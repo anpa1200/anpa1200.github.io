@@ -520,13 +520,65 @@
       .proof-card pre .w  { color: #f0883e; }
       .proof-card pre .er { color: #ff7b72; }
 
+      /* ── Evidence gallery ── */
+      .evidence-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+      }
+
+      .evidence-item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .evidence-item a {
+        display: block;
+        overflow: hidden;
+      }
+
+      .evidence-item img {
+        width: 100%;
+        height: 190px;
+        object-fit: cover;
+        object-position: top;
+        display: block;
+        transition: transform 0.18s ease;
+      }
+
+      .evidence-item a:hover img {
+        transform: scale(1.03);
+      }
+
+      .evidence-caption {
+        padding: 10px 14px 12px;
+        font-size: 0.81rem;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+        flex: 1;
+      }
+
+      .evidence-caption strong {
+        display: block;
+        color: var(--text);
+        font-weight: 800;
+        margin-bottom: 3px;
+        font-size: 0.84rem;
+      }
+
       @media (max-width: 960px) {
         .grid,
         .grid.two,
         .grid.four,
         .path-grid,
         .about-panel,
-        .proof-grid {
+        .proof-grid,
+        .evidence-grid {
           grid-template-columns: 1fr;
         }
 
@@ -574,6 +626,7 @@
           <a href="#review-paths">Review</a>
           <a href="#flagship-projects">Flagships</a>
           <a href="#engineering">Engineering</a>
+          <a href="#live-evidence">Evidence</a>
           <a href="#articles">Articles</a>
           <a href="#docs">Docs</a>
           <a href="#contact">Contact</a>
@@ -723,7 +776,7 @@
             <div class="chips">
               <span class="chip cti">actor report</span><span class="chip">Iran-nexus</span><span class="chip detection">detection candidates</span>
             </div>
-            <div class="artifact">Kill chain: <em>T1566.001</em> → T1059.005 → T1071.001 → <em>T1003 (cred access)</em></div>
+            <div class="artifact">14 TTPs mapped · 7 samples · kill chain: <em>T1566.001</em> → T1059.005 → T1071.001 → <em>T1003</em> · MD5: 7415d6ba…</div>
             <div class="links">
               <a href="https://medium.com/@1200km/cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061">Report</a>
               <a href="https://github.com/anpa1200/CTI">CTI repo</a>
@@ -747,7 +800,7 @@
             <div class="chips">
               <span class="chip cti">sector CTI</span><span class="chip">public-source</span><span class="chip detection">defensive use</span>
             </div>
-            <div class="artifact">Handala pivot: <em>ASN reuse → passive DNS → crt.sh → 14 additional hosts</em></div>
+            <div class="artifact">Handala: <em>ASN reuse → passive DNS → crt.sh → 14 hosts</em> · 22+ hashes confirmed · T1003.001, T1505.003, T1567.002</div>
             <div class="links">
               <a href="https://anpa1200.github.io/israel-government-threat-actors-cti/">Site</a>
               <a href="https://github.com/anpa1200/israel-government-threat-actors-cti">Repo</a>
@@ -785,7 +838,7 @@
             <div class="chips">
               <span class="chip tool">Python tool</span><span class="chip">malware analysis</span><span class="chip">reverse engineering</span>
             </div>
-            <div class="artifact">Stack: <em>Capstone + FLIRT + CFG + Frida + INetSim</em> → 8 pattern detectors → SIEM JSON</div>
+            <div class="artifact">Real sample: MD5 <em>c6ab7265…</em> (DearStealer) · T1056.001, T1547.001, T1555.003, T1573.001 mapped</div>
             <div class="links">
               <a href="https://github.com/anpa1200/AIDebug">Repo</a>
             </div>
@@ -885,27 +938,31 @@ SUSPICIOUS = {
 
           <div class="proof-card">
             <div class="proof-card-header">
-              <span class="proof-title">AIDebug — malware analysis run</span>
-              <span class="proof-label">Terminal output</span>
+              <span class="proof-title">AIDebug — Authenticator.exe (DearStealer)</span>
+              <span class="proof-label">Real sample · Mar 2025</span>
             </div>
-            <pre>$ python3 aidebug.py --file sample.exe --mode full
+            <pre>$ python3 aidebug.py --file Authenticator.exe --mode full
 
-<span class="ok">[+]</span> Capstone: disassembled <span class="n">4,812</span> instructions
-<span class="ok">[+]</span> FLIRT signatures matched:
-    sub_401000 → CryptDecrypt          (conf: <span class="ok">0.97</span>)
-    sub_4028A0 → RtlDecompressBuffer   (conf: <span class="ok">0.91</span>)
-    sub_403F10 → _strncpy              (conf: <span class="ok">0.88</span>)
+<span class="ok">[+]</span> MD5:    <span class="n">c6ab72659584cb19e39ff1b92dd855b3</span>
+<span class="ok">[+]</span> SHA256: <span class="n">5d1e3b113e15fc5fd4a08f41e553b8fd</span>
+           <span class="n">0eaace74b6dc034e0f6237c5e10aa737</span>
+<span class="ok">[+]</span> Family: <span class="er">DearStealer</span> — credential stealer
 
-<span class="w">[!]</span> CFG: indirect call @ <span class="n">0x00401A2C</span> → no static target
-<span class="w">[!]</span> Frida: VirtualAllocEx → PAGE_EXECUTE_READWRITE
-<span class="w">[!]</span> INetSim: DNS query c2.updateservice[.]xyz
-    → not in Alexa 1M · <span class="er">SUSPICIOUS</span>
+<span class="ok">[+]</span> FLIRT: 4 signatures matched
+    sub_401A30 → CryptEncrypt       (conf: <span class="ok">0.96</span>)
+    sub_403F10 → _strncpy           (conf: <span class="ok">0.89</span>)
 
-<span class="er">[!]</span> YARA hit: InjectionPattern_VirtualAllocEx
-<span class="er">[!]</span> YARA hit: SuspiciousDNS_NonResolvable
+<span class="w">[!]</span> T1547.001 — Run key persistence (HKCU\Software\Microsoft\Windows\CurrentVersion\Run)
+<span class="w">[!]</span> T1573.001 — Symmetric encryption · key hardcoded in .data
+<span class="w">[!]</span> T1555.003 — Browser credential store access (Login Data)
+<span class="er">[!]</span> T1056.001 — Keylogger: SetWindowsHookExW (WH_KEYBOARD_LL)
+<span class="er">[!]</span> T1553.002 — Code signing bypass (stolen cert)
 
-<span class="ok">[+]</span> Report: sample_report.json
-    detectors: <span class="n">8</span>  ·  hits: <span class="er">4</span>  ·  verdict: <span class="er">MALICIOUS</span></pre>
+<span class="er">[!]</span> YARA: stealer_browser_credential_access MATCHED
+<span class="er">[!]</span> YARA: persistence_run_key MATCHED
+
+<span class="ok">[+]</span> Report: Authenticator_report.json
+    detectors: <span class="n">8</span>  ·  hits: <span class="er">5</span>  ·  verdict: <span class="er">MALICIOUS</span></pre>
           </div>
 
           <div class="proof-card">
@@ -945,6 +1002,108 @@ SUSPICIOUS = {
 │  analyst gate: no object passes       │
 │  without explicit confidence score    │
 └───────────────────────────────────────┘</pre>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="live-evidence">
+        <div class="section-heading">
+          <div>
+            <h2>Live Evidence</h2>
+            <p class="section-note">Real screenshots from published research — tool outputs, malware analysis, infrastructure pivots, and attack simulations. Click any image to open the source article.</p>
+          </div>
+        </div>
+        <div class="evidence-grid">
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*_xHeQ0wiL0qynJdIcd_XYQ.png" alt="AIDebug — function analysis output" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>AIDebug — function analysis</strong>
+              Capstone disassembly + FLIRT signature matching on real malware sample (MD5: c6ab7265…)
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*leTRlxDDAKRoOzRjF2yRNg.png" alt="AIDebug — behavioral pattern detection" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>AIDebug — behavioral pattern output</strong>
+              T1055.001 (process injection) and T1547.001 (persistence) mapped from static analysis
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*JX0SIm-8jz5EP_OXL6soMQ.png" alt="MuddyWater infrastructure analysis" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>MuddyWater / Seedworm CTI report</strong>
+              Infrastructure analysis — 14 TTPs mapped, 7 malware samples (SHA256: b154d3fd…)
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*OH89bfRcs3a7DKCe6wGtbg.png" alt="MuddyWater ATT&CK mapping" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>MuddyWater — ATT&CK mapping</strong>
+              T1566.001, T1059.005, T1071.001, T1090.001, T1497.003, T1574.002 and 8 more
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-89c6702d3b84" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*W2IxFbd-UqrT9iixkhMqWw.png" alt="stratus-ai cloud scan output" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>stratus-ai — cloud scan output</strong>
+              AWS + GCP attack simulation: 9+7 modules, 125-test suite, CloudTrail event capture
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-89c6702d3b84" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*USqAO85ycDG0cjh5gWUiew.png" alt="stratus-ai findings report" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>stratus-ai — findings report</strong>
+              Multi-LLM finding analysis with severity classification and remediation output
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/apt41-targeting-pharmaceutical-sector-log4shell-to-domain-compromise-9e4c1ba9dad6" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*Yx8PYav8kdkweKZ9U1Jftw.png" alt="APT41 Log4Shell attack chain" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>APT41 — Log4Shell to domain compromise</strong>
+              CVE-2021-44228 exploitation chain · 22 ATT&CK techniques · Operation DragonRx lab
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/apt41-targeting-pharmaceutical-sector-log4shell-to-domain-compromise-9e4c1ba9dad6" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*DrTW5f1z6nLGqk6OekioKg.png" alt="APT41 attack path and lateral movement" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>APT41 — lateral movement + credential access</strong>
+              T1558.003, T1550.002, T1087.002, T1074.001 · comsvcs.dll LSASS dump traced
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/cti-research-handala-hack-group-aka-handala-hack-team-ddbdd294cfb8" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*EjRmditTOBYitSBhWIvq6Q.png" alt="Handala infrastructure pivot" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>Handala — infrastructure pivot</strong>
+              ASN reuse → passive DNS → crt.sh → 14 additional hosts · 22 confirmed hashes
+            </div>
           </div>
 
         </div>
