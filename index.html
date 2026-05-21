@@ -457,69 +457,6 @@
         margin-top: 34px;
       }
 
-      /* ── Engineering proof blocks ── */
-      .proof-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 20px;
-      }
-
-      .proof-card {
-        background: #0d1117;
-        border: 1px solid #30363d;
-        border-radius: 10px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .proof-card-header {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px 16px;
-        border-bottom: 1px solid #30363d;
-        background: #161b22;
-      }
-
-      .proof-card-header .proof-title {
-        font-size: 0.84rem;
-        font-weight: 800;
-        color: #e6edf3;
-      }
-
-      .proof-card-header .proof-label {
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: #8b949e;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        white-space: nowrap;
-      }
-
-      .proof-card pre {
-        margin: 0;
-        padding: 16px 20px;
-        font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', monospace;
-        font-size: 0.77rem;
-        line-height: 1.68;
-        color: #e6edf3;
-        overflow-x: auto;
-        white-space: pre;
-        background: #0d1117;
-        flex: 1;
-      }
-
-      .proof-card pre .c  { color: #8b949e; }
-      .proof-card pre .k  { color: #ff7b72; }
-      .proof-card pre .s  { color: #a5d6ff; }
-      .proof-card pre .f  { color: #d2a8ff; }
-      .proof-card pre .n  { color: #79c0ff; }
-      .proof-card pre .ok { color: #3fb950; }
-      .proof-card pre .w  { color: #f0883e; }
-      .proof-card pre .er { color: #ff7b72; }
-
       /* ── Evidence gallery ── */
       .evidence-grid {
         display: grid;
@@ -577,7 +514,6 @@
         .grid.four,
         .path-grid,
         .about-panel,
-        .proof-grid,
         .evidence-grid {
           grid-template-columns: 1fr;
         }
@@ -625,7 +561,6 @@
           <a href="cv.html">CV</a>
           <a href="#review-paths">Review</a>
           <a href="#flagship-projects">Flagships</a>
-          <a href="#engineering">Engineering</a>
           <a href="#live-evidence">Evidence</a>
           <a href="#articles">Articles</a>
           <a href="#docs">Docs</a>
@@ -891,122 +826,6 @@
         </div>
       </section>
 
-      <section id="engineering">
-        <div class="section-heading">
-          <div>
-            <h2>Engineering Proof</h2>
-            <p class="section-note">
-              Raw code, terminal outputs, and pipeline diagrams from production tools.
-            </p>
-          </div>
-          <a class="button" href="https://github.com/anpa1200">All repos</a>
-        </div>
-        <div class="proof-grid">
-
-          <div class="proof-card">
-            <div class="proof-card-header">
-              <span class="proof-title">PE-Import-Analyzer — risk-class triage</span>
-              <span class="proof-label">Python · LIEF</span>
-            </div>
-            <pre><span class="c"># Sort Windows API imports by injection risk class</span>
-<span class="k">import</span> lief, json
-
-DANGEROUS = {
-    <span class="s">"VirtualAllocEx"</span>, <span class="s">"WriteProcessMemory"</span>,
-    <span class="s">"CreateRemoteThread"</span>, <span class="s">"NtUnmapViewOfSection"</span>
-}
-SUSPICIOUS = {
-    <span class="s">"VirtualAlloc"</span>, <span class="s">"LoadLibraryA"</span>, <span class="s">"GetProcAddress"</span>,
-    <span class="s">"SetWindowsHookExW"</span>, <span class="s">"OpenProcess"</span>
-}
-
-<span class="k">def</span> <span class="f">triage_imports</span>(path):
-    pe = lief.parse(path)
-    findings = []
-    <span class="k">for</span> lib <span class="k">in</span> pe.imports:
-        <span class="k">for</span> e <span class="k">in</span> lib.entries:
-            <span class="k">if</span> e.name <span class="k">in</span> DANGEROUS:
-                findings.append({<span class="s">"api"</span>: e.name, <span class="s">"risk"</span>: <span class="er">"CRITICAL"</span>})
-            <span class="k">elif</span> e.name <span class="k">in</span> SUSPICIOUS:
-                findings.append({<span class="s">"api"</span>: e.name, <span class="s">"risk"</span>: <span class="w">"SUSPICIOUS"</span>})
-    <span class="k">return</span> {
-        <span class="s">"binary"</span>: path,
-        <span class="s">"hits"</span>: findings,
-        <span class="s">"verdict"</span>: <span class="er">"INJECT_RISK"</span> <span class="k">if</span> findings <span class="k">else</span> <span class="ok">"CLEAN"</span>
-    }</pre>
-          </div>
-
-          <div class="proof-card">
-            <div class="proof-card-header">
-              <span class="proof-title">AIDebug — Authenticator.exe (DearStealer)</span>
-              <span class="proof-label">Real sample · Mar 2025</span>
-            </div>
-            <pre>$ python3 aidebug.py --file Authenticator.exe --mode full
-
-<span class="ok">[+]</span> MD5:    <span class="n">c6ab72659584cb19e39ff1b92dd855b3</span>
-<span class="ok">[+]</span> SHA256: <span class="n">5d1e3b113e15fc5fd4a08f41e553b8fd</span>
-           <span class="n">0eaace74b6dc034e0f6237c5e10aa737</span>
-<span class="ok">[+]</span> Family: <span class="er">DearStealer</span> — credential stealer
-
-<span class="ok">[+]</span> FLIRT: 4 signatures matched
-    sub_401A30 → CryptEncrypt       (conf: <span class="ok">0.96</span>)
-    sub_403F10 → _strncpy           (conf: <span class="ok">0.89</span>)
-
-<span class="w">[!]</span> T1547.001 — Run key persistence (HKCU\Software\Microsoft\Windows\CurrentVersion\Run)
-<span class="w">[!]</span> T1573.001 — Symmetric encryption · key hardcoded in .data
-<span class="w">[!]</span> T1555.003 — Browser credential store access (Login Data)
-<span class="er">[!]</span> T1056.001 — Keylogger: SetWindowsHookExW (WH_KEYBOARD_LL)
-<span class="er">[!]</span> T1553.002 — Code signing bypass (stolen cert)
-
-<span class="er">[!]</span> YARA: stealer_browser_credential_access MATCHED
-<span class="er">[!]</span> YARA: persistence_run_key MATCHED
-
-<span class="ok">[+]</span> Report: Authenticator_report.json
-    detectors: <span class="n">8</span>  ·  hits: <span class="er">5</span>  ·  verdict: <span class="er">MALICIOUS</span></pre>
-          </div>
-
-          <div class="proof-card">
-            <div class="proof-card-header">
-              <span class="proof-title">CTI-to-detection pipeline</span>
-              <span class="proof-label">Architecture</span>
-            </div>
-            <pre>THREAT ACTOR ACTIVITY
-        │
-        ▼
-┌───────────────────────────────────────┐
-│  Collection + Evidence Label          │
-│  OSINT · passive DNS · Shodan · crt.sh│
-│  confidence: CONFIRMED / PROBABLE /   │
-│             POSSIBLE / UNCONFIRMED    │
-└──────────────────┬────────────────────┘
-                   │
-                   ▼
-┌───────────────────────────────────────┐
-│  TTP Extraction + Source Gate         │
-│  ATT&CK Navigator · kill chain        │
-│  6-criteria eval before evidence      │
-│  enters analysis workflow             │
-└──────────────────┬────────────────────┘
-                   │
-                   ▼
-┌───────────────────────────────────────┐
-│  Detection Triage + Backlog           │
-│  Sigma · YARA · hunting hypotheses    │
-│  mapped to telemetry gaps             │
-└──────────────────┬────────────────────┘
-                   │
-                   ▼
-┌───────────────────────────────────────┐
-│  Platform Ingest — OpenCTI            │
-│  STIX 2.1 · connector pipeline        │
-│  analyst gate: no object passes       │
-│  without explicit confidence score    │
-└───────────────────────────────────────┘</pre>
-          </div>
-
-        </div>
-      </section>
-
       <section id="live-evidence">
         <div class="section-heading">
           <div>
@@ -1016,89 +835,195 @@ SUSPICIOUS = {
         </div>
         <div class="evidence-grid">
 
+          <!-- AIDebug tool — TUI + analysis panels -->
           <div class="evidence-item">
             <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*_xHeQ0wiL0qynJdIcd_XYQ.png" alt="AIDebug — function analysis output" loading="lazy" />
+              <img src="https://cdn-images-1.medium.com/max/800/1*_xHeQ0wiL0qynJdIcd_XYQ.png" alt="AIDebug TUI — function analysis" loading="lazy" />
             </a>
             <div class="evidence-caption">
-              <strong>AIDebug — function analysis</strong>
-              Capstone disassembly + FLIRT signature matching on real malware sample (MD5: c6ab7265…)
+              <strong>AIDebug — function analysis (TUI)</strong>
+              Capstone disassembly + FLIRT signature matching on real sample (MD5: c6ab7265…)
             </div>
           </div>
 
           <div class="evidence-item">
             <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*leTRlxDDAKRoOzRjF2yRNg.png" alt="AIDebug — behavioral pattern detection" loading="lazy" />
+              <img src="https://cdn-images-1.medium.com/max/800/1*leTRlxDDAKRoOzRjF2yRNg.png" alt="AIDebug — behavioral pattern tab" loading="lazy" />
             </a>
             <div class="evidence-caption">
-              <strong>AIDebug — behavioral pattern output</strong>
-              T1055.001 (process injection) and T1547.001 (persistence) mapped from static analysis
+              <strong>AIDebug — behavioral patterns tab</strong>
+              PatternDetector flags T1055.001 and T1547.001 without AI call
             </div>
           </div>
 
           <div class="evidence-item">
-            <a href="https://medium.com/@1200km/cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*JX0SIm-8jz5EP_OXL6soMQ.png" alt="MuddyWater infrastructure analysis" loading="lazy" />
+            <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*tH9TDOyCSciwoj-nNGOmug.png" alt="AIDebug — malware pattern detection results" loading="lazy" />
             </a>
             <div class="evidence-caption">
-              <strong>MuddyWater / Seedworm CTI report</strong>
-              Infrastructure analysis — 14 TTPs mapped, 7 malware samples (SHA256: b154d3fd…)
+              <strong>AIDebug — pattern detection output</strong>
+              8 behavioral patterns scanned per function; registry modification flagged
             </div>
           </div>
 
           <div class="evidence-item">
-            <a href="https://medium.com/@1200km/cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*OH89bfRcs3a7DKCe6wGtbg.png" alt="MuddyWater ATT&CK mapping" loading="lazy" />
+            <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*of0ge8cgd1epxG1JYAl4Jg.png" alt="AIDebug — control flow graph visualization" loading="lazy" />
             </a>
             <div class="evidence-caption">
-              <strong>MuddyWater — ATT&CK mapping</strong>
-              T1566.001, T1059.005, T1071.001, T1090.001, T1497.003, T1574.002 and 8 more
+              <strong>AIDebug — control flow graph (CFG)</strong>
+              Basic-block graph built per function; branch structure visible without reading ASM
             </div>
           </div>
 
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*Vv3lX0WAQEjMC_6wC0iq4g.png" alt="AIDebug — four-panel TUI overview" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>AIDebug — four-panel TUI layout</strong>
+              Disasm · Patterns · CFG · AI tabs on a live binary; no sandbox required
+            </div>
+          </div>
+
+          <!-- DearStealer (Authenticator.exe) — static + dynamic tool chain -->
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/authenticator-exe-dearsteeler-0c1d69767939" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/0*nzo7nSbGUaJ-TFeU.png" alt="CFF Explorer — PE header analysis" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>CFF Explorer — PE header analysis</strong>
+              Import table, DOS/NT headers, sections examined on Authenticator.exe
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/authenticator-exe-dearsteeler-0c1d69767939" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/0*amQ87xfX1IqLNGWf.png" alt="Detect It Easy — packing and obfuscation scan" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>Detect It Easy — entropy + packing scan</strong>
+              DIE analysis: normal entropy, no packer detected on DearStealer sample
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/authenticator-exe-dearsteeler-0c1d69767939" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/0*UJhbmktjbQ7VzWTh" alt="Process Monitor — Authenticator.exe process tree" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>Procmon — dynamic process trace</strong>
+              Authenticator.exe runs with no subprocesses and closes after 2 min (stealer behavior)
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/authenticator-exe-dearsteeler-0c1d69767939" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/0*z-m-FTqz_QN0_fko" alt="FakeNet-NG — network traffic capture" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>FakeNet-NG — network capture</strong>
+              No HTTP plaintext to malicious domain; encrypted TLS channel confirmed (T1573.001)
+            </div>
+          </div>
+
+          <!-- AgentTesla — unpacking + deobfuscation chain -->
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/spw-aw25-po-010-sms-exe-exe-agentTesla-767fbc920295" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*RXmFEKOUREzSeODYBeNt6g.png" alt="unpac.me — file upload for automated unpacking" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>unpac.me — automated unpacker upload</strong>
+              Packed .NET sample submitted; SmartAssembly obfuscation layer identified
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/spw-aw25-po-010-sms-exe-exe-agentTesla-767fbc920295" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*eMYQZC6KFDcKnJ-vFxNXGw.png" alt="unpac.me — unpacked files ready for analysis" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>unpac.me — unpacked result</strong>
+              Nested packing layers stripped; unpacked files available for static analysis
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/spw-aw25-po-010-sms-exe-exe-agentTesla-767fbc920295" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*ApmlW8S_9cMgYQK6LRMioQ.png" alt="de4dot — .NET deobfuscation" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>de4dot — .NET deobfuscation</strong>
+              DeepSea Obfuscator layer removed; strings and control flow restored
+            </div>
+          </div>
+
+          <!-- Android APK Analysis Tool — terminal tool chain -->
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*_gu6yDsutmzsOZiz93K-nQ.png" alt="Android APK tool — terminal run output" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>APK Analyzer — terminal run</strong>
+              Four-phase analysis from a single CLI command; no sandbox required
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*Rhxbr-T5BQDcQBz0QrlV0g.png" alt="Android APK tool — Phase 1 static analysis" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>APK Analyzer — Phase 1 (Androguard)</strong>
+              Permissions, intents, native libs, DEX entropy extracted via Androguard
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*8j5CoAXYIay94qvnQtVk-w.png" alt="Android APK tool — ATT&CK TTP mapping output" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>APK Analyzer — MITRE ATT&CK mapping</strong>
+              CRITICAL service + T1416 OverlayActivity flagged without bytecode decompilation
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12" target="_blank" rel="noopener">
+              <img src="https://cdn-images-1.medium.com/max/800/1*FKmRR9uTcB1_As7v1hJBng.png" alt="Android APK tool — YARA scan results" loading="lazy" />
+            </a>
+            <div class="evidence-caption">
+              <strong>APK Analyzer — YARA scan + AI analysis</strong>
+              Curated ruleset hits for Cerberus/Joker/FluBot families; AI remediation steps output
+            </div>
+          </div>
+
+          <!-- stratus-ai cloud security scanner -->
           <div class="evidence-item">
             <a href="https://medium.com/@1200km/i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-89c6702d3b84" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*W2IxFbd-UqrT9iixkhMqWw.png" alt="stratus-ai cloud scan output" loading="lazy" />
+              <img src="https://cdn-images-1.medium.com/max/800/1*W2IxFbd-UqrT9iixkhMqWw.png" alt="stratus-ai — cloud attack simulation output" loading="lazy" />
             </a>
             <div class="evidence-caption">
               <strong>stratus-ai — cloud scan output</strong>
-              AWS + GCP attack simulation: 9+7 modules, 125-test suite, CloudTrail event capture
+              AWS + GCP attack simulation: 9+7 modules, 125-test suite, CloudTrail capture
             </div>
           </div>
 
           <div class="evidence-item">
             <a href="https://medium.com/@1200km/i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-89c6702d3b84" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*USqAO85ycDG0cjh5gWUiew.png" alt="stratus-ai findings report" loading="lazy" />
+              <img src="https://cdn-images-1.medium.com/max/800/1*USqAO85ycDG0cjh5gWUiew.png" alt="stratus-ai — findings report with severity" loading="lazy" />
             </a>
             <div class="evidence-caption">
               <strong>stratus-ai — findings report</strong>
-              Multi-LLM finding analysis with severity classification and remediation output
+              Multi-LLM severity classification and remediation output per finding
             </div>
           </div>
 
-          <div class="evidence-item">
-            <a href="https://medium.com/@1200km/apt41-targeting-pharmaceutical-sector-log4shell-to-domain-compromise-9e4c1ba9dad6" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*Yx8PYav8kdkweKZ9U1Jftw.png" alt="APT41 Log4Shell attack chain" loading="lazy" />
-            </a>
-            <div class="evidence-caption">
-              <strong>APT41 — Log4Shell to domain compromise</strong>
-              CVE-2021-44228 exploitation chain · 22 ATT&CK techniques · Operation DragonRx lab
-            </div>
-          </div>
-
-          <div class="evidence-item">
-            <a href="https://medium.com/@1200km/apt41-targeting-pharmaceutical-sector-log4shell-to-domain-compromise-9e4c1ba9dad6" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*DrTW5f1z6nLGqk6OekioKg.png" alt="APT41 attack path and lateral movement" loading="lazy" />
-            </a>
-            <div class="evidence-caption">
-              <strong>APT41 — lateral movement + credential access</strong>
-              T1558.003, T1550.002, T1087.002, T1074.001 · comsvcs.dll LSASS dump traced
-            </div>
-          </div>
-
+          <!-- Handala infrastructure pivot -->
           <div class="evidence-item">
             <a href="https://medium.com/@1200km/cti-research-handala-hack-group-aka-handala-hack-team-ddbdd294cfb8" target="_blank" rel="noopener">
-              <img src="https://cdn-images-1.medium.com/max/800/1*EjRmditTOBYitSBhWIvq6Q.png" alt="Handala infrastructure pivot" loading="lazy" />
+              <img src="https://cdn-images-1.medium.com/max/800/1*EjRmditTOBYitSBhWIvq6Q.png" alt="Handala infrastructure pivot chain" loading="lazy" />
             </a>
             <div class="evidence-caption">
               <strong>Handala — infrastructure pivot</strong>
