@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HexStrike — Andrey Pautov</title>
+    <meta
+      name="description"
+      content="AI-driven penetration testing framework. All articles, guides, and lab walkthroughs for HexStrike-AI — from initial setup to advanced attack scenarios."
+    />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="HexStrike — Andrey Pautov" />
+    <meta
+      property="og:description"
+      content="AI-driven penetration testing framework. All articles, guides, and lab walkthroughs for HexStrike-AI — from initial setup to advanced attack scenarios."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://anpa1200.github.io/hexstrike.html" />
+    <meta property="og:image" content="https://anpa1200.github.io/assets/ap-logo.png" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="icon" href="assets/ap-logo.png" type="image/png" />
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --text: #172033;
+        --muted: #5b667a;
+        --line: #dbe4ef;
+        --accent: #0f62fe;
+        --accent-dark: #054ada;
+        --ok: #007a5a;
+        --chip: #eef4ff;
+        --chip-strong: #dbe9ff;
+        --shadow: 0 14px 34px rgba(24, 38, 69, 0.09);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.58;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { color: var(--accent-dark); text-decoration: underline; }
+
+      /* ── Nav ── */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav,
+      .page-hero-inner,
+      main,
+      .footer-inner {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        font-size: 0.92rem;
+      }
+
+      .nav-links a.active {
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      /* ── Page hero ── */
+      .page-hero {
+        background: linear-gradient(120deg, rgba(15,98,254,0.10), rgba(0,122,90,0.08)), #ffffff;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .page-hero-inner {
+        padding: 64px 0 52px;
+      }
+
+      .page-eyebrow {
+        color: var(--accent-dark);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+
+      .page-title {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.1;
+      }
+
+      .page-lead {
+        max-width: 760px;
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 1.07rem;
+      }
+
+      .page-hero-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 18px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text);
+        background: var(--panel);
+        text-decoration: none;
+        transition: border-color 0.14s, background 0.14s;
+      }
+      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
+      .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+      .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+      /* ── Main content ── */
+      main {
+        padding: 48px 0 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 52px;
+      }
+
+      .lab-group {}
+
+      .group-header {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--line);
+        margin-bottom: 4px;
+      }
+
+      .group-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+      }
+
+      .group-count {
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      /* ── Lab rows ── */
+      .lab-row {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 18px 0;
+        align-items: start;
+      }
+
+      .lab-meta {
+        padding-right: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .lab-name {
+        font-weight: 800;
+        font-size: 0.97rem;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .lab-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .chip {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        background: var(--chip);
+        color: var(--accent-dark);
+      }
+      .chip.lab { background: #fff4e6; color: #8a4800; }
+      .chip.cloud { background: #e8f5f0; color: #005f42; }
+      .chip.android { background: #e8f8e8; color: #1a6b1a; }
+      .chip.ai { background: #f3eeff; color: #5b1fcb; }
+      .chip.red { background: #fff0f0; color: #b91c1c; }
+      .chip.malware { background: #fef2f2; color: #991b1b; }
+
+      .lab-body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .lab-desc {
+        font-size: 0.92rem;
+        color: var(--text);
+        margin: 0;
+        line-height: 1.55;
+      }
+
+      .lab-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 0.84rem;
+      }
+
+      .lab-links a {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .lab-links a[href*="github"] {
+        color: var(--muted);
+      }
+      .lab-links a[href*="github"]:hover {
+        color: var(--accent);
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 0;
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 720px) {
+        .lab-row {
+          grid-template-columns: 1fr;
+        }
+        .lab-meta {
+          padding-right: 0;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 10px;
+        }
+        .lab-badges {
+          flex-direction: row;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .nav-links { gap: 10px; font-size: 0.85rem; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="/">
+          <img src="assets/ap-logo.png" alt="AP logo" width="36" height="36" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="/">Portfolio</a>
+          <a href="about.html">About</a>
+          <a href="cv.html">CV</a>
+          <a href="labs.html">Labs</a>
+          <a href="guides.html">Guides</a>
+          <a href="hexstrike.html" class="active">HexStrike</a>
+          <a href="https://github.com/anpa1200">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="page-hero">
+      <div class="page-hero-inner">
+        <p class="page-eyebrow">19 articles · AI-driven pentesting · All authorized labs</p>
+        <h1 class="page-title">HexStrike</h1>
+        <p class="page-lead">
+          AI-driven penetration testing framework. All articles, guides, and lab walkthroughs for
+          HexStrike-AI — from initial setup to advanced attack scenarios.
+        </p>
+        <div class="page-hero-links">
+          <a class="button primary" href="https://github.com/anpa1200/Hexstrike-AI" target="_blank" rel="noopener">HexStrike Repo →</a>
+          <a class="button" href="https://anpa1200.github.io/Hexstrike-AI-guide/" target="_blank" rel="noopener">HexStrike Docs →</a>
+          <a class="button" href="/">← Portfolio</a>
+        </div>
+      </div>
+    </div>
+
+    <main>
+
+      <!-- ── Getting Started ── -->
+      <section class="lab-group" id="getting-started">
+        <div class="group-header">
+          <h2 class="group-title">Getting Started</h2>
+          <span class="group-count">3 articles</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Install, Configure &amp; Run MCP</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">setup</span>
+              <span class="chip">MCP</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Complete install guide: MCP server setup, model configuration (Gemini/OpenAI/Ollama/Llama), and first run.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-ai-install-configure-and-run-mcp-with-gemini-openai-cursor-llama-85a0e5752949" target="_blank" rel="noopener">HexStrike AI: Install, Configure, and Run MCP with Gemini, OpenAI, Cursor, Llama</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Force Multiplier for Red Teams</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip red">red team</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              What HexStrike does, threat model implications, and how it changes the offensive security workflow.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-ai-a-force-multiplier-for-red-teams-and-a-dangerous-shift-in-the-threat-landscape-3e1d4e86f3ae" target="_blank" rel="noopener">HexStrike-AI: A Force Multiplier for Red Teams — and a Dangerous Shift in the Threat Landscape</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">HexStrike + Gemini vs. HackerAI</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">comparison</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Comparative analysis: architecture, autonomy level, tool coverage, and practical use case fit.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-gemini-vs-hackerai-ops-copilot-vs-chatbot-with-tools-1d799845410b" target="_blank" rel="noopener">HexStrike + Gemini vs. HackerAI: "Ops Copilot" vs. "Chatbot with Tools"</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── AI Backend Integration ── -->
+      <section class="lab-group" id="ai-backend">
+        <div class="group-header">
+          <h2 class="group-title">AI Backend Integration</h2>
+          <span class="group-count">4 articles</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Shodan + HexStrike via Gemini-CLI</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Shodan</span>
+              <span class="chip">Gemini</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Shodan API wiring into HexStrike MCP context for automated exposure-aware recon.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/integrating-shodan-with-hexstrike-ai-using-gemini-cli-b6f9fcbe8e6e" target="_blank" rel="noopener">Integrating Shodan with HexStrike-AI Using Gemini-CLI</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">MCP Orchestration with Ollama</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Ollama</span>
+              <span class="chip">local LLM</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Air-gapped setup: Ollama local LLM, SSH tool routing from Ubuntu to Kali, performance benchmarks.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-mcp-orchestration-with-ollama-ubuntu-host-kali-vm-ssh-bridging-and-performance-f049ab140596" target="_blank" rel="noopener">HexStrike MCP Orchestration with Ollama: Ubuntu Host, Kali VM, SSH Bridging, and Performance</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">HexStrike + OpenAI Codex</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">OpenAI</span>
+              <span class="chip red">exploitation</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              OpenAI Codex as the reasoning backend; full Metasploitable exploitation walkthrough.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-openai-codex-ai-driven-exploitation-of-metasploitable-b892c07be39f" target="_blank" rel="noopener">HexStrike + OpenAI Codex. AI-Driven Exploitation of Metasploitable</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">HackerAI Predecessor Walkthrough</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">HackerAI</span>
+              <span class="chip">Metasploitable</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              HackerAI (predecessor) walkthrough; comparison with HexStrike MCP approach.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/enhancing-penetration-testing-with-hackerai-step-by-step-guide-metasploitable-lab-b2ab2cdd4139" target="_blank" rel="noopener">Enhancing Penetration Testing with HackerAI: Step-by-Step Guide (Metasploitable Lab)</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Network & Infrastructure Attacks ── -->
+      <section class="lab-group" id="network-infra">
+        <div class="group-header">
+          <h2 class="group-title">Network &amp; Infrastructure Attacks</h2>
+          <span class="group-count">4 articles</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Full Network Discovery &amp; Exploitation</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip red">network</span>
+              <span class="chip">home lab</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Home lab network sweep: host discovery → service enum → vulnerability scan → exploitation chain.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/ai-driven-pentesting-at-home-using-hexstrike-ai-for-full-network-discovery-and-exploitation-00a9e88b3bde" target="_blank" rel="noopener">AI-Driven Pentesting at Home: Using HexStrike-AI for Full Network Discovery and Exploitation</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">HexStrike + Cursor: Full Subnet Compromise</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Cursor</span>
+              <span class="chip red">pivot</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Cursor IDE + HexStrike MCP: autonomous pivot from one compromised host to full subnet control.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-cursor-mcp-from-single-target-full-subnet-compromise-lab-pt-walkthrough-f2e1fd793ad7" target="_blank" rel="noopener">HexStrike + Cursor (MCP): From Single Target → Full Subnet Compromise (Lab PT Walkthrough)</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">AI-Assisted SSH Brute-Force</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Gemini</span>
+              <span class="chip red">brute-force</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Gemini-guided wordlist selection and SSH brute-force with real-time result interpretation.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-gemini-ai-assisted-ssh-credential-brute-force-a9162f8e253b" target="_blank" rel="noopener">HexStrike + Gemini. AI-Assisted SSH Credential Brute-Force</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">AI-Assisted SMB Credential Brute-Force</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Gemini</span>
+              <span class="chip red">SMB</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              SMB share enumeration + credential attack with AI-driven result analysis and next-step suggestions.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-gemini-ai-assisted-smb-exposure-credential-brute-force-2c5f99dcdbf4" target="_blank" rel="noopener">HexStrike + Gemini. AI-Assisted SMB Exposure Credential Brute-Force</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Web Application & Cloud ── -->
+      <section class="lab-group" id="web-cloud">
+        <div class="group-header">
+          <h2 class="group-title">Web Application &amp; Cloud</h2>
+          <span class="group-count">2 articles</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">AI-Driven Web App Pentesting</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip red">web</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              HexStrike-driven web app attack: parameter fuzzing, injection detection, and automated report generation.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/ai-driven-web-application-pentesting-with-hexstrike-ai-67f3dae32040" target="_blank" rel="noopener">AI-Driven Web Application Pentesting with HexStrike-AI</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">HexStrike + Burp Suite MCP</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Cursor</span>
+              <span class="chip cloud">cloud</span>
+              <span class="chip red">web</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Multi-MCP setup: HexStrike + Burp Suite both as MCP servers under Cursor AI orchestration.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/ai-assisted-web-and-cloud-penetration-testing-with-cursor-mcp-hexstrike-and-burp-suite-mcp-01c02eed5258" target="_blank" rel="noopener">AI-Assisted Web and Cloud Penetration Testing with Cursor + MCP HexStrike and Burp Suite MCP</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Password Recovery ── -->
+      <section class="lab-group" id="password-recovery">
+        <div class="group-header">
+          <h2 class="group-title">Password Recovery</h2>
+          <span class="group-count">3 articles</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">AI-Driven ZIP Password Recovery</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Gemini-CLI</span>
+              <span class="chip red">cracking</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Gemini-CLI + HexStrike ZIP cracking: intelligent wordlist mutation based on target context.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/ai-driven-zip-password-recovery-with-hexstrike-ai-and-gemini-cli-b8fc5c475ebc" target="_blank" rel="noopener">AI-Driven ZIP Password Recovery with HexStrike-AI and Gemini-CLI</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">AI-Driven Office Document Password Recovery</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Gemini-CLI</span>
+              <span class="chip red">cracking</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              DOCX/XLSX/PPT hash extraction + AI-guided recovery for Office encrypted documents.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/ai-driven-office-documents-password-recovery-with-hexstrike-ai-and-gemini-cli-3c8bb7deb82d" target="_blank" rel="noopener">AI-Driven Office Documents Password Recovery with HexStrike-AI and Gemini-CLI</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">AI-Driven PDF Password Recovery</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Gemini-CLI</span>
+              <span class="chip red">cracking</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              PDF hash extraction and AI-assisted cracking with Gemini wordlist optimization.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/ai-driven-pdf-password-recovery-with-hexstrike-ai-and-gemini-cli-cfa7eb0fae91" target="_blank" rel="noopener">AI-Driven PDF Password Recovery with HexStrike-AI and Gemini-CLI</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Advanced Scenarios ── -->
+      <section class="lab-group" id="advanced">
+        <div class="group-header">
+          <h2 class="group-title">Advanced Scenarios</h2>
+          <span class="group-count">3 articles</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">OSINT: Email to Full Exposure Map</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Cursor</span>
+              <span class="chip">OSINT</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Email → domain → infrastructure → exposure graph: automated OSINT pivot chain.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/hexstrike-cursor-for-osint-from-one-email-to-a-full-exposure-map-ffdfc7ba1b30" target="_blank" rel="noopener">HexStrike + Cursor for OSINT: From One Email to a Full Exposure Map</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Fully Automated ADCS ESC8 Attack</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Cursor</span>
+              <span class="chip red">ADCS</span>
+              <span class="chip red">ESC8</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              End-to-end ADCS ESC8 exploitation: NTLM relay setup → certificate request → domain compromise, fully AI-orchestrated.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/cursor-hexstrike-fully-automated-adcs-esc8-attack-8736fec53c58" target="_blank" rel="noopener">Cursor + HexStrike. Fully Automated ADCS ESC8 Attack</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Vulnerable Ubuntu Lab + Full PT</span>
+            <div class="lab-badges">
+              <span class="chip ai">AI-driven</span>
+              <span class="chip">Linux</span>
+              <span class="chip red">exploitation</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Lab setup + full pentest walkthrough: HexStrike against the vulnerable Ubuntu target from zero to root.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/building-an-extremely-vulnerable-ubuntu-24-04-server-lab-bonus-full-pt-with-hexstrike-90034032775b" target="_blank" rel="noopener">Building an Extremely Vulnerable Ubuntu 24.04 Server Lab (Bonus: Full PT with Hexstrike)</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        Andrey Pautov · CTI-to-detection practitioner · Tel Aviv, Israel ·
+        <a href="mailto:1200km@gmail.com">1200km@gmail.com</a> ·
+        <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> ·
+        <a href="/">Portfolio</a>
+      </div>
+    </footer>
+
+  </body>
+</html>
