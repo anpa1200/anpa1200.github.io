@@ -457,12 +457,76 @@
         margin-top: 34px;
       }
 
+      /* ── Engineering proof blocks ── */
+      .proof-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 20px;
+      }
+
+      .proof-card {
+        background: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .proof-card-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 16px;
+        border-bottom: 1px solid #30363d;
+        background: #161b22;
+      }
+
+      .proof-card-header .proof-title {
+        font-size: 0.84rem;
+        font-weight: 800;
+        color: #e6edf3;
+      }
+
+      .proof-card-header .proof-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+
+      .proof-card pre {
+        margin: 0;
+        padding: 16px 20px;
+        font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', monospace;
+        font-size: 0.77rem;
+        line-height: 1.68;
+        color: #e6edf3;
+        overflow-x: auto;
+        white-space: pre;
+        background: #0d1117;
+        flex: 1;
+      }
+
+      .proof-card pre .c  { color: #8b949e; }
+      .proof-card pre .k  { color: #ff7b72; }
+      .proof-card pre .s  { color: #a5d6ff; }
+      .proof-card pre .f  { color: #d2a8ff; }
+      .proof-card pre .n  { color: #79c0ff; }
+      .proof-card pre .ok { color: #3fb950; }
+      .proof-card pre .w  { color: #f0883e; }
+      .proof-card pre .er { color: #ff7b72; }
+
       @media (max-width: 960px) {
         .grid,
         .grid.two,
         .grid.four,
         .path-grid,
-        .about-panel {
+        .about-panel,
+        .proof-grid {
           grid-template-columns: 1fr;
         }
 
@@ -509,6 +573,7 @@
           <a href="cv.html">CV</a>
           <a href="#review-paths">Review</a>
           <a href="#flagship-projects">Flagships</a>
+          <a href="#engineering">Engineering</a>
           <a href="#articles">Articles</a>
           <a href="#docs">Docs</a>
           <a href="#contact">Contact</a>
@@ -770,6 +835,118 @@
               <a href="https://anpa1200.github.io/Hexstrike-AI-guide/">Offensive guides</a>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section id="engineering">
+        <div class="section-heading">
+          <div>
+            <h2>Engineering Proof</h2>
+            <p class="section-note">
+              Raw code, terminal outputs, and pipeline diagrams from production tools.
+            </p>
+          </div>
+          <a class="button" href="https://github.com/anpa1200">All repos</a>
+        </div>
+        <div class="proof-grid">
+
+          <div class="proof-card">
+            <div class="proof-card-header">
+              <span class="proof-title">PE-Import-Analyzer — risk-class triage</span>
+              <span class="proof-label">Python · LIEF</span>
+            </div>
+            <pre><span class="c"># Sort Windows API imports by injection risk class</span>
+<span class="k">import</span> lief, json
+
+DANGEROUS = {
+    <span class="s">"VirtualAllocEx"</span>, <span class="s">"WriteProcessMemory"</span>,
+    <span class="s">"CreateRemoteThread"</span>, <span class="s">"NtUnmapViewOfSection"</span>
+}
+SUSPICIOUS = {
+    <span class="s">"VirtualAlloc"</span>, <span class="s">"LoadLibraryA"</span>, <span class="s">"GetProcAddress"</span>,
+    <span class="s">"SetWindowsHookExW"</span>, <span class="s">"OpenProcess"</span>
+}
+
+<span class="k">def</span> <span class="f">triage_imports</span>(path):
+    pe = lief.parse(path)
+    findings = []
+    <span class="k">for</span> lib <span class="k">in</span> pe.imports:
+        <span class="k">for</span> e <span class="k">in</span> lib.entries:
+            <span class="k">if</span> e.name <span class="k">in</span> DANGEROUS:
+                findings.append({<span class="s">"api"</span>: e.name, <span class="s">"risk"</span>: <span class="er">"CRITICAL"</span>})
+            <span class="k">elif</span> e.name <span class="k">in</span> SUSPICIOUS:
+                findings.append({<span class="s">"api"</span>: e.name, <span class="s">"risk"</span>: <span class="w">"SUSPICIOUS"</span>})
+    <span class="k">return</span> {
+        <span class="s">"binary"</span>: path,
+        <span class="s">"hits"</span>: findings,
+        <span class="s">"verdict"</span>: <span class="er">"INJECT_RISK"</span> <span class="k">if</span> findings <span class="k">else</span> <span class="ok">"CLEAN"</span>
+    }</pre>
+          </div>
+
+          <div class="proof-card">
+            <div class="proof-card-header">
+              <span class="proof-title">AIDebug — malware analysis run</span>
+              <span class="proof-label">Terminal output</span>
+            </div>
+            <pre>$ python3 aidebug.py --file sample.exe --mode full
+
+<span class="ok">[+]</span> Capstone: disassembled <span class="n">4,812</span> instructions
+<span class="ok">[+]</span> FLIRT signatures matched:
+    sub_401000 → CryptDecrypt          (conf: <span class="ok">0.97</span>)
+    sub_4028A0 → RtlDecompressBuffer   (conf: <span class="ok">0.91</span>)
+    sub_403F10 → _strncpy              (conf: <span class="ok">0.88</span>)
+
+<span class="w">[!]</span> CFG: indirect call @ <span class="n">0x00401A2C</span> → no static target
+<span class="w">[!]</span> Frida: VirtualAllocEx → PAGE_EXECUTE_READWRITE
+<span class="w">[!]</span> INetSim: DNS query c2.updateservice[.]xyz
+    → not in Alexa 1M · <span class="er">SUSPICIOUS</span>
+
+<span class="er">[!]</span> YARA hit: InjectionPattern_VirtualAllocEx
+<span class="er">[!]</span> YARA hit: SuspiciousDNS_NonResolvable
+
+<span class="ok">[+]</span> Report: sample_report.json
+    detectors: <span class="n">8</span>  ·  hits: <span class="er">4</span>  ·  verdict: <span class="er">MALICIOUS</span></pre>
+          </div>
+
+          <div class="proof-card">
+            <div class="proof-card-header">
+              <span class="proof-title">CTI-to-detection pipeline</span>
+              <span class="proof-label">Architecture</span>
+            </div>
+            <pre>THREAT ACTOR ACTIVITY
+        │
+        ▼
+┌───────────────────────────────────────┐
+│  Collection + Evidence Label          │
+│  OSINT · passive DNS · Shodan · crt.sh│
+│  confidence: CONFIRMED / PROBABLE /   │
+│             POSSIBLE / UNCONFIRMED    │
+└──────────────────┬────────────────────┘
+                   │
+                   ▼
+┌───────────────────────────────────────┐
+│  TTP Extraction + Source Gate         │
+│  ATT&CK Navigator · kill chain        │
+│  6-criteria eval before evidence      │
+│  enters analysis workflow             │
+└──────────────────┬────────────────────┘
+                   │
+                   ▼
+┌───────────────────────────────────────┐
+│  Detection Triage + Backlog           │
+│  Sigma · YARA · hunting hypotheses    │
+│  mapped to telemetry gaps             │
+└──────────────────┬────────────────────┘
+                   │
+                   ▼
+┌───────────────────────────────────────┐
+│  Platform Ingest — OpenCTI            │
+│  STIX 2.1 · connector pipeline        │
+│  analyst gate: no object passes       │
+│  without explicit confidence score    │
+└───────────────────────────────────────┘</pre>
+          </div>
+
         </div>
       </section>
 
