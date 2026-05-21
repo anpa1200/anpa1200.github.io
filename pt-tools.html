@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PT Tools Guide — Andrey Pautov</title>
+    <meta
+      name="description"
+      content="Penetration testing tool guides by Andrey Pautov — Nmap, Hydra, Metasploit, Burp Suite, SQLMap, John the Ripper, Hashcat, and 40+ more tools across recon, web app testing, password attacks, and exploitation."
+    />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="PT Tools Guide — Andrey Pautov" />
+    <meta
+      property="og:description"
+      content="Classic penetration testing tool guides: network recon, web application testing, password attacks, exploitation, Active Directory, cloud, and Kubernetes — 45+ articles and 2 repos."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://anpa1200.github.io/pt-tools.html" />
+    <meta property="og:image" content="https://anpa1200.github.io/assets/ap-logo.png" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="icon" href="assets/ap-logo.png" type="image/png" />
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --text: #172033;
+        --muted: #5b667a;
+        --line: #dbe4ef;
+        --accent: #0f62fe;
+        --accent-dark: #054ada;
+        --ok: #007a5a;
+        --chip: #eef4ff;
+        --chip-strong: #dbe9ff;
+        --shadow: 0 14px 34px rgba(24, 38, 69, 0.09);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.58;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { color: var(--accent-dark); text-decoration: underline; }
+
+      .site-header {
+        position: sticky; top: 0; z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav, .page-hero-inner, main, .footer-inner {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        min-height: 64px;
+        display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-weight: 800; color: var(--text); text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+
+      .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
+      .nav-links a.active { color: var(--accent); font-weight: 800; }
+
+      .page-hero {
+        background: linear-gradient(120deg, rgba(138,72,0,0.08), rgba(15,98,254,0.08)), #ffffff;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .page-hero-inner { padding: 64px 0 52px; }
+
+      .page-eyebrow {
+        color: #8a4800;
+        font-size: 0.76rem; font-weight: 800;
+        letter-spacing: 0.09em; text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+
+      .page-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
+      .page-lead { max-width: 760px; margin: 16px 0 0; color: var(--muted); font-size: 1.07rem; }
+
+      .page-hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+      .button {
+        display: inline-flex; align-items: center;
+        padding: 8px 18px; border: 1px solid var(--line); border-radius: 6px;
+        font-size: 0.88rem; font-weight: 700; color: var(--text);
+        background: var(--panel); text-decoration: none;
+        transition: border-color 0.14s, background 0.14s;
+      }
+      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
+      .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+      .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+      main { padding: 48px 0 64px; display: flex; flex-direction: column; gap: 52px; }
+
+      .group-header {
+        display: flex; align-items: baseline; gap: 14px;
+        padding-bottom: 10px; border-bottom: 2px solid var(--line); margin-bottom: 4px;
+      }
+
+      .group-title {
+        margin: 0; font-size: 1rem; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);
+      }
+
+      .group-count { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+
+      /* Repo rows */
+      .lab-row {
+        display: grid; grid-template-columns: 220px 1fr; gap: 0;
+        border-bottom: 1px solid var(--line); padding: 18px 0; align-items: start;
+      }
+
+      .lab-meta { padding-right: 24px; display: flex; flex-direction: column; gap: 8px; }
+      .lab-name { font-weight: 800; font-size: 0.97rem; color: var(--text); line-height: 1.3; }
+      .lab-badges { display: flex; flex-wrap: wrap; gap: 5px; }
+
+      .chip {
+        display: inline-block; padding: 2px 9px; border-radius: 999px;
+        font-size: 0.72rem; font-weight: 700; background: var(--chip); color: var(--accent-dark);
+      }
+      .chip.orange { background: #fff4e6; color: #8a4800; }
+      .chip.red { background: #fff0f0; color: #b91c1c; }
+      .chip.tool { background: #f3eeff; color: #5b1fcb; }
+
+      .lab-body { display: flex; flex-direction: column; gap: 8px; }
+      .lab-desc { font-size: 0.92rem; color: var(--text); margin: 0; line-height: 1.55; }
+      .lab-links { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.84rem; }
+      .lab-links a { color: var(--accent); font-weight: 600; }
+      .lab-links a[href*="github"] { color: var(--muted); }
+      .lab-links a[href*="github"]:hover { color: var(--accent); }
+
+      /* Article guide lists */
+      .guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
+      .guide-list { display: flex; flex-direction: column; }
+
+      .guide-item {
+        padding: 13px 0; border-bottom: 1px solid var(--line);
+        display: flex; flex-direction: column; gap: 4px;
+      }
+      .guide-item:last-child { border-bottom: none; }
+
+      .guide-title { font-weight: 700; font-size: 0.95rem; color: var(--accent); }
+      .guide-title:hover { color: var(--accent-dark); }
+
+      .guide-desc { margin: 0; font-size: 0.87rem; color: var(--muted); line-height: 1.5; }
+
+      .guide-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+      .guide-tag {
+        font-size: 0.69rem; font-weight: 700; padding: 2px 8px;
+        border-radius: 999px; background: var(--chip); color: var(--accent-dark);
+      }
+      .guide-tag.orange { background: #fff4e6; color: #8a4800; }
+      .guide-tag.green { background: #e8f5f0; color: #005f42; }
+      .guide-tag.red { background: #fff0f0; color: #b91c1c; }
+      .guide-tag.purple { background: #f3eeff; color: #5b1fcb; }
+
+      footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
+
+      @media (max-width: 720px) {
+        .lab-row { grid-template-columns: 1fr; }
+        .lab-meta { padding-right: 0; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .guide-grid { grid-template-columns: 1fr; gap: 0; }
+      }
+      @media (max-width: 600px) { .nav-links { gap: 10px; font-size: 0.85rem; } }
+    </style>
+  </head>
+  <body>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="/">
+          <img src="assets/ap-logo.png" alt="AP logo" width="36" height="36" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="/">Portfolio</a>
+          <a href="about.html">About</a>
+          <a href="cv.html">CV</a>
+          <a href="cti.html">CTI</a>
+          <a href="labs.html">Labs</a>
+          <a href="guides.html">Guides</a>
+          <a href="hexstrike.html">HexStrike</a>
+          <a href="ai-offensive.html">AI Offensive</a>
+          <a href="pt-tools.html" class="active">PT Tools</a>
+          <a href="https://github.com/anpa1200">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="page-hero">
+      <div class="page-hero-inner">
+        <p class="page-eyebrow">2 Repos · 45+ Articles · Classic Toolset</p>
+        <h1 class="page-title">PT Tools & Techniques</h1>
+        <p class="page-lead">
+          Reference guides for the core penetration testing toolkit — network reconnaissance, web
+          application testing, password attacks, exploitation, Active Directory, and cloud.
+          All tools, all techniques, all authorized lab-verified walkthroughs.
+        </p>
+        <div class="page-hero-links">
+          <a class="button primary" href="https://medium.com/@1200km" target="_blank" rel="noopener">All Medium articles</a>
+          <a class="button" href="https://github.com/anpa1200" target="_blank" rel="noopener">GitHub repos</a>
+          <a class="button" href="/">← Portfolio</a>
+        </div>
+      </div>
+    </div>
+
+    <main>
+
+      <!-- ── Git Repositories ── -->
+      <section id="repos">
+        <div class="group-header">
+          <h2 class="group-title">Git Repositories</h2>
+          <span class="group-count">2 repos</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">RTSP-brute-force-tool</span>
+            <div class="lab-badges">
+              <span class="chip orange">Python</span>
+              <span class="chip">RTSP</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Production-grade RTSP security assessment tool: vendor presets for 20+ camera manufacturers
+              (Hikvision, Dahua, Axis, Hanwha, Uniview), multiple path testing, wordlist directories,
+              config files, parallel workers, and a scriptable CLI. Authorized use only.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/cracking-rtsp-security-a-comprehensive-guide-to-using-the-rtsp-brute-force-tool-ad1c29b9e5ee" target="_blank" rel="noopener">Guide article</a>
+              <a href="https://github.com/anpa1200/RTSP-brute-force-tool" target="_blank" rel="noopener">github/RTSP-brute-force-tool</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Passwords Toolkit</span>
+            <div class="lab-badges">
+              <span class="chip orange">Python</span>
+              <span class="chip">wordlists</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Security testing toolkit: Personal Password Generator (PPG) for custom wordlist creation,
+              phone number generators, and Base64 credential pairs. Designed for authorized password
+              testing and red team credential validation workflows.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/personal-pass-generator-ppg-the-ultimate-tool-for-custom-password-lists-4979a3a1385c" target="_blank" rel="noopener">PPG article</a>
+              <a href="https://github.com/anpa1200/Passwords" target="_blank" rel="noopener">github/Passwords</a>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── Network Reconnaissance ── -->
+      <section id="network-recon">
+        <div class="group-header">
+          <h2 class="group-title">Network Reconnaissance</h2>
+          <span class="group-count">10 articles</span>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-nmap-a-comprehensive-guide-to-network-exploration-and-security-auditing-part-1-f36d74d1b2c0" target="_blank" rel="noopener">Mastering Nmap — Part 1: Core Scanning</a>
+              <p class="guide-desc">Host discovery, port scanning modes, timing templates, and output formats. Nmap fundamentals for structured network reconnaissance.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Nmap</span><span class="guide-tag">recon</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-nmap-a-comprehensive-guide-to-network-exploration-and-security-auditing-part-2-d5a95569031c" target="_blank" rel="noopener">Mastering Nmap — Part 2: Service and OS Detection</a>
+              <p class="guide-desc">Service version detection, OS fingerprinting, banner grabbing, and interpreting ambiguous scan results with confidence.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Nmap</span><span class="guide-tag">fingerprinting</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-nmap-a-comprehensive-guide-to-network-exploration-and-security-auditing-part-3-450eec6e9db2" target="_blank" rel="noopener">Mastering Nmap — Part 3: Firewall Evasion and Stealth</a>
+              <p class="guide-desc">Fragmentation, decoys, idle scans, timing manipulation, and techniques for scanning through firewalls and IDS/IPS in authorized engagements.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Nmap</span><span class="guide-tag">evasion</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-nmap-a-comprehensive-guide-to-network-exploration-and-security-auditing-part-4-scripts-5ec77704057f" target="_blank" rel="noopener">Mastering Nmap — Part 4: NSE Scripts</a>
+              <p class="guide-desc">Nmap Scripting Engine: vulnerability detection scripts, service-specific probes, brute-force scripts, and writing custom NSE scripts.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Nmap</span><span class="guide-tag">NSE</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-the-basics-essential-cli-tools-for-reconnaissance-in-penetration-testing-ee7fd9e36394" target="_blank" rel="noopener">Essential CLI Tools for Reconnaissance</a>
+              <p class="guide-desc">Practical overview of the core recon toolkit: which tools to use at each stage, how to chain their output, and when to switch between passive and active methods.</p>
+              <div class="guide-tags"><span class="guide-tag">recon</span><span class="guide-tag">CLI toolkit</span></div>
+            </div>
+
+          </div>
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/shodan-guide-how-you-can-find-everything-640f47f41bbe" target="_blank" rel="noopener">Shodan: How to Find Everything</a>
+              <p class="guide-desc">Shodan search operators, filters, and dork patterns for discovering exposed services, industrial systems, IoT devices, and misconfigured infrastructure.</p>
+              <div class="guide-tags"><span class="guide-tag">Shodan</span><span class="guide-tag">OSINT</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/censys-for-enhanced-cybersecurity-insight-533df14794bd" target="_blank" rel="noopener">Censys for Enhanced Cybersecurity Insight</a>
+              <p class="guide-desc">Using Censys for internet-wide asset discovery: certificate transparency, protocol fingerprinting, and building exposure maps for authorized assessments.</p>
+              <div class="guide-tags"><span class="guide-tag">Censys</span><span class="guide-tag">OSINT</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/theharvester-your-essential-tool-for-osint-and-reconnaissance-in-cybersecurity-10aa6d76f5b3" target="_blank" rel="noopener">theHarvester: OSINT and Reconnaissance</a>
+              <p class="guide-desc">Email, subdomain, IP, and employee enumeration with theHarvester — configuring data sources, interpreting results, and feeding output into the attack workflow.</p>
+              <div class="guide-tags"><span class="guide-tag">theHarvester</span><span class="guide-tag">OSINT</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/spiderfoot-deep-dive-installation-scans-and-practical-use-cases-11ea6537ad6f" target="_blank" rel="noopener">SpiderFoot Deep Dive: Installation, Scans, and Practical Use Cases</a>
+              <p class="guide-desc">SpiderFoot OSINT automation: module selection, scan configuration, correlation of cross-source findings, and integrating results into a target profile.</p>
+              <div class="guide-tags"><span class="guide-tag">SpiderFoot</span><span class="guide-tag">OSINT</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/owasp-amass-project-guide-94bd55521f91" target="_blank" rel="noopener">OWASP Amass Project Guide</a>
+              <p class="guide-desc">Amass for subdomain enumeration and attack surface mapping: passive and active modes, DNS brute-forcing, graph output, and integrating with other recon tools.</p>
+              <div class="guide-tags"><span class="guide-tag">Amass</span><span class="guide-tag">subdomain</span></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Web Application Testing ── -->
+      <section id="web-app">
+        <div class="group-header">
+          <h2 class="group-title">Web Application Testing</h2>
+          <span class="group-count">10 articles</span>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/web-applications-penetretion-testing-stage-1-reconnaissance-6b6b7aae0399" target="_blank" rel="noopener">Web App Pentesting — Stage 1: Reconnaissance</a>
+              <p class="guide-desc">Passive and active recon for web targets: technology fingerprinting, directory enumeration, subdomain discovery, and building an attack surface map before touching the app.</p>
+              <div class="guide-tags"><span class="guide-tag green">web app</span><span class="guide-tag">recon</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/web-applications-penetretion-testing-stage-2-scanning-and-vulnerability-assessment-15021e81c130" target="_blank" rel="noopener">Web App Pentesting — Stage 2: Scanning and Vulnerability Assessment</a>
+              <p class="guide-desc">Automated and manual scanning: Nikto, Burp Scanner, ZAP active scan, and manual verification of findings — separating signal from noise in web vulnerability reports.</p>
+              <div class="guide-tags"><span class="guide-tag green">web app</span><span class="guide-tag">scanning</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-burp-suite-vulnerability-scanner-019ed82c8bac" target="_blank" rel="noopener">Mastering Burp Suite Vulnerability Scanner</a>
+              <p class="guide-desc">Burp Scanner configuration, crawl scope, active scan tuning, issue types, confidence levels, and building a structured pentest report from scanner findings.</p>
+              <div class="guide-tags"><span class="guide-tag green">Burp Suite</span><span class="guide-tag">scanning</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/cracking-web-interfaces-with-burp-suite-a-comprehensive-tutorial-33087bb286b0" target="_blank" rel="noopener">Cracking Web Interfaces with Burp Suite</a>
+              <p class="guide-desc">Using Burp Intruder and Repeater for form-based login brute force, session token analysis, and parameter manipulation in web authentication flows.</p>
+              <div class="guide-tags"><span class="guide-tag green">Burp Suite</span><span class="guide-tag">brute force</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/owasp-zap-a-comprehensive-guide-to-web-application-security-testing-6c247f4be39b" target="_blank" rel="noopener">OWASP ZAP: Web Application Security Testing Guide</a>
+              <p class="guide-desc">Full ZAP workflow: spider, active scanner, fuzzer, AJAX spider, and HUD mode. Setting up ZAP as an intercepting proxy for authenticated application testing.</p>
+              <div class="guide-tags"><span class="guide-tag green">OWASP ZAP</span></div>
+            </div>
+
+          </div>
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/sqlmap-a-deep-dive-into-automated-sql-injection-testing-part-1-basic-wizard-6dd540363c83" target="_blank" rel="noopener">SQLMap Deep Dive — Part 1: Basic and Wizard Modes</a>
+              <p class="guide-desc">SQLMap fundamentals: detection modes, database enumeration, data extraction, and the wizard for quick assessments against SQL-injectable endpoints.</p>
+              <div class="guide-tags"><span class="guide-tag green">SQLMap</span><span class="guide-tag">SQL injection</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/sqlmap-a-deep-dive-into-automated-sql-injection-testing-part-2-advanced-custom-setup-0136ac6ffe53" target="_blank" rel="noopener">SQLMap Deep Dive — Part 2: Advanced and Custom Setup</a>
+              <p class="guide-desc">Advanced SQLMap: tamper scripts, custom headers, crawling, POST injection, OS command execution, file read/write, and evading WAF detection.</p>
+              <div class="guide-tags"><span class="guide-tag green">SQLMap</span><span class="guide-tag">advanced</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/nikto-uncovering-web-server-vulnerabilities-with-an-open-source-scanner-6d2d2fbc1e21" target="_blank" rel="noopener">Nikto: Uncovering Web Server Vulnerabilities</a>
+              <p class="guide-desc">Nikto scan configuration, plugin selection, evasion options, and interpreting output for common web server misconfigurations and outdated software.</p>
+              <div class="guide-tags"><span class="guide-tag green">Nikto</span><span class="guide-tag">web server</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-dirbuster-a-strategic-approach-to-uncovering-hidden-web-assets-31c8406a892b" target="_blank" rel="noopener">Mastering DirBuster: Uncovering Hidden Web Assets</a>
+              <p class="guide-desc">Directory and file brute-forcing with DirBuster: wordlist selection, threading, extension bruteforcing, and interpreting 200/301/403 response patterns.</p>
+              <div class="guide-tags"><span class="guide-tag green">DirBuster</span><span class="guide-tag">enumeration</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/from-bugs-to-breaches-learning-secure-coding-through-the-owasp-top-10-21b425fafb83" target="_blank" rel="noopener">From Bugs to Breaches: Learning Secure Coding via OWASP Top 10</a>
+              <p class="guide-desc">Attacker-perspective walkthrough of OWASP Top 10 vulnerabilities — understanding each class to test for them effectively and build detection coverage.</p>
+              <div class="guide-tags"><span class="guide-tag red">OWASP Top 10</span><span class="guide-tag green">secure coding</span></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Password Attacks & Credential Testing ── -->
+      <section id="password-attacks">
+        <div class="group-header">
+          <h2 class="group-title">Password Attacks & Credential Testing</h2>
+          <span class="group-count">15 articles</span>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-hydra-the-ultimate-guide-to-network-logon-cracking-182579dbaed1" target="_blank" rel="noopener">Mastering Hydra: Network Logon Cracking</a>
+              <p class="guide-desc">Hydra fundamentals and advanced options: protocol selection, wordlist configuration, rate limiting, and service-specific setup for HTTP, FTP, SSH, SMB, and more.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Hydra</span><span class="guide-tag">brute force</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/breaking-the-code-how-to-use-hashcat-for-effective-password-cracking-15f8da8facb8" target="_blank" rel="noopener">Hashcat: Effective Password Cracking</a>
+              <p class="guide-desc">Hashcat attack modes, GPU optimization, rule files, combinator attacks, and hash type selection — from hash identification to cracked output.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Hashcat</span><span class="guide-tag">password cracking</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/mastering-john-the-ripper-a-complete-guide-to-password-cracking-e42d68239c71" target="_blank" rel="noopener">Mastering John the Ripper</a>
+              <p class="guide-desc">John the Ripper across all major attack modes: wordlist, incremental, single, and external. Rule-based mutations, format detection, and cracking complex hashes.</p>
+              <div class="guide-tags"><span class="guide-tag orange">John the Ripper</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/john-the-ripper-hash-formats-f2ec958acaf8" target="_blank" rel="noopener">John the Ripper Hash Formats Reference</a>
+              <p class="guide-desc">Comprehensive format reference: identifying which --format flag matches which hash type across Windows, Linux, application, and archive hash families.</p>
+              <div class="guide-tags"><span class="guide-tag orange">John the Ripper</span><span class="guide-tag">reference</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/2john-9bb0bd44ed64" target="_blank" rel="noopener">2John: Extract Hashes from Common File Types</a>
+              <p class="guide-desc">Using the *2john family (office2john, pdf2john, zip2john, ssh2john, keepass2john) to extract crackable hashes from protected files for John the Ripper.</p>
+              <div class="guide-tags"><span class="guide-tag orange">John the Ripper</span><span class="guide-tag">hash extraction</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/personal-pass-generator-ppg-the-ultimate-tool-for-custom-password-lists-4979a3a1385c" target="_blank" rel="noopener">Personal Pass Generator (PPG): Custom Password Lists</a>
+              <p class="guide-desc">PPG walkthrough: generating target-specific wordlists from known personal details — the strongest attack vector against security-aware users who use "personalized" passwords.</p>
+              <div class="guide-tags"><span class="guide-tag orange">PPG</span><span class="guide-tag">wordlists</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/passwords-cracking-zip-pdf-web-rdp-ssh-cameras-c1bacbd592cd" target="_blank" rel="noopener">Password Cracking: ZIP, PDF, Web, RDP, SSH, Cameras</a>
+              <p class="guide-desc">Consolidated guide covering all major password cracking scenarios in authorized testing: archives, documents, web logins, remote access protocols, and IP cameras.</p>
+              <div class="guide-tags"><span class="guide-tag orange">password cracking</span><span class="guide-tag">multi-target</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/wifi-cracking-with-aircrack-ng-d51cf98c789f" target="_blank" rel="noopener">WiFi Cracking with Aircrack-ng</a>
+              <p class="guide-desc">WPA/WPA2 capture and offline cracking with Aircrack-ng: monitor mode, deauth injection, 4-way handshake capture, and dictionary/brute-force attacks.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Aircrack-ng</span><span class="guide-tag">WiFi</span></div>
+            </div>
+
+          </div>
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/accessing-remote-desktops-a-beginner-s-guide-to-rdp-cracking-with-crowbar-and-ppg-tools-5f50027115b7" target="_blank" rel="noopener">RDP Cracking with Crowbar and PPG</a>
+              <p class="guide-desc">Authorized RDP credential testing: Crowbar for protocol-correct RDP brute-force, PPG for personalized wordlist generation, and rate-limiting considerations.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Crowbar</span><span class="guide-tag">RDP</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/cracking-ssh-with-metasploit-a-step-by-step-guide-to-exploiting-weak-credentials-3ec6ef4cee5b" target="_blank" rel="noopener">Cracking SSH with Metasploit: Exploiting Weak Credentials</a>
+              <p class="guide-desc">SSH credential testing via Metasploit's auxiliary scanner module: target configuration, wordlist setup, threading, and post-exploitation access after successful login.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Metasploit</span><span class="guide-tag">SSH</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/cracking-telnet-exploring-weaknesses-and-exploitation-techniques-af5d743abb09" target="_blank" rel="noopener">Cracking Telnet: Weaknesses and Exploitation Techniques</a>
+              <p class="guide-desc">Telnet credential testing and exploitation: default credential attacks, session hijacking risks, and why Telnet remains a viable target in industrial and legacy environments.</p>
+              <div class="guide-tags"><span class="guide-tag orange">Telnet</span><span class="guide-tag">legacy</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/cracking-rtsp-security-a-comprehensive-guide-to-using-the-rtsp-brute-force-tool-ad1c29b9e5ee" target="_blank" rel="noopener">Cracking RTSP Security: RTSP Brute Force Tool Guide</a>
+              <p class="guide-desc">Using the RTSP Brute Force Tool for authorized IP camera security assessment: vendor presets, path enumeration, credential testing, and stream access verification.</p>
+              <div class="guide-tags"><span class="guide-tag orange">RTSP</span><span class="guide-tag">cameras</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/zip-file-password-cracking-guide-with-real-life-examples-4e8705d51897" target="_blank" rel="noopener">ZIP File Password Cracking — Guide with Real Examples</a>
+              <p class="guide-desc">ZIP archive password recovery: zip2john hash extraction, dictionary and brute-force attack modes, encryption type detection, and authorized recovery scenarios.</p>
+              <div class="guide-tags"><span class="guide-tag orange">password recovery</span><span class="guide-tag">ZIP</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/pdf-file-password-cracking-guide-with-real-life-examples-901ee411a6f4" target="_blank" rel="noopener">PDF File Password Cracking — Guide with Real Examples</a>
+              <p class="guide-desc">PDF owner and user password recovery: pdf2john extraction, encryption version detection, and attack strategy selection for different PDF security levels.</p>
+              <div class="guide-tags"><span class="guide-tag orange">password recovery</span><span class="guide-tag">PDF</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/office-file-doc-docx-ppt-password-cracking-guide-with-real-life-examples-f8e356144ca4" target="_blank" rel="noopener">Office File Password Cracking — Guide with Real Examples</a>
+              <p class="guide-desc">DOC, DOCX, PPT password recovery: office2john/msoffice2john extraction, encryption strength detection, and efficient cracking for both legacy and modern Office formats.</p>
+              <div class="guide-tags"><span class="guide-tag orange">password recovery</span><span class="guide-tag">Office</span></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Exploitation & Post-Exploitation ── -->
+      <section id="exploitation">
+        <div class="group-header">
+          <h2 class="group-title">Exploitation & Post-Exploitation</h2>
+          <span class="group-count">6 articles</span>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/the-basic-toolkit-for-penetration-testing-303da9234d82" target="_blank" rel="noopener">The Basic Toolkit for Penetration Testing</a>
+              <p class="guide-desc">Essential PT tool selection: which tools to have, why, and how they fit together across reconnaissance, exploitation, credential testing, and post-exploitation phases.</p>
+              <div class="guide-tags"><span class="guide-tag red">exploitation</span><span class="guide-tag">toolkit</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/the-ultimate-guide-to-metasploit-part-1-43c8573487df" target="_blank" rel="noopener">The Ultimate Guide to Metasploit — Part 1</a>
+              <p class="guide-desc">Metasploit Framework fundamentals: msfconsole navigation, workspace management, database integration, payload types, and the exploit lifecycle from search to shell.</p>
+              <div class="guide-tags"><span class="guide-tag red">Metasploit</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/metasploit-modules-guide-auxiliary-1821db1712f0" target="_blank" rel="noopener">Metasploit Modules Guide: Auxiliary</a>
+              <p class="guide-desc">Auxiliary module reference: scanners, fuzzers, credential testers, and enumeration modules — how to select, configure, and run auxiliary modules effectively.</p>
+              <div class="guide-tags"><span class="guide-tag red">Metasploit</span><span class="guide-tag">auxiliary</span></div>
+            </div>
+
+          </div>
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/title-metasploit-modules-guide-exploit-73eecb50e3c3" target="_blank" rel="noopener">Metasploit Modules Guide: Exploit</a>
+              <p class="guide-desc">Exploit module deep dive: RHOST/LHOST configuration, payload selection, session types, post-exploitation modules, and pivoting through Meterpreter.</p>
+              <div class="guide-tags"><span class="guide-tag red">Metasploit</span><span class="guide-tag">exploit</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/exploiting-ftp-vulnerabilities-for-effective-penetration-testing-a2810df78602" target="_blank" rel="noopener">Exploiting FTP Vulnerabilities for Penetration Testing</a>
+              <p class="guide-desc">FTP attack vectors: anonymous login, credential brute-force, banner grabbing, directory traversal, and using FTP for post-exploitation file transfer and persistence.</p>
+              <div class="guide-tags"><span class="guide-tag red">FTP</span><span class="guide-tag">exploitation</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/sublist3r-your-essential-tool-for-subdomain-enumeration-c1910121d712" target="_blank" rel="noopener">Sublist3r: Subdomain Enumeration</a>
+              <p class="guide-desc">Sublist3r for passive subdomain discovery: multi-source aggregation, integration with brute-force modes, and feeding results into the attack surface map.</p>
+              <div class="guide-tags"><span class="guide-tag">Sublist3r</span><span class="guide-tag">subdomain</span></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Advanced Attack Techniques ── -->
+      <section id="advanced-attacks">
+        <div class="group-header">
+          <h2 class="group-title">Advanced Attack Techniques</h2>
+          <span class="group-count">5 articles — AD, ADCS, Kubernetes, Cloud</span>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/active-directory-penetration-testing-745cfb31d7d3" target="_blank" rel="noopener">Active Directory Penetration Testing</a>
+              <p class="guide-desc">Full AD attack chain: Kerberoasting, AS-REP roasting, ACL abuse, Pass-the-Hash, Pass-the-Ticket, LSASS credential dumping, and DCSync — step-by-step walkthrough.</p>
+              <div class="guide-tags"><span class="guide-tag red">Active Directory</span><span class="guide-tag">Windows</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/adcs-esc8-attack-certificate-based-domain-compromise-complete-guide-7ec76562fa6d" target="_blank" rel="noopener">ADCS ESC8 Attack: Certificate-Based Domain Compromise</a>
+              <p class="guide-desc">Complete ESC8 exploitation guide: ADCS misconfiguration discovery, Web Enrollment abuse, certificate request, and leveraging the certificate for domain admin access.</p>
+              <div class="guide-tags"><span class="guide-tag red">ADCS</span><span class="guide-tag">ESC8</span><span class="guide-tag">domain</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/unlocking-web-intelligence-a-deep-dive-into-whatweb-8ee4e64ce411" target="_blank" rel="noopener">WhatWeb: Unlocking Web Intelligence</a>
+              <p class="guide-desc">WhatWeb for technology fingerprinting: CMS detection, server identification, framework recognition, and building target technology profiles for vulnerability mapping.</p>
+              <div class="guide-tags"><span class="guide-tag green">WhatWeb</span><span class="guide-tag">fingerprinting</span></div>
+            </div>
+
+          </div>
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/black-box-kubernetes-penetration-testing-playbook-56350b178af4" target="_blank" rel="noopener">Black-Box Kubernetes Penetration Testing Playbook</a>
+              <p class="guide-desc">Manual K8s PT from zero knowledge: cluster discovery, API server enumeration, RBAC misconfiguration exploitation, container escape, and lateral movement across namespaces.</p>
+              <div class="guide-tags"><span class="guide-tag red">Kubernetes</span><span class="guide-tag">cloud</span></div>
+            </div>
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/gcp-penetration-testing-a-step-by-step-attack-guide-9e39bc3eb96d" target="_blank" rel="noopener">GCP Penetration Testing: Step-by-Step Attack Guide</a>
+              <p class="guide-desc">GCP attack chain: IAM misconfiguration discovery, service account key abuse, privilege escalation, compute instance access, and data exfiltration from Cloud Storage.</p>
+              <div class="guide-tags"><span class="guide-tag red">GCP</span><span class="guide-tag">cloud</span></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Security Reference ── -->
+      <section id="security-reference">
+        <div class="group-header">
+          <h2 class="group-title">Security Reference</h2>
+          <span class="group-count">2 articles</span>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/quick-start-server-hardening-checklist-all-open-source-08e9887b9faa" target="_blank" rel="noopener">Quick-Start Server Hardening Checklist (All Open-Source)</a>
+              <p class="guide-desc">Practical hardening checklist covering SSH lockdown, firewall rules, fail2ban, auditd, unattended upgrades, and service minimization — all open-source tooling.</p>
+              <div class="guide-tags"><span class="guide-tag green">hardening</span><span class="guide-tag">defensive</span></div>
+            </div>
+
+          </div>
+          <div class="guide-list">
+
+            <div class="guide-item">
+              <a class="guide-title" href="https://medium.com/@1200km/protocol-level-network-threat-hunting-a-wireshark-centric-guide-a6770ffc96c6" target="_blank" rel="noopener">Protocol-Level Network Threat Hunting with Wireshark</a>
+              <p class="guide-desc">Wireshark-driven analysis: protocol anomaly detection, C2 pattern identification, DNS tunneling indicators, and SSL/TLS fingerprinting in captured traffic.</p>
+              <div class="guide-tags"><span class="guide-tag green">Wireshark</span><span class="guide-tag">threat hunting</span></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        Andrey Pautov · CTI-to-detection practitioner · Tel Aviv, Israel ·
+        <a href="mailto:1200km@gmail.com">1200km@gmail.com</a> ·
+        <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> ·
+        <a href="/">Portfolio</a>
+      </div>
+    </footer>
+
+  </body>
+</html>
