@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab Work — Andrey Pautov</title>
+    <meta
+      name="description"
+      content="Attack simulation labs, vulnerable infrastructure environments, and malware analysis labs by Andrey Pautov — CTI-to-detection practitioner."
+    />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="Lab Work — Andrey Pautov" />
+    <meta
+      property="og:description"
+      content="Authorized, controlled lab environments: attack simulation, vulnerable cloud/AD/Android/AI infrastructure, and malware analysis setups."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://anpa1200.github.io/labs.html" />
+    <meta property="og:image" content="https://anpa1200.github.io/assets/ap-logo.png" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="icon" href="assets/ap-logo.png" type="image/png" />
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --text: #172033;
+        --muted: #5b667a;
+        --line: #dbe4ef;
+        --accent: #0f62fe;
+        --accent-dark: #054ada;
+        --ok: #007a5a;
+        --chip: #eef4ff;
+        --chip-strong: #dbe9ff;
+        --shadow: 0 14px 34px rgba(24, 38, 69, 0.09);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.58;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { color: var(--accent-dark); text-decoration: underline; }
+
+      /* ── Nav ── */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav,
+      .page-hero-inner,
+      main,
+      .footer-inner {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        font-size: 0.92rem;
+      }
+
+      .nav-links a.active {
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      /* ── Page hero ── */
+      .page-hero {
+        background: linear-gradient(120deg, rgba(15,98,254,0.10), rgba(0,122,90,0.08)), #ffffff;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .page-hero-inner {
+        padding: 64px 0 52px;
+      }
+
+      .page-eyebrow {
+        color: var(--accent-dark);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+
+      .page-title {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.1;
+      }
+
+      .page-lead {
+        max-width: 760px;
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 1.07rem;
+      }
+
+      .page-hero-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 18px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text);
+        background: var(--panel);
+        text-decoration: none;
+        transition: border-color 0.14s, background 0.14s;
+      }
+      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
+      .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+      .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+      /* ── Main content ── */
+      main {
+        padding: 48px 0 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 52px;
+      }
+
+      .lab-group {}
+
+      .group-header {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--line);
+        margin-bottom: 4px;
+      }
+
+      .group-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+      }
+
+      .group-count {
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      /* ── Lab rows ── */
+      .lab-row {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 18px 0;
+        align-items: start;
+      }
+
+      .lab-meta {
+        padding-right: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .lab-name {
+        font-weight: 800;
+        font-size: 0.97rem;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .lab-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .chip {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        background: var(--chip);
+        color: var(--accent-dark);
+      }
+      .chip.lab { background: #fff4e6; color: #8a4800; }
+      .chip.cloud { background: #e8f5f0; color: #005f42; }
+      .chip.android { background: #e8f8e8; color: #1a6b1a; }
+      .chip.ai { background: #f3eeff; color: #5b1fcb; }
+      .chip.red { background: #fff0f0; color: #b91c1c; }
+      .chip.malware { background: #fef2f2; color: #991b1b; }
+
+      .lab-body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .lab-desc {
+        font-size: 0.92rem;
+        color: var(--text);
+        margin: 0;
+        line-height: 1.55;
+      }
+
+      .lab-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 0.84rem;
+      }
+
+      .lab-links a {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .lab-links a[href*="github"] {
+        color: var(--muted);
+      }
+      .lab-links a[href*="github"]:hover {
+        color: var(--accent);
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 0;
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 720px) {
+        .lab-row {
+          grid-template-columns: 1fr;
+        }
+        .lab-meta {
+          padding-right: 0;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 10px;
+        }
+        .lab-badges {
+          flex-direction: row;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .nav-links { gap: 10px; font-size: 0.85rem; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="/">
+          <img src="assets/ap-logo.png" alt="AP logo" width="36" height="36" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="/">Portfolio</a>
+          <a href="about.html">About</a>
+          <a href="cv.html">CV</a>
+          <a href="labs.html" class="active">Labs</a>
+          <a href="https://github.com/anpa1200">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="page-hero">
+      <div class="page-hero-inner">
+        <p class="page-eyebrow">Authorized · Controlled · Purpose-built</p>
+        <h1 class="page-title">Lab Work</h1>
+        <p class="page-lead">
+          Hands-on environments built to understand attacker behavior, validate detection assumptions,
+          and practice the full attack-to-defend cycle across cloud, Windows, Linux, Android, and AI surfaces.
+          All labs are authorized and isolated.
+        </p>
+        <div class="page-hero-links">
+          <a class="button primary" href="https://github.com/anpa1200">All GitHub repos</a>
+          <a class="button" href="https://medium.com/@1200km">Medium articles</a>
+          <a class="button" href="/">← Portfolio</a>
+        </div>
+      </div>
+    </div>
+
+    <main>
+
+      <!-- ── Attack Simulation ── -->
+      <section class="lab-group" id="attack-simulation">
+        <div class="group-header">
+          <h2 class="group-title">Attack Simulation</h2>
+          <span class="group-count">1 lab</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Operation DragonRx</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip red">APT41</span>
+              <span class="chip">Log4Shell</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Full-stack APT41 pharmaceutical-sector attack simulation. Log4Shell (CVE-2021-44228) initial access
+              → Sliver C2 → Active Directory lateral movement → LSASS credential dump → dual-layer detection
+              with Wazuh + Zeek + Elastic. Published lab architecture and full attack playbook.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/lab-architecture-operation-dragonrx-38602f432e5c">Lab Architecture (Medium)</a>
+              <a href="https://medium.com/@1200km/attack-playbook-operation-dragonrx-91339316f0df">Attack Playbook (Medium)</a>
+              <a href="https://medium.com/@1200km/apt41-targeting-pharmaceutical-sector-log4shell-to-domain-compromise-9e4c1ba9dad6">APT41 CTI Report</a>
+              <a href="https://github.com/anpa1200/dragonrx-lab">github/dragonrx-lab</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Cloud & Kubernetes ── -->
+      <section class="lab-group" id="cloud-labs">
+        <div class="group-header">
+          <h2 class="group-title">Cloud & Kubernetes</h2>
+          <span class="group-count">4 labs</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Vulnerable Cloud Lab (GCP + AWS)</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip cloud">cloud</span>
+              <span class="chip">Terraform</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Fully automated Terraform deployment of intentionally misconfigured GCP + AWS infrastructure
+              for cloud pentest practice. Covers IAM privilege escalation, public storage buckets, unencrypted
+              secrets, lateral movement paths, and CloudTrail evasion. Destroy-when-done design.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/building-a-vulnerable-cloud-pentest-lab-with-terraform-9858ac96b29e">Cloud Lab article</a>
+              <a href="https://medium.com/@1200km/building-a-vulnerable-gcp-pentest-lab-with-terraform-9d1edfcd8eff">GCP Lab article</a>
+              <a href="https://medium.com/@1200km/a-complete-cloud-penetration-testing-walkthrough-72a48e6b5c0b">Full PT walkthrough</a>
+              <a href="https://github.com/anpa1200/vulnerable-cloud-lab">github/vulnerable-cloud-lab</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Kubernetes Security Lab</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip cloud">cloud</span>
+              <span class="chip">Kubernetes</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Vulnerable Kubernetes cluster covering 25 critical security issues: privileged containers,
+              hostPath mounts, unauthenticated dashboards, RBAC misconfigurations, exposed secrets, and
+              container escape paths. One-prompt Cursor AI deployment option included.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/building-a-vulnerable-kubernetes-lab-a-complete-guide-to-25-critical-security-issues-fae4fc8e3a91">K8s Lab article</a>
+              <a href="https://medium.com/@1200km/one-prompt-ai-powered-black-box-kubernetes-penetration-test-3cc35b1b1bac">One-prompt K8s PT</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">IIS / SharePoint Lab + Fluent Bit</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip cloud">cloud</span>
+              <span class="chip">Windows Server</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Vulnerable IIS + SharePoint server environment with Fluent Bit log shipping.
+              Full deployment guide. Built to practice web server exploitation and log analysis
+              for detection hypothesis validation.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/build-a-vulnerable-iis-sharepoint-lab-with-fluent-bit-complete-deployment-guide-8fe947e8439e">Deployment guide</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">stratus-ai (Cloud Attack Simulation)</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip cloud">cloud</span>
+              <span class="chip">AWS</span>
+              <span class="chip">GCP</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Cloud attack simulation platform: 9 AWS + 7 GCP modules covering CloudTrail evasion,
+              privilege escalation, lateral movement, and data exfiltration. 125-test suite.
+              ECS Fargate / Cloud Run deployment. Multi-LLM finding analysis with severity classification.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-89c6702d3b84">Article</a>
+              <a href="https://github.com/anpa1200/stratus-ai">github/stratus-ai</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Active Directory & Windows ── -->
+      <section class="lab-group" id="ad-labs">
+        <div class="group-header">
+          <h2 class="group-title">Active Directory & Windows</h2>
+          <span class="group-count">2 labs</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Active Directory PenTest Lab</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip red">Windows AD</span>
+              <span class="chip">Kerberos</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Full Windows domain lab: Active Directory with GPOs, multiple misconfigurations, Kerberoasting
+              paths, Pass-the-Hash, AS-REP roasting, and LSASS dump scenarios. Two deployment options:
+              manual step-by-step guide and one-prompt Cursor AI automated setup. Black-box AI-driven
+              pentest walkthrough included.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/active-directory-lab-for-pentest-manual-deployment-guide-cab28cd4ad8d">Manual deployment guide</a>
+              <a href="https://medium.com/@1200km/deploy-a-complete-active-directory-pentest-lab-in-one-prompt-with-cursor-ai-ff926fd2b3fc">One-prompt deploy (Cursor AI)</a>
+              <a href="https://medium.com/@1200km/ai-driven-black-box-active-directory-penetration-testing-52041e2c10c3">AI-driven AD PT walkthrough</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Vulnerable Windows 10 Lab</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip red">Windows</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Script-automated extremely vulnerable Windows 10 machine for pentest training.
+              Disabled firewall and AV, weak credentials, open services, unpatched CVEs.
+              Full pentest walkthrough with HexStrike included as a bonus.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/building-an-extremely-vulnerable-windows-10-lab-a-step-by-step-guide-bonus-full-pt-with-9290d388744c">Setup guide + walkthrough</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Android & Mobile ── -->
+      <section class="lab-group" id="android-labs">
+        <div class="group-header">
+          <h2 class="group-title">Android & Mobile</h2>
+          <span class="group-count">3 labs</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Deliberately Vulnerable Android App</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip android">Android</span>
+              <span class="chip">OWASP Mobile Top 10</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Intentionally vulnerable Android application covering all OWASP Mobile Top 10 vulnerability
+              classes: insecure data storage, improper authentication, code tampering, reverse engineering
+              exposure, insufficient cryptography, and more. Built for authorized security research, CTF
+              practice, and mobile security education.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/deliberately-vulnerable-android-app-covering-every-owasp-mobile-top-10-class-7be775fc6415">Article</a>
+              <a href="https://github.com/anpa1200/Vulnerable-APK">github/Vulnerable-APK</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Android App Analysis Lab</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip android">Android</span>
+              <span class="chip">Androguard</span>
+              <span class="chip">Frida</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Ubuntu-based Android malware analysis lab setup guide: Androguard static analysis,
+              Frida dynamic instrumentation, Android emulator configuration, APK decompilation
+              toolchain. Includes terminal APK static-analysis framework with YARA hits, ATT&CK
+              mappings, and Frida hook generation.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/building-an-android-app-analysis-lab-on-ubuntu-a-practical-setup-guide-4a09fff37622">Lab setup guide</a>
+              <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12">APK Analysis Tool article</a>
+              <a href="https://github.com/anpa1200/Android-Malware-Analysis">github/Android-Malware-Analysis</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">One-Prompt Android PT Lab</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip android">Android</span>
+              <span class="chip ai">AI-driven</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Autonomous Android security research with Cursor AI: one-prompt setup of the full
+              mobile PT environment, automated static/dynamic analysis workflow, and AI-guided
+              vulnerability discovery on the vulnerable APK target.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/the-one-prompt-pt-lab-autonomous-android-security-research-with-cursor-ai-b96ed2053071">Article</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── AI Security ── -->
+      <section class="lab-group" id="ai-labs">
+        <div class="group-header">
+          <h2 class="group-title">AI Security</h2>
+          <span class="group-count">1 lab</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Vulnerable AI Lab</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip ai">AI security</span>
+              <span class="chip">LLM</span>
+              <span class="chip">RAG</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Intentionally vulnerable AI application lab — like DVWA but for modern AI systems.
+              Targets: RAG assistants, tool-calling agents, and LLM-powered copilots.
+              Covers prompt injection, indirect prompt injection, data exfiltration via tool calls,
+              agent goal hijacking, and retrieval poisoning.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/vulnerable-ai-lab-3747e96314dd">Article</a>
+              <a href="https://github.com/anpa1200/AI-PT-Lab">github/AI-PT-Lab</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Linux & Web App ── -->
+      <section class="lab-group" id="linux-labs">
+        <div class="group-header">
+          <h2 class="group-title">Linux & Web Application</h2>
+          <span class="group-count">2 labs</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Vulnerable Ubuntu 24.04 Server Lab</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip">Linux</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Script-automated extremely vulnerable Ubuntu 24.04 server: misconfigured SSH, exposed
+              services, weak credentials, privilege escalation paths. Full end-to-end pentest walkthrough
+              with HexStrike as a bonus alongside the setup guide.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/building-an-extremely-vulnerable-ubuntu-24-04-server-lab-bonus-full-pt-with-hexstrike-90034032775b">Setup guide + walkthrough</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">DVWA Lab — Ansible-Automated</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip">DVWA</span>
+              <span class="chip">Ansible</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Reproducible DVWA (Damn Vulnerable Web Application) deployment automated with Ansible.
+              One-command spin-up of a safe, isolated web-app attack-and-detect training environment.
+              Idempotent playbooks for consistent lab rebuilds.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/automating-a-safe-dvwa-lab-with-ansible-build-a-reproducible-vulnerable-environment-for-training-026d74697c4a">Article</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Malware Analysis ── -->
+      <section class="lab-group" id="malware-labs">
+        <div class="group-header">
+          <h2 class="group-title">Malware Analysis</h2>
+          <span class="group-count">3 labs / toolkits</span>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">AIDebug — Malware RE Walker</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip malware">malware</span>
+              <span class="chip">Capstone</span>
+              <span class="chip">Frida</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Reverse engineering walker with TUI: Capstone disassembly, FLIRT signature matching,
+              control flow graph extraction, Frida-based dynamic tracing, INetSim network isolation,
+              8 behavioral malware pattern detectors, and SIEM-ready JSON output. Tested on real
+              DearStealer sample (MD5: c6ab7265…) — T1056.001, T1547.001, T1555.003, T1573.001 mapped.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a">Article</a>
+              <a href="https://github.com/anpa1200/AIDebug">github/AIDebug</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Android Malware Analysis Toolkit</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip malware">malware</span>
+              <span class="chip android">Android</span>
+              <span class="chip">YARA</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Terminal APK static-analysis framework: Androguard parsing, YARA rule matching,
+              ATT&CK technique mapping, VirusTotal integration, and Frida hook generation —
+              all from a single CLI command. No sandbox required.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12">Article</a>
+              <a href="https://github.com/anpa1200/Android-Malware-Analysis">github/Android-Malware-Analysis</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-row">
+          <div class="lab-meta">
+            <span class="lab-name">Static Malware Analysis Toolkit</span>
+            <div class="lab-badges">
+              <span class="chip lab">lab</span>
+              <span class="chip malware">malware</span>
+              <span class="chip">PE analysis</span>
+              <span class="chip">LIEF</span>
+            </div>
+          </div>
+          <div class="lab-body">
+            <p class="lab-desc">
+              Production-ready toolkit for initial triage of suspicious PE binaries: PE-Import-Analyzer
+              (LIEF-based API risk classification, CRITICAL/SUSPICIOUS/UNCOMMON), string extraction,
+              obfuscation detection, and file fingerprinting. Published static malware analysis article series.
+            </p>
+            <div class="lab-links">
+              <a href="https://medium.com/@1200km/basic-static-malware-analysis-from-triage-to-unpacking-explained-and-automated-6efda96ba9b3">Static analysis overview</a>
+              <a href="https://medium.com/@1200km/static-malware-analysis-strings-analysis-e87664f1bbcc">Strings analysis</a>
+              <a href="https://medium.com/@1200km/static-malware-analysis-obfuscation-51de39920627">Obfuscation</a>
+              <a href="https://github.com/anpa1200/PE-Import-Analyzer">github/PE-Import-Analyzer</a>
+              <a href="https://github.com/anpa1200/Malware_analysis">github/Malware_analysis</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        Andrey Pautov · CTI-to-detection practitioner · Tel Aviv, Israel ·
+        <a href="mailto:1200km@gmail.com">1200km@gmail.com</a> ·
+        <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> ·
+        <a href="/">Portfolio</a>
+      </div>
+    </footer>
+
+  </body>
+</html>
