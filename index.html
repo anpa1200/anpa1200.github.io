@@ -508,6 +508,121 @@
         font-size: 0.84rem;
       }
 
+      /* ── Page sidebar ── */
+      .page-sidenav {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 220px;
+        background: var(--panel);
+        border-right: 1px solid var(--line);
+        flex-direction: column;
+        z-index: 12;
+        overflow: hidden;
+      }
+
+      .sidenav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px;
+        font-weight: 800;
+        font-size: 0.87rem;
+        color: var(--text);
+        border-bottom: 1px solid var(--line);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+
+      .sidenav-brand:hover {
+        background: var(--bg);
+        text-decoration: none;
+        color: var(--text);
+      }
+
+      .sidenav-brand img {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        flex-shrink: 0;
+      }
+
+      .sidenav-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0 12px;
+      }
+
+      .sidenav-group {
+        font-size: 0.66rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--muted);
+        padding: 16px 20px 5px;
+      }
+
+      .sidenav-scroll a {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 6px 20px 6px 18px;
+        font-size: 0.86rem;
+        color: var(--muted);
+        border-left: 2px solid transparent;
+        text-decoration: none;
+        transition: color 0.12s, background 0.12s, border-color 0.12s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .sidenav-scroll a:hover {
+        color: var(--text);
+        background: var(--bg);
+        text-decoration: none;
+      }
+
+      .sidenav-scroll a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: var(--chip);
+        font-weight: 700;
+      }
+
+      .sidenav-footer {
+        padding: 12px 20px;
+        border-top: 1px solid var(--line);
+        font-size: 0.75rem;
+        color: var(--muted);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sidenav-footer a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.75rem;
+      }
+
+      .sidenav-footer a:hover {
+        color: var(--accent);
+      }
+
+      @media (min-width: 1380px) {
+        .page-sidenav {
+          display: flex;
+        }
+
+        body {
+          padding-left: 220px;
+        }
+      }
+
       @media (max-width: 960px) {
         .grid,
         .grid.two,
@@ -550,6 +665,33 @@
     </style>
   </head>
   <body>
+    <aside class="page-sidenav" id="page-sidenav" aria-label="Page navigation">
+      <a class="sidenav-brand" href="#start">
+        <img src="assets/ap-logo.png" alt="AP" />
+        Andrey Pautov
+      </a>
+      <nav class="sidenav-scroll">
+        <div class="sidenav-group">Portfolio</div>
+        <a href="#review-paths" data-section="review-paths">Review Paths</a>
+        <a href="#flagship-projects" data-section="flagship-projects">Flagships</a>
+        <a href="#work-by-domain" data-section="work-by-domain">By Domain</a>
+        <a href="#live-evidence" data-section="live-evidence">Evidence</a>
+        <div class="sidenav-group">Content</div>
+        <a href="#articles" data-section="articles">Articles</a>
+        <a href="#tools" data-section="tools">Tools</a>
+        <a href="#docs" data-section="docs">Docs</a>
+        <a href="#labs" data-section="labs">Labs</a>
+        <div class="sidenav-group">More</div>
+        <a href="#contact" data-section="contact">Contact</a>
+        <a href="about.html">About Me</a>
+        <a href="cv.html">CV</a>
+      </nav>
+      <div class="sidenav-footer">
+        <span>anpa1200.github.io</span>
+        <a href="#start" title="Back to top">↑ top</a>
+      </div>
+    </aside>
+
     <header class="site-header">
       <nav class="nav" aria-label="Main navigation">
         <a class="brand" href="/">
@@ -1442,5 +1584,32 @@
         Andrey Pautov — CTI-to-detection practitioner. Profiles adversary behavior, maps TTPs to detection candidates, and ships analyst tooling for CTI and reverse engineering.
       </div>
     </footer>
+
+    <script>
+      (function () {
+        var links = document.querySelectorAll('.sidenav-scroll a[data-section]');
+        var sections = [];
+        links.forEach(function (a) {
+          var el = document.getElementById(a.dataset.section);
+          if (el) sections.push({ el: el, a: a });
+        });
+        if (!sections.length || !('IntersectionObserver' in window)) return;
+
+        var active = null;
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var match = sections.find(function (s) { return s.el === entry.target; });
+            if (!match) return;
+            if (entry.isIntersecting) {
+              if (active) active.classList.remove('active');
+              active = match.a;
+              active.classList.add('active');
+            }
+          });
+        }, { rootMargin: '-15% 0px -60% 0px', threshold: 0 });
+
+        sections.forEach(function (s) { observer.observe(s.el); });
+      })();
+    </script>
   </body>
 </html>
