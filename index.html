@@ -3,27 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Andrey Pautov | Cybersecurity Research and AI Security Tooling</title>
+    <title>Andrey Pautov | Practical CTI Engineering</title>
     <meta
       name="description"
-      content="Practical CTI engineering by Andrey Pautov: IOC pivots, ATT&CK-mapped malware analysis, detections, labs, and CVE prioritization."
+      content="Practical CTI engineering by Andrey Pautov: reports to hunts, IOCs to pivots, malware to ATT&CK detections, CVEs to prioritized work."
     />
     <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="Andrey Pautov | Practical CTI Engineering" />
+    <meta
+      property="og:description"
+      content="CTI, detection engineering, malware analysis, cloud-security tooling, and offensive labs built for defender action."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://anpa1200.github.io/" />
     <style>
       :root {
-        --bg: #f7f9fc;
+        --bg: #f6f8fb;
         --panel: #ffffff;
         --text: #172033;
-        --muted: #5c677d;
-        --line: #dde5f0;
+        --muted: #5b667a;
+        --line: #dbe4ef;
         --accent: #0f62fe;
         --accent-dark: #054ada;
-        --chip: #eaf1ff;
-        --shadow: 0 18px 45px rgba(30, 42, 70, 0.1);
+        --ok: #007a5a;
+        --warn: #935f00;
+        --chip: #eef4ff;
+        --chip-strong: #dbe9ff;
+        --shadow: 0 14px 34px rgba(24, 38, 69, 0.09);
       }
 
       * {
         box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
       }
 
       body {
@@ -33,7 +47,7 @@
           "Segoe UI", sans-serif;
         color: var(--text);
         background: var(--bg);
-        line-height: 1.6;
+        line-height: 1.58;
       }
 
       a {
@@ -47,94 +61,101 @@
       }
 
       .site-header {
-        border-bottom: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.94);
         position: sticky;
         top: 0;
         z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(12px);
       }
 
-      .nav {
-        width: min(1120px, calc(100% - 32px));
+      .nav,
+      .hero-inner,
+      main,
+      .footer-inner {
+        width: min(1180px, calc(100% - 32px));
         margin: 0 auto;
+      }
+
+      .nav {
         min-height: 64px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 20px;
+        gap: 18px;
       }
 
       .brand {
-        font-weight: 800;
-        letter-spacing: 0;
+        font-weight: 850;
+        color: var(--text);
       }
 
       .nav-links {
         display: flex;
         flex-wrap: wrap;
         gap: 14px;
-        font-size: 0.94rem;
+        font-size: 0.92rem;
       }
 
       .hero {
         background:
-          linear-gradient(120deg, rgba(15, 98, 254, 0.1), rgba(0, 117, 112, 0.08)),
+          linear-gradient(120deg, rgba(15, 98, 254, 0.11), rgba(0, 122, 90, 0.1)),
           #ffffff;
         border-bottom: 1px solid var(--line);
       }
 
-      .hero-inner,
-      main {
-        width: min(1120px, calc(100% - 32px));
-        margin: 0 auto;
-      }
-
       .hero-inner {
-        padding: 84px 0 72px;
+        padding: 86px 0 70px;
       }
 
       .eyebrow {
         color: var(--accent-dark);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
         font-size: 0.78rem;
+        font-weight: 850;
+        letter-spacing: 0.08em;
         margin: 0 0 14px;
+        text-transform: uppercase;
       }
 
       h1 {
-        font-size: clamp(2.45rem, 5vw, 4.8rem);
-        line-height: 1;
-        letter-spacing: 0;
+        max-width: 980px;
         margin: 0;
-        max-width: 920px;
+        font-size: clamp(2.45rem, 5.2vw, 5rem);
+        letter-spacing: 0;
+        line-height: 0.98;
       }
 
       .lead {
-        max-width: 780px;
+        max-width: 860px;
+        margin: 24px 0 0;
         color: var(--muted);
         font-size: 1.16rem;
-        margin: 24px 0 0;
+      }
+
+      .actions,
+      .links,
+      .chips,
+      .metric-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
       }
 
       .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
         margin-top: 30px;
       }
 
       .button {
         display: inline-flex;
+        min-height: 44px;
         align-items: center;
         justify-content: center;
-        min-height: 44px;
         padding: 0 18px;
-        border-radius: 7px;
         border: 1px solid var(--line);
+        border-radius: 7px;
         background: var(--panel);
-        font-weight: 700;
+        color: var(--text);
+        font-weight: 800;
       }
 
       .button.primary {
@@ -148,12 +169,34 @@
         color: #ffffff;
       }
 
+      .metric-row {
+        margin-top: 28px;
+      }
+
+      .metric {
+        min-width: 150px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.74);
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 1.12rem;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
       main {
-        padding: 48px 0 72px;
+        padding: 50px 0 80px;
       }
 
       section {
-        margin-top: 52px;
+        margin-top: 60px;
       }
 
       section:first-child {
@@ -162,22 +205,22 @@
 
       .section-heading {
         display: flex;
-        align-items: end;
+        align-items: flex-end;
         justify-content: space-between;
         gap: 20px;
         margin-bottom: 18px;
       }
 
       h2 {
-        font-size: 1.65rem;
-        line-height: 1.15;
         margin: 0;
+        font-size: 1.72rem;
+        line-height: 1.16;
       }
 
       .section-note {
-        color: var(--muted);
-        max-width: 620px;
+        max-width: 650px;
         margin: 8px 0 0;
+        color: var(--muted);
       }
 
       .grid {
@@ -190,71 +233,146 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .grid.four {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
       .card {
-        background: var(--panel);
+        min-width: 0;
+        padding: 20px;
         border: 1px solid var(--line);
         border-radius: 8px;
-        padding: 20px;
+        background: var(--panel);
         box-shadow: var(--shadow);
-        min-width: 0;
       }
 
       .card h3 {
         margin: 0 0 10px;
         font-size: 1.06rem;
-        line-height: 1.25;
+        line-height: 1.28;
       }
 
       .card p {
-        color: var(--muted);
         margin: 0;
+        color: var(--muted);
+      }
+
+      .card.featured {
+        border-color: #b8cdf5;
+        background: linear-gradient(180deg, #ffffff, #f8fbff);
       }
 
       .links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
         margin-top: 16px;
-        font-size: 0.95rem;
-        font-weight: 700;
+        font-size: 0.94rem;
+        font-weight: 800;
       }
 
       .chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 16px;
+        margin-top: 14px;
       }
 
       .chip {
         display: inline-flex;
+        min-height: 27px;
         align-items: center;
-        min-height: 28px;
         padding: 0 10px;
         border-radius: 999px;
         background: var(--chip);
         color: #24416f;
+        font-size: 0.78rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .chip.cti,
+      .chip.detection {
+        background: var(--chip-strong);
+      }
+
+      .chip.offensive {
+        color: #663c00;
+        background: #fff3d7;
+      }
+
+      .chip.tool,
+      .chip.malware {
+        color: #074b3d;
+        background: #dcf7ef;
+      }
+
+      .chip.article {
+        color: #49306b;
+        background: #f0e7ff;
+      }
+
+      .article-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .article-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .article-row h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+
+      .article-row p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .article-meta {
+        color: var(--muted);
         font-size: 0.82rem;
-        font-weight: 700;
+        font-weight: 800;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .path-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .path {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .path h3 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+      }
+
+      .path ol {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
       }
 
       .about-panel {
         display: grid;
-        grid-template-columns: 1.3fr 0.7fr;
-        gap: 18px;
-        align-items: stretch;
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 16px;
       }
 
       .list {
         margin: 14px 0 0;
         padding-left: 18px;
         color: var(--muted);
-      }
-
-      .contact-list {
-        display: grid;
-        gap: 10px;
-        margin-top: 14px;
       }
 
       footer {
@@ -264,30 +382,37 @@
         background: #ffffff;
       }
 
-      .footer-inner {
-        width: min(1120px, calc(100% - 32px));
-        margin: 0 auto;
-      }
-
-      @media (max-width: 860px) {
-        .nav {
-          align-items: flex-start;
-          flex-direction: column;
-          padding: 16px 0;
-        }
-
-        .hero-inner {
-          padding: 58px 0 50px;
-        }
-
+      @media (max-width: 960px) {
         .grid,
         .grid.two,
+        .grid.four,
+        .path-grid,
         .about-panel {
           grid-template-columns: 1fr;
         }
 
         .section-heading {
           display: block;
+        }
+
+        .article-row {
+          grid-template-columns: 1fr;
+        }
+
+        .article-meta {
+          text-align: left;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .nav {
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 14px 0;
+        }
+
+        .hero-inner {
+          padding: 58px 0 48px;
         }
       }
     </style>
@@ -297,351 +422,573 @@
       <nav class="nav" aria-label="Main navigation">
         <a class="brand" href="#">Andrey Pautov</a>
         <div class="nav-links">
-          <a href="#docs">Documentation</a>
-          <a href="#projects">Projects</a>
-          <a href="#writing">Writing</a>
-          <a href="#about">About</a>
+          <a href="#start">Start</a>
+          <a href="#articles">Articles</a>
+          <a href="#tools">Tools</a>
+          <a href="#docs">Docs</a>
+          <a href="#labs">Labs</a>
           <a href="#contact">Contact</a>
         </div>
       </nav>
     </header>
 
-    <div class="hero">
+    <div class="hero" id="start">
       <div class="hero-inner">
-        <p class="eyebrow">Cybersecurity research | AI security tooling | CTI</p>
-        <h1>Practical security projects for analysts, defenders, and researchers.</h1>
+        <p class="eyebrow">Practical CTI engineering | Malware analysis | Detection engineering</p>
+        <h1>Reports to hunts. IOCs to pivots. Malware to ATT&CK-mapped detections.</h1>
         <p class="lead">
-          I build AI-assisted cybersecurity tools, malware-analysis workflows,
-          threat intelligence research, and documentation sites that help security
-          teams move from raw artifacts to actionable insight.
+          I build CTI and security tooling for defenders who need output they can use:
+          evidence-labeled reports, infrastructure pivots, YARA and ATT&CK mappings,
+          hunt hypotheses, cloud findings, and vulnerability prioritization.
         </p>
         <div class="actions">
-          <a class="button primary" href="#docs">Explore documentation sites</a>
-          <a class="button" href="https://github.com/anpa1200">GitHub CTI portfolio</a>
-          <a class="button" href="https://medium.com/@1200km">Medium articles</a>
+          <a class="button primary" href="https://github.com/anpa1200">GitHub portfolio</a>
+          <a class="button" href="#articles">Read the CTI work</a>
+          <a class="button" href="#tools">Use the tools</a>
+          <a class="button" href="https://medium.com/@1200km">Medium profile</a>
         </div>
-        <div class="links" aria-label="Featured CTI writing">
-          <a href="https://medium.com/@1200km/cti-kill-chain-an-analyst-guide-with-real-world-evidence-c3bef6fd2979">CTI Kill Chain</a>
-          <a href="https://infosecwriteups.com/infrastructure-pivoting-how-cti-analysts-expand-from-a-single-ioc-to-a-full-attacker-network">Infrastructure Pivoting</a>
-          <a href="https://medium.com/@1200km/attribution-methodology-how-to-build-defend-and-challenge-a-threat-actor-attribution-071066437ced">Attribution Methodology</a>
-          <a href="https://medium.com/@1200km/manual-cti-vs-ai-assisted-cti-a-step-by-step-clock-comparison-ee08325203fc">Manual vs AI CTI</a>
+        <div class="metric-row" aria-label="Portfolio snapshot">
+          <div class="metric"><strong>100+ articles</strong><span>Medium research and guides</span></div>
+          <div class="metric"><strong>CTI first</strong><span>Reports, pivots, hunts, detections</span></div>
+          <div class="metric"><strong>Tool-backed</strong><span>Python, YARA, Frida, ATT&CK, CVSS</span></div>
+          <div class="metric"><strong>Offensive context</strong><span>Labs explain operator behavior</span></div>
         </div>
       </div>
     </div>
 
     <main>
-      <section id="docs">
+      <section id="start-here">
         <div class="section-heading">
           <div>
-            <h2>Docusaurus Documentation Sites</h2>
+            <h2>Start Here</h2>
             <p class="section-note">
-              Full documentation projects, field guides, and structured CTI
-              workflows published under anpa1200.github.io.
+              Six entry points that explain the portfolio without making you read everything.
             </p>
           </div>
         </div>
         <div class="grid">
-          <article class="card">
-            <h3>HexStrike AI Guide</h3>
-            <p>
-              AI-driven penetration testing and security research guide for
-              authorized lab assessment, evidence collection, troubleshooting,
-              and reporting.
-            </p>
-            <div class="chips">
-              <span class="chip">AI security</span>
-              <span class="chip">Lab workflows</span>
-            </div>
-            <div class="links">
-              <a href="https://anpa1200.github.io/Hexstrike-AI-guide/">Site</a>
-              <a href="https://github.com/anpa1200/Hexstrike-AI-guide">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Israel Government Threat Actors CTI</h3>
-            <p>
-              Defensive CTI knowledge base for Israeli government, public-sector,
-              municipal, critical infrastructure, and supplier exposure.
-            </p>
-            <div class="chips">
-              <span class="chip">CTI</span>
-              <span class="chip">Public sector</span>
-            </div>
-            <div class="links">
-              <a href="https://anpa1200.github.io/israel-government-threat-actors-cti/">Site</a>
-              <a href="https://github.com/anpa1200/israel-government-threat-actors-cti">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Customer-Driven AI CTI Project</h3>
-            <p>
-              Gate-controlled CTI-to-detection methodology for building customer
-              relevant intelligence programs and detection-ready outputs.
-            </p>
-            <div class="chips">
-              <span class="chip">CTI program</span>
-              <span class="chip">Detection engineering</span>
-            </div>
-            <div class="links">
-              <a href="https://anpa1200.github.io/customer-driven-ai-cti-project/">Site</a>
-              <a href="https://github.com/anpa1200/customer-driven-ai-cti-project">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Customer-Driven AI CTI Project Template</h3>
-            <p>
-              Reusable project template for moving from intelligence requirements
-              to validated hunts, detections, and customer delivery.
-            </p>
-            <div class="chips">
-              <span class="chip">Template</span>
-              <span class="chip">Hunts</span>
-            </div>
-            <div class="links">
-              <a href="https://anpa1200.github.io/customer-driven-ai-cti-project-template/">Site</a>
-              <a href="https://github.com/anpa1200/customer-driven-ai-cti-project-template">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>CTI Analyst Field Manual</h3>
-            <p>
-              Field manual for threat intelligence research, defensible analytic
-              judgment, hunting hypotheses, and detection-ready outputs.
-            </p>
-            <div class="chips">
-              <span class="chip">Analyst tradecraft</span>
-              <span class="chip">Threat hunting</span>
-            </div>
-            <div class="links">
-              <a href="https://anpa1200.github.io/cti-analyst-field-manual/">Site</a>
-              <a href="https://github.com/anpa1200/cti-analyst-field-manual">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>CVSS v4.0 Field Guide</h3>
-            <p>
-              Practitioner-focused CVSS v4.0 documentation for vulnerability
-              management, environmental scoring, scanner triage, and evidence.
-            </p>
-            <div class="chips">
-              <span class="chip">Vulnerability management</span>
-              <span class="chip">CVSS v4.0</span>
-            </div>
-            <div class="links">
-              <a href="https://anpa1200.github.io/cvss/">Site</a>
-              <a href="https://github.com/anpa1200/cvss">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>OpenCTI Intelligent Shield Docs</h3>
-            <p>
-              Documentation site inside the OpenCTI Intelligent Shield project,
-              focused on CTI operations and security-team workflows.
-            </p>
-            <div class="chips">
-              <span class="chip">OpenCTI</span>
-              <span class="chip">Operations</span>
-            </div>
-            <div class="links">
-              <a href="https://github.com/anpa1200/opencti-intelligent-shield">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Medium Blog Navigator</h3>
-            <p>
-              Docusaurus navigation layer for Medium articles, sorted by recency,
-              topic, depth, and role-based reading paths.
-            </p>
-            <div class="chips">
-              <span class="chip">Blog index</span>
-              <span class="chip">Reading paths</span>
-            </div>
-            <div class="links">
-              <a href="https://anpa1200.github.io/medium-blog-navigation/">Site</a>
-              <a href="https://github.com/anpa1200/medium-blog-navigation">Repository</a>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section id="projects">
-        <div class="section-heading">
-          <div>
-            <h2>Featured Projects</h2>
-            <p class="section-note">
-              Security tools and research repositories for malware analysis,
-              CTI, cloud security, offensive research, and analyst productivity.
-            </p>
-          </div>
-        </div>
-        <div class="grid">
-          <article class="card">
-            <h3>Android-Malware-Analysis</h3>
-            <p>
-              AI-powered static APK analysis with YARA, semantic component
-              analysis, VirusTotal validation, MITRE mapping, and Frida output.
-            </p>
-            <div class="links">
-              <a href="https://github.com/anpa1200/Android-Malware-Analysis">Repository</a>
-              <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12">Article</a>
-            </div>
-          </article>
-
-          <article class="card">
+          <article class="card featured">
             <h3>AIDebug</h3>
-            <p>
-              AI-assisted malware reverse engineering debugger with disassembly,
-              malware pattern detection, CFG visualization, and Frida mode.
-            </p>
+            <p>Malware reverse-engineering assistant that produces CFGs, YARA, JSON, IOC context, and ATT&CK mappings.</p>
+            <div class="chips">
+              <span class="chip malware">malware</span><span class="chip detection">ATT&CK</span><span class="chip tool">tool</span>
+            </div>
             <div class="links">
-              <a href="https://github.com/anpa1200/AIDebug">Repository</a>
+              <a href="https://github.com/anpa1200/AIDebug">Repo</a>
               <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a">Article</a>
             </div>
           </article>
 
-          <article class="card">
-            <h3>StratusAI</h3>
-            <p>
-              AI-powered multi-cloud security scanner for AWS and GCP with
-              multi-LLM finding synthesis and attack-chain analysis.
-            </p>
+          <article class="card featured">
+            <h3>Android-Malware-Analysis</h3>
+            <p>APK static analysis with YARA, semantic scoring, VirusTotal context, MITRE output, and Frida hooks.</p>
+            <div class="chips">
+              <span class="chip malware">malware</span><span class="chip tool">Android</span><span class="chip detection">YARA</span>
+            </div>
             <div class="links">
-              <a href="https://github.com/anpa1200/stratus-ai">Repository</a>
+              <a href="https://github.com/anpa1200/Android-Malware-Analysis">Repo</a>
+              <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12">Article</a>
+            </div>
+          </article>
+
+          <article class="card featured">
+            <h3>CTI Reports</h3>
+            <p>Evidence-labeled reports on actor activity, defensive guidance, IOC handling, and SOC-ready outputs.</p>
+            <div class="chips">
+              <span class="chip cti">CTI</span><span class="chip detection">reports</span><span class="chip">evidence</span>
+            </div>
+            <div class="links">
+              <a href="https://github.com/anpa1200/CTI">Repo</a>
+              <a href="https://anpa1200.github.io/israel-government-threat-actors-cti/">Israel CTI site</a>
+            </div>
+          </article>
+
+          <article class="card featured">
+            <h3>cvss_4.0</h3>
+            <p>CVSS-BTE enrichment using NVD, CISA KEV, EPSS, and asset profiles to prioritize remediation.</p>
+            <div class="chips">
+              <span class="chip detection">vulnerability</span><span class="chip tool">CLI</span><span class="chip">EPSS</span>
+            </div>
+            <div class="links">
+              <a href="https://github.com/anpa1200/cvss_4.0">Repo</a>
+              <a href="https://medium.com/bugbountywriteup/cvss-v4-0-the-practical-field-guide-for-vulnerability-management-5b5a59728456">Article</a>
+              <a href="https://anpa1200.github.io/cvss/">Guide</a>
+            </div>
+          </article>
+
+          <article class="card featured">
+            <h3>StratusAI</h3>
+            <p>Multi-cloud AWS/GCP scanner with external modules and AI attack-chain synthesis.</p>
+            <div class="chips">
+              <span class="chip tool">cloud</span><span class="chip">AWS</span><span class="chip">GCP</span>
+            </div>
+            <div class="links">
+              <a href="https://github.com/anpa1200/stratus-ai">Repo</a>
               <a href="https://medium.com/@1200km/stratusai-i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-heres-everything-89c6702d3b84">Article</a>
             </div>
           </article>
 
-          <article class="card">
-            <h3>AuditAI</h3>
-            <p>
-              AI-powered host vulnerability assessment and security auditing
-              platform for practical security review workflows.
-            </p>
-            <div class="links">
-              <a href="https://github.com/anpa1200/AuditAI">Repository</a>
+          <article class="card featured">
+            <h3>autoWF</h3>
+            <p>IOC-to-infrastructure pivoting scaffold for passive DNS, reverse IP, ASN, TLS, subdomains, search, and WHOIS.</p>
+            <div class="chips">
+              <span class="chip cti">CTI</span><span class="chip tool">pivoting</span><span class="chip">OSINT</span>
             </div>
-          </article>
-
-          <article class="card">
-            <h3>Static Malware Analysis Orchestrator</h3>
-            <p>
-              One-command pipeline for static malware triage, strings, PE import
-              analysis, unpacking, and LLM-ready reports.
-            </p>
             <div class="links">
-              <a href="https://github.com/anpa1200/Static-malware-Analysis-Orchestrator">Repository</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>cvss_4.0</h3>
-            <p>
-              CVSS v4.0 enrichment tool using NVD, CISA KEV, EPSS, and asset
-              profiles to produce CVSS-BTE vectors and SLA guidance.
-            </p>
-            <div class="links">
-              <a href="https://github.com/anpa1200/cvss_4.0">Repository</a>
-              <a href="https://medium.com/bugbountywriteup/cvss-v4-0-the-practical-field-guide-for-vulnerability-management-5b5a59728456">Article</a>
+              <a href="https://github.com/anpa1200/autoWF">Repo</a>
+              <a href="https://infosecwriteups.com/infrastructure-pivoting-how-cti-analysts-expand-from-a-single-ioc-to-a-full-attacker-network">Article</a>
             </div>
           </article>
         </div>
       </section>
 
-      <section id="writing">
+      <section id="articles">
         <div class="section-heading">
           <div>
-            <h2>Writing and Research</h2>
+            <h2>Article Library</h2>
             <p class="section-note">
-              Technical articles, field notes, and practitioner guides on AI
-              security, malware analysis, CTI tradecraft, and vulnerability
-              management.
+              Direct Medium links only. The blog navigator is listed separately as an index resource, not used as a substitute article link.
             </p>
           </div>
-          <a class="button" href="https://medium.com/@1200km">All Medium articles</a>
+          <a class="button" href="https://medium.com/@1200km">Medium profile</a>
         </div>
-        <div class="grid two">
-          <article class="card">
-            <h3>AI-Powered Malware Debugger</h3>
-            <p>
-              Engineering walkthrough for a debugger that explains functions,
-              detects malware patterns, builds CFGs, and supports Frida runtime
-              instrumentation.
+
+        <h2>CTI, Attribution, Pivoting</h2>
+        <div class="article-list">
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/cti-research-kubernetes-cloud-native-threat-landscape-70373d6d7a87">CTI Research: Kubernetes & Cloud-Native Threat Landscape</a></h3>
+              <p>Technical kill chain analysis, detection engineering, and defensive architecture for cloud-native threats.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip detection">detection</span><span class="chip">Kubernetes</span><span class="chip">cloud</span><span class="chip article">full-long guide</span></div>
+            </div>
+            <div class="article-meta">Medium · Apr 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/the-intelligent-shield-057c9b4b9394">The Intelligent Shield. OpenCTI</a></h3>
+              <p>OpenCTI deployment and AI-driven enrichment: connectors, STIX, feeds, confidence scoring, and operations.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip tool">OpenCTI</span><span class="chip">AI enrichment</span><span class="chip article">full guide</span></div>
+            </div>
+            <div class="article-meta">Medium · May 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061">CTI Research: MuddyWater/Seedworm</a></h3>
+              <p>Evidence-labeled assessment, technical timeline, defensive priorities, and SOC guidance.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip">MuddyWater</span><span class="chip">Iran</span><span class="chip detection">SOC</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/cti-research-handala-hack-group-aka-handala-hack-team-ddbdd294cfb8">CTI Research: Handala Hack Group</a></h3>
+              <p>Threat persona and cluster analysis with evidence labels, IOC handling, and defensive guidance.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip">Handala</span><span class="chip">Israel</span><span class="chip detection">detection</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://infosecwriteups.com/infrastructure-pivoting-how-cti-analysts-expand-from-a-single-ioc-to-a-full-attacker-network">Infrastructure Pivoting: From One IOC to a Full Attacker Network</a></h3>
+              <p>Field manual for passive DNS, reverse IP, ASN reuse, TLS certificates, internet search, and WHOIS pivots.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip tool">autoWF</span><span class="chip">OSINT</span><span class="chip article">full guide</span></div>
+            </div>
+            <div class="article-meta">InfoSec Write-ups · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/attribution-methodology-how-to-build-defend-and-challenge-a-threat-actor-attribution-071066437ced">Attribution Methodology</a></h3>
+              <p>How to build, defend, and challenge attribution claims without overstating the evidence.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip">attribution</span><span class="chip">confidence</span><span class="chip article">full guide</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/att-ck-as-a-working-tool-theory-and-hands-on-practical-usage-d63835c9f101">ATT&CK as a Working Tool</a></h3>
+              <p>Hands-on ATT&CK use for mapping, gap analysis, Sigma thinking, hunting, and adversary emulation.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip detection">ATT&CK</span><span class="chip">hunting</span><span class="chip article">full-long guide</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/cti-kill-chain-an-analyst-guide-with-real-world-evidence-c3bef6fd2979">CTI Kill Chain: An Analyst Guide With Real-World Evidence</a></h3>
+              <p>Kill-chain thinking for analysts who need evidence, not generic phase labels.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip">kill chain</span><span class="chip">evidence</span><span class="chip article">guide</span></div>
+            </div>
+            <div class="article-meta">Medium · May 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/manual-cti-vs-ai-assisted-cti-a-step-by-step-clock-comparison-ee08325203fc">Manual CTI vs. AI-Assisted CTI</a></h3>
+              <p>Step-by-step comparison of where AI compresses CTI work and where analyst judgment remains non-negotiable.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip">AI workflow</span><span class="chip">tradecraft</span><span class="chip article">full guide</span></div>
+            </div>
+            <div class="article-meta">Medium · May 2026</div>
+          </article>
+        </div>
+
+        <h2 style="margin-top: 34px;">CTI Program Design</h2>
+        <div class="article-list">
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/customer-driven-ai-cti-project-c0db3cdc1830">Customer-Driven AI CTI Project</a></h3>
+              <p>Gate-controlled CTI-to-detection methodology and project workflow overview.</p>
+              <div class="chips"><span class="chip cti">CTI program</span><span class="chip detection">detection engineering</span><span class="chip">governance</span></div>
+            </div>
+            <div class="article-meta">Medium · May 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/customer-driven-ai-cti-project-template-part-1-foundations-745861507d03">Customer-Driven AI CTI Project Template: Part 1</a></h3>
+              <p>Foundations and methodology for a customer-driven CTI lifecycle.</p>
+              <div class="chips"><span class="chip cti">methodology</span><span class="chip">template</span><span class="chip article">full-long guide</span></div>
+            </div>
+            <div class="article-meta">Medium · May 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/customer-driven-ai-cti-project-template-part-2a-phase-by-phase-execution-guide-f9751a8bcb59">Customer-Driven AI CTI Project Template: Part 2A</a></h3>
+              <p>Phase-by-phase execution guide from requirements to hunts and detections.</p>
+              <div class="chips"><span class="chip cti">execution</span><span class="chip detection">hunts</span><span class="chip article">full-long guide</span></div>
+            </div>
+            <div class="article-meta">Medium · May 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/customer-driven-ai-cti-project-template-part-2b-reference-toolkit-3a56fab0b943">Customer-Driven AI CTI Project Template: Part 2B</a></h3>
+              <p>Reference toolkit for artifacts, gates, delivery materials, and validation.</p>
+              <div class="chips"><span class="chip cti">reference</span><span class="chip tool">toolkit</span><span class="chip">validation</span></div>
+            </div>
+            <div class="article-meta">Medium · May 2026</div>
+          </article>
+        </div>
+
+        <h2 style="margin-top: 34px;">Detection And Hunting</h2>
+        <div class="article-list">
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/endpoint-threat-hunting-proactive-detection-on-windows-linux-and-macos-f892d9b8a113">Endpoint Threat Hunting: Windows, Linux, and macOS</a></h3>
+              <p>Telemetry, artifacts, MITRE ATT&CK tactics, and practical playbooks for endpoint hunting.</p>
+              <div class="chips"><span class="chip detection">hunting</span><span class="chip">endpoint</span><span class="chip">SOC</span></div>
+            </div>
+            <div class="article-meta">Medium · Dec 2025</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/protocol-level-network-threat-hunting-a-wireshark-centric-guide-a6770ffc96c6">Protocol-Level Network Threat Hunting</a></h3>
+              <p>Wireshark-centric guide to IOCs, protocol anomalies, C2 signals, and packet-level hunting.</p>
+              <div class="chips"><span class="chip detection">hunting</span><span class="chip">network</span><span class="chip">Wireshark</span></div>
+            </div>
+            <div class="article-meta">Medium · Dec 2025</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/threat-hunting-with-the-pyramid-of-pain-8add3cedb380">Threat Hunting with the Pyramid of Pain</a></h3>
+              <p>How to move defenders from brittle IOCs toward artifacts and TTPs that cost attackers more.</p>
+              <div class="chips"><span class="chip detection">hunting</span><span class="chip cti">CTI</span><span class="chip">TTPs</span></div>
+            </div>
+            <div class="article-meta">Medium · Jul 2025</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/single-event-detection-rules-in-cybersecurity-aa7498f665bd">Single-Event Detection Rules in Cybersecurity</a></h3>
+              <p>Atomic detection rules for SIEM, XDR, and log-based detection platforms.</p>
+              <div class="chips"><span class="chip detection">detection</span><span class="chip">atomic rules</span><span class="chip">SIEM</span></div>
+            </div>
+            <div class="article-meta">Medium · Dec 2025</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/correlation-based-detection-rules-in-cybersecurity-from-atomic-events-to-behavioral-insight-1b3df31597bb">Correlation-Based Detection Rules</a></h3>
+              <p>Multi-event analytics, temporal logic, and behavioral detection across SIEM and XDR.</p>
+              <div class="chips"><span class="chip detection">correlation</span><span class="chip">SIEM</span><span class="chip">XDR</span></div>
+            </div>
+            <div class="article-meta">Medium · Dec 2025</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/the-atomic-standard-a-practitioners-compendium-for-single-event-threat-detection-570c4241d4d9">The Atomic Standard</a></h3>
+              <p>Practitioner compendium for single-event threat detection and rule design.</p>
+              <div class="chips"><span class="chip detection">detection</span><span class="chip">rules</span><span class="chip article">article</span></div>
+            </div>
+            <div class="article-meta">Medium · Nov 2025</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/the-invisible-pipeline-defending-ci-cd-from-targeted-attacks-456283ee5ed3">The Invisible Pipeline</a></h3>
+              <p>Defending CI/CD systems from targeted attacks with concrete controls and detection ideas.</p>
+              <div class="chips"><span class="chip detection">detection</span><span class="chip">CI/CD</span><span class="chip">DevSecOps</span></div>
+            </div>
+            <div class="article-meta">Medium · Oct 2025</div>
+          </article>
+        </div>
+
+        <h2 style="margin-top: 34px;">Malware, Cloud, AI Security</h2>
+        <div class="article-list">
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12">Android APK Analysis Tool</a></h3>
+              <p>AI-powered static APK malware analysis with YARA, VirusTotal, MITRE mapping, and Frida hooks.</p>
+              <div class="chips"><span class="chip malware">malware</span><span class="chip tool">tool</span><span class="chip">Android</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a">AI-Powered Malware Debugger</a></h3>
+              <p>AIDebug walkthrough: FLIRT, patterns, CFGs, Frida, unpacking detection, YARA, and reports.</p>
+              <div class="chips"><span class="chip malware">malware</span><span class="chip detection">ATT&CK</span><span class="chip tool">tool</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/stratusai-i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-heres-everything-89c6702d3b84">StratusAI Cloud Security Scanner</a></h3>
+              <p>AWS and GCP scanner architecture, multi-LLM routing, Terraform deployment, and test coverage.</p>
+              <div class="chips"><span class="chip tool">cloud</span><span class="chip">AWS</span><span class="chip">GCP</span><span class="chip">AI</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/@1200km/ai-in-offensive-operations-how-threat-actors-use-artificial-intelligence-4eaeeaf029a9">AI in Offensive Operations</a></h3>
+              <p>Evidence-based research on attacker AI use, TTPs, incidents, confidence, and forecast judgments.</p>
+              <div class="chips"><span class="chip cti">CTI</span><span class="chip offensive">offensive</span><span class="chip">AI security</span></div>
+            </div>
+            <div class="article-meta">Medium · Apr 2026</div>
+          </article>
+          <article class="article-row">
+            <div>
+              <h3><a href="https://medium.com/bugbountywriteup/cvss-v4-0-the-practical-field-guide-for-vulnerability-management-5b5a59728456">CVSS v4.0 Field Guide</a></h3>
+              <p>CVSS-BTE, KEV, EPSS, environmental scoring, examples, scanner triage, and automation.</p>
+              <div class="chips"><span class="chip detection">vulnerability</span><span class="chip tool">CVSS</span><span class="chip">EPSS</span></div>
+            </div>
+            <div class="article-meta">Medium · Mar 2026</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="tools">
+        <div class="section-heading">
+          <div>
+            <h2>Tools And Repositories</h2>
+            <p class="section-note">
+              Repositories are grouped by defender output, not by programming language.
             </p>
+          </div>
+          <a class="button" href="https://github.com/anpa1200">All GitHub repos</a>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>Malware Analysis Stack</h3>
+            <p>AIDebug, Android-Malware-Analysis, Static Malware Orchestrator, Unpacker, PE Import Analyzer, String Analyzer, and file triage.</p>
+            <div class="chips"><span class="chip malware">malware</span><span class="chip detection">YARA</span><span class="chip">Frida</span><span class="chip">IOC</span></div>
             <div class="links">
-              <a href="https://medium.com/@1200km/ai-powered-malware-debugger-that-explains-every-function-it-sees-2a28ef75df8a">Read on Medium</a>
+              <a href="https://github.com/anpa1200/AIDebug">AIDebug</a>
+              <a href="https://github.com/anpa1200/Android-Malware-Analysis">APK analysis</a>
+              <a href="https://github.com/anpa1200/Static-malware-Analysis-Orchestrator">Orchestrator</a>
+              <a href="https://github.com/anpa1200/Unpacker">Unpacker</a>
+              <a href="https://github.com/anpa1200/PE-Import-Analyzer">PE imports</a>
+              <a href="https://github.com/anpa1200/String-Analyzer">Strings</a>
+              <a href="https://github.com/anpa1200/Basic-File-Information-Gathering-Script">File triage</a>
             </div>
           </article>
 
           <article class="card">
-            <h3>Android APK Analysis Tool</h3>
-            <p>
-              Practical guide to AI-powered static malware analysis in the
-              terminal, including YARA, VirusTotal, risk scoring, and Frida hooks.
-            </p>
+            <h3>CTI Engineering</h3>
+            <p>Reports, pivoting, detection packs, and hunting hypotheses that move intelligence into operational use.</p>
+            <div class="chips"><span class="chip cti">CTI</span><span class="chip detection">hunting</span><span class="chip tool">tooling</span></div>
             <div class="links">
-              <a href="https://medium.com/@1200km/android-apk-analysis-tool-ai-powered-static-malware-analysis-in-your-terminal-4beb239dad12">Read on Medium</a>
+              <a href="https://github.com/anpa1200/CTI">CTI</a>
+              <a href="https://github.com/anpa1200/autoWF">autoWF</a>
+              <a href="https://github.com/anpa1200/cti-detection-pack">Detection pack</a>
+              <a href="https://github.com/anpa1200/threat-hunting-hypotheses">Hunt hypotheses</a>
             </div>
           </article>
 
           <article class="card">
-            <h3>StratusAI Cloud Security Scanner</h3>
-            <p>
-              Full engineering walkthrough for an AWS and GCP scanner with
-              multi-LLM routing, Terraform deployment, and test coverage.
-            </p>
+            <h3>Vulnerability And Cloud</h3>
+            <p>CVSS-BTE enrichment, cloud scanning, and vulnerable cloud labs for realistic prioritization and testing.</p>
+            <div class="chips"><span class="chip tool">cloud</span><span class="chip">CVSS</span><span class="chip">AWS</span><span class="chip">GCP</span></div>
             <div class="links">
-              <a href="https://medium.com/@1200km/stratusai-i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-heres-everything-89c6702d3b84">Read on Medium</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>CVSS v4.0 Field Guide</h3>
-            <p>
-              Practical vulnerability-management guide covering CVSS-BTE,
-              environmental metrics, KEV, EPSS, scanner triage, and automation.
-            </p>
-            <div class="links">
-              <a href="https://medium.com/bugbountywriteup/cvss-v4-0-the-practical-field-guide-for-vulnerability-management-5b5a59728456">Read on Medium</a>
+              <a href="https://github.com/anpa1200/cvss_4.0">cvss_4.0</a>
+              <a href="https://github.com/anpa1200/stratus-ai">stratus-ai</a>
+              <a href="https://github.com/anpa1200/vulnerable-cloud-lab">vulnerable-cloud-lab</a>
             </div>
           </article>
         </div>
       </section>
 
-      <section id="about">
+      <section id="docs">
+        <div class="section-heading">
+          <div>
+            <h2>Docusaurus Sites</h2>
+            <p class="section-note">
+              Full documentation projects. These are separate from Medium articles and are linked directly.
+            </p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>CTI Analyst Field Manual</h3>
+            <p>Analytic judgment, evidence discipline, hunting hypotheses, and detection-ready outputs.</p>
+            <div class="chips"><span class="chip cti">CTI</span><span class="chip detection">hunting</span><span class="chip">manual</span></div>
+            <div class="links"><a href="https://anpa1200.github.io/cti-analyst-field-manual/">Site</a><a href="https://github.com/anpa1200/cti-analyst-field-manual">Repo</a></div>
+          </article>
+          <article class="card">
+            <h3>Israel Government Threat Actors CTI</h3>
+            <p>Defensive CTI knowledge base for Israeli public sector, critical infrastructure, municipal, and supplier exposure.</p>
+            <div class="chips"><span class="chip cti">Israel CTI</span><span class="chip">public sector</span><span class="chip detection">defense</span></div>
+            <div class="links"><a href="https://anpa1200.github.io/israel-government-threat-actors-cti/">Site</a><a href="https://github.com/anpa1200/israel-government-threat-actors-cti">Repo</a></div>
+          </article>
+          <article class="card">
+            <h3>Customer-Driven AI CTI Project</h3>
+            <p>Gate-controlled methodology for turning intelligence requirements into hunts, detections, and delivery artifacts.</p>
+            <div class="chips"><span class="chip cti">CTI program</span><span class="chip detection">detections</span><span class="chip">governance</span></div>
+            <div class="links"><a href="https://anpa1200.github.io/customer-driven-ai-cti-project/">Site</a><a href="https://github.com/anpa1200/customer-driven-ai-cti-project">Repo</a></div>
+          </article>
+          <article class="card">
+            <h3>Customer-Driven AI CTI Template</h3>
+            <p>Reusable templates for requirements, hunts, detections, evidence packs, and customer delivery.</p>
+            <div class="chips"><span class="chip cti">template</span><span class="chip detection">hunts</span><span class="chip tool">toolkit</span></div>
+            <div class="links"><a href="https://anpa1200.github.io/customer-driven-ai-cti-project-template/">Site</a><a href="https://github.com/anpa1200/customer-driven-ai-cti-project-template">Repo</a></div>
+          </article>
+          <article class="card">
+            <h3>CVSS v4.0 Field Guide</h3>
+            <p>Practical CVSS v4.0 scoring, environmental profiles, scanner triage, and prioritization guidance.</p>
+            <div class="chips"><span class="chip detection">vulnerability</span><span class="chip">CVSS</span><span class="chip">risk</span></div>
+            <div class="links"><a href="https://anpa1200.github.io/cvss/">Site</a><a href="https://github.com/anpa1200/cvss">Repo</a></div>
+          </article>
+          <article class="card">
+            <h3>HexStrike AI Guide</h3>
+            <p>Authorized AI-assisted security lab workflows used as operator-context evidence for CTI work.</p>
+            <div class="chips"><span class="chip offensive">offensive</span><span class="chip">lab</span><span class="chip">AI</span></div>
+            <div class="links"><a href="https://anpa1200.github.io/Hexstrike-AI-guide/">Site</a><a href="https://github.com/anpa1200/Hexstrike-AI-guide">Repo</a></div>
+          </article>
+          <article class="card">
+            <h3>Medium Blog Navigator</h3>
+            <p>Separate index for browsing the full Medium library by topic, depth, and role. Article cards above use direct article links.</p>
+            <div class="chips"><span class="chip">index</span><span class="chip">navigation</span><span class="chip">100+ articles</span></div>
+            <div class="links"><a href="https://anpa1200.github.io/medium-blog-navigation/">Site</a><a href="https://github.com/anpa1200/medium-blog-navigation">Repo</a></div>
+          </article>
+          <article class="card">
+            <h3>OpenCTI Intelligent Shield</h3>
+            <p>OpenCTI operations and security-team workflows for AI-driven enrichment and threat-intelligence management.</p>
+            <div class="chips"><span class="chip cti">OpenCTI</span><span class="chip tool">tool</span><span class="chip">operations</span></div>
+            <div class="links"><a href="https://github.com/anpa1200/opencti-intelligent-shield">Repo</a><a href="https://medium.com/@1200km/the-intelligent-shield-057c9b4b9394">Article</a></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="labs">
+        <div class="section-heading">
+          <div>
+            <h2>Offensive And Lab Work</h2>
+            <p class="section-note">
+              This is the credibility layer: labs and offensive workflows explain why the CTI is operationally grounded.
+            </p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>Operation DragonRx</h3>
+            <p>APT41 pharmaceutical-sector scenario with lab architecture and attack playbook material.</p>
+            <div class="chips"><span class="chip cti">CTI</span><span class="chip offensive">lab</span><span class="chip">APT41</span></div>
+            <div class="links">
+              <a href="https://medium.com/@1200km/lab-architecture-operation-dragonrx-38602f432e5c">Lab Architecture</a>
+              <a href="https://medium.com/@1200km/attack-playbook-operation-dragonrx-91339316f0df">Attack Playbook</a>
+              <a href="https://github.com/anpa1200/dragonrx-lab">Repo</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Cloud And Kubernetes Labs</h3>
+            <p>Terraform and Kubernetes environments for testing cloud identity, misconfiguration, and detection assumptions.</p>
+            <div class="chips"><span class="chip tool">cloud</span><span class="chip offensive">lab</span><span class="chip">Kubernetes</span></div>
+            <div class="links">
+              <a href="https://github.com/anpa1200/vulnerable-cloud-lab">vulnerable-cloud-lab</a>
+              <a href="https://medium.com/@1200km/cti-research-kubernetes-cloud-native-threat-landscape-70373d6d7a87">K8s CTI article</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Credential And Protocol Testing</h3>
+            <p>Authorized password-list generation and RTSP credential-testing utilities for controlled assessments.</p>
+            <div class="chips"><span class="chip offensive">offensive</span><span class="chip tool">tool</span><span class="chip">credentials</span></div>
+            <div class="links">
+              <a href="https://github.com/anpa1200/Passwords">Passwords</a>
+              <a href="https://github.com/anpa1200/RTSP-brute-force-tool">RTSP tool</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="paths">
+        <div class="section-heading">
+          <div>
+            <h2>Reading Paths</h2>
+            <p class="section-note">Choose a route based on what you need to evaluate.</p>
+          </div>
+        </div>
+        <div class="path-grid">
+          <div class="path">
+            <h3>CTI Lead</h3>
+            <ol>
+              <li><a href="https://medium.com/@1200km/cti-research-kubernetes-cloud-native-threat-landscape-70373d6d7a87">Kubernetes CTI</a></li>
+              <li><a href="https://medium.com/@1200km/attribution-methodology-how-to-build-defend-and-challenge-a-threat-actor-attribution-071066437ced">Attribution Methodology</a></li>
+              <li><a href="https://anpa1200.github.io/cti-analyst-field-manual/">Field Manual</a></li>
+            </ol>
+          </div>
+          <div class="path">
+            <h3>Detection Engineer</h3>
+            <ol>
+              <li><a href="https://medium.com/@1200km/single-event-detection-rules-in-cybersecurity-aa7498f665bd">Atomic Detections</a></li>
+              <li><a href="https://medium.com/@1200km/correlation-based-detection-rules-in-cybersecurity-from-atomic-events-to-behavioral-insight-1b3df31597bb">Correlation Rules</a></li>
+              <li><a href="https://github.com/anpa1200/cti-detection-pack">Detection Pack</a></li>
+            </ol>
+          </div>
+          <div class="path">
+            <h3>Malware Analyst</h3>
+            <ol>
+              <li><a href="https://github.com/anpa1200/AIDebug">AIDebug</a></li>
+              <li><a href="https://github.com/anpa1200/Android-Malware-Analysis">APK Analysis</a></li>
+              <li><a href="https://github.com/anpa1200/Unpacker">Unpacker</a></li>
+            </ol>
+          </div>
+          <div class="path">
+            <h3>Cloud Defender</h3>
+            <ol>
+              <li><a href="https://github.com/anpa1200/stratus-ai">StratusAI</a></li>
+              <li><a href="https://github.com/anpa1200/vulnerable-cloud-lab">Cloud Lab</a></li>
+              <li><a href="https://medium.com/@1200km/cti-research-kubernetes-cloud-native-threat-landscape-70373d6d7a87">K8s Threat Landscape</a></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact">
         <div class="about-panel">
           <article class="card">
-            <h2>About Me</h2>
+            <h2>About</h2>
             <p>
-              I am a cybersecurity researcher and builder focused on practical,
-              research-backed tools and workflows for analysts, defenders,
-              researchers, and security engineers.
+              I am a practical CTI engineer with offensive-security and malware-analysis background.
+              My work is built around defender action: what to hunt, what to pivot, what to map, what to prioritize, and what to validate.
             </p>
             <ul class="list">
-              <li>AI-powered security automation</li>
-              <li>Malware triage and static analysis</li>
-              <li>Cyber Threat Intelligence and detection engineering</li>
-              <li>Offensive security research in authorized lab environments</li>
-              <li>Analyst-friendly documentation and repeatable workflows</li>
+              <li>CTI as engineering, not report writing alone.</li>
+              <li>Evidence labels and confidence language for threat research.</li>
+              <li>Malware tooling that emits detection and intelligence artifacts.</li>
+              <li>Offensive labs used to understand operator behavior.</li>
             </ul>
           </article>
-
-          <article class="card" id="contact">
-            <h2>Contact</h2>
-            <p>
-              Follow my research, tools, and technical writing through these
-              public profiles.
-            </p>
-            <div class="contact-list">
-              <a href="https://github.com/anpa1200">GitHub: anpa1200</a>
-              <a href="https://medium.com/@1200km">Medium: @1200km</a>
-              <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn: Andrey Pautov</a>
+          <article class="card">
+            <h2>Contact And Profiles</h2>
+            <p>Use the public profiles below for code, writing, and professional context.</p>
+            <div class="links">
+              <a href="https://github.com/anpa1200">GitHub</a>
+              <a href="https://medium.com/@1200km">Medium</a>
+              <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a>
+              <a href="https://x.com/AndreyPa5">Twitter/X</a>
             </div>
           </article>
         </div>
@@ -650,8 +997,7 @@
 
     <footer>
       <div class="footer-inner">
-        Cybersecurity research, practical tooling, and intelligence-driven
-        engineering by Andrey Pautov.
+        Practical CTI engineering, malware-analysis tooling, detection engineering, and lab-backed security research by Andrey Pautov.
       </div>
     </footer>
   </body>
