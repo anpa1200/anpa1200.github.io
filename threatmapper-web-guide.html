@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TMTG21RVHM');
+    </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-4GbcvBt1YwbUIazfcM7HFDbTxHzGoa2tBMutVpD+cTA=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ThreatMapper Web — Guide — Andrey Pautov</title>
+    <meta name="description" content="ThreatMapper Web is a browser-native MITRE ATT&CK explorer. Interactive matrix, 160+ APT groups, Group vs Group comparison, TTP detail panels, and report export — no server, no Docker, no install." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="ThreatMapper Web — Guide — Andrey Pautov" />
+    <meta property="og:description" content="How to use ThreatMapper Web: browser-native ATT&CK matrix, APT library, TTP comparison, Group vs Group analysis, and ecosystem links." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://1200km.com/threatmapper-web-guide.html" />
+    <meta property="og:image" content="https://1200km.com/assets/ap-logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png" />
+    <link rel="canonical" href="https://1200km.com/threatmapper-web-guide.html" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="icon" href="assets/ap-logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --text: #172033;
+        --muted: #5b667a;
+        --line: #dbe4ef;
+        --accent: #0f62fe;
+        --accent-dark: #054ada;
+        --red: #b91c1c;
+        --red-bg: #fff0f0;
+        --chip: #eef4ff;
+        --shadow: 0 14px 34px rgba(24,38,69,0.09);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.6;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { color: var(--accent-dark); text-decoration: underline; }
+
+      .site-header {
+        position: sticky; top: 0; z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav, .page-hero-inner, main, .footer-inner {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        min-height: 64px;
+        display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        font-weight: 700; color: var(--text); text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+
+      .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
+
+      .page-hero {
+        background: linear-gradient(120deg, rgba(185,28,28,0.08), rgba(15,98,254,0.07)), #ffffff;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .page-hero-inner { padding: 64px 0 52px; }
+
+      .page-eyebrow {
+        color: var(--red);
+        font-size: 0.76rem; font-weight: 600;
+        letter-spacing: 0.09em; text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+
+      .page-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
+
+      .page-lead {
+        max-width: 760px; margin: 16px 0 0;
+        color: var(--muted); font-size: 1.07rem;
+      }
+
+      .page-hero-links {
+        display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px;
+      }
+
+      .button {
+        display: inline-flex; align-items: center;
+        padding: 8px 18px; border: 1px solid var(--line);
+        border-radius: 6px; font-size: 0.88rem; font-weight: 700;
+        color: var(--text); background: var(--panel);
+        text-decoration: none;
+        transition: border-color 0.14s, background 0.14s;
+      }
+      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
+      .button.primary { background: var(--red); color: #fff; border-color: var(--red); }
+      .button.primary:hover { background: #991b1b; border-color: #991b1b; color: #fff; }
+
+      main {
+        padding: 52px 0 72px;
+        display: flex; flex-direction: column; gap: 56px;
+      }
+
+      /* ── Feature sections ── */
+      .section-label {
+        font-size: 0.72rem; font-weight: 700;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        color: var(--red); margin: 0 0 6px;
+      }
+
+      .section-title {
+        margin: 0 0 6px;
+        font-size: 1.45rem; font-weight: 800; line-height: 1.2;
+      }
+
+      .section-lead {
+        margin: 0 0 24px;
+        color: var(--muted); font-size: 0.97rem; max-width: 700px;
+      }
+
+      /* ── Feature cards grid ── */
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+      }
+
+      .feature-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 22px 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .feature-card-icon {
+        font-size: 1.4rem; margin-bottom: 10px;
+      }
+
+      .feature-card-title {
+        font-weight: 700; font-size: 1rem; margin: 0 0 6px;
+      }
+
+      .feature-card-desc {
+        margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.55;
+      }
+
+      /* ── How-to steps ── */
+      .steps { display: flex; flex-direction: column; gap: 0; }
+
+      .step {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        gap: 0 18px;
+        padding: 18px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .step:last-child { border-bottom: none; }
+
+      .step-num {
+        width: 36px; height: 36px;
+        background: var(--red-bg); color: var(--red);
+        border-radius: 50%; font-weight: 800; font-size: 0.95rem;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; margin-top: 2px;
+      }
+
+      .step-body { }
+      .step-title { font-weight: 700; font-size: 0.97rem; margin: 0 0 4px; }
+      .step-desc { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.55; }
+
+      /* ── Compare table ── */
+      .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        background: var(--panel);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+
+      .compare-table th {
+        background: #f0f4fc;
+        font-weight: 700;
+        text-align: left;
+        padding: 12px 16px;
+        border-bottom: 2px solid var(--line);
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+
+      .compare-table td {
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+
+      .compare-table tr:last-child td { border-bottom: none; }
+
+      .yes { color: #007a5a; font-weight: 700; }
+      .no  { color: var(--muted); }
+
+      /* ── Ecosystem bar ── */
+      .ecosystem-bar {
+        background: linear-gradient(120deg, #0d1b2e, #132240);
+        border-radius: 12px;
+        padding: 32px 36px;
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 24px; flex-wrap: wrap;
+      }
+
+      .ecosystem-bar-text h3 {
+        margin: 0 0 6px; font-size: 1.1rem; color: #e2e8f0; font-weight: 700;
+      }
+
+      .ecosystem-bar-text p {
+        margin: 0; font-size: 0.88rem; color: #7a96bc; line-height: 1.55; max-width: 540px;
+      }
+
+      .ecosystem-links {
+        display: flex; flex-wrap: wrap; gap: 10px; flex-shrink: 0;
+      }
+
+      .eco-link {
+        display: inline-flex; align-items: center;
+        padding: 7px 15px;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 6px;
+        font-size: 0.84rem; font-weight: 600;
+        color: #93c5fd; text-decoration: none;
+        background: rgba(255,255,255,0.06);
+        transition: background 0.14s, border-color 0.14s;
+      }
+      .eco-link:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; text-decoration: none; }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 0;
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 720px) {
+        .feature-grid { grid-template-columns: 1fr; }
+        .ecosystem-bar { flex-direction: column; align-items: flex-start; }
+        .nav { flex-direction: column; align-items: flex-start; gap: 10px; padding: 10px 0; }
+        .nav-links { grid-template-columns: repeat(3, max-content); display: grid; gap: 8px 14px; }
+        .page-hero-links { display: grid; grid-template-columns: repeat(2, max-content); gap: 10px; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="index.html">
+          <img src="assets/ap-logo.png" alt="Andrey Pautov logo" width="36" height="36" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="index.html">Main page</a>
+          <a href="about.html">About</a>
+          <a href="cv.html">CV</a>
+          <a href="cti.html" class="active">CTI</a>
+          <a href="labs.html">Labs</a>
+          <a href="guides.html">Guides</a>
+          <a href="hexstrike.html">HexStrike</a>
+          <a href="ai-offensive.html">AI Offensive</a>
+          <a href="pt-tools.html">PT Tools</a>
+          <a href="https://github.com/anpa1200">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="page-hero">
+      <div class="page-hero-inner">
+        <p class="page-eyebrow">◈ ThreatMapper Web · Browser-native · No install</p>
+        <h1 class="page-title">ThreatMapper Web</h1>
+        <p class="page-lead">
+          A fully browser-based MITRE ATT&CK explorer. Map threat actor behaviour, compare APT groups,
+          run gap analysis, and export reports — no server, no Docker, no API keys required.
+        </p>
+        <div class="page-hero-links">
+          <a class="button primary" href="https://1200km.com/threat-matrix/" target="_blank" rel="noopener">Open tool →</a>
+          <a class="button" href="https://github.com/anpa1200/threatmapper-web" target="_blank" rel="noopener">GitHub repo</a>
+          <a class="button" href="https://1200km.com/threatmapper-docs/" target="_blank" rel="noopener">Docker version docs</a>
+          <a class="button" href="cti.html">CTI page</a>
+        </div>
+      </div>
+    </div>
+
+    <main>
+
+      <!-- ── What it is ── -->
+      <section>
+        <p class="section-label">Overview</p>
+        <h2 class="section-title">What is ThreatMapper Web?</h2>
+        <p class="section-lead">
+          ThreatMapper Web is the lightweight, zero-install counterpart to the self-hosted
+          <a href="https://1200km.com/threatmapper-docs/" target="_blank" rel="noopener">ThreatMapper Docker platform</a>.
+          It runs entirely in your browser — no account, no API key, no backend. Load the page and start
+          building ATT&CK layers immediately.
+        </p>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-card-icon">◈</div>
+            <div class="feature-card-title">ATT&CK Matrix</div>
+            <p class="feature-card-desc">
+              Full interactive MITRE ATT&CK matrix across all 14 tactics. Click cells to select techniques,
+              expand sub-techniques, overlay APT group profiles, and filter by name or ID. Colour-coded
+              states show selected (red), overlay (blue), and shared (amber) techniques at a glance.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-icon">◉</div>
+            <div class="feature-card-title">APT Library</div>
+            <p class="feature-card-desc">
+              160+ named threat groups from MITRE ATT&CK. Browse, search, and open any group profile to
+              see its full TTP set. Load a group's techniques into your selection, overlay it on the matrix,
+              or jump directly to the Compare view.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-icon">⊘</div>
+            <div class="feature-card-title">My TTPs vs Groups</div>
+            <p class="feature-card-desc">
+              Jaccard similarity ranking of your selected techniques against all ATT&CK threat groups.
+              Click any result to see shared techniques, your-only techniques, and a full gap analysis —
+              which techniques in the group's profile you don't cover yet.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-icon">⊕</div>
+            <div class="feature-card-title">Group vs Group</div>
+            <p class="feature-card-desc">
+              Select up to 6 APT groups and compare them simultaneously. N×N Jaccard similarity matrix,
+              combined ATT&CK view with per-group coloured dots, and a sortable technique table with
+              per-group checkmarks — useful for cluster analysis and attribution disambiguation.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-icon">↗</div>
+            <div class="feature-card-title">TTP Detail Panels</div>
+            <p class="feature-card-desc">
+              Click any technique ID anywhere in the tool to open a detail panel. Shows the technique
+              description, tactic tags, MITRE ATT&CK link, Anomaly Detection Atlas cross-references,
+              ITDR Handbook links (for identity techniques), and CTI Field Manual link.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-icon">↓</div>
+            <div class="feature-card-title">Report &amp; Export</div>
+            <p class="feature-card-desc">
+              Export your TTP selection as a MITRE ATT&CK Navigator-compatible JSON layer, a CSV table,
+              or a formatted PDF report. The Report view shows your full selection with tactic breakdown
+              and export buttons.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── How to use ── -->
+      <section>
+        <p class="section-label">Workflow</p>
+        <h2 class="section-title">How to Use It</h2>
+        <p class="section-lead">A typical analyst workflow from zero to attribution finding.</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <p class="step-title">Open the tool</p>
+              <p class="step-desc">
+                Navigate to <a href="https://1200km.com/threat-matrix/" target="_blank" rel="noopener">1200km.com/threat-matrix/</a>.
+                The MITRE ATT&CK data loads automatically from a bundled JSON file — no network calls to external services.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <p class="step-title">Build your TTP selection</p>
+              <p class="step-desc">
+                In the <strong>ATT&CK Matrix</strong> view, click technique cells to select them (they turn red).
+                Click the small monospace ID at the top of each cell to open the detail panel instead.
+                Use the filter bar to narrow by name or ID when working with a known technique list.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <p class="step-title">Load from APT Library (optional)</p>
+              <p class="step-desc">
+                Go to <strong>APT Library</strong>, find a group (search by name or ID), and click
+                <em>Load as my selection</em> to replace your layer with that group's TTPs, or
+                <em>Overlay on matrix</em> to visualise the group on the matrix without replacing your layer.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <p class="step-title">Compare against threat groups</p>
+              <p class="step-desc">
+                Go to <strong>My TTPs vs Groups</strong>. The ranking updates automatically from your
+                selection. Click any result row to see the detail panel: similarity score, shared techniques
+                (amber badges — click to open detail), and gap analysis.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <p class="step-title">Run Group vs Group analysis (optional)</p>
+              <p class="step-desc">
+                Go to <strong>Group vs Group</strong>, search and select up to 6 APT groups, and explore
+                the Overlap Matrix, ATT&CK View, and Technique Table tabs. Click technique IDs in the table
+                to open detail panels.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-body">
+              <p class="step-title">Export</p>
+              <p class="step-desc">
+                Go to <strong>Report</strong> and export as ATT&CK Navigator JSON, CSV, or PDF.
+                The Navigator JSON can be imported directly into the official MITRE ATT&CK Navigator
+                or into the self-hosted <a href="https://github.com/anpa1200/threatmapper" target="_blank" rel="noopener">ThreatMapper Docker tool</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TTP Detail Panels ── -->
+      <section>
+        <p class="section-label">Feature Spotlight</p>
+        <h2 class="section-title">Clickable TTP Detail Panels</h2>
+        <p class="section-lead">
+          Every technique ID displayed in the tool — in the matrix, the library, the compare results,
+          and the group-vs-group table — is a clickable link.
+        </p>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-card-title">Where to click</div>
+            <p class="feature-card-desc">
+              In the <strong>ATT&CK Matrix</strong>, click the small monospace ID (e.g. <code>T1078</code>)
+              at the top of each cell — not the cell body, which toggles selection. Everywhere else
+              (library, compare badges, group-vs-group table), click the ID text directly.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-title">What the panel shows</div>
+            <p class="feature-card-desc">
+              Technique name and ID, tactic pills, direct MITRE ATT&CK link,
+              <a href="https://1200km.com/anomaly-detection-atlas/" target="_blank" rel="noopener">Anomaly Detection Atlas</a>
+              cross-references (for covered techniques), ITDR Handbook links for identity techniques,
+              and CTI Field Manual link.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-title">Identity technique links</div>
+            <p class="feature-card-desc">
+              For techniques in the identity category (T1078 Valid Accounts, T1098 Account Manipulation,
+              T1110 Brute Force, T1556 Modify Authentication Process, and others), the panel automatically
+              includes a link to the
+              <a href="https://1200km.com/ITDR/" target="_blank" rel="noopener">ITDR Handbook</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Web vs Docker comparison ── -->
+      <section>
+        <p class="section-label">Tool Comparison</p>
+        <h2 class="section-title">Web Tool vs Docker Platform</h2>
+        <p class="section-lead">
+          Both tools are part of the same project. Use the web tool for quick analysis without setup;
+          use the Docker platform for AI-powered extraction, campaigns, saved reports, and PDF generation.
+        </p>
+
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>ThreatMapper Web</th>
+              <th>ThreatMapper Docker</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Install required</td>
+              <td class="yes">None — open in browser</td>
+              <td class="no">Docker Compose</td>
+            </tr>
+            <tr>
+              <td>ATT&CK Matrix</td>
+              <td class="yes">✓</td>
+              <td class="yes">✓ (with D3 zoom/pan)</td>
+            </tr>
+            <tr>
+              <td>APT Library</td>
+              <td class="yes">✓ 160+ groups</td>
+              <td class="yes">✓ 174+ groups + 56+ campaigns</td>
+            </tr>
+            <tr>
+              <td>My TTPs vs Groups (Compare)</td>
+              <td class="yes">✓</td>
+              <td class="yes">✓ Groups / Campaigns / Reports</td>
+            </tr>
+            <tr>
+              <td>Group vs Group</td>
+              <td class="yes">✓ up to 6 groups</td>
+              <td class="yes">✓ up to 6 groups</td>
+            </tr>
+            <tr>
+              <td>TTP detail panels</td>
+              <td class="yes">✓ with ecosystem links</td>
+              <td class="yes">✓ with description, detection, LLM chat</td>
+            </tr>
+            <tr>
+              <td>AI report analysis</td>
+              <td class="no">✗</td>
+              <td class="yes">✓ Claude / GPT-4o / Gemini</td>
+            </tr>
+            <tr>
+              <td>Named campaigns</td>
+              <td class="no">✗</td>
+              <td class="yes">✓ 56+ MITRE campaigns</td>
+            </tr>
+            <tr>
+              <td>Report library</td>
+              <td class="no">✗</td>
+              <td class="yes">✓ stored sessions, re-compare</td>
+            </tr>
+            <tr>
+              <td>PDF export</td>
+              <td class="yes">✓ basic</td>
+              <td class="yes">✓ full multi-page</td>
+            </tr>
+            <tr>
+              <td>ATT&CK Navigator JSON export</td>
+              <td class="yes">✓</td>
+              <td class="yes">✓</td>
+            </tr>
+            <tr>
+              <td>LLM chat assistant per technique</td>
+              <td class="no">✗</td>
+              <td class="yes">✓</td>
+            </tr>
+            <tr>
+              <td>Anomaly Detection Atlas links</td>
+              <td class="yes">✓</td>
+              <td class="yes">✓</td>
+            </tr>
+            <tr>
+              <td>Privacy — data stays local</td>
+              <td class="yes">✓ browser-only, no backend</td>
+              <td class="yes">✓ self-hosted</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ── Ecosystem ── -->
+      <section>
+        <div class="ecosystem-bar">
+          <div class="ecosystem-bar-text">
+            <h3>Part of the 1200km.com CTI Ecosystem</h3>
+            <p>
+              ThreatMapper Web connects to the full 1200km.com knowledge base.
+              TTP detail panels link directly to Anomaly Detection Atlas pages, the ITDR Handbook
+              for identity techniques, and the CTI Analyst Field Manual.
+            </p>
+          </div>
+          <div class="ecosystem-links">
+            <a class="eco-link" href="https://1200km.com/threat-matrix/" target="_blank" rel="noopener">◈ Open ThreatMapper Web</a>
+            <a class="eco-link" href="https://1200km.com/anomaly-detection-atlas/" target="_blank" rel="noopener">Anomaly Detection Atlas</a>
+            <a class="eco-link" href="https://1200km.com/ITDR/" target="_blank" rel="noopener">ITDR Handbook</a>
+            <a class="eco-link" href="https://1200km.com/cti-analyst-field-manual/" target="_blank" rel="noopener">CTI Field Manual</a>
+            <a class="eco-link" href="https://1200km.com/threatmapper-docs/" target="_blank" rel="noopener">Docker Tool Docs</a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        Andrey Pautov · CTI-to-detection practitioner · Tel Aviv, Israel ·
+        <a href="mailto:1200km@gmail.com">1200km@gmail.com</a> ·
+        <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> ·
+        <a href="index.html">Main page</a>
+      </div>
+    </footer>
+
+  </body>
+</html>
