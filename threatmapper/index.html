@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TMTG21RVHM');
+    </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-4GbcvBt1YwbUIazfcM7HFDbTxHzGoa2tBMutVpD+cTA=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ThreatMapper — AI-Assisted MITRE ATT&amp;CK CTI Platform | 1200km</title>
+    <meta name="description" content="ThreatMapper is a self-hosted AI-assisted cyber threat intelligence platform that maps threat reports to MITRE ATT&CK, compares TTP overlap with known groups and campaigns, and generates analyst-ready intelligence outputs." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta name="keywords" content="ThreatMapper, MITRE ATT&CK, CTI, cyber threat intelligence, threat intelligence platform, ATT&CK Navigator, detection engineering, TTP mapping, APT similarity, threat report analysis, AI cybersecurity tool, self-hosted CTI platform, ATT&CK mapping, security research portfolio" />
+    <meta property="og:title" content="ThreatMapper — AI-Assisted MITRE ATT&amp;CK CTI Platform" />
+    <meta property="og:description" content="Map threat reports to ATT&CK, compare TTP overlap with groups and campaigns, and generate CTI-to-detection outputs. Self-hosted, Docker-based AI-assisted platform." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://1200km.com/threatmapper/" />
+    <meta property="og:site_name" content="1200km.com — Andrey Pautov" />
+    <meta property="og:image" content="https://1200km.com/assets/threatmapper-web-og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ThreatMapper — AI-Assisted MITRE ATT&amp;CK CTI Platform" />
+    <meta name="twitter:description" content="Self-hosted AI-assisted CTI platform: map threat reports to ATT&CK, compare TTP overlap with known groups, generate analyst-ready outputs." />
+    <meta name="twitter:image" content="https://1200km.com/assets/threatmapper-web-og.png" />
+    <link rel="canonical" href="https://1200km.com/threatmapper/" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="icon" href="../assets/ap-logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "ThreatMapper",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "Self-hosted / Web / Docker",
+        "description": "Self-hosted AI-assisted cyber threat intelligence platform for mapping threat reports to MITRE ATT&CK, comparing TTP overlap with known groups and campaigns, and generating analyst-ready intelligence outputs.",
+        "url": "https://1200km.com/threatmapper/",
+        "codeRepository": "https://github.com/anpa1200/threatmapper",
+        "installUrl": "https://github.com/anpa1200/threatmapper",
+        "screenshot": "https://1200km.com/assets/threatmapper-web-og.png",
+        "softwareHelp": { "@type": "CreativeWork", "url": "https://1200km.com/threatmapper-docs/" },
+        "author": {
+          "@type": "Person",
+          "name": "Andrey Pautov",
+          "url": "https://1200km.com/",
+          "sameAs": [
+            "https://github.com/anpa1200",
+            "https://medium.com/@1200km",
+            "https://www.linkedin.com/in/andrey-pautov/"
+          ]
+        },
+        "sameAs": [
+          "https://github.com/anpa1200/threatmapper",
+          "https://1200km.com/threatmapper-docs/",
+          "https://medium.com/@1200km/threatmapper-i-built-a-self-hosted-ai-threat-intelligence-platform-heres-how-to-use-it-0aa7673e6bd8"
+        ]
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #050c1a;
+        --text: #cdd9ee;
+        --muted: #7a96bc;
+        --line: #1a3060;
+        --accent: #0f62fe;
+        --accent-soft: #93c5fd;
+        --panel: #ffffff;
+        --panel-translucent: rgba(255,255,255,0.82);
+        --panel-ink: #172033;
+        --panel-ink-soft: #2d3a4f;
+        --panel-muted: #5a6f8f;
+        --ok: #34d399;
+        --warn: #b45309;
+        --chip: #0d1f3c;
+        --chip-strong: #162d52;
+        --shadow: 0 14px 34px rgba(0,0,0,0.45);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: #050c1a url(../assets/bg-cyber.png) center/cover fixed;
+        line-height: 1.58;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { color: var(--accent-soft); text-decoration: underline; }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav, .hero-inner, main, .footer-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        font-size: 0.92rem;
+      }
+
+      .nav-links a { color: var(--muted); }
+      .nav-links a:hover { color: var(--text); text-decoration: none; }
+      .nav-links a.active { color: var(--accent-soft); font-weight: 600; }
+
+      /* ── Hero ── */
+      .hero {
+        background: rgba(5,12,26,0.88);
+        border-bottom: 1px solid var(--line);
+        padding: 80px 0 60px;
+      }
+
+      .eyebrow {
+        color: var(--accent-soft);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 4.8vw, 4rem);
+        line-height: 1.04;
+        letter-spacing: -0.01em;
+      }
+
+      .hero-sub {
+        max-width: 780px;
+        margin: 20px 0 0;
+        font-size: 1.12rem;
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: rgba(5,12,26,0.6);
+        color: var(--text);
+        font-weight: 600;
+        font-size: 0.94rem;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      .button:hover {
+        background: rgba(26,86,168,0.3);
+        border-color: var(--accent);
+        text-decoration: none;
+        color: var(--text);
+      }
+
+      .button.primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #ffffff;
+        font-size: 1rem;
+        padding: 0 26px;
+      }
+
+      .button.primary:hover {
+        background: #054ada;
+        border-color: #054ada;
+        color: #ffffff;
+      }
+
+      /* ── Main layout ── */
+      main { padding: 48px 0 80px; }
+
+      section { margin-top: 64px; }
+      section:first-child { margin-top: 0; }
+
+      h2 {
+        margin: 0 0 10px;
+        font-size: 1.7rem;
+        line-height: 1.2;
+        color: var(--text);
+      }
+
+      .section-sub {
+        max-width: 680px;
+        margin: 0 0 24px;
+        color: var(--muted);
+        font-size: 0.97rem;
+      }
+
+      /* ── Cards / panels ── */
+      .card {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        color: var(--panel-ink-soft);
+      }
+
+      .card h3 {
+        margin: 0 0 10px;
+        font-size: 1.05rem;
+        color: var(--panel-ink);
+        line-height: 1.3;
+      }
+
+      .card p { margin: 0; line-height: 1.6; }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 16px;
+      }
+
+      .grid.two { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .grid.four { grid-template-columns: repeat(4,minmax(0,1fr)); }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+        font-size: 0.93rem;
+        font-weight: 600;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .chip {
+        display: inline-flex;
+        min-height: 26px;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: var(--chip);
+        color: var(--accent-soft);
+        font-size: 0.76rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      /* ── Warning / notice panels ── */
+      .notice {
+        padding: 14px 18px;
+        border-radius: 8px;
+        border-left: 4px solid;
+        font-size: 0.93rem;
+        line-height: 1.6;
+      }
+
+      .notice.warn {
+        border-color: #b45309;
+        background: #fff8ed;
+        color: #5c3a00;
+      }
+
+      .notice.info {
+        border-color: var(--accent);
+        background: #f0f5ff;
+        color: #1e3a6e;
+      }
+
+      .notice strong { font-weight: 700; }
+
+      /* ── Workflow flow ── */
+      .flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(255,255,255,0.04);
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      .flow-step {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        background: var(--chip-strong);
+        border-radius: 6px;
+        color: var(--accent-soft);
+        font-weight: 600;
+        font-size: 0.84rem;
+        white-space: nowrap;
+      }
+
+      .flow-arrow {
+        color: var(--line);
+        font-size: 1rem;
+        flex-shrink: 0;
+        user-select: none;
+      }
+
+      /* ── Capability list ── */
+      .cap-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .cap-list li {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        padding: 10px 14px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: rgba(255,255,255,0.03);
+        color: var(--text);
+        font-size: 0.94rem;
+        line-height: 1.5;
+      }
+
+      .cap-list li::before {
+        content: "◈";
+        color: var(--accent);
+        font-size: 0.72rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      /* ── Footer CTA ── */
+      .footer-cta {
+        margin-top: 72px;
+        padding: 36px 28px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(15,98,254,0.06);
+        text-align: center;
+      }
+
+      .footer-cta h2 { margin-bottom: 8px; font-size: 1.5rem; }
+      .footer-cta p { color: var(--muted); margin: 0 0 22px; }
+
+      /* ── Page footer ── */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 28px 0;
+        color: var(--panel-muted);
+        background: #ffffff;
+      }
+
+      @media (max-width: 960px) {
+        .grid, .grid.two, .grid.four { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 760px) {
+        .nav { align-items: flex-start; flex-direction: column; padding: 14px 0; }
+        .hero { padding: 52px 0 42px; }
+      }
+
+      @media (max-width: 720px) {
+        .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
+        .nav-links { display: grid; grid-template-columns: repeat(3,max-content); gap: 8px 14px; width: 100%; }
+        body { overflow-x: hidden; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html">
+          <img src="../assets/ap-logo.png" alt="Andrey Pautov logo" width="36" height="36" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="../index.html">Main page</a>
+          <a href="../about.html">About</a>
+          <a href="../cv.html">CV</a>
+          <a href="../cti.html">CTI</a>
+          <a href="../labs.html">Labs</a>
+          <a href="../guides.html">Guides</a>
+          <a href="../hexstrike.html">HexStrike</a>
+          <a href="../ai-offensive.html">AI Offensive</a>
+          <a href="../pt-tools.html">PT Tools</a>
+          <a href="https://github.com/anpa1200">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ── Hero ── -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-inner">
+        <p class="eyebrow">Self-Hosted · AI-Assisted · MITRE ATT&amp;CK · CTI Platform</p>
+        <h1 id="hero-heading">ThreatMapper</h1>
+        <p class="hero-sub">
+          AI-assisted CTI platform for mapping threat reports to MITRE ATT&amp;CK, comparing TTP overlap
+          with known groups and campaigns, and generating analyst-ready intelligence outputs.
+          Self-hosted. Multi-provider LLM. Docker Compose. No cloud dependencies.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="https://1200km.com/threat-matrix/" target="_blank" rel="noopener noreferrer">▶ Open Live Demo</a>
+          <a class="button" href="https://github.com/anpa1200/threatmapper" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="button" href="https://1200km.com/threatmapper-docs/" target="_blank" rel="noopener noreferrer">Documentation</a>
+          <a class="button" href="https://medium.com/@1200km/threatmapper-i-built-a-self-hosted-ai-threat-intelligence-platform-heres-how-to-use-it-0aa7673e6bd8" target="_blank" rel="noopener noreferrer">Medium Walkthrough</a>
+        </div>
+      </div>
+    </section>
+
+    <main>
+
+      <!-- ── Public demo notice ── -->
+      <div class="notice warn" style="max-width:860px;margin:0 auto;" role="note" aria-label="Public demo privacy notice">
+        <strong>Public demo privacy note.</strong>
+        The hosted demo at <a href="https://1200km.com/threat-matrix/" target="_blank" rel="noopener noreferrer">1200km.com/threat-matrix/</a>
+        is intended for exploration and demonstration.
+        Do not upload confidential, customer-sensitive, classified, or internal reports into the public demo.
+        Use the <a href="https://github.com/anpa1200/threatmapper" target="_blank" rel="noopener noreferrer">self-hosted Docker deployment</a> for private analysis.
+      </div>
+
+      <!-- ── Problem ── -->
+      <section aria-labelledby="problem-heading">
+        <h2 id="problem-heading">The Analyst Problem</h2>
+        <p class="section-sub">
+          CTI work has a structural bottleneck between raw intelligence and structured, actionable output.
+        </p>
+        <div class="grid">
+          <article class="card">
+            <h3>Reports are inconsistent and verbose</h3>
+            <p>Vendor CTI reports, incident writeups, and OSINT sources vary widely in structure, depth, and terminology. Extracting ATT&amp;CK technique references manually is slow and error-prone at scale.</p>
+          </article>
+          <article class="card">
+            <h3>ATT&amp;CK mapping is a repetitive bottleneck</h3>
+            <p>Mapping behaviors in a report to ATT&amp;CK technique IDs requires reading, judgment, and cross-referencing — repeated for every source, every engagement, every campaign update.</p>
+          </article>
+          <article class="card">
+            <h3>Comparing reports to groups is manual</h3>
+            <p>Checking whether extracted TTPs resemble a known APT group's profile means manually looking up groups, comparing technique lists, and tracking overlaps and gaps — without tooling, this is ad hoc at best.</p>
+          </article>
+          <article class="card">
+            <h3>CTI-to-detection requires structured output</h3>
+            <p>Turning CTI into a detection backlog requires structured technique IDs, tactic context, and evidence. Unstructured report text doesn't translate directly into Sigma rules, SIEM queries, or detection priorities.</p>
+          </article>
+          <article class="card">
+            <h3>Existing tools visualize — they don't automate the workflow</h3>
+            <p>ATT&amp;CK Navigator and similar tools are excellent for visualization, but they require the analyst to build layers manually. The extraction, comparison, and export workflow still requires custom effort.</p>
+          </article>
+          <article class="card">
+            <h3>Privacy-sensitive reports can't go to commercial tools</h3>
+            <p>Customer reports, red team debriefs, and internal incidents can't be uploaded to cloud-hosted SaaS analysis platforms. Analysts need self-hosted options with full data control.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Solution ── -->
+      <section aria-labelledby="solution-heading">
+        <h2 id="solution-heading">What ThreatMapper Does</h2>
+        <p class="section-sub">
+          ThreatMapper automates the mechanical steps of the CTI-to-detection workflow
+          while keeping analyst judgment at every decision gate.
+        </p>
+        <div class="grid two">
+          <article class="card">
+            <h3>From report to ATT&amp;CK techniques</h3>
+            <p>Upload a PDF, DOCX, or paste raw text. Select your LLM provider. ThreatMapper extracts ATT&amp;CK technique IDs with supporting evidence and confidence scores, streamed token by token.</p>
+            <div class="chips">
+              <span class="chip">PDF · DOCX · TXT</span>
+              <span class="chip">Claude · GPT-4o · Gemini</span>
+              <span class="chip">Streaming extraction</span>
+            </div>
+          </article>
+          <article class="card">
+            <h3>TTP overlap against known groups and campaigns</h3>
+            <p>Extracted techniques are compared against all known ATT&amp;CK groups and campaigns using Jaccard similarity. Results surface groups with the highest TTP overlap — useful as an analytical signal for hypothesis generation and investigation prioritization.</p>
+            <div class="chips">
+              <span class="chip">174+ APT groups</span>
+              <span class="chip">Jaccard TTP overlap</span>
+              <span class="chip">Hypothesis generation</span>
+            </div>
+          </article>
+          <article class="card">
+            <h3>ATT&amp;CK Navigator heatmaps</h3>
+            <p>Extracted techniques are visualized as an interactive ATT&amp;CK Navigator-style heatmap. Layer overlays, campaign comparisons, and named layer libraries allow side-by-side analytical views.</p>
+            <div class="chips">
+              <span class="chip">Navigator layers</span>
+              <span class="chip">Campaign overlay</span>
+              <span class="chip">Layer library</span>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Structured outputs for detection workflows</h3>
+            <p>Export structured technique lists, confidence scores, and evidence references. One-click PDF reports suitable for analyst handoffs, briefings, or detection backlog tickets.</p>
+            <div class="chips">
+              <span class="chip">PDF reports</span>
+              <span class="chip">Structured JSON</span>
+              <span class="chip">Detection backlog support</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Workflow ── -->
+      <section aria-labelledby="workflow-heading">
+        <h2 id="workflow-heading">Workflow</h2>
+        <p class="section-sub">End-to-end flow from raw threat report to analyst-ready output.</p>
+        <div class="flow" aria-label="ThreatMapper workflow steps">
+          <span class="flow-step">Threat Report</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">LLM-assisted extraction</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">ATT&amp;CK technique mapping</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Group / Campaign TTP overlap</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Gap analysis</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Navigator layer / PDF / detection backlog</span>
+        </div>
+        <p style="margin-top:14px;color:var(--muted);font-size:0.9rem;">
+          All steps include analyst review points. ThreatMapper accelerates mechanical work —
+          it does not replace analyst judgment on evidence quality, confidence calibration, or attribution decisions.
+        </p>
+      </section>
+
+      <!-- ── Capabilities ── -->
+      <section aria-labelledby="capabilities-heading">
+        <h2 id="capabilities-heading">Key Capabilities</h2>
+        <ul class="cap-list" aria-labelledby="capabilities-heading">
+          <li>PDF, DOCX, and plain-text threat report ingestion</li>
+          <li>MITRE ATT&amp;CK Enterprise, Mobile, and ICS domain support</li>
+          <li>Multi-provider LLM support — Claude, OpenAI GPT-4o, Google Gemini — configurable per analysis</li>
+          <li>Real-time streaming technique extraction with evidence and confidence scores</li>
+          <li>ATT&amp;CK group and campaign TTP overlap scoring (Jaccard similarity, 174+ groups)</li>
+          <li>Stored report comparison — compare current analysis against previously analyzed reports</li>
+          <li>ATT&amp;CK Navigator-compatible layer output for visualization and export</li>
+          <li>Interactive ATT&amp;CK Navigator heatmap with campaign overlay support</li>
+          <li>Named layer library for managing multiple analytical views</li>
+          <li>One-click PDF report generation for analyst handoffs and briefings</li>
+          <li>API-first FastAPI backend — scriptable and extensible</li>
+          <li>PostgreSQL storage for analysis history and stored report comparison</li>
+          <li>Self-hosted Docker Compose deployment — no cloud dependencies, full data control</li>
+        </ul>
+      </section>
+
+      <!-- ── Safety note ── -->
+      <section aria-labelledby="attribution-heading">
+        <h2 id="attribution-heading">On Attribution and TTP Overlap</h2>
+        <div class="notice info">
+          <strong>ThreatMapper does not perform definitive attribution.</strong>
+          TTP overlap scores are Jaccard similarity values computed against known ATT&amp;CK group and campaign profiles.
+          These scores are useful as <strong>analytical signals</strong> for hypothesis generation, investigation prioritization,
+          and detection focus — not as definitive attribution claims.
+          TTP overlap with a known group's profile does not confirm that group's involvement.
+          Multiple groups share common techniques. Analyst judgment and corroborating evidence
+          are required before any attribution conclusion is drawn.
+        </div>
+      </section>
+
+      <!-- ── Architecture ── -->
+      <section aria-labelledby="architecture-heading">
+        <h2 id="architecture-heading">Architecture Overview</h2>
+        <p class="section-sub">ThreatMapper is a self-hosted stack deployable via Docker Compose.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Frontend</h3>
+            <p>React single-page application. Interactive ATT&amp;CK Navigator matrix, streaming extraction panel, comparison views, and report generation. Runs in the browser after container startup.</p>
+          </article>
+          <article class="card">
+            <h3>Backend API</h3>
+            <p>FastAPI (Python). Handles report ingestion, LLM provider routing, ATT&amp;CK data lookups, similarity computation, and structured output generation. REST endpoints, documented and testable.</p>
+          </article>
+          <article class="card">
+            <h3>Storage</h3>
+            <p>PostgreSQL database for storing analysis results, technique extractions, report metadata, and layer configurations. Enables stored report comparison across multiple analyses.</p>
+          </article>
+          <article class="card">
+            <h3>ATT&amp;CK Data Layer</h3>
+            <p>Bundled MITRE ATT&amp;CK STIX data for Enterprise, Mobile, and ICS domains. Group and campaign profiles used for TTP overlap computation without requiring external API calls during analysis.</p>
+          </article>
+          <article class="card">
+            <h3>LLM Provider Abstraction</h3>
+            <p>Configurable multi-provider LLM routing. Claude (Anthropic), OpenAI GPT-4o, and Google Gemini supported. Provider selection at analysis time — no vendor lock-in, switchable per use case.</p>
+          </article>
+          <article class="card">
+            <h3>Export and Reporting Layer</h3>
+            <p>Structured JSON output for downstream tooling integration. ATT&amp;CK Navigator-compatible layer files. PDF report generation for analyst briefings and detection backlog handoffs.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Related projects ── -->
+      <section aria-labelledby="ecosystem-heading">
+        <h2 id="ecosystem-heading">ThreatMapper in the 1200km Ecosystem</h2>
+        <p class="section-sub">
+          ThreatMapper is one component in a broader CTI and detection engineering portfolio.
+          Related projects it connects to:
+        </p>
+        <div class="grid">
+          <article class="card">
+            <h3><a href="https://1200km.com/cti-analyst-field-manual/">CTI Analyst Field Manual</a></h3>
+            <p>Practitioner tradecraft for CTI analysts: evidence discipline, attribution methodology, Admiralty scale, hunting hypothesis construction, and detection backlog management. 80 pages, 10 modules.</p>
+            <div class="links">
+              <a href="https://1200km.com/cti-analyst-field-manual/">Open Manual</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/operation-desert-hydra/">Operation Desert Hydra</a></h3>
+            <p>Complete CTI-to-detection pipeline on a real adversary — the kind of structured workflow ThreatMapper is designed to accelerate. From raw reports to 16 validated detection rules.</p>
+            <div class="links">
+              <a href="https://1200km.com/operation-desert-hydra/">View pipeline</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/opencti-intelligent-shield/">OpenCTI Intelligent Shield</a></h3>
+            <p>OpenCTI platform with AI enrichment connector — structured STIX 2.1 intelligence management, source confidence scoring, and analyst-gated knowledge graph workflows.</p>
+            <div class="links">
+              <a href="https://1200km.com/opencti-intelligent-shield/">View project</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/customer-driven-ai-cti-project/">Customer-Driven AI CTI</a></h3>
+            <p>End-to-end methodology for structured CTI engagements with human validation gates. ThreatMapper fits into the extraction and mapping phases of this 15-phase cycle.</p>
+            <div class="links">
+              <a href="https://1200km.com/customer-driven-ai-cti-project/">View methodology</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Detection Atlas</a></h3>
+            <p>Vendor-neutral reference connecting ATT&amp;CK-aligned techniques to statistical anomalies and log sources. Useful downstream from ThreatMapper output for detection design.</p>
+            <div class="links">
+              <a href="https://1200km.com/anomaly-detection-atlas/">Open Atlas</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/insider-threat-detection/">Insider Threat Detection Guide</a></h3>
+            <p>Detection engineering reference for insider threat scenarios — 14 documented cases, 4-tier detection taxonomy, UEBA, and deception. ATT&amp;CK-aligned throughout.</p>
+            <div class="links">
+              <a href="https://1200km.com/insider-threat-detection/">View guide</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/ai-vs-defense/">Old Defense vs New-Age Attacks</a></h3>
+            <p>How AI changes the attacker skill floor and what SOC teams must change in detection, CTI, and response. Context for why AI-assisted CTI tooling matters for defenders.</p>
+            <div class="links">
+              <a href="https://1200km.com/ai-vs-defense/">View guide</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/threat-matrix/">ThreatMapper Web</a></h3>
+            <p>Browser-native ATT&amp;CK explorer — interactive matrix, 160+ APT groups, Group vs Group comparison, TTP gap analysis, and export. No install, no LLM, no backend. Works offline.</p>
+            <div class="links">
+              <a href="https://1200km.com/threat-matrix/">Open Tool</a>
+              <a href="../threatmapper-web-guide.html">Guide</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3><a href="https://1200km.com/israel-government-threat-actors-cti/">Israel Government Threat Actors CTI</a></h3>
+            <p>Sector CTI covering Iranian, Palestinian, and regional threat actors targeting Israeli public sector and critical infrastructure — the type of structured CTI ThreatMapper helps produce.</p>
+            <div class="links">
+              <a href="https://1200km.com/israel-government-threat-actors-cti/">View CTI</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Footer CTA ── -->
+      <div class="footer-cta" role="complementary" aria-label="Quick links">
+        <h2>Get Started with ThreatMapper</h2>
+        <p>Explore the live demo, deploy self-hosted, or read the full documentation.</p>
+        <div class="actions" style="justify-content:center;">
+          <a class="button primary" href="https://1200km.com/threat-matrix/" target="_blank" rel="noopener noreferrer">▶ Open Live Demo</a>
+          <a class="button" href="https://github.com/anpa1200/threatmapper" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="button" href="https://1200km.com/threatmapper-docs/" target="_blank" rel="noopener noreferrer">Documentation</a>
+          <a class="button" href="https://medium.com/@1200km/threatmapper-i-built-a-self-hosted-ai-threat-intelligence-platform-heres-how-to-use-it-0aa7673e6bd8" target="_blank" rel="noopener noreferrer">Medium Walkthrough</a>
+        </div>
+      </div>
+
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <a href="../index.html" style="color:inherit;font-weight:600;">Andrey Pautov</a> — CTI-to-detection practitioner.
+        ThreatMapper is an open-source project. All work featured on this site is original.
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:12px;font-size:0.86rem;">
+          <a href="../index.html">Portfolio</a>
+          <a href="../about.html">About</a>
+          <a href="https://github.com/anpa1200/threatmapper" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://1200km.com/threatmapper-docs/" target="_blank" rel="noopener noreferrer">Docs</a>
+          <a href="https://medium.com/@1200km" target="_blank" rel="noopener noreferrer">Medium</a>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>
