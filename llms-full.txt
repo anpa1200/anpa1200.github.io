@@ -428,11 +428,22 @@
 
 ### OpenCTI Intelligent Shield
 **URL:** https://1200km.com/opencti-intelligent-shield/
-**Content:** Deploying AI-powered enrichment in OpenCTI platform
-- Custom Claude connector for automated STIX 2.1 object enrichment
-- Confidence scoring methodology for AI-generated enrichments
-- Integration architecture: OpenCTI → AI enrichment → analyst validation
-- STIX relationship automation
+**GitHub:** https://github.com/anpa1200/opencti-intelligent-shield
+**Medium article:** https://medium.com/@1200km/the-intelligent-shield-057c9b4b9394
+**Content:** Complete guide to deploying an AI-powered CTI platform with OpenCTI
+- **Architecture:** OpenCTI (Node.js) + ElasticSearch + JanusGraph + RabbitMQ + MinIO + Redis; TAXII 2.x server; GraphQL/REST API
+- **Intelligence feeds — Free/Open-Source:** MITRE ATT&CK, CVE/NVD, AlienVault OTX, Abuse.ch (URLhaus/ThreatFox/Malware Bazaar), Shodan, TAXII clients
+- **Intelligence feeds — Commercial:** MISP, VirusTotal, Mandiant, Recorded Future, CrowdStrike Falcon, Sekoia, ThreatConnect, Intel 471
+- **Intelligence feeds — ISAC/Government:** CISA AIS, FS-ISAC, H-ISAC, NATO MISP, ENISA
+- **TLP assignment:** WHITE (MITRE, CVE, confidence 90), GREEN (OTX, confidence 60), AMBER (commercial, confidence 85), RED (internal SOC, confidence 95)
+- **Hardware:** minimum 8 cores/16 GB/200 GB; recommended 16 cores/32 GB/1 TB NVMe
+- **Deployment:** three Docker Compose stacks — core (OpenCTI + ES + Minio + Redis + RabbitMQ), connectors, AI enrichment
+- **Claude AI connector:** custom Python connector using pycti + Anthropic API; 3-stage pipeline: entity extraction → STIX relationship inference → write back as STIX 2.1 objects
+- **Inference rules:** attribution_attribution (transitive), sighting_incident, indicate_sighted, report_ref_indicator_based_on, observable_value, parent_technique_use
+- **Security hardening:** 9-step checklist — change default credentials, HTTPS reverse proxy, ES authentication, RabbitMQ restriction, secrets management, TLP defaults, audit logging, network segmentation, daily backups
+- **Investigation workflows:** threat actor profiling (Lazarus Group knowledge graph example), report ingestion (MuddyWater PDF auto-import), IOC pivoting (IP → actor attribution via GraphQL API), CVE research (CVE-2024-21762 → Midnight Eclipse campaign → UPSTYLE malware), incident response case creation
+- **STIX objects managed:** IntrusionSet, Malware, Tool, AttackPattern, Report, Indicator, Observable, Sector, Country, Organization, Relationship
+- **Ecosystem integration:** feeds into CTI-to-detection workflow documented in CTI Analyst Field Manual and Customer-Driven AI CTI Project; actor intelligence feeds Israel Threat Actors CTI profiles; provides TAXII output for SIEM/firewall/EDR integration
 
 ---
 
