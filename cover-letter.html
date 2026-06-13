@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>(function(){var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script>
     <script>
@@ -392,6 +393,60 @@
       }
 
 
+    
+      /* ─── Light / dark toggle ─── */
+      [data-theme="light"] {
+        --bg: #f0f4ff;
+        --text: #0a1a50;
+        --muted: #4b6080;
+        --line: #c8d5ee;
+        --accent: #0f62fe;
+        --accent-soft: #1d4ed8;
+        --panel: #ffffff;
+        --panel-translucent: rgba(255,255,255,0.97);
+        --panel-ink: #0a1830;
+        --panel-ink-soft: #1e3050;
+        --panel-muted: #4b6080;
+        --chip: #e8eeff;
+        --chip-strong: #d4e2ff;
+        --shadow: 0 6px 20px rgba(15,98,254,0.10);
+        --warn: #b45309;
+        --ok: #059669;
+      }
+      [data-theme="light"] body {
+        background: #f0f4ff !important;
+        background-image: none !important;
+      }
+      [data-theme="light"] .site-header {
+        background: rgba(236,242,255,0.94) !important;
+        border-bottom: 1px solid #c8d5ee;
+      }
+      [data-theme="light"] footer,
+      [data-theme="light"] .footer {
+        background: rgba(236,242,255,0.96) !important;
+        border-top: 1px solid #c8d5ee;
+      }
+      .theme-btn {
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: border-color 0.15s, color 0.15s;
+        flex-shrink: 0;
+        font-family: inherit;
+      }
+      .theme-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent-soft);
+      }
     </style>
   </head>
   <body>
@@ -414,7 +469,7 @@
           <a href="pt-tools.html">PT Tools</a>
           <a href="https://github.com/anpa1200">GitHub</a>
           <a href="https://medium.com/@1200km">Medium</a>
-        </div>
+        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">☀</button>
       </nav>
     </header>
 
@@ -501,5 +556,20 @@
     </footer>
 
   <script>document.getElementById('js-print-btn').addEventListener('click',function(){window.print();});</script>
+  
+    <script>
+      function toggleTheme() {
+        var t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+        var btn = document.getElementById('theme-btn');
+        if (btn) btn.textContent = t === 'dark' ? '☀' : '☾';
+      }
+      (function(){
+        var t = localStorage.getItem('theme') || 'dark';
+        var btn = document.getElementById('theme-btn');
+        if (btn) btn.textContent = t === 'dark' ? '☀' : '☾';
+      })();
+    </script>
   </body>
 </html>
