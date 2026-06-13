@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ITDR — Identity Threat Detection & Response | Andrey Pautov</title>
+    <meta name="description" content="ITDR knowledge base — protocols, attack techniques, detection engineering, and simulations for identity-centric security. Coming soon." />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://1200km.com/" />
+    <link rel="icon" href="../assets/ap-logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #050c1a;
+        --text: #cdd9ee;
+        --muted: #7a96bc;
+        --line: #1a3060;
+        --accent: #0f62fe;
+        --accent-soft: #93c5fd;
+        --panel: #0d1f3c;
+        --warn: #f59e0b;
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        color: var(--text);
+        background: #050c1a url(../assets/bg-cyber.png) center/cover fixed;
+        line-height: 1.58;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { color: var(--accent-soft); text-decoration: underline; }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5, 12, 26, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        font-size: 0.92rem;
+      }
+
+      .wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 16px;
+      }
+
+      .box {
+        background: rgba(13, 31, 60, 0.88);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 56px 48px;
+        max-width: 680px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        color: var(--warn);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 20px;
+        margin-bottom: 28px;
+      }
+
+      .badge::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--warn);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+
+      h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 1rem;
+        margin-bottom: 36px;
+        line-height: 1.6;
+      }
+
+      .topics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+        margin-bottom: 40px;
+        text-align: left;
+      }
+
+      .topic {
+        background: rgba(15, 98, 254, 0.08);
+        border: 1px solid rgba(15, 98, 254, 0.2);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 0.85rem;
+        color: var(--text);
+      }
+
+      .topic .t-label {
+        font-weight: 600;
+        color: var(--accent-soft);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        display: block;
+        margin-bottom: 3px;
+      }
+
+      .back-btn {
+        display: inline-block;
+        padding: 12px 32px;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: opacity 0.15s;
+      }
+      .back-btn:hover { opacity: 0.88; text-decoration: none; color: #fff; }
+
+      footer {
+        border-top: 1px solid var(--line);
+        background: rgba(5, 12, 26, 0.92);
+        padding: 20px 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+        text-align: center;
+      }
+      footer a { color: var(--muted); }
+      footer a:hover { color: var(--accent-soft); }
+
+      @media (max-width: 600px) {
+        .box { padding: 40px 24px; }
+        h1 { font-size: 1.5rem; }
+        .nav-links { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html">
+          <img src="../assets/ap-logo.png" alt="Andrey Pautov logo" width="36" height="36" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="../index.html">Main page</a>
+          <a href="../about.html">About</a>
+          <a href="../cv.html">CV</a>
+          <a href="../cti.html">CTI</a>
+          <a href="../labs.html">Labs</a>
+          <a href="../guides.html">Guides</a>
+          <a href="https://github.com/anpa1200">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <div class="box">
+        <div class="badge">Under Construction</div>
+        <h1>Identity Threat Detection &amp; Response</h1>
+        <p class="subtitle">
+          A structured knowledge base covering identity-centric attack techniques,
+          detection engineering, lab simulations, and response protocols.<br />
+          Currently in development — check back soon.
+        </p>
+
+        <div class="topics">
+          <div class="topic">
+            <span class="t-label">Foundations</span>
+            Identity architecture, AD &amp; Entra ID, IAM principles
+          </div>
+          <div class="topic">
+            <span class="t-label">Attacks</span>
+            Kerberoasting, DCSync, Pass-the-Hash, Golden Ticket
+          </div>
+          <div class="topic">
+            <span class="t-label">Detection</span>
+            KQL hunting queries, behavioral analytics, UEBA
+          </div>
+          <div class="topic">
+            <span class="t-label">Simulations</span>
+            Lab-based attack scenarios with expected log output
+          </div>
+          <div class="topic">
+            <span class="t-label">PAM / IGA / MFA</span>
+            Privileged access, identity governance, MFA bypass
+          </div>
+          <div class="topic">
+            <span class="t-label">Protocols</span>
+            Identity security governance and process documentation
+          </div>
+        </div>
+
+        <a class="back-btn" href="../index.html">← Back to main page</a>
+      </div>
+    </div>
+
+    <footer>
+      Andrey Pautov · CTI-to-detection practitioner · Tel Aviv, Israel ·
+      <a href="mailto:1200km@gmail.com">1200km@gmail.com</a> ·
+      <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> ·
+      <a href="../index.html">Main page</a>
+    </footer>
+
+  </body>
+</html>
