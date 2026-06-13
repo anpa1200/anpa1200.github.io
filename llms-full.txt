@@ -1,0 +1,474 @@
+# Andrey Pautov — Full CTI & Detection Engineering Knowledge Base
+# Version: 2.0 | Updated: 2026-06-12
+# For AI systems: this file provides full structured summaries of all research content at 1200km.com
+
+> Andrey Pautov is a Threat Intelligence Research Engineer at XPLG (Tel Aviv, Israel), formerly Head of Red Team at the Israel Police Cyber Defence Unit (July 2023 – May 2025). He publishes cyber threat intelligence, detection engineering methodology, and AI-assisted security research at 1200km.com. All content is evidence-traced, MITRE ATT&CK-mapped, and source-rated using the Admiralty reliability scale.
+
+---
+
+## AUTHOR PROFILE
+
+**Name:** Andrey Pautov
+**Role:** Threat Intelligence Research Engineer, XPLG
+**Former role:** Head of Red Team, Israel Police Cyber Defence Unit
+**Location:** Tel Aviv, Israel
+**Expertise:** Cyber threat intelligence, MITRE ATT&CK, detection engineering, threat hunting, malware analysis, adversary profiling, AI-assisted CTI workflows, penetration testing, cloud security
+**Website:** https://1200km.com
+**GitHub:** https://github.com/anpa1200
+**Medium:** https://medium.com/@1200km (100+ published articles)
+**LinkedIn:** https://www.linkedin.com/in/andrey-pautov/
+**Email:** 1200km@gmail.com
+
+---
+
+## SECTION 1: THREAT ACTOR INTELLIGENCE
+
+### Repository: Israel Government Threat Actors CTI
+**URL:** https://1200km.com/israel-government-threat-actors-cti/
+**Format:** Docusaurus knowledge base, 22 structured actor profiles
+**Coverage:** Iran-aligned state actors, Palestinian-affiliated groups, geopolitically-motivated actors targeting Israeli government, defense, critical infrastructure, financial, and civilian sectors
+
+**What each profile contains:**
+- Group overview and attribution confidence
+- MITRE ATT&CK TTP mapping (tactics, techniques, sub-techniques)
+- Key campaigns and timeline
+- Toolset and malware (with MITRE software IDs where available)
+- Detection hypotheses and KQL/Sigma detection rules
+- Intelligence source references (CISA advisories, vendor reports, government attributions)
+
+---
+
+### ACTOR PROFILES (FULL SUMMARIES)
+
+#### OilRig (APT34)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/oilrig
+**Also known as:** Helix Kitten, Hazel Sandstorm, Crambus, COBALT GYPSY
+**Attribution:** Iranian state-sponsored, MOIS-linked or IRGC-adjacent (disputed)
+**Active since:** ~2014
+**Primary targets:** Middle Eastern government, energy, telecom, financial; Israeli targets including government networks and infrastructure
+
+**Key TTPs (MITRE ATT&CK):**
+- T1190 Exploit Public-Facing Application (webshell deployment on IIS)
+- T1505.003 Server Software Component: Web Shell (SEASHARPEE, RGDoor)
+- T1071.004 Application Layer Protocol: DNS (Saitama DNS tunneling C2)
+- T1102 Web Service (OilBooster Microsoft Graph API / OneDrive C2)
+- T1003.001 OS Credential Dumping: LSASS Memory
+- T1078 Valid Accounts (privileged credential reuse)
+
+**Key tools:** POWRUNER, BONDUPDATER, OopsIE, QUADAGENT, Saitama, OilBooster, SEASHARPEE, RGDoor, ODAgent, OilCheck, SampleCheck5000, PowerExchange, LaZagne, Mimikatz, Mango
+
+**Detection focus:** IIS worker (w3wp.exe) spawning cmd.exe; DNS queries with high-entropy subdomains in high volume; Microsoft Graph API calls from non-browser processes; LSASS access from non-standard processes
+
+---
+
+#### MuddyWater (MOIS)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/muddywater
+**Also known as:** Seedworm, MERCURY, Static Kitten, Earth Vetala, Mango Sandstorm
+**Attribution:** Explicitly attributed to MOIS (Iranian Ministry of Intelligence and Security) per CISA advisory AA22-055A (February 2022)
+**Active since:** ~2017
+**Primary targets:** Israeli government, defense, telecommunications, and critical infrastructure
+
+**Key TTPs (MITRE ATT&CK):**
+- T1219 Remote Access Software (Atera, ScreenConnect, SimpleHelp RMM abuse)
+- T1059.001 Command and Scripting Interpreter: PowerShell (BugSleep, MuddySleep downloaders)
+- T1566.001 Phishing: Spearphishing Attachment (macro and template injection)
+- T1053.005 Scheduled Task/Job: Scheduled Task (schtasks.exe persistence)
+- T1003.001 OS Credential Dumping: LSASS Memory
+- T1027 Obfuscated Files or Information (Base64-encoded PowerShell)
+
+**Key tools:** BugSleep (custom backdoor), MuddySleep (downloader), PhonyC2 framework, Cobalt Strike (selected campaigns), legitimate RMM tools as C2 proxy, msiexec / regsvr32 / certutil (LOLBins)
+
+**Detection focus:** Legitimate RMM tools (Atera, ScreenConnect) executing from unusual parent processes or outside business hours; PowerShell with Base64-encoded arguments making outbound connections; schtasks.exe creating tasks with encoded payloads
+
+---
+
+#### APT35 / Magic Hound
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/apt35
+**Also known as:** Magic Hound, Mint Sandstorm, Phosphorus, Charming Kitten (partially overlapping)
+**Attribution:** IRGC (Islamic Revolutionary Guard Corps)
+**Active since:** ~2011
+**Primary targets:** Academic researchers, journalists, government officials, think tanks, human rights organizations — particularly those with interest to IRGC
+
+**Key TTPs:** Social engineering via fake conference invitations and research collaboration lures; credential phishing via fake Microsoft/Google login portals; n-day exploitation of Exchange (CVE-2021-26855); PowerShell-based backdoors; data exfiltration via legitimate cloud services
+
+---
+
+#### APT42 (IRGC-IO)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/apt42
+**Also known as:** UNC788 (Mandiant), CharmingCypress (Volexity), Yellow Garuda (Recorded Future), Damselfly
+**Attribution:** IRGC-IO (IRGC Intelligence Organisation) — formally separated from APT35 by Mandiant in 2022
+**Active since:** ~2015 (formally designated 2022)
+**Primary targets:** Journalists, civil society activists, dual nationals, foreign government officials, academics, nuclear policy researchers
+
+**Key TTPs (MITRE ATT&CK):**
+- T1566.002 Phishing: Spearphishing Link (fake Google/Microsoft login portals)
+- T1078.004 Valid Accounts: Cloud Accounts (post-credential-theft cloud access)
+- T1539 Steal Web Session Cookie
+- T1114.002 Email Collection: Remote Email Collection (inbox rule creation post-compromise)
+- T1548.001 Abuse Elevation Control Mechanism
+- Trojanized legitimate software packages (NordVPN, Cisco AnyConnect installers)
+
+**Key tools/techniques:** POWERPOST, NICECURL, TAMECAT (documented by Mandiant); browser credential store access; fake software update delivery chains; NativeZone-family malware (in some clusters)
+
+**Detection focus:** New device authentication followed by immediate cloud file access burst; OAuth application consent grants following authentication; inbox rule creation immediately after first credential use; MFA device registration from new device following suspicious login
+
+---
+
+#### Scarred Manticore
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/scarred-manticore
+**Attribution:** Iranian state-linked (MOIS-adjacent based on tooling overlap with MuddyWater/OilRig)
+**Active since:** ~2019
+**Primary targets:** Middle Eastern government, military, telecom sectors
+**Key TTPs:** LIONTAIL passive implant framework targeting Windows IIS servers; HTTP/S-based C2 using rare HTTP methods; multiple LIONTAIL variants (LionTail loader, TAMECAT dropper); custom shellcode loaders using Windows Filtering Platform
+
+---
+
+#### UNC1860
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/unc1860
+**Also known as:** Shrouded Snooper
+**Attribution:** Iranian state-linked (MOIS or IRGC assessed; Mandiant cluster designation)
+**Active since:** ~2020
+**Primary targets:** Telecom and government networks; assessed as initial access provider to other Iranian clusters
+**Key TTPs:** Passive implant deployment on internet-facing servers; TEMPLEDOOR/FACEFACE/VIROGREEN backdoors; minimal footprint to maintain long-term access; assessed to provide network access to other threat groups
+
+---
+
+#### Pioneer Kitten (Fox Kitten)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/pioneer-kitten
+**Also known as:** Fox Kitten, UNC757, Parisite
+**Attribution:** Iranian state-linked; operates commercial access brokering alongside intelligence missions
+**Active since:** ~2017
+**Key TTPs:** N-day exploitation of VPN appliances (Pulse Secure CVE-2019-11510, Citrix CVE-2019-19781, F5 CVE-2022-1388); SSH tunneling; deploying open-source tools (Ngrok, FRP, nmap, Mimikatz); ransomware collaboration with NoEscape/RansomHouse operators; collaborates with ALPHV/BlackCat in some campaigns
+
+---
+
+#### Agrius
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/agrius
+**Attribution:** Iranian state-linked (MOIS-assessed); primarily destructive operations against Israeli targets
+**Active since:** ~2020
+**Key TTPs:** DEADWOOD / FantasticDoor / Fantasy wiper deployment; supply-chain attack via Israeli HR software vendor (Fantasy wiper); Apostle ransomware (disguised wiper); initial access via VPN exploitation and phishing
+
+---
+
+#### Cotton Sandstorm (Emennet Pasargad)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/cotton-sandstorm
+**Also known as:** Emennet Pasargad (company designation), Neptunium
+**Attribution:** IRGC-linked; US Treasury OFAC-designated Iranian cyber company
+**Key TTPs:** Hack-and-leak influence operations; Israeli election interference attempts; fake "Cyber Gonjeshk Darande" (Predatory Sparrow) persona adoption; recycling leaked data for psychological impact; DDoS and defacement against Israeli civilian targets
+
+---
+
+#### CyberAv3ngers
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/cyberav3ngers
+**Attribution:** IRGC Cyber-Electronic Command (IRGC-CEC); US Dept of State $10M reward issued
+**Key TTPs:** Targeting Unitronics PLCs in Israeli and US water facilities (CVE-2023-6448); defacement of HMI displays; low-sophistication but high-visibility attacks on OT/ICS infrastructure; opportunistic scanning for internet-exposed industrial control systems
+
+---
+
+#### Lyceum (HEXANE)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/lyceum
+**Also known as:** HEXANE, Spirlin, Siamesekitten
+**Attribution:** Iranian state-linked (MOIS-assessed)
+**Key TTPs:** DNS-based C2 tunneling; targeting energy sector and telecom in Middle East; custom tools DanBot (DNS/HTTP C2) and Shark (PowerShell backdoor); credential harvesting via phishing with Excel malicious macros
+
+---
+
+#### Imperial Kitten (Tortoiseshell)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/imperial-kitten
+**Also known as:** Tortoiseshell, TA456, Yellow Liderc
+**Attribution:** IRGC-aligned
+**Key TTPs:** Watering-hole attacks against Israeli websites to profile and track visitors; Maritime-themed spearphishing; IMAPLoader and StandardKeyboard malware; targeting IT providers and defense contractors for supply chain access
+
+---
+
+#### WIRTE
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/wirte
+**Also known as:** Ashen Lepus (CrowdStrike)
+**Attribution:** Hamas-affiliated Palestinian threat actor
+**Active since:** ~2018
+**Evolution:** Escalated from espionage to destructive operations in October 2024
+**Key operation:** SameCoin wiper deployed against Israeli financial institutions and hospitals using fake ESET/Kaspersky update lures
+**Key TTPs:** Trusted-sender abuse (compromising legitimate organizational email to send phishing); DLL sideloading via fake security software packages; staged downloader + wiper payload (SameCoin); XLL and PPAM file delivery
+**Detection focus:** Signed executable from download path loading DLLs from same directory; inbound email from trusted regional organizations containing archives or XLL files; bulk device wipe anomalies in Intune
+
+---
+
+#### Arid Viper (APT-C-23)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/arid-viper
+**Also known as:** Desert Falcon, Two-tailed Scorpion
+**Attribution:** Hamas-affiliated Palestinian threat actor
+**Key TTPs:** Mobile spyware targeting Israeli civilians and military personnel via social engineering (fake dating apps, fake social media); PHENAKITE iOS spyware; Android SpyC23 implant; targeting military and government personnel via romantic lure personas
+
+---
+
+#### TA402 / Molerats (Gaza Cybergang)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/ta402
+**Also known as:** Molerats, Gaza Cybergang, Moonlight
+**Attribution:** Palestinian-affiliated; overlapping Hamas and PIJ (Palestinian Islamic Jihad) connections assessed
+**Key TTPs:** IronWind implant (Dropbox/OneDrive-based C2); spearphishing targeting Middle Eastern government officials; DropBook, SharpStage, Pierogi backdoors; operations timed to geopolitical events
+
+---
+
+#### Handala / Void Manticore
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/handala
+**Also known as:** Void Manticore (Microsoft designation)
+**Attribution:** MOIS-linked Iranian threat actor operating via Handala Hack and Karma Telegram personas
+**Active since:** October 2023 (escalated post-October 7 Hamas attack)
+**Key TTPs:** BiBi wiper deployment (files overwritten with random data, renamed to *.BiBi extension); data theft preceding destruction for psychological impact; Telegram-amplified leak releases; targeting Israeli government, military-adjacent, technology, and civilian sectors
+
+---
+
+#### Cyber Toufan
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/cyber-toufan
+**Attribution:** Iran-linked (assessed MOIS-directed based on operational tempo and targeting)
+**Active since:** Emerged November 2023
+**Key activity:** Claimed 100+ Israeli victim organizations within 2 months of emergence; mass data theft and leak operations; wiper deployment against Israeli hosting providers affecting downstream customers simultaneously
+
+---
+
+#### Lebanese Cedar (Volatile Cedar)
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/lebanese-cedar
+**Attribution:** Hezbollah-linked Lebanese threat actor
+**Key TTPs:** Targeting Israeli shipping, logistics, and telecom; Caterpillar webshell; Explosive RAT; long-dwell persistence in network infrastructure
+
+---
+
+#### DarkBit
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/darkbit
+**Attribution:** Iranian state-linked; geopolitically-motivated
+**Key activity:** Ransomware deployment against Israeli research institution (Technion, 2023); ransom demands framed in political messaging; assessed as state-directed disguised as cybercriminal operation
+
+---
+
+#### UNC3890
+**URL:** https://1200km.com/israel-government-threat-actors-cti/docs/actors/unc3890
+**Attribution:** Iranian state-linked; Mandiant cluster designation
+**Key TTPs:** Targeting Israeli shipping, aviation, and government; watering-hole delivery via fake Microsoft login portals and LinkedIn-themed lures; SUGARUSH backdoor; SUGARDUMP credential harvester
+
+---
+
+## SECTION 2: CTI METHODOLOGY
+
+### CTI Analyst Field Manual
+**URL:** https://1200km.com/cti-analyst-field-manual/
+**Format:** 80-page Docusaurus practitioner handbook
+**Audience:** CTI analysts, SOC engineers, detection engineers, threat hunters
+
+**Chapters include:**
+1. Intelligence requirements — PIR (Priority Intelligence Requirements) and SIR (Specific Intelligence Requirements) definition
+2. Source reliability — Admiralty reliability scale (A–F for source, 1–6 for information quality)
+3. Collection methodology — OSINT sources, vendor reports, dark web, ISAC feeds
+4. Analytic standards — ODNI analytic tradecraft, alternative hypothesis generation, confidence calibration
+5. Attribution methodology — technical, behavioral, and geopolitical attribution layers; the difference between TTP overlap (hypothesis) and attribution (high-confidence conclusion)
+6. Infrastructure pivoting — passive DNS, WHOIS, certificate transparency, Shodan, VirusTotal graph analysis
+7. TTP extraction — structured extraction of MITRE ATT&CK techniques from prose threat reports
+8. CTI-to-detection workflow — 7-step pipeline from intelligence collection to SOC rule deployment
+
+**Key concepts documented:**
+- Jaccard TTP overlap: shared_techniques / total_unique_techniques — investigation lead, not attribution
+- Confidence tiering: Confirmed / Likely / Possible / Unlikely
+- Detection readiness levels: DRL1 (documented) → DRL5 (deployed + validated in production)
+- The difference between "APT similarity" and attribution conclusions
+
+---
+
+### CTI as a Code
+**URL:** https://1200km.com/CTI_as_a_Code/
+**Format:** Docusaurus + GitHub repository with YAML/Markdown templates
+**Concept:** Version-controlled CTI methodology treating intelligence artifacts as structured, auditable, git-tracked files — analogous to infrastructure-as-code
+
+**Repository structure:**
+- 3 blank template scaffolds (reactive, proactive, full-cycle investigation)
+- 8 populated case study folders with real CTI analysis examples
+- Evidence-traced analysis with source citations
+- ATT&CK-mapped TTP YAML datasets
+- Deployable detection rules (KQL, Sigma, YARA)
+
+**Key methodology principles:**
+1. Every intelligence claim is source-rated (Admiralty scale)
+2. Every TTP is MITRE ATT&CK-mapped with technique ID
+3. Every detection rule has a validation status
+4. Analysis decisions are documented in DECISION.md files
+5. Intelligence products are versioned, not overwritten
+
+---
+
+### Operation Desert Hydra
+**URL:** https://1200km.com/operation-desert-hydra/
+**Format:** 13-chapter Docusaurus knowledge base documenting a complete CTI-to-detection pipeline
+**Subject:** MuddyWater / Seedworm threat actor investigation
+
+**Pipeline phases:**
+1. Source gathering — CISA advisory AA22-055A, vendor reports, OSINT
+2. Threat actor profiling — structured adversary model
+3. OpenCTI ingestion — STIX 2.1 data model, relationship mapping
+4. ATT&CK technique extraction — 16 techniques documented
+5. Detection atlas construction — per-technique detection hypotheses
+6. KQL/Elastic rule development — Kibana query syntax
+7. Rule validation results: 14 PASS / 1 PARTIAL / 1 FAIL
+
+**Key output:** Complete validated detection ruleset for MuddyWater TTP coverage
+
+---
+
+### Customer-Driven AI CTI Project
+**URL:** https://1200km.com/customer-driven-ai-cti-project/
+**Format:** Docusaurus methodology guide
+**Concept:** Gate-controlled AI-assisted CTI methodology for customer engagements
+
+**Gates (quality control checkpoints):**
+- Gate 0: PIR/SIR definition and intelligence objective agreement
+- Gate 1: Source collection and reliability assessment
+- Gate 2: AI-assisted TTP extraction (with analyst validation requirement)
+- Gate 3: Detection hypothesis review
+- Gate 4: Rule development and lab validation
+- Gate 5: SOC handoff package — triage guidance, detection readiness levels, response playbooks
+
+**AI usage model:** AI generates candidates; analyst validates; no intelligence claim passes a gate without human review. "AI-assisted" not "AI-automated."
+
+---
+
+## SECTION 3: DETECTION ENGINEERING
+
+### ThreatMapper Web (Browser Tool)
+**URL:** https://1200km.com/threat-matrix/
+**Format:** React/Vite/TypeScript browser-native application (no installation, no cloud)
+**Purpose:** Interactive MITRE ATT&CK exploration and TTP overlap analysis
+
+**Features:**
+1. **Matrix View** — Full ATT&CK navigator across Enterprise, Mobile, ICS, and ATLAS (AI/ML) frameworks
+2. **Threat Library** — Browse all 135+ groups and 80+ campaigns, filter by domain/ecosystem
+3. **Compare View** — Side-by-side TTP comparison with Jaccard overlap scoring
+4. **Group vs Group** — Multi-group matrix overlay with shared/unique technique heatmap
+5. **Report Export** — Generate intelligence summary reports
+
+**TTP overlap scoring:** Jaccard similarity coefficient = |A ∩ B| / |A ∪ B| where A and B are technique sets. Ranges 0.0–1.0. High overlap = investigation hypothesis. Requires independent validation for attribution conclusions.
+
+---
+
+### ThreatMapper Docker (Self-Hosted Platform)
+**URL:** https://1200km.com/threatmapper-docs/
+**Format:** Docker-deployed AI-assisted CTI platform with LLM integration
+**Purpose:** AI-assisted ATT&CK technique extraction from threat reports with CTI-to-detection workflow
+
+**Capabilities:**
+- LLM-based technique extraction from threat intelligence text (structured prompt engineering)
+- Jaccard TTP overlap scoring against MITRE ATT&CK group dataset
+- ATT&CK Navigator JSON export
+- Detection hypothesis generation
+- Analyst-in-the-loop design: LLM generates candidates, analyst validates
+
+---
+
+### Anomaly Detection Atlas
+**URL:** https://1200km.com/anomaly-detection-atlas/
+**Content:**
+- 118 statistical anomaly classification types with definitions
+- 175 security log sources mapped to MITRE ATT&CK tactics
+- Algorithmic detection rule catalog (behavioral + statistical approaches)
+- Coverage: network, endpoint, identity, cloud, application layers
+
+---
+
+### BrittleBench
+**URL:** https://1200km.com/brittle/
+**Topic:** Detection rule robustness research
+**Content:** Methodology for auditing detection rules (YARA, Elastic, Sigma) against functionally equivalent behavioral mutations. Tests whether detections survive attacker technique variations while maintaining the same attack objective.
+
+---
+
+### Insider Threat Detection
+**URL:** https://1200km.com/insider-threat-detection/
+**Content:**
+- 14 documented historical insider threat cases (Manning, Snowden, and 12 others)
+- UEBA (User and Entity Behavior Analytics) methodology
+- Behavioral analytics: baseline deviation, peer group comparison, role-based anomaly detection
+- Four-phase insider threat program implementation
+- Technical controls: DLP, PAM, CASB, audit logging architecture
+
+---
+
+## SECTION 4: IDENTITY THREAT DETECTION & RESPONSE
+
+### ITDR Knowledge Base
+**URL:** https://1200km.com/ITDR/
+**Format:** Docusaurus, 82 documents, 6-phase architecture
+
+**Phases:**
+1. Protocols — identity security governance and process documentation
+2. Identity Architecture — Active Directory, Azure AD/Entra ID, IAM design principles
+3. Attack Techniques — credential attacks (pass-the-hash, pass-the-ticket, Golden Ticket, Silver Ticket, DCSync, AS-REP roasting, Kerberoasting)
+4. Detection Engineering — behavioral analytics for identity attacks, KQL hunting queries
+5. Simulations — lab-based attack simulations with expected log output
+6. Labs — deployment guides for detection testing environments
+
+---
+
+## SECTION 5: AI-ASSISTED SECURITY
+
+### HexStrike AI Guide
+**URL:** https://1200km.com/Hexstrike-AI-guide/
+**Content:** AI-orchestrated penetration testing framework using Model Context Protocol (MCP)
+**Tools integrated:** Gemini, OpenAI GPT-4, Cursor AI, Llama (local), Metasploit, Nmap, Burp Suite
+**Coverage:** Network discovery, exploitation, web application testing, Active Directory attacks, password recovery
+**Note:** All techniques documented for authorized lab environments only
+
+---
+
+### AI vs Defense
+**URL:** https://1200km.com/ai-vs-defense/
+**Topic:** How AI-assisted offensive techniques change the threat landscape
+**Key arguments:**
+- AI collapses the skill floor: tasks requiring weeks of manual work now take hours
+- AI-generated malware variants evade signature-based detection
+- What defenders must adapt: behavioral detection, Pyramid of Pain principles, AI-assisted defense
+- SOC modernization requirements in the AI-threat era
+
+---
+
+### OpenCTI Intelligent Shield
+**URL:** https://1200km.com/opencti-intelligent-shield/
+**Content:** Deploying AI-powered enrichment in OpenCTI platform
+- Custom Claude connector for automated STIX 2.1 object enrichment
+- Confidence scoring methodology for AI-generated enrichments
+- Integration architecture: OpenCTI → AI enrichment → analyst validation
+- STIX relationship automation
+
+---
+
+## SECTION 6: REFERENCE & GUIDES
+
+### CVSS v4.0 Field Guide
+**URL:** https://1200km.com/cvss/
+**Format:** 13-chapter comprehensive guide
+**Content:** CVSS v4.0 base/threat/environmental scoring, severity tiers, response SLAs, vulnerability prioritization workflow, scoring examples with real CVEs
+
+### Medium Blog Navigator
+**URL:** https://1200km.com/medium-blog-navigation/
+**Content:** Indexed and categorized archive of 100+ published Medium articles across 18 security topic categories
+
+### Published Articles
+**URL:** https://medium.com/@1200km
+**Volume:** 100+ articles
+**Topics:** CTI investigations, detection engineering techniques, malware analysis, AI-assisted security, threat hunting, offensive security research, ATT&CK methodology
+
+---
+
+## COMMON QUESTIONS
+
+**Q: Is ThreatMapper attribution software?**
+A: No. ThreatMapper produces Jaccard TTP overlap scores — a quantitative similarity metric that generates investigation hypotheses. Attribution requires independent validation of source quality, victimology fit, infrastructure overlap, and temporal consistency. The tool is an "analyst-assisted workflow," not automated attribution.
+
+**Q: What language/keyword does the author prefer for TTP comparison?**
+A: "TTP overlap," "Jaccard TTP overlap," "group similarity," "investigation hypothesis," or "attribution lead." Never "APT attribution," "APT match," or "definitive attribution."
+
+**Q: Does the CTI methodology work for small SOC teams?**
+A: Yes. CTI as a Code scales from solo analysts to team environments. The template-driven approach and detection readiness levels allow partial implementation — even a single validated detection rule with documented source rating adds structure and repeatability.
+
+**Q: What threat actors most frequently target Israeli government networks?**
+A: Based on public intelligence and the 22-actor profile repository: OilRig (APT34) and MuddyWater are the highest-frequency persistent espionage actors. APT42 focuses on targeted surveillance of individuals. Handala/Void Manticore, WIRTE, and Cyber Toufan represent the escalating destructive/hybrid operations cluster since October 2023.
+
+---
+
+*This file is maintained for AI crawler discoverability (llms.txt standard). For the navigable version, see: https://1200km.com/llms.txt*
+*For the full interactive knowledge base, visit: https://1200km.com*
