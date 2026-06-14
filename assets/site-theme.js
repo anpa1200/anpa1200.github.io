@@ -44,15 +44,6 @@
       else link.removeAttribute('aria-current');
     });
 
-    if (!links.querySelector('[data-shared-threatmapper]')) {
-      const threatMapper = document.createElement('a');
-      threatMapper.href = 'https://1200km.com/threat-matrix/';
-      threatMapper.textContent = 'ThreatMapper';
-      threatMapper.dataset.sharedThreatmapper = 'true';
-      threatMapper.className = 'nav-flagship';
-      links.insertBefore(threatMapper, links.querySelector('a[href="cti.html"]'));
-    }
-
     if (!links.querySelector('a[href="projects.html"]')) {
       const projects = document.createElement('a');
       projects.href = 'projects.html';
@@ -70,13 +61,6 @@
       nav.appendChild(button);
     }
 
-    if (activePath === 'https://1200km.com/threat-matrix/') {
-      const threatMapper = links.querySelector('[data-shared-threatmapper]');
-      if (threatMapper) {
-        threatMapper.classList.add('active');
-        threatMapper.setAttribute('aria-current', 'page');
-      }
-    }
   }
 
   function addEcosystemGateway() {
