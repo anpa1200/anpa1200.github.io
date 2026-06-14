@@ -7,3 +7,7 @@ links.
 Published target:
 
 https://1200km.com
+
+Canonical project inventory:
+
+https://1200km.com/projects.html

@@ -53,6 +53,14 @@
       links.insertBefore(threatMapper, links.querySelector('a[href="cti.html"]'));
     }
 
+    if (!links.querySelector('a[href="projects.html"]')) {
+      const projects = document.createElement('a');
+      projects.href = 'projects.html';
+      projects.textContent = 'Projects';
+      const github = links.querySelector('a[href="https://github.com/anpa1200"]');
+      links.insertBefore(projects, github);
+    }
+
     if (!nav.querySelector('#theme-btn')) {
       const button = document.createElement('button');
       button.className = 'theme-btn';
@@ -126,6 +134,7 @@
             <p>Practical field guides, implementation documentation, source code, and professional context.</p>
             <div class="site-ecosystem-links">
               <a href="guides.html">Guides</a>
+              <a href="projects.html">Projects</a>
               <a href="https://github.com/anpa1200">GitHub</a>
               <a href="about.html">About</a>
             </div>
@@ -160,6 +169,7 @@
           <strong>Platforms &amp; Tools</strong>
           <a href="https://1200km.com/threat-matrix/">ThreatMapper Web</a>
           <a href="https://1200km.com/threatmapper/">ThreatMapper Hub</a>
+          <a href="projects.html">Projects</a>
           <a href="ai-offensive.html">AI Offensive</a>
           <a href="pt-tools.html">PT Tools</a>
         </nav>
@@ -167,6 +177,7 @@
           <strong>Profile &amp; Contact</strong>
           <a href="about.html">About</a>
           <a href="cv.html">CV</a>
+          <a href="projects.html">Projects</a>
           <a href="https://github.com/anpa1200">GitHub</a>
           <a href="mailto:1200km@gmail.com">Email</a>
         </nav>
