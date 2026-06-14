@@ -10,7 +10,20 @@
     const target = document.querySelector('.navbar__items--right');
     if (!target || target.querySelector('[data-ecosystem-nav]')) return;
 
-    links.slice().reverse().forEach(function ([label, href, flagship]) {
+    const navbar = target.closest('.navbar');
+    const nativeItems = navbar ? navbar.querySelectorAll('.navbar__item:not([data-ecosystem-nav])') : [];
+    const nativeLinks = navbar ? Array.from(navbar.querySelectorAll('a[href]:not([data-ecosystem-nav])')) : [];
+    const destinations = new Set(nativeLinks.map(function (link) {
+      return new URL(link.href, window.location.href).href.replace(/\/$/, '');
+    }));
+
+    // Full project navbars already provide their own project and ecosystem routes.
+    // Injecting another four links makes those headers overflow and truncates branding.
+    if (nativeItems.length >= 7) return;
+
+    links.filter(function ([, href]) {
+      return !destinations.has(new URL(href).href.replace(/\/$/, ''));
+    }).slice().reverse().forEach(function ([label, href, flagship]) {
       const link = document.createElement('a');
       link.href = href;
       link.textContent = label;
