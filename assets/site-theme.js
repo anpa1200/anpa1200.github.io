@@ -29,6 +29,31 @@
     const links = nav && nav.querySelector('.nav-links');
     if (!nav || !links) return;
 
+    const navItems = [
+      { href: 'about.html', label: 'About' },
+      { href: 'cv.html', label: 'CV' },
+      { href: 'cti.html', label: 'CTI' },
+      { href: 'labs.html', label: 'Labs' },
+      { href: 'guides.html', label: 'Guides' },
+      { href: 'hexstrike.html', label: 'HexStrike' },
+      { href: 'ai-offensive.html', label: 'OfSec' },
+      { href: 'pt-tools.html', label: 'PT Tools' },
+      { href: 'projects.html', label: 'Projects' },
+      { href: 'https://github.com/anpa1200', label: 'GitHub ↗', external: true },
+      { href: 'https://medium.com/@1200km', label: 'Medium ↗', external: true },
+    ];
+
+    links.replaceChildren(...navItems.map(function (item) {
+      const link = document.createElement('a');
+      link.href = item.href;
+      link.textContent = item.label;
+      if (item.external) {
+        link.target = '_blank';
+        link.rel = 'noopener';
+      }
+      return link;
+    }));
+
     const path = window.location.pathname.replace(/\/+$/, '').split('/').pop() || 'index.html';
     const activePath = path === 'cover-letter.html'
       ? 'cv.html'
@@ -43,14 +68,6 @@
       if (active) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
     });
-
-    if (!links.querySelector('a[href="projects.html"]')) {
-      const projects = document.createElement('a');
-      projects.href = 'projects.html';
-      projects.textContent = 'Projects';
-      const github = links.querySelector('a[href="https://github.com/anpa1200"]');
-      links.insertBefore(projects, github);
-    }
 
     if (!nav.querySelector('#theme-btn')) {
       const button = document.createElement('button');
