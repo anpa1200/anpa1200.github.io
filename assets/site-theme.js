@@ -107,6 +107,7 @@
               <a href="https://1200km.com/threat-matrix/">Web workspace</a>
               <a href="https://1200km.com/threatmapper/">Project hub</a>
               <a href="https://1200km.com/threatmapper-docs/">Docs</a>
+              <a href="https://1200km.com/articles/threatmapper-v2-self-hosted-ai-cti-platform.html">Article</a>
             </div>
           </article>
           <article class="site-ecosystem-card">
