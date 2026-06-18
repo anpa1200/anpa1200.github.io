@@ -1,6 +1,6 @@
 (function () {
   const links = [
-    ['ThreatMapper', 'https://1200km.com/threat-matrix/', true],
+    ['AdversaryGraph', 'https://1200km.com/threat-matrix/', true],
     ['Portfolio', 'https://1200km.com/', false],
     ['CTI', 'https://1200km.com/cti.html', false],
     ['Labs', 'https://1200km.com/labs.html', false],
@@ -48,10 +48,10 @@
               <h2>Explore the 1200km security research ecosystem</h2>
               <p>Continue from this project into connected intelligence research, detection guidance, analyst tooling, documentation, and reproducible labs.</p>
             </div>
-            <a class="button button--primary" href="https://1200km.com/threat-matrix/">Open ThreatMapper</a>
+            <a class="button button--primary" href="https://1200km.com/threat-matrix/">Open AdversaryGraph</a>
           </div>
           <div class="ecosystem-project-grid">
-            <article class="ecosystem-project-card"><strong>ThreatMapper</strong><span>Interactive actor and ATT&amp;CK research workspace with detection and hunting context.</span><a href="https://1200km.com/threat-matrix/">Open workspace →</a></article>
+            <article class="ecosystem-project-card"><strong>AdversaryGraph</strong><span>Interactive actor and ATT&amp;CK research workspace with detection and hunting context.</span><a href="https://1200km.com/threat-matrix/">Open workspace →</a></article>
             <article class="ecosystem-project-card"><strong>CTI Research</strong><span>Actor profiles, attribution methodology, reports, and CTI-to-detection workflows.</span><a href="https://1200km.com/cti.html">Explore CTI →</a></article>
             <article class="ecosystem-project-card"><strong>Labs &amp; Offensive Research</strong><span>Reproducible attack simulations and practical security environments.</span><a href="https://1200km.com/labs.html">Explore labs →</a></article>
             <article class="ecosystem-project-card"><strong>Portfolio &amp; Source</strong><span>All projects, guides, source repositories, articles, and professional context.</span><a href="https://1200km.com/">Open portfolio →</a></article>

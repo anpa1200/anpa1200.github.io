@@ -57,7 +57,7 @@
     const path = window.location.pathname.replace(/\/+$/, '').split('/').pop() || 'index.html';
     const activePath = path === 'cover-letter.html'
       ? 'cv.html'
-      : path === 'threatmapper-web-guide.html'
+      : path === 'adversarygraph-web-guide.html'
         ? 'https://1200km.com/threat-matrix/'
         : path;
     links.querySelectorAll('a').forEach(function (link) {
@@ -96,18 +96,18 @@
             <h2 id="site-ecosystem-heading">Move from intelligence to practical action.</h2>
             <p>Explore connected research, tooling, documentation, and reproducible labs across the full CTI-to-detection workflow.</p>
           </div>
-          <a class="button primary" href="https://1200km.com/threat-matrix/">Open ThreatMapper</a>
+          <a class="button primary" href="https://1200km.com/threat-matrix/">Open AdversaryGraph</a>
         </div>
         <div class="site-ecosystem-grid">
           <article class="site-ecosystem-card">
             <span>Flagship platform</span>
-            <h3>ThreatMapper</h3>
+            <h3>AdversaryGraph</h3>
             <p>Investigate actors and TTPs, compare behavior, and move into detection and hunting guidance.</p>
             <div class="site-ecosystem-links">
               <a href="https://1200km.com/threat-matrix/">Web workspace</a>
-              <a href="https://1200km.com/threatmapper/">Project hub</a>
-              <a href="https://1200km.com/threatmapper-docs/">Docs</a>
-              <a href="https://1200km.com/articles/threatmapper-v2-self-hosted-ai-cti-platform.html">Article</a>
+              <a href="https://1200km.com/adversarygraph/">Project hub</a>
+              <a href="https://1200km.com/adversarygraph-docs/">Docs</a>
+              <a href="https://1200km.com/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html">Article</a>
             </div>
           </article>
           <article class="site-ecosystem-card">
@@ -169,8 +169,8 @@
         </nav>
         <nav class="shared-footer-column" aria-label="Platforms and tools">
           <strong>Platforms &amp; Tools</strong>
-          <a href="https://1200km.com/threat-matrix/">ThreatMapper Web</a>
-          <a href="https://1200km.com/threatmapper/">ThreatMapper Hub</a>
+          <a href="https://1200km.com/threat-matrix/">AdversaryGraph Web</a>
+          <a href="https://1200km.com/adversarygraph/">AdversaryGraph Hub</a>
           <a href="projects.html">Projects</a>
           <a href="ai-offensive.html">AI Offensive</a>
           <a href="pt-tools.html">PT Tools</a>

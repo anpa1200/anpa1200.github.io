@@ -57,12 +57,12 @@ const gitlabMrs = runJson(
 );
 
 const repos = {
-  threatmapper: ghRepo('anpa1200/threatmapper'),
+  adversarygraph: ghRepo('anpa1200/adversarygraph'),
   aidebug: ghRepo('anpa1200/AIDebug'),
 };
 
 const releases = {
-  threatmapper: ghLatestRelease('anpa1200/threatmapper', 'v2.0.0'),
+  adversarygraph: ghLatestRelease('anpa1200/adversarygraph', 'v2.0.0'),
   aidebug: ghLatestRelease('anpa1200/AIDebug', 'v1.1.0'),
 };
 
@@ -79,11 +79,11 @@ const stats = {
     closed_mrs: gitlabMrs.filter(mr => mr.state === 'closed').length,
   },
   repositories: {
-    threatmapper: {
-      stars: repos.threatmapper.stargazers_count,
-      forks: repos.threatmapper.forks_count,
-      release: releases.threatmapper.tag,
-      release_url: releases.threatmapper.url,
+    adversarygraph: {
+      stars: repos.adversarygraph.stargazers_count,
+      forks: repos.adversarygraph.forks_count,
+      release: releases.adversarygraph.tag,
+      release_url: releases.adversarygraph.url,
     },
     aidebug: {
       stars: repos.aidebug.stargazers_count,
@@ -97,8 +97,8 @@ const stats = {
 stats.totals = {
   open_upstream_items: stats.github.open_prs + stats.gitlab.open_mrs,
   merged_external_items: stats.github.merged_prs + stats.gitlab.merged_mrs,
-  aidebug_threatmapper_stars: stats.repositories.aidebug.stars + stats.repositories.threatmapper.stars,
-  aidebug_threatmapper_forks: stats.repositories.aidebug.forks + stats.repositories.threatmapper.forks,
+  aidebug_adversarygraph_stars: stats.repositories.aidebug.stars + stats.repositories.adversarygraph.stars,
+  aidebug_adversarygraph_forks: stats.repositories.aidebug.forks + stats.repositories.adversarygraph.forks,
 };
 
 mkdirSync(path.dirname(statsPath), { recursive: true });
@@ -138,20 +138,20 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>v[^<]+<\/strong><span>ThreatMapper release<\/span><\/div>/,
-  `<div><strong>${stats.repositories.threatmapper.release}</strong><span>ThreatMapper release</span></div>`,
-  'ThreatMapper release metric',
+  /<div><strong>v[^<]+<\/strong><span>AdversaryGraph release<\/span><\/div>/,
+  `<div><strong>${stats.repositories.adversarygraph.release}</strong><span>AdversaryGraph release</span></div>`,
+  'AdversaryGraph release metric',
 );
 html = replaceOrThrow(
   html,
   /<div><strong>\d+<\/strong><span>GitHub stars<\/span><\/div>/,
-  `<div><strong>${stats.totals.aidebug_threatmapper_stars}</strong><span>GitHub stars</span></div>`,
+  `<div><strong>${stats.totals.aidebug_adversarygraph_stars}</strong><span>GitHub stars</span></div>`,
   'combined star count',
 );
 html = replaceOrThrow(
   html,
-  /<p>Combined live public stars for AIDebug and ThreatMapper(?:, plus \d+ public forks,)? at verification time\.<\/p>/,
-  `<p>Combined live public stars for AIDebug and ThreatMapper, plus ${stats.totals.aidebug_threatmapper_forks} public forks, at verification time.</p>`,
+  /<p>Combined live public stars for AIDebug and AdversaryGraph(?:, plus \d+ public forks,)? at verification time\.<\/p>/,
+  `<p>Combined live public stars for AIDebug and AdversaryGraph, plus ${stats.totals.aidebug_adversarygraph_forks} public forks, at verification time.</p>`,
   'combined star description',
 );
 html = replaceOrThrow(
@@ -163,14 +163,14 @@ html = replaceOrThrow(
 html = replaceOrThrow(
   html,
   /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?<span class="chip">Self-hosted<\/span>\s+)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
-  `<span class="chip release">Release ${stats.repositories.threatmapper.release}</span>$1<span class="chip">${stats.repositories.threatmapper.stars} stars</span>\n              <span class="chip">${stats.repositories.threatmapper.forks} fork${stats.repositories.threatmapper.forks === 1 ? '' : 's'}</span>`,
-  'ThreatMapper release chips',
+  `<span class="chip release">Release ${stats.repositories.adversarygraph.release}</span>$1<span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
+  'AdversaryGraph release chips',
 );
 html = replaceOrThrow(
   html,
-  /https:\/\/github\.com\/anpa1200\/threatmapper\/releases\/tag\/v[^"]+/,
-  stats.repositories.threatmapper.release_url || `https://github.com/anpa1200/threatmapper/releases/tag/${stats.repositories.threatmapper.release}`,
-  'ThreatMapper release URL',
+  /https:\/\/github\.com\/anpa1200\/adversarygraph\/releases\/tag\/v[^"]+/,
+  stats.repositories.adversarygraph.release_url || `https://github.com/anpa1200/adversarygraph/releases/tag/${stats.repositories.adversarygraph.release}`,
+  'AdversaryGraph release URL',
 );
 html = replaceOrThrow(
   html,
@@ -180,4 +180,4 @@ html = replaceOrThrow(
 );
 
 writeFileSync(pagePath, html);
-console.log(`Updated external-validation.html: ${stats.totals.merged_external_items} merged, ${stats.totals.open_upstream_items} open, ${stats.totals.aidebug_threatmapper_stars} stars.`);
+console.log(`Updated external-validation.html: ${stats.totals.merged_external_items} merged, ${stats.totals.open_upstream_items} open, ${stats.totals.aidebug_adversarygraph_stars} stars.`);

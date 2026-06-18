@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>(function(){var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TMTG21RVHM');
+    </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-4GbcvBt1YwbUIazfcM7HFDbTxHzGoa2tBMutVpD+cTA=' 'sha256-1Hte8hAi5KQyJQXAhhKSJpedGi3X91IT7FC2Ej6825k=' 'sha256-tKdjbTbecNA89yNcvR2w2Ude0xxGJKJjGEFInzivX8w=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AdversaryGraph v2.0: I Built a Self-Hosted AI Threat Intelligence Platform | 1200km</title>
+    <meta name="description" content="AdversaryGraph v2.0 is an open-source, self-hosted AI CTI workbench for mapping threat reports to MITRE ATT&CK, reviewing evidence, comparing TTP overlap, and exporting PDF/STIX outputs." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta name="keywords" content="AdversaryGraph v2.0, self-hosted CTI platform, AI threat intelligence, MITRE ATT&CK mapping, STIX OpenCTI export, detection engineering, CTI workflow, Andrey Pautov, 1200km" />
+    <meta property="og:title" content="AdversaryGraph v2.0 - Self-Hosted AI CTI Platform for MITRE ATT&CK Mapping" />
+    <meta property="og:description" content="Open-source CTI-to-detection workbench for evidence-reviewed ATT&CK mappings, actor/campaign comparison, PDF reports, and STIX/OpenCTI export." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://1200km.com/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html" />
+    <meta property="og:image" content="https://1200km.com/assets/adversarygraph-v2/01-31Nq2VMJ9Mm9lgryHGJRQQ.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://1200km.com/assets/adversarygraph-v2/01-31Nq2VMJ9Mm9lgryHGJRQQ.webp" />
+    <link rel="canonical" href="https://1200km.com/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html" />
+    <link rel="icon" href="../assets/ap-logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/site-theme.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "AdversaryGraph v2.0: I Built a Self-Hosted AI Threat Intelligence Platform",
+        "description": "AdversaryGraph v2.0 is an open-source, self-hosted CTI-to-detection workbench for mapping threat reports to MITRE ATT&CK, reviewing evidence, comparing TTP overlap, and exporting PDF/STIX outputs.",
+        "datePublished": "2026-06-16",
+        "dateModified": "2026-06-16",
+        "author": { "@type": "Person", "name": "Andrey Pautov", "url": "https://1200km.com/" },
+        "publisher": { "@type": "Organization", "name": "1200km", "url": "https://1200km.com/" },
+        "image": "https://1200km.com/assets/adversarygraph-v2/01-31Nq2VMJ9Mm9lgryHGJRQQ.webp",
+        "mainEntityOfPage": "https://1200km.com/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html",
+        "sameAs": [
+          "https://1200km.com/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html",
+          "https://github.com/anpa1200/adversarygraph"
+        ]
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #050c1a;
+        --text: #cdd9ee;
+        --muted: #7a96bc;
+        --line: #1a3060;
+        --accent: #0f62fe;
+        --accent-soft: #93c5fd;
+        --panel: #ffffff;
+        --panel-ink: #172033;
+        --panel-muted: #5a6f8f;
+        --chip: #0d1f3c;
+        --shadow: 0 14px 34px rgba(0,0,0,0.45);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.7;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(5,12,26,0.94), rgba(5,12,26,0.86)),
+          url("../assets/bg-cyber.png") center/cover no-repeat;
+        z-index: -1;
+      }
+      a { color: var(--accent-soft); text-decoration: none; }
+      a:hover { color: #dbeafe; text-decoration: underline; }
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(5,12,26,0.92);
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(14px);
+      }
+      .nav, .article-hero-inner, main, .footer-inner {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+      .nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+      .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
+      .article-hero {
+        border-bottom: 1px solid rgba(147,197,253,0.2);
+        background: rgba(5,12,26,0.82);
+      }
+      .article-hero-inner { padding: 64px 0 34px; }
+      .eyebrow {
+        margin: 0 0 12px;
+        color: #7dd3fc;
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        max-width: 920px;
+        color: #f8fbff;
+        font-size: clamp(2.1rem, 5vw, 4rem);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+      }
+      .lead {
+        max-width: 820px;
+        margin: 18px 0 0;
+        color: #c9d7ea;
+        font-size: 1.08rem;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(147,197,253,0.28);
+        border-radius: 999px;
+        padding: 5px 10px;
+        color: #93c5fd;
+        background: rgba(13,31,60,0.78);
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+      .hero-image {
+        display: block;
+        width: 100%;
+        margin: 34px 0 0;
+        border: 1px solid rgba(147,197,253,0.28);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 34px;
+        padding: 44px 0 72px;
+      }
+      article {
+        min-width: 0;
+        background: rgba(8,19,38,0.86);
+        border: 1px solid rgba(147,197,253,0.24);
+        border-radius: 14px;
+        padding: clamp(22px, 4vw, 42px);
+        box-shadow: var(--shadow);
+      }
+      aside {
+        align-self: start;
+        position: sticky;
+        top: 84px;
+      }
+      .side-card {
+        background: rgba(8,19,38,0.86);
+        border: 1px solid rgba(147,197,253,0.24);
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+      h2 {
+        margin: 42px 0 12px;
+        color: #f8fbff;
+        font-size: 1.45rem;
+        line-height: 1.25;
+      }
+      h2:first-child { margin-top: 0; }
+      h3 { margin: 24px 0 8px; color: #f8fbff; }
+      p { margin: 0 0 16px; }
+      ul, ol { margin: 0 0 18px 22px; padding: 0; }
+      li { margin: 6px 0; }
+      figure { margin: 28px 0; }
+      figure img {
+        display: block;
+        width: 100%;
+        border: 1px solid rgba(147,197,253,0.24);
+        border-radius: 10px;
+        background: #050c1a;
+      }
+      figcaption { margin-top: 8px; color: #8da6ca; font-size: 0.88rem; }
+      .callout {
+        border: 1px solid rgba(96,165,250,0.38);
+        border-radius: 12px;
+        padding: 18px;
+        background: rgba(15,98,254,0.12);
+        margin: 24px 0;
+      }
+      .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 0; }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 14px;
+        border: 1px solid rgba(147,197,253,0.35);
+        border-radius: 8px;
+        color: #eef5ff;
+        font-weight: 800;
+      }
+      .button.primary { background: #60a5fa; color: #031026; border-color: transparent; }
+      .toc {
+        margin: 0;
+        padding-left: 18px;
+        color: #93c5fd;
+        font-size: 0.92rem;
+      }
+      .toc li { margin: 8px 0; }
+      footer {
+        border-top: 1px solid rgba(147,197,253,0.2);
+        padding: 22px 0;
+        color: #7a96bc;
+        font-size: 0.88rem;
+      }
+
+      .article-visual { scroll-margin-top: 90px; }
+      pre {
+        overflow-x: auto;
+        border: 1px solid rgba(147,197,253,0.24);
+        border-radius: 10px;
+        padding: 14px;
+        background: #020817;
+        color: #dbeafe;
+        font-size: 0.86rem;
+        line-height: 1.55;
+      }
+      code {
+        border-radius: 5px;
+        padding: 0.1em 0.28em;
+        background: rgba(147,197,253,0.12);
+        color: #dbeafe;
+      }
+      pre code { padding: 0; background: transparent; }
+      .table-wrap { overflow-x: auto; margin: 24px 0; }
+      table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+      th, td { border: 1px solid rgba(147,197,253,0.24); padding: 10px; vertical-align: top; }
+      th { color: #f8fbff; background: rgba(15,98,254,0.16); }
+      blockquote { margin: 22px 0; padding: 14px 18px; border-left: 4px solid #60a5fa; background: rgba(15,98,254,0.1); color: #dbeafe; }
+      @media (max-width: 860px) {
+        main { grid-template-columns: 1fr; }
+        aside { position: static; }
+        .nav { flex-direction: column; align-items: flex-start; padding: 10px 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html">
+          <img src="../assets/ap-logo.png" alt="Andrey Pautov logo" width="36" height="36" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="../about.html">About</a>
+          <a href="../cv.html">CV</a>
+          <a href="../cti.html">CTI</a>
+          <a href="../labs.html">Labs</a>
+          <a href="../guides.html">Guides</a>
+          <a href="../projects.html">Projects</a>
+          <a href="../external-validation.html">Validation</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://medium.com/@1200km" target="_blank" rel="noopener">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="article-hero">
+      <div class="article-hero-inner">
+        <p class="eyebrow">AdversaryGraph v2.0 / Open-source CTI platform / Published 2026-06-16</p>
+        <h1>AdversaryGraph v2.0: I Built a Self-Hosted AI Threat Intelligence Platform</h1>
+        <p class="lead">
+          Full 1200km mirror of the Medium article with the same walkthrough structure, screenshots, infographics, and practical guidance for deploying and using AdversaryGraph v2.0.
+        </p>
+        <div class="meta" aria-label="Article tags">
+          <span class="chip">MITRE ATT&amp;CK</span>
+          <span class="chip">CTI-to-detection</span>
+          <span class="chip">Local LLM support</span>
+          <span class="chip">STIX/OpenCTI</span>
+          <span class="chip">DFIR examples</span>
+        </div>
+        <div class="button-row">
+          <a class="button primary" href="https://github.com/anpa1200/adversarygraph" target="_blank" rel="noopener">Open GitHub repo</a>
+          <a class="button" href="../adversarygraph/">Project hub</a>
+          <a class="button" href="https://1200km.com/adversarygraph-docs/">Official docs</a>
+          <a class="button" href="https://1200km.com/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html" target="_blank" rel="noopener">Canonical 1200km article</a>
+        </div>
+        <img class="hero-image" src="../assets/adversarygraph-v2/01-31Nq2VMJ9Mm9lgryHGJRQQ.webp" alt="AdversaryGraph v2.0 article cover" />
+      </div>
+    </section>
+
+        <main>
+      <article>
+        <p>Threat intelligence is useful only when it becomes operational.</p>
+        <p>A report is not enough. A PDF from a vendor, an incident response write-up, a malware analysis note, or a DFIR case study still needs to be translated into practical defensive work:</p>
+        <ul>
+          <li>What MITRE ATT&amp;CK techniques are actually described?</li>
+          <li>Which mappings are supported by real evidence?</li>
+          <li>Which known groups or campaigns share similar TTPs?</li>
+          <li>Which overlaps are only generic commodity behavior?</li>
+          <li>Which techniques become detection gaps?</li>
+          <li>How do I move the result into an analyst workflow, ATT&amp;CK Navigator, PDF reporting, or OpenCTI?</li>
+        </ul>
+        <p>That is the problem AdversaryGraph was built to solve.</p>
+        <p>AdversaryGraph is an open-source, self-hosted CTI-to-detection workbench. It helps analysts map threat reports to MITRE ATT&amp;CK, review evidence, compare TTP overlap against groups and campaigns, export reports, and hand off structured outputs to detection engineering or CTI platforms.</p>
+        <p>Version 2.0 adds the features that make it much more useful in real analyst workflows:</p>
+        <ul>
+          <li>Local LLM support through OpenAI-compatible endpoints</li>
+          <li>STIX 2.1 export for OpenCTI</li>
+          <li>DFIR Report example indexing</li>
+          <li>enriched ATT&amp;CK group and actor pages</li>
+          <li>MITRE ATT&amp;CK reference sync</li>
+          <li>report-to-analysis-to-comparison demo assets</li>
+          <li>full operator documentation</li>
+        </ul>
+        <p>GitHub:</p>
+        <p><a href="https://github.com/anpa1200/adversarygraph" target="_blank" rel="noopener">https://github.com/anpa1200/adversarygraph</a></p>
+        <p>Release v2.0.0:</p>
+        <p><a href="https://github.com/anpa1200/adversarygraph/releases/tag/v2.0.0" target="_blank" rel="noopener">https://github.com/anpa1200/adversarygraph/releases/tag/v2.0.0</a></p>
+        <p>Full guide:</p>
+        <p><a href="https://github.com/anpa1200/adversarygraph/blob/main/docs/full-guide-v2.md" target="_blank" rel="noopener">https://github.com/anpa1200/adversarygraph/blob/main/docs/full-guide-v2.md</a></p>
+        <h2 id="table-of-contents">Table of Contents</h2>
+        <ul>
+          <li><a href="#what-adversarygraph-is">What AdversaryGraph Is</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#installation">Installation</a></li>
+          <li><a href="#local-llm-support">Local LLM Support</a></li>
+          <li><a href="#discover-page">Discover Page</a></li>
+          <li><a href="#ai-analysis">AI Analysis</a></li>
+          <li><a href="#review-status">Review Status</a></li>
+          <li><a href="#navigator">Navigator</a></li>
+          <li><a href="#attck-group-library">ATT&amp;CK Group Library</a></li>
+          <li><a href="#group-and-campaign-comparison">Group And Campaign Comparison</a></li>
+          <li><a href="#compare-modes">Compare Modes</a></li>
+          <li><a href="#group-vs-group">Group vs Group</a></li>
+          <li><a href="#dfir-examples">DFIR Examples</a></li>
+          <li><a href="#reference-sync">Reference Sync</a></li>
+          <li><a href="#stix-21-export-for-opencti">STIX 2.1 Export For OpenCTI</a></li>
+          <li><a href="#pdf-export">PDF Export</a></li>
+          <li><a href="#attck-navigator-export">ATT&amp;CK Navigator Export</a></li>
+          <li><a href="#api">API</a></li>
+          <li><a href="#security-and-privacy-notes">Security And Privacy Notes</a></li>
+          <li><a href="#what-adversarygraph-is-not">What AdversaryGraph Is Not</a></li>
+          <li><a href="#recommended-workflow">Recommended Workflow</a></li>
+          <li><a href="#release-evidence">Release Evidence</a></li>
+          <li><a href="#links">Links</a></li>
+          <li><a href="#final-thoughts">Final Thoughts</a></li>
+          <li><a href="#follow-my-work">Follow My Work</a></li>
+        </ul>
+        <h2 id="what-adversarygraph-is">What AdversaryGraph Is</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/01-31Nq2VMJ9Mm9lgryHGJRQQ.webp" alt="AdversaryGraph v2.0 Medium article visual 01" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 01, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/02-69nMwI7Xj8eNIWHv_C_KVg.webp" alt="AdversaryGraph v2.0 Medium article visual 02" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 02, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>AdversaryGraph is not a SIEM.</p>
+        <p>It is not an EDR.</p>
+        <p>It is not an attribution engine.</p>
+        <p>It is a workbench for the middle part of CTI work: the place where an analyst takes narrative reporting and turns it into ATT&amp;CK mappings, evidence, similarity leads, detection gaps, and structured exports.</p>
+        <p>The core workflow is:</p>
+        <pre><code class="language-text">report -&gt; ATT&amp;CK mapping candidates -&gt; analyst review -&gt; group/campaign/report comparison -&gt; detection gaps -&gt; exports</code></pre>
+        <p>This matters because most threat intelligence still arrives as prose. Someone has to read it, extract behaviors, map them to ATT&amp;CK, check the evidence, and make the result useful for detection teams.</p>
+        <p>AdversaryGraph helps automate the repetitive parts while keeping analyst review in the loop.</p>
+        <h2 id="architecture">Architecture</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/03-7jquz_YKO0Odni3r3InzYw.webp" alt="AdversaryGraph v2.0 Medium article visual 03" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 03, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/04-VAfpLRWhfkB0pwRR5C4Nlw.webp" alt="AdversaryGraph v2.0 Medium article visual 04" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 04, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/05-Up-LNxuga22bScwyZiFuHA.webp" alt="AdversaryGraph v2.0 Medium article visual 05" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 05, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/06-4zLLN71CBFHIMCEPOrTxmw.webp" alt="AdversaryGraph v2.0 Medium article visual 06" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 06, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/07-Dw7KTqHRijCEkYvUrdBMbQ.webp" alt="AdversaryGraph v2.0 Medium article visual 07" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 07, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/08-07j05Kn78RJY96S3Ga4IVQ.webp" alt="AdversaryGraph v2.0 Medium article visual 08" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 08, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/09-z711T5SOrORpjITlM2IY9A.webp" alt="AdversaryGraph v2.0 Medium article visual 09" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 09, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>AdversaryGraph runs as a self-hosted Docker Compose stack:</p>
+        <ul>
+          <li>React / Vite frontend</li>
+          <li>FastAPI backend</li>
+          <li>PostgreSQL for ATT&amp;CK data and analysis history</li>
+          <li>Redis and Celery for background jobs</li>
+          <li>scheduled MITRE ATT&amp;CK synchronization</li>
+          <li>optional embedded reference book</li>
+        </ul>
+        <p>The Docker deployment is the full version. It supports private report analysis, configured LLM providers, local LLM gateways, report storage, API workflows, and exports.</p>
+        <p>The public browser workspace is for exploration and manual ATT&amp;CK work. Do not upload private reports into public demos.</p>
+        <h2 id="installation">Installation</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/10-a6c9YTdIktlPk1w0FRQHaA.webp" alt="AdversaryGraph v2.0 Medium article visual 10" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 10, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/11-z4L2KcZIixQjdkrcBt8OlA.webp" alt="AdversaryGraph v2.0 Medium article visual 11" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 11, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/12-l_EPylZmZEnAaDF6JjQE4w.webp" alt="AdversaryGraph v2.0 Medium article visual 12" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 12, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>Clone the repository:</p>
+        <pre><code class="language-bash">git clone https://github.com/anpa1200/adversarygraph.git
+cd adversarygraph</code></pre>
+        <p>Create the environment file:</p>
+        <pre><code class="language-bash">cp .env.example .env</code></pre>
+        <p>Configure at least one AI provider:</p>
+        <pre><code class="language-env">ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4.1
+GEMINI_API_KEY=</code></pre>
+        <p>Start the stack:</p>
+        <pre><code class="language-bash">docker compose up -d --build</code></pre>
+        <p>Open the UI:</p>
+        <pre><code class="language-text">http://localhost:3000</code></pre>
+        <p>Open the API docs:</p>
+        <pre><code class="language-text">http://localhost:8000/docs</code></pre>
+        <p>Check health:</p>
+        <pre><code class="language-bash">curl http://localhost:8000/api/health</code></pre>
+        <p>Expected result:</p>
+        <pre><code class="language-json">{"status":"ok","version":"2.0.0"}</code></pre>
+        <p>On first startup, AdversaryGraph ingests MITRE ATT&amp;CK STIX data into PostgreSQL. This can take a few minutes.</p>
+        <h2 id="local-llm-support">Local LLM Support</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/13-CsGSK7APVQvnvTDCLxXKNA.webp" alt="AdversaryGraph v2.0 Medium article visual 13" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 13, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/14-EsC2UAT23n0xRDPv29oEWg.webp" alt="AdversaryGraph v2.0 Medium article visual 14" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 14, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>AdversaryGraph v2.0 supports local LLMs through OpenAI-compatible APIs.</p>
+        <p>This is important if you want to analyze sensitive reports without sending them to a public cloud provider.</p>
+        <p>Supported patterns include:</p>
+        <ul>
+          <li>Ollama</li>
+          <li>LM Studio</li>
+          <li>LocalAI</li>
+          <li>vLLM</li>
+          <li>any OpenAI-compatible internal gateway</li>
+        </ul>
+        <p>Example with Ollama:</p>
+        <pre><code class="language-bash">ollama pull llama3.1:8b
+ollama serve</code></pre>
+        <p>Then configure:</p>
+        <pre><code class="language-env">LOCAL_LLM_BASE_URL=http://host.docker.internal:11434/v1
+LOCAL_LLM_API_KEY=local
+LOCAL_LLM_MODEL=llama3.1:8b</code></pre>
+        <p>In the UI, select <strong>Local</strong> as the LLM provider.</p>
+        <p>Use a capable model. Small models may fail to produce clean JSON or may produce weak ATT&amp;CK mappings.</p>
+        <h2 id="discover-page">Discover Page</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/15-89fT-TuOac6OMSNdZ61vag.webp" alt="AdversaryGraph v2.0 Medium article visual 15" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 15, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/16-FpAXPkiL1j3fiuOkL7tp8A.webp" alt="AdversaryGraph v2.0 Medium article visual 16" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 16, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>The Discover page is the starting point.</p>
+        <p>It shows:</p>
+        <ul>
+          <li>actor count</li>
+          <li>technique count</li>
+          <li>public report count</li>
+          <li>selected TTP count</li>
+          <li>coverage state</li>
+          <li>most-referenced techniques</li>
+          <li>recent public intelligence examples</li>
+        </ul>
+        <p>It also gives quick entry points:</p>
+        <ul>
+          <li>investigate actor</li>
+          <li>analyze report with AI</li>
+          <li>compare behavior</li>
+          <li>review coverage</li>
+        </ul>
+        <p>This page is for orientation. It helps you decide where to start.</p>
+        <h2 id="ai-analysis">AI Analysis</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/17-aSqu_irokLlGQa1Njwa0fQ.webp" alt="AdversaryGraph v2.0 Medium article visual 17" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 17, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/18-RL5VY8-RMrIQv_SIZpwPQQ.webp" alt="AdversaryGraph v2.0 Medium article visual 18" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 18, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/19-T8D25vI8Mt2T7iWmqEJkfA.webp" alt="AdversaryGraph v2.0 Medium article visual 19" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 19, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/20-q9LHKlOmbS1119qTlPKjIA.webp" alt="AdversaryGraph v2.0 Medium article visual 20" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 20, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>The AI Analysis page accepts:</p>
+        <ul>
+          <li>pasted text</li>
+          <li>PDF</li>
+          <li>DOCX</li>
+          <li>TXT</li>
+        </ul>
+        <p>The workflow:</p>
+        <ol>
+          <li>Select ATT&amp;CK domain: Enterprise, Mobile, or ICS.</li>
+          <li>Select provider: Claude, OpenAI, Gemini, or Local.</li>
+          <li>Paste text or upload a report.</li>
+          <li>Run analysis.</li>
+          <li>Watch the streamed response.</li>
+          <li>Review extracted techniques.</li>
+          <li>Inject reviewed TTPs into Navigator.</li>
+          <li>Export PDF or STIX/OpenCTI output.</li>
+        </ol>
+        <p>Each extracted technique includes:</p>
+        <ul>
+          <li>ATT&amp;CK ID</li>
+          <li>technique name</li>
+          <li>tactic</li>
+          <li>confidence</li>
+          <li>evidence</li>
+          <li>review status</li>
+          <li>evidence source</li>
+        </ul>
+        <p>The evidence field is the most important part.</p>
+        <p>If the evidence does not show behavior, the mapping should not be accepted.</p>
+        <p>For example, an actor name in a report does not automatically prove the techniques associated with that actor. A tool name does not automatically prove every technique that tool can perform. AdversaryGraph helps generate candidates, but the analyst decides what is defensible.</p>
+        <h2 id="review-status">Review Status</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/32-oyHjzN-tAx7Lx19Xg0IPyA.webp" alt="AdversaryGraph v2.0 Medium article visual 32" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 32, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>AdversaryGraph supports analyst review states:</p>
+        <ul>
+          <li>suggested</li>
+          <li>accepted</li>
+          <li>rejected</li>
+          <li>needs evidence</li>
+        </ul>
+        <p>This makes the tool more useful than a simple “AI says these are TTPs” output.</p>
+        <p>You can separate raw model suggestions from reviewed findings.</p>
+        <p>That distinction matters when the output is sent to another analyst, a SOC team, a detection engineer, or OpenCTI.</p>
+        <h2 id="navigator">Navigator</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/21-QkMDTHSy82_j4PA96Q3j6A.webp" alt="AdversaryGraph v2.0 Medium article visual 21" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 21, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/22-62_zstQMYPoqj4kSTn4nBg.webp" alt="AdversaryGraph v2.0 Medium article visual 22" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 22, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/33-Rai3eOrk1Upsd4zeHxtroA.webp" alt="AdversaryGraph v2.0 Medium article visual 33" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 33, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>Navigator is the ATT&amp;CK matrix workspace.</p>
+        <p>You can:</p>
+        <ul>
+          <li>browse Enterprise, Mobile, and ICS ATT&amp;CK plus MITRE ATLAS</li>
+          <li>search techniques</li>
+          <li>expand sub-techniques</li>
+          <li>filter by platform</li>
+          <li>manually select TTPs</li>
+          <li>import ATT&amp;CK Navigator layers</li>
+          <li>save and load server-side layers</li>
+          <li>overlay actor/group techniques</li>
+          <li>export layers</li>
+          <li>export PDF summaries</li>
+        </ul>
+        <p>After AI Analysis, you can inject extracted techniques into Navigator and continue working manually.</p>
+        <p>This is important because ATT&amp;CK analysis is rarely finished after one model response. Analysts need to add, remove, correct, compare, and explain.</p>
+        <h2 id="attck-group-library">ATT&amp;CK Group Library</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/23-XfbZTKCAGTSArnhi3tiMOA.webp" alt="AdversaryGraph v2.0 Medium article visual 23" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 23, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/24-m1Zh30Hm7e6wmzZq1Mjdog.webp" alt="AdversaryGraph v2.0 Medium article visual 24" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 24, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/25-lKoiwInK4AuBHDFSINWekA.webp" alt="AdversaryGraph v2.0 Medium article visual 25" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 25, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>AdversaryGraph v2.0 improves the ATT&amp;CK Group Library.</p>
+        <p>Actor pages now include:</p>
+        <ul>
+          <li>ATT&amp;CK group ID</li>
+          <li>STIX ID</li>
+          <li>aliases</li>
+          <li>description</li>
+          <li>created and modified metadata</li>
+          <li>ATT&amp;CK object version</li>
+          <li>mapped technique count</li>
+          <li>campaign count</li>
+          <li>tactic coverage</li>
+          <li>observed platform coverage</li>
+          <li>technique usage evidence</li>
+          <li>external references</li>
+          <li>source names</li>
+          <li>direct MITRE ATT&amp;CK link</li>
+        </ul>
+        <p>This makes the actor pages more useful for real CTI review.</p>
+        <p>Instead of only seeing a name and a list of techniques, you can inspect the supporting context and understand where the profile comes from.</p>
+        <h2 id="group-and-campaign-comparison">Group And Campaign Comparison</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/26-aJW4II93D-bLqFMexDlW1g.webp" alt="AdversaryGraph v2.0 Medium article visual 26" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 26, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/27-_Dlqijzjnt_Ehr1ULHPmrg.webp" alt="AdversaryGraph v2.0 Medium article visual 27" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 27, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/28-lLkb-oRUX5Tns2S85SS16g.webp" alt="AdversaryGraph v2.0 Medium article visual 28" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 28, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>AdversaryGraph compares selected TTPs against:</p>
+        <ul>
+          <li>ATT&amp;CK groups</li>
+          <li>ATT&amp;CK campaigns</li>
+          <li>previous stored report analyses</li>
+        </ul>
+        <p>The comparison uses Jaccard overlap.</p>
+        <p>This is useful for investigation, but it is not attribution.</p>
+        <p>A high overlap means:</p>
+        <pre><code class="language-text">this TTP set shares behavior with this profile</code></pre>
+        <p>It does not mean:</p>
+        <pre><code class="language-text">this actor definitely did it</code></pre>
+        <p>That difference matters.</p>
+        <p>Attribution needs more evidence: infrastructure, malware, victimology, timing, tooling, procedures, and external intelligence.</p>
+        <p>AdversaryGraph helps you find overlap worth investigating.</p>
+        <h2 id="compare-modes">Compare Modes</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/29-0dTCvSgZ4dMeQDXkbutXPA.webp" alt="AdversaryGraph v2.0 Medium article visual 29" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 29, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>The Compare page has three modes.</p>
+        <h3 id="groups">Groups</h3>
+        <p>Compare your selected TTPs against ATT&amp;CK group profiles.</p>
+        <p>Use this for:</p>
+        <ul>
+          <li>initial lead generation</li>
+          <li>actor-profile overlap</li>
+          <li>detection-gap planning</li>
+        </ul>
+        <h3 id="campaigns">Campaigns</h3>
+        <p>Compare against named ATT&amp;CK campaigns.</p>
+        <p>This can be more specific than group comparison because group profiles often span years of activity, while campaigns represent narrower operations.</p>
+        <h3 id="reports">Reports</h3>
+        <p>Compare against previous AI analyses stored in the local database.</p>
+        <p>Use this for:</p>
+        <ul>
+          <li>cross-report correlation</li>
+          <li>incident clustering</li>
+          <li>repeated behavior discovery</li>
+          <li>retrospective comparison</li>
+        </ul>
+        <h2 id="group-vs-group">Group vs Group</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/30-ecTDnydMYwWX8-Ncuk8GfQ.webp" alt="AdversaryGraph v2.0 Medium article visual 30" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 30, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>The Group vs Group page compares multiple ATT&amp;CK group profiles at once.</p>
+        <p>It includes:</p>
+        <ul>
+          <li>overlap matrix</li>
+          <li>combined ATT&amp;CK view</li>
+          <li>technique table</li>
+        </ul>
+        <p>This is useful when you want to understand which behaviors are shared across actors and which techniques may be more distinctive.</p>
+        <h2 id="dfir-examples">DFIR Examples</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/31-JDE0azpONj0OVW95p9yZkg.webp" alt="AdversaryGraph v2.0 Medium article visual 31" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 31, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>AdversaryGraph v2.0 adds DFIR Examples.</p>
+        <p>The page indexes public DFIR Report metadata:</p>
+        <ul>
+          <li>title</li>
+          <li>source URL</li>
+          <li>date</li>
+          <li>tags</li>
+          <li>ATT&amp;CK techniques</li>
+          <li>actor mappings where available</li>
+        </ul>
+        <p>AdversaryGraph does not mirror third-party report content. It stores metadata only.</p>
+        <p>The workflow is:</p>
+        <ol>
+          <li>Open an indexed DFIR example.</li>
+          <li>Go to the original report page.</li>
+          <li>Save the source page as a local PDF.</li>
+          <li>Upload the PDF to AdversaryGraph AI Analysis.</li>
+          <li>Extract ATT&amp;CK candidates.</li>
+          <li>Review evidence.</li>
+          <li>Compare against groups, campaigns, and stored reports.</li>
+        </ol>
+        <p>This gives analysts a practical way to test the workflow with public material while respecting the original source.</p>
+        <h2 id="reference-sync">Reference Sync</h2>
+        
+<figure class="article-visual">
+  <img src="../assets/adversarygraph-v2/34-lp9MmZunILgId0X7JHQVbw.webp" alt="AdversaryGraph v2.0 Medium article visual 34" loading="lazy" />
+  <figcaption>AdversaryGraph v2.0 walkthrough visual 34, mirrored from the original Medium article.</figcaption>
+</figure>
+
+        <p>ATT&amp;CK changes over time.</p>
+        <p>AdversaryGraph includes Reference Sync for:</p>
+        <ul>
+          <li>Enterprise ATT&amp;CK</li>
+          <li>Mobile ATT&amp;CK</li>
+          <li>ICS ATT&amp;CK</li>
+        </ul>
+        <p>The sync page shows:</p>
+        <ul>
+          <li>current ingested version</li>
+          <li>latest known version</li>
+          <li>update state</li>
+          <li>configured domains</li>
+          <li>manual sync trigger</li>
+          <li>force sync option</li>
+        </ul>
+        <p>Scheduled sync runs through Celery Beat.</p>
+        <p>This matters because a report analyzed today may need to be compared again after ATT&amp;CK changes.</p>
+        <h2 id="stix-21-export-for-opencti">STIX 2.1 Export For OpenCTI</h2>
+        <p>This is one of the most important v2.0 additions.</p>
+        <p>AdversaryGraph can export a completed analysis as a STIX 2.1 bundle:</p>
+        <pre><code class="language-text">GET /api/export/analysis/{session_id}/stix</code></pre>
+        <p>The UI also includes:</p>
+        <pre><code class="language-text">↓ STIX/OpenCTI</code></pre>
+        <p>The bundle contains:</p>
+        <ul>
+          <li>STIX <code>report</code></li>
+          <li>ATT&amp;CK <code>attack-pattern</code> objects for extracted techniques</li>
+          <li>optional <code>intrusion-set</code> objects for group-similarity leads</li>
+          <li><code>x_adversarygraph_*</code> metadata</li>
+        </ul>
+        <p>The custom metadata includes:</p>
+        <ul>
+          <li>provider</li>
+          <li>model</li>
+          <li>ATT&amp;CK domain</li>
+          <li>confidence</li>
+          <li>review status</li>
+          <li>evidence source</li>
+          <li>similarity score</li>
+          <li>shared techniques</li>
+        </ul>
+        <p>Important: this is not an IOC export.</p>
+        <p>AdversaryGraph is not mainly about indicators.</p>
+        <p>It is about reports, TTPs, ATT&amp;CK mapping, evidence review, and detection handoff.</p>
+        <p>The OpenCTI export reflects that. It moves report and behavior context into a CTI platform without pretending that similarity equals attribution.</p>
+        <h2 id="pdf-export">PDF Export</h2>
+        <p>AdversaryGraph can export a completed AI analysis as a PDF report.</p>
+        <p>The PDF includes:</p>
+        <ul>
+          <li>analysis metadata</li>
+          <li>provider and model</li>
+          <li>ATT&amp;CK domain</li>
+          <li>executive summary</li>
+          <li>extracted techniques</li>
+          <li>evidence</li>
+          <li>confidence</li>
+          <li>group similarity leads</li>
+          <li>tactic coverage</li>
+        </ul>
+        <p>This is useful for analyst handoff, internal review, and detection backlog discussions.</p>
+        <h2 id="attck-navigator-export">ATT&amp;CK Navigator Export</h2>
+        <p>Navigator layers can be exported in ATT&amp;CK Navigator-compatible JSON format.</p>
+        <p>This is useful when your team already uses ATT&amp;CK Navigator and wants to continue analysis there.</p>
+        <p>You can also import existing Navigator layers into AdversaryGraph.</p>
+        <h2 id="api">API</h2>
+        <p>AdversaryGraph exposes API endpoints for integration.</p>
+        <p>Common endpoints:</p>
+        <pre><code class="language-text">GET  /api/health
+GET  /api/attack/versions
+GET  /api/attack/techniques
+GET  /api/attack/techniques/{attack_id}
+GET  /api/apt/groups
+GET  /api/apt/groups/{group_id}
+POST /api/apt/compare
+GET  /api/apt/campaigns
+POST /api/apt/campaigns/compare
+POST /api/analyze
+POST /api/analyze/stream
+GET  /api/analyze/sessions
+GET  /api/analyze/{session_id}
+PATCH /api/analyze/sessions/{session_id}/techniques/{attack_id}/review
+GET  /api/export/analysis/{session_id}
+GET  /api/export/analysis/{session_id}/stix
+POST /api/export/layer
+GET  /api/sync/status
+POST /api/sync/trigger</code></pre>
+        <p>The API makes it possible to connect AdversaryGraph to internal workflows, report pipelines, or CTI tooling.</p>
+        <h2 id="security-and-privacy-notes">Security And Privacy Notes</h2>
+        <p>AdversaryGraph should be deployed in controlled environments.</p>
+        <p>For private work:</p>
+        <ul>
+          <li>self-host the Docker stack</li>
+          <li>use a local LLM or an approved provider</li>
+          <li>restrict network exposure</li>
+          <li>put the app behind authentication</li>
+          <li>use TLS</li>
+          <li>define report retention</li>
+          <li>define raw response retention</li>
+          <li>back up PostgreSQL if report history matters</li>
+        </ul>
+        <p>Do not upload confidential reports into public demos.</p>
+        <h2 id="what-adversarygraph-is-not">What AdversaryGraph Is Not</h2>
+        <p>AdversaryGraph is not:</p>
+        <ul>
+          <li>an attribution engine</li>
+          <li>a SIEM</li>
+          <li>an EDR</li>
+          <li>a replacement for OpenCTI</li>
+          <li>a replacement for MISP</li>
+          <li>a replacement for ATT&amp;CK Navigator</li>
+          <li>a fully automated detection generator</li>
+        </ul>
+        <p>It is a focused workbench for CTI-to-detection workflows.</p>
+        <p>Its job is to help analysts move from report text to reviewed ATT&amp;CK evidence and useful handoff artifacts.</p>
+        <h2 id="recommended-workflow">Recommended Workflow</h2>
+        <p>The workflow I recommend is:</p>
+        <ol>
+          <li>Start with a public or authorized report.</li>
+          <li>Run AI Analysis.</li>
+          <li>Review every extracted mapping.</li>
+          <li>Accept only evidence-backed TTPs.</li>
+          <li>Inject accepted TTPs into Navigator.</li>
+          <li>Compare against groups.</li>
+          <li>Compare against campaigns.</li>
+          <li>Compare against previous reports.</li>
+          <li>Review detection gaps.</li>
+          <li>Export PDF for analyst handoff.</li>
+          <li>Export STIX/OpenCTI if promoting to a CTI platform.</li>
+          <li>Document uncertainty.</li>
+        </ol>
+        <p>The most important rule:</p>
+        <pre><code class="language-text">ATT&amp;CK overlap is not attribution.</code></pre>
+        <p>Use similarity as a lead. Use evidence for conclusions.</p>
+        <h2 id="release-evidence">Release Evidence</h2>
+        <p>AdversaryGraph v2.0.0 includes:</p>
+        <ul>
+          <li>Docker Compose deployment</li>
+          <li>FastAPI backend</li>
+          <li>React frontend</li>
+          <li>PostgreSQL report and ATT&amp;CK storage</li>
+          <li>Redis/Celery background workers</li>
+          <li>Claude, OpenAI, Gemini, and Local LLM support</li>
+          <li>MITRE ATT&amp;CK Enterprise, Mobile, ICS, and MITRE ATLAS support</li>
+          <li>enriched ATT&amp;CK actor pages</li>
+          <li>DFIR example metadata</li>
+          <li>STIX/OpenCTI export</li>
+          <li>PDF export</li>
+          <li>Navigator JSON export</li>
+          <li>backend test suite</li>
+          <li>frontend production build</li>
+          <li>demo video and GIF</li>
+          <li>full guide and release notes</li>
+        </ul>
+        <p>Verification for v2.0.0:</p>
+        <pre><code class="language-text">Backend tests: 76 passed
+Frontend build: passed</code></pre>
+        <h2 id="links">Links</h2>
+        <p>GitHub:</p>
+        <p><a href="https://github.com/anpa1200/adversarygraph" target="_blank" rel="noopener">https://github.com/anpa1200/adversarygraph</a></p>
+        <p>Release:</p>
+        <p><a href="https://github.com/anpa1200/adversarygraph/releases/tag/v2.0.0" target="_blank" rel="noopener">https://github.com/anpa1200/adversarygraph/releases/tag/v2.0.0</a></p>
+        <p>Full guide:</p>
+        <p><a href="https://github.com/anpa1200/adversarygraph/blob/main/docs/full-guide-v2.md" target="_blank" rel="noopener">https://github.com/anpa1200/adversarygraph/blob/main/docs/full-guide-v2.md</a></p>
+        <p>Project hub:</p>
+        <p><a href="https://1200km.com/adversarygraph/" target="_blank" rel="noopener">https://1200km.com/adversarygraph/</a></p>
+        <p>Public ATT&amp;CK workspace:</p>
+        <p><a href="https://1200km.com/threat-matrix/" target="_blank" rel="noopener">https://1200km.com/threat-matrix/</a></p>
+        <p>External validation:</p>
+        <p><a href="https://1200km.com/external-validation.html" target="_blank" rel="noopener">https://1200km.com/external-validation.html</a></p>
+        <h2 id="final-thoughts">Final Thoughts</h2>
+        <p>The goal of AdversaryGraph is simple: make threat intelligence easier to operationalize.</p>
+        <p>It does not replace analysts. It gives analysts a structured place to work.</p>
+        <p>Reports become ATT&amp;CK candidates.</p>
+        <p>Candidates become reviewed mappings.</p>
+        <p>Mappings become comparison sets.</p>
+        <p>Comparison sets become detection questions.</p>
+        <p>And reviewed results can move into PDF, Navigator, JSON, or OpenCTI.</p>
+        <p>That is the part of CTI work I wanted to improve.</p>
+        <h2 id="follow-my-work">Follow My Work</h2>
+        <p>I publish practical cybersecurity research, CTI workflows, detection engineering notes, malware analysis projects, OpenCTI work, cloud and Kubernetes security research, AI-assisted security tooling, labs, and technical guides.</p>
+        <p>Portfolio / Knowledge Base: <a href="https://1200km.com/" target="_blank" rel="noopener">https://1200km.com/</a></p>
+        <p>Medium: <a href="https://medium.com/@1200km" target="_blank" rel="noopener">https://medium.com/@1200km</a></p>
+        <p>GitHub: <a href="https://github.com/anpa1200" target="_blank" rel="noopener">https://github.com/anpa1200</a></p>
+        <p>LinkedIn: <a href="https://www.linkedin.com/in/andrey-pautov/" target="_blank" rel="noopener">https://www.linkedin.com/in/andrey-pautov/</a></p>
+        <p>Andrey Pautov</p>
+      </article>
+
+      <aside>
+        <div class="side-card">
+          <h3>Contents</h3>
+          <ol class="toc">
+            <li><a href="#table-of-contents">Table of Contents</a></li>
+            <li><a href="#what-adversarygraph-is">What AdversaryGraph Is</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#local-llm-support">Local LLM Support</a></li>
+            <li><a href="#discover-page">Discover Page</a></li>
+            <li><a href="#ai-analysis">AI Analysis</a></li>
+            <li><a href="#review-status">Review Status</a></li>
+            <li><a href="#navigator">Navigator</a></li>
+            <li><a href="#attck-group-library">ATT&amp;CK Group Library</a></li>
+            <li><a href="#group-and-campaign-comparison">Group And Campaign Comparison</a></li>
+            <li><a href="#compare-modes">Compare Modes</a></li>
+            <li><a href="#group-vs-group">Group vs Group</a></li>
+            <li><a href="#dfir-examples">DFIR Examples</a></li>
+            <li><a href="#reference-sync">Reference Sync</a></li>
+            <li><a href="#stix-21-export-for-opencti">STIX 2.1 Export For OpenCTI</a></li>
+            <li><a href="#pdf-export">PDF Export</a></li>
+            <li><a href="#attck-navigator-export">ATT&amp;CK Navigator Export</a></li>
+            <li><a href="#api">API</a></li>
+            <li><a href="#security-and-privacy-notes">Security And Privacy Notes</a></li>
+            <li><a href="#what-adversarygraph-is-not">What AdversaryGraph Is Not</a></li>
+            <li><a href="#recommended-workflow">Recommended Workflow</a></li>
+            <li><a href="#release-evidence">Release Evidence</a></li>
+            <li><a href="#links">Links</a></li>
+            <li><a href="#final-thoughts">Final Thoughts</a></li>
+            <li><a href="#follow-my-work">Follow My Work</a></li>
+          </ol>
+          <div class="button-row">
+            <a class="button primary" href="https://github.com/anpa1200/adversarygraph" target="_blank" rel="noopener">Repo</a>
+            <a class="button" href="https://1200km.com/adversarygraph-docs/">Docs</a>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        Follow My Work -
+        <a href="../index.html">Portfolio / Knowledge Base</a> -
+        <a href="https://medium.com/@1200km">Medium</a> -
+        <a href="https://github.com/anpa1200">GitHub</a> -
+        <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a>
+        <br />Andrey Pautov
+      </div>
+    </footer>
+  </body>
+</html>
