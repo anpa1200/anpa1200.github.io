@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TMTG21RVHM');
+    </script>
+    <meta charset="utf-8" />
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AdversaryGraph Use Cases — AI CTI, ATT&amp;CK, IOC Enrichment | 1200km</title>
+    <meta name="description" content="Twenty-six practical AdversaryGraph use cases covering AI report analysis, ATT&CK mapping, IOC enrichment, sector intelligence, STIX/TAXII/MISP, Sigma/YARA feeds, sandbox behavior, and detection handoff." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="AdversaryGraph Use Cases" />
+    <meta property="og:description" content="Practical analyst workflows showing the full AdversaryGraph capability set." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://1200km.com/adversarygraph/use-cases.html" />
+    <meta property="og:image" content="https://1200km.com/assets/adversarygraph-web-og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://1200km.com/adversarygraph/use-cases.html" />
+    <link rel="icon" href="../assets/ap-logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #050c1a;
+        --panel: rgba(8, 19, 38, 0.88);
+        --panel-2: rgba(12, 28, 54, 0.92);
+        --text: #dce8fb;
+        --muted: #8fa8cc;
+        --line: #1f3b70;
+        --accent: #0f62fe;
+        --accent-soft: #93c5fd;
+        --pink: #f43f5e;
+        --green: #34d399;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: #050c1a url(../assets/bg-cyber.png) center/cover fixed;
+        line-height: 1.58;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(5,12,26,0.96), rgba(5,12,26,0.88));
+        z-index: -1;
+      }
+      a { color: var(--accent-soft); text-decoration: none; }
+      a:hover { color: #dbeafe; text-decoration: underline; }
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.92);
+        backdrop-filter: blur(14px);
+      }
+      .nav, .hero-inner, main, .footer-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+      .nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text);
+        font-weight: 800;
+      }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+      .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
+      .nav-links a { color: var(--muted); }
+      .nav-links a.active { color: var(--accent-soft); font-weight: 700; }
+      .hero {
+        padding: 72px 0 48px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.86);
+      }
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--accent-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 0.76rem;
+        font-weight: 800;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(2.25rem, 4.8vw, 4.2rem);
+        line-height: 1.04;
+      }
+      .hero-sub {
+        max-width: 880px;
+        margin: 18px 0 0;
+        color: #c7d7ef;
+        font-size: 1.08rem;
+      }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+      .button {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: rgba(8,19,38,0.72);
+        color: var(--text);
+        font-weight: 700;
+      }
+      .button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      main { padding: 44px 0 76px; }
+      section { margin-bottom: 48px; }
+      h2 {
+        margin: 0 0 12px;
+        color: #f8fbff;
+        font-size: 1.45rem;
+      }
+      .section-sub {
+        margin: 0 0 22px;
+        max-width: 850px;
+        color: var(--muted);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .case-card {
+        min-height: 238px;
+        border: 1px solid rgba(147,197,253,0.24);
+        border-radius: 10px;
+        background: var(--panel);
+        padding: 18px;
+      }
+      .case-card h3 {
+        margin: 0 0 8px;
+        color: #fff;
+        font-size: 1.03rem;
+      }
+      .case-card p { margin: 0 0 10px; color: #b9cbe7; }
+      .case-card strong { color: #f8fbff; }
+      .case-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 12px;
+      }
+      .chip {
+        display: inline-flex;
+        border: 1px solid rgba(147,197,253,0.28);
+        border-radius: 999px;
+        padding: 4px 9px;
+        background: rgba(15,98,254,0.12);
+        color: #bfdbfe;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .map {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid rgba(147,197,253,0.24);
+        border-radius: 10px;
+        background: var(--panel);
+      }
+      .map th, .map td {
+        padding: 12px;
+        border-bottom: 1px solid rgba(147,197,253,0.14);
+        text-align: left;
+        vertical-align: top;
+      }
+      .map th { color: #fff; background: rgba(15,98,254,0.12); }
+      .map td { color: #b9cbe7; }
+      .notice {
+        border: 1px solid rgba(52,211,153,0.32);
+        border-radius: 10px;
+        background: rgba(5, 46, 34, 0.34);
+        padding: 18px;
+        color: #c7f9df;
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        background: rgba(5,12,26,0.96);
+        color: var(--muted);
+        padding: 24px 0;
+      }
+      @media (max-width: 820px) {
+        .grid { grid-template-columns: 1fr; }
+        .nav { align-items: flex-start; flex-direction: column; padding: 14px 0; }
+        .nav-links { gap: 9px; }
+        .map { display: block; overflow-x: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html">
+          <img src="../assets/ap-logo.png" alt="Andrey Pautov logo" />
+          <span>Andrey Pautov</span>
+        </a>
+        <div class="nav-links">
+          <a href="../index.html">Main page</a>
+          <a href="index.html" class="active">AdversaryGraph</a>
+          <a href="https://1200km.com/adversarygraph-docs/use-cases/">Docs Use Cases</a>
+          <a href="../guides.html">Guides</a>
+          <a href="https://github.com/anpa1200/adversarygraph">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">AdversaryGraph v2.5 · Practical Workflows</p>
+        <h1>Use Cases for AI-Assisted CTI, ATT&amp;CK Mapping, and IOC Enrichment</h1>
+        <p class="hero-sub">
+          Twenty-six analyst workflows showing how AdversaryGraph supports report analysis, actor comparison,
+          sector intelligence, IOC enrichment, STIX/TAXII/MISP exchange, Sigma/YARA and sandbox context,
+          detection handoff, and deployment validation.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="https://1200km.com/adversarygraph-docs/use-cases/">Read Full Docs Page</a>
+          <a class="button" href="index.html">Project Hub</a>
+          <a class="button" href="https://github.com/anpa1200/adversarygraph">Deploy Self-Hosted</a>
+          <a class="button" href="https://1200km.com/threat-matrix/">Open Web Workspace</a>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <section>
+        <h2>Use Case Library</h2>
+        <p class="section-sub">
+          These are practical ways to use the tool in CTI, SOC, incident response, malware analysis,
+          detection engineering, and platform validation work.
+        </p>
+        <div class="grid">
+          <article class="case-card"><h3>1. Map a new threat report to ATT&amp;CK</h3><p><strong>Flow:</strong> Upload PDF/DOCX/TXT or paste text, run AI Analysis, review evidence, accept TTPs, and inject them into Navigator.</p><p><strong>Output:</strong> Technique list, evidence, confidence, review status, layer, JSON, and PDF.</p><div class="case-meta"><span class="chip">AI Analysis</span><span class="chip">ATT&amp;CK</span></div></article>
+          <article class="case-card"><h3>2. Build a client-facing CTI briefing</h3><p><strong>Flow:</strong> Analyze a report, validate TTPs, compare actors, add IOCs, and export a PDF.</p><p><strong>Output:</strong> Evidence-backed briefing with actor context and detection priorities.</p><div class="case-meta"><span class="chip">PDF</span><span class="chip">Briefing</span></div></article>
+          <article class="case-card"><h3>3. Compare an incident to APT groups</h3><p><strong>Flow:</strong> Extract TTPs, run group comparison, inspect Jaccard overlap, and open actor pages.</p><p><strong>Output:</strong> Ranked actor hypotheses, not definitive attribution.</p><div class="case-meta"><span class="chip">Actors</span><span class="chip">Similarity</span></div></article>
+          <article class="case-card"><h3>4. Compare multiple reports</h3><p><strong>Flow:</strong> Store report analyses, compare shared TTPs, tactics, IOCs, and actor links.</p><p><strong>Output:</strong> Relatedness view with shared and distinct behavior.</p><div class="case-meta"><span class="chip">Reports</span><span class="chip">Overlap</span></div></article>
+          <article class="case-card"><h3>5. Turn CTI into a detection backlog</h3><p><strong>Flow:</strong> Accept validated TTPs, review tactic coverage, inspect guidance, and export evidence.</p><p><strong>Output:</strong> Prioritized detection engineering candidates.</p><div class="case-meta"><span class="chip">Detection</span><span class="chip">Backlog</span></div></article>
+          <article class="case-card"><h3>6. Create ATT&amp;CK Navigator layers</h3><p><strong>Flow:</strong> Select TTPs manually, import layers, inject AI findings, or load actor TTPs.</p><p><strong>Output:</strong> Navigator-compatible JSON and matrix visualization.</p><div class="case-meta"><span class="chip">Navigator</span><span class="chip">Layer</span></div></article>
+          <article class="case-card"><h3>7. Review detection coverage gaps</h3><p><strong>Flow:</strong> Load TTPs, inspect tactic distribution, compare against actor or campaign profiles.</p><p><strong>Output:</strong> Missing technique areas and priority gaps.</p><div class="case-meta"><span class="chip">Coverage</span><span class="chip">Gap Analysis</span></div></article>
+          <article class="case-card"><h3>8. Track actor relevance by sector</h3><p><strong>Flow:</strong> Filter by sector, region, technology, and activity window in Sector Intel.</p><p><strong>Output:</strong> Relevant actor ranking and matrix-ready TTPs.</p><div class="case-meta"><span class="chip">Sector Intel</span><span class="chip">Priority</span></div></article>
+          <article class="case-card"><h3>9. Build a sector-specific threat model</h3><p><strong>Flow:</strong> Combine sector filters, actor profiles, relevant TTPs, and evidence cards.</p><p><strong>Output:</strong> Customer-specific threat model and ATT&amp;CK behavior map.</p><div class="case-meta"><span class="chip">Threat Model</span><span class="chip">Customer</span></div></article>
+          <article class="case-card"><h3>10. Enrich actor profiles with IOCs</h3><p><strong>Flow:</strong> Open actor IOCs, sync ThreatFox or custom feeds, and export CSV.</p><p><strong>Output:</strong> Actor-linked observables with source and last-seen context.</p><div class="case-meta"><span class="chip">IOC</span><span class="chip">Actors</span></div></article>
+          <article class="case-card"><h3>11. Maintain a central IOC Library</h3><p><strong>Flow:</strong> Search by indicator, description, malware, campaign, actor, type, source, or last seen.</p><p><strong>Output:</strong> Central observable library with enrichment actions.</p><div class="case-meta"><span class="chip">IOC Library</span><span class="chip">Search</span></div></article>
+          <article class="case-card"><h3>12. Enrich an IOC with VirusTotal</h3><p><strong>Flow:</strong> Query an IP, domain, URL, or hash and review reputation, tags, rules, relationships, actors, and TTPs.</p><p><strong>Output:</strong> Structured enrichment with pivots to matrix and actor pages.</p><div class="case-meta"><span class="chip">VirusTotal</span><span class="chip">Enrichment</span></div></article>
+          <article class="case-card"><h3>13. Pull OTX, Malpedia, and ThreatFox context</h3><p><strong>Flow:</strong> Configure keys, sync sources, and enrich actor, malware, and IOC records.</p><p><strong>Output:</strong> Source-backed external intelligence with timestamps.</p><div class="case-meta"><span class="chip">OTX</span><span class="chip">Malpedia</span><span class="chip">ThreatFox</span></div></article>
+          <article class="case-card"><h3>14. Import custom private feeds</h3><p><strong>Flow:</strong> Add JSON, CSV, or TXT feeds and keep customer intelligence in the external DB.</p><p><strong>Output:</strong> Private observables separated from public reference data.</p><div class="case-meta"><span class="chip">Custom Feed</span><span class="chip">Private DB</span></div></article>
+          <article class="case-card"><h3>15. Import and export STIX/TAXII</h3><p><strong>Flow:</strong> Export STIX indicators, import STIX files, or pull TAXII collection objects.</p><p><strong>Output:</strong> Structured CTI exchange with compatible platforms.</p><div class="case-meta"><span class="chip">STIX</span><span class="chip">TAXII</span></div></article>
+          <article class="case-card"><h3>16. Connect MISP JSON exports</h3><p><strong>Flow:</strong> Provide a MISP JSON export URL or gateway URL and sync it as a source.</p><p><strong>Output:</strong> MISP-backed IOC records for search and enrichment.</p><div class="case-meta"><span class="chip">MISP</span><span class="chip">JSON</span></div></article>
+          <article class="case-card"><h3>17. Sync Sigma and YARA rule feeds</h3><p><strong>Flow:</strong> Add rule feeds and review detection-rule matches in enrichment context.</p><p><strong>Output:</strong> Detection context for IOCs, malware families, and techniques.</p><div class="case-meta"><span class="chip">Sigma</span><span class="chip">YARA</span></div></article>
+          <article class="case-card"><h3>18. Enrich malware behavior from sandboxes</h3><p><strong>Flow:</strong> Sync sandbox behavior sources and connect observed behavior to malware, IOCs, and TTPs.</p><p><strong>Output:</strong> Runtime evidence for behavior and technique mapping.</p><div class="case-meta"><span class="chip">Sandbox</span><span class="chip">Behavior</span></div></article>
+          <article class="case-card"><h3>19. Extract IOCs from uploaded reports</h3><p><strong>Flow:</strong> Analyze a report, extract observables, map them to actors or malware, and store them.</p><p><strong>Output:</strong> Report-derived IOC records with source context.</p><div class="case-meta"><span class="chip">Extraction</span><span class="chip">Reports</span></div></article>
+          <article class="case-card"><h3>20. Analyze DFIR report examples</h3><p><strong>Flow:</strong> Open DFIR Examples, inspect source-linked TTPs and actors, then use the report for AI analysis.</p><p><strong>Output:</strong> Practice dataset for validation and demos.</p><div class="case-meta"><span class="chip">DFIR</span><span class="chip">Examples</span></div></article>
+          <article class="case-card"><h3>21. Compare two APT groups</h3><p><strong>Flow:</strong> Select groups, inspect shared and different techniques, and review the combined matrix.</p><p><strong>Output:</strong> Group-to-group behavior comparison.</p><div class="case-meta"><span class="chip">Group vs Group</span><span class="chip">APT</span></div></article>
+          <article class="case-card"><h3>22. Track ATT&amp;CK changes over time</h3><p><strong>Flow:</strong> Track actor changes, sync references, and compare stored data to current ATT&amp;CK.</p><p><strong>Output:</strong> Visible actor and technique updates.</p><div class="case-meta"><span class="chip">Sync</span><span class="chip">Change Tracking</span></div></article>
+          <article class="case-card"><h3>23. Use local or private LLMs</h3><p><strong>Flow:</strong> Configure a local/private LLM gateway and choose it during analysis.</p><p><strong>Output:</strong> Private extraction with operator-controlled model routing.</p><div class="case-meta"><span class="chip">Local LLM</span><span class="chip">Privacy</span></div></article>
+          <article class="case-card"><h3>24. Build a repeatable CTI pipeline</h3><p><strong>Flow:</strong> Track intake, analysis, review states, actor hypotheses, IOC enrichment, and detection candidates.</p><p><strong>Output:</strong> Auditable CTI-to-detection workflow.</p><div class="case-meta"><span class="chip">Pipeline</span><span class="chip">Operations</span></div></article>
+          <article class="case-card"><h3>25. Validate deployment readiness</h3><p><strong>Flow:</strong> Run selftest, fix popup errors, recheck, and open troubleshooting when needed.</p><p><strong>Output:</strong> Clear API, DB, ATT&amp;CK, ATLAS, and enrichment readiness status.</p><div class="case-meta"><span class="chip">Selftest</span><span class="chip">Troubleshooting</span></div></article>
+          <article class="case-card"><h3>26. Prepare release or maintainer evidence</h3><p><strong>Flow:</strong> Combine release notes, selftest output, screenshots, sample data, API docs, and validation pages.</p><p><strong>Output:</strong> Evidence package for publication, review, or stakeholder approval.</p><div class="case-meta"><span class="chip">Release</span><span class="chip">Validation</span></div></article>
+        </div>
+      </section>
+
+      <section>
+        <h2>Capability Map</h2>
+        <table class="map">
+          <thead><tr><th>Capability</th><th>Relevant Use Cases</th></tr></thead>
+          <tbody>
+            <tr><td>AI report extraction</td><td>1, 2, 3, 4, 19, 20, 23, 24</td></tr>
+            <tr><td>ATT&amp;CK Navigator and layers</td><td>1, 5, 6, 7, 8, 9, 21</td></tr>
+            <tr><td>Actor and campaign comparison</td><td>3, 4, 8, 9, 21, 22</td></tr>
+            <tr><td>Sector intelligence</td><td>8, 9</td></tr>
+            <tr><td>IOC Library</td><td>10, 11, 12, 14, 15, 16, 19</td></tr>
+            <tr><td>External enrichment</td><td>12, 13, 17, 18</td></tr>
+            <tr><td>STIX/TAXII/MISP workflows</td><td>15, 16</td></tr>
+            <tr><td>Detection engineering handoff</td><td>5, 7, 17, 18, 24</td></tr>
+            <tr><td>Operations and pipeline</td><td>2, 19, 24, 26</td></tr>
+            <tr><td>Deployment reliability</td><td>23, 25, 26</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="notice">
+        <strong>Attribution note:</strong> AdversaryGraph shows TTP overlap and supporting evidence for analyst hypothesis generation. It does not make definitive attribution claims without corroborating evidence and analyst judgment.
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <a href="../index.html">Andrey Pautov</a> · <a href="index.html">AdversaryGraph Project Hub</a> · <a href="https://1200km.com/adversarygraph-docs/use-cases/">Full docs use-cases page</a> · <a href="https://github.com/anpa1200/adversarygraph">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>
