@@ -62,7 +62,7 @@ const repos = {
 };
 
 const releases = {
-  adversarygraph: ghLatestRelease('anpa1200/adversarygraph', 'v2.0.0'),
+  adversarygraph: ghLatestRelease('anpa1200/adversarygraph', 'v2.1.1'),
   aidebug: ghLatestRelease('anpa1200/AIDebug', 'v1.1.0'),
 };
 
