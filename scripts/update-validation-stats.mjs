@@ -29,6 +29,16 @@ function ghRepo(nameWithOwner) {
   return runJson('gh', ['api', `repos/${nameWithOwner}`]);
 }
 
+function ghUserRepos(username) {
+  const repos = [];
+  for (let page = 1; ; page += 1) {
+    const batch = runJson('gh', ['api', `users/${username}/repos?per_page=100&page=${page}`], []);
+    if (!batch.length) break;
+    repos.push(...batch);
+  }
+  return repos;
+}
+
 function ghLatestRelease(nameWithOwner, fallbackTag) {
   const release = runJson('gh', ['api', `repos/${nameWithOwner}/releases/latest`], null);
   return release ? { tag: release.tag_name, url: release.html_url, published_at: release.published_at } : { tag: fallbackTag, url: '', published_at: null };
@@ -60,6 +70,7 @@ const repos = {
   adversarygraph: ghRepo('anpa1200/adversarygraph'),
   aidebug: ghRepo('anpa1200/AIDebug'),
 };
+const publicRepos = ghUserRepos('anpa1200');
 
 const releases = {
   adversarygraph: ghLatestRelease('anpa1200/adversarygraph', 'v2.1.1'),
@@ -97,6 +108,10 @@ const stats = {
 stats.totals = {
   open_upstream_items: stats.github.open_prs + stats.gitlab.open_mrs,
   merged_external_items: stats.github.merged_prs + stats.gitlab.merged_mrs,
+  github_public_repos: publicRepos.length,
+  github_forked_repos: publicRepos.filter(repo => repo.fork).length,
+  github_total_stars: publicRepos.reduce((total, repo) => total + repo.stargazers_count, 0),
+  github_total_forks: publicRepos.reduce((total, repo) => total + repo.forks_count, 0),
   aidebug_adversarygraph_stars: stats.repositories.aidebug.stars + stats.repositories.adversarygraph.stars,
   aidebug_adversarygraph_forks: stats.repositories.aidebug.forks + stats.repositories.adversarygraph.forks,
 };
@@ -145,13 +160,13 @@ html = replaceOrThrow(
 html = replaceOrThrow(
   html,
   /<div><strong>\d+<\/strong><span>GitHub stars<\/span><\/div>/,
-  `<div><strong>${stats.totals.aidebug_adversarygraph_stars}</strong><span>GitHub stars</span></div>`,
+  `<div><strong>${stats.totals.github_total_stars}</strong><span>GitHub stars</span></div>`,
   'combined star count',
 );
 html = replaceOrThrow(
   html,
-  /<p>Combined live public stars for AIDebug and AdversaryGraph(?:, plus \d+ public forks,)? at verification time\.<\/p>/,
-  `<p>Combined live public stars for AIDebug and AdversaryGraph, plus ${stats.totals.aidebug_adversarygraph_forks} public forks, at verification time.</p>`,
+  /<p>(?:Combined live public stars for AIDebug and AdversaryGraph(?:, plus \d+ public forks,)? at verification time\.|Live public portfolio total across \d+ GitHub repositories, including \d+ forks and \d+ combined stars for AIDebug plus AdversaryGraph\.)<\/p>/,
+  `<p>Live public portfolio total across ${stats.totals.github_public_repos} GitHub repositories, including ${stats.totals.github_total_forks} repository forks and ${stats.totals.aidebug_adversarygraph_stars} combined stars for AIDebug plus AdversaryGraph.</p>`,
   'combined star description',
 );
 html = replaceOrThrow(
