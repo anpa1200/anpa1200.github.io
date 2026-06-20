@@ -165,7 +165,7 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<p>(?:Combined live public stars for AIDebug and AdversaryGraph(?:, plus \d+ public forks,)? at verification time\.|Live public portfolio total across \d+ GitHub repositories, including \d+ forks and \d+ combined stars for AIDebug plus AdversaryGraph\.)<\/p>/,
+  /<p>(?:Combined live public stars for AIDebug and AdversaryGraph(?:, plus \d+ public forks,)? at verification time\.|Live public portfolio total across \d+ GitHub repositories, including \d+ (?:repository )?forks and \d+ combined stars for AIDebug plus AdversaryGraph\.)<\/p>/,
   `<p>Live public portfolio total across ${stats.totals.github_public_repos} GitHub repositories, including ${stats.totals.github_total_forks} repository forks and ${stats.totals.aidebug_adversarygraph_stars} combined stars for AIDebug plus AdversaryGraph.</p>`,
   'combined star description',
 );
