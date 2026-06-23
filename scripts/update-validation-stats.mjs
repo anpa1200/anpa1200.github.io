@@ -49,7 +49,9 @@ function todayIsoDate() {
 }
 
 function replaceOrThrow(html, pattern, replacement, label) {
+  pattern.lastIndex = 0;
   if (!pattern.test(html)) throw new Error(`Could not update ${label}`);
+  pattern.lastIndex = 0;
   return html.replace(pattern, replacement);
 }
 
@@ -307,13 +309,13 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /https:\/\/github\.com\/anpa1200\/adversarygraph\/releases\/tag\/v[^"]+/,
+  /https:\/\/github\.com\/anpa1200\/adversarygraph\/releases\/tag\/v[^"]+/g,
   stats.repositories.adversarygraph.release_url || `https://github.com/anpa1200/adversarygraph/releases/tag/${stats.repositories.adversarygraph.release}`,
   'AdversaryGraph release URL',
 );
 html = replaceOrThrow(
   html,
-  /https:\/\/github\.com\/anpa1200\/AIDebug\/releases\/tag\/v[^"]+/,
+  /https:\/\/github\.com\/anpa1200\/AIDebug\/releases\/tag\/v[^"]+/g,
   stats.repositories.aidebug.release_url || `https://github.com/anpa1200/AIDebug/releases/tag/${stats.repositories.aidebug.release}`,
   'AIDebug release URL',
 );
