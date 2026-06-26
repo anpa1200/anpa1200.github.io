@@ -29,6 +29,17 @@ function ghRepo(nameWithOwner) {
   return runJson('gh', ['api', `repos/${nameWithOwner}`]);
 }
 
+function ghPrDetails(pr) {
+  const nameWithOwner = pr.repository.nameWithOwner;
+  const details = runJson('gh', ['api', `repos/${nameWithOwner}/pulls/${pr.number}`]);
+  return {
+    ...pr,
+    canonical_state: details.state,
+    merged_at: details.merged_at,
+    closed_at: details.closed_at,
+  };
+}
+
 function ghUserRepos(username) {
   const repos = [];
   for (let page = 1; ; page += 1) {
@@ -143,11 +154,13 @@ ${topRepos}
 }
 
 const github = {
-  open: ghSearch(['--author', 'anpa1200', '--state', 'open', '--limit', '100']),
-  merged: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--merged', '--limit', '100']),
-  closed: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--limit', '100']),
+  open_search: ghSearch(['--author', 'anpa1200', '--state', 'open', '--limit', '100']).map(ghPrDetails),
+  merged_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--merged', '--limit', '100']).map(ghPrDetails),
+  closed_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--limit', '100']).map(ghPrDetails),
 };
-github.closed_unmerged = github.closed.filter(pr => pr.state !== 'merged');
+github.open = github.open_search.filter(pr => pr.canonical_state === 'open' && !pr.merged_at);
+github.merged = github.merged_search.filter(pr => pr.merged_at);
+github.closed_unmerged = github.closed_search.filter(pr => pr.canonical_state === 'closed' && !pr.merged_at);
 
 const gitlabMrs = runJson(
   'glab',
