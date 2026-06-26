@@ -29,6 +29,10 @@ function ghRepo(nameWithOwner) {
   return runJson('gh', ['api', `repos/${nameWithOwner}`]);
 }
 
+function ghUser(username) {
+  return runJson('gh', ['api', `users/${username}`]);
+}
+
 function ghPrDetails(pr) {
   const nameWithOwner = pr.repository.nameWithOwner;
   const details = runJson('gh', ['api', `repos/${nameWithOwner}/pulls/${pr.number}`]);
@@ -172,6 +176,7 @@ const repos = {
   adversarygraph: ghRepo('anpa1200/adversarygraph'),
   aidebug: ghRepo('anpa1200/AIDebug'),
 };
+const user = ghUser('anpa1200');
 const publicRepos = ghUserRepos('anpa1200');
 const topPublicRepos = [...publicRepos]
   .sort((left, right) => right.stargazers_count - left.stargazers_count || right.forks_count - left.forks_count || left.name.localeCompare(right.name))
@@ -207,6 +212,13 @@ const stats = {
         url: mr.web_url,
         updated_at: mr.updated_at,
       })),
+  },
+  profile: {
+    url: user.html_url,
+    followers: user.followers,
+    following: user.following,
+    public_repos: user.public_repos,
+    updated_at: user.updated_at,
   },
   repositories: {
     adversarygraph: {
@@ -247,6 +259,7 @@ stats.totals = {
   github_total_forks: publicRepos.reduce((total, repo) => total + repo.forks_count, 0),
   aidebug_adversarygraph_stars: stats.repositories.aidebug.stars + stats.repositories.adversarygraph.stars,
   aidebug_adversarygraph_forks: stats.repositories.aidebug.forks + stats.repositories.adversarygraph.forks,
+  github_followers: stats.profile.followers,
 };
 
 mkdirSync(path.dirname(statsPath), { recursive: true });
@@ -298,10 +311,32 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<p>(?:Combined live public stars for AIDebug and AdversaryGraph(?:, plus \d+ public forks,)? at verification time\.|Live public portfolio total across \d+ GitHub repositories, including \d+ (?:repository )?forks and \d+ combined stars for AIDebug plus AdversaryGraph\.|Live public portfolio total across \d+ GitHub repositories, including \d+ forked repositories, \d+ repository forks, and \d+ combined stars for AIDebug plus AdversaryGraph\.)<\/p>/,
-  `<p>Live public portfolio total across ${stats.totals.github_public_repos} GitHub repositories, including ${stats.totals.github_forked_repos} forked repositories, ${stats.totals.github_total_forks} repository forks, and ${stats.totals.aidebug_adversarygraph_stars} combined stars for AIDebug plus AdversaryGraph.</p>`,
+  /<p>(?:Combined live public stars for AIDebug and AdversaryGraph(?:, plus \d+ public forks,)? at verification time\.|Live public portfolio total across \d+ GitHub repositories, including \d+ (?:repository )?forks and \d+ combined stars for AIDebug plus AdversaryGraph\.|Live public portfolio total across \d+ GitHub repositories, including \d+ forked repositories, \d+ repository forks(?:, \d+ GitHub followers)?, and \d+ combined stars for AIDebug plus AdversaryGraph\.)<\/p>/,
+  `<p>Live public portfolio total across ${stats.totals.github_public_repos} GitHub repositories, including ${stats.totals.github_forked_repos} forked repositories, ${stats.totals.github_total_forks} repository forks, ${stats.totals.github_followers} GitHub followers, and ${stats.totals.aidebug_adversarygraph_stars} combined stars for AIDebug plus AdversaryGraph.</p>`,
   'combined star description',
 );
+if (/<span>GitHub followers<\/span>/.test(html)) {
+  html = replaceOrThrow(
+    html,
+    /<article class="card metric">\s+<div><strong>\d+<\/strong><span>GitHub followers<\/span><\/div>\s+<p>[^<]*<\/p>\s+<\/article>/,
+    `<article class="card metric">
+            <div><strong>${stats.totals.github_followers}</strong><span>GitHub followers</span></div>
+            <p>Live public GitHub follower count for the anpa1200 account at verification time.</p>
+          </article>`,
+    'GitHub followers metric',
+  );
+} else {
+  html = replaceOrThrow(
+    html,
+    /(<article class="card metric">\s+<div><strong>\d+<\/strong><span>GitHub stars<\/span><\/div>\s+<p>[^<]*<\/p>\s+<\/article>)/,
+    `$1
+          <article class="card metric">
+            <div><strong>${stats.totals.github_followers}</strong><span>GitHub followers</span></div>
+            <p>Live public GitHub follower count for the anpa1200 account at verification time.</p>
+          </article>`,
+    'GitHub followers metric insertion',
+  );
+}
 html = replaceOrThrow(
   html,
   /<!-- BEGIN VALIDATION_SIGNAL -->[\s\S]*?<!-- END VALIDATION_SIGNAL -->/,
@@ -316,7 +351,7 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?<span class="chip">Self-hosted<\/span>\s+)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
+  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?<span class="chip">Self-hosted<\/span>(?:\s+<span class="chip">Malware Analysis<\/span>)?\s+)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
   `<span class="chip release">Release ${stats.repositories.adversarygraph.release}</span>$1<span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
   'AdversaryGraph release chips',
 );
@@ -334,4 +369,4 @@ html = replaceOrThrow(
 );
 
 writeFileSync(pagePath, html);
-console.log(`Updated external-validation.html: ${stats.totals.merged_external_items} merged PR/MR, ${stats.totals.open_upstream_items} open PR/MR, ${stats.totals.github_total_stars} total stars, ${stats.totals.github_total_forks} total forks.`);
+console.log(`Updated external-validation.html: ${stats.totals.merged_external_items} merged PR/MR, ${stats.totals.open_upstream_items} open PR/MR, ${stats.totals.github_total_stars} total stars, ${stats.totals.github_total_forks} total forks, ${stats.totals.github_followers} GitHub followers.`);
