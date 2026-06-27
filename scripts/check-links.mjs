@@ -15,14 +15,27 @@
  *   node scripts/check-links.mjs            # internal checks only (fast, offline)
  *   node scripts/check-links.mjs --external # additionally probe external URLs (network)
  */
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { join, dirname, resolve, normalize } from 'node:path';
+import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
+import { join, dirname, resolve, normalize, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const checkExternal = process.argv.includes('--external');
 
-const htmlFiles = readdirSync(ROOT).filter((f) => f.endsWith('.html'));
+const SKIP_DIRS = new Set(['.git', 'node_modules']);
+
+function walkHtml(dir = ROOT) {
+  const files = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (SKIP_DIRS.has(entry.name)) continue;
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) files.push(...walkHtml(path));
+    else if (entry.isFile() && entry.name.endsWith('.html')) files.push(relative(ROOT, path));
+  }
+  return files.sort();
+}
+
+const htmlFiles = walkHtml();
 
 const hrefRe = /(?:href|src)\s*=\s*"([^"]+)"/gi;
 const idRe = /\sid\s*=\s*"([^"]+)"/gi;
@@ -45,7 +58,15 @@ function localPathExists(rel) {
   if (clean === '' || clean === '/') return true;
   const p = normalize(join(ROOT, decodeURIComponent(clean.replace(/^\//, ''))));
   if (!p.startsWith(ROOT)) return false;
-  return existsSync(p);
+  if (!existsSync(p)) return false;
+  if (statSync(p).isDirectory()) return existsSync(join(p, 'index.html'));
+  return true;
+}
+
+function resolveLocalRef(fromFile, url) {
+  const clean = url.split('#')[0].split('?')[0];
+  if (clean.startsWith('/')) return clean;
+  return normalize(join(dirname(fromFile), clean));
 }
 
 const externalToProbe = new Set();
@@ -69,9 +90,9 @@ for (const f of htmlFiles) {
     if (/^https?:\/\//i.test(url)) {
       let u;
       try { u = new URL(url); } catch { continue; }
-      if (u.hostname === '1200km.com' && /^\/[^/]+\.(html|pdf|png|xml|txt)$/i.test(u.pathname)) {
-        if (!localPathExists(u.pathname)) results.broken.push(`${f}: ${url} (expected local ${u.pathname})`);
-        else results.ok++;
+      if (u.hostname === '1200km.com') {
+        if (localPathExists(u.pathname)) results.ok++;
+        else externalToProbe.add(url);
       } else {
         externalToProbe.add(url);
       }
@@ -80,7 +101,8 @@ for (const f of htmlFiles) {
 
     if (url.startsWith('//')) { externalToProbe.add('https:' + url); continue; }
 
-    if (!localPathExists(url)) results.broken.push(`${f}: ${url}`);
+    const resolved = resolveLocalRef(f, url);
+    if (!localPathExists(resolved)) results.broken.push(`${f}: ${url}`);
     else results.ok++;
   }
 }

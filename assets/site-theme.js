@@ -30,15 +30,17 @@
     if (!nav || !links) return;
 
     const navItems = [
-      { href: 'about.html', label: 'About' },
-      { href: 'cv.html', label: 'CV' },
-      { href: 'cti.html', label: 'CTI' },
-      { href: 'labs.html', label: 'Labs' },
-      { href: 'guides.html', label: 'Guides' },
-      { href: 'hexstrike.html', label: 'HexStrike' },
-      { href: 'ai-offensive.html', label: 'OfSec' },
-      { href: 'pt-tools.html', label: 'PT Tools' },
-      { href: 'projects.html', label: 'Projects' },
+      { href: '/about.html', label: 'About' },
+      { href: '/cv.html', label: 'CV' },
+      { href: '/cti.html', label: 'CTI' },
+      { href: '/labs.html', label: 'Labs' },
+      { href: '/guides.html', label: 'Guides' },
+      { href: '/articles/', label: 'Articles' },
+      { href: '/hexstrike.html', label: 'HexStrike' },
+      { href: '/ai-offensive.html', label: 'OfSec' },
+      { href: '/pt-tools.html', label: 'PT Tools' },
+      { href: '/projects.html', label: 'Projects' },
+      { href: '/external-validation.html', label: 'Validation' },
       { href: 'https://github.com/anpa1200', label: 'GitHub ↗', external: true },
       { href: 'https://medium.com/@1200km', label: 'Medium ↗', external: true },
     ];
@@ -54,16 +56,19 @@
       return link;
     }));
 
-    const path = window.location.pathname.replace(/\/+$/, '').split('/').pop() || 'index.html';
+    const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+    const path = pathname.split('/').pop() || 'index.html';
     const activePath = path === 'cover-letter.html'
-      ? 'cv.html'
+      ? '/cv.html'
       : path === 'adversarygraph-web-guide.html'
         ? 'https://1200km.com/threat-matrix/'
-        : path;
+        : pathname === '/articles'
+          ? '/articles/'
+          : pathname;
     links.querySelectorAll('a').forEach(function (link) {
       const href = link.getAttribute('href') || '';
       const local = href.split('#')[0].split('?')[0];
-      const active = local === activePath || href === activePath || (activePath === '' && local === 'index.html');
+      const active = local === activePath || href === activePath || (activePath === '/' && local === '/');
       link.classList.toggle('active', active);
       if (active) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
@@ -115,7 +120,7 @@
             <h3>CTI Research</h3>
             <p>Actor profiles, evidence-led attribution, ATT&amp;CK mapping, reports, and analyst methodology.</p>
             <div class="site-ecosystem-links">
-              <a href="cti.html">CTI library</a>
+              <a href="/cti.html">CTI library</a>
               <a href="https://1200km.com/cti-analyst-field-manual/">Field manual</a>
               <a href="https://medium.com/@1200km">Medium</a>
             </div>
@@ -125,9 +130,9 @@
             <h3>Labs &amp; Offensive Research</h3>
             <p>Reproducible attack simulations and security labs built to validate defensive assumptions.</p>
             <div class="site-ecosystem-links">
-              <a href="labs.html">Labs</a>
-              <a href="ai-offensive.html">AI Offensive</a>
-              <a href="pt-tools.html">PT Tools</a>
+              <a href="/labs.html">Labs</a>
+              <a href="/ai-offensive.html">AI Offensive</a>
+              <a href="/pt-tools.html">PT Tools</a>
             </div>
           </article>
           <article class="site-ecosystem-card">
@@ -135,10 +140,10 @@
             <h3>Guides &amp; Source</h3>
             <p>Practical field guides, implementation documentation, source code, and professional context.</p>
             <div class="site-ecosystem-links">
-              <a href="guides.html">Guides</a>
-              <a href="projects.html">Projects</a>
+              <a href="/guides.html">Guides</a>
+              <a href="/projects.html">Projects</a>
               <a href="https://github.com/anpa1200">GitHub</a>
-              <a href="about.html">About</a>
+              <a href="/about.html">About</a>
             </div>
           </article>
         </div>
@@ -155,31 +160,32 @@
       <div class="shared-footer-inner">
         <div class="shared-footer-brand">
           <a href="index.html">
-            <img src="assets/ap-logo.png" alt="" width="36" height="36" />
+            <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
             <strong>Andrey Pautov</strong>
           </a>
           <p>CTI-to-detection practitioner building threat intelligence research, analyst tooling, and practical security labs.</p>
         </div>
         <nav class="shared-footer-column" aria-label="Research">
           <strong>Research</strong>
-          <a href="cti.html">CTI</a>
-          <a href="guides.html">Guides</a>
-          <a href="labs.html">Labs</a>
+          <a href="/cti.html">CTI</a>
+          <a href="/guides.html">Guides</a>
+          <a href="/labs.html">Labs</a>
+          <a href="/articles/">Articles</a>
           <a href="https://medium.com/@1200km">Medium</a>
         </nav>
         <nav class="shared-footer-column" aria-label="Platforms and tools">
           <strong>Platforms &amp; Tools</strong>
           <a href="https://1200km.com/threat-matrix/">AdversaryGraph Web</a>
           <a href="https://1200km.com/adversarygraph/">AdversaryGraph Hub</a>
-          <a href="projects.html">Projects</a>
-          <a href="ai-offensive.html">AI Offensive</a>
-          <a href="pt-tools.html">PT Tools</a>
+          <a href="/projects.html">Projects</a>
+          <a href="/ai-offensive.html">AI Offensive</a>
+          <a href="/pt-tools.html">PT Tools</a>
         </nav>
         <nav class="shared-footer-column" aria-label="Profile and contact">
           <strong>Profile &amp; Contact</strong>
-          <a href="about.html">About</a>
-          <a href="cv.html">CV</a>
-          <a href="projects.html">Projects</a>
+          <a href="/about.html">About</a>
+          <a href="/cv.html">CV</a>
+          <a href="/projects.html">Projects</a>
           <a href="https://github.com/anpa1200">GitHub</a>
           <a href="mailto:1200km@gmail.com">Email</a>
         </nav>
