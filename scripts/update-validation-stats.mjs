@@ -33,14 +33,20 @@ function ghUser(username) {
   return runJson('gh', ['api', `users/${username}`]);
 }
 
-function ghPrDetails(pr) {
+function ghPrDetails(pr, includeReviewHealth = false) {
   const nameWithOwner = pr.repository.nameWithOwner;
   const details = runJson('gh', ['api', `repos/${nameWithOwner}/pulls/${pr.number}`]);
+  const comments = includeReviewHealth ? runJson('gh', ['api', `repos/${nameWithOwner}/issues/${pr.number}/comments?per_page=100`], []) : [];
+  const reviews = includeReviewHealth ? runJson('gh', ['api', `repos/${nameWithOwner}/pulls/${pr.number}/reviews?per_page=100`], []) : [];
   return {
     ...pr,
     canonical_state: details.state,
     merged_at: details.merged_at,
     closed_at: details.closed_at,
+    draft: details.draft,
+    mergeable_state: details.mergeable_state || 'unknown',
+    comments_count: Array.isArray(comments) ? comments.length : 0,
+    reviews_count: Array.isArray(reviews) ? reviews.length : 0,
   };
 }
 
@@ -57,6 +63,25 @@ function ghUserRepos(username) {
 function ghLatestRelease(nameWithOwner, fallbackTag) {
   const release = runJson('gh', ['api', `repos/${nameWithOwner}/releases/latest`], null);
   return release ? { tag: release.tag_name, url: release.html_url, published_at: release.published_at } : { tag: fallbackTag, url: '', published_at: null };
+}
+
+function gitlabMr(projectPath, iid) {
+  const encodedProject = encodeURIComponent(projectPath);
+  return runJson(
+    'curl',
+    ['-fsSL', `https://gitlab.com/api/v4/projects/${encodedProject}/merge_requests/${iid}`],
+    null,
+  );
+}
+
+function uniqueBy(items, keyFn) {
+  const seen = new Set();
+  return items.filter(item => {
+    const key = keyFn(item);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function todayIsoDate() {
@@ -85,6 +110,27 @@ function escapeHtml(value) {
 
 function plural(value, singular, pluralValue = `${singular}s`) {
   return `${value} ${value === 1 ? singular : pluralValue}`;
+}
+
+function renderReviewBacklog() {
+  const review = stats.github.open_review;
+  const stateRows = [
+    ['Clean / mergeable', review.clean, 'No technical blocker detected by GitHub.'],
+    ['Unstable', review.unstable, 'Usually branch protection, missing status context, or pending required checks.'],
+    ['Behind', review.behind, 'Source branch needs sync with the target branch.'],
+    ['Blocked', review.blocked, 'Repository rules block merge until a required condition is satisfied.'],
+    ['Unknown', review.unknown, 'GitHub did not expose a stable mergeability result at snapshot time.'],
+  ].map(([label, value, hint]) => `              <li><span>${escapeHtml(label)}<br /><span class="muted">${escapeHtml(hint)}</span></span><strong>${value}</strong></li>`)
+    .join('\n');
+
+  return `          <article class="card">
+            <h3>Open PR Backlog Health</h3>
+            <p>${review.no_comments_no_reviews} of ${stats.github.open_prs} open GitHub PRs have no maintainer comments or reviews yet. ${review.drafts} are draft PRs.</p>
+            <ul class="signal-list">
+${stateRows}
+            </ul>
+            <p class="note">Main reason for the backlog: external maintainer review latency. Actionable technical items at this snapshot: ${review.behind} behind, ${review.blocked} blocked, ${review.unstable} unstable.</p>
+          </article>`;
 }
 
 function repoStatsCard(repoKey, title, description) {
@@ -126,7 +172,7 @@ function renderValidationSignal() {
           </article>
           <article class="card">
             <h3>GitLab MR Review Signal</h3>
-            <p>GitLab merge requests are included when authenticated GitLab data is available to the updater.</p>
+            <p>GitLab merge requests are included from authenticated GitLab data plus public MR verification for known upstream requests.</p>
             <ul class="signal-list">
               <li><span>Open GitLab MRs</span><strong>${stats.gitlab.open_mrs}</strong></li>
               <li><span>Merged GitLab MRs</span><strong>${stats.gitlab.merged_mrs}</strong></li>
@@ -147,6 +193,7 @@ ${gitlabLinks}
           </article>
 ${repoStatsCard('adversarygraph', 'AdversaryGraph', 'Repository traction and release evidence for the self-hosted CTI platform.')}
 ${repoStatsCard('aidebug', 'AIDebug', 'Repository traction and release evidence for the malware-analysis and reverse-engineering debugger.')}
+${renderReviewBacklog()}
           <article class="card">
             <h3>Top Starred Public Repositories</h3>
             <p>Highest-star public repositories visible under the GitHub account at snapshot time.</p>
@@ -158,9 +205,9 @@ ${topRepos}
 }
 
 const github = {
-  open_search: ghSearch(['--author', 'anpa1200', '--state', 'open', '--limit', '100']).map(ghPrDetails),
-  merged_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--merged', '--limit', '100']).map(ghPrDetails),
-  closed_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--limit', '100']).map(ghPrDetails),
+  open_search: ghSearch(['--author', 'anpa1200', '--state', 'open', '--limit', '100']).map(pr => ghPrDetails(pr, true)),
+  merged_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--merged', '--limit', '100']).map(pr => ghPrDetails(pr)),
+  closed_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--limit', '100']).map(pr => ghPrDetails(pr)),
 };
 github.open = github.open_search.filter(pr => pr.canonical_state === 'open' && !pr.merged_at);
 github.merged = github.merged_search.filter(pr => pr.merged_at);
@@ -171,6 +218,10 @@ const gitlabMrs = runJson(
   ['api', 'merge_requests?scope=all&author_username=1200km&per_page=100&order_by=updated_at&sort=desc'],
   [],
 );
+const publicGitlabMrs = [
+  gitlabMr('kalilinux/documentation/kali-tools', 30),
+].filter(Boolean);
+const allGitlabMrs = uniqueBy([...gitlabMrs, ...publicGitlabMrs], mr => mr.web_url || `${mr.project_id}:${mr.iid}`);
 
 const repos = {
   adversarygraph: ghRepo('anpa1200/adversarygraph'),
@@ -200,17 +251,30 @@ const stats = {
     open_prs: github.open.length,
     merged_prs: github.merged.length,
     closed_unmerged_prs: github.closed_unmerged.length,
+    open_review: {
+      clean: github.open.filter(pr => pr.mergeable_state === 'clean').length,
+      unstable: github.open.filter(pr => pr.mergeable_state === 'unstable').length,
+      behind: github.open.filter(pr => pr.mergeable_state === 'behind').length,
+      blocked: github.open.filter(pr => pr.mergeable_state === 'blocked').length,
+      unknown: github.open.filter(pr => !['clean', 'unstable', 'behind', 'blocked'].includes(pr.mergeable_state)).length,
+      drafts: github.open.filter(pr => pr.draft).length,
+      no_comments_no_reviews: github.open.filter(pr => pr.comments_count === 0 && pr.reviews_count === 0).length,
+      with_comments_or_reviews: github.open.filter(pr => pr.comments_count > 0 || pr.reviews_count > 0).length,
+    },
   },
   gitlab: {
-    open_mrs: gitlabMrs.filter(mr => mr.state === 'opened').length,
-    merged_mrs: gitlabMrs.filter(mr => mr.state === 'merged').length,
-    closed_mrs: gitlabMrs.filter(mr => mr.state === 'closed').length,
-    open_items: gitlabMrs
+    open_mrs: allGitlabMrs.filter(mr => mr.state === 'opened').length,
+    merged_mrs: allGitlabMrs.filter(mr => mr.state === 'merged').length,
+    closed_mrs: allGitlabMrs.filter(mr => mr.state === 'closed').length,
+    open_items: allGitlabMrs
       .filter(mr => mr.state === 'opened')
       .map(mr => ({
         title: mr.title,
         url: mr.web_url,
         updated_at: mr.updated_at,
+        merge_status: mr.detailed_merge_status || mr.merge_status || 'unknown',
+        draft: Boolean(mr.draft || mr.work_in_progress),
+        has_conflicts: Boolean(mr.has_conflicts),
       })),
   },
   profile: {
