@@ -43,7 +43,7 @@
   var status = document.getElementById("feedback-status");
   var output = document.getElementById("feedback-output");
   var copyButton = document.getElementById("feedback-copy");
-  var saveButton = document.getElementById("feedback-save");
+  var githubButton = document.getElementById("feedback-github");
   var emailButton = document.getElementById("feedback-email");
   var resetButton = document.getElementById("feedback-reset");
   var currentImage = null;
@@ -171,15 +171,8 @@
       imageName.textContent = currentImage.name;
       imageMeta.textContent = detectedType + " / " + Math.round(file.size / 1024) + " KB / validated by magic bytes";
       preview.classList.add("is-visible");
-      setStatus("Screenshot validated locally. Attach it manually to the email draft if needed.", "ok");
+      setStatus("Screenshot validated locally. Attach it manually to the email draft or GitHub issue if needed.", "ok");
     });
-  }
-
-  function safeFilePart(value) {
-    return normalizeText(value || "adversarygraph-feedback", 80)
-      .toLowerCase()
-      .replace(/[^a-z0-9._-]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "adversarygraph-feedback";
   }
 
   function collectReport() {
@@ -278,20 +271,15 @@
     }
   });
 
-  saveButton.addEventListener("click", function () {
+  githubButton.addEventListener("click", function () {
     try {
       var report = collectReport();
       showReport(report);
-      var blob = new Blob([report.body], { type: "text/markdown;charset=utf-8" });
-      var url = URL.createObjectURL(blob);
-      var link = document.createElement("a");
-      link.href = url;
-      link.download = safeFilePart(report.title) + "-" + new Date().toISOString().slice(0, 10) + ".md";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-      setStatus("Sanitized note saved locally. Email it or attach the validated screenshot manually if needed.", "ok");
+      var url = "https://github.com/anpa1200/adversarygraph/issues/new?title=" +
+        encodeURIComponent("[" + fields.type.value + "] " + report.title) +
+        "&body=" + encodeURIComponent(report.body);
+      window.open(url, "_blank", "noopener,noreferrer");
+      setStatus("GitHub issue draft opened. Submitting it will send repository notifications.", "ok");
     } catch (error) {
       handleValidationError(error);
     }
