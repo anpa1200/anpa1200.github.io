@@ -43,7 +43,7 @@
   var status = document.getElementById("feedback-status");
   var output = document.getElementById("feedback-output");
   var copyButton = document.getElementById("feedback-copy");
-  var githubButton = document.getElementById("feedback-github");
+  var saveButton = document.getElementById("feedback-save");
   var emailButton = document.getElementById("feedback-email");
   var resetButton = document.getElementById("feedback-reset");
   var currentImage = null;
@@ -171,8 +171,15 @@
       imageName.textContent = currentImage.name;
       imageMeta.textContent = detectedType + " / " + Math.round(file.size / 1024) + " KB / validated by magic bytes";
       preview.classList.add("is-visible");
-      setStatus("Screenshot validated locally. Attach it manually to the GitHub issue or email draft.", "ok");
+      setStatus("Screenshot validated locally. Attach it manually to the email draft if needed.", "ok");
     });
+  }
+
+  function safeFilePart(value) {
+    return normalizeText(value || "adversarygraph-feedback", 80)
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "adversarygraph-feedback";
   }
 
   function collectReport() {
@@ -183,12 +190,6 @@
     var values = [title, contact, url, details];
     var labels = ["title", "contact", "URL", "details"];
 
-    if (title.length < 8) {
-      throw new Error("Title must be at least 8 characters.");
-    }
-    if (details.length < 30) {
-      throw new Error("Details must be at least 30 characters.");
-    }
     for (var i = 0; i < values.length; i += 1) {
       var finding = hasDangerousPattern(values[i]);
       if (finding) {
@@ -201,12 +202,12 @@
       "",
       "Type: " + fields.type.value,
       "Area: " + fields.area.value,
-      "Title: " + title,
+      "Title: " + (title || "not provided"),
       "Page: " + (url || "not provided"),
       "Contact: " + (contact || "not provided"),
       "",
       "## Details",
-      details,
+      details || "not provided",
       "",
       "## Screenshot",
       currentImage
@@ -217,11 +218,11 @@
       "- Plain-text report generated without raw HTML rendering.",
       "- Text fields normalized, length-limited, and screened for XSS/SQLi/shell/template-injection patterns.",
       "- Image files are accepted only after PNG/JPEG/GIF/WebP magic-number validation.",
-      "- This static page does not store feedback or screenshots."
+      "- This static page does not store feedback or screenshots server-side."
     ].join("\n");
 
     return {
-      title: title,
+      title: title || fields.type.value,
       body: report
     };
   }
@@ -277,15 +278,20 @@
     }
   });
 
-  githubButton.addEventListener("click", function () {
+  saveButton.addEventListener("click", function () {
     try {
       var report = collectReport();
       showReport(report);
-      var url = "https://github.com/anpa1200/adversarygraph/issues/new?title=" +
-        encodeURIComponent("[" + fields.type.value + "] " + report.title) +
-        "&body=" + encodeURIComponent(report.body);
-      window.open(url, "_blank", "noopener,noreferrer");
-      setStatus("GitHub issue draft opened. Attach the validated screenshot manually if needed.", "ok");
+      var blob = new Blob([report.body], { type: "text/markdown;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = safeFilePart(report.title) + "-" + new Date().toISOString().slice(0, 10) + ".md";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setStatus("Sanitized note saved locally. Email it or attach the validated screenshot manually if needed.", "ok");
     } catch (error) {
       handleValidationError(error);
     }
