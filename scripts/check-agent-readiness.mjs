@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+
+const root = resolve(new URL('..', import.meta.url).pathname);
+const requiredFiles = [
+  'llms.txt',
+  'agent-index.md',
+  'auth.md',
+  '_headers',
+  '.well-known/api-catalog',
+  '.well-known/openapi.json',
+  '.well-known/mcp/server-card.json',
+  '.well-known/agent-skills/index.json',
+  '.well-known/skills/index.json',
+  'agent-skills/summarize-portfolio.md',
+  'agent-skills/explain-adversarygraph.md',
+  'agent-skills/cti-to-detection-context.md',
+  'index.md',
+  'projects.md',
+  'adversarygraph.md',
+  'adversarygraph-docs/index.md',
+  'adversarygraph-docs/capabilities.md',
+  'cti-analyst-field-manual/index.md',
+  'israel-government-threat-actors-cti/index.md',
+];
+
+function read(rel) {
+  return readFileSync(join(root, rel), 'utf8');
+}
+
+function sha256(rel) {
+  return createHash('sha256').update(read(rel)).digest('hex');
+}
+
+const failures = [];
+for (const file of requiredFiles) {
+  if (!existsSync(join(root, file))) failures.push(`Missing ${file}`);
+}
+
+for (const file of ['.well-known/api-catalog', '.well-known/openapi.json', '.well-known/mcp/server-card.json', '.well-known/agent-skills/index.json', '.well-known/skills/index.json']) {
+  try {
+    JSON.parse(read(file));
+  } catch (error) {
+    failures.push(`Invalid JSON in ${file}: ${error.message}`);
+  }
+}
+
+const robots = read('robots.txt');
+if (!robots.includes('Content-Signal: search=yes, ai-input=yes, ai-train=no')) failures.push('robots.txt is missing Content-Signal');
+if (!robots.includes('Sitemap: https://1200km.com/sitemap.xml')) failures.push('robots.txt is missing canonical sitemap');
+
+const headers = read('_headers');
+for (const expected of ['</llms.txt>', '</agent-index.md>', '</.well-known/api-catalog>', '</.well-known/mcp/server-card.json>', '</.well-known/agent-skills/index.json>']) {
+  if (!headers.includes(expected)) failures.push(`_headers missing ${expected}`);
+}
+
+const skills = JSON.parse(read('.well-known/agent-skills/index.json'));
+const expectedHashes = {
+  'https://1200km.com/agent-skills/summarize-portfolio.md': sha256('agent-skills/summarize-portfolio.md'),
+  'https://1200km.com/agent-skills/explain-adversarygraph.md': sha256('agent-skills/explain-adversarygraph.md'),
+  'https://1200km.com/agent-skills/cti-to-detection-context.md': sha256('agent-skills/cti-to-detection-context.md'),
+};
+
+for (const skill of skills.skills || []) {
+  if (expectedHashes[skill.url] !== skill.sha256) {
+    failures.push(`Skill hash mismatch for ${skill.name}`);
+  }
+}
+
+const homepage = read('index.html');
+if (!homepage.includes('type="text/markdown" href="/index.md"')) failures.push('Homepage missing markdown alternate link');
+if (!homepage.includes('"@type": "Person"')) failures.push('Homepage missing Person JSON-LD');
+
+const adversaryGraph = read('adversarygraph/index.html');
+if (!adversaryGraph.includes('type="text/markdown" href="/adversarygraph.md"')) failures.push('AdversaryGraph page missing markdown alternate link');
+if (!adversaryGraph.includes('"@type": "SoftwareApplication"')) failures.push('AdversaryGraph page missing SoftwareApplication JSON-LD');
+
+if (failures.length) {
+  console.error(failures.join('\n'));
+  process.exit(1);
+}
+
+console.log('Agent readiness static checks passed.');
