@@ -11,6 +11,9 @@ const requiredFiles = [
   '_headers',
   '.well-known/api-catalog',
   '.well-known/openapi.json',
+  '.well-known/oauth-authorization-server',
+  '.well-known/openid-configuration',
+  '.well-known/oauth-protected-resource',
   '.well-known/mcp/server-card.json',
   '.well-known/agent-skills/index.json',
   '.well-known/skills/index.json',
@@ -24,6 +27,10 @@ const requiredFiles = [
   'adversarygraph-docs/capabilities.md',
   'cti-analyst-field-manual/index.md',
   'israel-government-threat-actors-cti/index.md',
+  'assets/webmcp-readonly.js',
+  'cloudflare/agent-readiness-worker.js',
+  'cloudflare/wrangler.toml.example',
+  'cloudflare/dns-aid-records.md',
 ];
 
 function read(rel) {
@@ -39,7 +46,16 @@ for (const file of requiredFiles) {
   if (!existsSync(join(root, file))) failures.push(`Missing ${file}`);
 }
 
-for (const file of ['.well-known/api-catalog', '.well-known/openapi.json', '.well-known/mcp/server-card.json', '.well-known/agent-skills/index.json', '.well-known/skills/index.json']) {
+for (const file of [
+  '.well-known/api-catalog',
+  '.well-known/openapi.json',
+  '.well-known/oauth-authorization-server',
+  '.well-known/openid-configuration',
+  '.well-known/oauth-protected-resource',
+  '.well-known/mcp/server-card.json',
+  '.well-known/agent-skills/index.json',
+  '.well-known/skills/index.json',
+]) {
   try {
     JSON.parse(read(file));
   } catch (error) {
@@ -52,7 +68,15 @@ if (!robots.includes('Content-Signal: search=yes, ai-input=yes, ai-train=no')) f
 if (!robots.includes('Sitemap: https://1200km.com/sitemap.xml')) failures.push('robots.txt is missing canonical sitemap');
 
 const headers = read('_headers');
-for (const expected of ['</llms.txt>', '</agent-index.md>', '</.well-known/api-catalog>', '</.well-known/mcp/server-card.json>', '</.well-known/agent-skills/index.json>']) {
+for (const expected of [
+  '</llms.txt>',
+  '</agent-index.md>',
+  '</auth.md>',
+  '</.well-known/api-catalog>',
+  '</.well-known/openapi.json>',
+  '</.well-known/mcp/server-card.json>',
+  '</.well-known/agent-skills/index.json>',
+]) {
   if (!headers.includes(expected)) failures.push(`_headers missing ${expected}`);
 }
 
@@ -72,10 +96,19 @@ for (const skill of skills.skills || []) {
 const homepage = read('index.html');
 if (!homepage.includes('type="text/markdown" href="/index.md"')) failures.push('Homepage missing markdown alternate link');
 if (!homepage.includes('"@type": "Person"')) failures.push('Homepage missing Person JSON-LD');
+if (!homepage.includes('/assets/webmcp-readonly.js')) failures.push('Homepage missing read-only WebMCP script');
 
 const adversaryGraph = read('adversarygraph/index.html');
 if (!adversaryGraph.includes('type="text/markdown" href="/adversarygraph.md"')) failures.push('AdversaryGraph page missing markdown alternate link');
 if (!adversaryGraph.includes('"@type": "SoftwareApplication"')) failures.push('AdversaryGraph page missing SoftwareApplication JSON-LD');
+if (!adversaryGraph.includes('/assets/webmcp-readonly.js')) failures.push('AdversaryGraph page missing read-only WebMCP script');
+
+const worker = read('cloudflare/agent-readiness-worker.js');
+if (!worker.includes('HOME_LINKS')) failures.push('Cloudflare Worker missing homepage Link header configuration');
+if (!worker.includes('text/markdown')) failures.push('Cloudflare Worker missing markdown negotiation support');
+
+const auth = read('auth.md');
+if (!auth.startsWith('# Auth.md')) failures.push('auth.md missing expected Auth.md heading');
 
 if (failures.length) {
   console.error(failures.join('\n'));
