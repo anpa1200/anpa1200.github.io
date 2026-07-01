@@ -40,6 +40,8 @@ _a2a._agents.1200km.com TXT "v=aid1; skills=https://1200km.com/.well-known/agent
 
 See `cloudflare/dns-aid-records.md` for the Cloudflare DNS entry plan.
 
+The repo also includes `scripts/cloudflare-upsert-dns-aid.mjs` and the manual workflow `.github/workflows/cloudflare-dns-aid.yml` for upserting the TXT fallback records when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ZONE_ID` are configured.
+
 ## Markdown Negotiation
 
 The repository is static GitHub Pages content. True `Accept: text/markdown` negotiation requires Cloudflare Worker, Cloudflare Pages Functions, or another edge/server layer.
@@ -51,7 +53,15 @@ This repo includes `cloudflare/agent-readiness-worker.js`, which can run in fron
 - `Content-Type` fixes for Markdown and well-known metadata.
 - CORS for well-known discovery files.
 
-Use `cloudflare/wrangler.toml.example` as the deployment template.
+Use `cloudflare/wrangler.toml.example` as the deployment template. The production Worker config is committed as `wrangler.toml`.
+
+Deploy it manually with:
+
+```bash
+npx wrangler deploy
+```
+
+Or enable the GitHub Action by adding repository secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and setting repository variable `CLOUDFLARE_WORKER_DEPLOY_ENABLED=true`.
 
 ## WebMCP
 

@@ -20,6 +20,16 @@ const HOME_LINKS = [
   '</sitemap.xml>; rel="sitemap"; type="application/xml"',
 ];
 
+const JSON_WELL_KNOWN_PATHS = new Set([
+  '/.well-known/openapi.json',
+  '/.well-known/oauth-authorization-server',
+  '/.well-known/openid-configuration',
+  '/.well-known/oauth-protected-resource',
+  '/.well-known/mcp/server-card.json',
+  '/.well-known/agent-skills/index.json',
+  '/.well-known/skills/index.json',
+]);
+
 function wantsMarkdown(request) {
   const accept = request.headers.get('accept') || '';
   return accept.toLowerCase().includes('text/markdown');
@@ -41,6 +51,9 @@ function addDiscoveryHeaders(response, pathname) {
   }
   if (pathname === '/.well-known/api-catalog') {
     headers.set('Content-Type', 'application/linkset+json; charset=utf-8');
+  }
+  if (JSON_WELL_KNOWN_PATHS.has(pathname)) {
+    headers.set('Content-Type', 'application/json; charset=utf-8');
   }
   if (pathname.startsWith('/.well-known/')) {
     headers.set('Access-Control-Allow-Origin', '*');

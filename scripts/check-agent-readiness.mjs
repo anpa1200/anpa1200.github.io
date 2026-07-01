@@ -31,6 +31,10 @@ const requiredFiles = [
   'cloudflare/agent-readiness-worker.js',
   'cloudflare/wrangler.toml.example',
   'cloudflare/dns-aid-records.md',
+  'wrangler.toml',
+  '.github/workflows/cloudflare-worker.yml',
+  '.github/workflows/cloudflare-dns-aid.yml',
+  'scripts/cloudflare-upsert-dns-aid.mjs',
 ];
 
 function read(rel) {
@@ -106,6 +110,10 @@ if (!adversaryGraph.includes('/assets/webmcp-readonly.js')) failures.push('Adver
 const worker = read('cloudflare/agent-readiness-worker.js');
 if (!worker.includes('HOME_LINKS')) failures.push('Cloudflare Worker missing homepage Link header configuration');
 if (!worker.includes('text/markdown')) failures.push('Cloudflare Worker missing markdown negotiation support');
+if (!worker.includes('JSON_WELL_KNOWN_PATHS')) failures.push('Cloudflare Worker missing well-known JSON content-type fixes');
+
+const wrangler = read('wrangler.toml');
+if (!wrangler.includes('1200km.com/*')) failures.push('wrangler.toml missing 1200km.com route');
 
 const auth = read('auth.md');
 if (!auth.startsWith('# Auth.md')) failures.push('auth.md missing expected Auth.md heading');
