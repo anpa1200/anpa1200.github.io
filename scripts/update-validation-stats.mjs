@@ -339,14 +339,14 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>\d+<\/strong><span>Merged external PRs<\/span><\/div>/,
-  `<div><strong>${stats.totals.merged_external_items}</strong><span>Merged external PRs</span></div>`,
+  /<div><strong>\d+<\/strong><span>Approved external PRs<\/span><\/div>/,
+  `<div><strong>${stats.totals.merged_external_items}</strong><span>Approved external PRs</span></div>`,
   'merged PR count',
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>\d+<\/strong><span>Open upstream PRs(?:\/MRs)?<\/span><\/div>/,
-  `<div><strong>${stats.totals.open_upstream_items}</strong><span>Open upstream PRs/MRs</span></div>`,
+  /<div><strong>\d+<\/strong><span>Open upstream submissions<\/span><\/div>/,
+  `<div><strong>${stats.totals.open_upstream_items}</strong><span>Open upstream submissions</span></div>`,
   'open PR/MR count',
 );
 html = replaceOrThrow(
@@ -409,13 +409,13 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip release">PyPI 1\.1\.0<\/span>[\s\S]*?<span class="chip">Python<\/span>\s+)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork<\/span>/,
+  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip release">PyPI 1\.1\.0<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork<\/span>/,
   `<span class="chip release">Release ${stats.repositories.aidebug.release}</span>$1<span class="chip">${stats.repositories.aidebug.stars} stars</span>\n              <span class="chip">${stats.repositories.aidebug.forks} fork${stats.repositories.aidebug.forks === 1 ? '' : 's'}</span>`,
   'AIDebug release chips',
 );
 html = replaceOrThrow(
   html,
-  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?<span class="chip">Self-hosted<\/span>(?:\s+<span class="chip">Malware Analysis<\/span>)?\s+)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
+  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
   `<span class="chip release">Release ${stats.repositories.adversarygraph.release}</span>$1<span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
   'AdversaryGraph release chips',
 );
