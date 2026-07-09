@@ -5,6 +5,7 @@ import path from 'node:path';
 const repoRoot = path.resolve(new URL('.', import.meta.url).pathname, '..');
 const pagePath = path.join(repoRoot, 'external-validation.html');
 const statsPath = path.join(repoRoot, 'assets', 'validation', 'stats.json');
+const cloneHistoryPath = path.join(repoRoot, 'assets', 'validation', 'clone-history.json');
 
 function runJson(command, args, fallback = null) {
   try {
@@ -98,6 +99,15 @@ function replaceOrThrow(html, pattern, replacement, label) {
 function formatDate(value) {
   if (!value) return 'unknown';
   return new Date(value).toISOString().slice(0, 10);
+}
+
+const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function formatDateRange(fromIso, toIso) {
+  const from = new Date(`${fromIso}T00:00:00Z`);
+  const to = new Date(`${toIso}T00:00:00Z`);
+  const fromLabel = `${MONTH_ABBR[from.getUTCMonth()]} ${from.getUTCDate()}`;
+  const toLabel = `${MONTH_ABBR[to.getUTCMonth()]} ${to.getUTCDate()}`;
+  return `${fromLabel}–${toLabel} ${to.getUTCFullYear()}`;
 }
 
 function escapeHtml(value) {
@@ -245,6 +255,64 @@ const releases = {
   aidebug: ghLatestRelease('anpa1200/AIDebug', 'v1.1.0'),
 };
 
+function ghCloneTraffic(nameWithOwner) {
+  return runJson('gh', ['api', `repos/${nameWithOwner}/traffic/clones`], null);
+}
+
+const sourceRepoNames = publicRepos.filter(repo => !repo.fork).map(repo => repo.full_name);
+const cloneTrafficByRepo = {};
+for (const nameWithOwner of sourceRepoNames) {
+  const traffic = ghCloneTraffic(nameWithOwner);
+  if (traffic) cloneTrafficByRepo[nameWithOwner] = traffic;
+}
+
+const activeCloneRepos = Object.entries(cloneTrafficByRepo).filter(([, traffic]) => traffic.count > 0);
+const last14Days = {
+  repos: activeCloneRepos.length,
+  clones: activeCloneRepos.reduce((total, [, traffic]) => total + traffic.count, 0),
+  uniques: activeCloneRepos.reduce((total, [, traffic]) => total + traffic.uniques, 0),
+};
+
+const todayUtc = todayIsoDate();
+const dailyTotals = new Map();
+for (const traffic of Object.values(cloneTrafficByRepo)) {
+  for (const entry of traffic.clones ?? []) {
+    const date = entry.timestamp.slice(0, 10);
+    if (date === todayUtc) continue; // today's window is still accumulating; exclude until finalized
+    const existing = dailyTotals.get(date) ?? { clones: 0, uniques: 0 };
+    existing.clones += entry.count;
+    existing.uniques += entry.uniques;
+    dailyTotals.set(date, existing);
+  }
+}
+
+let cloneHistory = { tracking_started: todayUtc, baseline: null, days: {} };
+try {
+  cloneHistory = JSON.parse(readFileSync(cloneHistoryPath, 'utf8'));
+} catch {
+  // no history yet; this run establishes the log going forward
+}
+// Days already folded into the manually-reconciled baseline must not be re-added,
+// or they would be double-counted in the cumulative total.
+const baselineThrough = cloneHistory.baseline?.through ?? null;
+for (const [date, totals] of dailyTotals) {
+  if (baselineThrough && date <= baselineThrough) continue;
+  cloneHistory.days[date] = totals; // finalized days only; overwrite with freshest pull
+}
+mkdirSync(path.dirname(cloneHistoryPath), { recursive: true });
+writeFileSync(cloneHistoryPath, `${JSON.stringify(cloneHistory, null, 2)}\n`);
+
+const historyDates = Object.keys(cloneHistory.days).sort();
+const cumulativeClones = {
+  since: cloneHistory.baseline ? cloneHistory.tracking_started : (historyDates[0] ?? todayUtc),
+  through: historyDates[historyDates.length - 1] ?? baselineThrough ?? todayUtc,
+  clones: (cloneHistory.baseline?.clones ?? 0) + Object.values(cloneHistory.days).reduce((total, d) => total + d.clones, 0),
+  uniques: (cloneHistory.baseline?.uniques ?? 0) + Object.values(cloneHistory.days).reduce((total, d) => total + d.uniques, 0),
+};
+const thisRunDates = [...dailyTotals.keys()].sort();
+last14Days.since = thisRunDates[0] ?? todayUtc;
+last14Days.through = thisRunDates[thisRunDates.length - 1] ?? todayUtc;
+
 const stats = {
   generated_at: new Date().toISOString(),
   github: {
@@ -310,6 +378,10 @@ const stats = {
       release_url: releases.aidebug.url,
     },
     top_by_stars: topPublicRepos,
+  },
+  clone_traffic: {
+    last_14_days: last14Days,
+    cumulative: cumulativeClones,
   },
 };
 
@@ -401,6 +473,20 @@ if (/<span>GitHub followers<\/span>/.test(html)) {
     'GitHub followers metric insertion',
   );
 }
+html = replaceOrThrow(
+  html,
+  /<div><strong>[\d,]+<\/strong><span>Total clones — last 14 days<\/span><\/div>\s*<p>Combined clone count across \d+ active source repositories? \([^)]*\)\. [\d,]+ unique cloners portfolio-wide\.<\/p>/,
+  `<div><strong>${last14Days.clones.toLocaleString('en-US')}</strong><span>Total clones — last 14 days</span></div>
+            <p>Combined clone count across ${last14Days.repos} active source repositories (${formatDateRange(last14Days.since, last14Days.through)}). ${last14Days.uniques.toLocaleString('en-US')} unique cloners portfolio-wide.</p>`,
+  'total clones last 14 days metric',
+);
+html = replaceOrThrow(
+  html,
+  /<div><strong>[\d,]+<\/strong><span>Total clones since tracking began<\/span><\/div>\s*<p>Cumulative clone count across (?:the same \d+ repositories|active repositories) since daily tracking started \([^)]*\)\. [\d,]+ unique cloners portfolio-wide, summed across days\.<\/p>/,
+  `<div><strong>${cumulativeClones.clones.toLocaleString('en-US')}</strong><span>Total clones since tracking began</span></div>
+            <p>Cumulative clone count across active repositories since daily tracking started (${formatDateRange(cumulativeClones.since, cumulativeClones.through)}). ${cumulativeClones.uniques.toLocaleString('en-US')} unique cloners portfolio-wide, summed across days.</p>`,
+  'cumulative clones since tracking began metric',
+);
 html = replaceOrThrow(
   html,
   /<!-- BEGIN VALIDATION_SIGNAL -->[\s\S]*?<!-- END VALIDATION_SIGNAL -->/,
