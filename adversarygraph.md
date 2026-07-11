@@ -18,6 +18,8 @@ It helps analysts connect:
 
 - Docs: https://1200km.com/adversarygraph-docs/
 - Capabilities: https://1200km.com/adversarygraph-docs/capabilities/
+- Detection engineering techniques: https://1200km.com/newest-detection-engineering-techniques/
+- Log-to-report workflow: https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html
 - GitHub: https://github.com/anpa1200/adversarygraph
 
 ## Public Capabilities Described

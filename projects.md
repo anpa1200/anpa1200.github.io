@@ -8,11 +8,14 @@ AdversaryGraph is the flagship project: a self-hosted CTI-to-detection workbench
 
 Project hub: https://1200km.com/adversarygraph/
 
+Detection engineering article hub: https://1200km.com/newest-detection-engineering-techniques/
+
 ## Ecosystem Themes
 
 - CTI-to-detection workflows
 - Threat actor and campaign analysis
 - Detection engineering education
+- Validated telemetry and detection-as-code workflows
 - Malware-analysis workflow support
 - Vulnerable lab environments for controlled learning
 - Open-source security tooling

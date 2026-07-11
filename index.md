@@ -25,6 +25,7 @@ Canonical page: https://1200km.com/adversarygraph/
 - AdversaryGraph: https://1200km.com/adversarygraph/
 - AdversaryGraph Docs: https://1200km.com/adversarygraph-docs/
 - Threat Matrix: https://1200km.com/threat-matrix/
+- Newest Detection Engineering Techniques: https://1200km.com/newest-detection-engineering-techniques/
 - Articles: https://1200km.com/articles/
 
 ## Safety Boundary

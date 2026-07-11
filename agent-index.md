@@ -35,6 +35,9 @@ Core capabilities:
 - `/adversarygraph-docs/` - Documentation root
 - `/adversarygraph-docs/capabilities/` - Capability overview
 - `/threat-matrix/` - ATT&CK / threat matrix interface
+- `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
+- `/guides.html#detection` - Detection and SOC guide cluster
+- `/articles/` - Local article archive
 - `/cti-analyst-field-manual/` - CTI methodology
 - `/israel-government-threat-actors-cti/` - CTI research example
 
