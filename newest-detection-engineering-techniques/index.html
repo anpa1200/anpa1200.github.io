@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>(function(){var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t);})();</script>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-4GbcvBt1YwbUIazfcM7HFDbTxHzGoa2tBMutVpD+cTA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://1200km.com; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Newest Detection Engineering Techniques — 1200km</title>
+    <meta
+      name="description"
+      content="1200km ecosystem page for the Medium article Newest Detection Engineering Techniques: telemetry-first engineering, validation, stateful correlation, risk scoring, cloud, CI/CD, runtime, data lakes, and AI-agent detection."
+    />
+    <meta name="author" content="Andrey Pautov" />
+    <meta name="keywords" content="detection engineering, validated telemetry, detection-as-code, SIEM, Sigma, KQL, EQL, YARA-L, cloud detection, identity detection, CI/CD security, eBPF, OCSF, OpenTelemetry GenAI, LLM agent security, AdversaryGraph" />
+    <meta property="og:title" content="Newest Detection Engineering Techniques" />
+    <meta property="og:description" content="From rules to validated security telemetry: practical detection engineering techniques for identity, cloud, CI/CD, runtime, data lakes, and AI-era workflows." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://1200km.com/newest-detection-engineering-techniques/" />
+    <meta property="og:image" content="https://1200km.com/assets/cti/newest-detection-engineering-techniques/figure-01.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Newest Detection Engineering Techniques" />
+    <meta name="twitter:description" content="A 1200km ecosystem page for practical, validated detection engineering in identity, cloud, SaaS, CI/CD, runtime, data lake, and AI-agent environments." />
+    <meta name="twitter:image" content="https://1200km.com/assets/cti/newest-detection-engineering-techniques/figure-01.webp" />
+    <link rel="canonical" href="https://1200km.com/newest-detection-engineering-techniques/" />
+    <link rel="icon" href="/assets/ap-logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Newest Detection Engineering Techniques: From Rules to Validated Security Telemetry",
+        "alternativeHeadline": "Practical methods for identity, cloud, CI/CD, runtime, and AI-era threat detection",
+        "author": { "@type": "Person", "name": "Andrey Pautov", "url": "https://1200km.com/about.html" },
+        "datePublished": "2026-07-11",
+        "dateModified": "2026-07-11",
+        "image": "https://1200km.com/assets/cti/newest-detection-engineering-techniques/figure-01.webp",
+        "url": "https://1200km.com/newest-detection-engineering-techniques/",
+        "mainEntityOfPage": "https://1200km.com/newest-detection-engineering-techniques/",
+        "isBasedOn": "https://medium.com/@1200km/newest-detection-engineering-techniques-from-rules-to-validated-security-telemetry-a5ccb46d5556",
+        "about": [
+          "Detection engineering",
+          "Security telemetry validation",
+          "Detection-as-code",
+          "Cloud and SaaS detection",
+          "AI agent security telemetry"
+        ],
+        "isPartOf": { "@type": "WebSite", "name": "1200km", "url": "https://1200km.com/" }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #050c1a;
+        --panel: #0b1426;
+        --panel-2: #101b31;
+        --text: #e7edf8;
+        --muted: #91a5c5;
+        --line: #223657;
+        --accent: #38bdf8;
+        --red: #ff3f68;
+        --green: #34d399;
+        --amber: #fbbf24;
+        --shadow: 0 22px 70px rgba(0, 0, 0, 0.38);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 80% 12%, rgba(56, 189, 248, 0.18), transparent 30rem),
+          radial-gradient(circle at 12% 5%, rgba(255, 63, 104, 0.14), transparent 28rem),
+          linear-gradient(180deg, #071225 0%, #050c1a 46%, #060914 100%);
+        line-height: 1.64;
+      }
+
+      a { color: #8bd3ff; text-decoration: none; }
+      a:hover { color: #fda4af; text-decoration: underline; }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5, 12, 26, 0.91);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav,
+      .hero-inner,
+      main,
+      .footer-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        min-height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text);
+        font-weight: 800;
+      }
+      .brand img { width: 34px; height: 34px; border-radius: 10px; }
+      .brand:hover { color: var(--text); text-decoration: none; }
+
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 14px;
+        font-size: 0.92rem;
+      }
+
+      .hero { border-bottom: 1px solid var(--line); }
+      .hero-inner {
+        padding: 74px 0 42px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.75fr);
+        gap: 34px;
+        align-items: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        margin: 0 0 16px;
+        padding: 7px 10px;
+        border: 1px solid rgba(56, 189, 248, 0.45);
+        border-radius: 999px;
+        color: #bae6fd;
+        background: rgba(56, 189, 248, 0.12);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 12ch;
+        font-size: clamp(2.5rem, 6.4vw, 5.4rem);
+        line-height: 0.97;
+        letter-spacing: -0.04em;
+      }
+
+      .lead {
+        max-width: 68ch;
+        margin: 22px 0 0;
+        color: #c7d2fe;
+        font-size: 1.12rem;
+      }
+
+      .hero-actions,
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #0e1b30;
+        color: var(--text);
+        font-weight: 800;
+      }
+      .button.primary { background: var(--red); color: #fff; border-color: var(--red); }
+      .button:hover { text-decoration: none; transform: translateY(-1px); }
+
+      .hero-card,
+      .card,
+      figure,
+      .toc,
+      .callout {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(11, 20, 38, 0.84);
+        box-shadow: var(--shadow);
+      }
+
+      .hero-card { padding: 12px; }
+      .hero-card img {
+        display: block;
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+      }
+      .hero-card p { margin: 12px 6px 4px; color: var(--muted); font-size: 0.9rem; }
+
+      main {
+        display: grid;
+        grid-template-columns: 270px minmax(0, 1fr);
+        gap: 26px;
+        padding: 32px 0 68px;
+      }
+
+      .toc {
+        position: sticky;
+        top: 82px;
+        align-self: start;
+        padding: 18px;
+      }
+      .toc h2 { margin: 0 0 12px; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.08em; color: #93c5fd; }
+      .toc a {
+        display: block;
+        padding: 8px 0;
+        border-top: 1px solid rgba(34, 54, 87, 0.65);
+        color: #cbd5e1;
+        font-size: 0.92rem;
+      }
+
+      .article { min-width: 0; }
+      section {
+        scroll-margin-top: 86px;
+        margin-bottom: 24px;
+      }
+
+      .section-card {
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(11, 20, 38, 0.7);
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: clamp(1.55rem, 3vw, 2.25rem);
+        line-height: 1.15;
+      }
+      h3 { margin: 22px 0 10px; font-size: 1.18rem; }
+      p { margin: 0 0 14px; }
+      ul { margin: 0; padding-left: 1.25rem; }
+      li + li { margin-top: 8px; }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 14px 0 0;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border: 1px solid #2b476f;
+        border-radius: 999px;
+        background: #101f36;
+        color: #c7d2fe;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .chip.risk { border-color: rgba(255, 63, 104, 0.6); color: #fecdd3; background: rgba(255, 63, 104, 0.14); }
+      .chip.ok { border-color: rgba(52, 211, 153, 0.6); color: #bbf7d0; background: rgba(52, 211, 153, 0.12); }
+
+      .matrix,
+      .technique-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .card { padding: 18px; box-shadow: none; }
+      .card strong { display: block; margin-bottom: 8px; color: #fff; }
+      .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+      .figures {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin: 20px 0 2px;
+      }
+      .figures.single { grid-template-columns: 1fr; }
+      figure { margin: 0; overflow: hidden; box-shadow: none; }
+      figure a { display: block; }
+      figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        background: #050912;
+      }
+      figcaption {
+        padding: 10px 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .source-list {
+        columns: 2;
+        column-gap: 24px;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        background: #050c1a;
+      }
+      .footer-inner {
+        padding: 26px 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 980px) {
+        .hero-inner,
+        main {
+          grid-template-columns: 1fr;
+        }
+        .toc { position: static; }
+        h1 { max-width: 100%; }
+      }
+
+      @media (max-width: 720px) {
+        .nav { align-items: flex-start; flex-direction: column; padding: 12px 0; }
+        .figures,
+        .matrix,
+        .technique-grid,
+        .source-list {
+          display: grid;
+          grid-template-columns: 1fr;
+          columns: auto;
+        }
+        .hero-inner { padding-top: 42px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="1200km logo" />
+          <span>1200km CTI</span>
+        </a>
+        <div class="nav-links">
+          <a href="/cti.html">CTI Index</a>
+          <a href="/guides.html">Guides</a>
+          <a href="/articles/">Articles</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/threat-matrix/">Threat Matrix</a>
+          <a href="https://medium.com/@1200km/newest-detection-engineering-techniques-from-rules-to-validated-security-telemetry-a5ccb46d5556" target="_blank" rel="noopener">Medium ↗</a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <p class="eyebrow">Detection Engineering · Published Jul 11, 2026 · Medium companion page</p>
+          <h1>Newest Detection Engineering Techniques</h1>
+          <p class="lead">
+            A practical 1200km ecosystem page for the article about moving from individual SIEM rules
+            to validated security telemetry: telemetry requirements, stateful correlation,
+            risk scoring, identity/session detection, cloud/SaaS data-plane coverage, CI/CD,
+            runtime detection, data lakes, and LLM/agent workflow telemetry.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#executive-judgment">Read the integration</a>
+            <a class="button" href="/adversarygraph/">Map in AdversaryGraph</a>
+            <a class="button" href="https://medium.com/@1200km/newest-detection-engineering-techniques-from-rules-to-validated-security-telemetry-a5ccb46d5556" target="_blank" rel="noopener">Read full Medium article</a>
+          </div>
+        </div>
+        <figure class="hero-card">
+          <a href="/assets/cti/newest-detection-engineering-techniques/figure-01.webp">
+            <img src="/assets/cti/newest-detection-engineering-techniques/figure-01.webp" alt="Newest detection engineering techniques cover graphic" />
+          </a>
+          <p>All 25 article figures are mirrored locally for the 1200km archive and linked into the detection-engineering ecosystem.</p>
+        </figure>
+      </div>
+    </section>
+
+    <main>
+      <aside class="toc" aria-label="Table of contents">
+        <h2>Contents</h2>
+        <a href="#executive-judgment">Executive judgment</a>
+        <a href="#ecosystem">Ecosystem links</a>
+        <a href="#techniques">Technique map</a>
+        <a href="#identity-cloud">Identity, cloud, CI/CD</a>
+        <a href="#runtime-ai">Runtime, data lakes, AI</a>
+        <a href="#implementation">90-day plan</a>
+        <a href="#figures">Figure archive</a>
+        <a href="#sources">Source base</a>
+      </aside>
+
+      <article class="article">
+        <section id="executive-judgment" class="section-card">
+          <h2>Executive Judgment</h2>
+          <p>
+            The central argument of the article is that modern detection engineering is no longer only
+            rule writing. It is the engineering of a defensive loop: required telemetry, normalized fields,
+            attacker-behavior hypotheses, detection logic, validation evidence, false-positive control,
+            drift monitoring, and analyst feedback.
+          </p>
+          <p>
+            This page connects that argument to the 1200km ecosystem. Use
+            <a href="/adversarygraph/">AdversaryGraph</a> for report/log ingestion and detection backlog context,
+            <a href="/threat-matrix/">Threat Matrix</a> for ATT&amp;CK navigation,
+            <a href="/adversarygraph-docs/observability-security-validation/">observability validation</a>
+            for telemetry readiness, and the <a href="/cti.html">CTI research index</a>
+            for source-rated, evidence-traced analysis.
+          </p>
+          <div class="figures">
+            <figure>
+              <a href="/assets/cti/newest-detection-engineering-techniques/figure-02.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-02.webp" alt="Detection engineering defensive loop infographic" loading="lazy" /></a>
+              <figcaption>The article frames detection as a loop: telemetry, behavior, logic, validation, measurement, and feedback.</figcaption>
+            </figure>
+            <figure>
+              <a href="/assets/cti/newest-detection-engineering-techniques/figure-03.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-03.webp" alt="Detection engineering practical conclusion infographic" loading="lazy" /></a>
+              <figcaption>The practical conclusion: threat-informed logic must be connected to reliable telemetry and validation.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section id="ecosystem" class="section-card">
+          <h2>How This Fits the 1200km Ecosystem</h2>
+          <div class="matrix">
+            <div class="card"><strong>AdversaryGraph</strong><p>Use it to extract ATT&amp;CK techniques, IOCs, actor links, and detection candidates from reports, logs, malware findings, and asset context.</p></div>
+            <div class="card"><strong>Threat Matrix</strong><p>Use it as the canonical ATT&amp;CK navigation layer for TTP links, platform references, and technique-level research pivots.</p></div>
+            <div class="card"><strong>Validation Workflows</strong><p>Use detection-as-code, replay tests, emulation, and SIEM result evidence to prove that a rule detects the claimed behavior.</p></div>
+          </div>
+          <div class="links">
+            <a class="button" href="/adversarygraph-docs/capabilities/">AdversaryGraph capabilities</a>
+            <a class="button" href="/adversarygraph-docs/attack-simulation/">Attack simulation</a>
+            <a class="button" href="/adversarygraph-docs/observability-security-validation/">Telemetry validation</a>
+            <a class="button" href="/articles/adversarygraph-from-log-to-report-ioc-investigation.html">Log-to-report workflow</a>
+          </div>
+        </section>
+
+        <section id="techniques" class="section-card">
+          <h2>Technique Map</h2>
+          <p>
+            The Medium article organizes the current detection-engineering stack into 13 practical techniques.
+            The useful way to read them is not as separate tricks, but as a maturity path from data availability
+            to stateful behavior, validation, and controlled automation.
+          </p>
+          <div class="technique-grid">
+            <div class="card"><strong>1. Telemetry-first engineering</strong><p>Define required log sources and fields before writing the rule.</p></div>
+            <div class="card"><strong>2. Detection-as-code validation</strong><p>Store rules in Git, but prove them with fixtures, replay, and emulation.</p></div>
+            <div class="card"><strong>3. Stateful correlation</strong><p>Link password spray, session use, SaaS actions, cloud roles, and workload context over time.</p></div>
+            <div class="card"><strong>4. Risk-based alerting</strong><p>Aggregate weak signals by entity with deduplication, caps, and time decay.</p></div>
+            <div class="card"><strong>5. Identity and session abuse</strong><p>Detect context shifts in token, device, ASN, country, app, and session behavior.</p></div>
+            <div class="card"><strong>6. Cloud and SaaS data plane</strong><p>Collect the read/export/query events that prove data access, not only admin activity.</p></div>
+            <div class="card"><strong>7. CI/CD supply chain</strong><p>Treat workflows, secrets, pull requests, OIDC trust, and signing authority as telemetry.</p></div>
+            <div class="card"><strong>8. Runtime detection</strong><p>Use eBPF/Falco-style runtime evidence for shells, token reads, and container escape indicators.</p></div>
+            <div class="card"><strong>9. Rare-event analytics</strong><p>Use peer group, first-seen, and entity-specific rarity instead of broad anomaly language.</p></div>
+            <div class="card"><strong>10. Statistical change</strong><p>Use baselines and z-scores only when the field semantics and baseline population are correct.</p></div>
+            <div class="card"><strong>11. Data lakes and OCSF</strong><p>Separate portable logic from high-fidelity native detections and schema-specific joins.</p></div>
+            <div class="card"><strong>12. LLM/agent telemetry</strong><p>Log prompt source, retrieval, tool calls, approvals, MCP servers, and agent retry loops.</p></div>
+            <div class="card"><strong>13. AI-assisted engineering</strong><p>Let LLMs draft or translate, but make the pipeline and analyst verify.</p></div>
+          </div>
+          <div class="figures">
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-04.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-04.webp" alt="Modern detection engineering loop" loading="lazy" /></a><figcaption>Modern detection engineering loop: from threat model to telemetry, logic, test, deployment, measurement, and feedback.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-05.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-05.webp" alt="Concrete outputs of the detection engineering loop" loading="lazy" /></a><figcaption>Each stage needs a concrete output: field contract, hypothesis, rule, test, dashboard, and owner.</figcaption></figure>
+          </div>
+        </section>
+
+        <section id="identity-cloud" class="section-card">
+          <h2>Identity, Cloud, SaaS, and CI/CD</h2>
+          <p>
+            The strongest part of the article is its focus on valid-account and trusted-system abuse.
+            Modern intrusions often use stolen credentials, session material, OAuth grants, service accounts,
+            SaaS exports, or privileged CI/CD workflow context. That makes authentication, authorization,
+            workflow, and data-plane telemetry detection inputs.
+          </p>
+          <div class="figures">
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-06.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-06.png" alt="S3 data access detection plan" loading="lazy" /></a><figcaption>Technique 1: S3 data access coverage starts with the question of whether object-read telemetry exists.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-07.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-07.png" alt="S3 data access detection logic" loading="lazy" /></a><figcaption>Object-read count, baseline, peer group, bucket sensitivity, and new source context turn volume into a useful signal.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-08.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-08.png" alt="Detection-as-code metadata structure" loading="lazy" /></a><figcaption>Technique 2: detection-as-code needs metadata, required sources, required fields, validation fixtures, and deployment mode.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-09.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-09.png" alt="Password spray followed by successful login sequence" loading="lazy" /></a><figcaption>Technique 3: stateful detection links failed logins, success, and later SaaS or cloud activity by entity and time.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-12.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-12.png" alt="Session context shift detection" loading="lazy" /></a><figcaption>Technique 5: session abuse is often visible as context shift across device, location, ASN, user agent, app, and token use.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-15.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-15.png" alt="Privileged workflow touched by untrusted input" loading="lazy" /></a><figcaption>Technique 7: CI/CD security requires static workflow analysis and runtime evidence for privileged workflows touched by untrusted input.</figcaption></figure>
+          </div>
+          <div class="callout">
+            <strong>Operational rule:</strong> if the attacker can act through a trusted identity, SaaS tenant, cloud role, or workflow token, that system must be in the telemetry plan.
+          </div>
+        </section>
+
+        <section id="runtime-ai" class="section-card">
+          <h2>Runtime, Data Lakes, and AI-Era Workflows</h2>
+          <p>
+            Runtime detection, OCSF-style data lakes, and LLM/agent telemetry are useful when they are treated
+            as engineering systems with field contracts and validation. They are weak when treated as magic
+            platforms that make missing telemetry, vague anomaly language, or untested rules acceptable.
+          </p>
+          <div class="figures">
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-10.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-10.png" alt="Risk scoring pattern summary" loading="lazy" /></a><figcaption>Technique 4: weak-signal aggregation turns low-confidence events into a higher-value entity risk story.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-11.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-11.png" alt="Risk scoring SQL skeleton" loading="lazy" /></a><figcaption>Production risk scoring needs deduplication, caps, decay, and signal ownership, not a blind flat sum.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-16.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-16.png" alt="Shell in production container runtime detection" loading="lazy" /></a><figcaption>Technique 8: eBPF/runtime logic catches behavior such as an unexpected shell in a production container.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-17.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-17.png" alt="Peer-group analytics and first-seen detection" loading="lazy" /></a><figcaption>Technique 9: peer groups and first-seen analytics make anomaly detection specific enough to test.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-18.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-18.png" alt="SaaS bulk download statistical change detection" loading="lazy" /></a><figcaption>Technique 10: statistical change detection works only when field semantics, baseline windows, and population thresholds are correct.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-19.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-19.png" alt="Security data lake architecture" loading="lazy" /></a><figcaption>Technique 11: data lake architecture separates storage, schema contracts, enrichment, native query logic, and detection output.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-20.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-20.png" alt="Required telemetry for agent detection" loading="lazy" /></a><figcaption>Technique 12: agent detection starts with prompt, retrieval, model request, tool call, approval, and MCP telemetry.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-21.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-21.png" alt="Prompt injection leading to tool misuse detection" loading="lazy" /></a><figcaption>Prompt-injection detection needs to connect external content, instruction-like text, tool selection, and approval outcomes.</figcaption></figure>
+          </div>
+        </section>
+
+        <section id="implementation" class="section-card">
+          <h2>90-Day Implementation View</h2>
+          <p>
+            The 90-day plan in the article is a practical deployment sequence: inventory detections,
+            identify owners and required sources, build validation fixtures, validate against behavior,
+            add stateful identity and cloud detections, introduce risk scoring, and then monitor telemetry drift.
+          </p>
+          <div class="matrix">
+            <div class="card"><strong>Days 1-30</strong><p>Inventory detections, owners, fields, data sources, and build basic validation.</p></div>
+            <div class="card"><strong>Days 31-60</strong><p>Validate behavior, replay fixtures, add identity, session, cloud, and SaaS data-plane detections.</p></div>
+            <div class="card"><strong>Days 61-90</strong><p>Add risk scoring, false-positive review, telemetry drift dashboards, and quality metrics.</p></div>
+          </div>
+          <div class="figures">
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-22.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-22.png" alt="AI-assisted detection engineering workflow" loading="lazy" /></a><figcaption>Technique 13: AI can draft, translate, and summarize, but schema validation and human approval stay mandatory.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-23.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-23.png" alt="Practical 90-day implementation plan" loading="lazy" /></a><figcaption>The 90-day plan turns detection-engineering theory into sequenced, measurable implementation work.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-24.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-24.png" alt="Validation metrics that matter" loading="lazy" /></a><figcaption>Validation metrics: proven detections, tested fields, false-positive rate, drift, owner freshness, and analyst value.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-25.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-25.png" alt="Common detection engineering failure modes" loading="lazy" /></a><figcaption>Common failure modes include heatmap theater, syntax-only CI, missing data-plane logs, and premature autonomous response.</figcaption></figure>
+          </div>
+        </section>
+
+        <section id="figures" class="section-card">
+          <h2>Complete Local Figure Archive</h2>
+          <p>
+            These are the locally mirrored visuals from the published Medium article. The images are stored under
+            <code>/assets/cti/newest-detection-engineering-techniques/</code> so the 1200km archive is not dependent
+            on Medium image delivery.
+          </p>
+          <div class="figures">
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-01.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-01.webp" alt="Figure 01 cover" loading="lazy" /></a><figcaption>Figure 01: article cover.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-02.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-02.webp" alt="Figure 02 defensive loop" loading="lazy" /></a><figcaption>Figure 02: detection engineering defensive loop.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-03.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-03.webp" alt="Figure 03 practical conclusion" loading="lazy" /></a><figcaption>Figure 03: practical conclusion.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-04.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-04.webp" alt="Figure 04 modern loop" loading="lazy" /></a><figcaption>Figure 04: modern detection engineering loop.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-05.webp"><img src="/assets/cti/newest-detection-engineering-techniques/figure-05.webp" alt="Figure 05 stage outputs" loading="lazy" /></a><figcaption>Figure 05: concrete stage outputs.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-06.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-06.png" alt="Figure 06 S3 detection plan" loading="lazy" /></a><figcaption>Figure 06: S3 detection plan.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-07.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-07.png" alt="Figure 07 S3 detection logic" loading="lazy" /></a><figcaption>Figure 07: S3 detection logic.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-08.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-08.png" alt="Figure 08 detection metadata" loading="lazy" /></a><figcaption>Figure 08: detection-as-code metadata.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-09.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-09.png" alt="Figure 09 password spray sequence" loading="lazy" /></a><figcaption>Figure 09: stateful password spray sequence.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-10.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-10.png" alt="Figure 10 risk scoring" loading="lazy" /></a><figcaption>Figure 10: risk scoring pattern.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-11.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-11.png" alt="Figure 11 risk scoring SQL" loading="lazy" /></a><figcaption>Figure 11: risk scoring skeleton.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-12.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-12.png" alt="Figure 12 session context shift" loading="lazy" /></a><figcaption>Figure 12: session context shift.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-13.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-13.png" alt="Figure 13 cloud logging strategy" loading="lazy" /></a><figcaption>Figure 13: cloud logging strategy.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-14.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-14.png" alt="Figure 14 Snowflake-style data theft" loading="lazy" /></a><figcaption>Figure 14: Snowflake-style data-theft pattern.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-15.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-15.png" alt="Figure 15 CI/CD detection" loading="lazy" /></a><figcaption>Figure 15: privileged workflow and untrusted input.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-16.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-16.png" alt="Figure 16 runtime detection" loading="lazy" /></a><figcaption>Figure 16: shell in production container.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-17.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-17.png" alt="Figure 17 peer group analytics" loading="lazy" /></a><figcaption>Figure 17: peer-group analytics.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-18.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-18.png" alt="Figure 18 statistical change detection" loading="lazy" /></a><figcaption>Figure 18: SaaS bulk download anomaly.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-19.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-19.png" alt="Figure 19 data lake architecture" loading="lazy" /></a><figcaption>Figure 19: data lake and OCSF architecture.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-20.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-20.png" alt="Figure 20 agent telemetry" loading="lazy" /></a><figcaption>Figure 20: required agent telemetry.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-21.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-21.png" alt="Figure 21 prompt injection detection" loading="lazy" /></a><figcaption>Figure 21: prompt injection to tool misuse.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-22.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-22.png" alt="Figure 22 AI-assisted workflow" loading="lazy" /></a><figcaption>Figure 22: AI-assisted detection engineering.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-23.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-23.png" alt="Figure 23 90-day plan" loading="lazy" /></a><figcaption>Figure 23: 90-day implementation plan.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-24.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-24.png" alt="Figure 24 validation metrics" loading="lazy" /></a><figcaption>Figure 24: validation metrics.</figcaption></figure>
+            <figure><a href="/assets/cti/newest-detection-engineering-techniques/figure-25.png"><img src="/assets/cti/newest-detection-engineering-techniques/figure-25.png" alt="Figure 25 failure modes" loading="lazy" /></a><figcaption>Figure 25: common failure modes.</figcaption></figure>
+          </div>
+        </section>
+
+        <section id="sources" class="section-card">
+          <h2>Source Base and Practical References</h2>
+          <p>
+            The original article uses real-world references across identity, cloud, SaaS, supply chain,
+            runtime detection, data lakes, and AI-agent security. Start with these ecosystem pivots:
+          </p>
+          <ul class="source-list">
+            <li><a href="https://cloud.google.com/blog/topics/threat-intelligence/unc5537-snowflake-data-theft-extortion" target="_blank" rel="noopener">Mandiant / Google Cloud: UNC5537 Snowflake data theft</a></li>
+            <li><a href="https://www.microsoft.com/en-us/security/blog/" target="_blank" rel="noopener">Microsoft Security Blog: identity and Midnight Blizzard guidance</a></li>
+            <li><a href="https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions" target="_blank" rel="noopener">GitHub Actions security hardening</a></li>
+            <li><a href="https://sysdig.com/blog/" target="_blank" rel="noopener">Sysdig research: JADEPUFFER and cloud/runtime threats</a></li>
+            <li><a href="https://attack.mitre.org/" target="_blank" rel="noopener">MITRE ATT&amp;CK</a></li>
+            <li><a href="https://github.com/SigmaHQ/sigma" target="_blank" rel="noopener">Sigma rule format</a></li>
+            <li><a href="https://schema.ocsf.io/" target="_blank" rel="noopener">OCSF schema</a></li>
+            <li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/" target="_blank" rel="noopener">OpenTelemetry GenAI semantic conventions</a></li>
+          </ul>
+          <div class="links">
+            <a class="button primary" href="https://medium.com/@1200km/newest-detection-engineering-techniques-from-rules-to-validated-security-telemetry-a5ccb46d5556" target="_blank" rel="noopener">Read the full article on Medium</a>
+            <a class="button" href="/articles/">Back to articles</a>
+            <a class="button" href="/guides.html#detection">Detection guides</a>
+          </div>
+        </section>
+      </article>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        Andrey Pautov — 1200km CTI and detection engineering archive ·
+        <a href="/">Home</a> · <a href="/articles/">Articles</a> · <a href="/guides.html">Guides</a> · <a href="/projects.html">Projects</a>
+      </div>
+    </footer>
+  </body>
+</html>
