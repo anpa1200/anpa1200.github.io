@@ -87,11 +87,13 @@ for (const page of requiredPages) checkPage(page);
 
 const robots = read('robots.txt');
 if (!has(robots, 'Sitemap: https://1200km.com/sitemap.xml')) failures.push('robots.txt: missing sitemap index');
+if (!has(robots, 'Sitemap: https://1200km.com/sitemap-all.xml')) failures.push('robots.txt: missing full generated sitemap');
 if (!has(robots, 'Disallow: /cover-letter.html')) failures.push('robots.txt: cover letter should remain disallowed');
 if (!has(robots, 'Content-Signal: search=yes, ai-input=yes, ai-train=no')) failures.push('robots.txt: missing Content-Signal policy');
 
 const sitemapIndex = read('sitemap.xml');
 if (!has(sitemapIndex, '<loc>https://1200km.com/sitemap-pages.xml</loc>')) failures.push('sitemap.xml: missing main page sitemap');
+if (!has(sitemapIndex, '<loc>https://1200km.com/sitemap-all.xml</loc>')) failures.push('sitemap.xml: missing full generated sitemap');
 if (!has(sitemapIndex, '<loc>https://1200km.com/threat-matrix/entity-sitemap.xml</loc>')) failures.push('sitemap.xml: missing Threat Matrix entity sitemap');
 
 const sitemapPages = read('sitemap-pages.xml');
@@ -104,6 +106,15 @@ const feed = read('feed.xml');
 if (!has(feed, '<rss version="2.0"')) failures.push('feed.xml: missing RSS root');
 if (!has(feed, '<atom:link href="https://1200km.com/feed.xml" rel="self" type="application/rss+xml" />')) failures.push('feed.xml: missing self atom:link');
 if (!has(feed, '<item>')) failures.push('feed.xml: missing feed items');
+
+const sitemapAll = read('sitemap-all.xml');
+const sitemapAllUrlCount = (sitemapAll.match(/<loc>/g) || []).length;
+if (!has(sitemapAll, '<loc>https://1200km.com/threat-matrix/techniques/T1053.005/</loc>')) failures.push('sitemap-all.xml: missing Threat Matrix canonical technique page');
+if (!has(sitemapAll, '<loc>https://1200km.com/adversarygraph-docs/</loc>')) failures.push('sitemap-all.xml: missing AdversaryGraph docs canonical page');
+if (!has(sitemapAll, '<loc>https://1200km.com/ITDR/</loc>')) failures.push('sitemap-all.xml: missing ITDR canonical page');
+if (has(sitemapAll, '404.html')) failures.push('sitemap-all.xml: should not list 404 pages');
+if (has(sitemapAll, 'cover-letter.html')) failures.push('sitemap-all.xml: should not list noindex cover letter');
+if (sitemapAllUrlCount < 1000) failures.push(`sitemap-all.xml: expected broad coverage, found only ${sitemapAllUrlCount} URLs`);
 
 if (failures.length) {
   console.error('SEO check failed:');
