@@ -37,7 +37,7 @@
       { href: '/guides.html', label: 'Guides' },
       { href: '/articles/', label: 'Articles' },
       { href: '/hexstrike.html', label: 'HexStrike' },
-      { href: '/ai-offensive.html', label: 'Offencive' },
+      { href: '/ai-offensive.html', label: 'Offensive' },
       { href: '/pt-tools.html', label: 'PT Tools' },
       { href: '/projects.html', label: 'Projects' },
       { href: '/external-validation.html', label: 'Validation' },
@@ -51,7 +51,7 @@
       link.textContent = item.label;
       if (item.external) {
         link.target = '_blank';
-        link.rel = 'noopener';
+        link.rel = 'noopener noreferrer';
       }
       return link;
     }));
@@ -187,7 +187,7 @@
           <a href="/cv.html">CV</a>
           <a href="/projects.html">Projects</a>
           <a href="https://github.com/anpa1200">GitHub</a>
-          <a href="mailto:1200km@gmail.com">Email</a>
+          <a href="#" data-email-user="1200km" data-email-domain="gmail.com">Email</a>
         </nav>
       </div>
       <div class="shared-footer-bottom">
@@ -210,6 +210,7 @@
     applyTheme(preferredTheme(), false);
     addEcosystemGateway();
     normalizeFooter();
+    initializeEmailLinks();
 
     const button = document.getElementById('theme-btn');
     if (button && !button.dataset.themeReady) {
@@ -218,6 +219,16 @@
         applyTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light', true);
       });
     }
+  }
+
+  function initializeEmailLinks() {
+    document.querySelectorAll('[data-email-user][data-email-domain]').forEach(function (item) {
+      const address = `${item.dataset.emailUser}@${item.dataset.emailDomain}`;
+      if (item.tagName.toLowerCase() === 'a') {
+        item.href = `mailto:${address}`;
+      }
+      item.textContent = item.dataset.emailLabel || address;
+    });
   }
 
   window.addEventListener('storage', function (event) {

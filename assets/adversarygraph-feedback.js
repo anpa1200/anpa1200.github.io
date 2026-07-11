@@ -289,7 +289,8 @@
     try {
       var report = collectReport();
       showReport(report);
-      var mailto = "mailto:1200km@gmail.com?subject=" +
+      var recipient = ["1200km", "gmail.com"].join("@");
+      var mailto = "mailto:" + recipient + "?subject=" +
         encodeURIComponent("AdversaryGraph " + fields.type.value + ": " + report.title) +
         "&body=" + encodeURIComponent(report.body);
       window.location.href = mailto;

@@ -6,6 +6,7 @@
  *   - relative links/assets resolve to a real file on disk
  *   - in-page anchors (#id) point to an element that exists in the same file
  *   - absolute https://1200km.com/<file>.{html,pdf,png,xml,txt} map to a real local file
+ *     unless the path belongs to a separately published 1200km sibling site
  *
  * Reports (non-fatal warnings):
  *   - leftover anpa1200.github.io references
@@ -23,6 +24,12 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const checkExternal = process.argv.includes('--external');
 
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
+const LIVE_1200KM_ROOTS = [
+  '/CTI_as_a_Code/',
+  '/cti-analyst-field-manual/',
+  '/israel-government-threat-actors-cti/',
+  '/operation-desert-hydra/',
+];
 
 function walkHtml(dir = ROOT) {
   const files = [];
@@ -69,6 +76,10 @@ function resolveLocalRef(fromFile, url) {
   return normalize(join(dirname(fromFile), clean));
 }
 
+function isLive1200kmSiblingPath(pathname) {
+  return LIVE_1200KM_ROOTS.some((root) => pathname === root || pathname.startsWith(root));
+}
+
 const externalToProbe = new Set();
 
 for (const f of htmlFiles) {
@@ -91,7 +102,8 @@ for (const f of htmlFiles) {
       let u;
       try { u = new URL(url); } catch { continue; }
       if (u.hostname === '1200km.com') {
-        if (localPathExists(u.pathname)) results.ok++;
+        if (isLive1200kmSiblingPath(u.pathname)) externalToProbe.add(url);
+        else if (localPathExists(u.pathname)) results.ok++;
         else externalToProbe.add(url);
       } else {
         externalToProbe.add(url);
@@ -100,6 +112,10 @@ for (const f of htmlFiles) {
     }
 
     if (url.startsWith('//')) { externalToProbe.add('https:' + url); continue; }
+    if (url.startsWith('/') && isLive1200kmSiblingPath(url.split('#')[0].split('?')[0])) {
+      externalToProbe.add('https://1200km.com' + url);
+      continue;
+    }
 
     const resolved = resolveLocalRef(f, url);
     if (!localPathExists(resolved)) results.broken.push(`${f}: ${url}`);

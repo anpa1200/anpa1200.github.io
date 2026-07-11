@@ -146,13 +146,13 @@ ${stateRows}
 function repoStatsCard(repoKey, title, description) {
   const repo = stats.repositories[repoKey];
   return `          <article class="card">
-            <h3><a href="${escapeHtml(repo.url)}" target="_blank" rel="noopener">${escapeHtml(title)}</a></h3>
+            <h3><a href="${escapeHtml(repo.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
             <p>${escapeHtml(description)}</p>
             <ul class="signal-list">
               <li><span>Stars / forks</span><strong>${repo.stars} / ${repo.forks}</strong></li>
               <li><span>Watchers</span><strong>${repo.watchers}</strong></li>
               <li><span>Open issues</span><strong>${repo.open_issues}</strong></li>
-              <li><span>Latest release</span><strong><a href="${escapeHtml(repo.release_url || repo.url)}" target="_blank" rel="noopener">${escapeHtml(repo.release)}</a></strong></li>
+              <li><span>Latest release</span><strong><a href="${escapeHtml(repo.release_url || repo.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.release)}</a></strong></li>
               <li><span>Last pushed</span><strong>${formatDate(repo.pushed_at)}</strong></li>
             </ul>
           </article>`;
@@ -160,10 +160,10 @@ function repoStatsCard(repoKey, title, description) {
 
 function renderValidationSignal() {
   const topRepos = stats.repositories.top_by_stars
-    .map(repo => `              <li><span><a href="${escapeHtml(repo.url)}" target="_blank" rel="noopener">${escapeHtml(repo.name)}</a><br /><span class="muted">${repo.fork ? 'forked repository' : 'source repository'}</span></span><strong>${repo.stars} stars / ${repo.forks} ${repo.forks === 1 ? 'fork' : 'forks'}</strong></li>`)
+    .map(repo => `              <li><span><a href="${escapeHtml(repo.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.name)}</a><br /><span class="muted">${repo.fork ? 'forked repository' : 'source repository'}</span></span><strong>${repo.stars} stars / ${repo.forks} ${repo.forks === 1 ? 'fork' : 'forks'}</strong></li>`)
     .join('\n');
   const gitlabLinks = stats.gitlab.open_items.length
-    ? `\n            <div class="links">\n${stats.gitlab.open_items.map(item => `              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.title)}</a>`).join('\n')}\n            </div>`
+    ? `\n            <div class="links">\n${stats.gitlab.open_items.map(item => `              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>`).join('\n')}\n            </div>`
     : '';
 
   return `<div class="grid">
@@ -176,8 +176,8 @@ function renderValidationSignal() {
               <li><span>Closed unmerged GitHub PRs</span><strong>${stats.github.closed_unmerged_prs}</strong></li>
             </ul>
             <div class="links">
-              <a href="https://github.com/pulls?q=is%3Apr+author%3Aanpa1200+is%3Aopen" target="_blank" rel="noopener">Open PR search</a>
-              <a href="https://github.com/pulls?q=is%3Apr+author%3Aanpa1200+is%3Amerged" target="_blank" rel="noopener">Merged PR search</a>
+              <a href="https://github.com/pulls?q=is%3Apr+author%3Aanpa1200+is%3Aopen" target="_blank" rel="noopener noreferrer">Open PR search</a>
+              <a href="https://github.com/pulls?q=is%3Apr+author%3Aanpa1200+is%3Amerged" target="_blank" rel="noopener noreferrer">Merged PR search</a>
             </div>
           </article>
           <article class="card">
