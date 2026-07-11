@@ -37,7 +37,7 @@
       { href: '/guides.html', label: 'Guides' },
       { href: '/articles/', label: 'Articles' },
       { href: '/hexstrike.html', label: 'HexStrike' },
-      { href: '/ai-offensive.html', label: 'OfSec' },
+      { href: '/ai-offensive.html', label: 'Offencive' },
       { href: '/pt-tools.html', label: 'PT Tools' },
       { href: '/projects.html', label: 'Projects' },
       { href: '/external-validation.html', label: 'Validation' },
