@@ -1,6 +1,8 @@
 # AdversaryGraph Documentation
 
-The AdversaryGraph documentation explains how the self-hosted platform supports CTI-to-detection workflows, ATT&CK mapping, IOC investigation, malware-analysis evidence review, attack-surface mapping, attack simulation documentation, SIEM validation documentation, and analyst reporting.
+The AdversaryGraph documentation explains how the self-hosted platform supports CTI-to-detection workflows, ATT&CK mapping, IOC investigation, JA3/JA4+ network fingerprint pivots, malware-analysis evidence review, attack-surface mapping, Threat Radar, EMB3D assessment, attack simulation documentation, SIEM validation documentation, and analyst reporting.
+
+Current release: v5.9.1.
 
 ## Start Here
 
@@ -9,6 +11,7 @@ The AdversaryGraph documentation explains how the self-hosted platform supports 
 - Architecture: https://1200km.com/adversarygraph-docs/architecture/
 - Commercial trust: https://1200km.com/adversarygraph-docs/commercial-trust/
 - Case studies and validation: https://1200km.com/adversarygraph-docs/case-studies-validation/
+- Roadmap: https://1200km.com/adversarygraph-docs/roadmap/
 
 ## Public vs Restricted
 

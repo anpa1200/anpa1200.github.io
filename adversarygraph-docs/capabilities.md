@@ -2,15 +2,21 @@
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench for analysts and detection engineers.
 
+Current release: v5.9.1.
+
 ## Core Capabilities
 
 - CTI report analysis and evidence review
 - IOC extraction, enrichment, and investigation
+- JA3/JA4+ network fingerprint IOC extraction, import, review, and pivoting
 - MITRE ATT&CK and ATLAS mapping
 - Actor, campaign, and report comparison
 - Malware-analysis evidence mapping
 - CVE Library context and relationship review
 - Asset attack-surface mapping
+- Threat Radar product-security CTI and exposure review
+- EMB3D assessment workflow
+- Evidence-to-Detection Graph reasoning
 - Detection-gap and telemetry-readiness review
 - Controlled attack simulation documentation
 - SIEM validation documentation
