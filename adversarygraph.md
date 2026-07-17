@@ -17,8 +17,8 @@ It helps analysts connect:
 ## Current Release Package
 
 AdversaryGraph v6.0.0 adds a reproducible release gate, rollback guidance,
-sanitized screenshot evidence, and documented case studies. The GitHub tag and
-release are authoritative once v6 is published.
+sanitized screenshot evidence, and documented case studies. The published
+GitHub tag and release are the authoritative v6 source.
 
 ## Public Documentation
 
