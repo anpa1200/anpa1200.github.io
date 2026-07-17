@@ -14,10 +14,18 @@ It helps analysts connect:
 - SIEM validation results
 - Analyst decisions
 
+## Current Release Package
+
+AdversaryGraph v6.0.0 adds a reproducible release gate, rollback guidance,
+sanitized screenshot evidence, and documented case studies. The GitHub tag and
+release are authoritative once v6 is published.
+
 ## Public Documentation
 
 - Docs: https://1200km.com/adversarygraph-docs/
 - Capabilities: https://1200km.com/adversarygraph-docs/capabilities/
+- v6 release readiness: https://1200km.com/adversarygraph-docs/release-readiness-v6/
+- v6 case studies: https://1200km.com/adversarygraph-docs/case-studies-v6/
 - Detection engineering techniques: https://1200km.com/newest-detection-engineering-techniques/
 - Log-to-report workflow: https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html
 - GitHub: https://github.com/anpa1200/adversarygraph
