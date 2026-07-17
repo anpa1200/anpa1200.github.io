@@ -475,16 +475,16 @@ if (/<span>GitHub followers<\/span>/.test(html)) {
 }
 html = replaceOrThrow(
   html,
-  /<div><strong>[\d,]+<\/strong><span>Total clones — last 14 days<\/span><\/div>\s*<p>Combined clone count across \d+ active source repositories? \([^)]*\)\. [\d,]+ unique cloners portfolio-wide\.<\/p>/,
+  /<div><strong>[\d,]+<\/strong><span>Total clones — last 14 days<\/span><\/div>\s*<p>Combined clone count across \d+ (?:active|daily-tracked) source repositories? \([^)]*\)\. [\d,]+ unique cloners(?: portfolio-wide|, summed across days)\.<\/p>/,
   `<div><strong>${last14Days.clones.toLocaleString('en-US')}</strong><span>Total clones — last 14 days</span></div>
-            <p>Combined clone count across ${last14Days.repos} active source repositories (${formatDateRange(last14Days.since, last14Days.through)}). ${last14Days.uniques.toLocaleString('en-US')} unique cloners portfolio-wide.</p>`,
+            <p>Combined clone count across ${last14Days.repos} daily-tracked source repositories (${formatDateRange(last14Days.since, last14Days.through)}). ${last14Days.uniques.toLocaleString('en-US')} unique cloners, summed across days.</p>`,
   'total clones last 14 days metric',
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>[\d,]+<\/strong><span>Total clones since tracking began<\/span><\/div>\s*<p>Cumulative clone count across (?:the same \d+ repositories|active repositories) since daily tracking started \([^)]*\)\. [\d,]+ unique cloners portfolio-wide, summed across days\.<\/p>/,
+  /<div><strong>[\d,]+<\/strong><span>Total clones since tracking began<\/span><\/div>\s*<p>Cumulative clone count across (?:the same \d+ repositories|active repositories|\d+ daily-tracked source repositories) since (?:daily )?tracking started \([^)]*\)\. [\d,]+ unique cloners(?: portfolio-wide)?, summed across days\.<\/p>/,
   `<div><strong>${cumulativeClones.clones.toLocaleString('en-US')}</strong><span>Total clones since tracking began</span></div>
-            <p>Cumulative clone count across active repositories since daily tracking started (${formatDateRange(cumulativeClones.since, cumulativeClones.through)}). ${cumulativeClones.uniques.toLocaleString('en-US')} unique cloners portfolio-wide, summed across days.</p>`,
+            <p>Cumulative clone count across ${last14Days.repos} daily-tracked source repositories since tracking started (${formatDateRange(cumulativeClones.since, cumulativeClones.through)}). ${cumulativeClones.uniques.toLocaleString('en-US')} unique cloners, summed across days.</p>`,
   'cumulative clones since tracking began metric',
 );
 html = replaceOrThrow(
