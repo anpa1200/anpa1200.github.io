@@ -214,10 +214,14 @@ ${topRepos}
         </div>`;
 }
 
+function isExternalRepo(pr) {
+  return !pr.repository.nameWithOwner.startsWith('anpa1200/');
+}
+
 const github = {
-  open_search: ghSearch(['--author', 'anpa1200', '--state', 'open', '--limit', '100']).map(pr => ghPrDetails(pr, true)),
-  merged_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--merged', '--limit', '100']).map(pr => ghPrDetails(pr)),
-  closed_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--limit', '100']).map(pr => ghPrDetails(pr)),
+  open_search: ghSearch(['--author', 'anpa1200', '--state', 'open', '--limit', '100']).filter(isExternalRepo).map(pr => ghPrDetails(pr, true)),
+  merged_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--merged', '--limit', '100']).filter(isExternalRepo).map(pr => ghPrDetails(pr)),
+  closed_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--limit', '100']).filter(isExternalRepo).map(pr => ghPrDetails(pr)),
 };
 github.open = github.open_search.filter(pr => pr.canonical_state === 'open' && !pr.merged_at);
 github.merged = github.merged_search.filter(pr => pr.merged_at);
