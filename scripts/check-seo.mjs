@@ -14,6 +14,7 @@ const requiredPages = [
   { file: 'guides.html', url: 'https://1200km.com/guides.html', schema: ['CollectionPage'] },
   { file: 'labs.html', url: 'https://1200km.com/labs.html', schema: ['CollectionPage'] },
   { file: 'articles/index.html', url: 'https://1200km.com/articles/', schema: ['CollectionPage'] },
+  { file: 'search.html', url: 'https://1200km.com/search.html', schema: ['WebPage'] },
   { file: 'articles/adversarygraph-v2-self-hosted-ai-cti-platform.html', url: 'https://1200km.com/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html', schema: ['TechArticle'] },
   { file: 'articles/adversarygraph-from-log-to-report-ioc-investigation.html', url: 'https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html', schema: ['TechArticle'] },
   { file: 'newest-detection-engineering-techniques/index.html', url: 'https://1200km.com/newest-detection-engineering-techniques/', schema: ['TechArticle'] },
@@ -95,6 +96,9 @@ const sitemapIndex = read('sitemap.xml');
 if (!has(sitemapIndex, '<loc>https://1200km.com/sitemap-pages.xml</loc>')) failures.push('sitemap.xml: missing main page sitemap');
 if (!has(sitemapIndex, '<loc>https://1200km.com/sitemap-all.xml</loc>')) failures.push('sitemap.xml: missing full generated sitemap');
 if (!has(sitemapIndex, '<loc>https://1200km.com/threat-matrix/entity-sitemap.xml</loc>')) failures.push('sitemap.xml: missing Threat Matrix entity sitemap');
+
+const homepage = read('index.html');
+if (!has(homepage, '"urlTemplate": "https://1200km.com/search.html?q={search_term_string}"')) failures.push('index.html: WebSite SearchAction must target the working site search');
 
 const sitemapPages = read('sitemap-pages.xml');
 for (const page of requiredPages) {

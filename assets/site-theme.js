@@ -3,6 +3,17 @@
   const themeColor = document.querySelector('meta[name="theme-color"]');
   const media = window.matchMedia('(prefers-color-scheme: light)');
 
+  function loadSiteSearch() {
+    if (document.querySelector('script[data-site-search-loader], script[src*="/assets/site-search.js"]')) return;
+    const script = document.createElement('script');
+    script.src = '/assets/site-search.js?v=20260719-1';
+    script.defer = true;
+    script.dataset.siteSearchLoader = 'true';
+    document.head.appendChild(script);
+  }
+
+  loadSiteSearch();
+
   function preferredTheme() {
     return localStorage.getItem('theme') || (media.matches ? 'light' : 'dark');
   }

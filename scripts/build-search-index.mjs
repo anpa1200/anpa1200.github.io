@@ -1,0 +1,235 @@
+#!/usr/bin/env node
+import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as pagefind from 'pagefind';
+import {
+  SITE_ORIGIN,
+  collectLocalSitemapUrls,
+  localFileForUrl,
+  normalizeCanonical,
+  normalizeSiteUrl,
+  parseSitemap,
+  prepareHtmlForSearch,
+  shouldExcludeUrl,
+  validatePage,
+} from './search-index-lib.mjs';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const args = process.argv.slice(2);
+
+function option(name, fallback = null) {
+  const index = args.indexOf(name);
+  return index >= 0 && args[index + 1] ? args[index + 1] : fallback;
+}
+
+const remote = args.includes('--remote');
+const quiet = args.includes('--quiet');
+const outputPath = resolve(option('--output', join(ROOT, 'pagefind')));
+const minimumPages = Number.parseInt(option('--minimum-pages', remote ? '1600' : '1000'), 10);
+const maxPageFailures = Number.parseInt(option('--max-page-failures', remote ? '12' : '0'), 10);
+const concurrency = Math.max(1, Math.min(24, Number.parseInt(option('--concurrency', '12'), 10)));
+const rootSitemap = remote ? `${SITE_ORIGIN}/sitemap.xml` : join(ROOT, 'sitemap.xml');
+
+function log(message) {
+  if (!quiet) console.log(message);
+}
+
+function assertSafeOutput(path) {
+  const resolved = resolve(path);
+  if (resolved === '/' || resolved === ROOT || resolved === resolve(ROOT, '..')) {
+    throw new Error(`Refusing unsafe search output path: ${resolved}`);
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
+}
+
+async function fetchText(url, { attempts = 3, timeoutMs = 20_000 } = {}) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        headers: {
+          accept: 'text/html,application/xml;q=0.9,text/xml;q=0.8',
+          'user-agent': '1200km-search-indexer/1.0 (+https://1200km.com/search.html)',
+        },
+        redirect: 'follow',
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!normalizeSiteUrl(response.url)) throw new Error(`refused off-origin redirect to ${response.url}`);
+      const length = Number.parseInt(response.headers.get('content-length') || '0', 10);
+      if (length > 8_000_000) throw new Error(`response too large (${length} bytes)`);
+      const text = await response.text();
+      if (text.length > 8_000_000) throw new Error(`response too large (${text.length} bytes)`);
+      return text;
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await sleep(350 * (2 ** (attempt - 1)));
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+  throw new Error(`${url}: ${lastError?.message || 'request failed'}`);
+}
+
+async function collectRemoteUrls(entry) {
+  const pages = new Set();
+  const visited = new Set();
+
+  async function visit(reference) {
+    const normalized = normalizeCanonical(reference);
+    if (!normalized || visited.has(normalized)) return;
+    visited.add(normalized);
+    const xml = await fetchText(normalized);
+    const sitemap = parseSitemap(xml, normalized);
+    if (sitemap.isIndex) {
+      for (const location of sitemap.locations) await visit(location);
+    } else {
+      sitemap.locations.forEach((location) => pages.add(location));
+    }
+  }
+
+  await visit(entry);
+  return pages;
+}
+
+function rootOwnedUrls() {
+  const xml = readFileSync(join(ROOT, 'sitemap-pages.xml'), 'utf8');
+  return new Set(parseSitemap(xml).locations);
+}
+
+async function pageSource(url, localOnly, preferLocal) {
+  const localPath = localFileForUrl(ROOT, url);
+  if ((localOnly || preferLocal) && localPath) return readFile(localPath, 'utf8');
+  if (localOnly) throw new Error(`${url}: no local canonical file`);
+  return fetchText(url);
+}
+
+async function replaceOutput(stagedOutput, destination) {
+  assertSafeOutput(destination);
+  await mkdir(dirname(destination), { recursive: true });
+  const backup = `${destination}.previous-${process.pid}`;
+  if (existsSync(destination)) await rename(destination, backup);
+  try {
+    await rename(stagedOutput, destination);
+    if (existsSync(backup)) await rm(backup, { recursive: true, force: true });
+  } catch (error) {
+    if (existsSync(backup) && !existsSync(destination)) await rename(backup, destination);
+    throw error;
+  }
+}
+
+assertSafeOutput(outputPath);
+const startedAt = Date.now();
+const localPages = await collectLocalSitemapUrls(ROOT, rootSitemap);
+const discovered = remote ? await collectRemoteUrls(rootSitemap) : localPages;
+if (remote) localPages.forEach((url) => discovered.add(url));
+
+const owned = rootOwnedUrls();
+const urls = [...discovered]
+  .filter((url) => !shouldExcludeUrl(url))
+  .sort((a, b) => a.localeCompare(b));
+log(`Discovered ${urls.length} canonical search pages (${remote ? 'live sitemap union' : 'local sitemap union'}).`);
+
+const { index, errors: createErrors } = await pagefind.createIndex({
+  excludeSelectors: [
+    '.ag-project-notice',
+    '#page-sidenav',
+    '.table-of-contents',
+    '.theme-doc-breadcrumbs',
+    '.theme-doc-toc-mobile',
+    '.theme-doc-toc-desktop',
+    '.pagination-nav',
+  ],
+  forceLanguage: 'en',
+  includeCharacters: '.:-_/@',
+});
+if (!index || createErrors.length) throw new Error(`Unable to create Pagefind index: ${createErrors.join('; ')}`);
+
+let indexedPages = 0;
+const skipped = new Map();
+const failures = [];
+
+for (let offset = 0; offset < urls.length; offset += concurrency) {
+  const batch = urls.slice(offset, offset + concurrency);
+  const fetched = await Promise.all(batch.map(async (url) => {
+    try {
+      const html = await pageSource(url, !remote, remote && owned.has(url));
+      return { url, html };
+    } catch (error) {
+      return { url, error };
+    }
+  }));
+
+  for (const item of fetched) {
+    if (item.error) {
+      if (/HTTP (404|410)\b/.test(item.error.message)) {
+        skipped.set('stale-sitemap-url', (skipped.get('stale-sitemap-url') || 0) + 1);
+        continue;
+      }
+      failures.push(item.error.message);
+      continue;
+    }
+    const validation = validatePage(item.url, item.html);
+    if (!validation.indexable) {
+      skipped.set(validation.reason, (skipped.get(validation.reason) || 0) + 1);
+      continue;
+    }
+    const result = await index.addHTMLFile({
+      content: prepareHtmlForSearch(item.url, item.html),
+      url: normalizeSiteUrl(item.url).pathname,
+    });
+    if (result.errors.length) failures.push(`${item.url}: ${result.errors.join('; ')}`);
+    else indexedPages += 1;
+  }
+  const completed = Math.min(offset + batch.length, urls.length);
+  if (completed === urls.length || completed % (concurrency * 10) === 0) {
+    log(`Indexed ${completed}/${urls.length} candidates…`);
+  }
+}
+
+if (indexedPages < minimumPages) {
+  await pagefind.close();
+  throw new Error(`Search index coverage is too small: ${indexedPages} pages; expected at least ${minimumPages}.`);
+}
+if (failures.length > maxPageFailures) {
+  await pagefind.close();
+  throw new Error(`Search indexing had ${failures.length} page failures (maximum ${maxPageFailures}):\n${failures.slice(0, 20).join('\n')}`);
+}
+
+await mkdir(dirname(outputPath), { recursive: true });
+const temporaryRoot = await mkdtemp(join(dirname(outputPath), '.1200km-pagefind-'));
+const stagedOutput = join(temporaryRoot, 'pagefind');
+const writeResult = await index.writeFiles({ outputPath: stagedOutput });
+if (writeResult.errors.length) {
+  await pagefind.close();
+  throw new Error(`Pagefind bundle write failed: ${writeResult.errors.join('; ')}`);
+}
+
+const metadata = {
+  schemaVersion: 1,
+  pagefindVersion: '1.5.2',
+  source: remote ? 'canonical-live-sitemaps-with-local-root-overrides' : 'canonical-local-sitemaps',
+  generatedAt: new Date().toISOString(),
+  discoveredPages: urls.length,
+  indexedPages,
+  skipped: Object.fromEntries([...skipped.entries()].sort()),
+  failedPages: failures.length,
+  durationMs: Date.now() - startedAt,
+};
+await writeFile(join(stagedOutput, 'search-build.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+await pagefind.close();
+await replaceOutput(stagedOutput, outputPath);
+await rm(temporaryRoot, { recursive: true, force: true });
+
+log(`Search index ready: ${indexedPages} pages at ${outputPath}.`);
+if (failures.length) {
+  console.warn(`Search index completed with ${failures.length} tolerated fetch failure(s):`);
+  failures.slice(0, 20).forEach((failure) => console.warn(`- ${failure}`));
+}

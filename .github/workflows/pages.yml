@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * *'
+  repository_dispatch:
+    types: [rebuild-search]
 
 permissions:
   contents: read
@@ -16,15 +20,45 @@ concurrency:
 
 jobs:
   deploy:
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked search tooling
+        run: npm ci
+      - name: Validate search source
+        run: npm run check-search
+      - name: Stage publishable site
+        run: |
+          mkdir -p "${RUNNER_TEMP}/site"
+          git archive --format=tar --output="${RUNNER_TEMP}/site.tar" HEAD
+          tar --extract --file="${RUNNER_TEMP}/site.tar" --directory="${RUNNER_TEMP}/site" \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='cloudflare' \
+            --exclude='node_modules' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='scripts' \
+            --exclude='tests'
+          node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
+      - name: Build canonical domain-wide search index
+        run: npm run build-search:remote -- --output "${RUNNER_TEMP}/site/pagefind"
+      - name: Validate search coverage and ranking
+        run: npm run check-search:index -- --bundle "${RUNNER_TEMP}/site/pagefind" --remote
+      - name: Browser smoke test search and autocomplete
+        run: npm run check-search:browser -- --site "${RUNNER_TEMP}/site" --bundle "${RUNNER_TEMP}/site/pagefind"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: ${{ runner.temp }}/site
+          include-hidden-files: true
       - uses: actions/deploy-pages@v4
         id: deployment
