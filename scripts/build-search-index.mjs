@@ -247,7 +247,7 @@ if (writeResult.errors.length) {
 const metadata = {
   schemaVersion: 1,
   pagefindVersion: '1.5.2',
-  source: remote ? 'canonical-live-sitemaps-with-local-root-overrides' : 'canonical-local-sitemaps',
+  source: remote ? 'canonical-live-sitemaps-with-local-release-overrides' : 'canonical-local-sitemaps',
   generatedAt: new Date().toISOString(),
   discoveredPages: urls.length,
   indexedPages,
