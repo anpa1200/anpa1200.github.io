@@ -2,7 +2,16 @@
   const root = document.documentElement;
   const themeColor = document.querySelector('meta[name="theme-color"]');
   const media = window.matchMedia('(prefers-color-scheme: light)');
-  const searchAssetVersion = '20260719-2';
+  const searchAssetVersion = '20260720-1';
+  const themeAssetVersion = '20260720-nav';
+
+  function loadSiteThemeStyles() {
+    if (document.querySelector('link[href*="/assets/site-theme.css"], link[href^="assets/site-theme.css"], link[href^="../assets/site-theme.css"]')) return;
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = `/assets/site-theme.css?v=${themeAssetVersion}`;
+    document.head.appendChild(stylesheet);
+  }
 
   function loadSiteSearch() {
     if (!document.getElementById('site-search-styles')) {
@@ -14,12 +23,13 @@
     }
     if (document.querySelector('script[data-site-search-loader], script[src*="/assets/site-search.js"]')) return;
     const script = document.createElement('script');
-    script.src = '/assets/site-search.js?v=20260719-2';
+    script.src = '/assets/site-search.js?v=20260720-1';
     script.defer = true;
     script.dataset.siteSearchLoader = 'true';
     document.head.appendChild(script);
   }
 
+  loadSiteThemeStyles();
   loadSiteSearch();
 
   function preferredTheme() {
@@ -45,35 +55,73 @@
 
   function normalizeHeader() {
     const nav = document.querySelector('.site-header .nav');
-    const links = nav && nav.querySelector('.nav-links');
+    let links = nav && nav.querySelector('.nav-links');
     if (!nav || !links) return;
 
     const navItems = [
-      { href: '/about.html', label: 'About' },
-      { href: '/cv.html', label: 'CV' },
-      { href: '/cti.html', label: 'CTI' },
+      { href: '/cti.html', label: 'Research' },
+      { href: '/adversarygraph/', label: 'AdversaryGraph', flagship: true },
       { href: '/labs.html', label: 'Labs' },
       { href: '/guides.html', label: 'Guides' },
-      { href: '/articles/', label: 'Articles' },
-      { href: '/hexstrike.html', label: 'HexStrike' },
-      { href: '/ai-offensive.html', label: 'Offensive' },
-      { href: '/pt-tools.html', label: 'PT Tools' },
       { href: '/projects.html', label: 'Projects' },
-      { href: '/external-validation.html', label: 'Validation' },
-      { href: 'https://github.com/anpa1200', label: 'GitHub ↗', external: true },
-      { href: 'https://medium.com/@1200km', label: 'Medium ↗', external: true },
+      { href: '/about.html', label: 'About' },
     ];
 
-    links.replaceChildren(...navItems.map(function (item) {
+    if (links.tagName.toLowerCase() !== 'details') {
+      const details = document.createElement('details');
+      details.className = links.className;
+      links.replaceWith(details);
+      links = details;
+    }
+
+    const summary = document.createElement('summary');
+    summary.className = 'nav-menu-toggle';
+    summary.setAttribute('aria-label', 'Open navigation');
+    summary.innerHTML = '<span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>'
+      + '<span class="nav-menu-text">Menu</span>';
+
+    const list = document.createElement('div');
+    list.className = 'nav-list';
+    list.id = 'primary-nav-list';
+    list.replaceChildren(...navItems.map(function (item) {
       const link = document.createElement('a');
       link.href = item.href;
       link.textContent = item.label;
+      if (item.flagship) link.classList.add('nav-flagship');
       if (item.external) {
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
       }
       return link;
     }));
+    links.replaceChildren(summary, list);
+
+    const mobileNavigation = window.matchMedia('(max-width: 900px)');
+    const syncNavigationMode = function () {
+      const mode = mobileNavigation.matches ? 'mobile' : 'desktop';
+      if (links.dataset.navigationMode === mode) return;
+      links.dataset.navigationMode = mode;
+      links.open = mode === 'desktop';
+    };
+    syncNavigationMode();
+    if (!links.dataset.navigationMediaReady) {
+      links.dataset.navigationMediaReady = 'true';
+      mobileNavigation.addEventListener('change', syncNavigationMode);
+    }
+
+    const brand = nav.querySelector('.brand');
+    if (brand) {
+      brand.href = '/';
+      const image = brand.querySelector('img');
+      if (image) image.alt = '';
+      let copy = brand.querySelector('.brand-copy');
+      if (!copy) {
+        copy = document.createElement('span');
+        copy.className = 'brand-copy';
+        brand.replaceChildren(...(image ? [image] : []), copy);
+      }
+      copy.innerHTML = '<strong>Andrey Pautov</strong><small>Security research</small>';
+    }
 
     const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
     const path = pathname.split('/').pop() || 'index.html';
@@ -84,14 +132,35 @@
         : pathname === '/articles'
           ? '/articles/'
           : pathname;
-    links.querySelectorAll('a').forEach(function (link) {
+    list.querySelectorAll('a').forEach(function (link) {
       const href = link.getAttribute('href') || '';
       const local = href.split('#')[0].split('?')[0];
-      const active = local === activePath || href === activePath || (activePath === '/' && local === '/');
+      const active = local === activePath
+        || href === activePath
+        || (activePath === '/' && local === '/')
+        || (local === '/adversarygraph/' && (pathname.startsWith('/adversarygraph') || path === 'adversarygraph-web-guide.html'));
       link.classList.toggle('active', active);
       if (active) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
     });
+
+    if (!links.dataset.navigationReady) {
+      links.dataset.navigationReady = 'true';
+      links.addEventListener('toggle', function () {
+        summary.setAttribute('aria-label', links.open ? 'Close navigation' : 'Open navigation');
+      });
+      list.addEventListener('click', function (event) {
+        if (event.target.closest('a') && mobileNavigation.matches) links.open = false;
+      });
+      document.addEventListener('click', function (event) {
+        if (links.open && mobileNavigation.matches && !links.contains(event.target)) links.open = false;
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape' || !links.open || !mobileNavigation.matches) return;
+        links.open = false;
+        summary.focus();
+      });
+    }
 
     if (!nav.querySelector('#theme-btn')) {
       const button = document.createElement('button');
@@ -109,11 +178,50 @@
       host.dataset.searchState = 'loading';
       host.innerHTML = '<a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">'
         + '<span aria-hidden="true" class="site-search-fallback-icon"></span>'
-        + '<span class="site-search-fallback-text">Search research</span>'
-        + '<kbd class="site-search-fallback-shortcut" aria-hidden="true">Ctrl K</kbd></a>';
+        + '<span class="site-search-fallback-text">Search research</span></a>';
       nav.insertBefore(host, nav.querySelector('#theme-btn'));
     }
 
+  }
+
+  function initializeSideNavigation() {
+    const links = Array.from(document.querySelectorAll('.sidenav-scroll a[data-section]'));
+    if (!links.length || !('IntersectionObserver' in window)) return;
+
+    const sections = links.map(function (link) {
+      return { link, section: document.getElementById(link.dataset.section) };
+    }).filter(function (entry) {
+      return entry.section;
+    });
+    if (!sections.length) return;
+
+    let active = links.find(function (link) {
+      return link.getAttribute('aria-current') === 'location';
+    }) || null;
+    const activate = function (link) {
+      if (active === link) return;
+      if (active) {
+        active.classList.remove('active');
+        active.removeAttribute('aria-current');
+      }
+      active = link;
+      active.classList.add('active');
+      active.setAttribute('aria-current', 'location');
+    };
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        const match = sections.find(function (candidate) {
+          return candidate.section === entry.target;
+        });
+        if (match) activate(match.link);
+      });
+    }, { rootMargin: '-15% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(function (entry) {
+      observer.observe(entry.section);
+    });
   }
 
   function addEcosystemGateway() {
@@ -238,6 +346,7 @@
 
   function initialize() {
     normalizeHeader();
+    initializeSideNavigation();
     applyTheme(preferredTheme(), false);
     addEcosystemGateway();
     normalizeFooter();

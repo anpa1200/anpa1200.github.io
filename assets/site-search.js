@@ -4,9 +4,9 @@
   if (window.__1200kmSiteSearch) return;
   window.__1200kmSiteSearch = true;
 
-  const ASSET_VERSION = '20260719-2';
+  const ASSET_VERSION = '20260720-1';
   const PAGEFIND_VERSION = '1.5.2';
-  const compactNavigation = window.matchMedia('(max-width: 1100px)');
+  const compactNavigation = window.matchMedia('(max-width: 1180px)');
   const path = window.location.pathname.replace(/\/index\.html$/i, '/');
   const interactiveThreatMatrix = path === '/threat-matrix/' || path === '/threat-matrix';
   const searchPage = Boolean(document.querySelector('[data-site-search-page]'));
@@ -14,6 +14,7 @@
   let searchFailed = false;
   let mountFrame = 0;
   let readinessTimer = 0;
+  let modalOpener = null;
 
   if (interactiveThreatMatrix) return;
 
@@ -54,21 +55,40 @@
     link.href = '/search.html';
     link.dataset.siteSearchControl = 'fallback';
     link.setAttribute('aria-label', 'Search all 1200km research');
-    link.innerHTML = '<span aria-hidden="true" class="site-search-fallback-icon"></span><span class="site-search-fallback-text">Search research</span>'
-      + (compact ? '' : '<kbd class="site-search-fallback-shortcut" aria-hidden="true">Ctrl K</kbd>');
+    link.innerHTML = '<span aria-hidden="true" class="site-search-fallback-icon"></span><span class="site-search-fallback-text">Search research</span>';
     return link;
   }
 
   function buildTrigger(compact) {
-    const trigger = document.createElement('pagefind-modal-trigger');
-    trigger.dataset.siteSearchControl = 'trigger';
-    trigger.setAttribute('placeholder', 'Search research');
-    trigger.setAttribute('shortcut', 'mod+k');
-    if (compact) {
-      trigger.setAttribute('compact', 'true');
-      trigger.setAttribute('hide-shortcut', 'true');
+    const button = document.createElement('button');
+    button.className = 'pf-trigger-btn';
+    button.type = 'button';
+    button.dataset.siteSearchControl = 'trigger';
+    button.setAttribute('aria-label', 'Search all 1200km research');
+    button.setAttribute('aria-haspopup', 'dialog');
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', 'site-search-modal');
+
+    const icon = document.createElement('span');
+    icon.className = 'pf-trigger-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    button.appendChild(icon);
+
+    if (!compact) {
+      const text = document.createElement('span');
+      text.className = 'pf-trigger-text';
+      text.textContent = 'Search research';
+      button.appendChild(text);
     }
-    return trigger;
+
+    button.addEventListener('click', function () {
+      const modal = document.getElementById('site-search-modal');
+      if (!modal || typeof modal.open !== 'function') return;
+      modalOpener = button;
+      button.setAttribute('aria-expanded', 'true');
+      modal.open();
+    });
+    return button;
   }
 
   function populateHost(host, compact) {
@@ -100,7 +120,8 @@
     input.setAttribute('placeholder', 'Search actors, ATT&CK techniques, AdversaryGraph, CTI, labs…');
     input.setAttribute('max-results', '8');
     input.setAttribute('show-sub-results', 'false');
-    input.setAttribute('shortcut', 'mod+k');
+    input.setAttribute('shortcut', 'disabled');
+    input.setAttribute('hide-shortcut', 'true');
     return input;
   }
 
@@ -205,6 +226,8 @@
       input.setAttribute('placeholder', 'Try T1059.003, MuddyWater, Kerberoasting, RAG MCP…');
       input.setAttribute('max-results', '12');
       input.setAttribute('show-sub-results', 'false');
+      input.setAttribute('shortcut', 'disabled');
+      input.setAttribute('hide-shortcut', 'true');
       if (!window.matchMedia('(max-width: 760px)').matches) input.setAttribute('autofocus', 'true');
       inputHost.replaceWith(input);
     }
@@ -237,7 +260,22 @@
         },
       });
       if (searchPage) mountSearchPageComponents();
-      else ensureModal();
+      else {
+        ensureModal();
+        const modal = document.getElementById('site-search-modal');
+        const dialog = modal && (modal.dialogEl || modal.querySelector('dialog'));
+        if (dialog && dialog.dataset.siteSearchFocusManaged !== 'true') {
+          dialog.dataset.siteSearchFocusManaged = 'true';
+          dialog.addEventListener('close', function () {
+            document.querySelectorAll('[data-site-search-control="trigger"]').forEach(function (trigger) {
+              trigger.setAttribute('aria-expanded', 'false');
+            });
+            const opener = modalOpener;
+            modalOpener = null;
+            if (opener && opener.isConnected) opener.focus();
+          });
+        }
+      }
 
       await instance.triggerLoad();
       if (searchFailed) throw new Error('The search index did not initialize.');

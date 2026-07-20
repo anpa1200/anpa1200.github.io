@@ -81,6 +81,26 @@ test('homepage ships a visible progressive search fallback and hero search befor
   assert.match(html, /data-site-search-hero[\s\S]*?<form[^>]+action="\/search\.html"[\s\S]*?<input[^>]+name="q"/);
 });
 
+test('portfolio navigation is compact and search is click-only', () => {
+  const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const search = readFileSync(join(ROOT, 'assets', 'site-search.js'), 'utf8');
+  const theme = readFileSync(join(ROOT, 'assets', 'site-theme.js'), 'utf8');
+  const styles = readFileSync(join(ROOT, 'assets', 'site-search.css'), 'utf8');
+  const shellSources = `${html}\n${search}\n${theme}\n${styles}`;
+
+  assert.doesNotMatch(shellSources, /Ctrl\s*\+?\s*K|mod\+k|site-search-fallback-shortcut/i);
+  assert.doesNotMatch(search, /pagefind-modal-trigger/i);
+  assert.match(html, /<details class="nav-links">[\s\S]*?<div class="nav-list" id="primary-nav-list">/);
+  assert.match(html, /class="has-page-sidenav"/);
+  assert.match(html, /class="skip-link"[^>]+href="#main-content"/);
+
+  const primary = html.match(/<div class="nav-list" id="primary-nav-list">([\s\S]*?)<\/div>/)?.[1] || '';
+  assert.equal((primary.match(/<a\b/g) || []).length, 6);
+  for (const label of ['Research', 'AdversaryGraph', 'Labs', 'Guides', 'Projects', 'About']) {
+    assert.match(primary, new RegExp(`>${label}<`));
+  }
+});
+
 test('remote index builds prefer release files and require stable ranking fixtures', () => {
   const builder = readFileSync(join(ROOT, 'scripts', 'build-search-index.mjs'), 'utf8');
   assert.match(builder, /pageSource\(url, !remote, remote\)/);

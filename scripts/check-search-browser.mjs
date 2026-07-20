@@ -362,22 +362,50 @@ try {
     const heroInput = document.querySelector('[data-site-search-hero] .pf-searchbox-input');
     const theme = document.querySelector('#theme-btn');
     const links = document.querySelector('.nav-links');
+    const header = document.querySelector('.site-header');
+    const brand = document.querySelector('.site-header .brand');
+    const sidebar = document.querySelector('.page-sidenav');
+    const primaryLinks = Array.from(document.querySelectorAll('.site-header .nav-list a'));
     const triggerRect = trigger?.getBoundingClientRect();
     const heroRect = heroInput?.getBoundingClientRect();
     const themeRect = theme?.getBoundingClientRect();
     const linksRect = links?.getBoundingClientRect();
+    const headerRect = header?.getBoundingClientRect();
+    const sidebarRect = sidebar?.getBoundingClientRect();
+    const linkRects = primaryLinks.map((link) => link.getBoundingClientRect());
     const overlaps = (a, b) => Boolean(a && b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
     const hit = triggerRect && document.elementFromPoint(triggerRect.left + triggerRect.width / 2, triggerRect.top + triggerRect.height / 2);
     return {
       triggerVisible: Boolean(triggerRect && triggerRect.width >= 180 && triggerRect.height >= 38 && (hit === trigger || trigger.contains(hit))),
       heroVisible: Boolean(heroRect && heroRect.width >= 500 && heroRect.height >= 44),
+      headerHeight: headerRect?.height || 0,
+      primaryCount: primaryLinks.length,
+      primaryRows: new Set(linkRects.map((rect) => Math.round(rect.top))).size,
+      brandVisible: Boolean(brand && getComputedStyle(brand).display !== 'none'),
+      sidebarVisible: Boolean(sidebarRect && sidebarRect.width >= 220 && sidebarRect.width <= 260 && getComputedStyle(sidebar).display !== 'none'),
+      sidebarTargetHeight: Math.min(...Array.from(document.querySelectorAll('.sidenav-scroll a')).map((link) => link.getBoundingClientRect().height)),
+      sidebarCurrent: Boolean(document.querySelector('.sidenav-scroll a[aria-current="location"]')),
+      bodyOffset: parseFloat(getComputedStyle(document.body).paddingLeft),
+      sidebarWidth: sidebarRect?.width || 0,
       overlapsTheme: overlaps(triggerRect, themeRect),
       overlapsLinks: overlaps(triggerRect, linksRect),
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
       center: triggerRect ? { x: triggerRect.left + triggerRect.width / 2, y: triggerRect.top + triggerRect.height / 2 } : null,
     };
   })()`);
-  if (!desktopState.triggerVisible || !desktopState.heroVisible || desktopState.overlapsTheme || desktopState.overlapsLinks || desktopState.overflow) {
+  if (!desktopState.triggerVisible
+    || !desktopState.heroVisible
+    || desktopState.headerHeight > 72
+    || desktopState.primaryCount !== 6
+    || desktopState.primaryRows !== 1
+    || desktopState.brandVisible
+    || !desktopState.sidebarVisible
+    || desktopState.sidebarTargetHeight < 36
+    || !desktopState.sidebarCurrent
+    || Math.abs(desktopState.bodyOffset - desktopState.sidebarWidth) > 1
+    || desktopState.overlapsTheme
+    || desktopState.overlapsLinks
+    || desktopState.overflow) {
     failures.push(`desktop search layout failed: ${JSON.stringify(desktopState)}`);
   }
 
@@ -422,6 +450,49 @@ try {
     'desktop modal close and focus restoration'
   );
 
+  const standardHome = await attachPage(devtools, `${origin}/`, {
+    width: 1280,
+    height: 800,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await waitForExpression(
+    devtools,
+    standardHome.sessionId,
+    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn')) && document.querySelectorAll('.site-header .nav-list a').length === 6`,
+    'standard desktop header readiness'
+  );
+  const standardHeaderState = await evaluate(devtools, standardHome.sessionId, `(() => {
+    const brand = document.querySelector('.site-header .brand');
+    const list = document.querySelector('.site-header .nav-list');
+    const trigger = document.querySelector('.site-search-host--standalone .pf-trigger-btn');
+    const theme = document.querySelector('#theme-btn');
+    const header = document.querySelector('.site-header');
+    const rect = (node) => node?.getBoundingClientRect();
+    const brandRect = rect(brand);
+    const listRect = rect(list);
+    const triggerRect = rect(trigger);
+    const themeRect = rect(theme);
+    const overlaps = (a, b) => Boolean(a && b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
+    return {
+      height: rect(header)?.height || 0,
+      brandVisible: Boolean(brandRect && brandRect.width > 0 && getComputedStyle(brand).display !== 'none'),
+      rows: new Set(Array.from(list.querySelectorAll('a')).map((link) => Math.round(link.getBoundingClientRect().top))).size,
+      overlaps: overlaps(brandRect, listRect) || overlaps(brandRect, triggerRect) || overlaps(listRect, triggerRect) || overlaps(listRect, themeRect) || overlaps(triggerRect, themeRect),
+      sidebarVisible: getComputedStyle(document.querySelector('.page-sidenav')).display !== 'none',
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    };
+  })()`);
+  if (standardHeaderState.height > 72
+    || !standardHeaderState.brandVisible
+    || standardHeaderState.rows !== 1
+    || standardHeaderState.overlaps
+    || standardHeaderState.sidebarVisible
+    || standardHeaderState.overflow) {
+    failures.push(`standard desktop header layout failed: ${JSON.stringify(standardHeaderState)}`);
+  }
+  await devtools.send('Target.closeTarget', { targetId: standardHome.targetId });
+
   const homePage = await attachPage(devtools, `${origin}/`, {
     width: 390,
     height: 844,
@@ -431,20 +502,108 @@ try {
   await waitForExpression(
     devtools,
     homePage.sessionId,
-    `Boolean(document.querySelector('.site-search-host .pf-trigger-btn[aria-haspopup="dialog"][aria-keyshortcuts]'))`,
+    `Boolean(document.querySelector('.site-search-host .pf-trigger-btn[aria-haspopup="dialog"]'))`,
     'global search trigger'
   );
+
+  const mobileHeaderState = await evaluate(devtools, homePage.sessionId, `(() => {
+    const trigger = document.querySelector('.site-search-host .pf-trigger-btn');
+    const menu = document.querySelector('.nav-menu-toggle');
+    const theme = document.querySelector('#theme-btn');
+    const brand = document.querySelector('.site-header .brand');
+    const header = document.querySelector('.site-header');
+    const rect = (node) => node?.getBoundingClientRect();
+    const triggerRect = rect(trigger);
+    const menuRect = rect(menu);
+    const themeRect = rect(theme);
+    const brandRect = rect(brand);
+    const headerRect = rect(header);
+    const overlaps = (a, b) => Boolean(a && b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
+    const hit = triggerRect && document.elementFromPoint(triggerRect.left + triggerRect.width / 2, triggerRect.top + triggerRect.height / 2);
+    return {
+      triggerVisible: Boolean(triggerRect && triggerRect.width >= 44 && triggerRect.height >= 44 && (hit === trigger || trigger.contains(hit))),
+      menuVisible: Boolean(menuRect && menuRect.width >= 44 && menuRect.height >= 44),
+      themeVisible: Boolean(themeRect && themeRect.width >= 44 && themeRect.height >= 44),
+      headerHeight: headerRect?.height || 0,
+      overlaps: overlaps(brandRect, menuRect) || overlaps(brandRect, triggerRect) || overlaps(brandRect, themeRect) || overlaps(menuRect, triggerRect) || overlaps(menuRect, themeRect) || overlaps(triggerRect, themeRect),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+      shortcutText: /ctrl|cmd|command/i.test(header?.textContent || ''),
+      shortcutAria: Boolean(document.querySelector('.site-search-host [aria-keyshortcuts]')),
+      shortcutBadge: Boolean(document.querySelector('.site-search-host .pf-trigger-shortcut')),
+      center: triggerRect ? { x: triggerRect.left + triggerRect.width / 2, y: triggerRect.top + triggerRect.height / 2 } : null,
+    };
+  })()`);
+  if (!mobileHeaderState.triggerVisible
+    || !mobileHeaderState.menuVisible
+    || !mobileHeaderState.themeVisible
+    || mobileHeaderState.headerHeight > 72
+    || mobileHeaderState.overlaps
+    || mobileHeaderState.overflow
+    || mobileHeaderState.shortcutText
+    || mobileHeaderState.shortcutAria
+    || mobileHeaderState.shortcutBadge) {
+    failures.push(`mobile header layout failed: ${JSON.stringify(mobileHeaderState)}`);
+  }
+
+  await evaluate(devtools, homePage.sessionId, `document.querySelector('.nav-menu-toggle').click()`);
+  await waitForExpression(
+    devtools,
+    homePage.sessionId,
+    `document.querySelector('details.nav-links')?.open && getComputedStyle(document.querySelector('.site-header .nav-list')).display !== 'none'`,
+    'mobile navigation disclosure'
+  );
+  const mobileMenuState = await evaluate(devtools, homePage.sessionId, `(() => {
+    const list = document.querySelector('.site-header .nav-list');
+    const rect = list.getBoundingClientRect();
+    const links = Array.from(list.querySelectorAll('a'));
+    return {
+      count: links.length,
+      minTargetHeight: Math.min(...links.map((link) => link.getBoundingClientRect().height)),
+      withinViewport: rect.left >= -1 && rect.right <= window.innerWidth + 1 && rect.top >= -1 && rect.bottom <= window.innerHeight + 1,
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    };
+  })()`);
+  if (mobileMenuState.count !== 6 || mobileMenuState.minTargetHeight < 44 || !mobileMenuState.withinViewport || mobileMenuState.overflow) {
+    failures.push(`mobile navigation disclosure failed: ${JSON.stringify(mobileMenuState)}`);
+  }
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27,
+  }, homePage.sessionId);
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27,
+  }, homePage.sessionId);
+  await waitForExpression(
+    devtools,
+    homePage.sessionId,
+    `!document.querySelector('details.nav-links')?.open && document.activeElement === document.querySelector('.nav-menu-toggle')`,
+    'mobile navigation Escape close and focus restoration'
+  );
+
   await devtools.send('Input.dispatchKeyEvent', {
     type: 'rawKeyDown', key: 'k', code: 'KeyK', windowsVirtualKeyCode: 75, modifiers: 2,
   }, homePage.sessionId);
   await devtools.send('Input.dispatchKeyEvent', {
     type: 'keyUp', key: 'k', code: 'KeyK', windowsVirtualKeyCode: 75, modifiers: 2,
   }, homePage.sessionId);
+  await wait(250);
+  const shortcutState = await evaluate(devtools, homePage.sessionId, `({
+    modalOpen: Boolean(document.querySelector('#site-search-modal dialog')?.open),
+    heroFocused: document.activeElement === document.querySelector('[data-site-search-hero] .pf-searchbox-input'),
+  })`);
+  if (shortcutState.modalOpen || shortcutState.heroFocused) {
+    failures.push(`Ctrl+K must not invoke search: ${JSON.stringify(shortcutState)}`);
+  }
+
+  if (mobileHeaderState.center) {
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...mobileHeaderState.center }, homePage.sessionId);
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...mobileHeaderState.center }, homePage.sessionId);
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...mobileHeaderState.center }, homePage.sessionId);
+  }
   await waitForExpression(
     devtools,
     homePage.sessionId,
-    `Boolean(document.querySelector('#site-search-modal dialog')?.open)`,
-    'Ctrl+K modal open'
+    `Boolean(document.querySelector('#site-search-modal dialog')?.open) && document.activeElement === document.querySelector('#site-search-modal .pf-input')`,
+    'mobile search click and modal focus'
   );
   const mobileModalState = await evaluate(devtools, homePage.sessionId, `(() => {
     const rect = document.querySelector('#site-search-modal dialog').getBoundingClientRect();

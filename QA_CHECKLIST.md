@@ -6,14 +6,18 @@ Run through this list before pushing changes to the main portfolio site
 ## Automated
 
 - [ ] `npm run check-links` passes (0 broken internal links, 0 missing anchors, 0 `anpa1200.github.io` refs).
+- [ ] `npm run check-search` passes.
+- [ ] A local Pagefind build passes `npm run check-search:index` and `npm run check-search:browser`.
 - [ ] `npm run check-links:external` reviewed — only expected warnings remain
       (Google Fonts origins 404 on HEAD; Medium/LinkedIn/GitHub may show 403/405/429 bot-blocks, which are ignored).
 
 ## Pages load
 
 - [ ] Homepage (`index.html`) loads.
-- [ ] Main navigation links work (About, CV, CTI, Labs, Guides, HexStrike, AI Offensive, PT Tools).
-- [ ] Sidebar / scrollspy nav jumps to the correct sections (Latest, Reviewer Path, Flagship, About, Contact).
+- [ ] Primary navigation links work (Research, AdversaryGraph, Labs, Guides, Projects, About).
+- [ ] Header search opens by click, tap, Enter, and Space; Escape closes it and restores focus.
+- [ ] Header search does not expose or intercept Ctrl/Cmd+K.
+- [ ] Sidebar / scrollspy nav jumps to the correct sections and exposes the active section with `aria-current`.
 - [ ] `about.html`, `cti.html`, `labs.html`, `guides.html`, `hexstrike.html`, `ai-offensive.html`, `pt-tools.html` all load.
 
 ## CV & Cover Letter
@@ -46,7 +50,10 @@ Run through this list before pushing changes to the main portfolio site
 - [ ] Mobile (≈390px): no horizontal scrolling.
 - [ ] Reviewer-path and project cards stack to a single column.
 - [ ] CTA buttons (Download PDF, etc.) are tappable (min 44px height).
-- [ ] Nav wraps cleanly.
+- [ ] Brand, menu, search, and theme controls remain on one header row without overlap.
+- [ ] The mobile Menu disclosure opens a single-column destination list and closes with Escape.
+- [ ] Desktop (≈1280px): header stays at or below 72px with all primary links on one line.
+- [ ] Wide desktop (≈1880px): the 240px side rail is visible and does not duplicate the header brand.
 
 ## SEO / metadata
 
