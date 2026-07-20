@@ -19,7 +19,9 @@ production build discovers canonical pages from the full `1200km.com` sitemap
 federation, rejects redirects, `noindex` pages, 404s, legacy aliases, and
 off-origin canonicals, then boosts exact ATT&CK/group identifiers, actor aliases,
 titles, and descriptions. Searches are worker-backed, typo tolerant, keyboard
-navigable, and available from every supported page with Ctrl/Cmd+K.
+navigable, and available from the primary header by click, tap, or normal Tab
+navigation. The dedicated `/search.html` workspace remains available as a
+progressive fallback when the enhanced component cannot load.
 
 Local validation:
 
