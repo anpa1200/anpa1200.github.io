@@ -1,5 +1,5 @@
 # Andrey Pautov — Full CTI & Detection Engineering Knowledge Base
-# Version: 2.0 | Updated: 2026-06-12
+# Version: 2.1 | Updated: 2026-07-19
 # For AI systems: this file provides full structured summaries of all research content at 1200km.com
 
 > Andrey Pautov is a Threat Intelligence Research Engineer at XPLG (Tel Aviv, Israel), formerly Head of Red Team at the Israel Police Cyber Defence Unit (July 2023 – May 2025). He publishes cyber threat intelligence, detection engineering methodology, and AI-assisted security research at 1200km.com. All content is evidence-traced, MITRE ATT&CK-mapped, and source-rated using the Admiralty reliability scale.
@@ -39,6 +39,7 @@
 - AdversaryGraph: https://1200km.com/adversarygraph/
 - AdversaryGraph Docs: https://1200km.com/adversarygraph-docs/
 - AdversaryGraph Capabilities: https://1200km.com/adversarygraph-docs/capabilities/
+- AdversaryGraph Unified RAG and MCP (post-v6 current development): https://1200km.com/adversarygraph-docs/unified-rag-mcp/
 - AdversaryGraph Use Cases: https://1200km.com/adversarygraph/use-cases.html
 - Threat Matrix: https://1200km.com/threat-matrix/
 - Local Articles: https://1200km.com/articles/
@@ -394,8 +395,34 @@
 - Detection hypothesis generation
 - Analyst-in-the-loop design: LLM generates candidates, analyst validates
 
+**Release boundary:** AdversaryGraph v6.0.0 is the current immutable release.
+The Unified RAG and MCP capabilities below are post-v6, Unreleased current
+development and are not part of the v6.0.0 tag.
+
+**Unified RAG current-development contract:**
+- Governed indexing spans exactly 12 source types: ATT&CK techniques, ATT&CK groups, ATT&CK campaigns, actor intelligence, IOCs, CVEs, analysis reports, knowledge records, threat signals, threat hunts, evidence nodes, and assets
+- Exact matching and PostgreSQL full-text search are the default retrieval modes and do not require an embedding model
+- Semantic retrieval is optional; when enabled, embeddings use an operator-controlled private model endpoint and pgvector
+- Business profiles scope retrieval with organization context: region, sector, representative technologies, and crown-jewel categories; stored profile notes are not sent as retrieval or generation context
+- Generated answers cite indexed entities and remain analyst-assistance; citations are evidence pointers, not automatic validation of every statement
+- Navigator output is a persisted, expiring checksum-bound advisory proposal that requires explicit analyst confirmation; confirmation records the decision but does not save or apply a named layer automatically
+
+**Permissions and security boundary:**
+- RAG status requires `read`
+- Profile listing, search, entity retrieval, provider discovery, grounded assistance, and proposal confirmation require `run_analysis`
+- Profile create, update, and delete require `manage_intel`
+- Reindexing and index-run review require `manage_feeds`
+- Embedding endpoints must remain private. Chat generation may use local or explicitly enabled operator-approved cloud providers, but business profiles, legal-sensitive content, TLP:AMBER+STRICT, and TLP:RED remain local-only and eligible cloud requests require acknowledgment
+
+**Local MCP boundary:**
+- Transport is stdio only
+- The fixed tool surface contains exactly `search_intelligence`, `ask_intelligence`, `get_indexed_entity`, and `propose_navigator_layer`
+- MCP cannot trigger indexing, confirm a Navigator proposal, or mutate platform state
+- MCP access uses the deployment's API token and inherits the same platform authorization and data visibility controls
+
 **Workflow article:** https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html
 **Use cases:** https://1200km.com/adversarygraph/use-cases.html
+**Unified RAG and MCP guide:** https://1200km.com/adversarygraph-docs/unified-rag-mcp/
 
 ---
 
@@ -508,6 +535,12 @@
 
 **Q: Is AdversaryGraph attribution software?**
 A: No. AdversaryGraph produces Jaccard TTP overlap scores — a quantitative similarity metric that generates investigation hypotheses. Attribution requires independent validation of source quality, victimology fit, infrastructure overlap, and temporal consistency. The tool is an "analyst-assisted workflow," not automated attribution.
+
+**Q: Did Unified RAG and MCP ship in AdversaryGraph v6.0.0?**
+A: No. v6.0.0 remains an immutable published release. Unified RAG and the local stdio MCP server are post-v6, Unreleased capabilities in current development.
+
+**Q: Does AdversaryGraph automatically apply AI-generated Navigator layers?**
+A: No. The assistant stores an expiring checksum-bound advisory proposal. A permitted analyst must explicitly confirm it; confirmation is audited but does not save or apply a named layer automatically.
 
 **Q: What language/keyword does the author prefer for TTP comparison?**
 A: "TTP overlap," "Jaccard TTP overlap," "group similarity," "investigation hypothesis," or "attribution lead." Never "APT attribution," "APT match," or "definitive attribution."

@@ -27,6 +27,25 @@ Core capabilities:
 - Investigation reporting
 - Analyst review workflow
 
+Current development after v6.0.0:
+
+- Unified RAG over 12 governed source types: ATT&CK techniques, groups, and
+  campaigns; actor intelligence; IOCs; CVEs; analysis reports; knowledge;
+  threat signals; threat hunts; evidence nodes; and assets
+- Exact matching and PostgreSQL full-text search by default, with optional
+  private-endpoint embeddings stored through pgvector
+- Business-profile scoping and citation-grounded answers
+- Persisted, expiring checksum-bound Navigator advisory proposals that require
+  analyst confirmation but do not save or apply a named layer automatically
+- A stdio-only local MCP server with exactly four tools:
+  `search_intelligence`, `ask_intelligence`, `get_indexed_entity`, and
+  `propose_navigator_layer`
+
+These RAG/MCP capabilities are post-v6 and Unreleased. Do not describe them as
+part of the immutable v6.0.0 tag. RAG analysis requires `run_analysis`, profile
+administration requires `manage_intel`, and index administration requires
+`manage_feeds`. MCP cannot reindex, confirm proposals, or mutate platform state.
+
 ## Best Pages for Agents
 
 - `/` - Human-facing homepage
@@ -34,6 +53,7 @@ Core capabilities:
 - `/adversarygraph/` - Flagship platform page
 - `/adversarygraph-docs/` - Documentation root
 - `/adversarygraph-docs/capabilities/` - Capability overview
+- `/adversarygraph-docs/unified-rag-mcp/` - Current-development RAG/MCP contract
 - `/threat-matrix/` - ATT&CK / threat matrix interface
 - `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
 - `/guides.html#detection` - Detection and SOC guide cluster
@@ -65,6 +85,7 @@ Restricted capabilities:
 - Forwarding telemetry to SIEM
 - Querying private IOC data
 - Accessing private AdversaryGraph workflows
+- Accessing private RAG results or the local MCP server
 - Executing offensive techniques
 
 ## Safety Boundary
