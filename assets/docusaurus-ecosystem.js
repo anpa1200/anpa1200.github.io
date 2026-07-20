@@ -9,7 +9,7 @@
   function loadSiteSearch() {
     if (document.querySelector('script[data-site-search-loader], script[src*="/assets/site-search.js"]')) return;
     const script = document.createElement('script');
-    script.src = 'https://1200km.com/assets/site-search.js?v=20260719-1';
+    script.src = 'https://1200km.com/assets/site-search.js?v=20260719-2';
     script.defer = true;
     script.dataset.siteSearchLoader = 'true';
     document.head.appendChild(script);

@@ -55,6 +55,16 @@ jobs:
         run: npm run check-search:index -- --bundle "${RUNNER_TEMP}/site/pagefind" --remote
       - name: Browser smoke test search and autocomplete
         run: npm run check-search:browser -- --site "${RUNNER_TEMP}/site" --bundle "${RUNNER_TEMP}/site/pagefind"
+      - name: Preserve search diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: search-diagnostics-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/site/pagefind/search-build.json
+            ${{ runner.temp }}/site/pagefind/pagefind-entry.json
+          if-no-files-found: ignore
+          retention-days: 7
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

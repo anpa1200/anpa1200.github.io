@@ -4,8 +4,9 @@
   if (window.__1200kmSiteSearch) return;
   window.__1200kmSiteSearch = true;
 
-  const ASSET_VERSION = '20260719-1';
+  const ASSET_VERSION = '20260719-2';
   const PAGEFIND_VERSION = '1.5.2';
+  const compactNavigation = window.matchMedia('(max-width: 1100px)');
   const path = window.location.pathname.replace(/\/index\.html$/i, '/');
   const interactiveThreatMatrix = path === '/threat-matrix/' || path === '/threat-matrix';
   const searchPage = Boolean(document.querySelector('[data-site-search-page]'));
@@ -51,14 +52,17 @@
     const link = document.createElement('a');
     link.className = 'site-search-fallback' + (compact ? ' site-search-fallback--compact' : '');
     link.href = '/search.html';
+    link.dataset.siteSearchControl = 'fallback';
     link.setAttribute('aria-label', 'Search all 1200km research');
-    link.innerHTML = '<span aria-hidden="true" class="site-search-fallback-icon"></span><span class="site-search-fallback-text">Search</span>';
+    link.innerHTML = '<span aria-hidden="true" class="site-search-fallback-icon"></span><span class="site-search-fallback-text">Search research</span>'
+      + (compact ? '' : '<kbd class="site-search-fallback-shortcut" aria-hidden="true">Ctrl K</kbd>');
     return link;
   }
 
   function buildTrigger(compact) {
     const trigger = document.createElement('pagefind-modal-trigger');
-    trigger.setAttribute('placeholder', 'Search');
+    trigger.dataset.siteSearchControl = 'trigger';
+    trigger.setAttribute('placeholder', 'Search research');
     trigger.setAttribute('shortcut', 'mod+k');
     if (compact) {
       trigger.setAttribute('compact', 'true');
@@ -71,7 +75,43 @@
     const state = `${componentsReady}:${compact}`;
     if (host.dataset.siteSearchMounted === state) return;
     host.dataset.siteSearchMounted = state;
+    host.dataset.searchState = componentsReady ? 'ready' : searchFailed ? 'error' : 'loading';
+    host.classList.toggle('site-search-host--compact', compact);
     host.replaceChildren(componentsReady ? buildTrigger(compact) : fallbackLink(compact));
+  }
+
+  function buildHeroFallback() {
+    const form = document.createElement('form');
+    form.className = 'site-search-hero-form';
+    form.action = '/search.html';
+    form.method = 'get';
+    form.setAttribute('role', 'search');
+    form.dataset.siteSearchControl = 'hero-fallback';
+    form.innerHTML = '<span class="site-search-hero-icon" aria-hidden="true"></span>'
+      + '<input type="search" name="q" maxlength="300" autocomplete="off" spellcheck="false" enterkeyhint="search" '
+      + 'aria-label="Search all 1200km security research" placeholder="Search actors, ATT&amp;CK techniques, AdversaryGraph, CTI, labs…">'
+      + '<button type="submit">Search</button>';
+    return form;
+  }
+
+  function buildHeroSearchbox() {
+    const input = document.createElement('pagefind-searchbox');
+    input.dataset.siteSearchControl = 'hero-autocomplete';
+    input.setAttribute('placeholder', 'Search actors, ATT&CK techniques, AdversaryGraph, CTI, labs…');
+    input.setAttribute('max-results', '8');
+    input.setAttribute('show-sub-results', 'false');
+    input.setAttribute('shortcut', 'mod+k');
+    return input;
+  }
+
+  function heroSearchHost() {
+    const host = document.querySelector('[data-site-search-hero]');
+    if (!host) return;
+    const state = componentsReady ? 'ready' : searchFailed ? 'error' : 'loading';
+    if (host.dataset.searchState === state) return;
+    host.dataset.searchState = state;
+    if (componentsReady) host.replaceChildren(buildHeroSearchbox());
+    else if (!host.querySelector('.site-search-hero-form')) host.replaceChildren(buildHeroFallback());
   }
 
   function standaloneHost() {
@@ -85,7 +125,7 @@
       const themeButton = nav.querySelector('#theme-btn, .theme-btn');
       nav.insertBefore(host, themeButton || null);
     }
-    populateHost(host, window.matchMedia('(max-width: 760px)').matches);
+    populateHost(host, compactNavigation.matches);
   }
 
   function docusaurusHost() {
@@ -122,6 +162,7 @@
     standaloneHost();
     docusaurusHost();
     entityHost();
+    heroSearchHost();
     syncTheme();
   }
 
@@ -242,7 +283,7 @@
       new MutationObserver(scheduleMount).observe(docusaurusRoot, { childList: true, subtree: true });
     }
     new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    window.matchMedia('(max-width: 760px)').addEventListener('change', scheduleMount);
+    compactNavigation.addEventListener('change', scheduleMount);
   }
 
   if (document.readyState === 'loading') {

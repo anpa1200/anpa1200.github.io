@@ -69,3 +69,23 @@ test('search loader versions stay synchronized and the live index is not pinned 
   assert.doesNotMatch(search, /meta-cache-tag|metaCacheTag/, 'daily index rebuilds must not reuse a static Pagefind metadata cache tag');
   assert.doesNotMatch(search, /no-worker|noWorker/, 'production search should use Pagefind worker mode with its built-in fallback');
 });
+
+test('homepage ships a visible progressive search fallback and hero search before JavaScript', () => {
+  const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const search = readFileSync(join(ROOT, 'assets', 'site-search.js'), 'utf8');
+  const version = search.match(/const ASSET_VERSION = '([^']+)'/)?.[1];
+  assert.match(html, new RegExp(`id="site-search-styles"[^>]+site-search\\.css\\?v=${version}`));
+  assert.match(html, new RegExp(`site-search\\.js\\?v=${version}`));
+  assert.match(html, /class="site-search-host site-search-host--standalone"[\s\S]*?href="\/search\.html"[\s\S]*?id="theme-btn"/);
+  assert.match(html, /aria-label="Search all 1200km research"/);
+  assert.match(html, /data-site-search-hero[\s\S]*?<form[^>]+action="\/search\.html"[\s\S]*?<input[^>]+name="q"/);
+});
+
+test('remote index builds prefer release files and require stable ranking fixtures', () => {
+  const builder = readFileSync(join(ROOT, 'scripts', 'build-search-index.mjs'), 'utf8');
+  assert.match(builder, /pageSource\(url, !remote, remote\)/);
+  assert.match(builder, /requiredIndexUrls/);
+  assert.match(builder, /missing required release fixtures/);
+  assert.match(builder, /maxStalePages/);
+  assert.match(builder, /skippedDetails/);
+});

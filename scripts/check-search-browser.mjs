@@ -144,7 +144,7 @@ async function evaluate(devtools, sessionId, expression) {
   return result.result?.value;
 }
 
-async function attachPage(devtools, url, metrics = null) {
+async function attachPage(devtools, url, metrics = null, options = {}) {
   const { targetId } = await devtools.send('Target.createTarget', { url: 'about:blank' });
   const { sessionId } = await devtools.send('Target.attachToTarget', { targetId, flatten: true });
   await devtools.send('Runtime.enable', {}, sessionId);
@@ -162,6 +162,7 @@ async function attachPage(devtools, url, metrics = null) {
     ],
   }, sessionId);
   if (metrics) await devtools.send('Emulation.setDeviceMetricsOverride', metrics, sessionId);
+  if (options.disableScripts) await devtools.send('Emulation.setScriptExecutionDisabled', { value: true }, sessionId);
   await devtools.send('Page.navigate', { url }, sessionId);
   await waitForExpression(
     devtools,
@@ -321,6 +322,106 @@ try {
     'autocomplete recovery after zero results'
   );
 
+  const desktopMetrics = {
+    width: 1880,
+    height: 950,
+    deviceScaleFactor: 1,
+    mobile: false,
+  };
+  const staticHome = await attachPage(devtools, `${origin}/`, desktopMetrics, { disableScripts: true });
+  const staticControl = await evaluate(devtools, staticHome.sessionId, `(() => {
+    const control = document.querySelector('.site-search-host--standalone .site-search-fallback');
+    const host = control?.closest('.site-search-host');
+    const theme = document.querySelector('#theme-btn');
+    const rect = control?.getBoundingClientRect();
+    const style = control && getComputedStyle(control);
+    const hit = rect && document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    return {
+      href: control ? new URL(control.href).pathname : '',
+      label: control?.getAttribute('aria-label') || '',
+      visible: Boolean(rect && rect.width >= 180 && rect.height >= 38 && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0),
+      unoccluded: Boolean(control && (hit === control || control.contains(hit))),
+      beforeTheme: Boolean(host && theme && (host.compareDocumentPosition(theme) & Node.DOCUMENT_POSITION_FOLLOWING)),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    };
+  })()`);
+  if (staticControl.href !== '/search.html' || !/search/i.test(staticControl.label) || !staticControl.visible || !staticControl.unoccluded || !staticControl.beforeTheme || staticControl.overflow) {
+    failures.push(`static desktop search fallback failed: ${JSON.stringify(staticControl)}`);
+  }
+  await devtools.send('Target.closeTarget', { targetId: staticHome.targetId });
+
+  const desktopHome = await attachPage(devtools, `${origin}/`, desktopMetrics);
+  await waitForExpression(
+    devtools,
+    desktopHome.sessionId,
+    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn[aria-haspopup="dialog"]')) && Boolean(document.querySelector('[data-site-search-hero][data-search-state="ready"] .pf-searchbox-input'))`,
+    'visible desktop header and hero search readiness'
+  );
+  const desktopState = await evaluate(devtools, desktopHome.sessionId, `(() => {
+    const trigger = document.querySelector('.site-search-host--standalone .pf-trigger-btn');
+    const heroInput = document.querySelector('[data-site-search-hero] .pf-searchbox-input');
+    const theme = document.querySelector('#theme-btn');
+    const links = document.querySelector('.nav-links');
+    const triggerRect = trigger?.getBoundingClientRect();
+    const heroRect = heroInput?.getBoundingClientRect();
+    const themeRect = theme?.getBoundingClientRect();
+    const linksRect = links?.getBoundingClientRect();
+    const overlaps = (a, b) => Boolean(a && b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
+    const hit = triggerRect && document.elementFromPoint(triggerRect.left + triggerRect.width / 2, triggerRect.top + triggerRect.height / 2);
+    return {
+      triggerVisible: Boolean(triggerRect && triggerRect.width >= 180 && triggerRect.height >= 38 && (hit === trigger || trigger.contains(hit))),
+      heroVisible: Boolean(heroRect && heroRect.width >= 500 && heroRect.height >= 44),
+      overlapsTheme: overlaps(triggerRect, themeRect),
+      overlapsLinks: overlaps(triggerRect, linksRect),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+      center: triggerRect ? { x: triggerRect.left + triggerRect.width / 2, y: triggerRect.top + triggerRect.height / 2 } : null,
+    };
+  })()`);
+  if (!desktopState.triggerVisible || !desktopState.heroVisible || desktopState.overlapsTheme || desktopState.overlapsLinks || desktopState.overflow) {
+    failures.push(`desktop search layout failed: ${JSON.stringify(desktopState)}`);
+  }
+
+  await evaluate(devtools, desktopHome.sessionId, `(() => {
+    const input = document.querySelector('[data-site-search-hero] .pf-searchbox-input');
+    input.value = 'T1059.003';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  })()`);
+  await waitForExpression(
+    devtools,
+    desktopHome.sessionId,
+    `new URL(document.querySelector('[data-site-search-hero] .pf-searchbox-result[href]')?.href || location.href).pathname === '/threat-matrix/techniques/T1059.003/'`,
+    'homepage hero autocomplete ranking'
+  );
+  await evaluate(devtools, desktopHome.sessionId, `(() => {
+    const input = document.querySelector('[data-site-search-hero] .pf-searchbox-input');
+    input.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  })()`);
+
+  if (desktopState.center) {
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...desktopState.center }, desktopHome.sessionId);
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...desktopState.center }, desktopHome.sessionId);
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...desktopState.center }, desktopHome.sessionId);
+  }
+  await waitForExpression(
+    devtools,
+    desktopHome.sessionId,
+    `Boolean(document.querySelector('#site-search-modal dialog')?.open) && document.activeElement === document.querySelector('#site-search-modal .pf-input')`,
+    'desktop search-bar click and modal focus'
+  );
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27,
+  }, desktopHome.sessionId);
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27,
+  }, desktopHome.sessionId);
+  await waitForExpression(
+    devtools,
+    desktopHome.sessionId,
+    `!document.querySelector('#site-search-modal dialog')?.open && document.activeElement === document.querySelector('.site-search-host--standalone .pf-trigger-btn')`,
+    'desktop modal close and focus restoration'
+  );
+
   const homePage = await attachPage(devtools, `${origin}/`, {
     width: 390,
     height: 844,
@@ -445,6 +546,7 @@ try {
   if (relevantErrors.length) failures.push(`browser console errors: ${JSON.stringify(relevantErrors.slice(0, 5))}`);
 
   await devtools.send('Target.closeTarget', { targetId: searchPage.targetId });
+  await devtools.send('Target.closeTarget', { targetId: desktopHome.targetId });
   await devtools.send('Target.closeTarget', { targetId: homePage.targetId });
 } finally {
   socket.close();
@@ -463,4 +565,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('Browser search smoke test passed (ARIA autocomplete, ranking, zero-result recovery, responsive layout, keyboard flow, and standalone/Docusaurus/entity integrations).');
+console.log('Browser search smoke test passed (static fallback, visible desktop header/hero search, ARIA autocomplete, ranking, responsive layout, keyboard flow, and standalone/Docusaurus/entity integrations).');

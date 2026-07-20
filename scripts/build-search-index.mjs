@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as pagefind from 'pagefind';
@@ -29,8 +29,17 @@ const quiet = args.includes('--quiet');
 const outputPath = resolve(option('--output', join(ROOT, 'pagefind')));
 const minimumPages = Number.parseInt(option('--minimum-pages', remote ? '1600' : '1000'), 10);
 const maxPageFailures = Number.parseInt(option('--max-page-failures', remote ? '12' : '0'), 10);
+const maxStalePages = Number.parseInt(option('--max-stale-pages', remote ? '60' : '0'), 10);
 const concurrency = Math.max(1, Math.min(24, Number.parseInt(option('--concurrency', '12'), 10)));
 const rootSitemap = remote ? `${SITE_ORIGIN}/sitemap.xml` : join(ROOT, 'sitemap.xml');
+const requiredIndexUrls = [
+  `${SITE_ORIGIN}/`,
+  `${SITE_ORIGIN}/search.html`,
+  `${SITE_ORIGIN}/threat-matrix/techniques/T1059.003/`,
+  `${SITE_ORIGIN}/threat-matrix/actors/G0034/`,
+  `${SITE_ORIGIN}/threat-matrix/actors/G0069/`,
+  `${SITE_ORIGIN}/ITDR/`,
+];
 
 function log(message) {
   if (!quiet) console.log(message);
@@ -99,16 +108,13 @@ async function collectRemoteUrls(entry) {
   return pages;
 }
 
-function rootOwnedUrls() {
-  const xml = readFileSync(join(ROOT, 'sitemap-pages.xml'), 'utf8');
-  return new Set(parseSitemap(xml).locations);
-}
-
 async function pageSource(url, localOnly, preferLocal) {
   const localPath = localFileForUrl(ROOT, url);
-  if ((localOnly || preferLocal) && localPath) return readFile(localPath, 'utf8');
+  if ((localOnly || preferLocal) && localPath) {
+    return { html: await readFile(localPath, 'utf8'), source: 'local' };
+  }
   if (localOnly) throw new Error(`${url}: no local canonical file`);
-  return fetchText(url);
+  return { html: await fetchText(url), source: 'remote' };
 }
 
 async function replaceOutput(stagedOutput, destination) {
@@ -131,21 +137,25 @@ const localPages = await collectLocalSitemapUrls(ROOT, rootSitemap);
 const discovered = remote ? await collectRemoteUrls(rootSitemap) : localPages;
 if (remote) localPages.forEach((url) => discovered.add(url));
 
-const owned = rootOwnedUrls();
 const urls = [...discovered]
   .filter((url) => !shouldExcludeUrl(url))
-  .sort((a, b) => a.localeCompare(b));
+  .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 log(`Discovered ${urls.length} canonical search pages (${remote ? 'live sitemap union' : 'local sitemap union'}).`);
 
 const { index, errors: createErrors } = await pagefind.createIndex({
   excludeSelectors: [
     '.ag-project-notice',
     '#page-sidenav',
+    '.site-header',
+    '.site-search-hero',
+    '.site-search-host',
+    '.site-ecosystem-gateway',
     '.table-of-contents',
     '.theme-doc-breadcrumbs',
     '.theme-doc-toc-mobile',
     '.theme-doc-toc-desktop',
     '.pagination-nav',
+    'footer',
   ],
   forceLanguage: 'en',
   includeCharacters: '.:-_/@',
@@ -153,15 +163,21 @@ const { index, errors: createErrors } = await pagefind.createIndex({
 if (!index || createErrors.length) throw new Error(`Unable to create Pagefind index: ${createErrors.join('; ')}`);
 
 let indexedPages = 0;
+const indexedUrls = new Set();
+const sourceCounts = { local: 0, remote: 0 };
 const skipped = new Map();
+const skippedDetails = [];
 const failures = [];
 
 for (let offset = 0; offset < urls.length; offset += concurrency) {
   const batch = urls.slice(offset, offset + concurrency);
   const fetched = await Promise.all(batch.map(async (url) => {
     try {
-      const html = await pageSource(url, !remote, remote && owned.has(url));
-      return { url, html };
+      // Prefer every file present in the release checkout. Live fetching is a
+      // fallback for domain pages not tracked in this repository, which keeps
+      // the deploy gate deterministic without reducing domain-wide coverage.
+      const source = await pageSource(url, !remote, remote);
+      return { url, ...source };
     } catch (error) {
       return { url, error };
     }
@@ -171,6 +187,7 @@ for (let offset = 0; offset < urls.length; offset += concurrency) {
     if (item.error) {
       if (/HTTP (404|410)\b/.test(item.error.message)) {
         skipped.set('stale-sitemap-url', (skipped.get('stale-sitemap-url') || 0) + 1);
+        skippedDetails.push({ url: item.url, reason: 'stale-sitemap-url' });
         continue;
       }
       failures.push(item.error.message);
@@ -179,6 +196,7 @@ for (let offset = 0; offset < urls.length; offset += concurrency) {
     const validation = validatePage(item.url, item.html);
     if (!validation.indexable) {
       skipped.set(validation.reason, (skipped.get(validation.reason) || 0) + 1);
+      skippedDetails.push({ url: item.url, reason: validation.reason });
       continue;
     }
     const result = await index.addHTMLFile({
@@ -186,7 +204,11 @@ for (let offset = 0; offset < urls.length; offset += concurrency) {
       url: normalizeSiteUrl(item.url).pathname,
     });
     if (result.errors.length) failures.push(`${item.url}: ${result.errors.join('; ')}`);
-    else indexedPages += 1;
+    else {
+      indexedPages += 1;
+      indexedUrls.add(normalizeCanonical(item.url));
+      sourceCounts[item.source] += 1;
+    }
   }
   const completed = Math.min(offset + batch.length, urls.length);
   if (completed === urls.length || completed % (concurrency * 10) === 0) {
@@ -198,9 +220,19 @@ if (indexedPages < minimumPages) {
   await pagefind.close();
   throw new Error(`Search index coverage is too small: ${indexedPages} pages; expected at least ${minimumPages}.`);
 }
+const stalePages = skipped.get('stale-sitemap-url') || 0;
+if (stalePages > maxStalePages) {
+  await pagefind.close();
+  throw new Error(`Search indexing skipped ${stalePages} stale sitemap URLs (maximum ${maxStalePages}):\n${skippedDetails.filter((item) => item.reason === 'stale-sitemap-url').slice(0, 20).map((item) => item.url).join('\n')}`);
+}
 if (failures.length > maxPageFailures) {
   await pagefind.close();
   throw new Error(`Search indexing had ${failures.length} page failures (maximum ${maxPageFailures}):\n${failures.slice(0, 20).join('\n')}`);
+}
+const missingRequired = requiredIndexUrls.filter((url) => !indexedUrls.has(url));
+if (missingRequired.length) {
+  await pagefind.close();
+  throw new Error(`Search index is missing required release fixtures:\n${missingRequired.join('\n')}`);
 }
 
 await mkdir(dirname(outputPath), { recursive: true });
@@ -219,8 +251,11 @@ const metadata = {
   generatedAt: new Date().toISOString(),
   discoveredPages: urls.length,
   indexedPages,
+  sourceCounts,
   skipped: Object.fromEntries([...skipped.entries()].sort()),
+  skippedDetails: skippedDetails.slice(0, 200),
   failedPages: failures.length,
+  failureDetails: failures.slice(0, 50),
   durationMs: Date.now() - startedAt,
 };
 await writeFile(join(stagedOutput, 'search-build.json'), `${JSON.stringify(metadata, null, 2)}\n`);

@@ -2,11 +2,19 @@
   const root = document.documentElement;
   const themeColor = document.querySelector('meta[name="theme-color"]');
   const media = window.matchMedia('(prefers-color-scheme: light)');
+  const searchAssetVersion = '20260719-2';
 
   function loadSiteSearch() {
+    if (!document.getElementById('site-search-styles')) {
+      const stylesheet = document.createElement('link');
+      stylesheet.id = 'site-search-styles';
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = `/assets/site-search.css?v=${searchAssetVersion}`;
+      document.head.appendChild(stylesheet);
+    }
     if (document.querySelector('script[data-site-search-loader], script[src*="/assets/site-search.js"]')) return;
     const script = document.createElement('script');
-    script.src = '/assets/site-search.js?v=20260719-1';
+    script.src = '/assets/site-search.js?v=20260719-2';
     script.defer = true;
     script.dataset.siteSearchLoader = 'true';
     document.head.appendChild(script);
@@ -92,6 +100,18 @@
       button.type = 'button';
       button.setAttribute('aria-label', 'Toggle theme');
       nav.appendChild(button);
+    }
+
+    if (!nav.querySelector(':scope > .site-search-host')) {
+      const host = document.createElement('div');
+      host.className = 'site-search-host site-search-host--standalone';
+      host.dataset.siteSearchTheme = 'true';
+      host.dataset.searchState = 'loading';
+      host.innerHTML = '<a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">'
+        + '<span aria-hidden="true" class="site-search-fallback-icon"></span>'
+        + '<span class="site-search-fallback-text">Search research</span>'
+        + '<kbd class="site-search-fallback-shortcut" aria-hidden="true">Ctrl K</kbd></a>';
+      nav.insertBefore(host, nav.querySelector('#theme-btn'));
     }
 
   }

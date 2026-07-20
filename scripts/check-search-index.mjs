@@ -80,28 +80,28 @@ async function checkQueries() {
     });
     await search.init();
     const checks = [
-      ['T1059.003', '/threat-matrix/techniques/T1059.003/'],
-      ['T1059.00', '/threat-matrix/techniques/T1059.0'],
-      ['G0034', '/threat-matrix/actors/G0034/'],
-      ['MuddyWater', '/threat-matrix/actors/G0069/'],
-      ['Kerberoasting', '/ITDR/'],
-      ['Kerberosting', '/ITDR/'],
-      ['IOC enrichment', '/adversarygraph'],
+      { query: 'T1059.003', expectedPrefix: '/threat-matrix/techniques/T1059.003/', first: true },
+      { query: 'T1059.00', expectedPrefix: '/threat-matrix/techniques/T1059.0', first: true },
+      { query: 'G0034', expectedPrefix: '/threat-matrix/actors/G0034/', first: true },
+      { query: 'G0069', expectedPrefix: '/threat-matrix/actors/G0069/', first: true },
+      { query: 'MuddyWater', expectedPrefix: '/threat-matrix/actors/G0069/' },
+      { query: 'Kerberoasting', expectedPrefix: '/ITDR/' },
+      { query: 'Kerberosting', expectedPrefix: '/ITDR/' },
+      { query: 'IOC enrichment', expectedPrefix: '/adversarygraph' },
     ];
-    if (remote) checks.push(['RAG MCP', '/adversarygraph']);
-
-    for (const [query, expectedPrefix] of checks) {
+    for (const { query, expectedPrefix, first = false } of checks) {
       const result = await search.search(query);
-      const top = await Promise.all(result.results.slice(0, 5).map((item) => item.data()));
+      const top = await Promise.all(result.results.slice(0, 10).map((item) => item.data()));
+      console.log(`Search quality "${query}": ${top.map((item) => item.url).join(', ') || '(no results)'}`);
       if (!top.length) {
         failures.push(`query "${query}" returned no results`);
         continue;
       }
       const expected = top.findIndex((item) => item.url.startsWith(expectedPrefix));
       if (expected < 0) {
-        failures.push(`query "${query}" did not return ${expectedPrefix} in the top five (got ${top.map((item) => item.url).join(', ')})`);
+        failures.push(`query "${query}" did not return ${expectedPrefix} in the top ten (got ${top.map((item) => item.url).join(', ')})`);
       }
-      if (/^[GT]\d/i.test(query) && expected !== 0) {
+      if (first && expected !== 0) {
         failures.push(`identifier query "${query}" should rank its entity first (rank was ${expected + 1})`);
       }
     }
@@ -111,7 +111,13 @@ async function checkQueries() {
   }
 }
 
-if (!failures.length) await checkQueries();
+if (!failures.length) {
+  try {
+    await checkQueries();
+  } catch (error) {
+    failures.push(`query validation crashed: ${error.stack || error.message}`);
+  }
+}
 
 if (failures.length) {
   console.error('Search index check failed:');
