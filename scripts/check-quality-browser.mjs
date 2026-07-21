@@ -30,8 +30,10 @@ const pages = [
   ['docs', '/adversarygraph-docs/full-flow/'],
 ];
 const viewports = [
-  { label: 'mobile', width: 390, height: 844, mobile: true },
-  { label: 'desktop', width: 1440, height: 1000, mobile: false },
+  { label: 'mobile-dark', width: 390, height: 844, mobile: true, theme: 'dark' },
+  { label: 'mobile-light', width: 390, height: 844, mobile: true, theme: 'light' },
+  { label: 'desktop-dark', width: 1440, height: 1000, mobile: false, theme: 'dark' },
+  { label: 'desktop-light', width: 1440, height: 1000, mobile: false, theme: 'light' },
 ];
 const budgets = { cls: 0.1, lcp_ms: 4000, transfer_bytes: 6 * 1024 * 1024 };
 const contentTypes = {
@@ -147,10 +149,16 @@ const results = [];
 const failures = [];
 try {
   for (const viewport of viewports) {
+    await devtools.send('Emulation.setEmulatedMedia', {
+      features: [{ name: 'prefers-color-scheme', value: viewport.theme }],
+    }, sessionId);
     await devtools.send('Emulation.setDeviceMetricsOverride', {
       width: viewport.width, height: viewport.height, screenWidth: viewport.width,
       screenHeight: viewport.height, deviceScaleFactor: 1, mobile: viewport.mobile,
     }, sessionId);
+    await devtools.send('Page.navigate', { url: origin }, sessionId);
+    await wait(150);
+    await evaluate(devtools, sessionId, `localStorage.setItem('theme', ${JSON.stringify(viewport.theme)})`);
     for (const [name, path] of pages) {
       await devtools.send('Network.clearBrowserCache', {}, sessionId);
       await devtools.send('Page.navigate', { url: `${origin}${path}` }, sessionId);
