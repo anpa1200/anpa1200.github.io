@@ -108,8 +108,8 @@ catalogue and schema.
 - A local authored page with durable context or locally maintained evidence uses
   its 1200km URL as canonical and records the external publication, if any, as
   `source_url`.
-- The Medium Blog Navigator is a mirror collection. Each exported article is a
-  `mirror`, and the original Medium or InfoSec Write-ups URL is recorded as its
+- The 1200km Article Archive is a canonical local collection. Each preserved article is an
+  `article`, and the original Medium or InfoSec Write-ups URL is recorded as its
   source when it can be extracted from the page.
 - External articles without a local edition keep their publication URL as
   canonical and are not added to the 1200km sitemap.

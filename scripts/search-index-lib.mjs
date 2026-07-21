@@ -215,7 +215,7 @@ export function classifyUrl(urlValue) {
   const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
   if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actors';
   if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK techniques';
-  if (/^\/articles\//i.test(pathname) || /^\/medium-blog-navigation\//i.test(pathname)) return 'Articles';
+  if (/^\/articles\//i.test(pathname)) return 'Articles';
   if (/^\/adversarygraph-docs\//i.test(pathname)) return 'AdversaryGraph docs';
   if (/^\/ITDR\//.test(pathname)) return 'Identity security';
   if (/lab|simulation/i.test(pathname)) return 'Labs';

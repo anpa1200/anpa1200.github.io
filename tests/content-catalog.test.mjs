@@ -42,9 +42,13 @@ test('offensive indexes are not assigned catch-all CTI taxonomy', () => {
   }
 });
 
-test('current, superseded, archived, and externally published entities remain distinct', () => {
+test('current, superseded, archived, and externally sourced entities remain distinct', () => {
   assert.ok(catalog.items.some((item) => item.status === 'current-development'));
   assert.ok(catalog.items.some((item) => item.status === 'superseded'));
   assert.ok(catalog.items.some((item) => item.status === 'archived'));
-  assert.ok(catalog.items.some((item) => item.primary_type === 'article' && !item.canonical_url.startsWith('https://1200km.com/')));
+  assert.ok(catalog.items.some((item) =>
+    item.canonical_url.startsWith('https://1200km.com/')
+    && /^https:\/\/(?:medium\.com|infosecwriteups\.com)\//.test(item.source_url || '')
+    && item.source_url !== item.canonical_url
+  ));
 });
