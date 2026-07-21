@@ -156,7 +156,7 @@ if (siteRoot === sourceRoot) {
   const localArticles = readdirSync(path.join(sourceRoot, 'articles')).filter(name => name.endsWith('.html') && name !== 'index.html').length;
   if (localArticles !== fact('content.local_companion_articles').value) fail('Local companion article count disagrees with facts.');
   const remoteSites = JSON.parse(readFileSync(path.join(sourceRoot, 'seo', 'remote-sitemaps.json'), 'utf8'));
-  const excluded = new Set(['Live AdversaryGraph Documentation', 'Medium Blog Navigation']);
+  const excluded = new Set(['Live AdversaryGraph Documentation', '1200km Article Archive']);
   if (remoteSites.filter(item => !excluded.has(item.name)).length !== fact('content.field_guides').value) {
     fail('Field-guide count disagrees with seo/remote-sitemaps.json.');
   }

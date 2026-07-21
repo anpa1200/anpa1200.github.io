@@ -47,6 +47,21 @@ jobs:
             --exclude='tests'
           npm run build-shell -- --site "${RUNNER_TEMP}/site"
           node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
+      - name: Checkout canonical article archive source
+        uses: actions/checkout@v7
+        with:
+          repository: anpa1200/medium-blog-navigation
+          ref: ae0b2cd0060df643b48876466b64a1199e2e44c5
+          path: .article-archive-source
+      - name: Build and stage canonical article archive
+        working-directory: .article-archive-source
+        run: |
+          npm ci
+          npm run validate:archive
+          npm run validate:media:local
+          npm run build:embedded
+          mkdir -p "${RUNNER_TEMP}/site/articles"
+          cp -a build/. "${RUNNER_TEMP}/site/articles/"
       - name: Build canonical metadata and release HTML
         run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
       - name: Validate complete staged site

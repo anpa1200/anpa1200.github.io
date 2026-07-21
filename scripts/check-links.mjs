@@ -25,6 +25,7 @@ const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const siteFlag = process.argv.indexOf('--site');
 const ROOT = siteFlag >= 0 ? resolve(process.argv[siteFlag + 1] || '') : defaultRoot;
 const checkExternal = process.argv.includes('--external');
+const checkingAssembledSite = siteFlag >= 0;
 
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
 const LIVE_1200KM_ROOTS = [
@@ -33,6 +34,7 @@ const LIVE_1200KM_ROOTS = [
   '/israel-government-threat-actors-cti/',
   '/operation-desert-hydra/',
 ];
+const BUILD_TIME_LOCAL_ROOTS = ['/articles/read/'];
 
 function walkHtml(dir = ROOT) {
   const files = [];
@@ -68,6 +70,9 @@ for (const f of htmlFiles) {
 function localPathExists(rel) {
   const clean = rel.split('#')[0].split('?')[0];
   if (clean === '' || clean === '/') return true;
+  // Article pages are built from the pinned archive repository in the Pages
+  // workflow. Exact paths are checked again after the assembled site is staged.
+  if (!checkingAssembledSite && BUILD_TIME_LOCAL_ROOTS.some(root => clean.startsWith(root))) return true;
   const p = normalize(join(ROOT, decodeURIComponent(clean.replace(/^\//, ''))));
   if (!p.startsWith(ROOT)) return false;
   if (!existsSync(p)) return false;

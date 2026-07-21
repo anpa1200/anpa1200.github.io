@@ -161,8 +161,8 @@ function inferType(url, title, html, collection) {
   const path = new URL(url).pathname;
   if (collection) {
     if (collection.id === 'collection:medium-export') {
-      if (/^\/medium-blog-navigation\/(?:docs\/(?:articles|analysis)\/)?$/i.test(path)) return 'index';
-      return 'mirror';
+      if (/^\/articles\/(?:read\/)?$/i.test(path)) return 'index';
+      return 'article';
     }
     if (collection.id === 'collection:adversarygraph-docs') {
       if (/\/use-cases\/(?!$)/i.test(path) || /case-stud/i.test(path)) return 'case-study';

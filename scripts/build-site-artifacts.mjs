@@ -126,6 +126,27 @@ function gitDate(path) {
   }
 }
 
+let articleArchiveVerifiedAt = '';
+try {
+  const facts = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
+  articleArchiveVerifiedAt = isoDate(facts?.facts?.['content.medium_exported_articles']?.verified_at);
+} catch {
+  // A staged subtree can omit the main-site fact model; page metadata remains the fallback.
+}
+
+function archiveDate(canonical) {
+  let pathname = '';
+  try {
+    pathname = new URL(canonical).pathname;
+  } catch {
+    return '';
+  }
+  const datedArticle = pathname.match(/^\/articles\/read\/\d{4}\/(\d{4}-\d{2}-\d{2})-/);
+  if (datedArticle) return isoDate(datedArticle[1]);
+  if (pathname === '/articles/read/' || pathname === '/articles/read') return articleArchiveVerifiedAt;
+  return '';
+}
+
 function sitemapXml(entries) {
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -249,7 +270,7 @@ const feedItems = [];
 for (const page of pages) {
   const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
   const dates = contentDates(page.html);
-  const lastmod = dates.modified || dates.published || gitDate(page.path);
+  const lastmod = dates.modified || dates.published || archiveDate(page.canonical) || gitDate(page.path);
   localEntries.set(page.canonical, { loc: page.canonical, ...(lastmod ? { lastmod } : {}) });
 
   const parsed = parseJsonLd(page.html);
