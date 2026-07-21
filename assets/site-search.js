@@ -4,8 +4,21 @@
   if (window.__1200kmSiteSearch) return;
   window.__1200kmSiteSearch = true;
 
-  const ASSET_VERSION = '20260720-1';
+  const ASSET_VERSION = '20260721-5';
   const PAGEFIND_VERSION = '1.5.2';
+  const SEARCH_PAGE_BATCH_SIZE = 20;
+  const SEARCH_FILTERS = [
+    { key: 'primary_type', label: 'Content type' },
+    { key: 'primary_domain', label: 'Domain' },
+    { key: 'audience', label: 'Audience' },
+    { key: 'status', label: 'Status' },
+    { key: 'evidence_level', label: 'Evidence level' },
+    { key: 'version', label: 'Version' },
+    { key: 'source', label: 'Source' },
+    { key: 'updated_year', label: 'Updated year' },
+    { key: 'topic', label: 'Topic' },
+    { key: 'section', label: 'Collection' },
+  ];
   const compactNavigation = window.matchMedia('(max-width: 1180px)');
   const path = window.location.pathname.replace(/\/index\.html$/i, '/');
   const interactiveThreatMatrix = path === '/threat-matrix/' || path === '/threat-matrix';
@@ -15,6 +28,11 @@
   let mountFrame = 0;
   let readinessTimer = 0;
   let modalOpener = null;
+  let searchPageActivationRequested = false;
+  let pendingSearchValue = '';
+  let searchPageLimit = SEARCH_PAGE_BATCH_SIZE;
+  let searchPageTotal = 0;
+  let pagefindInstance = null;
 
   if (interactiveThreatMatrix) return;
 
@@ -115,14 +133,26 @@
   }
 
   function buildHeroSearchbox() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'site-search-hero-enhanced';
     const input = document.createElement('pagefind-searchbox');
     input.dataset.siteSearchControl = 'hero-autocomplete';
     input.setAttribute('placeholder', 'Search actors, ATT&CK techniques, AdversaryGraph, CTI, labs…');
-    input.setAttribute('max-results', '8');
-    input.setAttribute('show-sub-results', 'false');
+    input.setAttribute('max-results', '10');
+    input.setAttribute('show-sub-results', 'true');
     input.setAttribute('shortcut', 'disabled');
     input.setAttribute('hide-shortcut', 'true');
-    return input;
+    const allResults = document.createElement('a');
+    allResults.className = 'site-search-view-all';
+    allResults.href = '/search.html';
+    allResults.textContent = 'Open full search with filters →';
+    wrapper.addEventListener('input', function (event) {
+      if (!event.target?.matches?.('.pf-searchbox-input')) return;
+      const query = event.target.value.trim();
+      allResults.href = query ? `/search.html?q=${encodeURIComponent(query.slice(0, 300))}` : '/search.html';
+    });
+    wrapper.append(input, allResults);
+    return wrapper;
   }
 
   function heroSearchHost() {
@@ -206,13 +236,109 @@
     const searchPage = document.querySelector('[data-site-search-page]');
     if (!searchPage) return;
     setSearchPageStatus('Search is ready. Results update as you type.', 'ready');
-    const query = new URLSearchParams(window.location.search).get('q')?.trim();
-    if (!query) return;
-    const inputComponent = searchPage.querySelector('pagefind-searchbox');
+    const query = new URLSearchParams(window.location.search).get('q')?.trim() || pendingSearchValue.trim();
+    const inputComponent = searchPage.querySelector('pagefind-input, pagefind-searchbox');
     const input = inputComponent && (inputComponent.inputEl || inputComponent.querySelector('input'));
     if (!input) return;
-    input.value = query.slice(0, 300);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
+    if (query) {
+      input.value = query.slice(0, 300);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (searchPageActivationRequested) input.focus();
+  }
+
+  function repairFilterAccessibility(filtersHost) {
+    if (!filtersHost) return;
+    filtersHost.querySelectorAll('pagefind-filter-dropdown').forEach(function (dropdown) {
+      const button = dropdown.querySelector('.pf-dropdown-trigger');
+      const label = dropdown.getAttribute('label');
+      if (button && label) button.setAttribute('aria-label', label);
+    });
+  }
+
+  function formatFilterValue(value) {
+    return String(value)
+      .replace(/[-_]+/g, ' ')
+      .replace(/\b\w/g, function (letter) { return letter.toUpperCase(); });
+  }
+
+  function setSearchPageLimit(limit) {
+    searchPageLimit = Math.max(SEARCH_PAGE_BATCH_SIZE, limit);
+    const results = document.querySelector('[data-site-search-results] pagefind-results');
+    if (results) results.setAttribute('max-results', String(searchPageLimit));
+  }
+
+  function updateSearchPagination() {
+    const pagination = document.querySelector('[data-site-search-pagination]');
+    const button = document.querySelector('[data-site-search-load-more]');
+    const progress = document.querySelector('[data-site-search-progress]');
+    if (!pagination || !button || !progress) return;
+    const visible = Math.min(searchPageLimit, searchPageTotal);
+    progress.textContent = searchPageTotal ? `Showing ${visible} of ${searchPageTotal} results.` : '';
+    const remaining = Math.max(0, searchPageTotal - visible);
+    pagination.hidden = remaining === 0;
+    button.hidden = remaining === 0;
+    if (remaining) {
+      const next = Math.min(SEARCH_PAGE_BATCH_SIZE, remaining);
+      button.textContent = `Load ${next} more results`;
+      button.setAttribute('aria-label', `Load ${next} more results; ${remaining} results remain`);
+    }
+  }
+
+  function activeSearchFilters() {
+    const filters = pagefindInstance?.searchFilters || {};
+    return Object.entries(filters)
+      .flatMap(function ([key, values]) {
+        return (Array.isArray(values) ? values : []).map(function (value) { return { key, value }; });
+      });
+  }
+
+  function applySearchFilters(filters) {
+    if (!pagefindInstance) return;
+    setSearchPageLimit(SEARCH_PAGE_BATCH_SIZE);
+    pagefindInstance.triggerSearchWithFilters(pagefindInstance.searchTerm || '', filters);
+  }
+
+  function renderActiveFilters() {
+    const host = document.querySelector('[data-site-search-active]');
+    const list = document.querySelector('[data-site-search-active-list]');
+    if (!host || !list) return;
+    const active = activeSearchFilters();
+    host.hidden = active.length === 0;
+    const labels = new Map(SEARCH_FILTERS.map(function (filter) { return [filter.key, filter.label]; }));
+    const fragment = document.createDocumentFragment();
+    active.forEach(function (filter) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'site-search-filter-chip';
+      button.dataset.filterKey = filter.key;
+      button.dataset.filterValue = filter.value;
+      button.setAttribute('aria-label', `Remove ${labels.get(filter.key) || filter.key} filter: ${formatFilterValue(filter.value)}`);
+      button.textContent = `${labels.get(filter.key) || filter.key}: ${formatFilterValue(filter.value)} ×`;
+      button.addEventListener('click', function () {
+        const filters = { ...(pagefindInstance?.searchFilters || {}) };
+        const remaining = (filters[filter.key] || []).filter(function (value) { return value !== filter.value; });
+        if (remaining.length) filters[filter.key] = remaining;
+        else delete filters[filter.key];
+        applySearchFilters(filters);
+      });
+      fragment.appendChild(button);
+    });
+    list.replaceChildren(fragment);
+  }
+
+  function repairResultAccessibility(root = document) {
+    const results = [];
+    if (root.nodeType === Node.ELEMENT_NODE && root.matches?.('.pf-searchbox-result')) results.push(root);
+    root.querySelectorAll?.('.pf-searchbox-result').forEach(function (result) { results.push(result); });
+    results.forEach(function (result) {
+      // Pagefind labels the link from its title and describes it from excerpt
+      // text inside the same interactive element. Axe correctly flags that as
+      // a visible-label mismatch. Let the option derive its name from all of
+      // its visible contents instead.
+      result.removeAttribute('aria-labelledby');
+      result.removeAttribute('aria-describedby');
+    });
   }
 
   function mountSearchPageComponents() {
@@ -222,21 +348,95 @@
 
     const inputHost = searchPage.querySelector('[data-site-search-input]');
     if (inputHost) {
-      const input = document.createElement('pagefind-searchbox');
+      pendingSearchValue = inputHost.querySelector('input')?.value || pendingSearchValue;
+      const input = document.createElement('pagefind-input');
       input.setAttribute('placeholder', 'Try T1059.003, MuddyWater, Kerberoasting, RAG MCP…');
-      input.setAttribute('max-results', '12');
-      input.setAttribute('show-sub-results', 'false');
-      input.setAttribute('shortcut', 'disabled');
-      input.setAttribute('hide-shortcut', 'true');
       if (!window.matchMedia('(max-width: 760px)').matches) input.setAttribute('autofocus', 'true');
       inputHost.replaceWith(input);
     }
 
+    const filtersHost = searchPage.querySelector('[data-site-search-filters]');
+    if (filtersHost) {
+      const fragment = document.createDocumentFragment();
+      SEARCH_FILTERS.forEach(function (filter) {
+        const dropdown = document.createElement('pagefind-filter-dropdown');
+        dropdown.setAttribute('filter', filter.key);
+        dropdown.setAttribute('label', filter.label);
+        dropdown.setAttribute('single-select', 'true');
+        dropdown.setAttribute('sort', 'count-desc');
+        fragment.appendChild(dropdown);
+      });
+      filtersHost.replaceChildren(fragment);
+      const observer = new MutationObserver(function () {
+        repairFilterAccessibility(filtersHost);
+      });
+      observer.observe(filtersHost, { childList: true, subtree: true });
+      window.requestAnimationFrame(function () {
+        repairFilterAccessibility(filtersHost);
+        window.setTimeout(function () {
+          repairFilterAccessibility(filtersHost);
+        }, 500);
+      });
+    }
+
     const summaryHost = searchPage.querySelector('[data-site-search-summary]');
-    if (summaryHost) summaryHost.remove();
+    if (summaryHost) {
+      const summary = document.createElement('pagefind-summary');
+      summary.setAttribute('default-message', 'Browse all indexed research or enter a query.');
+      summaryHost.replaceChildren(summary);
+    }
 
     const resultsHost = searchPage.querySelector('[data-site-search-results]');
-    if (resultsHost) resultsHost.remove();
+    if (resultsHost) {
+      const results = document.createElement('pagefind-results');
+      results.setAttribute('max-results', String(SEARCH_PAGE_BATCH_SIZE));
+      results.setAttribute('max-sub-results', '4');
+      const template = document.createElement('script');
+      template.type = 'text/pagefind-template';
+      template.dataset.template = 'result';
+      template.textContent = `
+        <li class="pf-result">
+          <article class="site-search-result-card">
+            <p class="site-search-result-meta">
+              <span>{{ meta.primary_type }}</span>
+              <span>{{ meta.primary_domain }}</span>
+              <span>{{ meta.status }}</span>
+              <span>{{ meta.evidence_level }}</span>
+              <span>{{ meta.source }}</span>
+              <span>{{ meta.updated_year }}</span>
+            </p>
+            <h2 class="pf-result-title"><a class="pf-result-link" href="{{ meta.url | default(url) | safeUrl }}">{{ meta.title }}</a></h2>
+            {{#if excerpt}}<p class="pf-result-excerpt">{{+ excerpt +}}</p>{{/if}}
+            {{#if sub_results}}
+            <nav aria-label="Relevant sections">
+              <ul class="pf-heading-chips">
+                {{#each sub_results as sub}}
+                <li class="pf-heading-chip"><a class="pf-heading-link" href="{{ sub.url | safeUrl }}">{{ sub.title }}</a>{{#if sub.excerpt}}<p class="pf-heading-excerpt">{{+ sub.excerpt +}}</p>{{/if}}</li>
+                {{/each}}
+              </ul>
+            </nav>
+            {{/if}}
+          </article>
+        </li>`;
+      results.appendChild(template);
+      resultsHost.replaceChildren(results);
+    }
+
+    const clearAll = searchPage.querySelector('[data-site-search-clear-all]');
+    clearAll?.addEventListener('click', function () { applySearchFilters({}); });
+    const loadMore = searchPage.querySelector('[data-site-search-load-more]');
+    loadMore?.addEventListener('click', function () {
+      setSearchPageLimit(Math.min(searchPageTotal, searchPageLimit + SEARCH_PAGE_BATCH_SIZE));
+      pagefindInstance?.triggerSearch(pagefindInstance.searchTerm || '');
+    });
+
+    const workspace = searchPage.querySelector('.site-search-workspace');
+    workspace?.addEventListener('input', function (event) {
+      if (event.target?.matches?.('pagefind-input input, .pf-input')) setSearchPageLimit(SEARCH_PAGE_BATCH_SIZE);
+    }, true);
+    workspace?.addEventListener('change', function (event) {
+      if (event.target?.closest?.('pagefind-filter-dropdown')) setSearchPageLimit(SEARCH_PAGE_BATCH_SIZE);
+    }, true);
   }
 
   async function configureComponents() {
@@ -259,7 +459,23 @@
           },
         },
       });
-      if (searchPage) mountSearchPageComponents();
+      pagefindInstance = instance;
+      if (searchPage) {
+        instance.faceted = true;
+        mountSearchPageComponents();
+        instance.on('search', function () {
+          renderActiveFilters();
+        }, searchPage);
+        instance.on('results', function (result) {
+          searchPageTotal = result?.results?.length || 0;
+          updateSearchPagination();
+          renderActiveFilters();
+          if (instance.searchTerm) {
+            const resultsComponent = document.querySelector('[data-site-search-results] pagefind-results');
+            resultsComponent?.results?.slice(0, 3).forEach(function (entry) { entry.load(); });
+          }
+        }, searchPage);
+      }
       else {
         ensureModal();
         const modal = document.getElementById('site-search-modal');
@@ -282,6 +498,7 @@
 
       window.clearTimeout(readinessTimer);
       componentsReady = true;
+      repairFilterAccessibility(document.querySelector('[data-site-search-filters]'));
       mount();
       window.setTimeout(hydrateSearchPageQuery, 100);
     } catch (error) {
@@ -309,12 +526,50 @@
   }
 
   function initialize() {
-    addStylesheet('site-search-component-styles', `/pagefind/pagefind-component-ui.css?v=${PAGEFIND_VERSION}`);
     addStylesheet('site-search-styles', `/assets/site-search.css?v=${ASSET_VERSION}`);
     mount();
     document.addEventListener('pagefind-error', handleComponentError);
-    readinessTimer = window.setTimeout(handleComponentError, 20_000);
-    loadComponents();
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (node) {
+          repairResultAccessibility(node);
+        });
+      });
+      repairFilterAccessibility(document.querySelector('[data-site-search-filters]'));
+    }).observe(document.body, { childList: true, subtree: true });
+    function beginSearchLoad() {
+      if (document.getElementById('site-search-components')) return;
+      if (searchPage) setSearchPageStatus('Loading the research index…', 'loading');
+      addStylesheet('site-search-component-styles', `/pagefind/pagefind-component-ui.css?v=${PAGEFIND_VERSION}`);
+      readinessTimer = window.setTimeout(handleComponentError, 6_000);
+      loadComponents();
+    }
+    if (searchPage) {
+      const query = new URLSearchParams(window.location.search).get('q')?.trim();
+      if (query) beginSearchLoad();
+      else {
+        const workspace = document.querySelector('.site-search-workspace');
+        const activateSearchPage = function (event) {
+          if (!event.target?.closest?.('[data-site-search-input], [data-site-search-filters]')) return;
+          pendingSearchValue = document.querySelector('[data-site-search-input] input')?.value || '';
+          searchPageActivationRequested = true;
+          workspace?.removeEventListener('focusin', activateSearchPage);
+          workspace?.removeEventListener('pointerover', activateSearchPage);
+          beginSearchLoad();
+        };
+        workspace?.addEventListener('focusin', activateSearchPage);
+        workspace?.addEventListener('pointerover', activateSearchPage, { passive: true });
+      }
+    } else {
+      const eagerLoad = function (event) {
+        if (!event.target?.closest?.('.site-search-host, [data-site-search-hero]')) return;
+        document.removeEventListener('focusin', eagerLoad);
+        document.removeEventListener('pointerover', eagerLoad);
+        beginSearchLoad();
+      };
+      document.addEventListener('focusin', eagerLoad);
+      document.addEventListener('pointerover', eagerLoad, { passive: true });
+    }
 
     const docusaurusRoot = document.getElementById('__docusaurus');
     if (docusaurusRoot) {

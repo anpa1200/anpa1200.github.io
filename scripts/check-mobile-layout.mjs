@@ -1,0 +1,380 @@
+#!/usr/bin/env node
+import { createServer } from 'node:http';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, extname, join, resolve } from 'node:path';
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const args = process.argv.slice(2);
+const siteIndex = args.indexOf('--site');
+const outputIndex = args.indexOf('--screenshots');
+const site = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
+const screenshotRoot = resolve(
+  outputIndex >= 0 ? args[outputIndex + 1] : `/tmp/1200km-mobile-layout-${process.pid}`,
+);
+const chrome = process.env.CHROME_PATH || 'google-chrome';
+
+if (!existsSync(join(site, 'index.html'))) throw new Error(`Site root not found at ${site}`);
+
+const pages = [
+  ['home', '/'],
+  ['about', '/about.html'],
+  ['cv', '/cv.html'],
+  ['projects', '/projects.html'],
+  ['guides', '/guides.html'],
+  ['labs', '/labs.html'],
+  ['validation', '/external-validation.html'],
+  ['adversarygraph', '/adversarygraph/'],
+  ['search', '/search.html'],
+  ['docs-long', '/adversarygraph-docs/full-flow/'],
+  ['threat-matrix', '/threat-matrix/'],
+];
+
+const viewports = [
+  { label: '320', width: 320, height: 900, mobile: true },
+  { label: '360', width: 360, height: 900, mobile: true },
+  { label: '375', width: 375, height: 900, mobile: true },
+  { label: '390', width: 390, height: 900, mobile: true, screenshot: true },
+  { label: '430', width: 430, height: 900, mobile: true },
+  { label: '768', width: 768, height: 960, mobile: false },
+  { label: 'desktop', width: 1440, height: 1000, mobile: false },
+  // A 1280px browser at 200% zoom exposes roughly a 640 CSS-pixel layout viewport.
+  { label: 'zoom-200', width: 640, height: 900, mobile: false, screenshot: true, zoom: 2 },
+];
+
+const contentTypes = {
+  '.css': 'text/css; charset=utf-8',
+  '.gif': 'image/gif',
+  '.html': 'text/html; charset=utf-8',
+  '.ico': 'image/x-icon',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.pagefind': 'application/octet-stream',
+  '.pf_fragment': 'application/octet-stream',
+  '.pf_index': 'application/octet-stream',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
+};
+
+function fileForRequest(requestUrl) {
+  const pathname = decodeURIComponent(new URL(requestUrl, 'http://127.0.0.1').pathname);
+  let relative = pathname.replace(/^\/+/, '');
+  if (!relative || relative.endsWith('/')) relative += 'index.html';
+  const file = resolve(site, relative);
+  if (!file.startsWith(`${site}/`)) return null;
+  return file;
+}
+
+const server = createServer((request, response) => {
+  const file = fileForRequest(request.url || '/');
+  if (!file || !existsSync(file) || !statSync(file).isFile()) {
+    response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }).end('Not found');
+    return;
+  }
+  response.writeHead(200, {
+    'cache-control': 'no-store',
+    'content-type': contentTypes[extname(file)] || 'application/octet-stream',
+  });
+  response.end(readFileSync(file));
+});
+
+class DevTools {
+  constructor(socket) {
+    this.socket = socket;
+    this.nextId = 1;
+    this.pending = new Map();
+    socket.addEventListener('message', (event) => {
+      const message = JSON.parse(event.data);
+      if (!message.id) return;
+      const pending = this.pending.get(message.id);
+      if (!pending) return;
+      this.pending.delete(message.id);
+      if (message.error) pending.reject(new Error(`${pending.method}: ${message.error.message}`));
+      else pending.resolve(message.result);
+    });
+  }
+
+  send(method, params = {}, sessionId) {
+    const id = this.nextId++;
+    return new Promise((resolvePromise, reject) => {
+      this.pending.set(id, { method, resolve: resolvePromise, reject });
+      this.socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
+    });
+  }
+}
+
+function wait(ms) {
+  return new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
+}
+
+async function evaluate(devtools, sessionId, expression) {
+  const result = await devtools.send('Runtime.evaluate', {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+  }, sessionId);
+  if (result.exceptionDetails) throw new Error(result.exceptionDetails.text || 'Browser evaluation failed');
+  return result.result?.value;
+}
+
+async function waitForReady(devtools, sessionId, path) {
+  const deadline = Date.now() + 15_000;
+  while (Date.now() < deadline) {
+    const ready = await evaluate(devtools, sessionId, `(() => {
+      if (document.readyState !== 'complete') return false;
+      if (${JSON.stringify(path)} === '/threat-matrix/') {
+        return Boolean(document.querySelector('#root')?.textContent?.trim().length > 500);
+      }
+      return Boolean(document.body?.textContent?.trim().length > 100);
+    })()`);
+    if (ready) return;
+    await wait(120);
+  }
+  throw new Error(`Timed out loading ${path}`);
+}
+
+function layoutExpression(checkFixture) {
+  return `(() => {
+    const visible = (element) => {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const round = (value) => Math.round(value * 10) / 10;
+    const selector = 'main p, main li, article p, article li, .page-hero p, .profile-hero p, .cv-hero p';
+    const prose = Array.from(document.querySelectorAll(selector)).filter((element) =>
+      visible(element)
+      && !element.closest('nav, footer, pre, table, .sr-only, [hidden], .site-search-modal, .page-sidenav')
+      && !element.closest('#layout-regression-fixture')
+    );
+    const badWrap = prose.filter((element) => {
+      const style = getComputedStyle(element);
+      return style.overflowWrap === 'anywhere' || style.wordBreak === 'break-all';
+    }).slice(0, 5).map((element) => ({
+      tag: element.tagName,
+      className: String(element.className).slice(0, 80),
+      text: element.textContent.trim().slice(0, 90),
+      overflowWrap: getComputedStyle(element).overflowWrap,
+      wordBreak: getComputedStyle(element).wordBreak,
+    }));
+    const narrowProse = window.innerWidth >= 390 && window.innerWidth <= 430 ? prose.filter((element) => {
+      const parent = element.parentElement?.getBoundingClientRect();
+      const rect = element.getBoundingClientRect();
+      if (!parent || parent.width < 340) return false;
+      return rect.width < parent.width * 0.72;
+    }).slice(0, 5).map((element) => ({
+      tag: element.tagName,
+      className: String(element.className).slice(0, 80),
+      width: round(element.getBoundingClientRect().width),
+      parentWidth: round(element.parentElement.getBoundingClientRect().width),
+      maxWidth: getComputedStyle(element).maxWidth,
+    })) : [];
+    const controls = Array.from(document.querySelectorAll(
+      'header a, header button, header summary, .page-hero-links a, .profile-actions a, .cv-actions a, .cl-actions a, .hero-actions a, .button'
+    )).filter(visible);
+    const controlOverflow = controls.filter((element) => {
+      const rect = element.getBoundingClientRect();
+      return rect.left < -1 || rect.right > window.innerWidth + 1;
+    }).slice(0, 5).map((element) => ({
+      text: element.textContent.trim().slice(0, 60),
+      left: round(element.getBoundingClientRect().left),
+      right: round(element.getBoundingClientRect().right),
+    }));
+
+    let fixture = null;
+    if (${checkFixture}) {
+      const host = document.querySelector('.theme-doc-markdown') || document.querySelector('main') || document.body;
+      const section = document.createElement('section');
+      section.id = 'layout-regression-fixture';
+      section.style.cssText = 'box-sizing:border-box;width:calc(100% - 32px);max-width:860px;margin:24px auto;padding:16px;border:1px solid currentColor';
+      section.innerHTML = \`
+        <h2 data-fixture="heading">IdentityProviderConfigurationValidationAndCounterintelligenceCorrelation</h2>
+        <p data-fixture="prose">Ordinary prose should use the available content width and preserve complete words without emergency wrapping.</p>
+        <p><a data-fixture="url" href="https://github.com/anpa1200/adversarygraph/tree/main/documentation/examples/identity-provider-configuration-validation-and-counterintelligence-correlation">https://github.com/anpa1200/adversarygraph/tree/main/documentation/examples/identity-provider-configuration-validation-and-counterintelligence-correlation</a></p>
+        <p><code data-fixture="hash">sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</code></p>
+        <pre data-fixture="pre"><code>./scripts/release-readiness.sh --configuration identity-provider-configuration-validation-and-counterintelligence-correlation --full</code></pre>
+        <table data-fixture="table"><thead><tr><th>ATT&amp;CK identifier</th><th>Repository evidence location</th><th>Validation status</th></tr></thead><tbody><tr><td>T1059.003</td><td>documentation/examples/identity-provider-configuration-validation-and-counterintelligence-correlation</td><td>Analyst review required</td></tr></tbody></table>
+        <div class="hero-actions"><a class="button" href="#fixture-primary">Open technical evidence</a><a class="button" href="#fixture-secondary">Review validation methodology</a></div>
+      \`;
+      host.append(section);
+      const bounds = section.getBoundingClientRect();
+      const padding = parseFloat(getComputedStyle(section).paddingLeft) + parseFloat(getComputedStyle(section).paddingRight);
+      const proseElement = section.querySelector('[data-fixture="prose"]');
+      const proseStyle = getComputedStyle(proseElement);
+      const contained = (element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1;
+      };
+      const pre = section.querySelector('[data-fixture="pre"]');
+      const table = section.querySelector('[data-fixture="table"]');
+      fixture = {
+        proseWidth: round(proseElement.getBoundingClientRect().width),
+        contentWidth: round(bounds.width - padding),
+        proseWrap: proseStyle.overflowWrap,
+        proseWordBreak: proseStyle.wordBreak,
+        headingContained: contained(section.querySelector('[data-fixture="heading"]')),
+        urlContained: contained(section.querySelector('[data-fixture="url"]')),
+        hashContained: contained(section.querySelector('[data-fixture="hash"]')),
+        preContained: contained(pre),
+        preOverflow: getComputedStyle(pre).overflowX,
+        preScrollable: pre.scrollWidth > pre.clientWidth,
+        tableContained: contained(table),
+        tableOverflow: getComputedStyle(table).overflowX,
+        tableScrollable: table.scrollWidth >= table.clientWidth,
+        buttonsContained: Array.from(section.querySelectorAll('.button')).every(contained),
+      };
+    }
+
+    return {
+      viewport: window.innerWidth,
+      scrollWidth: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth),
+      horizontalOverflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > window.innerWidth + 1,
+      proseCount: prose.length,
+      badWrap,
+      narrowProse,
+      controlOverflow,
+      fixture,
+    };
+  })()`;
+}
+
+await mkdir(screenshotRoot, { recursive: true });
+await new Promise((resolvePromise, reject) => {
+  server.once('error', reject);
+  server.listen(0, '127.0.0.1', resolvePromise);
+});
+
+const origin = `http://127.0.0.1:${server.address().port}`;
+const browser = spawn(chrome, [
+  '--headless=new',
+  '--no-sandbox',
+  '--disable-gpu',
+  '--disable-background-networking',
+  '--remote-debugging-port=0',
+  'about:blank',
+], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+let browserLogs = '';
+const websocketUrl = await new Promise((resolvePromise, reject) => {
+  const timeout = setTimeout(() => reject(new Error(`Chrome did not expose DevTools. ${browserLogs.slice(-2000)}`)), 15_000);
+  browser.stderr.setEncoding('utf8');
+  browser.stderr.on('data', (chunk) => {
+    browserLogs = `${browserLogs}${chunk}`.slice(-12_000);
+    const match = browserLogs.match(/DevTools listening on (ws:\/\/[^\s]+)/);
+    if (!match) return;
+    clearTimeout(timeout);
+    resolvePromise(match[1]);
+  });
+  browser.once('error', reject);
+});
+
+const socket = new WebSocket(websocketUrl);
+await new Promise((resolvePromise, reject) => {
+  socket.addEventListener('open', resolvePromise, { once: true });
+  socket.addEventListener('error', () => reject(new Error('Unable to connect to Chrome DevTools')), { once: true });
+});
+
+const devtools = new DevTools(socket);
+const { targetId } = await devtools.send('Target.createTarget', { url: 'about:blank' });
+const { sessionId } = await devtools.send('Target.attachToTarget', { targetId, flatten: true });
+await devtools.send('Runtime.enable', {}, sessionId);
+await devtools.send('Page.enable', {}, sessionId);
+await devtools.send('Network.enable', {}, sessionId);
+await devtools.send('Network.setBlockedURLs', {
+  urls: [
+    'https://www.googletagmanager.com/*',
+    'https://www.google-analytics.com/*',
+    'https://fonts.googleapis.com/*',
+    'https://fonts.gstatic.com/*',
+  ],
+}, sessionId);
+
+const failures = [];
+const results = [];
+
+try {
+  for (const viewport of viewports) {
+    await devtools.send('Emulation.setDeviceMetricsOverride', {
+      width: viewport.width,
+      height: viewport.height,
+      screenWidth: viewport.width,
+      screenHeight: viewport.height,
+      deviceScaleFactor: 1,
+      mobile: viewport.mobile,
+    }, sessionId);
+
+    for (const [name, path] of pages) {
+      await devtools.send('Page.navigate', { url: `${origin}${path}` }, sessionId);
+      await waitForReady(devtools, sessionId, path);
+      await wait(path === '/threat-matrix/' ? 500 : 120);
+
+      const checkFixture = (name === 'home' || name === 'docs-long')
+        && ['320', '430', '768', 'desktop', 'zoom-200'].includes(viewport.label);
+      const state = await evaluate(devtools, sessionId, layoutExpression(checkFixture));
+      results.push({ page: name, viewport: viewport.label, ...state });
+
+      if (state.horizontalOverflow) failures.push(`${name}@${viewport.label}: page width ${state.scrollWidth} exceeds viewport ${state.viewport}`);
+      if (state.badWrap.length) failures.push(`${name}@${viewport.label}: ordinary prose uses emergency wrapping ${JSON.stringify(state.badWrap)}`);
+      if (state.narrowProse.length) failures.push(`${name}@${viewport.label}: ordinary prose is unnecessarily narrow ${JSON.stringify(state.narrowProse)}`);
+      if (state.controlOverflow.length) failures.push(`${name}@${viewport.label}: navigation or CTA overflow ${JSON.stringify(state.controlOverflow)}`);
+      if (state.fixture) {
+        const fixture = state.fixture;
+        if (fixture.proseWidth < fixture.contentWidth * 0.9 || fixture.proseWrap === 'anywhere' || fixture.proseWordBreak === 'break-all') {
+          failures.push(`${name}@${viewport.label}: stress prose failed ${JSON.stringify(fixture)}`);
+        }
+        if (!fixture.headingContained || !fixture.urlContained || !fixture.hashContained || !fixture.preContained || !fixture.tableContained || !fixture.buttonsContained) {
+          failures.push(`${name}@${viewport.label}: stress content escaped its container ${JSON.stringify(fixture)}`);
+        }
+        if (!['auto', 'scroll'].includes(fixture.preOverflow) || !fixture.preScrollable) {
+          failures.push(`${name}@${viewport.label}: code block is not horizontally usable ${JSON.stringify(fixture)}`);
+        }
+        if (!['auto', 'scroll'].includes(fixture.tableOverflow) || !fixture.tableScrollable) {
+          failures.push(`${name}@${viewport.label}: table is not horizontally usable ${JSON.stringify(fixture)}`);
+        }
+      }
+
+      if (viewport.screenshot && (viewport.label === '390' || ['home', 'docs-long'].includes(name))) {
+        const screenshot = await devtools.send('Page.captureScreenshot', {
+          format: 'png',
+          captureBeyondViewport: false,
+          fromSurface: true,
+        }, sessionId);
+        await writeFile(join(screenshotRoot, `${name}-${viewport.label}.png`), Buffer.from(screenshot.data, 'base64'));
+
+        if (name === 'threat-matrix' && viewport.label === '390') {
+          await evaluate(devtools, sessionId, `document.querySelector('#root')?.scrollIntoView({ block: 'start' })`);
+          await wait(120);
+          const navigationScreenshot = await devtools.send('Page.captureScreenshot', {
+            format: 'png',
+            captureBeyondViewport: false,
+            fromSurface: true,
+          }, sessionId);
+          await writeFile(
+            join(screenshotRoot, 'threat-matrix-navigation-390.png'),
+            Buffer.from(navigationScreenshot.data, 'base64'),
+          );
+        }
+      }
+    }
+  }
+
+  await writeFile(join(screenshotRoot, 'layout-results.json'), `${JSON.stringify(results, null, 2)}\n`);
+} finally {
+  socket.close();
+  browser.kill('SIGTERM');
+  server.close();
+}
+
+if (failures.length) {
+  console.error(`Mobile layout regression failed with ${failures.length} issue${failures.length === 1 ? '' : 's'}:`);
+  for (const failure of failures) console.error(`- ${failure}`);
+  console.error(`Screenshots and measurements: ${screenshotRoot}`);
+  process.exit(1);
+}
+
+console.log(`Mobile layout regression passed for ${pages.length} pages across ${viewports.length} viewport/zoom configurations.`);
+console.log(`Screenshots and measurements: ${screenshotRoot}`);

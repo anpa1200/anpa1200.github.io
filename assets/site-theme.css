@@ -130,6 +130,20 @@ a:hover,
   color: var(--accent-dark);
 }
 
+main p a:not(.button),
+main li a:not(.button),
+main dd a:not(.button),
+.note a:not(.button) {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+
+.card .links a,
+.doc-card-links a {
+  color: var(--accent) !important;
+}
+
 .card,
 .card.featured,
 .metric,
@@ -308,8 +322,14 @@ a:hover,
 }
 
 .doc-card .doc-card-desc,
-.doc-card p.doc-card-desc {
+.doc-card p.doc-card-desc,
+.doc-card p,
+.doc-card dd {
   color: var(--panel-ink-soft) !important;
+}
+
+.doc-card p.research-question {
+  color: var(--accent-dark) !important;
 }
 
 .metric span,
@@ -544,6 +564,84 @@ td {
   overscroll-behavior-inline: contain;
 }
 
+/*
+ * Responsive content containment
+ *
+ * Prose keeps normal word wrapping. Emergency wrapping belongs only to tokens
+ * that can legitimately have no soft break (URLs, hashes, identifiers and
+ * filenames). Code blocks and tables expose their own horizontal scroller so
+ * page-level overflow never has to be hidden.
+ */
+main,
+article,
+section,
+.grid,
+.card,
+.page-hero-inner,
+.profile-hero-inner,
+.cv-hero-inner,
+.cl-hero-inner {
+  min-width: 0;
+}
+
+p,
+li {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+h1,
+h2,
+h3,
+.page-title,
+.profile-name,
+.cv-name {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+a[href^="http"],
+a[href^="mailto:"],
+a[href^="ftp:"],
+.technical-token,
+.identifier,
+.hash,
+.filename,
+:not(pre) > code {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+pre {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  white-space: pre;
+}
+
+pre code {
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: inherit;
+}
+
+table:not(.compare-table) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+img,
+video,
+svg,
+canvas {
+  max-width: 100%;
+}
+
 .page-sidenav {
   background: var(--header-bg) !important;
   border-color: var(--line) !important;
@@ -634,7 +732,8 @@ td {
 .repo-row .repo-name,
 .article-row .article-title {
   color: var(--text) !important;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .lab-row .lab-desc,
@@ -643,7 +742,7 @@ td {
 .repo-row .repo-meta {
   color: var(--muted) !important;
   max-width: none !important;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   word-break: normal;
 }
 
@@ -756,6 +855,18 @@ footer,
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
 }
 
 body .site-header {
@@ -1355,53 +1466,71 @@ body .sidenav-footer span {
 
 footer,
 .footer {
-  padding: 40px 0 18px !important;
+  padding: 24px 0 16px !important;
 }
 
 .shared-footer-inner {
-  display: grid;
-  grid-template-columns: minmax(240px, 1.7fr) repeat(3, minmax(130px, 1fr));
-  gap: 32px;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 28px;
 }
 
-.shared-footer-brand a {
+.shared-footer-brand {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 10px;
   color: var(--text) !important;
+  text-decoration: none !important;
 }
 
 .shared-footer-brand img {
+  width: 32px;
+  height: 32px;
   border-radius: 10px;
 }
 
-.shared-footer-brand p {
-  max-width: 44ch;
-  margin: 12px 0 0;
-  color: var(--muted) !important;
-  font-size: 0.86rem;
+.shared-footer-brand span {
+  display: grid;
+  gap: 2px;
+  line-height: 1;
 }
 
-.shared-footer-column {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 7px;
-}
-
-.shared-footer-column strong {
-  margin-bottom: 4px;
+.shared-footer-brand strong {
   color: var(--text);
   font-size: 0.82rem;
 }
 
-.shared-footer-column a,
-.shared-footer-bottom a {
-  color: var(--muted) !important;
-  font-size: 0.82rem;
+.shared-footer-brand small {
+  color: var(--muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
-.shared-footer-column a:hover,
+.shared-footer-links,
+.shared-footer-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 15px;
+}
+
+.shared-footer-links a,
+.shared-footer-meta a,
+.shared-footer-bottom a {
+  color: var(--muted) !important;
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+.shared-footer-links a:hover,
+.shared-footer-meta a:hover,
 .shared-footer-bottom a:hover {
   color: var(--accent-dark) !important;
 }
@@ -1410,11 +1539,11 @@ footer,
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 30px;
-  padding-top: 16px;
+  margin-top: 18px;
+  padding-top: 13px;
   border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
 }
 
 @media (max-width: 920px) {
@@ -1422,12 +1551,63 @@ footer,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .shared-footer-inner {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .shared-footer-inner { justify-content: flex-start; }
 }
 
 @media (max-width: 640px) {
+  body :where(main, .page-hero, .profile-hero, .cv-hero, .cl-hero) :where(p, li) {
+    max-width: none !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+
+  .page-title,
+  .page-lead,
+  .page-eyebrow,
+  .profile-name,
+  .profile-title,
+  .cv-name,
+  .cv-headline,
+  .cl-hero-inner h1,
+  .cl-hero-inner p {
+    max-width: 100% !important;
+    word-break: normal !important;
+  }
+
+  .page-title,
+  .profile-name,
+  .cv-name,
+  .cl-hero-inner h1 {
+    overflow-wrap: break-word !important;
+  }
+
+  .page-lead,
+  .page-eyebrow,
+  .profile-title,
+  .cv-headline,
+  .cl-hero-inner p {
+    overflow-wrap: normal !important;
+  }
+
+  .page-hero-links,
+  .profile-actions,
+  .cv-actions,
+  .cl-actions,
+  .hero-actions {
+    display: grid !important;
+    width: 100%;
+    max-width: 100% !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)) !important;
+    gap: 10px;
+  }
+
+  :where(.page-hero-links, .profile-actions, .cv-actions, .cl-actions, .hero-actions) .button {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
   .site-ecosystem-gateway {
     padding: 42px 0;
   }
@@ -1438,9 +1618,13 @@ footer,
     flex-direction: column;
   }
 
-  .site-ecosystem-grid,
-  .shared-footer-inner {
+  .site-ecosystem-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shared-footer-inner {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

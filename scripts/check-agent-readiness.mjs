@@ -8,6 +8,8 @@ const requiredFiles = [
   'llms.txt',
   'agent-index.md',
   'auth.md',
+  'data/site-facts.json',
+  'data/site-facts.schema.json',
   '_headers',
   '.well-known/api-catalog',
   '.well-known/openapi.json',
@@ -68,7 +70,13 @@ for (const file of [
 }
 
 const robots = read('robots.txt');
-if (!robots.includes('Content-Signal: search=yes, ai-input=yes, ai-train=no')) failures.push('robots.txt is missing Content-Signal');
+if (!robots.includes('Policy: search=yes, user-triggered AI retrieval=yes, model training=no')) failures.push('robots.txt is missing the documented AI use policy');
+for (const agent of ['OAI-SearchBot', 'Claude-SearchBot', 'PerplexityBot']) {
+  if (!robots.includes(`User-agent: ${agent}`)) failures.push(`robots.txt is missing search agent ${agent}`);
+}
+for (const agent of ['GPTBot', 'ClaudeBot', 'Google-Extended']) {
+  if (!robots.includes(`User-agent: ${agent}`)) failures.push(`robots.txt is missing training control for ${agent}`);
+}
 if (!robots.includes('Sitemap: https://1200km.com/sitemap.xml')) failures.push('robots.txt is missing canonical sitemap');
 
 const headers = read('_headers');
@@ -80,6 +88,7 @@ for (const expected of [
   '</.well-known/openapi.json>',
   '</.well-known/mcp/server-card.json>',
   '</.well-known/agent-skills/index.json>',
+  '</data/site-facts.json>',
 ]) {
   if (!headers.includes(expected)) failures.push(`_headers missing ${expected}`);
 }

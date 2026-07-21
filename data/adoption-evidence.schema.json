@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1200km.com/data/adoption-evidence.schema.json",
+  "title": "1200km adoption and outcome evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "model_version", "updated_at", "methodology", "entries"],
+  "properties": {
+    "$schema": { "const": "./adoption-evidence.schema.json" },
+    "model_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "updated_at": { "type": "string", "format": "date" },
+    "methodology": { "type": "string", "minLength": 20 },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "product", "evidence_type", "organization", "visibility",
+        "permission_status", "verification_status", "source", "verified_at",
+        "use_case", "outcome", "limitations", "quote", "quote_approved",
+        "supporting_url", "publication_status"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+        "product": { "type": "string", "minLength": 1 },
+        "evidence_type": {
+          "enum": [
+            "public-deployment", "package-usage", "accepted-integration",
+            "independent-review", "cited-research", "user-submitted-case-study",
+            "verified-issue-resolution", "validated-detection-outcome", "repeat-use"
+          ]
+        },
+        "organization": { "type": ["string", "null"] },
+        "visibility": { "enum": ["independently-public", "permission-granted", "anonymous"] },
+        "permission_status": { "enum": ["not-required-public-record", "granted", "pending", "denied"] },
+        "verification_status": { "enum": ["verified", "unverified", "rejected"] },
+        "source": { "type": "string", "minLength": 1 },
+        "verified_at": { "type": "string", "format": "date" },
+        "use_case": { "type": "string", "minLength": 1 },
+        "outcome": { "type": "string", "minLength": 1 },
+        "limitations": { "type": "string", "minLength": 1 },
+        "quote": { "type": ["string", "null"] },
+        "quote_approved": { "type": "boolean" },
+        "supporting_url": { "type": "string", "format": "uri" },
+        "publication_status": { "enum": ["published", "review", "private", "rejected"] }
+      }
+    }
+  }
+}

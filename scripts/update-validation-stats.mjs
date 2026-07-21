@@ -6,6 +6,7 @@ const repoRoot = path.resolve(new URL('.', import.meta.url).pathname, '..');
 const pagePath = path.join(repoRoot, 'external-validation.html');
 const statsPath = path.join(repoRoot, 'assets', 'validation', 'stats.json');
 const cloneHistoryPath = path.join(repoRoot, 'assets', 'validation', 'clone-history.json');
+const factsPath = path.join(repoRoot, 'data', 'site-facts.json');
 
 function runJson(command, args, fallback = null) {
   try {
@@ -405,6 +406,22 @@ stats.totals = {
 mkdirSync(path.dirname(statsPath), { recursive: true });
 writeFileSync(statsPath, `${JSON.stringify(stats, null, 2)}\n`);
 
+const factsModel = JSON.parse(readFileSync(factsPath, 'utf8'));
+function refreshFact(key, value, status) {
+  const item = factsModel.facts[key];
+  if (!item) throw new Error(`Missing authoritative fact ${key}`);
+  item.value = value;
+  item.verified_at = todayUtc;
+  if (status) item.status = status;
+}
+refreshFact('adversarygraph.stable_release', stats.repositories.adversarygraph.release.replace(/^v/, ''), 'released');
+refreshFact('adversarygraph.latest_release_tag', stats.repositories.adversarygraph.release, 'released');
+refreshFact('adversarygraph.release_published_at', releases.adversarygraph.published_at, 'released');
+refreshFact('contributions.accepted_external', stats.totals.merged_external_items, 'accepted');
+refreshFact('contributions.open_external', stats.totals.open_upstream_items, 'submitted');
+refreshFact('contributions.closed_unmerged_external', stats.github.closed_unmerged_prs, 'closed-unmerged');
+writeFileSync(factsPath, `${JSON.stringify(factsModel, null, 2)}\n`);
+
 let html = readFileSync(pagePath, 'utf8');
 
 html = replaceOrThrow(
@@ -415,14 +432,14 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>\d+<\/strong><span>Approved external PRs<\/span><\/div>/,
-  `<div><strong>${stats.totals.merged_external_items}</strong><span>Approved external PRs</span></div>`,
+  /<div><strong(?:\s+data-site-fact="contributions\.accepted_external"\s+data-fact-value="\d+")?>\d+<\/strong><span>Accepted external contributions<\/span><\/div>/,
+  `<div><strong data-site-fact="contributions.accepted_external" data-fact-value="${stats.totals.merged_external_items}">${stats.totals.merged_external_items}</strong><span>Accepted external contributions</span></div>`,
   'merged PR count',
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>\d+<\/strong><span>Open upstream submissions<\/span><\/div>/,
-  `<div><strong>${stats.totals.open_upstream_items}</strong><span>Open upstream submissions</span></div>`,
+  /<div><strong(?:\s+data-site-fact="contributions\.open_external"\s+data-fact-value="\d+")?>\d+<\/strong><span>Open upstream submissions<\/span><\/div>/,
+  `<div><strong data-site-fact="contributions.open_external" data-fact-value="${stats.totals.open_upstream_items}">${stats.totals.open_upstream_items}</strong><span>Open upstream submissions</span></div>`,
   'open PR/MR count',
 );
 html = replaceOrThrow(
@@ -439,8 +456,8 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>v[^<]+<\/strong><span>AdversaryGraph release<\/span><\/div>/,
-  `<div><strong>${stats.repositories.adversarygraph.release}</strong><span>AdversaryGraph release</span></div>`,
+  /<div><strong(?:\s+data-site-fact="adversarygraph\.latest_release_tag"\s+data-fact-value="v[^"]+")?>v[^<]+<\/strong><span>AdversaryGraph stable release<\/span><\/div>/,
+  `<div><strong data-site-fact="adversarygraph.latest_release_tag" data-fact-value="${stats.repositories.adversarygraph.release}">${stats.repositories.adversarygraph.release}</strong><span>AdversaryGraph stable release</span></div>`,
   'AdversaryGraph release metric',
 );
 html = replaceOrThrow(
@@ -479,16 +496,16 @@ if (/<span>GitHub followers<\/span>/.test(html)) {
 }
 html = replaceOrThrow(
   html,
-  /<div><strong>[\d,]+<\/strong><span>Total clones — last 14 days<\/span><\/div>\s*<p>Combined clone count across \d+ (?:active|daily-tracked) source repositories? \([^)]*\)\. [\d,]+ unique cloners(?: portfolio-wide|, summed across days)\.<\/p>/,
+  /<div><strong>[\d,]+<\/strong><span>Total clones — last 14 days<\/span><\/div>\s*<p>[\s\S]*?<\/p>/,
   `<div><strong>${last14Days.clones.toLocaleString('en-US')}</strong><span>Total clones — last 14 days</span></div>
-            <p>Combined clone count across ${last14Days.repos} daily-tracked source repositories (${formatDateRange(last14Days.since, last14Days.through)}). ${last14Days.uniques.toLocaleString('en-US')} unique cloners, summed across days.</p>`,
+            <p>GitHub clone events summed across ${last14Days.repos} daily-tracked source repositories (${formatDateRange(last14Days.since, last14Days.through)}). The ${last14Days.uniques.toLocaleString('en-US')} GitHub-reported unique values are summed per repository and are not globally deduplicated people, users, or deployments.</p>`,
   'total clones last 14 days metric',
 );
 html = replaceOrThrow(
   html,
-  /<div><strong>[\d,]+<\/strong><span>Total clones since tracking began<\/span><\/div>\s*<p>Cumulative clone count across (?:the same \d+ repositories|active repositories|\d+ daily-tracked source repositories) since (?:daily )?tracking started \([^)]*\)\. [\d,]+ unique cloners(?: portfolio-wide)?, summed across days\.<\/p>/,
+  /<div><strong>[\d,]+<\/strong><span>Total clones since tracking began<\/span><\/div>\s*<p>[\s\S]*?<\/p>/,
   `<div><strong>${cumulativeClones.clones.toLocaleString('en-US')}</strong><span>Total clones since tracking began</span></div>
-            <p>Cumulative clone count across ${last14Days.repos} daily-tracked source repositories since tracking started (${formatDateRange(cumulativeClones.since, cumulativeClones.through)}). ${cumulativeClones.uniques.toLocaleString('en-US')} unique cloners, summed across days.</p>`,
+            <p>Cumulative GitHub clone events across ${last14Days.repos} daily-tracked source repositories (${formatDateRange(cumulativeClones.since, cumulativeClones.through)}). The ${cumulativeClones.uniques.toLocaleString('en-US')} GitHub-reported unique values are summed per repository/day and are not globally deduplicated people, users, or deployments.</p>`,
   'cumulative clones since tracking began metric',
 );
 html = replaceOrThrow(
@@ -505,8 +522,8 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
-  `<span class="chip release">Release ${stats.repositories.adversarygraph.release}</span>$1<span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
+  /<span class="chip release">Release (?:<span data-site-fact="adversarygraph\.latest_release_tag" data-fact-value="v[^"]+">)?v[^<]+(?:<\/span>)?<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
+  `<span class="chip release">Release <span data-site-fact="adversarygraph.latest_release_tag" data-fact-value="${stats.repositories.adversarygraph.release}">${stats.repositories.adversarygraph.release}</span></span>$1<span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
   'AdversaryGraph release chips',
 );
 html = replaceOrThrow(

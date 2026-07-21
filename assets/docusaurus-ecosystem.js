@@ -1,48 +1,14 @@
 (function () {
-  const links = [
-    ['AdversaryGraph', 'https://1200km.com/threat-matrix/', true],
-    ['Portfolio', 'https://1200km.com/', false],
-    ['CTI', 'https://1200km.com/cti.html', false],
-    ['Labs', 'https://1200km.com/labs.html', false],
-  ];
-
   function loadSiteSearch() {
     if (document.querySelector('script[data-site-search-loader], script[src*="/assets/site-search.js"]')) return;
     const script = document.createElement('script');
-    script.src = 'https://1200km.com/assets/site-search.js?v=20260720-1';
+    script.src = 'https://1200km.com/assets/site-search.js?v=20260721-5';
     script.defer = true;
     script.dataset.siteSearchLoader = 'true';
     document.head.appendChild(script);
   }
 
   loadSiteSearch();
-
-  function addNavigation() {
-    const target = document.querySelector('.navbar__items--right');
-    if (!target || target.querySelector('[data-ecosystem-nav]')) return;
-
-    const navbar = target.closest('.navbar');
-    const nativeItems = navbar ? navbar.querySelectorAll('.navbar__item:not([data-ecosystem-nav])') : [];
-    const nativeLinks = navbar ? Array.from(navbar.querySelectorAll('a[href]:not([data-ecosystem-nav])')) : [];
-    const destinations = new Set(nativeLinks.map(function (link) {
-      return new URL(link.href, window.location.href).href.replace(/\/$/, '');
-    }));
-
-    // Full project navbars already provide their own project and ecosystem routes.
-    // Injecting another four links makes those headers overflow and truncates branding.
-    if (nativeItems.length >= 7) return;
-
-    links.filter(function ([, href]) {
-      return !destinations.has(new URL(href).href.replace(/\/$/, ''));
-    }).slice().reverse().forEach(function ([label, href, flagship]) {
-      const link = document.createElement('a');
-      link.href = href;
-      link.textContent = label;
-      link.dataset.ecosystemNav = 'true';
-      link.className = 'navbar__item navbar__link ecosystem-nav-link' + (flagship ? ' ecosystem-nav-link--flagship' : '');
-      target.insertBefore(link, target.firstChild);
-    });
-  }
 
   function addGateway() {
     const footer = document.querySelector('.footer');
@@ -79,7 +45,6 @@
   }
 
   function integrate() {
-    addNavigation();
     addGateway();
   }
 

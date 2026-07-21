@@ -31,6 +31,8 @@ try {
   if (build.pagefindVersion !== '1.5.2') failures.push(`expected Pagefind 1.5.2, found ${build.pagefindVersion}`);
   if (build.indexedPages < minimumPages) failures.push(`expected at least ${minimumPages} indexed pages, found ${build.indexedPages}`);
   if (build.failedPages > (remote ? 12 : 0)) failures.push(`too many failed pages: ${build.failedPages}`);
+  if ((build.skipped?.['stale-sitemap-url'] || 0) !== 0) failures.push(`stale sitemap URLs were indexed: ${build.skipped['stale-sitemap-url']}`);
+  if (remote && build.canonicalSitemapPages !== build.indexedPages) failures.push('canonical sitemap coverage does not match the Pagefind index');
 } catch (error) {
   failures.push(`invalid search-build.json: ${error.message}`);
 }
@@ -79,17 +81,27 @@ async function checkQueries() {
       },
     });
     await search.init();
+    const filters = await search.filters();
+    for (const filter of ['content_type', 'primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'version', 'source', 'updated_year', 'topic', 'section']) {
+      const minimumValues = filter === 'updated_year' ? 1 : 2;
+      if (!filters[filter] || Object.keys(filters[filter]).length < minimumValues) failures.push(`search filter ${filter} is missing or incomplete`);
+    }
     const checks = [
-      { query: 'T1059.003', expectedPrefix: '/threat-matrix/techniques/T1059.003/', first: true },
-      { query: 'T1059.00', expectedPrefix: '/threat-matrix/techniques/T1059.0', first: true },
-      { query: 'G0034', expectedPrefix: '/threat-matrix/actors/G0034/', first: true },
-      { query: 'G0069', expectedPrefix: '/threat-matrix/actors/G0069/', first: true },
-      { query: 'MuddyWater', expectedPrefix: '/threat-matrix/actors/G0069/' },
-      { query: 'Kerberoasting', expectedPrefix: '/ITDR/' },
-      { query: 'Kerberosting', expectedPrefix: '/ITDR/' },
-      { query: 'IOC enrichment', expectedPrefix: '/adversarygraph' },
+      { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true },
+      { query: 'T1059.00', expectedPrefixes: ['/threat-matrix/techniques/T1059.0'], first: true },
+      { query: 'G0034', expectedPrefixes: ['/threat-matrix/actors/G0034/'], first: true },
+      { query: 'G0069', expectedPrefixes: ['/threat-matrix/actors/G0069/'], first: true },
+      { query: 'MuddyWater', expectedPrefixes: ['/threat-matrix/actors/G0069/'] },
+      { query: 'Kerberoasting', expectedPrefixes: ['/ITDR/'] },
+      { query: 'Kerberosting', expectedPrefixes: ['/ITDR/'] },
+      { query: 'AdversaryGraph', expectedPrefixes: ['/adversarygraph/', '/adversarygraph-docs/'] },
+      { query: 'Operation Desert Hydra', expectedPrefixes: ['/operation-desert-hydra/', '/labs.html'], expectedUrls: ['/'] },
+      { query: 'RAG MCP', expectedPrefixes: ['/adversarygraph', '/ai-offensive.html'] },
+      { query: 'AIDebug', expectedPrefixes: ['/external-validation.html', '/labs.html', '/ai-offensive.html'] },
+      { query: 'detection validation', expectedPrefixes: ['/adversarygraph', '/labs.html', '/newest-detection-engineering-techniques/'] },
+      { query: 'IOC enrichment', expectedPrefixes: ['/adversarygraph'] },
     ];
-    for (const { query, expectedPrefix, first = false } of checks) {
+    for (const { query, expectedPrefixes, expectedUrls = [], first = false } of checks) {
       const result = await search.search(query);
       const top = await Promise.all(result.results.slice(0, 10).map((item) => item.data()));
       console.log(`Search quality "${query}": ${top.map((item) => item.url).join(', ') || '(no results)'}`);
@@ -97,14 +109,19 @@ async function checkQueries() {
         failures.push(`query "${query}" returned no results`);
         continue;
       }
-      const expected = top.findIndex((item) => item.url.startsWith(expectedPrefix));
+      const expected = top.findIndex((item) => expectedUrls.includes(item.url) || expectedPrefixes.some((prefix) => item.url.startsWith(prefix)));
       if (expected < 0) {
-        failures.push(`query "${query}" did not return ${expectedPrefix} in the top ten (got ${top.map((item) => item.url).join(', ')})`);
+        failures.push(`query "${query}" did not return the expected result class (${expectedPrefixes.join(', ')}) in the top ten (got ${top.map((item) => item.url).join(', ')})`);
       }
       if (first && expected !== 0) {
         failures.push(`identifier query "${query}" should rank its entity first (rank was ${expected + 1})`);
       }
     }
+    const sectionResult = await search.search('Detection logic T1059.003');
+    const sectionPages = await Promise.all(sectionResult.results.slice(0, 5).map((item) => item.data()));
+    const technique = sectionPages.find((item) => item.url.startsWith('/threat-matrix/techniques/T1059.003/'));
+    const deepLink = technique?.sub_results?.find((item) => item.url.endsWith('#detection-logic'));
+    if (!deepLink) failures.push('search did not emit a #detection-logic section result for T1059.003');
     await search.destroy();
   } finally {
     await new Promise((resolvePromise) => server.close(resolvePromise));

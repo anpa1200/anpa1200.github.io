@@ -1,13 +1,107 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>T1049 System Network Connections Discovery | AdversaryGraph</title><meta name="description" content="T1049 System Network Connections Discovery: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1049/">
   <meta property="og:title" content="T1049 System Network Connections Discovery | AdversaryGraph"><meta property="og:description" content="T1049 System Network Connections Discovery: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1049/"><meta property="og:type" content="article">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-TMTG21RVHM')</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1049 System Network Connections Discovery","description":"Adversaries may attempt to get a listing of network connections to or from the compromised system they are currently accessing or from remote systems by querying for information over the network. \n\nAn adversary who gains access to a system that is part of a cloud-based environment may map out Virtual Private Clouds or Virtual Networks in order to determine what systems and services are connected. The actions performed are likely the same types of discovery techniques depending on the operating system, but the resulting information may include details about the networked cloud environment relevant to the adversary's goals. Cloud providers may have different ways in which their virtual networks operate. Similarly, adversaries who gain access to network devices may also perform similar discovery activities to gather information about connected systems and services.\n\nUtilities and commands that acquire this information include netstat, \"net use,\" and \"net session\" with Net. In Mac and Linux, netstat and lsof can be used to list current connections. who -a and w can be used to show which users are currently logged in, similar to \"net session\". Additionally, built-in features native to network devices and Network Device CLI may be used (e.g. show ip sockets, show tcp brief).","url":"https://1200km.com/threat-matrix/techniques/T1049/","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/"}}</script>
-  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style></head><body><main>
+  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style>    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1049/#webpage",
+            "url": "https://1200km.com/threat-matrix/techniques/T1049/",
+            "name": "System Network Connections Discovery",
+            "description": "T1049 System Network Connections Discovery: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1049/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "dateModified": "2026-06-27",
+            "mainEntity": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1049/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1049/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "The public browser workspace for the AdversaryGraph platform.",
+                "item": "https://1200km.com/threat-matrix/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "System Network Connections Discovery",
+                "item": "https://1200km.com/threat-matrix/techniques/T1049/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "T1049 System Network Connections Discovery",
+            "description": "Adversaries may attempt to get a listing of network connections to or from the compromised system they are currently accessing or from remote systems by querying for information over the network. \n\nAn adversary who gains access to a system that is part of a cloud-based environment may map out Virtual Private Clouds or Virtual Networks in order to determine what systems and services are connected. The actions performed are likely the same types of discovery techniques depending on the operating system, but the resulting information may include details about the networked cloud environment relevant to the adversary's goals. Cloud providers may have different ways in which their virtual networks operate. Similarly, adversaries who gain access to network devices may also perform similar discovery activities to gather information about connected systems and services.\n\nUtilities and commands that acquire this information include netstat, \"net use,\" and \"net session\" with Net. In Mac and Linux, netstat and lsof can be used to list current connections. who -a and w can be used to show which users are currently logged in, similar to \"net session\". Additionally, built-in features native to network devices and Network Device CLI may be used (e.g. show ip sockets, show tcp brief).",
+            "url": "https://1200km.com/threat-matrix/techniques/T1049/",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/threat-matrix/techniques/T1049/#article",
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1049/#webpage"
+            },
+            "dateModified": "2026-06-27"
+          }
+        ]
+      }
+    </script>
+</head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
   <p style="margin:0 0 8px;color:#67e8f9;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">AdversaryGraph public intelligence page</p>
-  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>AdversaryGraph Web</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
+  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>Threat Matrix</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
   <p style="margin:0 0 14px;color:#fca5a5"><strong>Validation disclaimer:</strong> TTP overlap, actor similarity, generated summaries, and coverage findings are investigation leads, not attribution proof or operational validation without analyst review.</p>
   <p style="display:flex;flex-wrap:wrap;gap:10px;margin:0">
     <a style="background:#e11d48;border-radius:6px;color:#fff;font-weight:800;padding:8px 10px;text-decoration:none" href="https://1200km.com/adversarygraph/">Main AdversaryGraph project</a>
@@ -17,12 +111,12 @@
   </p>
 </section>
   <nav><a href="https://1200km.com/threat-matrix/">AdversaryGraph</a> / ATT&amp;CK techniques / T1049</nav><p class="meta">T1049 · discovery · 30 actors · 1 correlated reports</p>
-  <h1>System Network Connections Discovery</h1><p>Adversaries may attempt to get a listing of network connections to or from the compromised system they are currently accessing or from remote systems by querying for information over the network.  An adversary who gains access to a system that is part of a cloud-based environment may map out Virtual Private Clouds or Virtual Networks in order to determine what systems and services are connected. The actions performed are likely the same types of discovery techniques depending on the operating system, but the resulting information may include details about the networked cloud environment relevant to the adversary&#39;s goals. Cloud providers may have different ways in which their virtual networks operate. Similarly, adversaries who gain access to network devices may also perform similar discovery activities to gather information about connected systems and services. Utilities and commands that acquire this information include netstat, &quot;net use,&quot; and &quot;net session&quot; with Net. In Mac and Linux, netstat and lsof can be used to list current connections. who -a and w can be used to show which users are currently logged in, similar to &quot;net session&quot;. Additionally, built-in features native to network devices and Network Device CLI may be used (e.g. show ip sockets, show tcp brief).</p>
+  <h1 id="system-network-connections-discovery">System Network Connections Discovery</h1><p>Adversaries may attempt to get a listing of network connections to or from the compromised system they are currently accessing or from remote systems by querying for information over the network.  An adversary who gains access to a system that is part of a cloud-based environment may map out Virtual Private Clouds or Virtual Networks in order to determine what systems and services are connected. The actions performed are likely the same types of discovery techniques depending on the operating system, but the resulting information may include details about the networked cloud environment relevant to the adversary&#39;s goals. Cloud providers may have different ways in which their virtual networks operate. Similarly, adversaries who gain access to network devices may also perform similar discovery activities to gather information about connected systems and services. Utilities and commands that acquire this information include netstat, &quot;net use,&quot; and &quot;net session&quot; with Net. In Mac and Linux, netstat and lsof can be used to list current connections. who -a and w can be used to show which users are currently logged in, similar to &quot;net session&quot;. Additionally, built-in features native to network devices and Network Device CLI may be used (e.g. show ip sockets, show tcp brief).</p>
   <p><a class="cta" href="https://1200km.com/threat-matrix/#/techniques/T1049">Open detection, hunting, mitigation, and evidence workspace</a></p>
-  <section><h2>Detection logic</h2><p>System and network discovery techniques normally occur throughout an operation as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as Lateral Movement, based on the information obtained. Monitor processes and command-line arguments for actions that could be taken to gather system and network information. Remote access tools with built-in features may interact directly with the Windows API to gather information. Further, Network Device CLI commands may also be used to gather system and network information with built-in features native to the network device platform.  Monitor CLI activity for unexpected or unauthorized use commands being run by non-standard users from non-standard locations. Information may also be acquired through Windows system management tools such as Windows Management Instrumentation and PowerShell.</p></section>
-  <section><h2>Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0082/"><strong>APT38</strong><br><span class="muted">G0082</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0093/"><strong>GALLIUM</strong><br><span class="muted">G0093</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0022/"><strong>APT3</strong><br><span class="muted">G0022</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0018/"><strong>admin@338</strong><br><span class="muted">G0018</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1017/"><strong>Volt Typhoon</strong><br><span class="muted">G1017</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0096/"><strong>APT41</strong><br><span class="muted">G0096</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0045/"><strong>menuPass</strong><br><span class="muted">G0045</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0050/"><strong>APT32</strong><br><span class="muted">G0050</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0069/"><strong>MuddyWater</strong><br><span class="muted">G0069</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0139/"><strong>TeamTNT</strong><br><span class="muted">G0139</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0138/"><strong>Andariel</strong><br><span class="muted">G0138</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0129/"><strong>Mustang Panda</strong><br><span class="muted">G0129</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0049/"><strong>OilRig</strong><br><span class="muted">G0049</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0081/"><strong>Tropic Trooper</strong><br><span class="muted">G0081</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0004/"><strong>Ke3chang</strong><br><span class="muted">G0004</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0006/"><strong>APT1</strong><br><span class="muted">G0006</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0033/"><strong>Poseidon Group</strong><br><span class="muted">G0033</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0114/"><strong>Chimera</strong><br><span class="muted">G0114</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0135/"><strong>BackdoorDiplomacy</strong><br><span class="muted">G0135</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1022/"><strong>ToddyCat</strong><br><span class="muted">G1022</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1023/"><strong>APT5</strong><br><span class="muted">G1023</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1032/"><strong>INC Ransom</strong><br><span class="muted">G1032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1006/"><strong>Earth Lusca</strong><br><span class="muted">G1006</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1001/"><strong>HEXANE</strong><br><span class="muted">G1001</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0059/"><strong>Magic Hound</strong><br><span class="muted">G0059</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0027/"><strong>Threat Group-3390</strong><br><span class="muted">G0027</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1016/"><strong>FIN13</strong><br><span class="muted">G1016</span></a></div></section>
-  <section><h2>Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://attack.mitre.org/groups/G0049/"><strong>OilRig G0049</strong><br><span class="muted">MITRE ATT&amp;CK · direct source mapping</span></a></div></section>
-  <section><h2>Continue the investigation</h2><div class="links">
+  <section><h2 id="detection-logic">Detection logic</h2><p>System and network discovery techniques normally occur throughout an operation as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as Lateral Movement, based on the information obtained. Monitor processes and command-line arguments for actions that could be taken to gather system and network information. Remote access tools with built-in features may interact directly with the Windows API to gather information. Further, Network Device CLI commands may also be used to gather system and network information with built-in features native to the network device platform.  Monitor CLI activity for unexpected or unauthorized use commands being run by non-standard users from non-standard locations. Information may also be acquired through Windows system management tools such as Windows Management Instrumentation and PowerShell.</p></section>
+  <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0082/"><strong>APT38</strong><br><span class="muted">G0082</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0093/"><strong>GALLIUM</strong><br><span class="muted">G0093</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0022/"><strong>APT3</strong><br><span class="muted">G0022</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0018/"><strong>admin@338</strong><br><span class="muted">G0018</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1017/"><strong>Volt Typhoon</strong><br><span class="muted">G1017</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0096/"><strong>APT41</strong><br><span class="muted">G0096</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0045/"><strong>menuPass</strong><br><span class="muted">G0045</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0050/"><strong>APT32</strong><br><span class="muted">G0050</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0069/"><strong>MuddyWater</strong><br><span class="muted">G0069</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0139/"><strong>TeamTNT</strong><br><span class="muted">G0139</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0138/"><strong>Andariel</strong><br><span class="muted">G0138</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0129/"><strong>Mustang Panda</strong><br><span class="muted">G0129</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0049/"><strong>OilRig</strong><br><span class="muted">G0049</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0081/"><strong>Tropic Trooper</strong><br><span class="muted">G0081</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0004/"><strong>Ke3chang</strong><br><span class="muted">G0004</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0006/"><strong>APT1</strong><br><span class="muted">G0006</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0033/"><strong>Poseidon Group</strong><br><span class="muted">G0033</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0114/"><strong>Chimera</strong><br><span class="muted">G0114</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0135/"><strong>BackdoorDiplomacy</strong><br><span class="muted">G0135</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1022/"><strong>ToddyCat</strong><br><span class="muted">G1022</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1023/"><strong>APT5</strong><br><span class="muted">G1023</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1032/"><strong>INC Ransom</strong><br><span class="muted">G1032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1006/"><strong>Earth Lusca</strong><br><span class="muted">G1006</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1001/"><strong>HEXANE</strong><br><span class="muted">G1001</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0059/"><strong>Magic Hound</strong><br><span class="muted">G0059</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0027/"><strong>Threat Group-3390</strong><br><span class="muted">G0027</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1016/"><strong>FIN13</strong><br><span class="muted">G1016</span></a></div></section>
+  <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://attack.mitre.org/groups/G0049/"><strong>OilRig G0049</strong><br><span class="muted">MITRE ATT&amp;CK · direct source mapping</span></a></div></section>
+  <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>
     <a href="https://1200km.com/cti-analyst-field-manual/">CTI Analyst Field Manual</a>

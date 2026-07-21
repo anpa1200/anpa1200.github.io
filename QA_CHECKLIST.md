@@ -5,16 +5,19 @@ Run through this list before pushing changes to the main portfolio site
 
 ## Automated
 
-- [ ] `npm run check-links` passes (0 broken internal links, 0 missing anchors, 0 `anpa1200.github.io` refs).
-- [ ] `npm run check-search` passes.
+- [ ] `npm run check-release-source` passes (code, search unit tests, all-page SEO, agent-readiness, and internal links).
+- [ ] `npm run check-adoption` passes; only verified, publication-approved evidence appears publicly.
+- [ ] Staged `npm run check-seo -- --site <site> --require-release-transform` passes before and after Pagefind rewrites the canonical sitemap.
 - [ ] A local Pagefind build passes `npm run check-search:index` and `npm run check-search:browser`.
+- [ ] The staged site passes `npm run check-quality:browser` and `npm run check-hygiene`; review the retained JSON report and mobile screenshots.
+- [ ] Pagefind reports zero skipped/stale/failed advertised URLs and the final `sitemap.xml` count matches the indexed-document count.
 - [ ] `npm run check-links:external` reviewed — only expected warnings remain
-      (Google Fonts origins 404 on HEAD; Medium/LinkedIn/GitHub may show 403/405/429 bot-blocks, which are ignored).
+      (Medium/LinkedIn/GitHub may show 403/405/429 bot-blocks, which are reviewed rather than treated as content proof).
 
 ## Pages load
 
 - [ ] Homepage (`index.html`) loads.
-- [ ] Primary navigation links work (Research, AdversaryGraph, Labs, Guides, Projects, About).
+- [ ] Primary navigation links work (Research, AdversaryGraph, Labs, Library, Projects, About).
 - [ ] Header search opens by click, tap, Enter, and Space; Escape closes it and restores focus.
 - [ ] Header search does not expose or intercept Ctrl/Cmd+K.
 - [ ] Sidebar / scrollspy nav jumps to the correct sections and exposes the active section with `aria-current`.
@@ -57,9 +60,17 @@ Run through this list before pushing changes to the main portfolio site
 
 ## SEO / metadata
 
-- [ ] Each indexed page has a meaningful `<title>` and `meta description`.
-- [ ] `rel="canonical"` points to the `1200km.com` URL.
-- [ ] Open Graph + Twitter card tags present (except intentionally `noindex` pages like the cover letter).
+- [ ] Every indexed page has one meaningful H1, a gap-free heading hierarchy, a main landmark, a meaningful title/description, and a self-canonical `1200km.com` URL.
+- [ ] `sitemap.xml`, `sitemap-all.xml`, `feed.xml`, `robots.txt`, `llms.txt`, and `llms-full.txt` load with HTTP 200 after deploy.
+- [ ] One consolidated JSON-LD graph is present on representative homepage, article, project, Threat Matrix, and Docusaurus pages; every internal `@id` resolves within its graph.
+- [ ] Homepage FAQ structured data matches the visible direct-answer section.
+- [ ] Exact identifiers, actor aliases, misspellings, and natural-language queries return useful results; sub-results point to real heading IDs.
+- [ ] Content type, topic, and section facets narrow results correctly on `/search.html`.
+- [ ] `robots.txt` allows search/retrieval agents, blocks named training crawlers, and publishes exactly one root sitemap directive.
+- [ ] Search Console and Bing Webmaster Tools show no new sitemap or canonical errors (external/manual; not implied by local tests).
+- [ ] Representative pages have been checked in Schema.org Validator and Google Rich Results Test where the page type is eligible.
+- [ ] Mobile Lighthouse runs for homepage and search page are recorded; Performance, Accessibility, Best Practices, and SEO regressions are investigated before release.
+- [ ] Docusaurus pages show no React hydration errors or relevant browser console errors.
 
 ## Regenerating the PDFs
 

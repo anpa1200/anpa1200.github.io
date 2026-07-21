@@ -144,6 +144,20 @@ async function evaluate(devtools, sessionId, expression) {
   return result.result?.value;
 }
 
+async function activateLazySearch(devtools, sessionId) {
+  await waitForExpression(
+    devtools,
+    sessionId,
+    `Boolean(document.querySelector('.site-search-host, [data-site-search-hero]'))`,
+    'progressive search fallback',
+  );
+  await evaluate(devtools, sessionId, `(() => {
+    const target = document.querySelector('.site-search-host, [data-site-search-hero]');
+    if (target) target.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+    return Boolean(target);
+  })()`);
+}
+
 async function attachPage(devtools, url, metrics = null, options = {}) {
   const { targetId } = await devtools.send('Target.createTarget', { url: 'about:blank' });
   const { sessionId } = await devtools.send('Target.attachToTarget', { targetId, flatten: true });
@@ -237,38 +251,38 @@ try {
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `Boolean(document.querySelector('[data-site-search-page] .pf-searchbox-result[href]')) && document.querySelector('[data-site-search-page] .pf-searchbox-results')?.getAttribute('aria-busy') !== 'true'`,
-    'live autocomplete results'
+    `/T1059\.003/.test(document.querySelector('[data-site-search-summary] .pf-summary')?.textContent || '') && document.querySelectorAll('[data-site-search-results] .pf-result').length > 0 && document.querySelector('[data-site-search-results] .pf-results')?.getAttribute('aria-busy') !== 'true'`,
+    'full-page result placeholders'
+  );
+  await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-results] .pf-result')?.scrollIntoView({ block: 'center' })`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `Boolean(document.querySelector('[data-site-search-results] .pf-result-link[href]')) && document.querySelector('[data-site-search-results] .pf-results')?.getAttribute('aria-busy') !== 'true'`,
+    'live full-page results'
   );
 
   const searchState = await evaluate(devtools, searchPage.sessionId, `(() => ({
-    input: document.querySelector('[data-site-search-page] .pf-searchbox-input')?.value,
-    results: Array.from(document.querySelectorAll('[data-site-search-page] .pf-searchbox-result[href]')).slice(0, 5).map((link) => ({ path: new URL(link.href).pathname, text: link.textContent.trim() })),
+    input: document.querySelector('[data-site-search-page] pagefind-input .pf-input')?.value,
+    results: Array.from(document.querySelectorAll('[data-site-search-results] .pf-result-link[href]')).slice(0, 5).map((link) => ({ path: new URL(link.href).pathname, text: link.textContent.trim() })),
     overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     error: document.querySelector('.pf-error')?.textContent || '',
-    role: document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('role'),
-    autocomplete: document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-autocomplete'),
-    expanded: document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-expanded'),
-    controls: document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-controls'),
-    listbox: document.querySelector('[data-site-search-page] .pf-searchbox-results')?.getAttribute('role'),
-    activeDescendant: document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-activedescendant'),
-    controlledRole: document.getElementById(document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-controls') || '')?.getAttribute('role'),
-    activeSelected: document.getElementById(document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-activedescendant') || '')?.getAttribute('aria-selected'),
+    inputType: document.querySelector('[data-site-search-page] pagefind-input .pf-input')?.type,
+    inputLabel: document.querySelector('[data-site-search-page] pagefind-input .pf-input')?.closest('[role="search"]')?.getAttribute('aria-label'),
+    resultsLabel: document.querySelector('[data-site-search-results] .pf-results')?.getAttribute('aria-label'),
+    summary: document.querySelector('[data-site-search-summary] .pf-summary')?.textContent,
   }))()`);
   if (searchState.input !== 'T1059.003') failures.push(`query hydration failed: ${searchState.input}`);
   if (searchState.results[0]?.path !== '/threat-matrix/techniques/T1059.003/') {
-    failures.push(`entity autocomplete ranking failed: ${JSON.stringify(searchState.results)}`);
+    failures.push(`entity full-page ranking failed: ${JSON.stringify(searchState.results)}`);
   }
   if (searchState.overflow) failures.push('mobile search page has horizontal overflow');
   if (searchState.error) failures.push(`Pagefind rendered an error: ${searchState.error}`);
-  if (searchState.role !== 'combobox' || searchState.autocomplete !== 'list' || searchState.listbox !== 'listbox' || searchState.controlledRole !== 'listbox') {
-    failures.push(`autocomplete semantics are incomplete: ${JSON.stringify(searchState)}`);
-  }
-  if (searchState.expanded !== 'true' || !searchState.controls || !searchState.activeDescendant || searchState.activeSelected !== 'true') {
-    failures.push(`autocomplete state is not exposed to assistive technology: ${JSON.stringify(searchState)}`);
+  if (searchState.inputType !== 'search' || !/search/i.test(searchState.inputLabel || '') || !/results/i.test(searchState.resultsLabel || '') || !/result/i.test(searchState.summary || '')) {
+    failures.push(`full-page search semantics are incomplete: ${JSON.stringify(searchState)}`);
   }
 
-  await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-page] .pf-searchbox-input').focus()`);
+  await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-page] pagefind-input .pf-input').focus()`);
   await devtools.send('Input.dispatchKeyEvent', {
     type: 'rawKeyDown', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40,
   }, searchPage.sessionId);
@@ -278,13 +292,8 @@ try {
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-activedescendant') !== ${JSON.stringify(searchState.activeDescendant)}`,
-    'autocomplete ArrowDown selection'
-  );
-  const downSelection = await evaluate(
-    devtools,
-    searchPage.sessionId,
-    `document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-activedescendant')`
+    `document.activeElement === document.querySelector('[data-site-search-results] .pf-result-link')`,
+    'full-page ArrowDown result navigation'
   );
   await devtools.send('Input.dispatchKeyEvent', {
     type: 'rawKeyDown', key: 'ArrowUp', code: 'ArrowUp', windowsVirtualKeyCode: 38,
@@ -295,32 +304,101 @@ try {
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `document.querySelector('[data-site-search-page] .pf-searchbox-input')?.getAttribute('aria-activedescendant') !== ${JSON.stringify(downSelection)}`,
-    'autocomplete ArrowUp selection'
+    `document.activeElement === document.querySelector('[data-site-search-page] pagefind-input .pf-input')`,
+    'full-page ArrowUp input navigation'
   );
 
   await evaluate(devtools, searchPage.sessionId, `(() => {
-    const input = document.querySelector('[data-site-search-page] .pf-searchbox-input');
+    const input = document.querySelector('[data-site-search-page] pagefind-input .pf-input');
     input.value = '"zxqvnevermatches1200km"';
     input.dispatchEvent(new Event('input', { bubbles: true }));
   })()`);
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `Boolean(document.querySelector('[data-site-search-page] .pf-searchbox-empty'))`,
-    'autocomplete zero-result state'
+    `/no results/i.test(document.querySelector('[data-site-search-summary] .pf-summary')?.textContent || '')`,
+    'full-page zero-result state'
   );
   await evaluate(devtools, searchPage.sessionId, `(() => {
-    const input = document.querySelector('[data-site-search-page] .pf-searchbox-input');
+    const input = document.querySelector('[data-site-search-page] pagefind-input .pf-input');
     input.value = 'T1059.003';
     input.dispatchEvent(new Event('input', { bubbles: true }));
   })()`);
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `document.querySelector('[data-site-search-page] .pf-searchbox-input')?.value === 'T1059.003' && new URL(document.querySelector('[data-site-search-page] .pf-searchbox-result[href]')?.href || location.href).pathname === '/threat-matrix/techniques/T1059.003/'`,
-    'autocomplete recovery after zero results'
+    `document.querySelector('[data-site-search-page] pagefind-input .pf-input')?.value === 'T1059.003' && new URL(document.querySelector('[data-site-search-results] .pf-result-link[href]')?.href || location.href).pathname === '/threat-matrix/techniques/T1059.003/'`,
+    'full-page recovery after zero results'
   );
+  const searchFilters = await evaluate(
+    devtools,
+    searchPage.sessionId,
+    `Array.from(document.querySelectorAll('[data-site-search-filters] pagefind-filter-dropdown')).map((item) => item.getAttribute('filter'))`,
+  );
+  const expectedFilters = ['primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'version', 'source', 'updated_year', 'topic', 'section'];
+  if (JSON.stringify(searchFilters) !== JSON.stringify(expectedFilters)) {
+    failures.push(`expected controlled search facets ${expectedFilters.join(', ')}, found ${searchFilters.join(', ')}`);
+  }
+  const filterSemantics = await evaluate(devtools, searchPage.sessionId, `Array.from(document.querySelectorAll('[data-site-search-filters] .pf-dropdown-trigger')).map((button) => ({ role: button.getAttribute('role'), expanded: button.getAttribute('aria-expanded'), controls: button.getAttribute('aria-controls'), label: button.getAttribute('aria-label') }))`);
+  if (filterSemantics.length !== expectedFilters.length || filterSemantics.some((filter) => filter.role !== 'combobox' || filter.expanded !== 'false' || !filter.controls || !filter.label)) {
+    failures.push(`search facet semantics are incomplete: ${JSON.stringify(filterSemantics)}`);
+  }
+
+  await evaluate(devtools, searchPage.sessionId, `(() => {
+    const instance = window.PagefindComponents.getInstanceManager().getInstance('default');
+    instance.triggerSearchWithFilters('AdversaryGraph', { primary_domain: ['threat-intelligence'] });
+  })()`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `Boolean(document.querySelector('[data-site-search-active]:not([hidden]) .site-search-filter-chip')) && /Domain: Threat Intelligence/.test(document.querySelector('.site-search-filter-chip')?.textContent || '')`,
+    'visible removable active filter'
+  );
+  await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-clear-all]').click()`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `document.querySelector('[data-site-search-active]')?.hidden === true && Object.keys(window.PagefindComponents.getInstanceManager().getInstance('default').searchFilters || {}).length === 0`,
+    'clear-all search filters'
+  );
+
+  await evaluate(devtools, searchPage.sessionId, `window.PagefindComponents.getInstanceManager().getInstance('default').triggerSearchWithFilters('', {})`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `document.querySelectorAll('[data-site-search-results] .pf-result').length === 20 && /^Showing 20 of ([2-9][0-9]|[1-9][0-9]{2,}) results\.$/.test(document.querySelector('[data-site-search-progress]')?.textContent || '') && !document.querySelector('[data-site-search-pagination]')?.hidden`,
+    'initial paginated result set'
+  );
+  await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-load-more]').click()`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `document.querySelectorAll('[data-site-search-results] .pf-result').length === 40 && /^Showing 40 of /.test(document.querySelector('[data-site-search-progress]')?.textContent || '')`,
+    'load-more result expansion'
+  );
+
+  await evaluate(devtools, searchPage.sessionId, `(() => {
+    const input = document.querySelector('[data-site-search-page] pagefind-input .pf-input');
+    input.value = 'Detection logic T1059.003';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  })()`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `Boolean(Array.from(document.querySelectorAll('[data-site-search-results] .pf-heading-link[href*="#"]')).find((link) => new URL(link.href).hash === '#detection-logic'))`,
+    'heading-level search result'
+  );
+  const deepLinkState = await evaluate(devtools, searchPage.sessionId, `(async () => {
+    const link = Array.from(document.querySelectorAll('[data-site-search-results] .pf-heading-link[href*="#"]')).find((item) => new URL(item.href).hash === '#detection-logic');
+    if (!link) return { found: false };
+    const url = new URL(link.href);
+    const html = await fetch(url.pathname).then((response) => response.text());
+    const documentCopy = new DOMParser().parseFromString(html, 'text/html');
+    return { found: true, hash: url.hash, targetExists: Boolean(documentCopy.getElementById(url.hash.slice(1))) };
+  })()`);
+  if (!deepLinkState.found || !deepLinkState.targetExists) {
+    failures.push(`section deep link is not resolvable: ${JSON.stringify(deepLinkState)}`);
+  }
 
   const desktopMetrics = {
     width: 1880,
@@ -343,6 +421,12 @@ try {
       unoccluded: Boolean(control && (hit === control || control.contains(hit))),
       beforeTheme: Boolean(host && theme && (host.compareDocumentPosition(theme) & Node.DOCUMENT_POSITION_FOLLOWING)),
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+      navigation: Array.from(document.querySelectorAll('.site-header .nav-list a')).map((link) => ({
+        label: link.textContent.trim(),
+        path: new URL(link.href).pathname,
+        current: link.getAttribute('aria-current'),
+      })),
+      footerLinks: Array.from(document.querySelectorAll('.site-footer nav a')).map((link) => new URL(link.href).pathname),
     };
   })()`);
   if (staticControl.href !== '/search.html' || !/search/i.test(staticControl.label) || !staticControl.visible || !staticControl.unoccluded || !staticControl.beforeTheme || staticControl.overflow) {
@@ -350,7 +434,48 @@ try {
   }
   await devtools.send('Target.closeTarget', { targetId: staticHome.targetId });
 
+  const staticMobile = await attachPage(devtools, `${origin}/about.html`, {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+  }, { disableScripts: true });
+  const staticMobileState = await evaluate(devtools, staticMobile.sessionId, `(() => {
+    const summary = document.querySelector('.nav-menu-toggle');
+    const rect = summary?.getBoundingClientRect();
+    return {
+      navigation: Array.from(document.querySelectorAll('.site-header .nav-list a')).map((link) => link.textContent.trim()),
+      footerCount: document.querySelectorAll('.site-footer nav a').length,
+      privacy: Boolean(document.querySelector('.site-footer a[href="/privacy.html"]')),
+      search: new URL(document.querySelector('.site-search-fallback')?.href || location.href).pathname,
+      menuVisible: Boolean(rect && rect.width >= 44 && rect.height >= 44),
+      center: rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null,
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    };
+  })()`);
+  if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'AdversaryGraph', 'Labs', 'Library', 'Projects', 'About'])
+    || staticMobileState.footerCount !== 9
+    || !staticMobileState.privacy
+    || staticMobileState.search !== '/search.html'
+    || !staticMobileState.menuVisible
+    || staticMobileState.overflow) {
+    failures.push(`no-JavaScript mobile shell failed: ${JSON.stringify(staticMobileState)}`);
+  }
+  if (staticMobileState.center) {
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...staticMobileState.center }, staticMobile.sessionId);
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...staticMobileState.center }, staticMobile.sessionId);
+    await devtools.send('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...staticMobileState.center }, staticMobile.sessionId);
+  }
+  await waitForExpression(
+    devtools,
+    staticMobile.sessionId,
+    `document.querySelector('details.nav-links')?.open && getComputedStyle(document.querySelector('.site-header .nav-list')).display !== 'none'`,
+    'no-JavaScript native mobile navigation disclosure'
+  );
+  await devtools.send('Target.closeTarget', { targetId: staticMobile.targetId });
+
   const desktopHome = await attachPage(devtools, `${origin}/`, desktopMetrics);
+  await activateLazySearch(devtools, desktopHome.sessionId);
   await waitForExpression(
     devtools,
     desktopHome.sessionId,
@@ -391,6 +516,12 @@ try {
       overlapsLinks: overlaps(triggerRect, linksRect),
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
       center: triggerRect ? { x: triggerRect.left + triggerRect.width / 2, y: triggerRect.top + triggerRect.height / 2 } : null,
+      navigation: primaryLinks.map((link) => ({
+        label: link.textContent.trim(),
+        path: new URL(link.href).pathname,
+        current: link.getAttribute('aria-current'),
+      })),
+      footerLinks: Array.from(document.querySelectorAll('.site-footer nav a')).map((link) => new URL(link.href).pathname),
     };
   })()`);
   if (!desktopState.triggerVisible
@@ -407,6 +538,26 @@ try {
     || desktopState.overlapsLinks
     || desktopState.overflow) {
     failures.push(`desktop search layout failed: ${JSON.stringify(desktopState)}`);
+  }
+  const canonicalNavigation = [
+    { label: 'Research', path: '/cti.html', current: null },
+    { label: 'AdversaryGraph', path: '/adversarygraph/', current: null },
+    { label: 'Labs', path: '/labs.html', current: null },
+    { label: 'Library', path: '/guides.html', current: null },
+    { label: 'Projects', path: '/projects.html', current: null },
+    { label: 'About', path: '/about.html', current: null },
+  ];
+  if (JSON.stringify(staticControl.navigation) !== JSON.stringify(canonicalNavigation)
+    || JSON.stringify(desktopState.navigation) !== JSON.stringify(staticControl.navigation)
+    || JSON.stringify(desktopState.footerLinks) !== JSON.stringify(staticControl.footerLinks)
+    || staticControl.footerLinks.length !== 9
+    || !staticControl.footerLinks.includes('/privacy.html')) {
+    failures.push(`source/rendered shell mismatch: ${JSON.stringify({
+      sourceNavigation: staticControl.navigation,
+      renderedNavigation: desktopState.navigation,
+      sourceFooter: staticControl.footerLinks,
+      renderedFooter: desktopState.footerLinks,
+    })}`);
   }
 
   await evaluate(devtools, desktopHome.sessionId, `(() => {
@@ -456,6 +607,7 @@ try {
     deviceScaleFactor: 1,
     mobile: false,
   });
+  await activateLazySearch(devtools, standardHome.sessionId);
   await waitForExpression(
     devtools,
     standardHome.sessionId,
@@ -499,6 +651,7 @@ try {
     deviceScaleFactor: 1,
     mobile: true,
   });
+  await activateLazySearch(devtools, homePage.sessionId);
   await waitForExpression(
     devtools,
     homePage.sessionId,
@@ -545,7 +698,16 @@ try {
     failures.push(`mobile header layout failed: ${JSON.stringify(mobileHeaderState)}`);
   }
 
-  await evaluate(devtools, homePage.sessionId, `document.querySelector('.nav-menu-toggle').click()`);
+  await evaluate(devtools, homePage.sessionId, `document.querySelector('.nav-menu-toggle').focus()`);
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'rawKeyDown', key: ' ', code: 'Space', windowsVirtualKeyCode: 32,
+  }, homePage.sessionId);
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'char', key: ' ', code: 'Space', text: ' ', unmodifiedText: ' ', windowsVirtualKeyCode: 32,
+  }, homePage.sessionId);
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'keyUp', key: ' ', code: 'Space', windowsVirtualKeyCode: 32,
+  }, homePage.sessionId);
   await waitForExpression(
     devtools,
     homePage.sessionId,
@@ -578,6 +740,42 @@ try {
     `!document.querySelector('details.nav-links')?.open && document.activeElement === document.querySelector('.nav-menu-toggle')`,
     'mobile navigation Escape close and focus restoration'
   );
+
+  await evaluate(devtools, homePage.sessionId, `document.querySelector('.nav-menu-toggle').click()`);
+  await waitForExpression(
+    devtools,
+    homePage.sessionId,
+    `document.querySelector('details.nav-links')?.open`,
+    'mobile navigation reopen'
+  );
+  await evaluate(devtools, homePage.sessionId, `document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))`);
+  await waitForExpression(
+    devtools,
+    homePage.sessionId,
+    `!document.querySelector('details.nav-links')?.open`,
+    'mobile navigation outside-click close'
+  );
+
+  const mobileFooterState = await evaluate(devtools, homePage.sessionId, `(() => {
+    const footer = document.querySelector('.site-footer');
+    footer?.scrollIntoView({ block: 'end' });
+    const rect = footer?.getBoundingClientRect();
+    return {
+      links: footer?.querySelectorAll('nav a').length || 0,
+      labels: Array.from(footer?.querySelectorAll('nav') || []).map((nav) => nav.getAttribute('aria-label')),
+      privacy: Boolean(footer?.querySelector('a[href="/privacy.html"]')),
+      contained: Boolean(rect && rect.left >= -1 && rect.right <= window.innerWidth + 1),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    };
+  })()`);
+  if (mobileFooterState.links !== 9
+    || JSON.stringify(mobileFooterState.labels) !== JSON.stringify(['Footer navigation', 'Site information'])
+    || !mobileFooterState.privacy
+    || !mobileFooterState.contained
+    || mobileFooterState.overflow) {
+    failures.push(`mobile footer layout failed: ${JSON.stringify(mobileFooterState)}`);
+  }
+  await evaluate(devtools, homePage.sessionId, `window.scrollTo(0, 0)`);
 
   await devtools.send('Input.dispatchKeyEvent', {
     type: 'rawKeyDown', key: 'k', code: 'KeyK', windowsVirtualKeyCode: 75, modifiers: 2,
@@ -647,7 +845,18 @@ try {
     'modal close and focus restoration'
   );
 
-  await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-page] .pf-searchbox-input').focus()`);
+  await evaluate(devtools, searchPage.sessionId, `(() => {
+    const input = document.querySelector('[data-site-search-page] pagefind-input .pf-input');
+    input.value = 'T1059.003';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  })()`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `new URL(document.querySelector('[data-site-search-results] .pf-result-link')?.href || location.href).pathname === '/threat-matrix/techniques/T1059.003/'`,
+    'full-page result before keyboard navigation'
+  );
+  await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-results] .pf-result-link').focus()`);
   await devtools.send('Input.dispatchKeyEvent', {
     type: 'rawKeyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13,
   }, searchPage.sessionId);
@@ -658,11 +867,12 @@ try {
     devtools,
     searchPage.sessionId,
     `location.pathname === '/threat-matrix/techniques/T1059.003/'`,
-    'autocomplete Enter navigation'
+    'full-page result Enter navigation'
   );
 
   const entityFile = join(site, 'threat-matrix', 'techniques', 'T1059.003', 'index.html');
   if (existsSync(entityFile) && /site-search\.js/i.test(readFileSync(entityFile, 'utf8'))) {
+    await activateLazySearch(devtools, searchPage.sessionId);
     await waitForExpression(
       devtools,
       searchPage.sessionId,
@@ -688,6 +898,8 @@ try {
   for (const check of integrationChecks) {
     if (!existsSync(check.file) || !/site-search\.js/i.test(readFileSync(check.file, 'utf8'))) continue;
     const page = await attachPage(devtools, check.url);
+    if (check.selector.includes('docusaurus')) await wait(1_500);
+    await activateLazySearch(devtools, page.sessionId);
     await waitForExpression(
       devtools,
       page.sessionId,
@@ -697,11 +909,60 @@ try {
     await devtools.send('Target.closeTarget', { targetId: page.targetId });
   }
 
+  const threatMatrix = await attachPage(devtools, `${origin}/threat-matrix/`, {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+  });
+  await waitForExpression(
+    devtools,
+    threatMatrix.sessionId,
+    `Boolean(document.querySelector('button[aria-label="Search this workspace"]'))`,
+    'Threat Matrix workspace search label'
+  );
+  const threatMatrixSearchState = await evaluate(devtools, threatMatrix.sessionId, `(() => {
+    const globalForm = document.querySelector('.tm-search-scopes__global');
+    const globalInput = document.querySelector('#tm-global-search');
+    const workspaceButton = document.querySelector('button[aria-label="Search this workspace"]');
+    return {
+      globalLabel: document.querySelector('label[for="tm-global-search"]')?.textContent.trim(),
+      globalAction: new URL(globalForm?.action || location.href).pathname,
+      globalInputName: globalInput?.name,
+      workspaceLabel: workspaceButton?.getAttribute('aria-label'),
+      siteModal: Boolean(document.querySelector('#site-search-modal')),
+      pagefindLoader: Boolean(document.querySelector('script[src*="site-search.js"]')),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    };
+  })()`);
+  if (threatMatrixSearchState.globalLabel !== 'Search all 1200km research'
+    || threatMatrixSearchState.globalAction !== '/search.html'
+    || threatMatrixSearchState.globalInputName !== 'q'
+    || threatMatrixSearchState.workspaceLabel !== 'Search this workspace'
+    || threatMatrixSearchState.siteModal
+    || threatMatrixSearchState.pagefindLoader
+    || threatMatrixSearchState.overflow) {
+    failures.push(`Threat Matrix search scopes are not distinct: ${JSON.stringify(threatMatrixSearchState)}`);
+  }
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'rawKeyDown', key: 'k', code: 'KeyK', windowsVirtualKeyCode: 75, modifiers: 2,
+  }, threatMatrix.sessionId);
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'keyUp', key: 'k', code: 'KeyK', windowsVirtualKeyCode: 75, modifiers: 2,
+  }, threatMatrix.sessionId);
+  await waitForExpression(
+    devtools,
+    threatMatrix.sessionId,
+    `Boolean(document.querySelector('[role="dialog"][aria-label="Search this workspace"]')) && !document.querySelector('#site-search-modal')`,
+    'workspace-only Ctrl+K behavior'
+  );
+  await devtools.send('Target.closeTarget', { targetId: threatMatrix.targetId });
+
   const browserErrors = devtools.events.filter((event) =>
     event.method === 'Runtime.exceptionThrown'
     || (event.method === 'Log.entryAdded' && ['error', 'warning'].includes(event.params?.entry?.level))
   );
-  const relevantErrors = browserErrors.filter((event) => !/favicon|googleapis|gstatic|googletagmanager|google-analytics/i.test(JSON.stringify(event)));
+  const relevantErrors = browserErrors.filter((event) => !/favicon|googleapis|gstatic|googletagmanager|google-analytics|1200km\.com\/assets\/ap-logo\.png.*Content Security Policy/i.test(JSON.stringify(event)));
   if (relevantErrors.length) failures.push(`browser console errors: ${JSON.stringify(relevantErrors.slice(0, 5))}`);
 
   await devtools.send('Target.closeTarget', { targetId: searchPage.targetId });
@@ -724,4 +985,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('Browser search smoke test passed (static fallback, visible desktop header/hero search, ARIA autocomplete, ranking, responsive layout, keyboard flow, and standalone/Docusaurus/entity integrations).');
+console.log('Browser search smoke test passed (fallback, facets, active filters, counts, Load More, section links, ranking, responsive layout, keyboard flow, and standalone/Docusaurus/Threat Matrix integrations).');

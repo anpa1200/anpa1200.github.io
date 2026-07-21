@@ -19,12 +19,17 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench for mapping reports, 
 
 Canonical page: https://1200km.com/adversarygraph/
 
+Stable release: v6.0.0. Work listed under `Unreleased` on the AdversaryGraph
+`main` branch is current development and must not be attributed to that tag.
+
+Authoritative fact model: https://1200km.com/data/site-facts.json
+
 ## Public Pages
 
 - Projects: https://1200km.com/projects.html
 - AdversaryGraph: https://1200km.com/adversarygraph/
 - AdversaryGraph Docs: https://1200km.com/adversarygraph-docs/
-- Threat Matrix: https://1200km.com/threat-matrix/
+- Threat Matrix (public, read-only ATT&CK workspace associated with AdversaryGraph): https://1200km.com/threat-matrix/
 - Newest Detection Engineering Techniques: https://1200km.com/newest-detection-engineering-techniques/
 - Articles: https://1200km.com/articles/
 

@@ -18,7 +18,22 @@ state. This work is Unreleased and must not be attributed to v6.0.0.
 
 Project hub: https://1200km.com/adversarygraph/
 
-Current-development RAG/MCP guide: https://1200km.com/adversarygraph-docs/unified-rag-mcp/
+Stable release: v6.0.0.
+
+Current-development RAG/MCP source guide (Unreleased): https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md
+
+Authoritative facts and metric definitions: https://1200km.com/data/site-facts.json
+
+## Product Names and Lifecycle
+
+- AdversaryGraph: maintained flagship self-hosted platform.
+- Threat Matrix: maintained public, read-only browser ATT&CK workspace associated
+  with AdversaryGraph; not the full platform.
+- ThreatMapper: superseded historical name for AdversaryGraph.
+- AdversaryGraph Web: superseded alias for Threat Matrix.
+- GitHub-archived repositories: lpi, Malware_analysis, Networking, and
+  SystemCheck. Labs and research demonstrations are not automatically
+  classified as products.
 
 Detection engineering article hub: https://1200km.com/newest-detection-engineering-techniques/
 

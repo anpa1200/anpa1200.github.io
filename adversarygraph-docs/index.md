@@ -2,7 +2,7 @@
 
 The AdversaryGraph documentation explains how the self-hosted platform supports CTI-to-detection workflows, ATT&CK mapping, IOC investigation, JA3/JA4+ network fingerprint pivots, malware-analysis evidence review, attack-surface mapping, Threat Radar, EMB3D assessment, attack simulation documentation, SIEM validation documentation, and analyst reporting.
 
-Current release: v5.9.1.
+Current release: v6.0.0.
 
 ## Start Here
 

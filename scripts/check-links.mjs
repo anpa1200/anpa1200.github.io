@@ -15,12 +15,15 @@
  * Usage:
  *   node scripts/check-links.mjs            # internal checks only (fast, offline)
  *   node scripts/check-links.mjs --external # additionally probe external URLs (network)
+ *   node scripts/check-links.mjs --site DIR  # check an assembled deployment directory
  */
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, resolve, normalize, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const siteFlag = process.argv.indexOf('--site');
+const ROOT = siteFlag >= 0 ? resolve(process.argv[siteFlag + 1] || '') : defaultRoot;
 const checkExternal = process.argv.includes('--external');
 
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
@@ -44,7 +47,9 @@ function walkHtml(dir = ROOT) {
 
 const htmlFiles = walkHtml();
 
-const hrefRe = /(?:href|src)\s*=\s*"([^"]+)"/gi;
+const linkedTagRe = /<[a-z][\w:-]*\b[^>]*(?:href|src)\s*=\s*"[^"]+"[^>]*>/gi;
+const urlAttributeRe = /(?:href|src)\s*=\s*"([^"]+)"/i;
+const relAttributeRe = /\brel\s*=\s*"([^"]+)"/i;
 const idRe = /\sid\s*=\s*"([^"]+)"/gi;
 
 const results = { broken: [], missingAnchor: [], oldDomain: [], external: [], ok: 0 };
@@ -82,11 +87,28 @@ function isLive1200kmSiblingPath(pathname) {
 
 const externalToProbe = new Set();
 
+function decodeHtmlAttribute(value) {
+  return value
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#(?:0*39|x0*27);/gi, "'")
+    .replace(/&#(?:0*47|x0*2f);/gi, '/')
+    .replace(/&#(?:0*58|x0*3a);/gi, ':');
+}
+
+function isDiscoveryMetadata(tag) {
+  if (!/^<link\b/i.test(tag)) return false;
+  const rel = relAttributeRe.exec(tag)?.[1]?.toLowerCase().split(/\s+/) || [];
+  return rel.some((value) => ['canonical', 'alternate', 'preconnect', 'dns-prefetch'].includes(value));
+}
+
 for (const f of htmlFiles) {
   let m;
-  hrefRe.lastIndex = 0;
-  while ((m = hrefRe.exec(fileText[f]))) {
-    const url = m[1].trim();
+  linkedTagRe.lastIndex = 0;
+  while ((m = linkedTagRe.exec(fileText[f]))) {
+    const tag = m[0];
+    if (isDiscoveryMetadata(tag)) continue;
+    const url = decodeHtmlAttribute(urlAttributeRe.exec(tag)?.[1] || '').trim();
     if (!url) continue;
     if (/^(mailto:|tel:|data:|javascript:)/i.test(url)) continue;
     if (/anpa1200\.github\.io/i.test(url)) results.oldDomain.push(`${f}: ${url}`);
