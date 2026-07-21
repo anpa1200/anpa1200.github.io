@@ -1,13 +1,107 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>T1213 Data from Information Repositories | AdversaryGraph</title><meta name="description" content="T1213 Data from Information Repositories: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1213/">
   <meta property="og:title" content="T1213 Data from Information Repositories | AdversaryGraph"><meta property="og:description" content="T1213 Data from Information Repositories: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1213/"><meta property="og:type" content="article">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-TMTG21RVHM')</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1213 Data from Information Repositories","description":"Adversaries may leverage information repositories to mine valuable information. Information repositories are tools that allow for storage of information, typically to facilitate collaboration or information sharing between users, and can store a wide variety of data that may aid adversaries in further objectives, such as Credential Access, Lateral Movement, or Defense Evasion, or direct access to the target information. Adversaries may also abuse external sharing features to share sensitive documents with recipients outside of the organization (i.e., Transfer Data to Cloud Account). \n\nThe following is a brief list of example information that may hold potential value to an adversary and may also be found on an information repository:\n\n* Policies, procedures, and standards\n* Physical / logical network diagrams\n* System architecture diagrams\n* Technical system documentation\n* Testing / development credentials (i.e., Unsecured Credentials) \n* Work / project schedules\n* Source code snippets\n* Links to network shares and other internal resources\n* Contact or other sensitive information about business partners and customers, including personally identifiable information (PII) \n\nInformation stored in a repository may vary based on the specific instance or environment. Specific common information repositories include the following:\n\n* Storage services such as IaaS databases, enterprise databases, and more specialized platforms such as customer relationship management (CRM) databases \n* Collaboration platforms such as SharePoint, Confluence, and code repositories\n* Messaging platforms such as Slack and Microsoft Teams \n\nIn some cases, information repositories have been improperly secured, typically by unintentionally allowing for overly-broad access by all users or even public access to unauthenticated users. This is particularly common with cloud-native or cloud-hosted services, such as AWS Relational Database Service (RDS), Redis, or ElasticSearch.","url":"https://1200km.com/threat-matrix/techniques/T1213/","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/"}}</script>
-  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style></head><body><main>
+  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style>    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1213/#webpage",
+            "url": "https://1200km.com/threat-matrix/techniques/T1213/",
+            "name": "Data from Information Repositories",
+            "description": "T1213 Data from Information Repositories: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1213/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "dateModified": "2026-06-27",
+            "mainEntity": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1213/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1213/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "The public browser workspace for the AdversaryGraph platform.",
+                "item": "https://1200km.com/threat-matrix/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Data from Information Repositories",
+                "item": "https://1200km.com/threat-matrix/techniques/T1213/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "T1213 Data from Information Repositories",
+            "description": "Adversaries may leverage information repositories to mine valuable information. Information repositories are tools that allow for storage of information, typically to facilitate collaboration or information sharing between users, and can store a wide variety of data that may aid adversaries in further objectives, such as Credential Access, Lateral Movement, or Defense Evasion, or direct access to the target information. Adversaries may also abuse external sharing features to share sensitive documents with recipients outside of the organization (i.e., Transfer Data to Cloud Account). \n\nThe following is a brief list of example information that may hold potential value to an adversary and may also be found on an information repository:\n\n* Policies, procedures, and standards\n* Physical / logical network diagrams\n* System architecture diagrams\n* Technical system documentation\n* Testing / development credentials (i.e., Unsecured Credentials) \n* Work / project schedules\n* Source code snippets\n* Links to network shares and other internal resources\n* Contact or other sensitive information about business partners and customers, including personally identifiable information (PII) \n\nInformation stored in a repository may vary based on the specific instance or environment. Specific common information repositories include the following:\n\n* Storage services such as IaaS databases, enterprise databases, and more specialized platforms such as customer relationship management (CRM) databases \n* Collaboration platforms such as SharePoint, Confluence, and code repositories\n* Messaging platforms such as Slack and Microsoft Teams \n\nIn some cases, information repositories have been improperly secured, typically by unintentionally allowing for overly-broad access by all users or even public access to unauthenticated users. This is particularly common with cloud-native or cloud-hosted services, such as AWS Relational Database Service (RDS), Redis, or ElasticSearch.",
+            "url": "https://1200km.com/threat-matrix/techniques/T1213/",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/threat-matrix/techniques/T1213/#article",
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1213/#webpage"
+            },
+            "dateModified": "2026-06-27"
+          }
+        ]
+      }
+    </script>
+</head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
   <p style="margin:0 0 8px;color:#67e8f9;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">AdversaryGraph public intelligence page</p>
-  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>AdversaryGraph Web</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
+  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>Threat Matrix</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
   <p style="margin:0 0 14px;color:#fca5a5"><strong>Validation disclaimer:</strong> TTP overlap, actor similarity, generated summaries, and coverage findings are investigation leads, not attribution proof or operational validation without analyst review.</p>
   <p style="display:flex;flex-wrap:wrap;gap:10px;margin:0">
     <a style="background:#e11d48;border-radius:6px;color:#fff;font-weight:800;padding:8px 10px;text-decoration:none" href="https://1200km.com/adversarygraph/">Main AdversaryGraph project</a>
@@ -17,12 +111,12 @@
   </p>
 </section>
   <nav><a href="https://1200km.com/threat-matrix/">AdversaryGraph</a> / ATT&amp;CK techniques / T1213</nav><p class="meta">T1213 · collection · 5 actors · 1 correlated reports</p>
-  <h1>Data from Information Repositories</h1><p>Adversaries may leverage information repositories to mine valuable information. Information repositories are tools that allow for storage of information, typically to facilitate collaboration or information sharing between users, and can store a wide variety of data that may aid adversaries in further objectives, such as Credential Access, Lateral Movement, or Defense Evasion, or direct access to the target information. Adversaries may also abuse external sharing features to share sensitive documents with recipients outside of the organization (i.e., Transfer Data to Cloud Account).  The following is a brief list of example information that may hold potential value to an adversary and may also be found on an information repository: * Policies, procedures, and standards * Physical / logical network diagrams * System architecture diagrams * Technical system documentation * Testing / development credentials (i.e., Unsecured Credentials)  * Work / project schedules * Source code snippets * Links to network shares and other internal resources * Contact or other sensitive information about business partners and customers, including personally identifiable information (PII)  Information stored in a repository may vary based on the specific instance or environment. Specific common information repositories include the following: * Storage services such as IaaS databases, enterprise databases, and more specialized platforms such as customer relationship management (CRM) databases  * Collaboration platforms such as SharePoint, Confluence, and code repositories * Messaging platforms such as Slack and Microsoft Teams  In some cases, information repositories have been improperly secured, typically by unintentionally allowing for overly-broad access by all users or even public access to unauthenticated users. This is particularly common with cloud-native or cloud-hosted services, such as AWS Relational Database Service (RDS), Redis, or ElasticSearch.</p>
+  <h1 id="data-from-information-repositories">Data from Information Repositories</h1><p>Adversaries may leverage information repositories to mine valuable information. Information repositories are tools that allow for storage of information, typically to facilitate collaboration or information sharing between users, and can store a wide variety of data that may aid adversaries in further objectives, such as Credential Access, Lateral Movement, or Defense Evasion, or direct access to the target information. Adversaries may also abuse external sharing features to share sensitive documents with recipients outside of the organization (i.e., Transfer Data to Cloud Account).  The following is a brief list of example information that may hold potential value to an adversary and may also be found on an information repository: * Policies, procedures, and standards * Physical / logical network diagrams * System architecture diagrams * Technical system documentation * Testing / development credentials (i.e., Unsecured Credentials)  * Work / project schedules * Source code snippets * Links to network shares and other internal resources * Contact or other sensitive information about business partners and customers, including personally identifiable information (PII)  Information stored in a repository may vary based on the specific instance or environment. Specific common information repositories include the following: * Storage services such as IaaS databases, enterprise databases, and more specialized platforms such as customer relationship management (CRM) databases  * Collaboration platforms such as SharePoint, Confluence, and code repositories * Messaging platforms such as Slack and Microsoft Teams  In some cases, information repositories have been improperly secured, typically by unintentionally allowing for overly-broad access by all users or even public access to unauthenticated users. This is particularly common with cloud-native or cloud-hosted services, such as AWS Relational Database Service (RDS), Redis, or ElasticSearch.</p>
   <p><a class="cta" href="https://1200km.com/threat-matrix/#/techniques/T1213">Open detection, hunting, mitigation, and evidence workspace</a></p>
-  <section><h2>Detection logic</h2><p>As information repositories generally have a considerably large user base, detection of malicious use can be non-trivial. At minimum, access to information repositories performed by privileged users (for example, Active Directory Domain, Enterprise, or Schema Administrators) should be closely monitored and alerted upon, as these types of accounts should generally not be used to access information repositories. If the capability exists, it may be of value to monitor and alert on users that are retrieving and viewing a large number of documents and pages; this behavior may be indicative of programmatic means being used to retrieve all data within the repository. In environments with high-maturity, it may be possible to leverage User-Behavioral Analytics (UBA) platforms to detect and alert on user based anomalies. The user access logging within Microsoft&#39;s SharePoint can be configured to report access to certain pages and documents.  Sharepoint audit logging can also be configured to report when a user shares a resource.  The user access logging within Atlassian&#39;s Confluence can also be configured to report access to certain pages and documents through AccessLogFilter.  Additional log storage and analysis infrastructure will likely be required for more robust detection capabilities.</p></section>
-  <section><h2>Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0037/"><strong>FIN6</strong><br><span class="muted">G0037</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0016/"><strong>APT29</strong><br><span class="muted">G0016</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0007/"><strong>APT28</strong><br><span class="muted">G0007</span></a></div></section>
-  <section><h2>Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://cdn-images-1.medium.com/max/800/1*rJhQNIYp8Kpj1Acwmljrhg.png"><strong>CTI Led Defensive Strategy for a Cellular Provider  Case Study </strong><br><span class="muted">1200km Medium · authored report mention</span></a></div></section>
-  <section><h2>Continue the investigation</h2><div class="links">
+  <section><h2 id="detection-logic">Detection logic</h2><p>As information repositories generally have a considerably large user base, detection of malicious use can be non-trivial. At minimum, access to information repositories performed by privileged users (for example, Active Directory Domain, Enterprise, or Schema Administrators) should be closely monitored and alerted upon, as these types of accounts should generally not be used to access information repositories. If the capability exists, it may be of value to monitor and alert on users that are retrieving and viewing a large number of documents and pages; this behavior may be indicative of programmatic means being used to retrieve all data within the repository. In environments with high-maturity, it may be possible to leverage User-Behavioral Analytics (UBA) platforms to detect and alert on user based anomalies. The user access logging within Microsoft&#39;s SharePoint can be configured to report access to certain pages and documents.  Sharepoint audit logging can also be configured to report when a user shares a resource.  The user access logging within Atlassian&#39;s Confluence can also be configured to report access to certain pages and documents through AccessLogFilter.  Additional log storage and analysis infrastructure will likely be required for more robust detection capabilities.</p></section>
+  <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0037/"><strong>FIN6</strong><br><span class="muted">G0037</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0016/"><strong>APT29</strong><br><span class="muted">G0016</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0007/"><strong>APT28</strong><br><span class="muted">G0007</span></a></div></section>
+  <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://cdn-images-1.medium.com/max/800/1*rJhQNIYp8Kpj1Acwmljrhg.png"><strong>CTI Led Defensive Strategy for a Cellular Provider  Case Study </strong><br><span class="muted">1200km Medium · authored report mention</span></a></div></section>
+  <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>
     <a href="https://1200km.com/cti-analyst-field-manual/">CTI Analyst Field Manual</a>

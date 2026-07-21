@@ -17,6 +17,7 @@ const HOME_LINKS = [
   '</.well-known/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
   '</.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"',
   '</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
+  '</data/site-facts.json>; rel="service-desc"; type="application/json"',
   '</sitemap.xml>; rel="sitemap"; type="application/xml"',
 ];
 
@@ -54,6 +55,10 @@ function addDiscoveryHeaders(response, pathname) {
   }
   if (JSON_WELL_KNOWN_PATHS.has(pathname)) {
     headers.set('Content-Type', 'application/json; charset=utf-8');
+  }
+  if (pathname === '/data/site-facts.json' || pathname === '/data/site-facts.schema.json') {
+    headers.set('Content-Type', 'application/json; charset=utf-8');
+    headers.set('Access-Control-Allow-Origin', '*');
   }
   if (pathname.startsWith('/.well-known/')) {
     headers.set('Access-Control-Allow-Origin', '*');

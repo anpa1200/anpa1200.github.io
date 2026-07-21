@@ -2,6 +2,8 @@
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench created by Andrey Pautov.
 
+Authoritative release and lifecycle facts: https://1200km.com/data/site-facts.json
+
 It helps analysts connect:
 
 - CTI reports
@@ -52,7 +54,7 @@ require `manage_feeds`.
 
 - Docs: https://1200km.com/adversarygraph-docs/
 - Capabilities: https://1200km.com/adversarygraph-docs/capabilities/
-- Unified RAG and MCP (current development): https://1200km.com/adversarygraph-docs/unified-rag-mcp/
+- Unified RAG and MCP source guide (Unreleased): https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md
 - v6 release readiness: https://1200km.com/adversarygraph-docs/release-readiness-v6/
 - v6 case studies: https://1200km.com/adversarygraph-docs/case-studies-v6/
 - Detection engineering techniques: https://1200km.com/newest-detection-engineering-techniques/

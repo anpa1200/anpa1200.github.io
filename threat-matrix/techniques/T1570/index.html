@@ -1,13 +1,107 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>T1570 Lateral Tool Transfer | AdversaryGraph</title><meta name="description" content="T1570 Lateral Tool Transfer: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1570/">
   <meta property="og:title" content="T1570 Lateral Tool Transfer | AdversaryGraph"><meta property="og:description" content="T1570 Lateral Tool Transfer: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1570/"><meta property="og:type" content="article">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-TMTG21RVHM')</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1570 Lateral Tool Transfer","description":"Adversaries may transfer tools or other files between systems in a compromised environment. Once brought into the victim environment (i.e., Ingress Tool Transfer) files may then be copied from one system to another to stage adversary tools or other files over the course of an operation.\n\nAdversaries may copy files between internal victim systems to support lateral movement using inherent file sharing protocols such as file sharing over SMB/Windows Admin Shares to connected network shares or with authenticated connections via Remote Desktop Protocol.\n\nFiles can also be transferred using native or otherwise present tools on the victim system, such as scp, rsync, curl, sftp, and ftp. In some cases, adversaries may be able to leverage Web Services such as Dropbox or OneDrive to copy files from one machine to another via shared, automatically synced folders.","url":"https://1200km.com/threat-matrix/techniques/T1570/","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/"}}</script>
-  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style></head><body><main>
+  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style>    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1570/#webpage",
+            "url": "https://1200km.com/threat-matrix/techniques/T1570/",
+            "name": "Lateral Tool Transfer",
+            "description": "T1570 Lateral Tool Transfer: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1570/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "dateModified": "2026-06-27",
+            "mainEntity": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1570/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1570/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "The public browser workspace for the AdversaryGraph platform.",
+                "item": "https://1200km.com/threat-matrix/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Lateral Tool Transfer",
+                "item": "https://1200km.com/threat-matrix/techniques/T1570/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "T1570 Lateral Tool Transfer",
+            "description": "Adversaries may transfer tools or other files between systems in a compromised environment. Once brought into the victim environment (i.e., Ingress Tool Transfer) files may then be copied from one system to another to stage adversary tools or other files over the course of an operation.\n\nAdversaries may copy files between internal victim systems to support lateral movement using inherent file sharing protocols such as file sharing over SMB/Windows Admin Shares to connected network shares or with authenticated connections via Remote Desktop Protocol.\n\nFiles can also be transferred using native or otherwise present tools on the victim system, such as scp, rsync, curl, sftp, and ftp. In some cases, adversaries may be able to leverage Web Services such as Dropbox or OneDrive to copy files from one machine to another via shared, automatically synced folders.",
+            "url": "https://1200km.com/threat-matrix/techniques/T1570/",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/threat-matrix/techniques/T1570/#article",
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1570/#webpage"
+            },
+            "dateModified": "2026-06-27"
+          }
+        ]
+      }
+    </script>
+</head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
   <p style="margin:0 0 8px;color:#67e8f9;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">AdversaryGraph public intelligence page</p>
-  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>AdversaryGraph Web</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
+  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>Threat Matrix</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
   <p style="margin:0 0 14px;color:#fca5a5"><strong>Validation disclaimer:</strong> TTP overlap, actor similarity, generated summaries, and coverage findings are investigation leads, not attribution proof or operational validation without analyst review.</p>
   <p style="display:flex;flex-wrap:wrap;gap:10px;margin:0">
     <a style="background:#e11d48;border-radius:6px;color:#fff;font-weight:800;padding:8px 10px;text-decoration:none" href="https://1200km.com/adversarygraph/">Main AdversaryGraph project</a>
@@ -17,12 +111,12 @@
   </p>
 </section>
   <nav><a href="https://1200km.com/threat-matrix/">AdversaryGraph</a> / ATT&amp;CK techniques / T1570</nav><p class="meta">T1570 · lateral-movement · 14 actors · 3 correlated reports</p>
-  <h1>Lateral Tool Transfer</h1><p>Adversaries may transfer tools or other files between systems in a compromised environment. Once brought into the victim environment (i.e., Ingress Tool Transfer) files may then be copied from one system to another to stage adversary tools or other files over the course of an operation. Adversaries may copy files between internal victim systems to support lateral movement using inherent file sharing protocols such as file sharing over SMB/Windows Admin Shares to connected network shares or with authenticated connections via Remote Desktop Protocol. Files can also be transferred using native or otherwise present tools on the victim system, such as scp, rsync, curl, sftp, and ftp. In some cases, adversaries may be able to leverage Web Services such as Dropbox or OneDrive to copy files from one machine to another via shared, automatically synced folders.</p>
+  <h1 id="lateral-tool-transfer">Lateral Tool Transfer</h1><p>Adversaries may transfer tools or other files between systems in a compromised environment. Once brought into the victim environment (i.e., Ingress Tool Transfer) files may then be copied from one system to another to stage adversary tools or other files over the course of an operation. Adversaries may copy files between internal victim systems to support lateral movement using inherent file sharing protocols such as file sharing over SMB/Windows Admin Shares to connected network shares or with authenticated connections via Remote Desktop Protocol. Files can also be transferred using native or otherwise present tools on the victim system, such as scp, rsync, curl, sftp, and ftp. In some cases, adversaries may be able to leverage Web Services such as Dropbox or OneDrive to copy files from one machine to another via shared, automatically synced folders.</p>
   <p><a class="cta" href="https://1200km.com/threat-matrix/#/techniques/T1570">Open detection, hunting, mitigation, and evidence workspace</a></p>
-  <section><h2>Detection logic</h2><p>Monitor for file creation and files transferred within a network using protocols such as SMB or FTP. Unusual processes with internal network connections creating files on-system may be suspicious. Consider monitoring for abnormal usage of utilities and command-line arguments that may be used in support of remote transfer of files. Considering monitoring for alike file hashes or characteristics (ex: filename) that are created on multiple hosts.</p></section>
-  <section><h2>Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0093/"><strong>GALLIUM</strong><br><span class="muted">G0093</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1017/"><strong>Volt Typhoon</strong><br><span class="muted">G1017</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0096/"><strong>APT41</strong><br><span class="muted">G0096</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0050/"><strong>APT32</strong><br><span class="muted">G0050</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1007/"><strong>Aoqin Dragon</strong><br><span class="muted">G1007</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0114/"><strong>Chimera</strong><br><span class="muted">G0114</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1003/"><strong>Ember Bear</strong><br><span class="muted">G1003</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1030/"><strong>Agrius</strong><br><span class="muted">G1030</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1032/"><strong>INC Ransom</strong><br><span class="muted">G1032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0102/"><strong>Wizard Spider</strong><br><span class="muted">G0102</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0059/"><strong>Magic Hound</strong><br><span class="muted">G0059</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0051/"><strong>FIN10</strong><br><span class="muted">G0051</span></a></div></section>
-  <section><h2>Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://1200km.com/israel-government-threat-actors-cti/reports/apt39-arid-viper-unc3890-cyber-toufan-deep-research/"><strong>APT39 (Chafer / Remix Kitten)</strong><br><span class="muted">Israel Threat Actors CTI · explicit report mention</span></a><a class="card" href="https://github.com/anpa1200/CTI/blob/main/ATT&amp;CK/README.md"><strong>ATT&amp;CK as a Working Tool: Theory and Hands-On Practical Usage</strong><br><span class="muted">1200km CTI repository · explicit report mention</span></a><a class="card" href="https://cdn-images-1.medium.com/max/800/1*erhDw-Zg56_rlj9jR9y4bw.png"><strong>ATT CK as a Working Tool  Theory and Hands On Practical Usage</strong><br><span class="muted">1200km Medium · authored report mention</span></a></div></section>
-  <section><h2>Continue the investigation</h2><div class="links">
+  <section><h2 id="detection-logic">Detection logic</h2><p>Monitor for file creation and files transferred within a network using protocols such as SMB or FTP. Unusual processes with internal network connections creating files on-system may be suspicious. Consider monitoring for abnormal usage of utilities and command-line arguments that may be used in support of remote transfer of files. Considering monitoring for alike file hashes or characteristics (ex: filename) that are created on multiple hosts.</p></section>
+  <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0093/"><strong>GALLIUM</strong><br><span class="muted">G0093</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1017/"><strong>Volt Typhoon</strong><br><span class="muted">G1017</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0096/"><strong>APT41</strong><br><span class="muted">G0096</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0050/"><strong>APT32</strong><br><span class="muted">G0050</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1007/"><strong>Aoqin Dragon</strong><br><span class="muted">G1007</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0114/"><strong>Chimera</strong><br><span class="muted">G0114</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1003/"><strong>Ember Bear</strong><br><span class="muted">G1003</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1030/"><strong>Agrius</strong><br><span class="muted">G1030</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1032/"><strong>INC Ransom</strong><br><span class="muted">G1032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0102/"><strong>Wizard Spider</strong><br><span class="muted">G0102</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0059/"><strong>Magic Hound</strong><br><span class="muted">G0059</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0051/"><strong>FIN10</strong><br><span class="muted">G0051</span></a></div></section>
+  <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://1200km.com/israel-government-threat-actors-cti/reports/apt39-arid-viper-unc3890-cyber-toufan-deep-research/"><strong>APT39 (Chafer / Remix Kitten)</strong><br><span class="muted">Israel Threat Actors CTI · explicit report mention</span></a><a class="card" href="https://github.com/anpa1200/CTI/blob/main/ATT&amp;CK/README.md"><strong>ATT&amp;CK as a Working Tool: Theory and Hands-On Practical Usage</strong><br><span class="muted">1200km CTI repository · explicit report mention</span></a><a class="card" href="https://cdn-images-1.medium.com/max/800/1*erhDw-Zg56_rlj9jR9y4bw.png"><strong>ATT CK as a Working Tool  Theory and Hands On Practical Usage</strong><br><span class="muted">1200km Medium · authored report mention</span></a></div></section>
+  <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>
     <a href="https://1200km.com/cti-analyst-field-manual/">CTI Analyst Field Manual</a>

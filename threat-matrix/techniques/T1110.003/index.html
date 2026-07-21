@@ -1,13 +1,107 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>T1110.003 Password Spraying | AdversaryGraph</title><meta name="description" content="T1110.003 Password Spraying: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1110.003/">
   <meta property="og:title" content="T1110.003 Password Spraying | AdversaryGraph"><meta property="og:description" content="T1110.003 Password Spraying: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1110.003/"><meta property="og:type" content="article">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-TMTG21RVHM')</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1110.003 Password Spraying","description":"Adversaries may use a single or small list of commonly used passwords against many different accounts to attempt to acquire valid account credentials. Password spraying uses one password (e.g. 'Password01'), or a small list of commonly used passwords, that may match the complexity policy of the domain. Logins are attempted with that password against many different accounts on a network to avoid account lockouts that would normally occur when brute forcing a single account with many passwords. \n\nTypically, management services over commonly used ports are used when password spraying. Commonly targeted services include the following:\n\n* SSH (22/TCP)\n* Telnet (23/TCP)\n* FTP (21/TCP)\n* NetBIOS / SMB / Samba (139/TCP & 445/TCP)\n* LDAP (389/TCP)\n* Kerberos (88/TCP)\n* RDP / Terminal Services (3389/TCP)\n* HTTP/HTTP Management Services (80/TCP & 443/TCP)\n* MSSQL (1433/TCP)\n* Oracle (1521/TCP)\n* MySQL (3306/TCP)\n* VNC (5900/TCP)\n\nIn addition to management services, adversaries may \"target single sign-on (SSO) and cloud-based applications utilizing federated authentication protocols,\" as well as externally facing email applications, such as Office 365.\n\nIn default environments, LDAP and Kerberos connection attempts are less likely to trigger events over SMB, which creates Windows \"logon failure\" event ID 4625.","url":"https://1200km.com/threat-matrix/techniques/T1110.003/","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/"}}</script>
-  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style></head><body><main>
+  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style>    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1110.003/#webpage",
+            "url": "https://1200km.com/threat-matrix/techniques/T1110.003/",
+            "name": "Password Spraying",
+            "description": "T1110.003 Password Spraying: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1110.003/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "dateModified": "2026-06-27",
+            "mainEntity": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1110.003/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1110.003/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "The public browser workspace for the AdversaryGraph platform.",
+                "item": "https://1200km.com/threat-matrix/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Password Spraying",
+                "item": "https://1200km.com/threat-matrix/techniques/T1110.003/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "T1110.003 Password Spraying",
+            "description": "Adversaries may use a single or small list of commonly used passwords against many different accounts to attempt to acquire valid account credentials. Password spraying uses one password (e.g. 'Password01'), or a small list of commonly used passwords, that may match the complexity policy of the domain. Logins are attempted with that password against many different accounts on a network to avoid account lockouts that would normally occur when brute forcing a single account with many passwords. \n\nTypically, management services over commonly used ports are used when password spraying. Commonly targeted services include the following:\n\n* SSH (22/TCP)\n* Telnet (23/TCP)\n* FTP (21/TCP)\n* NetBIOS / SMB / Samba (139/TCP & 445/TCP)\n* LDAP (389/TCP)\n* Kerberos (88/TCP)\n* RDP / Terminal Services (3389/TCP)\n* HTTP/HTTP Management Services (80/TCP & 443/TCP)\n* MSSQL (1433/TCP)\n* Oracle (1521/TCP)\n* MySQL (3306/TCP)\n* VNC (5900/TCP)\n\nIn addition to management services, adversaries may \"target single sign-on (SSO) and cloud-based applications utilizing federated authentication protocols,\" as well as externally facing email applications, such as Office 365.\n\nIn default environments, LDAP and Kerberos connection attempts are less likely to trigger events over SMB, which creates Windows \"logon failure\" event ID 4625.",
+            "url": "https://1200km.com/threat-matrix/techniques/T1110.003/",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/threat-matrix/techniques/T1110.003/#article",
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1110.003/#webpage"
+            },
+            "dateModified": "2026-06-27"
+          }
+        ]
+      }
+    </script>
+</head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
   <p style="margin:0 0 8px;color:#67e8f9;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">AdversaryGraph public intelligence page</p>
-  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>AdversaryGraph Web</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
+  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>Threat Matrix</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
   <p style="margin:0 0 14px;color:#fca5a5"><strong>Validation disclaimer:</strong> TTP overlap, actor similarity, generated summaries, and coverage findings are investigation leads, not attribution proof or operational validation without analyst review.</p>
   <p style="display:flex;flex-wrap:wrap;gap:10px;margin:0">
     <a style="background:#e11d48;border-radius:6px;color:#fff;font-weight:800;padding:8px 10px;text-decoration:none" href="https://1200km.com/adversarygraph/">Main AdversaryGraph project</a>
@@ -17,12 +111,12 @@
   </p>
 </section>
   <nav><a href="https://1200km.com/threat-matrix/">AdversaryGraph</a> / ATT&amp;CK techniques / T1110.003</nav><p class="meta">T1110.003 · credential-access · 11 actors · 1 correlated reports</p>
-  <h1>Password Spraying</h1><p>Adversaries may use a single or small list of commonly used passwords against many different accounts to attempt to acquire valid account credentials. Password spraying uses one password (e.g. &#39;Password01&#39;), or a small list of commonly used passwords, that may match the complexity policy of the domain. Logins are attempted with that password against many different accounts on a network to avoid account lockouts that would normally occur when brute forcing a single account with many passwords.  Typically, management services over commonly used ports are used when password spraying. Commonly targeted services include the following: * SSH (22/TCP) * Telnet (23/TCP) * FTP (21/TCP) * NetBIOS / SMB / Samba (139/TCP &amp; 445/TCP) * LDAP (389/TCP) * Kerberos (88/TCP) * RDP / Terminal Services (3389/TCP) * HTTP/HTTP Management Services (80/TCP &amp; 443/TCP) * MSSQL (1433/TCP) * Oracle (1521/TCP) * MySQL (3306/TCP) * VNC (5900/TCP) In addition to management services, adversaries may &quot;target single sign-on (SSO) and cloud-based applications utilizing federated authentication protocols,&quot; as well as externally facing email applications, such as Office 365. In default environments, LDAP and Kerberos connection attempts are less likely to trigger events over SMB, which creates Windows &quot;logon failure&quot; event ID 4625.</p>
+  <h1 id="password-spraying">Password Spraying</h1><p>Adversaries may use a single or small list of commonly used passwords against many different accounts to attempt to acquire valid account credentials. Password spraying uses one password (e.g. &#39;Password01&#39;), or a small list of commonly used passwords, that may match the complexity policy of the domain. Logins are attempted with that password against many different accounts on a network to avoid account lockouts that would normally occur when brute forcing a single account with many passwords.  Typically, management services over commonly used ports are used when password spraying. Commonly targeted services include the following: * SSH (22/TCP) * Telnet (23/TCP) * FTP (21/TCP) * NetBIOS / SMB / Samba (139/TCP &amp; 445/TCP) * LDAP (389/TCP) * Kerberos (88/TCP) * RDP / Terminal Services (3389/TCP) * HTTP/HTTP Management Services (80/TCP &amp; 443/TCP) * MSSQL (1433/TCP) * Oracle (1521/TCP) * MySQL (3306/TCP) * VNC (5900/TCP) In addition to management services, adversaries may &quot;target single sign-on (SSO) and cloud-based applications utilizing federated authentication protocols,&quot; as well as externally facing email applications, such as Office 365. In default environments, LDAP and Kerberos connection attempts are less likely to trigger events over SMB, which creates Windows &quot;logon failure&quot; event ID 4625.</p>
   <p><a class="cta" href="https://1200km.com/threat-matrix/#/techniques/T1110.003">Open detection, hunting, mitigation, and evidence workspace</a></p>
-  <section><h2>Detection logic</h2><p>Monitor authentication logs for system and application login failures of Valid Accounts. Specifically, monitor for many failed authentication attempts across various accounts that may result from password spraying attempts. Consider the following event IDs: * Domain Controllers: &quot;Audit Logon&quot; (Success &amp; Failure) for event ID 4625. * Domain Controllers: &quot;Audit Kerberos Authentication Service&quot; (Success &amp; Failure) for event ID 4771. * All systems: &quot;Audit Logon&quot; (Success &amp; Failure) for event ID 4648.</p></section>
-  <section><h2>Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0077/"><strong>Leafminer</strong><br><span class="muted">G0077</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0016/"><strong>APT29</strong><br><span class="muted">G0016</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0114/"><strong>Chimera</strong><br><span class="muted">G0114</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0122/"><strong>Silent Librarian</strong><br><span class="muted">G0122</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1003/"><strong>Ember Bear</strong><br><span class="muted">G1003</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1030/"><strong>Agrius</strong><br><span class="muted">G1030</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0007/"><strong>APT28</strong><br><span class="muted">G0007</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1001/"><strong>HEXANE</strong><br><span class="muted">G1001</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0064/"><strong>APT33</strong><br><span class="muted">G0064</span></a></div></section>
-  <section><h2>Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://cdn-images-1.medium.com/max/800/1*rJhQNIYp8Kpj1Acwmljrhg.png"><strong>CTI Led Defensive Strategy for a Cellular Provider  Case Study </strong><br><span class="muted">1200km Medium · authored report mention</span></a></div></section>
-  <section><h2>Continue the investigation</h2><div class="links">
+  <section><h2 id="detection-logic">Detection logic</h2><p>Monitor authentication logs for system and application login failures of Valid Accounts. Specifically, monitor for many failed authentication attempts across various accounts that may result from password spraying attempts. Consider the following event IDs: * Domain Controllers: &quot;Audit Logon&quot; (Success &amp; Failure) for event ID 4625. * Domain Controllers: &quot;Audit Kerberos Authentication Service&quot; (Success &amp; Failure) for event ID 4771. * All systems: &quot;Audit Logon&quot; (Success &amp; Failure) for event ID 4648.</p></section>
+  <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0077/"><strong>Leafminer</strong><br><span class="muted">G0077</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0034/"><strong>Sandworm Team</strong><br><span class="muted">G0034</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0016/"><strong>APT29</strong><br><span class="muted">G0016</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0114/"><strong>Chimera</strong><br><span class="muted">G0114</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0122/"><strong>Silent Librarian</strong><br><span class="muted">G0122</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1003/"><strong>Ember Bear</strong><br><span class="muted">G1003</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1030/"><strong>Agrius</strong><br><span class="muted">G1030</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0007/"><strong>APT28</strong><br><span class="muted">G0007</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1001/"><strong>HEXANE</strong><br><span class="muted">G1001</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0064/"><strong>APT33</strong><br><span class="muted">G0064</span></a></div></section>
+  <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"><a class="card" href="https://cdn-images-1.medium.com/max/800/1*rJhQNIYp8Kpj1Acwmljrhg.png"><strong>CTI Led Defensive Strategy for a Cellular Provider  Case Study </strong><br><span class="muted">1200km Medium · authored report mention</span></a></div></section>
+  <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>
     <a href="https://1200km.com/cti-analyst-field-manual/">CTI Analyst Field Manual</a>

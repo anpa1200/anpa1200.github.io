@@ -1,13 +1,107 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>T1497.001 System Checks | AdversaryGraph</title><meta name="description" content="T1497.001 System Checks: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1497.001/">
   <meta property="og:title" content="T1497.001 System Checks | AdversaryGraph"><meta property="og:description" content="T1497.001 System Checks: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1497.001/"><meta property="og:type" content="article">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-TMTG21RVHM')</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1497.001 System Checks","description":"Adversaries may employ various system checks to detect and avoid virtualization and analysis environments. This may include changing behaviors based on the results of checks for the presence of artifacts indicative of a virtual machine environment (VME) or sandbox. If the adversary detects a VME, they may alter their malware to disengage from the victim or conceal the core functions of the implant. They may also search for VME artifacts before dropping secondary or additional payloads. Adversaries may use the information learned from Virtualization/Sandbox Evasion during automated discovery to shape follow-on behaviors.\n\nSpecific checks will vary based on the target and/or adversary, but may involve behaviors such as Windows Management Instrumentation, PowerShell, System Information Discovery, and Query Registry to obtain system information and search for VME artifacts. Adversaries may search for VME artifacts in memory, processes, file system, hardware, and/or the Registry. Adversaries may use scripting to automate these checks  into one script and then have the program exit if it determines the system to be a virtual environment. \n\nChecks could include generic system properties such as host/domain name and samples of network traffic. Adversaries may also check the network adapters addresses, CPU core count, and available memory/drive size. Once executed, malware may also use File and Directory Discovery to check if it was saved in a folder or file with unexpected or even analysis-related naming artifacts such as `malware`, `sample`, or `hash`.\n\nOther common checks may enumerate services running that are unique to these applications, installed programs on the system, manufacturer/product fields for strings relating to virtual machine applications, and VME-specific hardware/processor instructions. In applications like VMWare, adversaries can also use a special I/O port to send commands and receive output. \n \nHardware checks, such as the presence of the fan, temperature, and audio devices, could also be used to gather evidence that can be indicative a virtual environment. Adversaries may also query for specific readings from these devices.","url":"https://1200km.com/threat-matrix/techniques/T1497.001/","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/"}}</script>
-  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style></head><body><main>
+  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style>    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1497.001/#webpage",
+            "url": "https://1200km.com/threat-matrix/techniques/T1497.001/",
+            "name": "System Checks",
+            "description": "T1497.001 System Checks: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1497.001/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "dateModified": "2026-06-27",
+            "mainEntity": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1497.001/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1497.001/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "The public browser workspace for the AdversaryGraph platform.",
+                "item": "https://1200km.com/threat-matrix/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "System Checks",
+                "item": "https://1200km.com/threat-matrix/techniques/T1497.001/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "T1497.001 System Checks",
+            "description": "Adversaries may employ various system checks to detect and avoid virtualization and analysis environments. This may include changing behaviors based on the results of checks for the presence of artifacts indicative of a virtual machine environment (VME) or sandbox. If the adversary detects a VME, they may alter their malware to disengage from the victim or conceal the core functions of the implant. They may also search for VME artifacts before dropping secondary or additional payloads. Adversaries may use the information learned from Virtualization/Sandbox Evasion during automated discovery to shape follow-on behaviors.\n\nSpecific checks will vary based on the target and/or adversary, but may involve behaviors such as Windows Management Instrumentation, PowerShell, System Information Discovery, and Query Registry to obtain system information and search for VME artifacts. Adversaries may search for VME artifacts in memory, processes, file system, hardware, and/or the Registry. Adversaries may use scripting to automate these checks  into one script and then have the program exit if it determines the system to be a virtual environment. \n\nChecks could include generic system properties such as host/domain name and samples of network traffic. Adversaries may also check the network adapters addresses, CPU core count, and available memory/drive size. Once executed, malware may also use File and Directory Discovery to check if it was saved in a folder or file with unexpected or even analysis-related naming artifacts such as `malware`, `sample`, or `hash`.\n\nOther common checks may enumerate services running that are unique to these applications, installed programs on the system, manufacturer/product fields for strings relating to virtual machine applications, and VME-specific hardware/processor instructions. In applications like VMWare, adversaries can also use a special I/O port to send commands and receive output. \n \nHardware checks, such as the presence of the fan, temperature, and audio devices, could also be used to gather evidence that can be indicative a virtual environment. Adversaries may also query for specific readings from these devices.",
+            "url": "https://1200km.com/threat-matrix/techniques/T1497.001/",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/threat-matrix/techniques/T1497.001/#article",
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1497.001/#webpage"
+            },
+            "dateModified": "2026-06-27"
+          }
+        ]
+      }
+    </script>
+</head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
   <p style="margin:0 0 8px;color:#67e8f9;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">AdversaryGraph public intelligence page</p>
-  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>AdversaryGraph Web</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
+  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>Threat Matrix</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
   <p style="margin:0 0 14px;color:#fca5a5"><strong>Validation disclaimer:</strong> TTP overlap, actor similarity, generated summaries, and coverage findings are investigation leads, not attribution proof or operational validation without analyst review.</p>
   <p style="display:flex;flex-wrap:wrap;gap:10px;margin:0">
     <a style="background:#e11d48;border-radius:6px;color:#fff;font-weight:800;padding:8px 10px;text-decoration:none" href="https://1200km.com/adversarygraph/">Main AdversaryGraph project</a>
@@ -17,12 +111,12 @@
   </p>
 </section>
   <nav><a href="https://1200km.com/threat-matrix/">AdversaryGraph</a> / ATT&amp;CK techniques / T1497.001</nav><p class="meta">T1497.001 · defense-evasion, discovery · 5 actors · 0 correlated reports</p>
-  <h1>System Checks</h1><p>Adversaries may employ various system checks to detect and avoid virtualization and analysis environments. This may include changing behaviors based on the results of checks for the presence of artifacts indicative of a virtual machine environment (VME) or sandbox. If the adversary detects a VME, they may alter their malware to disengage from the victim or conceal the core functions of the implant. They may also search for VME artifacts before dropping secondary or additional payloads. Adversaries may use the information learned from Virtualization/Sandbox Evasion during automated discovery to shape follow-on behaviors. Specific checks will vary based on the target and/or adversary, but may involve behaviors such as Windows Management Instrumentation, PowerShell, System Information Discovery, and Query Registry to obtain system information and search for VME artifacts. Adversaries may search for VME artifacts in memory, processes, file system, hardware, and/or the Registry. Adversaries may use scripting to automate these checks  into one script and then have the program exit if it determines the system to be a virtual environment.  Checks could include generic system properties such as host/domain name and samples of network traffic. Adversaries may also check the network adapters addresses, CPU core count, and available memory/drive size. Once executed, malware may also use File and Directory Discovery to check if it was saved in a folder or file with unexpected or even analysis-related naming artifacts such as `malware`, `sample`, or `hash`. Other common checks may enumerate services running that are unique to these applications, installed programs on the system, manufacturer/product fields for strings relating to virtual machine applications, and VME-specific hardware/processor instructions. In applications like VMWare, adversaries can also use a special I/O port to send commands and receive output.    Hardware checks, such as the presence of the fan, temperature, and audio devices, could also be used to gather evidence that can be indicative a virtual environment. Adversaries may also query for specific readings from these devices.</p>
+  <h1 id="system-checks">System Checks</h1><p>Adversaries may employ various system checks to detect and avoid virtualization and analysis environments. This may include changing behaviors based on the results of checks for the presence of artifacts indicative of a virtual machine environment (VME) or sandbox. If the adversary detects a VME, they may alter their malware to disengage from the victim or conceal the core functions of the implant. They may also search for VME artifacts before dropping secondary or additional payloads. Adversaries may use the information learned from Virtualization/Sandbox Evasion during automated discovery to shape follow-on behaviors. Specific checks will vary based on the target and/or adversary, but may involve behaviors such as Windows Management Instrumentation, PowerShell, System Information Discovery, and Query Registry to obtain system information and search for VME artifacts. Adversaries may search for VME artifacts in memory, processes, file system, hardware, and/or the Registry. Adversaries may use scripting to automate these checks  into one script and then have the program exit if it determines the system to be a virtual environment.  Checks could include generic system properties such as host/domain name and samples of network traffic. Adversaries may also check the network adapters addresses, CPU core count, and available memory/drive size. Once executed, malware may also use File and Directory Discovery to check if it was saved in a folder or file with unexpected or even analysis-related naming artifacts such as `malware`, `sample`, or `hash`. Other common checks may enumerate services running that are unique to these applications, installed programs on the system, manufacturer/product fields for strings relating to virtual machine applications, and VME-specific hardware/processor instructions. In applications like VMWare, adversaries can also use a special I/O port to send commands and receive output.    Hardware checks, such as the presence of the fan, temperature, and audio devices, could also be used to gather evidence that can be indicative a virtual environment. Adversaries may also query for specific readings from these devices.</p>
   <p><a class="cta" href="https://1200km.com/threat-matrix/#/techniques/T1497.001">Open detection, hunting, mitigation, and evidence workspace</a></p>
-  <section><h2>Detection logic</h2><p>Virtualization/sandbox related system checks will likely occur in the first steps of an operation but may also occur throughout as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as lateral movement, based on the information obtained. Detecting actions related to virtualization and sandbox identification may be difficult depending on the adversary&#39;s implementation and monitoring required. Monitoring for suspicious processes being spawned that gather a variety of system information or perform other forms of Discovery, especially in a short period of time, may aid in detection.</p></section>
-  <section><h2>Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G1017/"><strong>Volt Typhoon</strong><br><span class="muted">G1017</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0120/"><strong>Evilnum</strong><br><span class="muted">G0120</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0049/"><strong>OilRig</strong><br><span class="muted">G0049</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0012/"><strong>Darkhotel</strong><br><span class="muted">G0012</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a></div></section>
-  <section><h2>Correlated CTI and IR reports</h2><div class="grid"></div></section>
-  <section><h2>Continue the investigation</h2><div class="links">
+  <section><h2 id="detection-logic">Detection logic</h2><p>Virtualization/sandbox related system checks will likely occur in the first steps of an operation but may also occur throughout as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as lateral movement, based on the information obtained. Detecting actions related to virtualization and sandbox identification may be difficult depending on the adversary&#39;s implementation and monitoring required. Monitoring for suspicious processes being spawned that gather a variety of system information or perform other forms of Discovery, especially in a short period of time, may aid in detection.</p></section>
+  <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G1017/"><strong>Volt Typhoon</strong><br><span class="muted">G1017</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0120/"><strong>Evilnum</strong><br><span class="muted">G0120</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0049/"><strong>OilRig</strong><br><span class="muted">G0049</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0012/"><strong>Darkhotel</strong><br><span class="muted">G0012</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a></div></section>
+  <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+  <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>
     <a href="https://1200km.com/cti-analyst-field-manual/">CTI Analyst Field Manual</a>

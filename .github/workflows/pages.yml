@@ -1,6 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
@@ -11,19 +13,14 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  quality:
     timeout-minutes: 20
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +31,7 @@ jobs:
       - name: Install locked search tooling
         run: npm ci
       - name: Validate search source
-        run: npm run check-search
+        run: npm run check-release-source
       - name: Stage publishable site
         run: |
           mkdir -p "${RUNNER_TEMP}/site"
@@ -48,27 +45,85 @@ jobs:
             --exclude='package-lock.json' \
             --exclude='scripts' \
             --exclude='tests'
+          npm run build-shell -- --site "${RUNNER_TEMP}/site"
           node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
+      - name: Build canonical metadata and release HTML
+        run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
+      - name: Validate complete staged site
+        run: |
+          npm run check-facts -- --site "${RUNNER_TEMP}/site"
+          npm run check-seo -- --site "${RUNNER_TEMP}/site" --require-release-transform
+          npm run check-links -- --site "${RUNNER_TEMP}/site"
+      - name: Build deployable domain content catalogue
+        run: >-
+          npm run build-content:remote --
+          --site "${RUNNER_TEMP}/site"
+          --source "${GITHUB_WORKSPACE}"
+          --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
       - name: Build canonical domain-wide search index
-        run: npm run build-search:remote -- --output "${RUNNER_TEMP}/site/pagefind"
+        run: >-
+          npm run build-search:remote --
+          --site "${RUNNER_TEMP}/site"
+          --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
+          --output "${RUNNER_TEMP}/site/pagefind"
+          --canonical-sitemap-output "${RUNNER_TEMP}/site/sitemap.xml"
+          --max-stale-pages 0
       - name: Validate search coverage and ranking
-        run: npm run check-search:index -- --bundle "${RUNNER_TEMP}/site/pagefind" --remote
+        run: |
+          node scripts/check-content-schema.mjs --site "${RUNNER_TEMP}/site"
+          node scripts/check-content-catalog.mjs --site "${RUNNER_TEMP}/site"
+          npm run check-search:index -- --bundle "${RUNNER_TEMP}/site/pagefind" --remote
       - name: Browser smoke test search and autocomplete
         run: npm run check-search:browser -- --site "${RUNNER_TEMP}/site" --bundle "${RUNNER_TEMP}/site/pagefind"
-      - name: Preserve search diagnostics on failure
-        if: ${{ failure() }}
+      - name: Browser mobile typography and overflow regression
+        run: >-
+          npm run check-layout:browser --
+          --site "${RUNNER_TEMP}/site"
+          --screenshots "${RUNNER_TEMP}/mobile-layout"
+      - name: Browser accessibility and performance regression
+        run: >-
+          npm run check-quality:browser --
+          --site "${RUNNER_TEMP}/site"
+          --report "${RUNNER_TEMP}/browser-quality.json"
+      - name: Validate deployable-file hygiene
+        run: npm run check-hygiene -- --site "${RUNNER_TEMP}/site"
+      - name: Revalidate published sitemap and metadata
+        run: |
+          npm run check-facts -- --site "${RUNNER_TEMP}/site"
+          node scripts/check-content-schema.mjs --site "${RUNNER_TEMP}/site"
+          node scripts/check-content-catalog.mjs --site "${RUNNER_TEMP}/site"
+          npm run check-seo -- --site "${RUNNER_TEMP}/site" --require-release-transform
+          npm run check-links -- --site "${RUNNER_TEMP}/site"
+      - name: Preserve quality evidence
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: search-diagnostics-${{ github.run_id }}
+          name: site-quality-${{ github.run_id }}
           path: |
+            ${{ runner.temp }}/mobile-layout
+            ${{ runner.temp }}/browser-quality.json
             ${{ runner.temp }}/site/pagefind/search-build.json
             ${{ runner.temp }}/site/pagefind/pagefind-entry.json
+            ${{ runner.temp }}/site/data/content-catalog.json
           if-no-files-found: ignore
-          retention-days: 7
-      - uses: actions/configure-pages@v5
+          retention-days: 14
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ runner.temp }}/site
           include-hidden-files: true
+
+  deploy:
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: quality
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/configure-pages@v5
       - uses: actions/deploy-pages@v4
         id: deployment

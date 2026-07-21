@@ -2,7 +2,7 @@
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench for analysts and detection engineers.
 
-Current release: v5.9.1.
+Current release: v6.0.0.
 
 ## Core Capabilities
 

@@ -7,6 +7,8 @@ This site exposes safe, read-only public metadata for AI agent discovery.
 - `/llms.txt`
 - `/agent-index.md`
 - `/auth.md`
+- `/data/site-facts.json`
+- `/data/site-facts.schema.json`
 - `/.well-known/api-catalog`
 - `/.well-known/openapi.json`
 - `/.well-known/mcp/server-card.json`
@@ -16,7 +18,7 @@ This site exposes safe, read-only public metadata for AI agent discovery.
 - Cloudflare Pages-compatible `_headers`
 - Cloudflare Worker for Link response headers and Markdown negotiation
 - Read-only WebMCP browser context
-- `Content-Signal` in `/robots.txt`
+- Standards-compatible, crawler-specific search/retrieval and model-training controls in `/robots.txt`
 
 ## Intentionally Deferred
 

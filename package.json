@@ -5,17 +5,33 @@
   "description": "Source for https://1200km.com — Andrey Pautov, cybersecurity research portfolio (CTI, detection engineering, threat hunting, offensive labs).",
   "type": "module",
   "scripts": {
+    "build-shell": "node scripts/build-site-shell.mjs",
+    "build-content": "node scripts/build-content-catalog.mjs",
+    "build-content:remote": "node scripts/build-content-catalog.mjs --remote",
+    "build-metadata": "node scripts/build-site-artifacts.mjs",
+    "build-metadata:remote": "node scripts/build-site-artifacts.mjs --remote",
     "build-search": "node scripts/build-search-index.mjs",
     "build-search:remote": "node scripts/build-search-index.mjs --remote",
     "check-search": "node --test tests/search-index.test.mjs && node --check assets/site-search.js && node --check scripts/build-search-index.mjs && node --check scripts/check-search-browser.mjs && node --check scripts/check-search-index.mjs && node --check scripts/inject-search-loader.mjs && node --check scripts/search-index-lib.mjs",
     "check-search:browser": "node scripts/check-search-browser.mjs",
     "check-search:index": "node scripts/check-search-index.mjs",
+    "check-shell": "node scripts/build-site-shell.mjs --check && node --test tests/site-shell.test.mjs",
+    "check-content": "node scripts/build-content-catalog.mjs --check && node scripts/check-content-schema.mjs && node scripts/check-content-catalog.mjs && node --test tests/content-catalog.test.mjs",
+    "check-layout": "node --test tests/mobile-typography.test.mjs",
+    "check-layout:browser": "node scripts/check-mobile-layout.mjs",
+    "check-quality:browser": "node scripts/check-quality-browser.mjs",
+    "check-adoption": "node scripts/check-adoption-evidence.mjs",
+    "check-hygiene": "node scripts/check-deployable-hygiene.mjs",
     "check-links": "node scripts/check-links.mjs",
     "check-links:external": "node scripts/check-links.mjs --external",
+    "check-facts": "node scripts/check-site-facts.mjs",
     "check-seo": "node scripts/check-seo.mjs",
-    "generate-sitemap-all": "node scripts/generate-sitemap-all.mjs",
+    "check-code": "node --check assets/site-performance.js && node --check assets/site-search.js && node --check assets/site-theme.js && node --check scripts/build-content-catalog.mjs && node --check scripts/build-public-pdfs.mjs && node --check scripts/build-site-artifacts.mjs && node --check scripts/build-site-shell.mjs && node --check scripts/build-search-index.mjs && node --check scripts/check-adoption-evidence.mjs && node --check scripts/check-content-catalog.mjs && node --check scripts/check-content-schema.mjs && node --check scripts/check-deployable-hygiene.mjs && node --check scripts/check-mobile-layout.mjs && node --check scripts/check-quality-browser.mjs && node --check scripts/check-search-browser.mjs && node --check scripts/check-search-index.mjs && node --check scripts/check-seo.mjs && node --check scripts/check-site-facts.mjs && node --check scripts/content-catalog-lib.mjs && node --check scripts/inject-search-loader.mjs && node --check scripts/release-html-lib.mjs && node --check scripts/search-index-lib.mjs && node --check scripts/site-shell-lib.mjs",
+    "check-release-source": "npm run check-code && npm run check-shell && npm run check-content && npm run check-search && npm run check-layout && npm run check-facts && npm run check-adoption && npm run check-seo && npm run check-agent-readiness && npm run check-links && npm run check-hygiene",
+    "generate-sitemap-all": "node scripts/build-site-artifacts.mjs --metadata-only --remote",
     "check-agent-readiness": "node scripts/check-agent-readiness.mjs",
     "check-agent-worker": "node --check cloudflare/agent-readiness-worker.js",
+    "build-public-pdfs": "node scripts/build-public-pdfs.mjs",
     "cloudflare:dns-aid": "node scripts/cloudflare-upsert-dns-aid.mjs",
     "update-validation": "node scripts/update-validation-stats.mjs"
   },
@@ -23,6 +39,9 @@
     "node": ">=22"
   },
   "devDependencies": {
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1",
+    "axe-core": "^4.10.3",
     "pagefind": "1.5.2"
   }
 }

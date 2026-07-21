@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { addHeadingIds, markPagefindContent } from './release-html-lib.mjs';
 
 export const SITE_ORIGIN = 'https://1200km.com';
 
@@ -100,11 +101,34 @@ export function normalizeCanonical(value, base = SITE_ORIGIN) {
 }
 
 export function parseSitemap(xml, base = SITE_ORIGIN) {
+  const parsed = parseSitemapEntries(xml, base);
+  return { isIndex: parsed.isIndex, locations: parsed.entries.map((entry) => entry.loc) };
+}
+
+export function parseSitemapEntries(xml, base = SITE_ORIGIN) {
   const isIndex = /<sitemapindex\b/i.test(xml);
-  const locations = [...xml.matchAll(/<loc>\s*([\s\S]*?)\s*<\/loc>/gi)]
-    .map((match) => normalizeCanonical(decodeEntities(match[1]), base))
-    .filter(Boolean);
-  return { isIndex, locations: [...new Set(locations)] };
+  const element = isIndex ? 'sitemap' : 'url';
+  const entries = [];
+  const seen = new Set();
+  for (const match of xml.matchAll(new RegExp(`<${element}\\b[^>]*>([\\s\\S]*?)<\\/${element}>`, 'gi'))) {
+    const location = match[1].match(/<loc>\s*([\s\S]*?)\s*<\/loc>/i)?.[1];
+    const loc = location ? normalizeCanonical(decodeEntities(location), base) : null;
+    if (!loc || seen.has(loc)) continue;
+    const lastmodValue = match[1].match(/<lastmod>\s*([\s\S]*?)\s*<\/lastmod>/i)?.[1] || '';
+    const lastmod = decodeEntities(lastmodValue).match(/^\d{4}-\d{2}-\d{2}/)?.[0] || '';
+    seen.add(loc);
+    entries.push({ loc, ...(lastmod ? { lastmod } : {}) });
+  }
+  // Tolerate minimal sitemap fixtures that omit the url/sitemap wrapper.
+  if (!entries.length) {
+    for (const match of xml.matchAll(/<loc>\s*([\s\S]*?)\s*<\/loc>/gi)) {
+      const loc = normalizeCanonical(decodeEntities(match[1]), base);
+      if (!loc || seen.has(loc)) continue;
+      seen.add(loc);
+      entries.push({ loc });
+    }
+  }
+  return { isIndex, entries };
 }
 
 export function localFileForUrl(root, value) {
@@ -200,6 +224,78 @@ export function classifyUrl(urlValue) {
   return '1200km';
 }
 
+export function classifyContentType(urlValue) {
+  const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
+  if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actor profile';
+  if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK technique';
+  if (/^\/articles\//i.test(pathname) || /newest-detection|embedded-systems/i.test(pathname)) return 'Article';
+  if (/\/docs?\/|\/adversarygraph-docs\//i.test(pathname)) return 'Documentation';
+  if (/lab|simulation/i.test(pathname)) return 'Lab';
+  if (/^\/(?:adversarygraph|threat-matrix)\/?$/i.test(pathname) || /(?:aidebug|stratus)/i.test(pathname)) return 'Tool';
+  if (/^(?:\/|\/about\.html|\/cv\.html)$/i.test(pathname)) return 'Profile';
+  if (/search\.html$/i.test(pathname)) return 'Search';
+  if (/articles\/$|projects\.html$|guides\.html$|labs\.html$|cti\.html$/i.test(pathname)) return 'Collection';
+  return 'Research & guide';
+}
+
+const TOPIC_RULES = [
+  ['AdversaryGraph', /adversarygraph|threatmapper/i],
+  ['MITRE ATT&CK', /mitre|att&ck|attack technique|\bT\d{4}(?:\.\d{3})?\b|\bG\d{4}\b/i],
+  ['Cyber threat intelligence', /\bcti\b|threat intelligence|threat actor|ioc|indicator of compromise/i],
+  ['Threat hunting', /threat hunt|hunting hypothesis|hunt quer/i],
+  ['Detection engineering', /detection engineer|sigma|yara|siem|telemetry|detection rule/i],
+  ['Identity security', /identity|itdr|active directory|kerberos|entra|iam/i],
+  ['Malware analysis', /malware|reverse engineering|sandbox|static analysis|dynamic analysis/i],
+  ['AI security', /\bai\b|artificial intelligence|\bllm\b|rag|mcp|agentic/i],
+  ['Offensive security', /offensive|penetration test|red team|exploit|attack simulation/i],
+  ['Incident response', /incident response|\bir\b|forensic|containment/i],
+  ['Cloud security', /cloud|aws|azure|gcp|kubernetes|container/i],
+  ['Embedded security', /embedded|firmware|hardware|uefi|iot|bmc/i],
+];
+
+export function classifyTopics(urlValue, html) {
+  const haystack = [
+    normalizeSiteUrl(urlValue)?.pathname || '',
+    resultTitle(html, urlValue),
+    findMetaContent(html, 'description'),
+    findMetaContent(html, 'keywords'),
+  ].join(' ');
+  const topics = TOPIC_RULES.filter(([, pattern]) => pattern.test(haystack)).map(([name]) => name);
+  return topics.length ? topics.slice(0, 6) : ['Security research'];
+}
+
+function searchDate(html) {
+  return html.match(/"dateModified"\s*:\s*"(\d{4}-\d{2}-\d{2})/i)?.[1]
+    || html.match(/"datePublished"\s*:\s*"(\d{4}-\d{2}-\d{2})/i)?.[1]
+    || findMetaContent(html, 'article:modified_time').match(/^\d{4}-\d{2}-\d{2}/)?.[0]
+    || '';
+}
+
+function sourceName(catalogItem, canonicalUrl) {
+  const sourceValue = catalogItem?.source_url || canonicalUrl;
+  try {
+    const source = new URL(sourceValue);
+    const hostname = source.hostname.toLowerCase().replace(/^www\./, '');
+    const labels = {
+      '1200km.com': '1200km',
+      'attack.mitre.org': 'MITRE ATT&CK',
+      'github.com': 'GitHub',
+      'medium.com': 'Medium',
+      'infosecwriteups.com': 'InfoSec Write-ups',
+      'pypi.org': 'PyPI',
+    };
+    return labels[hostname] || hostname;
+  } catch {
+    return '1200km';
+  }
+}
+
+function contentVersion(catalogItem) {
+  if (catalogItem?.version) return catalogItem.version;
+  const appliesToVersion = catalogItem?.applies_to?.match(/\bv?\d+\.\d+(?:\.\d+)?\b/i)?.[0];
+  return appliesToVersion || 'Not version-specific';
+}
+
 function resultTitle(html, urlValue) {
   const h1 = stripHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || '');
   const title = stripHtml(html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '');
@@ -212,7 +308,7 @@ function resultTitle(html, urlValue) {
   return h1 || title || normalizeSiteUrl(urlValue)?.pathname || '1200km';
 }
 
-export function prepareHtmlForSearch(urlValue, html) {
+export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
   const url = normalizeSiteUrl(urlValue);
   if (!url) throw new Error(`Cannot prepare invalid URL: ${urlValue}`);
 
@@ -222,19 +318,39 @@ export function prepareHtmlForSearch(urlValue, html) {
   const description = findMetaContent(html, 'description').slice(0, 420);
   const aliases = extractAliases(html).join(', ').slice(0, 700);
   const collection = classifyUrl(url.href);
+  const contentType = classifyContentType(url.href);
+  const topics = classifyTopics(url.href, html);
+  const date = catalogItem?.updated_at || catalogItem?.published_at || searchDate(html);
+  const updatedYear = date?.match(/^\d{4}/)?.[0] || 'Unknown';
+  const source = sourceName(catalogItem, url.href);
+  const version = contentVersion(catalogItem);
   const metadata = [
     `<meta content="${escapeAttribute(title)}" data-pagefind-meta="title[content]">`,
     description ? `<meta content="${escapeAttribute(description)}" data-pagefind-meta="description[content]">` : '',
     identifier ? `<meta content="${escapeAttribute(identifier)}" data-pagefind-meta="identifier[content]">` : '',
     aliases ? `<meta content="${escapeAttribute(aliases)}" data-pagefind-meta="aliases[content]">` : '',
     `<meta content="${escapeAttribute(collection)}" data-pagefind-filter="section[content]" data-pagefind-meta="collection[content]">`,
+    `<meta content="${escapeAttribute(contentType)}" data-pagefind-filter="content_type[content]" data-pagefind-meta="content_type[content]">`,
+    catalogItem?.primary_type ? `<meta content="${escapeAttribute(catalogItem.primary_type)}" data-pagefind-filter="primary_type[content]" data-pagefind-meta="primary_type[content]">` : '',
+    catalogItem?.primary_domain ? `<meta content="${escapeAttribute(catalogItem.primary_domain)}" data-pagefind-filter="primary_domain[content]" data-pagefind-meta="primary_domain[content]">` : '',
+    catalogItem?.status ? `<meta content="${escapeAttribute(catalogItem.status)}" data-pagefind-filter="lifecycle[content]" data-pagefind-meta="lifecycle[content]">` : '',
+    catalogItem?.status ? `<meta content="${escapeAttribute(catalogItem.status)}" data-pagefind-filter="status[content]" data-pagefind-meta="status[content]">` : '',
+    catalogItem?.evidence_level ? `<meta content="${escapeAttribute(catalogItem.evidence_level)}" data-pagefind-filter="evidence_level[content]" data-pagefind-meta="evidence_level[content]">` : '',
+    ...(catalogItem?.audience || []).map((audience) => `<meta content="${escapeAttribute(audience)}" data-pagefind-filter="audience[content]">`),
+    catalogItem?.audience?.length ? `<meta content="${escapeAttribute(catalogItem.audience.join(', '))}" data-pagefind-meta="audience[content]">` : '',
+    `<meta content="${escapeAttribute(version)}" data-pagefind-filter="version[content]" data-pagefind-meta="version[content]">`,
+    `<meta content="${escapeAttribute(source)}" data-pagefind-filter="source[content]" data-pagefind-meta="source[content]">`,
+    `<meta content="${escapeAttribute(updatedYear)}" data-pagefind-filter="updated_year[content]" data-pagefind-meta="updated_year[content]">`,
+    ...topics.map((topic) => `<meta content="${escapeAttribute(topic)}" data-pagefind-filter="topic[content]">`),
+    `<meta content="${escapeAttribute(topics.join(', '))}" data-pagefind-meta="topics[content]">`,
+    date ? `<meta content="${escapeAttribute(date)}" data-pagefind-meta="date[content]">` : '',
   ].filter(Boolean).join('\n    ');
 
-  let prepared = html.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${metadata}`);
-  prepared = prepared.replace(/<body\b([^>]*)>/i, (tag, attributes) => {
-    if (/\bdata-pagefind-body\b/i.test(attributes)) return tag;
-    return `<body${attributes} data-pagefind-body>`;
-  });
+  // Do not create search-only anchors that are absent from a hydrated
+  // Docusaurus page. Docusaurus emits stable heading IDs at build time.
+  let prepared = /\bid=["']__docusaurus["']/i.test(html) ? html : addHeadingIds(html);
+  prepared = prepared.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${metadata}`);
+  prepared = markPagefindContent(prepared);
   return prepared;
 }
 

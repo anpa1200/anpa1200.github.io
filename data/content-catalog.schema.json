@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1200km.com/data/content-catalog.schema.json",
+  "title": "1200km controlled public-content catalogue",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "catalog_version",
+    "generated_at",
+    "scope",
+    "controlled_vocabularies",
+    "canonical_policy",
+    "declared_collections",
+    "aliases",
+    "inventory",
+    "items"
+  ],
+  "properties": {
+    "$schema": { "const": "./content-catalog.schema.json" },
+    "catalog_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "generated_at": { "type": "string", "format": "date" },
+    "scope": { "enum": ["local-source-catalog", "deployable-domain-catalog"] },
+    "controlled_vocabularies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary_types", "primary_domains", "audiences", "statuses", "maturity", "evidence_levels"],
+      "properties": {
+        "primary_types": { "const": ["research", "case-study", "guide", "lab", "tool", "platform", "documentation", "article", "mirror", "contribution", "index", "profile", "policy"] },
+        "primary_domains": { "const": ["threat-intelligence", "detection-engineering", "threat-hunting", "malware-analysis", "identity-security", "offensive-security", "cloud-security", "ai-security", "embedded-security", "application-security", "portfolio-governance", "cross-domain"] },
+        "audiences": { "const": ["cti-analyst", "detection-engineer", "threat-hunter", "security-engineer", "security-leader", "platform-operator", "developer", "general"] },
+        "statuses": { "const": ["released", "maintained", "current-development", "experimental", "superseded", "archived", "submitted", "accepted"] },
+        "maturity": { "const": ["production", "stable", "beta", "experimental", "historical", "reference"] },
+        "evidence_levels": { "const": ["source-backed", "lab-validated", "release-evidence", "externally-accepted", "illustrative", "unverified"] }
+      }
+    },
+    "canonical_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "medium_and_local_mirrors", "versioned_material", "redirects"],
+      "properties": {
+        "identity": { "type": "string", "minLength": 1 },
+        "medium_and_local_mirrors": { "type": "string", "minLength": 1 },
+        "versioned_material": { "type": "string", "minLength": 1 },
+        "redirects": { "type": "string", "minLength": 1 }
+      }
+    },
+    "declared_collections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/collection" },
+      "uniqueItems": true
+    },
+    "aliases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/alias" },
+      "uniqueItems": true
+    },
+    "inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_count", "indexable_count", "external_count", "by_primary_type", "by_primary_domain", "by_status", "by_evidence_level"],
+      "properties": {
+        "item_count": { "type": "integer", "minimum": 1 },
+        "indexable_count": { "type": "integer", "minimum": 0 },
+        "external_count": { "type": "integer", "minimum": 0 },
+        "by_primary_type": { "$ref": "#/$defs/counts" },
+        "by_primary_domain": { "$ref": "#/$defs/counts" },
+        "by_status": { "$ref": "#/$defs/counts" },
+        "by_evidence_level": { "$ref": "#/$defs/counts" }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "uniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "nullableDate": {
+      "oneOf": [
+        { "type": "string", "format": "date" },
+        { "type": "null" }
+      ]
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "collection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "canonical_prefix", "sitemap_url", "primary_type", "primary_domain", "audience", "status", "maturity", "evidence_level", "applies_to", "source_url"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^collection:[a-z0-9:-]+$" },
+        "name": { "type": "string", "minLength": 1 },
+        "canonical_prefix": { "type": "string", "format": "uri" },
+        "sitemap_url": { "type": "string", "format": "uri" },
+        "primary_type": { "$ref": "#/$defs/primaryType" },
+        "primary_domain": { "$ref": "#/$defs/primaryDomain" },
+        "audience": { "$ref": "#/$defs/audiences" },
+        "status": { "$ref": "#/$defs/status" },
+        "maturity": { "$ref": "#/$defs/maturityValue" },
+        "evidence_level": { "$ref": "#/$defs/evidenceLevel" },
+        "applies_to": { "type": "string", "minLength": 1 },
+        "source_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "alias": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alias_url", "canonical_url", "status", "reason"],
+      "properties": {
+        "alias_url": { "type": "string", "format": "uri" },
+        "canonical_url": { "type": "string", "format": "uri" },
+        "status": { "enum": ["superseded", "archived"] },
+        "prefix": { "type": "boolean" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "primary_type",
+        "primary_domain",
+        "audience",
+        "status",
+        "maturity",
+        "evidence_level",
+        "applies_to",
+        "canonical_url",
+        "published_at",
+        "updated_at",
+        "summary",
+        "tags",
+        "featured",
+        "indexable"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:._-]+$" },
+        "title": { "type": "string", "minLength": 1 },
+        "primary_type": { "$ref": "#/$defs/primaryType" },
+        "primary_domain": { "$ref": "#/$defs/primaryDomain" },
+        "audience": { "$ref": "#/$defs/audiences" },
+        "status": { "$ref": "#/$defs/status" },
+        "maturity": { "$ref": "#/$defs/maturityValue" },
+        "evidence_level": { "$ref": "#/$defs/evidenceLevel" },
+        "version": { "type": "string", "minLength": 1 },
+        "applies_to": { "type": "string", "minLength": 1 },
+        "canonical_url": { "type": "string", "format": "uri" },
+        "source_url": { "type": "string", "format": "uri" },
+        "alternate_urls": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" },
+          "uniqueItems": true
+        },
+        "published_at": { "$ref": "#/$defs/nullableDate" },
+        "updated_at": { "$ref": "#/$defs/nullableDate" },
+        "summary": { "type": "string", "minLength": 1 },
+        "tags": { "$ref": "#/$defs/uniqueStrings" },
+        "featured": { "type": "boolean" },
+        "indexable": { "type": "boolean" },
+        "archive_reason": { "type": "string", "minLength": 1 },
+        "collection_id": { "type": "string", "pattern": "^collection:[a-z0-9:-]+$" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "enum": ["archived", "superseded"] } }, "required": ["status"] },
+          "then": { "required": ["archive_reason"] }
+        }
+      ]
+    },
+    "primaryType": { "enum": ["research", "case-study", "guide", "lab", "tool", "platform", "documentation", "article", "mirror", "contribution", "index", "profile", "policy"] },
+    "primaryDomain": { "enum": ["threat-intelligence", "detection-engineering", "threat-hunting", "malware-analysis", "identity-security", "offensive-security", "cloud-security", "ai-security", "embedded-security", "application-security", "portfolio-governance", "cross-domain"] },
+    "audiences": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["cti-analyst", "detection-engineer", "threat-hunter", "security-engineer", "security-leader", "platform-operator", "developer", "general"] }
+    },
+    "status": { "enum": ["released", "maintained", "current-development", "experimental", "superseded", "archived", "submitted", "accepted"] },
+    "maturityValue": { "enum": ["production", "stable", "beta", "experimental", "historical", "reference"] },
+    "evidenceLevel": { "enum": ["source-backed", "lab-validated", "release-evidence", "externally-accepted", "illustrative", "unverified"] }
+  }
+}

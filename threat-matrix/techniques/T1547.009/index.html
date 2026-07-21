@@ -1,13 +1,107 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>T1547.009 Shortcut Modification | AdversaryGraph</title><meta name="description" content="T1547.009 Shortcut Modification: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1547.009/">
   <meta property="og:title" content="T1547.009 Shortcut Modification | AdversaryGraph"><meta property="og:description" content="T1547.009 Shortcut Modification: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1547.009/"><meta property="og:type" content="article">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMTG21RVHM"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-TMTG21RVHM')</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1547.009 Shortcut Modification","description":"Adversaries may create or modify shortcuts that can execute a program during system boot or user login. Shortcuts or symbolic links are used to reference other files or programs that will be opened or executed when the shortcut is clicked or executed by a system startup process.\n\nAdversaries may abuse shortcuts in the startup folder to execute their tools and achieve persistence. Although often used as payloads in an infection chain (e.g. Spearphishing Attachment), adversaries may also create a new shortcut as a means of indirection, while also abusing Masquerading to make the malicious shortcut appear as a legitimate program. Adversaries can also edit the target path or entirely replace an existing shortcut so their malware will be executed instead of the intended legitimate program.\n\nShortcuts can also be abused to establish persistence by implementing other methods. For example, LNK browser extensions may be modified (e.g. Browser Extensions) to persistently launch malware.","url":"https://1200km.com/threat-matrix/techniques/T1547.009/","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/"}}</script>
-  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style></head><body><main>
+  <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style>    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1547.009/#webpage",
+            "url": "https://1200km.com/threat-matrix/techniques/T1547.009/",
+            "name": "Shortcut Modification",
+            "description": "T1547.009 Shortcut Modification: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1547.009/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "dateModified": "2026-06-27",
+            "mainEntity": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1547.009/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1547.009/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "The public browser workspace for the AdversaryGraph platform.",
+                "item": "https://1200km.com/threat-matrix/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Shortcut Modification",
+                "item": "https://1200km.com/threat-matrix/techniques/T1547.009/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "T1547.009 Shortcut Modification",
+            "description": "Adversaries may create or modify shortcuts that can execute a program during system boot or user login. Shortcuts or symbolic links are used to reference other files or programs that will be opened or executed when the shortcut is clicked or executed by a system startup process.\n\nAdversaries may abuse shortcuts in the startup folder to execute their tools and achieve persistence. Although often used as payloads in an infection chain (e.g. Spearphishing Attachment), adversaries may also create a new shortcut as a means of indirection, while also abusing Masquerading to make the malicious shortcut appear as a legitimate program. Adversaries can also edit the target path or entirely replace an existing shortcut so their malware will be executed instead of the intended legitimate program.\n\nShortcuts can also be abused to establish persistence by implementing other methods. For example, LNK browser extensions may be modified (e.g. Browser Extensions) to persistently launch malware.",
+            "url": "https://1200km.com/threat-matrix/techniques/T1547.009/",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/threat-matrix/techniques/T1547.009/#article",
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1547.009/#webpage"
+            },
+            "dateModified": "2026-06-27"
+          }
+        ]
+      }
+    </script>
+</head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
   <p style="margin:0 0 8px;color:#67e8f9;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">AdversaryGraph public intelligence page</p>
-  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>AdversaryGraph Web</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
+  <p style="margin:0 0 12px;color:#e5e7eb">This page is part of <strong>Threat Matrix</strong>, the public browser workspace for the main AdversaryGraph platform. Use it for ATT&amp;CK pivots, actor and technique context, similarity leads, detection coverage review, and analyst-ready investigation paths.</p>
   <p style="margin:0 0 14px;color:#fca5a5"><strong>Validation disclaimer:</strong> TTP overlap, actor similarity, generated summaries, and coverage findings are investigation leads, not attribution proof or operational validation without analyst review.</p>
   <p style="display:flex;flex-wrap:wrap;gap:10px;margin:0">
     <a style="background:#e11d48;border-radius:6px;color:#fff;font-weight:800;padding:8px 10px;text-decoration:none" href="https://1200km.com/adversarygraph/">Main AdversaryGraph project</a>
@@ -17,12 +111,12 @@
   </p>
 </section>
   <nav><a href="https://1200km.com/threat-matrix/">AdversaryGraph</a> / ATT&amp;CK techniques / T1547.009</nav><p class="meta">T1547.009 · persistence, privilege-escalation · 7 actors · 0 correlated reports</p>
-  <h1>Shortcut Modification</h1><p>Adversaries may create or modify shortcuts that can execute a program during system boot or user login. Shortcuts or symbolic links are used to reference other files or programs that will be opened or executed when the shortcut is clicked or executed by a system startup process. Adversaries may abuse shortcuts in the startup folder to execute their tools and achieve persistence. Although often used as payloads in an infection chain (e.g. Spearphishing Attachment), adversaries may also create a new shortcut as a means of indirection, while also abusing Masquerading to make the malicious shortcut appear as a legitimate program. Adversaries can also edit the target path or entirely replace an existing shortcut so their malware will be executed instead of the intended legitimate program. Shortcuts can also be abused to establish persistence by implementing other methods. For example, LNK browser extensions may be modified (e.g. Browser Extensions) to persistently launch malware.</p>
+  <h1 id="shortcut-modification">Shortcut Modification</h1><p>Adversaries may create or modify shortcuts that can execute a program during system boot or user login. Shortcuts or symbolic links are used to reference other files or programs that will be opened or executed when the shortcut is clicked or executed by a system startup process. Adversaries may abuse shortcuts in the startup folder to execute their tools and achieve persistence. Although often used as payloads in an infection chain (e.g. Spearphishing Attachment), adversaries may also create a new shortcut as a means of indirection, while also abusing Masquerading to make the malicious shortcut appear as a legitimate program. Adversaries can also edit the target path or entirely replace an existing shortcut so their malware will be executed instead of the intended legitimate program. Shortcuts can also be abused to establish persistence by implementing other methods. For example, LNK browser extensions may be modified (e.g. Browser Extensions) to persistently launch malware.</p>
   <p><a class="cta" href="https://1200km.com/threat-matrix/#/techniques/T1547.009">Open detection, hunting, mitigation, and evidence workspace</a></p>
-  <section><h2>Detection logic</h2><p>Since a shortcut&#39;s target path likely will not change, modifications to shortcut files that do not correlate with known software changes, patches, removal, etc., may be suspicious. Analysis should attempt to relate shortcut file change or creation events to other potentially suspicious events based on known adversary behavior such as process launches of unknown executables that make network connections. Monitor for LNK files created with a Zone Identifier value greater than 1, which may indicate that the LNK file originated from outside of the network.</p></section>
-  <section><h2>Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0035/"><strong>Dragonfly</strong><br><span class="muted">G0035</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0078/"><strong>Gorgon Group</strong><br><span class="muted">G0078</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0087/"><strong>APT39</strong><br><span class="muted">G0087</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0065/"><strong>Leviathan</strong><br><span class="muted">G0065</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0016/"><strong>APT29</strong><br><span class="muted">G0016</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0012/"><strong>Darkhotel</strong><br><span class="muted">G0012</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a></div></section>
-  <section><h2>Correlated CTI and IR reports</h2><div class="grid"></div></section>
-  <section><h2>Continue the investigation</h2><div class="links">
+  <section><h2 id="detection-logic">Detection logic</h2><p>Since a shortcut&#39;s target path likely will not change, modifications to shortcut files that do not correlate with known software changes, patches, removal, etc., may be suspicious. Analysis should attempt to relate shortcut file change or creation events to other potentially suspicious events based on known adversary behavior such as process launches of unknown executables that make network connections. Monitor for LNK files created with a Zone Identifier value greater than 1, which may indicate that the LNK file originated from outside of the network.</p></section>
+  <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0035/"><strong>Dragonfly</strong><br><span class="muted">G0035</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0078/"><strong>Gorgon Group</strong><br><span class="muted">G0078</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0087/"><strong>APT39</strong><br><span class="muted">G0087</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0065/"><strong>Leviathan</strong><br><span class="muted">G0065</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0016/"><strong>APT29</strong><br><span class="muted">G0016</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0012/"><strong>Darkhotel</strong><br><span class="muted">G0012</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a></div></section>
+  <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+  <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>
     <a href="https://1200km.com/cti-analyst-field-manual/">CTI Analyst Field Manual</a>

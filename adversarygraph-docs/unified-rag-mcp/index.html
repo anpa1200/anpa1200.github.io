@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>AdversaryGraph Unified Intelligence RAG and MCP</title>
+    <meta name="description" content="Architecture, indexed source coverage, governance, REST API, MCP boundary, analyst workflows, and known limits for AdversaryGraph Unified Intelligence RAG and MCP." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta name="robots" content="noindex,follow" />
+    <meta property="og:title" content="AdversaryGraph Unified Intelligence RAG and MCP" />
+    <meta property="og:description" content="A provenance-preserving retrieval and advisory integration layer across ATT&amp;CK, actors, IOCs, CVEs, reports, hunts, evidence, and assets." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md" />
+    <meta property="og:site_name" content="1200km Security Research" />
+    <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <link rel="canonical" href="https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+    <link rel="icon" href="/assets/ap-logo-72.png" type="image/png" sizes="72x72" />
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
+    <link id="site-search-styles" rel="stylesheet" href="/assets/site-search.css?v=20260721-4" />
+    <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
+    <script src="/assets/site-search.js?v=20260721-4" data-site-search-loader defer></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "AdversaryGraph Unified Intelligence RAG and MCP",
+        "description": "Architecture, source coverage, governance, API and analyst boundaries for the post-v6 Unified Intelligence RAG and MCP capability.",
+        "url": "https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md",
+        "datePublished": "2026-07-21",
+        "dateModified": "2026-07-21",
+        "author": { "@type": "Person", "name": "Andrey Pautov", "url": "https://1200km.com/" },
+        "inLanguage": "en",
+        "about": ["Cyber threat intelligence", "Retrieval-augmented generation", "Model Context Protocol", "MITRE ATT&CK"]
+      }
+    </script>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.65; }
+      .doc-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 52px 0 88px; }
+      .doc-hero { padding: clamp(28px, 6vw, 58px); border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(140deg, rgba(15,98,254,.18), rgba(5,12,26,.82)); }
+      .doc-kicker { margin: 0 0 12px; color: #93c5fd; font-size: .76rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+      .doc-hero h1 { max-width: 900px; margin: 0; color: var(--text); font-size: clamp(2.2rem, 6vw, 4.7rem); line-height: 1.02; }
+      .doc-lead { max-width: 78ch; margin: 20px 0 0; color: var(--text); font-size: 1.08rem; }
+      .status-note { margin-top: 22px; padding: 14px 16px; border-left: 4px solid #f2bd64; background: rgba(242,189,100,.1); color: var(--text); }
+      .doc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 34px; margin-top: 34px; }
+      .doc-content article { margin-bottom: 22px; padding: clamp(20px, 4vw, 30px); border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--panel-ink-soft); }
+      .doc-content h2, .doc-content h3 { color: var(--panel-ink); }
+      .doc-content h2 { margin: 0 0 12px; font-size: 1.55rem; }
+      .doc-content h3 { margin: 24px 0 8px; font-size: 1.08rem; }
+      .doc-content p { margin: 10px 0; }
+      .doc-content li { margin: 7px 0; }
+      .doc-content code { padding: 2px 6px; border-radius: 5px; background: var(--chip); color: var(--panel-ink); }
+      .doc-content pre { overflow-x: auto; padding: 16px; border-radius: 10px; background: #07101f; color: #dbeafe; }
+      .source-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+      .source-table th, .source-table td { padding: 10px; border: 1px solid rgba(75,96,128,.35); text-align: left; vertical-align: top; }
+      .source-table th { background: var(--chip); color: var(--panel-ink); }
+      .doc-toc { position: sticky; top: 86px; align-self: start; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(7,16,31,.94); }
+      .doc-toc strong { display: block; margin-bottom: 10px; color: var(--text); }
+      .doc-toc a { display: block; padding: 6px 0; color: #b9c9e3; font-size: .88rem; }
+      .doc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+      @media (max-width: 860px) { .doc-grid { grid-template-columns: 1fr; } .doc-toc { position: static; order: -1; } }
+    </style>
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <!-- site-shell:header:start -->
+    <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-07-21.2">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
+          <span class="brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <details class="nav-links" data-mobile-navigation>
+          <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
+            <span class="nav-menu-text">Menu</span>
+          </summary>
+          <div class="nav-list" id="primary-nav-list">
+            <a href="/cti.html">Research</a>
+            <a class="nav-flagship active" aria-current="location" href="/adversarygraph/">AdversaryGraph</a>
+            <a href="/labs.html">Labs</a>
+            <a href="/guides.html">Library</a>
+            <a href="/projects.html">Projects</a>
+            <a href="/about.html">About</a>
+          </div>
+        </details>
+        <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">
+            <span aria-hidden="true" class="site-search-fallback-icon"></span>
+            <span class="site-search-fallback-text">Search research</span>
+          </a>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+    <!-- site-shell:header:end -->
+
+    <main class="doc-shell" id="main-content">
+      <header class="doc-hero">
+        <p class="doc-kicker">AdversaryGraph · post-v6 current development</p>
+        <h1>Unified Intelligence RAG and MCP</h1>
+        <p class="doc-lead">AdversaryGraph builds one provenance-preserving retrieval corpus over selected ATT&amp;CK, actor, IOC, CVE, report, knowledge, Threat Radar, Threat Hunting, Evidence Graph, and sanitized asset records. It returns source-linked evidence for analyst review and can propose—but never automatically apply—ATT&amp;CK Navigator techniques.</p>
+        <div class="status-note"><strong>Release and deployment boundary:</strong> this capability is post-v6 current development. It must not be attributed to the immutable AdversaryGraph v6.0.0 release. This local presentation copy is not the deployed Docusaurus route; use the linked source guide until that documentation deployment is published.</div>
+        <div class="doc-actions"><a class="button primary" href="https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md">Authoritative source guide</a><a class="button" href="/adversarygraph-docs/">All AdversaryGraph documentation</a></div>
+      </header>
+
+      <div class="doc-grid">
+        <div class="doc-content">
+          <article id="architecture">
+            <h2>How does the retrieval architecture work?</h2>
+            <p>Allowlisted collectors create canonical RAG documents and bounded chunks from authoritative platform tables. Retrieval combines exact identifier matching, PostgreSQL full-text search, optional pgvector cosine search, reciprocal-rank fusion, business-profile reranking, and a bounded one-hop relationship expansion.</p>
+            <pre><code>authoritative records
+→ field-allowlisted documents and chunks
+→ exact + lexical + optional vector retrieval
+→ business-context reranking and bounded relationship expansion
+→ routes, TLP, freshness, scores, warnings, and citations
+→ governed AI synthesis or an expiring Navigator proposal
+→ explicit analyst review and confirmation</code></pre>
+            <p>Vectors remain in PostgreSQL with their source records. A vector is a retrieval aid; it is not evidence confidence, attribution probability, or proof of relevance.</p>
+          </article>
+
+          <article id="coverage">
+            <h2>Which records can Unified RAG search?</h2>
+            <p>“Unified” means one controlled search contract over twelve implemented source types. It does not mean every database table or column is embedded.</p>
+            <table class="source-table">
+              <thead><tr><th>Source type</th><th>Primary searchable context</th><th>Default handling</th></tr></thead>
+              <tbody>
+                <tr><td><code>attack_technique</code></td><td>Current ATT&amp;CK/ATLAS techniques, tactics, platforms, data sources, detection text</td><td>TLP:CLEAR</td></tr>
+                <tr><td><code>attack_group</code></td><td>Groups, aliases, technique usage, attributed campaigns</td><td>TLP:CLEAR</td></tr>
+                <tr><td><code>attack_campaign</code></td><td>Campaign dates, actors, and technique usage</td><td>TLP:CLEAR</td></tr>
+                <tr><td><code>actor_intel</code></td><td>Stored sector, region, technology, confidence, dates, and evidence</td><td>TLP:AMBER+STRICT</td></tr>
+                <tr><td><code>ioc</code></td><td>Observable, type, context, ATT&amp;CK IDs, dates, confidence, source, tags, actor links</td><td>Stored/normalized TLP</td></tr>
+                <tr><td><code>cve</code></td><td>Description, CVSS, CWEs, CPEs, KEV, dates, tags, and stored relationships</td><td>Inherited and fail-closed marking</td></tr>
+                <tr><td><code>analysis_report</code></td><td>Completed report text, summary, extracted techniques, actor candidates</td><td>Stored report TLP</td></tr>
+                <tr><td><code>knowledge</code></td><td>Article title, summary, body, category, tags, publication date</td><td>TLP:CLEAR</td></tr>
+                <tr><td><code>threat_signal</code></td><td>Signal state, severity, confidence, CVEs, TTPs, IOCs, actors, sectors</td><td>Stored TLP/legal flag</td></tr>
+                <tr><td><code>threat_hunt</code></td><td>Hypothesis, scope, telemetry, query, evidence expectations, findings and outcome</td><td>Stored TLP; legal-sensitive</td></tr>
+                <tr><td><code>evidence_node</code></td><td>Evidence statements, behavior, observables, technique, detections, decisions</td><td>TLP:AMBER+STRICT; legal-sensitive</td></tr>
+                <tr><td><code>asset</code></td><td>Sanitized asset identity, exposure, criticality, technology, risk, technique IDs</td><td>TLP:AMBER+STRICT; legal-sensitive</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article id="governance">
+            <h2>How is sensitive intelligence governed?</h2>
+            <ul>
+              <li>Only curated fields are indexed; raw feed/provider payloads, credentials, audit tables, and arbitrary files are excluded.</li>
+              <li>Every chunk retains source type, stable source ID, canonical route, TLP, content hash, source version, and index time.</li>
+              <li>Client profiles are private reranking/generation context and are not globally retrievable corpus documents.</li>
+              <li>TLP:AMBER+STRICT, TLP:RED, and legally sensitive results cannot be sent to a cloud model.</li>
+              <li>Retrieved text is untrusted data. Instructions inside reports do not become system instructions or tool calls.</li>
+              <li>Generated answers must use verified source markers; unknown citations fail the request.</li>
+              <li>Proposed ATT&amp;CK IDs are checked against the current local catalog, and stale chunk hashes reject an answer.</li>
+            </ul>
+            <p>Field allowlisting is not a general DLP guarantee. Operators remain responsible for removing unnecessary secrets and applying correct TLP/legal markings before ingestion.</p>
+          </article>
+
+          <article id="workflows">
+            <h2>What can an analyst ask?</h2>
+            <h3>Business-context IOC discovery</h3>
+            <p>An analyst can ask for intelligence relevant to a business profile such as an Israel-based technology company. The profile can improve ranking, but the result remains source-bound and is not a targeting or attribution claim.</p>
+            <pre><code>{
+  "query": "Israel technology sector phishing infrastructure",
+  "source_types": ["actor_intel", "ioc", "attack_group", "attack_campaign", "analysis_report", "attack_technique"],
+  "domain": "enterprise-attack",
+  "limit": 12
+}</code></pre>
+            <h3>Navigator technique proposal</h3>
+            <p>The assistant may return an expiring, checksum-bound proposal containing only cited, locally valid techniques. Confirmation records a receipt; it does not automatically save a layer or mutate the Navigator workspace.</p>
+          </article>
+
+          <article id="api">
+            <h2>Which REST operations are exposed?</h2>
+            <ul>
+              <li><code>GET /api/rag/status</code> — corpus, embedding, coverage, and freshness status.</li>
+              <li><code>POST /api/rag/search</code> — exact, lexical, and optional vector retrieval.</li>
+              <li><code>GET /api/rag/entity/{type}/{id}</code> — one sanitized indexed entity.</li>
+              <li><code>POST /api/rag/assist</code> — citation-bound answer and optional proposal.</li>
+              <li><code>POST /api/rag/proposals/{id}/confirm</code> — confirm a proposal without saving a layer.</li>
+              <li><code>POST /api/rag/reindex</code> and <code>GET /api/rag/index-runs</code> — governed corpus administration.</li>
+            </ul>
+            <p>Analysis calls require <code>run_analysis</code>; profile administration requires <code>manage_intel</code>; index administration requires <code>manage_feeds</code>.</p>
+          </article>
+
+          <article id="mcp">
+            <h2>What does the MCP server allow?</h2>
+            <p>The local stdio MCP surface reuses the authenticated REST boundary. It exposes exactly four advisory tools: <code>search_intelligence</code>, <code>ask_intelligence</code>, <code>get_indexed_entity</code>, and <code>propose_navigator_layer</code>.</p>
+            <p>It cannot run arbitrary SQL, fetch arbitrary URLs, configure feeds, read secrets or raw provider JSON, execute simulations, forward SIEM data, confirm proposals, or mutate Navigator state.</p>
+          </article>
+
+          <article id="limits">
+            <h2>What are the known limits?</h2>
+            <ul>
+              <li>Indexed coverage is not proof that no relevant intelligence exists elsewhere.</li>
+              <li>Semantic similarity does not prove operational relevance; analysts must review relationships and evidence.</li>
+              <li>Relationship expansion is bounded and non-recursive, not a complete knowledge-graph traversal.</li>
+              <li>Source freshness, attribution, CVE-to-TTP links, and sector labels inherit source-record limitations.</li>
+              <li>The current single-workspace model is not a hard tenant-isolation boundary.</li>
+              <li>MCP integration is not permission to automate blocking, exploitation, hunt execution, response, or Navigator mutation.</li>
+            </ul>
+          </article>
+        </div>
+
+        <nav class="doc-toc" aria-label="On this page">
+          <strong>On this page</strong>
+          <a href="#architecture">Architecture</a>
+          <a href="#coverage">Indexed source coverage</a>
+          <a href="#governance">Security and governance</a>
+          <a href="#workflows">Analyst workflows</a>
+          <a href="#api">REST API</a>
+          <a href="#mcp">MCP boundary</a>
+          <a href="#limits">Known limits</a>
+        </nav>
+      </div>
+    </main>
+    <!-- site-shell:footer:start -->
+    <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-07-21.2">
+      <div class="shared-footer-inner">
+        <a class="shared-footer-brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="32" height="32" />
+          <span><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <nav class="shared-footer-links" aria-label="Footer navigation">
+          <a href="/cti.html">Research</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/labs.html">Labs</a>
+          <a href="/guides.html">Library</a>
+          <a href="/projects.html">Projects</a>
+          <a href="/about.html">About</a>
+        </nav>
+        <nav class="shared-footer-meta" aria-label="Site information">
+          <a href="/privacy.html">Privacy / Data Handling</a>
+          <a href="/about.html#contact">Contact</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></a>
+        </nav>
+      </div>
+      <div class="shared-footer-bottom">
+        <span>© 2026 Andrey Pautov · Original research and tooling</span>
+        <a href="#top" data-back-to-top>Back to top ↑</a>
+      </div>
+    </footer>
+    <!-- site-shell:footer:end -->
+  </body>
+</html>

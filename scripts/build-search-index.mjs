@@ -11,6 +11,7 @@ import {
   normalizeCanonical,
   normalizeSiteUrl,
   parseSitemap,
+  parseSitemapEntries,
   prepareHtmlForSearch,
   shouldExcludeUrl,
   validatePage,
@@ -26,12 +27,15 @@ function option(name, fallback = null) {
 
 const remote = args.includes('--remote');
 const quiet = args.includes('--quiet');
+const siteRoot = resolve(option('--site', ROOT));
 const outputPath = resolve(option('--output', join(ROOT, 'pagefind')));
 const minimumPages = Number.parseInt(option('--minimum-pages', remote ? '1600' : '1000'), 10);
 const maxPageFailures = Number.parseInt(option('--max-page-failures', remote ? '12' : '0'), 10);
-const maxStalePages = Number.parseInt(option('--max-stale-pages', remote ? '60' : '0'), 10);
+const maxStalePages = Number.parseInt(option('--max-stale-pages', '0'), 10);
 const concurrency = Math.max(1, Math.min(24, Number.parseInt(option('--concurrency', '12'), 10)));
-const rootSitemap = remote ? `${SITE_ORIGIN}/sitemap.xml` : join(ROOT, 'sitemap.xml');
+const rootSitemap = option('--sitemap', remote ? `${SITE_ORIGIN}/sitemap.xml` : join(siteRoot, 'sitemap-all.xml'));
+const canonicalSitemapOutput = option('--canonical-sitemap-output');
+const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-catalog.json')));
 const requiredIndexUrls = [
   `${SITE_ORIGIN}/`,
   `${SITE_ORIGIN}/search.html`,
@@ -40,6 +44,16 @@ const requiredIndexUrls = [
   `${SITE_ORIGIN}/threat-matrix/actors/G0069/`,
   `${SITE_ORIGIN}/ITDR/`,
 ];
+
+if (!existsSync(catalogPath)) throw new Error(`Content catalogue is required before search indexing: ${catalogPath}`);
+const catalog = JSON.parse(await readFile(catalogPath, 'utf8'));
+const catalogByUrl = new Map();
+for (const item of catalog.items || []) {
+  for (const value of [item.canonical_url, item.source_url, ...(item.alternate_urls || [])].filter(Boolean)) {
+    const normalized = normalizeCanonical(value) || value;
+    if (!catalogByUrl.has(normalized)) catalogByUrl.set(normalized, item);
+  }
+}
 
 function log(message) {
   if (!quiet) console.log(message);
@@ -92,11 +106,12 @@ async function collectRemoteUrls(entry) {
   const visited = new Set();
 
   async function visit(reference) {
-    const normalized = normalizeCanonical(reference);
+    const isRemote = /^https?:/i.test(reference);
+    const normalized = isRemote ? normalizeCanonical(reference) : resolve(reference);
     if (!normalized || visited.has(normalized)) return;
     visited.add(normalized);
-    const xml = await fetchText(normalized);
-    const sitemap = parseSitemap(xml, normalized);
+    const xml = isRemote ? await fetchText(normalized) : await readFile(normalized, 'utf8');
+    const sitemap = parseSitemap(xml, isRemote ? normalized : SITE_ORIGIN);
     if (sitemap.isIndex) {
       for (const location of sitemap.locations) await visit(location);
     } else {
@@ -109,7 +124,7 @@ async function collectRemoteUrls(entry) {
 }
 
 async function pageSource(url, localOnly, preferLocal) {
-  const localPath = localFileForUrl(ROOT, url);
+  const localPath = localFileForUrl(siteRoot, url);
   if ((localOnly || preferLocal) && localPath) {
     return { html: await readFile(localPath, 'utf8'), source: 'local' };
   }
@@ -133,7 +148,7 @@ async function replaceOutput(stagedOutput, destination) {
 
 assertSafeOutput(outputPath);
 const startedAt = Date.now();
-const localPages = await collectLocalSitemapUrls(ROOT, rootSitemap);
+const localPages = await collectLocalSitemapUrls(siteRoot, join(siteRoot, 'sitemap-all.xml'));
 const discovered = remote ? await collectRemoteUrls(rootSitemap) : localPages;
 if (remote) localPages.forEach((url) => discovered.add(url));
 
@@ -199,8 +214,17 @@ for (let offset = 0; offset < urls.length; offset += concurrency) {
       skippedDetails.push({ url: item.url, reason: validation.reason });
       continue;
     }
+    const catalogItem = catalogByUrl.get(normalizeCanonical(item.url));
+    if (!catalogItem) {
+      failures.push(`${item.url}: missing content-catalog identity`);
+      continue;
+    }
+    if (!catalogItem.indexable) {
+      failures.push(`${item.url}: sitemap includes a content-catalog item marked non-indexable`);
+      continue;
+    }
     const result = await index.addHTMLFile({
-      content: prepareHtmlForSearch(item.url, item.html),
+      content: prepareHtmlForSearch(item.url, item.html, catalogItem),
       url: normalizeSiteUrl(item.url).pathname,
     });
     if (result.errors.length) failures.push(`${item.url}: ${result.errors.join('; ')}`);
@@ -247,7 +271,7 @@ if (writeResult.errors.length) {
 const metadata = {
   schemaVersion: 1,
   pagefindVersion: '1.5.2',
-  source: remote ? 'canonical-live-sitemaps-with-local-release-overrides' : 'canonical-local-sitemaps',
+  source: remote ? 'generated-canonical-sitemap-with-local-release-overrides' : 'canonical-local-sitemap',
   generatedAt: new Date().toISOString(),
   discoveredPages: urls.length,
   indexedPages,
@@ -257,11 +281,44 @@ const metadata = {
   failedPages: failures.length,
   failureDetails: failures.slice(0, 50),
   durationMs: Date.now() - startedAt,
+  contentCatalogVersion: catalog.catalog_version,
+  contentCatalogScope: catalog.scope,
 };
 await writeFile(join(stagedOutput, 'search-build.json'), `${JSON.stringify(metadata, null, 2)}\n`);
 await pagefind.close();
 await replaceOutput(stagedOutput, outputPath);
 await rm(temporaryRoot, { recursive: true, force: true });
+
+if (canonicalSitemapOutput) {
+  const inputXml = /^https?:/i.test(rootSitemap)
+    ? await fetchText(rootSitemap)
+    : await readFile(resolve(rootSitemap), 'utf8');
+  const parsed = parseSitemapEntries(inputXml, SITE_ORIGIN);
+  if (parsed.isIndex) throw new Error('Canonical sitemap output requires a flat URL-set input.');
+  const byUrl = new Map(parsed.entries.map((entry) => [entry.loc, entry]));
+  const entries = [...indexedUrls].sort().map((loc) => byUrl.get(loc) || { loc });
+  const xmlEscape = (value) => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...entries.map((entry) => [
+      '  <url>',
+      `    <loc>${xmlEscape(entry.loc)}</loc>`,
+      ...(entry.lastmod ? [`    <lastmod>${entry.lastmod}</lastmod>`] : []),
+      '  </url>',
+    ].join('\n')),
+    '</urlset>',
+    '',
+  ].join('\n');
+  await writeFile(resolve(canonicalSitemapOutput), xml);
+  metadata.canonicalSitemapPages = entries.length;
+  await writeFile(join(outputPath, 'search-build.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  log(`Wrote canonical sitemap with ${entries.length} indexed URLs to ${resolve(canonicalSitemapOutput)}.`);
+}
 
 log(`Search index ready: ${indexedPages} pages at ${outputPath}.`);
 if (failures.length) {

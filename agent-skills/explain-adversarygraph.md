@@ -7,14 +7,20 @@ Explain AdversaryGraph using public documentation.
 ## Recommended Sources
 
 - https://1200km.com/adversarygraph/
+- https://1200km.com/data/site-facts.json
 - https://1200km.com/adversarygraph-docs/
 - https://1200km.com/adversarygraph-docs/capabilities/
-- https://1200km.com/adversarygraph-docs/unified-rag-mcp/
+- https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md (Unreleased current-development source guide)
 - https://github.com/anpa1200/adversarygraph
 
 ## Key Concepts
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench.
+
+Use `AdversaryGraph` as the flagship product name. `Threat Matrix` is the
+public, read-only browser ATT&CK workspace associated with AdversaryGraph; it
+is not the full platform. Treat `ThreatMapper` and `AdversaryGraph Web` as
+superseded names except in explicit historical context.
 
 Explain these capabilities when relevant:
 

@@ -5,6 +5,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   canonicalFromHtml,
+  classifyContentType,
+  classifyTopics,
   classifyUrl,
   normalizeCanonical,
   parseSitemap,
@@ -41,18 +43,54 @@ test('validation rejects redirects, noindex pages, aliases, and external canonic
 });
 
 test('search preprocessing marks canonical bodies and boosts entity identity', () => {
-  const html = '<html><head><title>Windows Command Shell | AdversaryGraph</title><meta name="description" content="Technique details"></head><body><main><h1>Windows Command Shell</h1></main></body></html>';
+  const html = '<html><head><title>Windows Command Shell | AdversaryGraph</title><meta name="description" content="MITRE ATT&CK technique details"></head><body><main><h1>Windows Command Shell</h1><h2>Detection logic</h2></main></body></html>';
   const prepared = prepareHtmlForSearch('https://1200km.com/threat-matrix/techniques/T1059.003/', html);
-  assert.match(prepared, /<body data-pagefind-body>/);
+  assert.match(prepared, /<main data-pagefind-body>/);
+  assert.match(prepared, /<h2 id="detection-logic">Detection logic<\/h2>/);
   assert.match(prepared, /content="T1059\.003 — Windows Command Shell" data-pagefind-meta="title\[content\]"/);
   assert.match(prepared, /content="T1059\.003" data-pagefind-meta="identifier\[content\]"/);
   assert.match(prepared, /data-pagefind-filter="section\[content\]"/);
+  assert.match(prepared, /data-pagefind-filter="content_type\[content\]"/);
+  assert.match(prepared, /content="MITRE ATT&amp;CK" data-pagefind-filter="topic\[content\]"/);
+});
+
+test('search preprocessing accepts controlled catalogue facets', () => {
+  const html = '<html><head><title>Example</title></head><body><main><h1>Example</h1></main></body></html>';
+  const prepared = prepareHtmlForSearch('https://1200km.com/example/', html, {
+    primary_type: 'guide',
+    primary_domain: 'detection-engineering',
+    audience: ['detection-engineer', 'threat-hunter'],
+    status: 'maintained',
+    evidence_level: 'source-backed',
+    version: '6.0.0',
+    source_url: 'https://github.com/anpa1200/adversarygraph',
+    updated_at: '2026-07-21',
+  });
+  assert.match(prepared, /data-pagefind-filter="primary_type\[content\]"/);
+  assert.match(prepared, /data-pagefind-filter="primary_domain\[content\]"/);
+  assert.match(prepared, /data-pagefind-filter="lifecycle\[content\]"/);
+  assert.match(prepared, /data-pagefind-filter="status\[content\]"/);
+  assert.match(prepared, /data-pagefind-filter="evidence_level\[content\]"/);
+  assert.match(prepared, /content="detection-engineer" data-pagefind-filter="audience\[content\]"/);
+  assert.match(prepared, /content="threat-hunter" data-pagefind-filter="audience\[content\]"/);
+  assert.match(prepared, /content="6\.0\.0" data-pagefind-filter="version\[content\]"/);
+  assert.match(prepared, /content="GitHub" data-pagefind-filter="source\[content\]"/);
+  assert.match(prepared, /content="2026" data-pagefind-filter="updated_year\[content\]"/);
 });
 
 test('search sections classify entities and documentation', () => {
   assert.equal(classifyUrl('https://1200km.com/threat-matrix/actors/G0069/'), 'Threat actors');
   assert.equal(classifyUrl('https://1200km.com/threat-matrix/techniques/T1059/'), 'ATT&CK techniques');
   assert.equal(classifyUrl('https://1200km.com/adversarygraph-docs/api/rag-mcp/'), 'AdversaryGraph docs');
+});
+
+test('search facets use deterministic content types and controlled topics', () => {
+  assert.equal(classifyContentType('https://1200km.com/threat-matrix/actors/G0069/'), 'Threat actor profile');
+  assert.equal(classifyContentType('https://1200km.com/articles/example.html'), 'Article');
+  assert.deepEqual(
+    classifyTopics('https://1200km.com/guide/', '<title>Threat hunting with Sigma</title><meta name="description" content="Detection engineering">'),
+    ['Threat hunting', 'Detection engineering'],
+  );
 });
 
 test('search loader versions stay synchronized and the live index is not pinned to stale metadata', () => {
@@ -66,6 +104,7 @@ test('search loader versions stay synchronized and the live index is not pinned 
   ]) {
     assert.match(readFileSync(join(ROOT, file), 'utf8'), new RegExp(`site-search\\.js\\?v=${version}`), `${file} must load the current search asset`);
   }
+  assert.match(readFileSync(join(ROOT, 'assets', 'site-theme.js'), 'utf8'), new RegExp(`searchAssetVersion = '${version}'`));
   assert.doesNotMatch(search, /meta-cache-tag|metaCacheTag/, 'daily index rebuilds must not reuse a static Pagefind metadata cache tag');
   assert.doesNotMatch(search, /no-worker|noWorker/, 'production search should use Pagefind worker mode with its built-in fallback');
 });
@@ -90,15 +129,29 @@ test('portfolio navigation is compact and search is click-only', () => {
 
   assert.doesNotMatch(shellSources, /Ctrl\s*\+?\s*K|mod\+k|site-search-fallback-shortcut/i);
   assert.doesNotMatch(search, /pagefind-modal-trigger/i);
-  assert.match(html, /<details class="nav-links">[\s\S]*?<div class="nav-list" id="primary-nav-list">/);
+  assert.match(html, /<details class="nav-links"[^>]*>[\s\S]*?<div class="nav-list" id="primary-nav-list">/);
   assert.match(html, /class="has-page-sidenav"/);
   assert.match(html, /class="skip-link"[^>]+href="#main-content"/);
 
   const primary = html.match(/<div class="nav-list" id="primary-nav-list">([\s\S]*?)<\/div>/)?.[1] || '';
   assert.equal((primary.match(/<a\b/g) || []).length, 6);
-  for (const label of ['Research', 'AdversaryGraph', 'Labs', 'Guides', 'Projects', 'About']) {
+  for (const label of ['Research', 'AdversaryGraph', 'Labs', 'Library', 'Projects', 'About']) {
     assert.match(primary, new RegExp(`>${label}<`));
   }
+  assert.match(search, /setAttribute\('show-sub-results', 'true'\)/);
+  assert.match(search, /pagefind-filter-dropdown/);
+  assert.match(search, /pagefind-results/);
+  assert.match(search, /SEARCH_PAGE_BATCH_SIZE = 20/);
+  assert.match(search, /window\.setTimeout\(handleComponentError, 6_000\)/);
+});
+
+test('Threat Matrix exposes distinct workspace and domain-wide search controls', () => {
+  const html = readFileSync(join(ROOT, 'threat-matrix', 'index.html'), 'utf8');
+  const scopeScript = readFileSync(join(ROOT, 'threat-matrix', 'assets', 'search-scope.js'), 'utf8');
+  assert.match(html, />Search this workspace</);
+  assert.match(html, /<form[^>]+action="\/search\.html"[\s\S]*?<label[^>]*>Search all 1200km research<\/label>/);
+  assert.match(scopeScript, /setAttribute\('aria-label', 'Search this workspace'\)/);
+  assert.doesNotMatch(html, /site-search\.js/);
 });
 
 test('remote index builds prefer release files and require stable ranking fixtures', () => {
@@ -107,5 +160,6 @@ test('remote index builds prefer release files and require stable ranking fixtur
   assert.match(builder, /requiredIndexUrls/);
   assert.match(builder, /missing required release fixtures/);
   assert.match(builder, /maxStalePages/);
+  assert.match(builder, /canonicalSitemapOutput/);
   assert.match(builder, /skippedDetails/);
 });

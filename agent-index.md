@@ -53,8 +53,8 @@ administration requires `manage_intel`, and index administration requires
 - `/adversarygraph/` - Flagship platform page
 - `/adversarygraph-docs/` - Documentation root
 - `/adversarygraph-docs/capabilities/` - Capability overview
-- `/adversarygraph-docs/unified-rag-mcp/` - Current-development RAG/MCP contract
-- `/threat-matrix/` - ATT&CK / threat matrix interface
+- `https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md` - Unreleased current-development RAG/MCP source guide
+- `/threat-matrix/` - Threat Matrix, the public read-only ATT&CK workspace associated with AdversaryGraph
 - `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
 - `/guides.html#detection` - Detection and SOC guide cluster
 - `/articles/` - Local article archive
@@ -65,6 +65,8 @@ administration requires `manage_intel`, and index administration requires
 
 - GitHub: https://github.com/anpa1200
 - Medium: https://medium.com/@1200km
+- Authoritative fact model: https://1200km.com/data/site-facts.json
+- Controlled content identities and taxonomy: https://1200km.com/data/content-catalog.json
 
 ## Public vs Restricted Capabilities
 

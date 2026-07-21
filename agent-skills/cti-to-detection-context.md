@@ -10,6 +10,7 @@ Retrieve public context about CTI-to-detection methodology from 1200km.com.
 - https://1200km.com/adversarygraph-docs/capabilities/
 - https://1200km.com/cti-analyst-field-manual/
 - https://1200km.com/threat-matrix/
+- https://1200km.com/data/site-facts.json
 
 ## Output Guidance
 
