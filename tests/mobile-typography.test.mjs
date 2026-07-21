@@ -50,6 +50,13 @@ test('shared styles distinguish prose from unbroken technical content', () => {
   assert.match(styles, /grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*10rem\),\s*1fr\)\)/);
 });
 
+test('AdversaryGraph product hero remains an unbroken responsive wordmark', () => {
+  const source = readFileSync(join(ROOT, 'adversarygraph', 'index.html'), 'utf8');
+  assert.match(source, /<h1[^>]*class="hero-title"[^>]*data-product-name="AdversaryGraph"[^>]*>AdversaryGraph<\/h1>/);
+  assert.match(source, /\.hero-title\s*\{[^}]*overflow-wrap:\s*normal;[^}]*word-break:\s*normal;[^}]*white-space:\s*nowrap;/s);
+  assert.match(source, /font-size:\s*clamp\(2rem,\s*4\.6vw,\s*4rem\)/);
+});
+
 test('generated AdversaryGraph docs load the post-bundle typography correction', () => {
   const longDocument = readFileSync(join(ROOT, 'adversarygraph-docs', 'full-flow', 'index.html'), 'utf8');
   const override = readFileSync(

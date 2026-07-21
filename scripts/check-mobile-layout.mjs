@@ -40,6 +40,7 @@ const viewports = [
   { label: '430', width: 430, height: 900, mobile: true },
   { label: '768', width: 768, height: 960, mobile: false },
   { label: 'desktop', width: 1440, height: 1000, mobile: false },
+  { label: 'wide-desktop', width: 1920, height: 1080, mobile: false, screenshot: true },
   // A 1280px browser at 200% zoom exposes roughly a 640 CSS-pixel layout viewport.
   { label: 'zoom-200', width: 640, height: 900, mobile: false, screenshot: true, zoom: 2 },
 ];
@@ -185,6 +186,22 @@ function layoutExpression(checkFixture) {
       right: round(element.getBoundingClientRect().right),
     }));
 
+    const productTitleElement = document.querySelector('[data-product-name="AdversaryGraph"]');
+    const productTitle = productTitleElement && visible(productTitleElement) ? (() => {
+      const rect = productTitleElement.getBoundingClientRect();
+      const style = getComputedStyle(productTitleElement);
+      const lineHeight = parseFloat(style.lineHeight);
+      return {
+        clientWidth: round(productTitleElement.clientWidth),
+        scrollWidth: round(productTitleElement.scrollWidth),
+        height: round(rect.height),
+        lineHeight: round(lineHeight),
+        whiteSpace: style.whiteSpace,
+        singleLine: rect.height <= lineHeight * 1.25,
+        contentContained: productTitleElement.scrollWidth <= productTitleElement.clientWidth + 1,
+      };
+    })() : null;
+
     let fixture = null;
     if (${checkFixture}) {
       const host = document.querySelector('.theme-doc-markdown') || document.querySelector('main') || document.body;
@@ -237,6 +254,7 @@ function layoutExpression(checkFixture) {
       badWrap,
       narrowProse,
       controlOverflow,
+      productTitle,
       fixture,
     };
   })()`;
@@ -321,6 +339,9 @@ try {
       if (state.badWrap.length) failures.push(`${name}@${viewport.label}: ordinary prose uses emergency wrapping ${JSON.stringify(state.badWrap)}`);
       if (state.narrowProse.length) failures.push(`${name}@${viewport.label}: ordinary prose is unnecessarily narrow ${JSON.stringify(state.narrowProse)}`);
       if (state.controlOverflow.length) failures.push(`${name}@${viewport.label}: navigation or CTA overflow ${JSON.stringify(state.controlOverflow)}`);
+      if (name === 'adversarygraph' && (!state.productTitle?.singleLine || !state.productTitle?.contentContained)) {
+        failures.push(`${name}@${viewport.label}: product title wraps or escapes its column ${JSON.stringify(state.productTitle)}`);
+      }
       if (state.fixture) {
         const fixture = state.fixture;
         if (fixture.proseWidth < fixture.contentWidth * 0.9 || fixture.proseWrap === 'anywhere' || fixture.proseWordBreak === 'break-all') {
@@ -337,7 +358,12 @@ try {
         }
       }
 
-      if (viewport.screenshot && (viewport.label === '390' || ['home', 'docs-long'].includes(name))) {
+      const captureRegressionScreenshot = viewport.screenshot && (
+        viewport.label === '390'
+        || ['home', 'docs-long'].includes(name)
+        || (name === 'adversarygraph' && viewport.label === 'wide-desktop')
+      );
+      if (captureRegressionScreenshot) {
         const screenshot = await devtools.send('Page.captureScreenshot', {
           format: 'png',
           captureBeyondViewport: false,
