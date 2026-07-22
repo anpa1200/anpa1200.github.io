@@ -14,6 +14,11 @@ import {
   prepareHtmlForSearch,
   validatePage,
 } from '../scripts/search-index-lib.mjs';
+import {
+  governanceBoost,
+  rerankSearchResults,
+  shouldApplyDiscoveryGovernance,
+} from '../scripts/search-governance-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -113,6 +118,28 @@ test('broad-discovery weights prioritize tier, then evidence, without hiding arc
   assert.ok(weight('reference', 'source-backed') > weight('reference', 'illustrative'));
   assert.ok(weight('reference', 'illustrative') > weight('reference', 'unverified'));
   assert.ok(weight('archive', 'unverified') > 0);
+});
+
+test('post-ranking governance applies only to broad discovery phrases', () => {
+  assert.equal(shouldApplyDiscoveryGovernance('threat intelligence'), true);
+  assert.equal(shouldApplyDiscoveryGovernance('Operation Desert Hydra'), true);
+  assert.equal(shouldApplyDiscoveryGovernance('T1059.003'), false);
+  assert.equal(shouldApplyDiscoveryGovernance('MuddyWater'), false);
+  assert.equal(shouldApplyDiscoveryGovernance('Historical AdversaryGraph v4 Capability Map'), false);
+  assert.ok(governanceBoost({ collection_tier: 'core', evidence_level: 'source-backed' })
+    > governanceBoost({ collection_tier: 'reference', evidence_level: 'externally-accepted' }));
+  const results = [
+    { id: 'archive', score: 10 },
+    { id: 'reference', score: 3 },
+    { id: 'core', score: 1 },
+  ];
+  const records = {
+    archive: { boost: 0.2 },
+    reference: { boost: 1 },
+    core: { boost: 12 },
+  };
+  assert.deepEqual(rerankSearchResults(results, 'cloud security', records).map((item) => item.id), ['core', 'reference', 'archive']);
+  assert.deepEqual(rerankSearchResults(results, 'T1059.003', records).map((item) => item.id), ['archive', 'reference', 'core']);
 });
 
 test('search loader versions stay synchronized and the live index is not pinned to stale metadata', () => {

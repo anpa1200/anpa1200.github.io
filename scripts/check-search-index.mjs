@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { rerankSearchResults } from './search-governance-lib.mjs';
 
 const args = process.argv.slice(2);
 const bundleIndex = args.indexOf('--bundle');
@@ -16,6 +17,7 @@ const required = [
   'pagefind-worker.js',
   'pagefind-entry.json',
   'search-build.json',
+  'search-governance.json',
   'wasm.en.pagefind',
 ];
 const failures = [];
@@ -26,6 +28,7 @@ for (const file of required) {
 }
 
 let build;
+let governance;
 try {
   build = JSON.parse(readFileSync(join(bundle, 'search-build.json'), 'utf8'));
   if (build.pagefindVersion !== '1.5.2') failures.push(`expected Pagefind 1.5.2, found ${build.pagefindVersion}`);
@@ -35,6 +38,15 @@ try {
   if (remote && build.canonicalSitemapPages !== build.indexedPages) failures.push('canonical sitemap coverage does not match the Pagefind index');
 } catch (error) {
   failures.push(`invalid search-build.json: ${error.message}`);
+}
+try {
+  governance = JSON.parse(readFileSync(join(bundle, 'search-governance.json'), 'utf8'));
+  if (governance.schema_version !== 1) failures.push(`unsupported search-governance schema ${governance.schema_version}`);
+  if (governance.indexed_page_count !== build?.indexedPages) failures.push(`search governance targets ${governance.indexed_page_count} of ${build?.indexedPages} indexed pages`);
+  if (governance.record_count < Math.floor((build?.indexedPages || 0) * 0.95)) failures.push(`search governance has too few Pagefind fragment records: ${governance.record_count}`);
+  if (Object.keys(governance.records || {}).length !== governance.record_count) failures.push('search governance record_count disagrees with its records');
+} catch (error) {
+  failures.push(`invalid search-governance.json: ${error.message}`);
 }
 
 const mime = {
@@ -107,7 +119,8 @@ async function checkQueries() {
     ];
     for (const { query, expectedPrefixes, expectedUrls = [], first = false, matchedTier, matchedSource, requiredTier, broad = false } of checks) {
       const result = await search.search(query);
-      const top = await Promise.all(result.results.slice(0, 10).map((item) => item.data()));
+      const ranked = rerankSearchResults(result.results, query, governance.records);
+      const top = await Promise.all(ranked.slice(0, 10).map((item) => item.data()));
       console.log(`Search quality "${query}": ${top.map((item) => item.url).join(', ') || '(no results)'}`);
       if (!top.length) {
         failures.push(`query "${query}" returned no results`);

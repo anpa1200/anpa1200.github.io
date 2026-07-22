@@ -4,7 +4,7 @@
   if (window.__1200kmSiteSearch) return;
   window.__1200kmSiteSearch = true;
 
-  const ASSET_VERSION = '20260722-1';
+  const ASSET_VERSION = '20260722-2';
   const PAGEFIND_VERSION = '1.5.2';
   const SEARCH_PAGE_BATCH_SIZE = 20;
   const SEARCH_FILTERS = [
@@ -34,6 +34,49 @@
   let searchPageLimit = SEARCH_PAGE_BATCH_SIZE;
   let searchPageTotal = 0;
   let pagefindInstance = null;
+
+  function shouldGovernDiscovery(term) {
+    if (term === null || term === undefined || !String(term).trim()) return true;
+    const tokens = String(term).trim().split(/\s+/).filter(Boolean);
+    return tokens.length === 2 || tokens.length === 3;
+  }
+
+  function rerankDiscoveryResults(results, term, records) {
+    if (!Array.isArray(results) || !shouldGovernDiscovery(term)) return results;
+    return results.map(function (result, index) {
+      return {
+        result,
+        index,
+        governedScore: (Number(result.score) || 0) * (records?.[result.id]?.boost || 1),
+      };
+    }).sort(function (left, right) {
+      return right.governedScore - left.governedScore
+        || (Number(right.result.score) || 0) - (Number(left.result.score) || 0)
+        || left.index - right.index;
+    }).map(function (entry) { return entry.result; });
+  }
+
+  async function installDiscoveryGovernance(instance) {
+    const engine = instance?.__pagefind__;
+    if (!engine || engine.__1200kmGovernanceInstalled) return false;
+    try {
+      const response = await fetch(`/pagefind/search-governance.json?v=${ASSET_VERSION}`, { credentials: 'same-origin' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const governance = await response.json();
+      if (governance.schema_version !== 1 || !governance.records) throw new Error('invalid governance payload');
+      const originalSearch = engine.search.bind(engine);
+      engine.search = async function (term, options) {
+        const result = await originalSearch(term, options);
+        if (result?.results) result.results = rerankDiscoveryResults(result.results, term, governance.records);
+        return result;
+      };
+      engine.__1200kmGovernanceInstalled = true;
+      return true;
+    } catch (error) {
+      console.warn('Search discovery governance unavailable; preserving Pagefind relevance order.', error);
+      return false;
+    }
+  }
 
   if (interactiveThreatMatrix) return;
 
@@ -496,6 +539,10 @@
       }
 
       await instance.triggerLoad();
+      const governanceInstalled = await installDiscoveryGovernance(instance);
+      if (searchPage && governanceInstalled && instance.searchResult) {
+        instance.triggerSearch(instance.searchTerm || '');
+      }
       if (searchFailed) throw new Error('The search index did not initialize.');
 
       window.clearTimeout(readinessTimer);

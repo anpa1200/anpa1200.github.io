@@ -1,9 +1,11 @@
 #!/usr/bin/env node
-import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'node:zlib';
 import * as pagefind from 'pagefind';
+import { governanceBoost } from './search-governance-lib.mjs';
 import {
   SITE_ORIGIN,
   collectLocalSitemapUrls,
@@ -146,6 +148,42 @@ async function replaceOutput(stagedOutput, destination) {
   }
 }
 
+async function writeGovernanceMap(bundlePath) {
+  const fragmentDirectory = join(bundlePath, 'fragment');
+  const records = {};
+  const missing = [];
+  for (const filename of (await readdir(fragmentDirectory)).filter((name) => name.endsWith('.pf_fragment')).sort()) {
+    const compressed = await readFile(join(fragmentDirectory, filename));
+    const decoded = gunzipSync(compressed).toString('utf8');
+    const jsonStart = decoded.indexOf('{');
+    if (jsonStart < 0) throw new Error(`Pagefind fragment ${filename} has no JSON payload.`);
+    const fragment = JSON.parse(decoded.slice(jsonStart));
+    const canonical = normalizeCanonical(fragment.raw_url || fragment.url);
+    const item = canonical ? catalogByUrl.get(canonical) : null;
+    if (!item) {
+      missing.push(fragment.raw_url || fragment.url || filename);
+      continue;
+    }
+    const id = filename.replace(/\.pf_fragment$/, '');
+    records[id] = {
+      boost: Number(governanceBoost(item).toFixed(3)),
+      collection_tier: item.collection_tier,
+      evidence_level: item.evidence_level,
+    };
+  }
+  if (missing.length || !Object.keys(records).length) {
+    throw new Error(`Search governance map coverage mismatch: ${Object.keys(records).length}/${indexedPages} records; missing ${missing.slice(0, 20).join(', ') || 'unknown fragments'}.`);
+  }
+  const governance = {
+    schema_version: 1,
+    content_catalog_version: catalog.catalog_version,
+    indexed_page_count: indexedPages,
+    record_count: Object.keys(records).length,
+    records,
+  };
+  await writeFile(join(bundlePath, 'search-governance.json'), `${JSON.stringify(governance)}\n`);
+}
+
 assertSafeOutput(outputPath);
 const startedAt = Date.now();
 const localPages = await collectLocalSitemapUrls(siteRoot, join(siteRoot, 'sitemap-all.xml'));
@@ -267,6 +305,7 @@ if (writeResult.errors.length) {
   await pagefind.close();
   throw new Error(`Pagefind bundle write failed: ${writeResult.errors.join('; ')}`);
 }
+await writeGovernanceMap(stagedOutput);
 
 const metadata = {
   schemaVersion: 1,
