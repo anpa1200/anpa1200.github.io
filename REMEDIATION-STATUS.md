@@ -4,8 +4,9 @@ Last updated: 2026-07-22
 
 ## Audited baseline
 
-- Main-site commit: `723770f8b4d3fca8e3547eb38c272205108849cf`
-- Pinned article-archive commit: `ae0b2cd0060df643b48876466b64a1199e2e44c5`
+- Main-site baseline commit: `723770f8b4d3fca8e3547eb38c272205108849cf`
+- Production-identity deployment commit: `74c6eeec8dbe545bebf0475e0adf633ed649019d`
+- Governed article-archive commit: `92ceaf7ea031c979da6d315aa3144eb9562c40d5`
 - Latest stable AdversaryGraph release: `v6.0.0`, published 2026-07-17 ([release](https://github.com/anpa1200/adversarygraph/releases/tag/v6.0.0))
 - Latest successful Pages run before remediation: [29869441714](https://github.com/anpa1200/anpa1200.github.io/actions/runs/29869441714)
 - Pages artifact digest before remediation: `sha256:dce8e2d59f906d43f6e07956c783d2c0b483383ee3c5e42876550aab7edf671b`
@@ -24,8 +25,8 @@ but there was no deterministic origin-to-artifact proof.
 | Phase | Status | Evidence |
 |---|---|---|
 | 0 — fresh baseline | Complete | Production responses, headers, hashes, release and workflow records captured on 2026-07-22. |
-| 1 — production identity | In progress | Build identity generator, staged validator, and post-deploy custom-origin verifier implemented locally. |
-| 2 — article canonical migration | Pending | External Medium canonical changes require explicit per-article verification and will not be assumed. |
+| 1 — production identity | Complete | [PR #9](https://github.com/anpa1200/anpa1200.github.io/pull/9), [run 29893391422](https://github.com/anpa1200/anpa1200.github.io/actions/runs/29893391422), and live `/build.json` verify commit `74c6eee` and artifact digest `sha256:7de25197d5574bf0b0ae00bc4939c347f45e0e274901bfe90922d08b68e8eea5`. |
+| 2 — article canonical migration | In progress | Archive [PR #5](https://github.com/anpa1200/medium-blog-navigation/pull/5) and link-policy fix [PR #6](https://github.com/anpa1200/medium-blog-navigation/pull/6) merged. All 177 items now have governed local canonicals, original-publication provenance, intrinsic image dimensions, valid same-origin URLs, and an explicit migration state. External publication settings still require manual verification. |
 | 3 — accessibility semantics | Pending | Existing browser gate covers serious/critical axe findings; moderate, ARIA-reference, duplicate-ID, and article matrices require expansion. |
 | 4 — search governance | Pending | Existing Pagefind facets and regression checks require collection-tier governance. |
 | 5 — structured data and SEO | Pending | Meta-keywords and semantic graph gaps remain verified. |
@@ -54,5 +55,6 @@ hand in this file.
 
 ## Pull requests and production verification
 
-- Pull request: pending.
-- Production verification: pending deployment of the build-identity gate.
+- Production identity: main-site [PR #9](https://github.com/anpa1200/anpa1200.github.io/pull/9), merged and verified in production.
+- Article governance: archive [PR #5](https://github.com/anpa1200/medium-blog-navigation/pull/5) and link fix [PR #6](https://github.com/anpa1200/medium-blog-navigation/pull/6), current source `92ceaf7ea031c979da6d315aa3144eb9562c40d5`.
+- Main-site article pin and governance-data deployment: in progress.

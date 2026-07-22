@@ -6,6 +6,7 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 const facts = JSON.parse(read('data/site-facts.json')).facts;
 const workflow = read('.github/workflows/pages.yml');
 const metadataBuilder = read('scripts/build-site-artifacts.mjs');
+const archiveStager = read('scripts/stage-article-archive-governance.mjs');
 const articleIndexes = [
   'ai-offensive.html',
   'cti.html',
@@ -21,8 +22,16 @@ test('Pages deploys the pinned article source into the canonical /articles route
   assert.match(workflow, /ref:\s*\$\{\{\s*env\.ARTICLE_ARCHIVE_COMMIT\s*\}\}/);
   assert.match(workflow, /npm run validate:archive/);
   assert.match(workflow, /npm run build:embedded/);
+  assert.match(workflow, /stage-article-archive-governance\.mjs/);
   assert.match(workflow, /site\/articles/);
-  assert.equal(facts['content.medium_exported_articles'].value, 177);
+  const pinnedCommit = workflow.match(/ARTICLE_ARCHIVE_COMMIT:\s*([0-9a-f]{40})/)?.[1];
+  assert.ok(pinnedCommit, 'workflow must pin a full article source commit');
+  assert.ok(
+    facts['content.medium_exported_articles'].source.some((url) => url.includes(`/blob/${pinnedCommit}/`)),
+    'article fact must cite the pinned catalog commit',
+  );
+  assert.match(archiveStager, /articleFact\.value !== catalog\.length/);
+  assert.match(archiveStager, /canonical_status_counts/);
 });
 
 test('article discovery pages use local reading URLs instead of publication URLs', () => {
