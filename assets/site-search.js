@@ -4,7 +4,7 @@
   if (window.__1200kmSiteSearch) return;
   window.__1200kmSiteSearch = true;
 
-  const ASSET_VERSION = '20260722-2';
+  const ASSET_VERSION = '20260722-3';
   const PAGEFIND_VERSION = '1.5.2';
   const SEARCH_PAGE_BATCH_SIZE = 20;
   const SEARCH_FILTERS = [
@@ -12,6 +12,7 @@
     { key: 'primary_domain', label: 'Domain' },
     { key: 'audience', label: 'Audience' },
     { key: 'status', label: 'Status' },
+    { key: 'lifecycle', label: 'Lifecycle' },
     { key: 'evidence_level', label: 'Evidence level' },
     { key: 'collection_tier', label: 'Collection tier' },
     { key: 'version', label: 'Version' },
@@ -445,6 +446,7 @@
               <span>{{ meta.primary_type }}</span>
               <span>{{ meta.primary_domain }}</span>
               <span>{{ meta.status }}</span>
+              <span>{{ meta.lifecycle }}</span>
               <span>{{ meta.evidence_level }}</span>
               <span>{{ meta.collection_tier }}</span>
               <span>{{ meta.source }}</span>

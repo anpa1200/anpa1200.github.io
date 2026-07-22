@@ -7,7 +7,7 @@ const args = process.argv.slice(2);
 const siteIndex = args.indexOf('--site');
 if (siteIndex < 0 || !args[siteIndex + 1]) throw new Error('Usage: inject-search-loader.mjs --site <staged-site>');
 const site = resolve(args[siteIndex + 1]);
-const loader = '<script src="/assets/site-search.js?v=20260722-2" defer></script>';
+const loader = '<script src="/assets/site-search.js?v=20260722-3" defer></script>';
 
 async function walk(directory) {
   const files = [];

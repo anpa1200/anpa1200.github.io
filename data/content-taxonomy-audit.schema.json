@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1200km.com/data/content-taxonomy-audit.schema.json",
+  "title": "1200km content taxonomy audit report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "report_version", "generated_at", "catalog_version", "scope", "item_count", "distributions", "authored_only", "review_queues", "warnings"],
+  "properties": {
+    "$schema": { "const": "../data/content-taxonomy-audit.schema.json" },
+    "report_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "generated_at": { "type": "string", "format": "date" },
+    "catalog_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "scope": { "enum": ["local-source-catalog", "deployable-domain-catalog"] },
+    "item_count": { "type": "integer", "minimum": 1 },
+    "distributions": { "$ref": "#/$defs/distributions" },
+    "authored_only": {
+      "allOf": [
+        { "$ref": "#/$defs/distributions" },
+        {
+          "type": "object",
+          "required": ["item_count"],
+          "properties": { "item_count": { "type": "integer", "minimum": 0 } }
+        }
+      ]
+    },
+    "review_queues": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currentness_unknown", "unverified"],
+      "properties": {
+        "currentness_unknown": { "type": "array", "items": { "$ref": "#/$defs/reviewItem" } },
+        "unverified": { "type": "array", "items": { "$ref": "#/$defs/reviewItem" } }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "count", "message"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z0-9_]+$" },
+          "severity": { "enum": ["review", "error"] },
+          "count": { "type": "integer", "minimum": 0 },
+          "message": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "distributions": {
+      "type": "object",
+      "required": ["by_primary_type", "by_primary_domain", "by_lifecycle", "by_evidence_level", "by_collection_tier", "by_canonical_owner", "by_source_platform"],
+      "properties": {
+        "by_primary_type": { "$ref": "#/$defs/counts" },
+        "by_primary_domain": { "$ref": "#/$defs/counts" },
+        "by_lifecycle": { "$ref": "#/$defs/counts" },
+        "by_evidence_level": { "$ref": "#/$defs/counts" },
+        "by_collection_tier": { "$ref": "#/$defs/counts" },
+        "by_canonical_owner": { "$ref": "#/$defs/counts" },
+        "by_source_platform": { "$ref": "#/$defs/counts" }
+      }
+    },
+    "reviewItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "canonical_url", "primary_domain", "lifecycle", "published_at", "updated_at"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "canonical_url": { "type": "string", "format": "uri" },
+        "primary_domain": { "type": "string", "minLength": 1 },
+        "lifecycle": { "type": "string", "minLength": 1 },
+        "published_at": { "type": ["string", "null"] },
+        "updated_at": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

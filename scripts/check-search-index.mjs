@@ -94,14 +94,14 @@ async function checkQueries() {
     });
     await search.init();
     const filters = await search.filters();
-    for (const filter of ['content_type', 'primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'collection_tier', 'version', 'source', 'updated_year', 'topic', 'section']) {
+    for (const filter of ['content_type', 'primary_type', 'primary_domain', 'audience', 'status', 'lifecycle', 'evidence_level', 'collection_tier', 'version', 'source', 'updated_year', 'topic', 'section']) {
       const minimumValues = filter === 'updated_year' ? 1 : 2;
       if (!filters[filter] || Object.keys(filters[filter]).length < minimumValues) failures.push(`search filter ${filter} is missing or incomplete`);
     }
     const checks = [
-      { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK' },
+      { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK', matchedType: 'generated-reference', matchedLifecycle: 'stable-reference' },
       { query: 'T1059.00', expectedPrefixes: ['/threat-matrix/techniques/T1059.0'], first: true, matchedTier: 'reference' },
-      { query: 'G0034', expectedPrefixes: ['/threat-matrix/actors/G0034/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK' },
+      { query: 'G0034', expectedPrefixes: ['/threat-matrix/actors/G0034/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK', matchedType: 'reference-entity', matchedLifecycle: 'stable-reference' },
       { query: 'G0069', expectedPrefixes: ['/threat-matrix/actors/G0069/'], first: true, matchedTier: 'reference' },
       { query: 'MuddyWater', expectedPrefixes: ['/threat-matrix/actors/G0069/'] },
       { query: 'Kerberoasting', expectedPrefixes: ['/ITDR/'] },
@@ -115,9 +115,9 @@ async function checkQueries() {
       { query: 'threat intelligence', expectedPrefixes: ['/cti.html', '/adversarygraph/', '/threat-matrix/', '/cti-analyst-field-manual/'], broad: true },
       { query: 'cloud security', expectedPrefixes: ['/pt-tools.html', '/labs.html', '/ITDR/docs/protocols/cloud-idp/', '/threat-matrix/techniques/'], broad: true },
       { query: 'malware analysis', expectedPrefixes: ['/articles/', '/labs.html', '/guides.html', '/external-validation.html'], broad: true },
-      { query: 'Historical AdversaryGraph v4 Capability Map', expectedPrefixes: ['/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html'], requiredTier: 'archive' },
+      { query: 'Historical AdversaryGraph v4 Capability Map', expectedPrefixes: ['/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html'], requiredTier: 'archive', matchedLifecycle: 'superseded' },
     ];
-    for (const { query, expectedPrefixes, expectedUrls = [], first = false, matchedTier, matchedSource, requiredTier, broad = false } of checks) {
+    for (const { query, expectedPrefixes, expectedUrls = [], first = false, matchedTier, matchedSource, matchedType, matchedLifecycle, requiredTier, broad = false } of checks) {
       const result = await search.search(query);
       const ranked = rerankSearchResults(result.results, query, governance.records);
       const top = await Promise.all(ranked.slice(0, 10).map((item) => item.data()));
@@ -139,6 +139,12 @@ async function checkQueries() {
       }
       if (matchedSource && matched?.meta?.source !== matchedSource) {
         failures.push(`query "${query}" expected matched source ${matchedSource}, found ${matched?.meta?.source || '(missing)'}`);
+      }
+      if (matchedType && matched?.meta?.primary_type !== matchedType) {
+        failures.push(`query "${query}" expected matched type ${matchedType}, found ${matched?.meta?.primary_type || '(missing)'}`);
+      }
+      if (matchedLifecycle && matched?.meta?.lifecycle !== matchedLifecycle) {
+        failures.push(`query "${query}" expected matched lifecycle ${matchedLifecycle}, found ${matched?.meta?.lifecycle || '(missing)'}`);
       }
       if (requiredTier && !top.some((item) => item.meta?.collection_tier === requiredTier)) {
         failures.push(`query "${query}" did not return required ${requiredTier} content in the top ten`);

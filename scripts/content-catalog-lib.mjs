@@ -16,7 +16,10 @@ export const VOCABULARIES = Object.freeze({
     'tool',
     'platform',
     'documentation',
+    'reference-entity',
+    'generated-reference',
     'article',
+    'redirect',
     'mirror',
     'contribution',
     'index',
@@ -29,13 +32,14 @@ export const VOCABULARIES = Object.freeze({
     'threat-hunting',
     'malware-analysis',
     'identity-security',
-    'offensive-security',
+    'offensive-research',
     'cloud-security',
     'ai-security',
-    'embedded-security',
     'application-security',
-    'portfolio-governance',
-    'cross-domain',
+    'network-security',
+    'platform-documentation',
+    'professional-profile',
+    'site-governance',
   ],
   audiences: [
     'cti-analyst',
@@ -56,6 +60,16 @@ export const VOCABULARIES = Object.freeze({
     'archived',
     'submitted',
     'accepted',
+  ],
+  lifecycles: [
+    'maintained',
+    'stable-reference',
+    'current-development',
+    'preserved',
+    'historical',
+    'currentness-unknown',
+    'superseded',
+    'archived',
   ],
   maturity: ['production', 'stable', 'beta', 'experimental', 'historical', 'reference'],
   evidence_levels: [
@@ -228,7 +242,7 @@ function governedItem(item, config) {
     || (collection?.id === 'collection:medium-export' && item.primary_type === 'index'
       ? '1200km'
       : platformForUrl(sourceCandidate));
-  return {
+  const governed = {
     ...item,
     source_platform: sourcePlatform,
     source_repository: sourceRepository,
@@ -236,6 +250,14 @@ function governedItem(item, config) {
     canonical_owner: item.canonical_owner || canonicalOwner(item.canonical_url),
     collection_tier: item.collection_tier || collectionTier(item, config, collection),
   };
+  const statusControlsLifecycle = ['current-development', 'experimental', 'superseded', 'archived'].includes(governed.status)
+    || governed.maturity === 'historical';
+  governed.lifecycle = item.lifecycle
+    || (statusControlsLifecycle ? defaultLifecycle(governed) : null)
+    || collection?.lifecycle
+    || defaultLifecycle(governed);
+  if (governed.lifecycle === 'maintained' && !governed.updated_at) governed.lifecycle = 'stable-reference';
+  return applyArticleGovernance(governed, config);
 }
 
 function inferType(url, title, html, collection) {
@@ -252,7 +274,8 @@ function inferType(url, title, html, collection) {
     if (/\/labs?\//i.test(path) || /\/simulations\/scenarios\//i.test(path)) return 'lab';
     return collection.primary_type;
   }
-  if (/^\/threat-matrix\/(?:actors|techniques)\//i.test(path)) return 'mirror';
+  if (/^\/threat-matrix\/actors\//i.test(path)) return 'reference-entity';
+  if (/^\/threat-matrix\/techniques\//i.test(path)) return 'generated-reference';
   if (path === '/threat-matrix/') return 'tool';
   if (path === '/adversarygraph/') return 'platform';
   if (/^\/articles\/.+\.html$/i.test(path)) return 'article';
@@ -271,18 +294,20 @@ function inferDomain(url, title, html, collection) {
   const path = new URL(url).pathname;
   const text = `${path} ${title} ${findMetaContent(html, 'description')}`;
   if (/^\/threat-matrix\//i.test(path)) return 'threat-intelligence';
-  if (collection && collection.primary_domain !== 'cross-domain') return collection.primary_domain;
+  if (collection && collection.id !== 'collection:medium-export') return collection.primary_domain;
   if (/^\/ITDR\//.test(path) || /identity|kerberos|active directory|entra|oauth|saml/i.test(text)) return 'identity-security';
-  if (/embedded|firmware|hardware|uefi|bmc/i.test(text)) return 'embedded-security';
+  if (/embedded|firmware|hardware|uefi|bmc/i.test(text)) return 'application-security';
   if (/malware|reverse engineering|debugger|unpack/i.test(text)) return 'malware-analysis';
   if (/threat hunt|hunting hypoth|hunt quer/i.test(text)) return 'threat-hunting';
   if (/detection|sigma|telemetry|siem|anomaly/i.test(text)) return 'detection-engineering';
   if (/cloud|kubernetes|aws|azure|gcp/i.test(text)) return 'cloud-security';
-  if (/pentest|penetration|offensive|hexstrike|exploit|password crack|nmap|burp/i.test(text)) return 'offensive-security';
+  if (/pentest|penetration|offensive|hexstrike|exploit|password crack|aircrack|hydra|sqlmap|metasploit|nmap|burp/i.test(text)) return 'offensive-research';
   if (/\bai\b|\bllm\b|agentic|prompt injection/i.test(text)) return 'ai-security';
   if (/adversarygraph|threat-matrix|\bcti\b|threat intelligence|att&ck|attack actor|ioc/i.test(text)) return 'threat-intelligence';
-  if (/about|portfolio|projects|privacy|search|curriculum vitae/i.test(text)) return 'portfolio-governance';
-  return 'cross-domain';
+  if (/about|portfolio|projects|privacy|search|curriculum vitae/i.test(text)) return 'site-governance';
+  if (/network|wireless|wi-?fi|dns|http|ssh|rdp|ftp|telnet|rtsp|subdomain|shodan/i.test(text)) return 'network-security';
+  if (/web|android|mobile|application|vulnerab|owasp|sql injection/i.test(text)) return 'application-security';
+  return 'network-security';
 }
 
 function defaultsForType(primaryType, primaryDomain) {
@@ -292,20 +317,86 @@ function defaultsForType(primaryType, primaryDomain) {
     'threat-hunting': ['threat-hunter', 'detection-engineer'],
     'malware-analysis': ['security-engineer', 'cti-analyst'],
     'identity-security': ['security-engineer', 'detection-engineer'],
-    'offensive-security': ['security-engineer'],
+    'offensive-research': ['security-engineer'],
     'cloud-security': ['security-engineer', 'detection-engineer'],
     'ai-security': ['security-engineer', 'developer'],
-    'embedded-security': ['security-engineer', 'cti-analyst'],
     'application-security': ['security-engineer', 'developer'],
-    'portfolio-governance': ['general'],
-    'cross-domain': ['general'],
+    'network-security': ['security-engineer'],
+    'platform-documentation': ['platform-operator', 'developer'],
+    'professional-profile': ['general', 'security-leader'],
+    'site-governance': ['general'],
   };
   const evidence = primaryType === 'lab' ? 'illustrative'
     : primaryType === 'platform' ? 'release-evidence'
-      : primaryType === 'mirror' ? 'source-backed'
+      : ['mirror', 'reference-entity', 'generated-reference'].includes(primaryType) ? 'source-backed'
         : 'source-backed';
-  const maturity = ['mirror', 'documentation', 'index', 'profile', 'policy'].includes(primaryType) ? 'reference' : 'stable';
+  const maturity = ['mirror', 'reference-entity', 'generated-reference', 'documentation', 'index', 'profile', 'policy'].includes(primaryType) ? 'reference' : 'stable';
   return { audience: audiences[primaryDomain], evidence_level: evidence, maturity };
+}
+
+function defaultLifecycle(item) {
+  if (item.status === 'current-development' || item.status === 'experimental') return 'current-development';
+  if (item.status === 'superseded') return 'superseded';
+  if (item.status === 'archived') return 'archived';
+  if (item.maturity === 'historical') return 'historical';
+  if (['reference-entity', 'generated-reference', 'documentation', 'mirror', 'index', 'profile', 'policy', 'contribution'].includes(item.primary_type)) return 'stable-reference';
+  if (!item.updated_at) return 'currentness-unknown';
+  return 'maintained';
+}
+
+function articleIdFromUrl(value) {
+  return new URL(value).pathname.match(/-([a-f0-9]{12})\/?$/i)?.[1]?.toLowerCase() || null;
+}
+
+function applyArticleGovernance(item, config) {
+  if (item.collection_id !== 'collection:medium-export' || item.primary_type !== 'article') return item;
+  const id = articleIdFromUrl(item.canonical_url);
+  const policy = config.article_lifecycle_policy || {};
+  const currentCore = new Set(policy.current_core_ids || []);
+  const stableReference = new Set(policy.stable_reference_ids || []);
+  const historical = new Set(policy.historical_ids || []);
+  const published = item.published_at || '';
+
+  if (currentCore.has(id)) return {
+    ...item,
+    status: 'released',
+    lifecycle: 'maintained',
+    maturity: 'stable',
+    collection_tier: 'core',
+    applies_to: 'current core 1200km research selected by the maintained article lifecycle policy',
+  };
+  if (stableReference.has(id)) return {
+    ...item,
+    status: 'released',
+    lifecycle: 'stable-reference',
+    maturity: 'reference',
+    collection_tier: 'reference',
+    applies_to: 'stable reference article; environment-specific commands and product details still require validation',
+  };
+  if (historical.has(id)) return {
+    ...item,
+    status: 'released',
+    lifecycle: 'historical',
+    maturity: 'historical',
+    collection_tier: 'archive',
+    applies_to: 'version-specific or time-bound historical publication; not current product guidance',
+  };
+  if (policy.preserved_before && published && published < policy.preserved_before) return {
+    ...item,
+    status: 'released',
+    lifecycle: 'preserved',
+    maturity: 'historical',
+    collection_tier: 'archive',
+    applies_to: `preserved publication from before ${policy.preserved_before}; current technical applicability is not asserted`,
+  };
+  return {
+    ...item,
+    status: 'released',
+    lifecycle: 'currentness-unknown',
+    maturity: 'reference',
+    collection_tier: 'archive',
+    applies_to: 'published article whose technical currentness has not yet been reverified',
+  };
 }
 
 function mediumSourceFromHtml(html, pageUrl) {
@@ -412,6 +503,7 @@ export function externalArticleItems(indexDocuments, config, existingItems = [])
         primary_domain: primaryDomain,
         audience: defaults.audience,
         status: 'released',
+        lifecycle: 'currentness-unknown',
         maturity: 'stable',
         evidence_level: 'unverified',
         ...(version ? { version } : {}),
@@ -457,6 +549,7 @@ export function buildCatalog(items, config, scope = 'local-source-catalog') {
       by_primary_type: counts(sorted, 'primary_type'),
       by_primary_domain: counts(sorted, 'primary_domain'),
       by_status: counts(sorted, 'status'),
+      by_lifecycle: counts(sorted, 'lifecycle'),
       by_evidence_level: counts(sorted, 'evidence_level'),
       by_collection_tier: counts(sorted, 'collection_tier'),
     },
@@ -469,6 +562,7 @@ export function catalogueSearchMetadata(item) {
     primaryType: item.primary_type,
     primaryDomain: item.primary_domain,
     status: item.status,
+    lifecycle: item.lifecycle,
     evidenceLevel: item.evidence_level,
     collectionTier: item.collection_tier,
   };

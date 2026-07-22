@@ -220,6 +220,16 @@ function rssDate(value) {
   return new Date(value.includes('T') ? value : `${value}T00:00:00Z`).toUTCString();
 }
 
+function feedTitle(title, url) {
+  if (
+    /^https:\/\/1200km\.com\/articles\/read\/\d{4}\/[^/]*adversarygraph-v(?:2|3|4|5)[^/]*\/$/i.test(url)
+    && !/^historical:/i.test(title)
+  ) {
+    return `Historical: ${title}`;
+  }
+  return title;
+}
+
 function feedXml(items) {
   const lastBuildDate = items.map((item) => item.modified || item.published).sort().at(-1);
   return [
@@ -235,7 +245,7 @@ function feedXml(items) {
     '    <ttl>1440</ttl>',
     ...items.flatMap((item) => [
       '    <item>',
-      `      <title>${xmlEscape(item.title)}</title>`,
+      `      <title>${xmlEscape(feedTitle(item.title, item.url))}</title>`,
       `      <link>${xmlEscape(item.url)}</link>`,
       `      <guid isPermaLink="true">${xmlEscape(item.url)}</guid>`,
       `      <pubDate>${rssDate(item.published)}</pubDate>`,

@@ -7,20 +7,26 @@ and a CTI item.
 
 ## What the inventory found
 
-The source catalogue generated on 2026-07-21 contains:
+The source catalogue generated on 2026-07-22 contains:
 
-- 1,043 canonical pages in the local deployment sitemap;
+- 1,055 governed identities, including 1,043 canonical pages in the local deployment sitemap;
 - one intentionally noindex post-v6 AdversaryGraph development guide;
-- 96 external Medium or InfoSec Write-ups articles linked by maintained indexes;
-- seven current externally hosted tool identities, plus Threat Matrix and two archived tool records;
+- 12 declared external repository or package identities;
 - four GitHub repositories explicitly marked archived;
-- ten separately deployed documentation, guide, case-study, lab, or mirror collections.
+- ten separately deployed documentation, guide, case-study, lab, research, or article collections.
 
 The large local page count is not an article count. It includes 816 generated
 ATT&CK actor and technique pages, 124 ITDR pages, and the checked-in
-AdversaryGraph documentation output. Generated ATT&CK pages are `mirror`
-records backed by the corresponding MITRE ATT&CK entity URL, not original CTI
+AdversaryGraph documentation output. ATT&CK actors are `reference-entity`
+records and technique pages are `generated-reference` records backed by the
+corresponding MITRE ATT&CK URL. They are neither mirrors nor authored CTI
 articles.
+
+The production build adds the pinned 177-article archive and regenerates the
+full-domain catalogue and taxonomy report from the deployable output. Article
+publication status and editorial lifecycle are separate: an article remains a
+released publication even when its currentness is unknown or it is preserved
+as historical material.
 
 The inventory also found and corrected three package rows whose advertised
 PyPI URLs returned 404 on 2026-07-21. Unpacker, PE Import Analyzer, and FileInfo
@@ -36,6 +42,9 @@ verified against the PyPI JSON API.
 - `data/content-catalog.json` is deterministic generated output.
 - `data/content-catalog.schema.json` is the Draft 2020-12 schema for the output.
 - `data/content-catalog.config.schema.json` validates generation policy.
+- `data/content-taxonomy-audit.schema.json` validates the distribution report.
+- `reports/content-taxonomy-audit.json` records raw and authored-only
+  distributions plus explicit editorial review queues.
 - `scripts/content-catalog-lib.mjs` owns inference and controlled vocabularies.
 - `scripts/build-content-catalog.mjs` builds local or full deployable catalogues.
 - `scripts/check-content-schema.mjs` performs formal JSON Schema validation.
@@ -60,7 +69,7 @@ identities or change its primary classification.
 Required item fields are:
 
 ```text
-id, title, primary_type, primary_domain, audience, status, maturity,
+id, title, primary_type, primary_domain, audience, status, lifecycle, maturity,
 evidence_level, version/applies_to, canonical_url, published_at, updated_at,
 summary, tags, featured, indexable
 ```
@@ -75,23 +84,43 @@ Primary type:
 
 ```text
 research, case-study, guide, lab, tool, platform, documentation, article,
-mirror, contribution, index, profile, policy
+reference-entity, generated-reference, redirect, mirror, contribution, index,
+profile, policy
 ```
 
 Primary domain:
 
 ```text
 threat-intelligence, detection-engineering, threat-hunting, malware-analysis,
-identity-security, offensive-security, cloud-security, ai-security,
-embedded-security, application-security, portfolio-governance, cross-domain
+identity-security, offensive-research, cloud-security, ai-security,
+application-security, network-security, platform-documentation,
+professional-profile, site-governance
 ```
 
-Lifecycle status:
+Publication status:
 
 ```text
 released, maintained, current-development, experimental, superseded, archived,
 submitted, accepted
 ```
+
+Editorial lifecycle:
+
+```text
+maintained, stable-reference, current-development, preserved, historical,
+currentness-unknown, superseded, archived
+```
+
+- `maintained`: current work with dated update evidence.
+- `stable-reference`: reference material whose identity remains useful without
+  claiming continuous revision.
+- `current-development`: work that is explicitly unreleased or experimental.
+- `preserved`: an older publication retained without asserting current
+  technical applicability.
+- `historical`: version-specific or time-bound evidence kept for context.
+- `currentness-unknown`: published material not yet reverified for current use.
+- `superseded`: replaced by a named current identity or release.
+- `archived`: intentionally retired material retained for provenance.
 
 Evidence level:
 
@@ -99,6 +128,17 @@ Evidence level:
 source-backed, lab-validated, release-evidence, externally-accepted,
 illustrative, unverified
 ```
+
+- `externally-accepted`: acceptance is recorded by the authoritative external
+  contribution system.
+- `release-evidence`: tied to a tagged release or its reproducible release gate.
+- `lab-validated`: exercised in the documented controlled lab and bounded by
+  that environment.
+- `source-backed`: supported by cited primary or authoritative sources.
+- `illustrative`: synthetic or demonstrative material that is not production
+  telemetry.
+- `unverified`: evidence quality has not yet been reviewed; no stronger claim
+  is implied.
 
 Maturity and audience values are also closed vocabularies in the generated
 catalogue and schema.
@@ -127,7 +167,7 @@ identities. During the GitHub Pages build, `build-content:remote` reads the
 complete domain sitemap after remote documentation sitemaps have been merged.
 It builds a deployable catalogue for every URL that Pagefind can index. Search
 metadata then derives controlled `primary_type`, `primary_domain`, `audience`,
-`status`, `evidence_level`, and `version` facets from that catalogue. It also
+`status`, `lifecycle`, `evidence_level`, and `version` facets from that catalogue. It also
 derives source and updated-year discovery facets without changing catalogue
 identity. The search build refuses a sitemap URL whose catalogue record is
 marked non-indexable.
@@ -140,10 +180,14 @@ The release gate fails for:
 - sitemap, RSS, or major-index links without a catalogue identity;
 - released local content without a deployable URL;
 - mirrors without a source URL;
+- maintained lifecycle records without dated update evidence;
+- historical, preserved, superseded, or archived material in the core tier;
+- ATT&CK actors or techniques misclassified as mirrors or authored articles;
+- archive article IDs not assigned by the reviewed lifecycle policy;
 - version-specific AdversaryGraph content without a version;
 - superseded or archived records without an archive reason or visible notice;
 - legacy aliases that are not noindex redirects;
-- offensive-security indexes classified as catch-all CTI;
+- offensive-research indexes classified as catch-all CTI;
 - a stale generated catalogue;
 - any JSON Schema violation.
 

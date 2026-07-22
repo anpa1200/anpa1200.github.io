@@ -7,6 +7,7 @@ import { VOCABULARIES } from '../scripts/content-catalog-lib.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const catalog = JSON.parse(readFileSync(join(ROOT, 'data', 'content-catalog.json'), 'utf8'));
+const taxonomyAudit = JSON.parse(readFileSync(join(ROOT, 'reports', 'content-taxonomy-audit.json'), 'utf8'));
 
 test('catalogue has one stable ID and canonical URL per item', () => {
   assert.equal(new Set(catalog.items.map((item) => item.id)).size, catalog.items.length);
@@ -19,6 +20,7 @@ test('catalogue uses scalar controlled primary classifications', () => {
     assert.equal(typeof item.primary_domain, 'string', item.id);
     assert.ok(VOCABULARIES.primary_types.includes(item.primary_type), item.id);
     assert.ok(VOCABULARIES.primary_domains.includes(item.primary_domain), item.id);
+    assert.ok(VOCABULARIES.lifecycles.includes(item.lifecycle), item.id);
     assert.ok(VOCABULARIES.collection_tiers.includes(item.collection_tier), item.id);
   }
 });
@@ -32,6 +34,8 @@ test('every item carries governed provenance independent of build origin', () =>
   }
   const technique = catalog.items.find((item) => item.canonical_url === 'https://1200km.com/threat-matrix/techniques/T1059.003/');
   assert.equal(technique?.source_platform, 'MITRE ATT&CK');
+  assert.equal(technique?.primary_type, 'generated-reference');
+  assert.equal(technique?.lifecycle, 'stable-reference');
   assert.equal(technique?.collection_tier, 'reference');
 });
 
@@ -59,7 +63,7 @@ test('offensive indexes are not assigned catch-all CTI taxonomy', () => {
     'https://1200km.com/ai-offensive.html',
     'https://1200km.com/pt-tools.html',
   ]) {
-    assert.equal(catalog.items.find((item) => item.canonical_url === url)?.primary_domain, 'offensive-security');
+    assert.equal(catalog.items.find((item) => item.canonical_url === url)?.primary_domain, 'offensive-research');
   }
 });
 
@@ -72,4 +76,13 @@ test('current, superseded, archived, and externally sourced entities remain dist
     && /^https:\/\/(?:medium\.com|infosecwriteups\.com)\//.test(item.source_url || '')
     && item.source_url !== item.canonical_url
   ));
+});
+
+test('taxonomy audit separates generated references from authored distribution', () => {
+  assert.equal(taxonomyAudit.item_count, catalog.items.length);
+  assert.equal(taxonomyAudit.distributions.by_primary_type['generated-reference'], 656);
+  assert.equal(taxonomyAudit.distributions.by_primary_type['reference-entity'], 160);
+  assert.equal(taxonomyAudit.authored_only.by_primary_type['generated-reference'], undefined);
+  assert.ok(taxonomyAudit.warnings.some((warning) => warning.code === 'GENERATED_REFERENCE_DISTRIBUTION'));
+  assert.ok(taxonomyAudit.warnings.every((warning) => warning.severity !== 'error'));
 });
