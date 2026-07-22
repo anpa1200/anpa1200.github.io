@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTICLE_ARCHIVE_COMMIT: ae0b2cd0060df643b48876466b64a1199e2e44c5
+  ARTICLE_ARCHIVE_COMMIT: c4047aa1d66434e294ff96ea7cedff38a0e5b565
 
 jobs:
   quality:
@@ -65,6 +65,13 @@ jobs:
           npm run build:embedded
           mkdir -p "${RUNNER_TEMP}/site/articles"
           cp -a build/. "${RUNNER_TEMP}/site/articles/"
+      - name: Stage and verify article governance data
+        run: >-
+          node scripts/stage-article-archive-governance.mjs
+          --site "${RUNNER_TEMP}/site"
+          --source "${GITHUB_WORKSPACE}"
+          --archive "${GITHUB_WORKSPACE}/.article-archive-source"
+          --archive-commit "${ARTICLE_ARCHIVE_COMMIT}"
       - name: Build canonical metadata and release HTML
         run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
       - name: Validate complete staged site
@@ -133,6 +140,9 @@ jobs:
             ${{ runner.temp }}/site/pagefind/search-build.json
             ${{ runner.temp }}/site/pagefind/pagefind-entry.json
             ${{ runner.temp }}/site/data/content-catalog.json
+            ${{ runner.temp }}/site/data/article-catalog.json
+            ${{ runner.temp }}/site/data/article-archive-build.json
+            ${{ runner.temp }}/site/reports/article-canonical-migration.csv
             ${{ runner.temp }}/site/build.json
           if-no-files-found: ignore
           retention-days: 14
