@@ -32,6 +32,22 @@ const pages = [
   ['threat-matrix', '/threat-matrix/'],
 ];
 
+const deployableCatalogPath = join(site, 'data', 'content-catalog.json');
+if (existsSync(deployableCatalogPath)) {
+  const deployableCatalog = JSON.parse(readFileSync(deployableCatalogPath, 'utf8'));
+  const governedArticle = (deployableCatalog.items || []).find((item) =>
+    item.lifecycle === 'historical'
+    && /^https:\/\/1200km\.com\/articles\/read\/\d{4}\/[^/]*adversarygraph-v4/i.test(item.canonical_url || '')
+  ) || (deployableCatalog.items || []).find((item) =>
+    item.lifecycle
+    && item.lifecycle !== 'maintained'
+    && /^https:\/\/1200km\.com\/articles\/read\/\d{4}\/[^/]+\/$/i.test(item.canonical_url || '')
+  );
+  if (governedArticle?.canonical_url) {
+    pages.push(['article-lifecycle', new URL(governedArticle.canonical_url).pathname]);
+  }
+}
+
 const viewports = [
   { label: '320', width: 320, height: 900, mobile: true },
   { label: '360', width: 360, height: 900, mobile: true },

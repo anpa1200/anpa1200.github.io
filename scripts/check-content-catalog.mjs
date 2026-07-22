@@ -67,6 +67,7 @@ function htmlFiles(directory) {
 
 const catalog = JSON.parse(read(catalogPath) || '{}');
 const config = JSON.parse(read(configPath) || '{}');
+const taxonomyAudit = JSON.parse(read(join(siteRoot, 'reports', 'content-taxonomy-audit.json')) || '{}');
 const schema = JSON.parse(read(join(ROOT, 'data', 'content-catalog.schema.json')) || '{}');
 if (schema.$schema !== 'https://json-schema.org/draft/2020-12/schema') fail('Content catalogue schema must use JSON Schema draft 2020-12.');
 if (catalog.$schema !== './content-catalog.schema.json') fail('Content catalogue has an unexpected $schema value.');
@@ -76,9 +77,15 @@ if (!['local-source-catalog', 'deployable-domain-catalog'].includes(catalog.scop
 if (JSON.stringify(catalog.controlled_vocabularies) !== JSON.stringify(VOCABULARIES)) fail('Checked-in controlled vocabularies disagree with the generator.');
 if (JSON.stringify(catalog.canonical_policy) !== JSON.stringify(CANONICAL_POLICY)) fail('Checked-in canonical policy disagrees with the generator.');
 if (!Array.isArray(catalog.items) || !catalog.items.length) fail('Content catalogue must contain items.');
+if (taxonomyAudit.catalog_version !== catalog.catalog_version || taxonomyAudit.scope !== catalog.scope || taxonomyAudit.item_count !== catalog.items?.length) {
+  fail('Content taxonomy audit identity disagrees with the content catalogue.');
+}
+for (const warning of taxonomyAudit.warnings || []) {
+  if (warning.severity === 'error') fail(`Taxonomy audit error ${warning.code}: ${warning.message}`);
+}
 
 const required = [
-  'id', 'title', 'primary_type', 'primary_domain', 'audience', 'status', 'maturity', 'evidence_level',
+  'id', 'title', 'primary_type', 'primary_domain', 'audience', 'status', 'lifecycle', 'maturity', 'evidence_level',
   'collection_tier', 'source_platform', 'source_repository', 'original_publication', 'canonical_owner',
   'applies_to', 'canonical_url', 'published_at', 'updated_at', 'summary', 'tags', 'featured', 'indexable',
 ];
@@ -93,6 +100,7 @@ for (const [index, item] of (catalog.items || []).entries()) {
   if (typeof item.primary_domain !== 'string' || !VOCABULARIES.primary_domains.includes(item.primary_domain)) fail(`${label}: unknown or non-scalar primary_domain ${JSON.stringify(item.primary_domain)}.`);
   if (!Array.isArray(item.audience) || !item.audience.length || item.audience.some((value) => !VOCABULARIES.audiences.includes(value))) fail(`${label}: audience contains an unknown value.`);
   if (!VOCABULARIES.statuses.includes(item.status)) fail(`${label}: unknown status ${item.status}.`);
+  if (!VOCABULARIES.lifecycles.includes(item.lifecycle)) fail(`${label}: unknown lifecycle ${item.lifecycle}.`);
   if (!VOCABULARIES.maturity.includes(item.maturity)) fail(`${label}: unknown maturity ${item.maturity}.`);
   if (!VOCABULARIES.evidence_levels.includes(item.evidence_level)) fail(`${label}: unknown evidence_level ${item.evidence_level}.`);
   if (!VOCABULARIES.collection_tiers.includes(item.collection_tier)) fail(`${label}: unknown collection_tier ${item.collection_tier}.`);
@@ -158,6 +166,23 @@ for (const [index, item] of (catalog.items || []).entries()) {
     if (new URL(canonical).hostname === '1200km.com' && !localPath && !declared) fail(`${label}: released item has no deployable URL or declared remote collection.`);
   }
   if (item.primary_type === 'mirror' && !item.source_url) fail(`${label}: mirror item must identify source_url.`);
+  if (item.lifecycle === 'maintained' && !item.updated_at) fail(`${label}: maintained lifecycle requires dated update evidence.`);
+  if (['archived', 'historical', 'preserved', 'superseded'].includes(item.lifecycle) && item.collection_tier === 'core') {
+    fail(`${label}: ${item.lifecycle} content cannot be in the core collection tier.`);
+  }
+  if (item.lifecycle === 'superseded' && item.status !== 'superseded') fail(`${label}: superseded lifecycle disagrees with publication status.`);
+  if (item.lifecycle === 'current-development' && !['current-development', 'experimental'].includes(item.status)) {
+    fail(`${label}: current-development lifecycle disagrees with publication status ${item.status}.`);
+  }
+  if (/^https:\/\/1200km\.com\/threat-matrix\/actors\//.test(canonical) && item.primary_type !== 'reference-entity') {
+    fail(`${label}: ATT&CK actor page must be classified as reference-entity.`);
+  }
+  if (/^https:\/\/1200km\.com\/threat-matrix\/techniques\//.test(canonical) && item.primary_type !== 'generated-reference') {
+    fail(`${label}: generated ATT&CK technique page must be classified as generated-reference.`);
+  }
+  if (item.primary_type === 'generated-reference' && item.lifecycle === 'maintained' && item.original_publication === item.canonical_url) {
+    fail(`${label}: generated reference is incorrectly presented as a maintained authored article.`);
+  }
   if (/\b(?:AdversaryGraph|ThreatMapper)\s+v\d/i.test(item.title) && !item.version) fail(`${label}: version-specific item is missing version.`);
   if (['archived', 'superseded'].includes(item.status) && item.collection_tier !== 'archive') fail(`${label}: archived or superseded content must use the archive tier.`);
 }
@@ -167,6 +192,7 @@ for (const collection of catalog.declared_collections || []) {
   if (!VOCABULARIES.primary_types.includes(collection.primary_type)) fail(`${collection.id}: unknown primary_type.`);
   if (!VOCABULARIES.primary_domains.includes(collection.primary_domain)) fail(`${collection.id}: unknown primary_domain.`);
   if (!VOCABULARIES.statuses.includes(collection.status)) fail(`${collection.id}: unknown status.`);
+  if (!VOCABULARIES.lifecycles.includes(collection.lifecycle)) fail(`${collection.id}: unknown lifecycle.`);
   if (!VOCABULARIES.maturity.includes(collection.maturity)) fail(`${collection.id}: unknown maturity.`);
   if (!VOCABULARIES.evidence_levels.includes(collection.evidence_level)) fail(`${collection.id}: unknown evidence level.`);
   if (!VOCABULARIES.collection_tiers.includes(collection.collection_tier)) fail(`${collection.id}: unknown collection tier.`);
@@ -234,12 +260,40 @@ for (const match of feed.matchAll(/<(?:link|guid)(?:\s[^>]*)?>(https:\/\/1200km\
 }
 
 for (const [path, expected] of [
-  ['https://1200km.com/hexstrike.html', 'offensive-security'],
-  ['https://1200km.com/ai-offensive.html', 'offensive-security'],
-  ['https://1200km.com/pt-tools.html', 'offensive-security'],
+  ['https://1200km.com/hexstrike.html', 'offensive-research'],
+  ['https://1200km.com/ai-offensive.html', 'offensive-research'],
+  ['https://1200km.com/pt-tools.html', 'offensive-research'],
 ]) {
   const item = itemByAnyUrl.get(path);
   if (!item || item.primary_domain !== expected) fail(`${path}: generic offensive material must not be classified as CTI.`);
+}
+
+const articlePolicy = config.article_lifecycle_policy || {};
+const governedArticleIds = [
+  ...(articlePolicy.current_core_ids || []),
+  ...(articlePolicy.stable_reference_ids || []),
+  ...(articlePolicy.historical_ids || []),
+];
+if (new Set(governedArticleIds).size !== governedArticleIds.length) fail('article_lifecycle_policy contains an ID in more than one lifecycle set.');
+if (catalog.scope === 'deployable-domain-catalog') {
+  const archiveBuildPath = join(siteRoot, 'data', 'article-archive-build.json');
+  const archiveFacts = existsSync(archiveBuildPath) ? JSON.parse(read(archiveBuildPath) || '{}') : null;
+  const archiveArticles = (catalog.items || []).filter((item) => /\/articles\/read\/\d{4}\//.test(item.canonical_url));
+  const expectedArticleCount = archiveFacts?.article_count;
+  if (!Number.isInteger(expectedArticleCount)) fail('Deployable catalogue is missing authoritative article-archive-build.json article_count.');
+  else if (archiveArticles.length !== expectedArticleCount) fail(`Article lifecycle coverage is ${archiveArticles.length}, expected ${expectedArticleCount}.`);
+  for (const id of governedArticleIds) {
+    if (!archiveArticles.some((item) => item.canonical_url.toLowerCase().includes(`-${id}/`))) fail(`article_lifecycle_policy ID ${id} is absent from the deployed archive.`);
+  }
+  if (archiveArticles.some((item) => item.status === 'maintained')) fail('Published archive articles must not use maintained as publication status.');
+  for (const lifecycle of ['maintained', 'stable-reference', 'preserved', 'historical', 'currentness-unknown']) {
+    if (!archiveArticles.some((item) => item.lifecycle === lifecycle)) fail(`Article archive does not populate lifecycle ${lifecycle}.`);
+  }
+  for (const item of archiveArticles.filter((entry) => ['stable-reference', 'preserved', 'historical', 'currentness-unknown'].includes(entry.lifecycle))) {
+    const path = localPathForUrl(item.canonical_url);
+    const html = path ? read(path) : '';
+    if (!html.includes(`data-content-lifecycle="${item.lifecycle}"`)) fail(`${item.id}: deployed article lacks its visible ${item.lifecycle} lifecycle notice.`);
+  }
 }
 
 const expectedInventory = {
@@ -248,6 +302,18 @@ const expectedInventory = {
   external_count: (catalog.items || []).filter((item) => !item.canonical_url.startsWith('https://1200km.com/')).length,
 };
 for (const [key, value] of Object.entries(expectedInventory)) if (catalog.inventory?.[key] !== value) fail(`inventory.${key} is ${catalog.inventory?.[key]}, expected ${value}.`);
+for (const [inventoryField, itemField] of [
+  ['by_primary_type', 'primary_type'],
+  ['by_primary_domain', 'primary_domain'],
+  ['by_status', 'status'],
+  ['by_lifecycle', 'lifecycle'],
+  ['by_evidence_level', 'evidence_level'],
+  ['by_collection_tier', 'collection_tier'],
+]) {
+  const expected = Object.fromEntries([...new Set((catalog.items || []).map((item) => item[itemField]))]
+    .sort().map((value) => [value, catalog.items.filter((item) => item[itemField] === value).length]));
+  if (JSON.stringify(catalog.inventory?.[inventoryField]) !== JSON.stringify(expected)) fail(`inventory.${inventoryField} disagrees with item records.`);
+}
 
 if (failures.length) {
   console.error(`Content catalogue validation failed (${failures.length}):`);

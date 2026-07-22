@@ -348,7 +348,7 @@ export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
     `<meta content="${escapeAttribute(contentType)}" data-pagefind-filter="content_type[content]" data-pagefind-meta="content_type[content]">`,
     catalogItem?.primary_type ? `<meta content="${escapeAttribute(catalogItem.primary_type)}" data-pagefind-filter="primary_type[content]" data-pagefind-meta="primary_type[content]">` : '',
     catalogItem?.primary_domain ? `<meta content="${escapeAttribute(catalogItem.primary_domain)}" data-pagefind-filter="primary_domain[content]" data-pagefind-meta="primary_domain[content]">` : '',
-    catalogItem?.status ? `<meta content="${escapeAttribute(catalogItem.status)}" data-pagefind-filter="lifecycle[content]" data-pagefind-meta="lifecycle[content]">` : '',
+    catalogItem?.lifecycle ? `<meta content="${escapeAttribute(catalogItem.lifecycle)}" data-pagefind-filter="lifecycle[content]" data-pagefind-meta="lifecycle[content]">` : '',
     catalogItem?.status ? `<meta content="${escapeAttribute(catalogItem.status)}" data-pagefind-filter="status[content]" data-pagefind-meta="status[content]">` : '',
     catalogItem?.evidence_level ? `<meta content="${escapeAttribute(catalogItem.evidence_level)}" data-pagefind-filter="evidence_level[content]" data-pagefind-meta="evidence_level[content]">` : '',
     catalogItem?.collection_tier ? `<meta content="${escapeAttribute(catalogItem.collection_tier)}" data-pagefind-filter="collection_tier[content]" data-pagefind-meta="collection_tier[content]">` : '',

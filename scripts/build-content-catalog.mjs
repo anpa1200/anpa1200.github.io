@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -9,6 +9,7 @@ import {
   createContentItem,
   externalArticleItems,
 } from './content-catalog-lib.mjs';
+import { buildTaxonomyAudit } from './content-taxonomy-audit-lib.mjs';
 import {
   SITE_ORIGIN,
   localFileForUrl,
@@ -27,6 +28,7 @@ function option(name, fallback = null) {
 const siteRoot = resolve(option('--site', ROOT));
 const sourceRoot = resolve(option('--source', ROOT));
 const output = resolve(option('--output', join(siteRoot, 'data', 'content-catalog.json')));
+const taxonomyOutput = resolve(option('--taxonomy-output', join(siteRoot, 'reports', 'content-taxonomy-audit.json')));
 const sitemapPath = resolve(option('--sitemap', join(siteRoot, args.includes('--remote') ? 'sitemap.xml' : 'sitemap-all.xml')));
 const remote = args.includes('--remote');
 const check = args.includes('--check');
@@ -134,15 +136,23 @@ for (const relativePath of config.major_indexes) {
 const declaredItems = config.declared_items || [];
 const externalItems = externalArticleItems(indexDocuments, config, [...localItems, ...declaredItems]);
 const catalog = buildCatalog([...localItems, ...declaredItems, ...externalItems], config, remote ? 'deployable-domain-catalog' : 'local-source-catalog');
+const taxonomyAudit = buildTaxonomyAudit(catalog);
 
 const serialized = `${JSON.stringify(catalog, null, 2)}\n`;
+const serializedAudit = `${JSON.stringify(taxonomyAudit, null, 2)}\n`;
 if (check) {
   if (!existsSync(output)) throw new Error(`Content catalogue is missing: ${output}`);
   const current = await readFile(output, 'utf8');
   if (current !== serialized) throw new Error('Content catalogue is stale. Run npm run build-content.');
+  if (!existsSync(taxonomyOutput)) throw new Error(`Content taxonomy audit is missing: ${taxonomyOutput}`);
+  const currentAudit = await readFile(taxonomyOutput, 'utf8');
+  if (currentAudit !== serializedAudit) throw new Error('Content taxonomy audit is stale. Run npm run build-content.');
   console.log(`Content catalogue is current: ${catalog.inventory.item_count} identities.`);
 } else {
+  await mkdir(dirname(taxonomyOutput), { recursive: true });
   await writeFile(output, serialized);
+  await writeFile(taxonomyOutput, serializedAudit);
   console.log(`Wrote ${catalog.inventory.item_count} content identities to ${output}.`);
+  console.log(`Wrote taxonomy audit to ${taxonomyOutput}.`);
 }
 console.log(`Coverage: ${sitemapItemCount} sitemap pages, ${(config.additional_pages || []).length} additional noindex page(s), ${externalItems.length} externally canonical articles, ${catalog.inventory.indexable_count} indexable items.`);

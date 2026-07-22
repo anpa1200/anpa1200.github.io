@@ -67,6 +67,7 @@ test('search preprocessing accepts controlled catalogue facets', () => {
     primary_domain: 'detection-engineering',
     audience: ['detection-engineer', 'threat-hunter'],
     status: 'maintained',
+    lifecycle: 'stable-reference',
     evidence_level: 'source-backed',
     collection_tier: 'core',
     source_platform: 'GitHub',
@@ -80,6 +81,7 @@ test('search preprocessing accepts controlled catalogue facets', () => {
   assert.match(prepared, /data-pagefind-filter="primary_type\[content\]"/);
   assert.match(prepared, /data-pagefind-filter="primary_domain\[content\]"/);
   assert.match(prepared, /data-pagefind-filter="lifecycle\[content\]"/);
+  assert.match(prepared, /content="stable-reference" data-pagefind-filter="lifecycle\[content\]"/);
   assert.match(prepared, /data-pagefind-filter="status\[content\]"/);
   assert.match(prepared, /data-pagefind-filter="evidence_level\[content\]"/);
   assert.match(prepared, /content="core" data-pagefind-filter="collection_tier\[content\]"/);

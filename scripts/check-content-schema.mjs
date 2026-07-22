@@ -33,3 +33,8 @@ await validate(
   join(ROOT, 'data', 'content-catalog.config.schema.json'),
   join(ROOT, 'data', 'content-catalog.config.json'),
 );
+await validate(
+  'content-taxonomy-audit.json',
+  join(ROOT, 'data', 'content-taxonomy-audit.schema.json'),
+  join(siteRoot, 'reports', 'content-taxonomy-audit.json'),
+);

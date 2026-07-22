@@ -86,6 +86,8 @@ jobs:
           --site "${RUNNER_TEMP}/site"
           --source "${GITHUB_WORKSPACE}"
           --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
+      - name: Apply governed article lifecycle notices
+        run: npm run build-lifecycle-banners -- --site "${RUNNER_TEMP}/site"
       - name: Build canonical domain-wide search index
         run: >-
           npm run build-search:remote --
@@ -146,6 +148,7 @@ jobs:
             ${{ runner.temp }}/site/data/article-catalog.json
             ${{ runner.temp }}/site/data/article-archive-build.json
             ${{ runner.temp }}/site/reports/article-canonical-migration.csv
+            ${{ runner.temp }}/site/reports/content-taxonomy-audit.json
             ${{ runner.temp }}/site/build.json
           if-no-files-found: ignore
           retention-days: 14
