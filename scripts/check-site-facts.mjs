@@ -279,10 +279,17 @@ if (!threatMatrixText.includes('Threat Matrix') || !threatMatrixText.includes('p
 const threatMatrixHtml = currentTexts.find(([name]) => name === 'threat-matrix/index.html')?.[1] || '';
 const threatMatrixNodes = flattenJsonLd(parseJsonLd(threatMatrixHtml, 'threat-matrix/index.html'));
 const threatMatrixApplication = threatMatrixNodes.find(node => node['@type'] === 'WebApplication' && node.name === 'Threat Matrix');
+const threatMatrixPlatform = threatMatrixNodes.find(node => node['@id'] === 'https://1200km.com/#software'
+  && node['@type'] === 'SoftwareApplication' && node.name === 'AdversaryGraph');
 if (!threatMatrixApplication) fail('Threat Matrix WebApplication JSON-LD is missing.');
-else if (threatMatrixApplication.isPartOf?.name !== 'AdversaryGraph'
-  || threatMatrixApplication.isPartOf?.softwareVersion !== stable) {
-  fail('Threat Matrix structured data disagrees with the AdversaryGraph relationship or stable release fact.');
+else {
+  const connectedRelationship = threatMatrixApplication.isPartOf?.['@id'] === 'https://1200km.com/#software'
+    && threatMatrixPlatform?.softwareVersion === stable;
+  const sourceRelationship = threatMatrixApplication.isPartOf?.name === 'AdversaryGraph'
+    && threatMatrixApplication.isPartOf?.softwareVersion === stable;
+  if (!connectedRelationship && !sourceRelationship) {
+    fail('Threat Matrix structured data disagrees with the AdversaryGraph relationship or stable release fact.');
+  }
 }
 
 const textSurfaceRequirements = new Map([

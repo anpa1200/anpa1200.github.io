@@ -12,6 +12,7 @@ import {
 } from './search-index-lib.mjs';
 import {
   PERSON_ID,
+  SOFTWARE_ID,
   WEBSITE_ID,
   parseJsonLd,
   stripHtml,
@@ -29,6 +30,7 @@ function option(name, fallback = null) {
 
 const siteRoot = resolve(option('--site', ROOT));
 const requireReleaseTransform = args.includes('--require-release-transform');
+const requireCatalogAgreement = args.includes('--require-catalog-agreement');
 const failures = [];
 const skippedDirectories = new Set(['.build', '.git', 'node_modules', 'pagefind']);
 
@@ -60,6 +62,21 @@ function schemaTypes(value, output = []) {
     else if (child && typeof child === 'object') schemaTypes(child, output);
   }
   return output;
+}
+
+function directTypes(value) {
+  const type = value?.['@type'];
+  return Array.isArray(type) ? type : typeof type === 'string' ? [type] : [];
+}
+
+function referenceId(value) {
+  return value && typeof value === 'object' ? value['@id'] || '' : '';
+}
+
+function validIsoDate(value) {
+  return typeof value === 'string'
+    && /^\d{4}-\d{2}-\d{2}$/.test(value)
+    && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
 }
 
 function internalReferences(value, output = []) {
@@ -116,7 +133,7 @@ function checkImages(rel, html, htmlPath, requireDimensions = true) {
   }
 }
 
-function checkGraph(rel, canonical, html) {
+function checkGraph(rel, canonical, html, expectedLastmod = '') {
   const scripts = [...html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
   if (scripts.length !== 1) failures.push(`${rel}: expected one consolidated JSON-LD block, found ${scripts.length}`);
   const parsed = parseJsonLd(html);
@@ -124,7 +141,9 @@ function checkGraph(rel, canonical, html) {
     failures.push(`${rel}: invalid JSON-LD (${parsed.failures.join('; ')})`);
     return;
   }
-  const ids = new Set(parsed.objects.map((object) => object?.['@id']).filter(Boolean));
+  const topLevelIds = parsed.objects.map((object) => object?.['@id']).filter(Boolean);
+  const ids = new Set(topLevelIds);
+  if (ids.size !== topLevelIds.length) failures.push(`${rel}: top-level JSON-LD @id values are not unique`);
   const requiredIds = [PERSON_ID, WEBSITE_ID, `${canonical}#webpage`, `${canonical}#breadcrumb`];
   for (const id of requiredIds) if (!ids.has(id)) failures.push(`${rel}: connected graph is missing ${id}`);
   const types = schemaTypes(parsed.objects);
@@ -134,6 +153,17 @@ function checkGraph(rel, canonical, html) {
   if (!types.some((type) => ['WebPage', 'AboutPage', 'CollectionPage', 'ContactPage', 'FAQPage', 'ItemPage', 'ProfilePage', 'SearchResultsPage'].includes(type))) {
     failures.push(`${rel}: graph is missing a WebPage type`);
   }
+  const page = parsed.objects.find((object) => object?.['@id'] === `${canonical}#webpage`);
+  const visibleTitle = stripHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1]
+    || html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1]
+    || '');
+  if (page?.url !== canonical) failures.push(`${rel}: WebPage.url does not match the canonical URL`);
+  if (page?.name !== visibleTitle) failures.push(`${rel}: WebPage.name does not match the visible H1`);
+  if (referenceId(page?.isPartOf) !== WEBSITE_ID) failures.push(`${rel}: WebPage.isPartOf does not reference the site WebSite`);
+  if (referenceId(page?.breadcrumb) !== `${canonical}#breadcrumb`) failures.push(`${rel}: WebPage.breadcrumb does not reference the page breadcrumb`);
+  if (expectedLastmod && page?.dateModified !== expectedLastmod) {
+    failures.push(`${rel}: WebPage.dateModified ${page?.dateModified || '(missing)'} disagrees with sitemap lastmod ${expectedLastmod}`);
+  }
   for (const reference of internalReferences(parsed.objects)) {
     if (!ids.has(reference)) failures.push(`${rel}: unresolved internal JSON-LD reference ${reference}`);
   }
@@ -141,6 +171,56 @@ function checkGraph(rel, canonical, html) {
   const positions = breadcrumb?.itemListElement?.map((item) => item.position) || [];
   if (!positions.length || positions.some((position, index) => position !== index + 1)) {
     failures.push(`${rel}: breadcrumb positions are missing or non-sequential`);
+  }
+  const lastCrumb = breadcrumb?.itemListElement?.at(-1);
+  const expectedCrumbName = canonical === 'https://1200km.com/' ? 'Home' : visibleTitle;
+  if (lastCrumb?.item !== canonical || lastCrumb?.name !== expectedCrumbName) {
+    failures.push(`${rel}: final breadcrumb does not represent the visible current page`);
+  }
+
+  if (directTypes(page).includes('FAQPage')) {
+    const questions = Array.isArray(page.mainEntity) ? page.mainEntity : [page.mainEntity].filter(Boolean);
+    if (!questions.length || questions.some((question) => (
+      !directTypes(question).includes('Question')
+      || typeof question.name !== 'string'
+      || !directTypes(question.acceptedAnswer).includes('Answer')
+      || typeof question.acceptedAnswer?.text !== 'string'
+    ))) failures.push(`${rel}: FAQPage does not contain visible Question/acceptedAnswer entities`);
+  }
+
+  const articleObjects = parsed.objects.filter((object) => directTypes(object)
+    .some((type) => ['Article', 'BlogPosting', 'TechArticle'].includes(type)));
+  const articleExpected = /^https:\/\/1200km\.com\/articles\/read\/\d{4}\/[^/]+\/?$/i.test(canonical)
+    || /^https:\/\/1200km\.com\/articles\/[^/]+\.html$/i.test(canonical);
+  if (articleExpected && articleObjects.length !== 1) {
+    failures.push(`${rel}: expected one article entity, found ${articleObjects.length}`);
+  }
+  for (const article of articleObjects) {
+    if (article['@id'] !== `${canonical}#article`) failures.push(`${rel}: article @id is not page-specific #article`);
+    if (article.url !== canonical) failures.push(`${rel}: article URL does not match canonical`);
+    if (article.headline !== visibleTitle) failures.push(`${rel}: article headline does not match the visible H1`);
+    if (referenceId(article.mainEntityOfPage) !== `${canonical}#webpage`) failures.push(`${rel}: article mainEntityOfPage does not reference the WebPage`);
+    if (referenceId(article.author) !== PERSON_ID) failures.push(`${rel}: article author does not reference the site Person`);
+    if (!article.publisher) failures.push(`${rel}: article publisher is missing`);
+    if (articleExpected && !validIsoDate(article.datePublished)) failures.push(`${rel}: article datePublished is missing or invalid`);
+    if (article.datePublished && !validIsoDate(article.datePublished)) failures.push(`${rel}: article datePublished is invalid`);
+    if (expectedLastmod && !validIsoDate(article.dateModified)) failures.push(`${rel}: article dateModified is missing or invalid`);
+    if (validIsoDate(article.datePublished) && validIsoDate(article.dateModified)
+      && article.dateModified < article.datePublished) failures.push(`${rel}: article dateModified precedes datePublished`);
+    if (article.datePublished && findMetaContent(html, 'article:published_time') !== article.datePublished) failures.push(`${rel}: article published meta disagrees with JSON-LD`);
+    if (article.dateModified && findMetaContent(html, 'article:modified_time') !== article.dateModified) failures.push(`${rel}: article modified meta disagrees with JSON-LD`);
+    if (expectedLastmod && article.dateModified !== expectedLastmod) failures.push(`${rel}: article dateModified disagrees with sitemap lastmod`);
+  }
+
+  for (const software of parsed.objects.filter((object) => directTypes(object)
+    .some((type) => ['SoftwareApplication', 'SoftwareSourceCode'].includes(type)))) {
+    if (software.name !== 'AdversaryGraph') continue;
+    if (software['@id'] !== SOFTWARE_ID) failures.push(`${rel}: AdversaryGraph does not use the stable software @id`);
+    if (referenceId(page?.mainEntity) === SOFTWARE_ID) {
+      if (referenceId(software.mainEntityOfPage) !== `${canonical}#webpage`) failures.push(`${rel}: AdversaryGraph mainEntityOfPage does not reference the current WebPage`);
+    } else if (['https://1200km.com/', 'https://1200km.com/adversarygraph/'].includes(canonical)) {
+      failures.push(`${rel}: WebPage.mainEntity does not reference AdversaryGraph`);
+    }
   }
 }
 
@@ -197,6 +277,14 @@ for (const path of files) {
   pages.push({ path, rel, html, canonical });
 }
 
+const sitemapDates = new Map();
+const preliminarySitemapPath = join(siteRoot, 'sitemap-all.xml');
+if (existsSync(preliminarySitemapPath)) {
+  for (const entry of parseSitemapEntries(readFileSync(preliminarySitemapPath, 'utf8')).entries) {
+    sitemapDates.set(entry.loc, entry.lastmod || '');
+  }
+}
+
 for (const page of pages) {
   const releaseHtml = requireReleaseTransform
     ? page.html
@@ -207,6 +295,15 @@ for (const page of pages) {
       siteRoot,
     });
   if (requireReleaseTransform && !/data-site-graph/.test(releaseHtml)) failures.push(`${page.rel}: release graph was not emitted`);
+  if (/<meta\b[^>]*\bname=["']keywords["']/i.test(releaseHtml)) failures.push(`${page.rel}: legacy meta keywords are present`);
+  const documentTitle = stripHtml(releaseHtml.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '');
+  if (!documentTitle) failures.push(`${page.rel}: document title is missing`);
+  if (documentTitle.length > 115) failures.push(`${page.rel}: document title remains excessively long (${documentTitle.length} characters)`);
+  if (/\|\s*AdversaryGraph Documentation\b|\|\s*ITDR\s*[–—-]\s*Identity Threat Detection/i.test(documentTitle)) {
+    failures.push(`${page.rel}: document title retains a repetitive generated suffix`);
+  }
+  if ((documentTitle.match(/\|\s*1200km\b/gi) || []).length > 1) failures.push(`${page.rel}: document title repeats the site name`);
+  if (/\|\s*1200km\s*\|/i.test(documentTitle)) failures.push(`${page.rel}: document title contains a duplicated site-name fragment`);
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(releaseHtml);
   if (/<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: release HTML still blocks on an external web font`);
   if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: analytics was not deferred to user interaction`);
@@ -228,7 +325,12 @@ for (const page of pages) {
     failures.push(`${page.rel}: missing RSS discovery link`);
   }
   checkImages(page.rel, releaseHtml, page.path, !isDocusaurus);
-  checkGraph(page.rel, page.canonical, releaseHtml);
+  checkGraph(
+    page.rel,
+    page.canonical,
+    releaseHtml,
+    requireReleaseTransform ? sitemapDates.get(page.canonical) || '' : '',
+  );
 }
 
 const canonicalUrls = new Set(pages.map((page) => page.canonical));
@@ -250,6 +352,29 @@ else {
   if (completeUrls.size !== complete.entries.length) failures.push('sitemap.xml contains duplicate URLs');
   if (completeUrls.size < canonicalUrls.size) failures.push('sitemap.xml does not cover all local canonical pages');
   for (const url of canonicalUrls) if (!completeUrls.has(url)) failures.push(`sitemap.xml is missing local URL ${url}`);
+}
+
+let catalogItemsByUrl = new Map();
+if (requireCatalogAgreement) {
+  const catalogPath = join(siteRoot, 'data', 'content-catalog.json');
+  if (!existsSync(catalogPath)) failures.push('content catalogue is missing for canonical agreement checks');
+  else {
+    const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
+    catalogItemsByUrl = new Map((catalog.items || []).map((item) => [item.canonical_url, item]));
+    for (const page of pages) {
+      const item = catalogItemsByUrl.get(page.canonical);
+      if (!item) {
+        failures.push(`${page.rel}: canonical page has no content-catalog identity`);
+        continue;
+      }
+      if (item.canonical_url !== page.canonical) failures.push(`${page.rel}: content-catalog canonical disagrees with HTML`);
+      const expectedDate = item.updated_at || item.published_at || '';
+      const sitemapDate = sitemapDates.get(page.canonical) || '';
+      if (expectedDate !== sitemapDate) {
+        failures.push(`${page.rel}: content-catalog date ${expectedDate || '(missing)'} disagrees with sitemap lastmod ${sitemapDate || '(missing)'}`);
+      }
+    }
+  }
 }
 
 const robotsPath = join(siteRoot, 'robots.txt');
@@ -284,6 +409,46 @@ else {
   if (itemUrls.length < 4) failures.push(`feed.xml has only ${itemUrls.length} articles; expected at least four`);
   if (new Set(itemUrls).size !== itemUrls.length) failures.push('feed.xml contains duplicate items');
   for (const url of itemUrls) if (!canonicalUrls.has(url)) failures.push(`feed.xml contains a non-canonical local item: ${url}`);
+  if (requireCatalogAgreement) {
+    for (const match of feed.matchAll(/<item>([\s\S]*?)<\/item>/gi)) {
+      const itemXml = match[1];
+      const url = normalizeCanonical(itemXml.match(/<guid\b[^>]*>\s*([^<]+)\s*<\/guid>/i)?.[1] || '');
+      const catalogItem = catalogItemsByUrl.get(url);
+      if (!catalogItem) {
+        failures.push(`feed.xml item has no catalogue identity: ${url || '(missing URL)'}`);
+        continue;
+      }
+      const published = itemXml.match(/<pubDate>\s*([^<]+)\s*<\/pubDate>/i)?.[1] || '';
+      const publishedDate = published && !Number.isNaN(Date.parse(published))
+        ? new Date(published).toISOString().slice(0, 10) : '';
+      if (publishedDate !== catalogItem.published_at) {
+        failures.push(`feed.xml publication date for ${url} disagrees with the content catalogue`);
+      }
+      const updated = itemXml.match(/<atom:updated>\s*([^<]+)\s*<\/atom:updated>/i)?.[1]?.slice(0, 10) || publishedDate;
+      const expectedUpdated = catalogItem.updated_at || catalogItem.published_at;
+      if (updated !== expectedUpdated) failures.push(`feed.xml update date for ${url} disagrees with the content catalogue`);
+    }
+  }
+}
+
+const validationTargetsPath = join(siteRoot, 'seo', 'structured-data-validation.json');
+if (!existsSync(validationTargetsPath)) failures.push('structured-data manual-validation targets are missing');
+else {
+  const targets = JSON.parse(readFileSync(validationTargetsPath, 'utf8'));
+  if (targets.schema_validator !== 'https://validator.schema.org/') failures.push('structured-data targets omit the Schema.org validator');
+  if (targets.google_rich_results_test !== 'https://search.google.com/test/rich-results') failures.push('structured-data targets omit Google Rich Results Test');
+  if (!Array.isArray(targets.representative_urls) || targets.representative_urls.length < 6) {
+    failures.push('structured-data targets must contain at least six representative URLs');
+  } else {
+    const seen = new Set();
+    for (const target of targets.representative_urls) {
+      const url = normalizeCanonical(target.url);
+      if (!url || !url.startsWith('https://1200km.com/')) failures.push(`invalid structured-data validation URL: ${target.url || '(missing)'}`);
+      if (!target.expected_type || !target.reason) failures.push(`incomplete structured-data validation target: ${target.url || '(missing)'}`);
+      if (seen.has(url)) failures.push(`duplicate structured-data validation target: ${url}`);
+      seen.add(url);
+    }
+  }
 }
 
 for (const file of ['llms.txt', 'llms-full.txt']) {
