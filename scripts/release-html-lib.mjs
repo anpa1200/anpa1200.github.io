@@ -400,6 +400,13 @@ export function deferThirdPartyBoot(html) {
 
 export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
+  // Keep release-owned browser enhancements on the same origin. Checked-in
+  // Docusaurus output historically used an absolute production URL, which made
+  // local/staged accessibility tests execute the previously deployed script.
+  transformed = transformed.replace(
+    /(["'])https:\/\/1200km\.com\/assets\/docusaurus-ecosystem\.js(?:\?[^"']*)?\1/gi,
+    '$1/assets/docusaurus-ecosystem.js$1',
+  );
   // Docusaurus hydrates its server-rendered application tree. Mutating that
   // tree after the framework build creates avoidable React hydration errors.
   // Its headings already carry stable IDs; Pagefind adds its content marker to

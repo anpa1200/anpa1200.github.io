@@ -16,19 +16,55 @@ const site = resolve(valueAfter('--site', ROOT));
 const reportPath = resolve(valueAfter('--report', `/tmp/1200km-browser-quality-${process.pid}.json`));
 const chrome = process.env.CHROME_PATH || 'google-chrome';
 const axeSource = readFileSync(join(ROOT, 'node_modules', 'axe-core', 'axe.min.js'), 'utf8');
+const allowlist = JSON.parse(readFileSync(join(ROOT, 'data', 'accessibility-allowlist.json'), 'utf8'));
+
+if (!Array.isArray(allowlist.entries)) throw new Error('Accessibility allowlist must contain an entries array.');
+for (const entry of allowlist.entries) {
+  for (const field of ['rule', 'page', 'selector', 'reason', 'owner', 'expires']) {
+    if (typeof entry[field] !== 'string' || !entry[field].trim()) throw new Error(`Accessibility allowlist entry is missing ${field}.`);
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.expires) || Date.parse(`${entry.expires}T23:59:59Z`) < Date.now()) {
+    throw new Error(`Accessibility allowlist entry ${entry.rule} has an invalid or expired date.`);
+  }
+}
 
 if (!existsSync(join(site, 'index.html'))) throw new Error(`Site root not found at ${site}`);
 
-const pages = [
+let pages = [
   ['home', '/'],
+  ['about', '/about.html'],
+  ['cv', '/cv.html'],
   ['selected-research', '/cti.html'],
   ['library', '/guides.html'],
   ['projects', '/projects.html'],
   ['search', '/search.html?q=T1059.003'],
   ['validation', '/external-validation.html'],
   ['adversarygraph', '/adversarygraph/'],
+  ['threat-matrix', '/threat-matrix/'],
   ['docs', '/adversarygraph-docs/full-flow/'],
 ];
+
+const articleCatalogPath = join(site, 'data', 'article-catalog.json');
+if (existsSync(articleCatalogPath)) {
+  const catalog = JSON.parse(readFileSync(articleCatalogPath, 'utf8'));
+  pages.push(['articles', '/articles/']);
+  const choices = [
+    ['article-normal', catalog.find((row) => row.images <= 2 && row.code_blocks <= 2)],
+    ['article-image-heavy', [...catalog].sort((a, b) => b.images - a.images)[0]],
+    ['article-code-heavy', [...catalog].sort((a, b) => b.code_blocks - a.code_blocks)[0]],
+    ['article-long-title', [...catalog].sort((a, b) => b.title.length - a.title.length)[0]],
+    ['article-historical', [...catalog].sort((a, b) => a.published_at.localeCompare(b.published_at))[0]],
+  ];
+  const selected = new Set();
+  for (const [label, row] of choices) {
+    if (!row || selected.has(row.local_path)) continue;
+    selected.add(row.local_path);
+    pages.push([label, `/articles/read/${row.local_path}/`]);
+  }
+}
+const onlyPage = valueAfter('--only', '');
+if (onlyPage) pages = pages.filter(([name]) => name === onlyPage);
+if (!pages.length) throw new Error(`No browser-quality page matched --only ${onlyPage}.`);
 const viewports = [
   { label: 'mobile-dark', width: 390, height: 844, mobile: true, theme: 'dark' },
   { label: 'mobile-light', width: 390, height: 844, mobile: true, theme: 'light' },
@@ -133,10 +169,22 @@ await devtools.send('Network.setBlockedURLs', { urls: [
   'https://fonts.googleapis.com/*', 'https://fonts.gstatic.com/*',
 ] }, sessionId);
 await devtools.send('Page.addScriptToEvaluateOnNewDocument', { source: `
-  window.__quality = { cls: 0, lcp: 0 };
+  window.__quality = { cls: 0, lcp: 0, shifts: [] };
   try {
     new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) if (!entry.hadRecentInput) window.__quality.cls += entry.value;
+      for (const entry of list.getEntries()) {
+        if (entry.hadRecentInput) continue;
+        window.__quality.cls += entry.value;
+        window.__quality.shifts.push({
+          startTime: Math.round(entry.startTime),
+          value: Number(entry.value.toFixed(4)),
+          sources: (entry.sources || []).slice(0, 5).map((source) => ({
+            node: source.node ? (source.node.id ? '#' + source.node.id : source.node.tagName?.toLowerCase() + (source.node.classList?.length ? '.' + [...source.node.classList].slice(0, 3).join('.') : '')) : '',
+            previousRect: source.previousRect ? { x: source.previousRect.x, y: source.previousRect.y, width: source.previousRect.width, height: source.previousRect.height } : null,
+            currentRect: source.currentRect ? { x: source.currentRect.x, y: source.currentRect.y, width: source.currentRect.width, height: source.currentRect.height } : null,
+          })),
+        });
+      }
     }).observe({ type: 'layout-shift', buffered: true });
     new PerformanceObserver((list) => {
       const entries = list.getEntries();
@@ -147,6 +195,11 @@ await devtools.send('Page.addScriptToEvaluateOnNewDocument', { source: `
 
 const results = [];
 const failures = [];
+function allowlisted(page, violation) {
+  if (!violation.targets.length) return false;
+  return violation.targets.every((target) => allowlist.entries.some((entry) =>
+    entry.rule === violation.id && entry.page === page && entry.selector === target));
+}
 try {
   for (const viewport of viewports) {
     await devtools.send('Emulation.setEmulatedMedia', {
@@ -179,6 +232,7 @@ try {
           mainCount: document.querySelectorAll('main').length,
           horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1,
           cls: Number((window.__quality?.cls || 0).toFixed(4)),
+          layout_shifts: window.__quality?.shifts || [],
           lcp_ms: Math.round(window.__quality?.lcp || 0),
           transfer_bytes: Math.round(resources.reduce((total, entry) => total + (entry.transferSize || 0), 0)),
           violations: audit.violations.map((item) => ({
@@ -189,10 +243,11 @@ try {
         };
       })()`);
       results.push({ page: name, viewport: viewport.label, ...state });
-      const blocking = state.violations.filter((item) => ['serious', 'critical'].includes(item.impact));
-      if (blocking.length) failures.push(`${name}@${viewport.label}: ${blocking.length} serious/critical axe violation(s): ${blocking.map((item) => item.id).join(', ')}`);
+      const blocking = state.violations.filter((item) =>
+        ['moderate', 'serious', 'critical'].includes(item.impact) && !allowlisted(name, item));
+      if (blocking.length) failures.push(`${name}@${viewport.label}: ${blocking.length} unallowlisted moderate/serious/critical axe violation(s): ${blocking.map((item) => item.id).join(', ')}`);
       if (state.h1Count !== 1) failures.push(`${name}@${viewport.label}: expected one h1, found ${state.h1Count}`);
-      if (state.mainCount < 1) failures.push(`${name}@${viewport.label}: main landmark missing`);
+      if (state.mainCount !== 1) failures.push(`${name}@${viewport.label}: expected one main landmark, found ${state.mainCount}`);
       if (state.horizontalOverflow) failures.push(`${name}@${viewport.label}: horizontal page overflow`);
       if (state.cls > budgets.cls) failures.push(`${name}@${viewport.label}: CLS ${state.cls} exceeds ${budgets.cls}`);
       if (state.lcp_ms > budgets.lcp_ms) failures.push(`${name}@${viewport.label}: local LCP ${state.lcp_ms}ms exceeds ${budgets.lcp_ms}ms`);
@@ -200,7 +255,7 @@ try {
     }
   }
 } finally {
-  await writeFile(reportPath, `${JSON.stringify({ generated_at: new Date().toISOString(), site, budgets, results, failures }, null, 2)}\n`);
+  await writeFile(reportPath, `${JSON.stringify({ generated_at: new Date().toISOString(), site, budgets, accessibility_allowlist: allowlist.entries, results, failures }, null, 2)}\n`);
   socket.close();
   browser.kill('SIGTERM');
   server.close();
