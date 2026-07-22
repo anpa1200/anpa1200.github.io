@@ -205,9 +205,13 @@ async function collectRemoteSitemap(sourceUrl, entries, visited = new Set()) {
   }
 }
 
-function feedCandidate(rel, types) {
-  if (!types.some((type) => ['Article', 'BlogPosting', 'TechArticle'].includes(type))) return false;
-  return rel.startsWith('articles/')
+function feedCandidate(rel, types, html) {
+  const articleRoute = /^articles\/read\/\d{4}\/[^/]+\/index\.html$/i.test(rel)
+    || /^articles\/[^/]+\.html$/i.test(rel);
+  if (!articleRoute && !types.some((type) => ['Article', 'BlogPosting', 'TechArticle'].includes(type))
+    && metaContent(html, 'og:type').toLowerCase() !== 'article') return false;
+  return articleRoute
+    || rel.startsWith('articles/')
     || rel.startsWith('newest-detection-engineering-techniques/')
     || rel.startsWith('embedded-systems-hardware-firmware/');
 }
@@ -270,24 +274,26 @@ const feedItems = [];
 for (const page of pages) {
   const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
   const dates = contentDates(page.html);
-  const lastmod = dates.modified || dates.published || archiveDate(page.canonical) || gitDate(page.path);
+  const published = dates.published || archiveDate(page.canonical);
+  const lastmod = dates.modified || published || gitDate(page.path);
   localEntries.set(page.canonical, { loc: page.canonical, ...(lastmod ? { lastmod } : {}) });
 
   const parsed = parseJsonLd(page.html);
   const types = schemaTypes(parsed.objects);
-  if (feedCandidate(rel, types) && dates.published) {
+  if (feedCandidate(rel, types, page.html) && published) {
     feedItems.push({
       url: page.canonical,
       title: page.title,
       description: metaContent(page.html, 'description'),
-      published: dates.published,
-      modified: dates.modified,
+      published,
+      modified: lastmod,
     });
   }
 
   if (transformHtml) {
     const transformed = transformReleaseHtml(page.html, {
       canonical: page.canonical,
+      datePublished: published,
       dateModified: lastmod,
       titleMap,
       htmlPath: page.path,
@@ -309,7 +315,7 @@ feedItems.push({
   title: `AdversaryGraph ${stableTag.value} Stable Release`,
   description: `AdversaryGraph ${stableTag.value} is the latest stable release. ${developmentStatus.value}`,
   published: stablePublished.value,
-  modified: stablePublished.value,
+  modified: localEntries.get('https://1200km.com/adversarygraph/')?.lastmod || stablePublished.value,
 });
 
 const remoteEntries = new Map();

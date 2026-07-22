@@ -3,6 +3,7 @@ import { dirname, extname, resolve } from 'node:path';
 
 export const PERSON_ID = 'https://1200km.com/#person';
 export const WEBSITE_ID = 'https://1200km.com/#website';
+export const SOFTWARE_ID = 'https://1200km.com/#software';
 
 const WEB_PAGE_TYPES = new Set([
   'AboutPage',
@@ -25,6 +26,7 @@ const PRIMARY_ENTITY_TYPES = new Set([
   'SoftwareSourceCode',
   'TechArticle',
 ]);
+const ARTICLE_TYPES = new Set(['Article', 'BlogPosting', 'TechArticle']);
 
 export function decodeEntities(value = '') {
   return value
@@ -59,6 +61,55 @@ function escapeAttribute(value = '') {
     .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+function replaceAttribute(tag, name, value) {
+  const escaped = escapeAttribute(value);
+  const pattern = new RegExp(`(\\b${name}\\s*=\\s*)(?:"[^"]*"|'[^']*'|[^\\s>]+)`, 'i');
+  if (pattern.test(tag)) return tag.replace(pattern, `$1"${escaped}"`);
+  return tag.replace(/\s*\/?\s*>$/, (ending) => ` ${name}="${escaped}"${ending}`);
+}
+
+export function removeMetaKeywords(html) {
+  return html.replace(/\s*<meta\b[^>]*>/gi, (tag) => (
+    (tagAttributes(tag).name || '').toLowerCase() === 'keywords' ? '' : tag
+  ));
+}
+
+export function normalizeSeoTitle(value = '') {
+  let title = decodeEntities(stripHtml(value));
+  title = title
+    .replace(/\s*\|\s*AdversaryGraph Documentation\s*[—-]\s*CTI-to-Detection Workbench\s*\|\s*1200km\s*$/i, ' | AdversaryGraph Docs')
+    .replace(/\s*\|\s*ITDR\s*[–—-]\s*Identity Threat Detection\s*&\s*Response\s*$/i, ' | ITDR')
+    .replace(/\s*\|\s*1200km Security Research Articles\s*\|\s*1200km\s*$/i, ' | 1200km')
+    .replace(/(?:\s*\|\s*1200km){2,}\s*$/i, ' | 1200km')
+    .replace(/\s*\|\s*1200km\s*\|\s*AdversaryGraph Docs\s*$/i, ' | AdversaryGraph Docs')
+    .replace(/^AdversaryGraph\s*[—-]\s*(.+)\s*\|\s*AdversaryGraph Docs$/i, '$1 | AdversaryGraph Docs')
+    .replace(/^(ITDR\s*[–—-]\s*Identity Threat Detection\s*&\s*Response)\s*\|\s*ITDR$/i, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return title;
+}
+
+export function normalizeDocumentTitles(html) {
+  let transformed = html.replace(/<title\b([^>]*)>([\s\S]*?)<\/title>/i, (full, attributes, title) => (
+    `<title${attributes}>${escapeHtml(normalizeSeoTitle(title))}</title>`
+  ));
+  transformed = transformed.replace(/<meta\b[^>]*>/gi, (tag) => {
+    const attributes = tagAttributes(tag);
+    const key = (attributes.property || attributes.name || '').toLowerCase();
+    if (!['og:title', 'twitter:title'].includes(key) || !attributes.content) return tag;
+    return replaceAttribute(tag, 'content', normalizeSeoTitle(attributes.content));
+  });
+  return transformed;
+}
+
+function escapeHtml(value = '') {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 export function slugifyHeading(value = '') {
@@ -140,12 +191,47 @@ function firstObjectWithType(objects, wanted) {
   return objects.find((object) => schemaTypes(object).some((type) => wanted.has(type)));
 }
 
-function normalizeReferences(value) {
-  if (Array.isArray(value)) return value.map(normalizeReferences);
+function findNestedObject(value, predicate) {
+  if (!value || typeof value !== 'object') return null;
+  if (predicate(value)) return value;
+  for (const child of Object.values(value)) {
+    if (Array.isArray(child)) {
+      for (const item of child) {
+        const found = findNestedObject(item, predicate);
+        if (found) return found;
+      }
+    } else if (child && typeof child === 'object') {
+      const found = findNestedObject(child, predicate);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function isQuestion(value) {
+  return value && typeof value === 'object'
+    && schemaTypes(value).includes('Question')
+    && typeof value.name === 'string'
+    && value.name.trim()
+    && value.acceptedAnswer
+    && schemaTypes(value.acceptedAnswer).includes('Answer')
+    && typeof value.acceptedAnswer.text === 'string'
+    && value.acceptedAnswer.text.trim();
+}
+
+function isValidFaqPage(value) {
+  const entities = Array.isArray(value?.mainEntity) ? value.mainEntity : [value?.mainEntity].filter(Boolean);
+  return entities.length > 0 && entities.every(isQuestion);
+}
+
+function normalizeReferences(value, preserveEntity = false) {
+  if (Array.isArray(value)) return value.map((child) => normalizeReferences(child));
   if (!value || typeof value !== 'object') return value;
   const types = schemaTypes(value);
-  if (types.includes('Person') && value.name === 'Andrey Pautov') return { '@id': PERSON_ID };
-  if (types.includes('WebSite') && (!value.url || value.url === 'https://1200km.com/')) return { '@id': WEBSITE_ID };
+  if (!preserveEntity && types.includes('Person') && value.name === 'Andrey Pautov') return { '@id': PERSON_ID };
+  if (!preserveEntity && types.includes('WebSite') && (!value.url || value.url === 'https://1200km.com/')) return { '@id': WEBSITE_ID };
+  if (!preserveEntity && types.some((type) => ['SoftwareApplication', 'SoftwareSourceCode'].includes(type))
+    && value.name === 'AdversaryGraph') return { '@id': SOFTWARE_ID };
   const normalized = {};
   for (const [key, child] of Object.entries(value)) {
     if (key === '@context') continue;
@@ -158,6 +244,13 @@ function pageTitle(html) {
   return stripHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1]
     || html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1]
     || '1200km Security Research');
+}
+
+function articleDocument(html, canonical, objects) {
+  if (objects.some((object) => schemaTypes(object).some((type) => ARTICLE_TYPES.has(type)))) return true;
+  const pathname = new URL(canonical).pathname;
+  return /^\/articles\/read\/\d{4}\/[^/]+\/?$/i.test(pathname)
+    || /^\/articles\/[^/]+\.html$/i.test(pathname);
 }
 
 function metaContent(html, key) {
@@ -199,7 +292,12 @@ export function buildBreadcrumb(canonical, title, titleMap = new Map()) {
   };
 }
 
-export function buildConnectedGraph(html, { canonical, dateModified = '', titleMap = new Map() }) {
+export function buildConnectedGraph(html, {
+  canonical,
+  datePublished = '',
+  dateModified = '',
+  titleMap = new Map(),
+}) {
   const { objects, failures } = parseJsonLd(html);
   if (failures.length) throw new Error(`Invalid JSON-LD: ${failures.join('; ')}`);
 
@@ -231,18 +329,26 @@ export function buildConnectedGraph(html, { canonical, dateModified = '', titleM
     '@id': WEBSITE_ID,
     name: websiteSource.name || '1200km Security Research',
     url: 'https://1200km.com/',
+    author: { '@id': PERSON_ID },
     publisher: { '@id': PERSON_ID },
     inLanguage: 'en',
   };
 
-  const specializedPageType = schemaTypes(pageSource).find((type) => WEB_PAGE_TYPES.has(type) && type !== 'WebPage');
+  const specializedPageType = schemaTypes(pageSource).find((type) => (
+    WEB_PAGE_TYPES.has(type)
+    && type !== 'WebPage'
+    && (type !== 'FAQPage' || isValidFaqPage(pageSource))
+    && (type !== 'ProfilePage'
+      || /^https:\/\/1200km\.com\/(?:about|cv)\.html$/i.test(canonical)
+      || pageSource.mainEntity?.['@id'] === PERSON_ID)
+  ));
   const breadcrumb = buildBreadcrumb(canonical, title, titleMap);
   const page = {
     ...normalizeReferences(cloneWithoutContext(pageSource)),
     '@type': specializedPageType || 'WebPage',
     '@id': `${canonical}#webpage`,
     url: canonical,
-    name: pageSource.name || pageSource.headline || title,
+    name: title,
     ...(description ? { description } : {}),
     isPartOf: { '@id': WEBSITE_ID },
     breadcrumb: { '@id': breadcrumb['@id'] },
@@ -250,44 +356,105 @@ export function buildConnectedGraph(html, { canonical, dateModified = '', titleM
     inLanguage: pageSource.inLanguage || 'en',
   };
   if (image && !page.primaryImageOfPage) page.primaryImageOfPage = { '@type': 'ImageObject', url: image };
-  if (dateModified && !page.dateModified) page.dateModified = dateModified;
+  if (dateModified) page.dateModified = dateModified;
+  if (specializedPageType !== 'FAQPage' && schemaTypes(pageSource).includes('FAQPage')) delete page.mainEntity;
 
   const excluded = new Set(['Person', 'WebSite', 'BreadcrumbList', ...WEB_PAGE_TYPES]);
-  const primary = [];
-  for (const object of objects) {
+  const sourcePrimary = objects.filter((object) => {
     const types = schemaTypes(object);
-    if (!types.length || types.some((type) => excluded.has(type))) continue;
-    const normalized = normalizeReferences(cloneWithoutContext(object));
+    return types.length && !types.some((type) => excluded.has(type));
+  });
+  if (!sourcePrimary.length && articleDocument(html, canonical, objects)) {
+    sourcePrimary.push({ '@type': 'TechArticle' });
+  }
+  const primary = [];
+  const usedIds = new Set([PERSON_ID, WEBSITE_ID, page['@id'], breadcrumb['@id']]);
+  for (const object of sourcePrimary) {
+    const types = schemaTypes(object);
+    const normalized = normalizeReferences(cloneWithoutContext(object), true);
     const ordinal = primary.length + 1;
-    const suffix = types.some((type) => /Article|BlogPosting/.test(type)) ? 'article'
+    const isArticle = types.some((type) => ARTICLE_TYPES.has(type));
+    const isAdversaryGraph = types.some((type) => /Software/.test(type))
+      && (normalized.name === 'AdversaryGraph' || normalized['@id'] === SOFTWARE_ID);
+    const suffix = isArticle ? 'article'
       : types.some((type) => /Software/.test(type)) ? 'software'
         : types.includes('FAQPage') ? 'faq' : `entity-${ordinal}`;
-    normalized['@id'] = normalized['@id'] || `${canonical}#${suffix}`;
+    let entityId = isAdversaryGraph ? SOFTWARE_ID : (normalized['@id'] || `${canonical}#${suffix}`);
+    if (usedIds.has(entityId)) {
+      let sequence = 2;
+      const base = `${canonical}#${suffix}`;
+      entityId = base;
+      while (usedIds.has(entityId)) entityId = `${base}-${sequence++}`;
+    }
+    normalized['@id'] = entityId;
+    usedIds.add(entityId);
     if (types.some((type) => PRIMARY_ENTITY_TYPES.has(type))) {
       normalized.author = normalized.author || { '@id': PERSON_ID };
-      normalized.mainEntityOfPage = normalized.mainEntityOfPage || { '@id': page['@id'] };
-      if (dateModified && !normalized.dateModified) normalized.dateModified = dateModified;
+      normalized.publisher = normalized.publisher || { '@id': PERSON_ID };
+      normalized.mainEntityOfPage = { '@id': page['@id'] };
+      if (dateModified) normalized.dateModified = dateModified;
+    }
+    if (isArticle) {
+      normalized.url = canonical;
+      normalized.headline = title;
+      if (description) normalized.description = description;
+      if (image && !normalized.image) normalized.image = image;
+      if (datePublished) normalized.datePublished = datePublished;
     }
     primary.push(normalized);
   }
 
   if (specializedPageType === 'ProfilePage') page.mainEntity = { '@id': PERSON_ID };
-  else if (primary.length) page.mainEntity = { '@id': primary[0]['@id'] };
+  else if (specializedPageType !== 'FAQPage' && primary.length) page.mainEntity = { '@id': primary[0]['@id'] };
+
+  const related = [];
+  const referencesSoftware = JSON.stringify([page, primary]).includes(`"@id":"${SOFTWARE_ID}"`);
+  if (referencesSoftware && !usedIds.has(SOFTWARE_ID)) {
+    const embeddedSoftware = findNestedObject(objects, (object) => (
+      schemaTypes(object).some((type) => ['SoftwareApplication', 'SoftwareSourceCode'].includes(type))
+      && object.name === 'AdversaryGraph'
+    ));
+    related.push({
+      ...(embeddedSoftware ? normalizeReferences(cloneWithoutContext(embeddedSoftware), true) : {}),
+      '@type': 'SoftwareApplication',
+      '@id': SOFTWARE_ID,
+      name: 'AdversaryGraph',
+      url: embeddedSoftware?.url || 'https://1200km.com/adversarygraph/',
+      applicationCategory: embeddedSoftware?.applicationCategory || 'SecurityApplication',
+    });
+  }
 
   return {
     '@context': 'https://schema.org',
-    '@graph': [person, website, page, breadcrumb, ...primary],
+    '@graph': [person, website, page, breadcrumb, ...primary, ...related],
   };
 }
 
 export function replaceStructuredData(html, options) {
   const graph = buildConnectedGraph(html, options);
-  const withoutJsonLd = html.replace(/\s*<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
+  let withoutJsonLd = html.replace(/\s*<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
+  const article = graph['@graph'].find((object) => schemaTypes(object).some((type) => ARTICLE_TYPES.has(type)));
+  if (article?.datePublished) withoutJsonLd = upsertMeta(withoutJsonLd, 'property', 'article:published_time', article.datePublished);
+  if (article?.dateModified) withoutJsonLd = upsertMeta(withoutJsonLd, 'property', 'article:modified_time', article.dateModified);
   const payload = JSON.stringify(graph, null, 2).replace(/<\/script/gi, '<\\/script');
   const script = `\n    <script type="application/ld+json" data-site-graph>\n${payload.split('\n').map((line) => `      ${line}`).join('\n')}\n    </script>\n`;
   // Use a callback so `$&`, `$\`` and `$'` sequences inside CTI descriptions
   // are treated as literal JSON content rather than replacement tokens.
   return withoutJsonLd.replace(/<\/head>/i, () => `${script}</head>`);
+}
+
+function upsertMeta(html, attribute, key, content) {
+  let found = false;
+  const transformed = html.replace(/<meta\b[^>]*>/gi, (tag) => {
+    const attributes = tagAttributes(tag);
+    if ((attributes[attribute] || '').toLowerCase() !== key.toLowerCase()) return tag;
+    if (found) return '';
+    found = true;
+    return replaceAttribute(tag, 'content', content);
+  });
+  if (found) return transformed;
+  const meta = `    <meta ${attribute}="${escapeAttribute(key)}" content="${escapeAttribute(content)}" />\n`;
+  return transformed.replace(/<\/head>/i, () => `${meta}</head>`);
 }
 
 function imageDimensions(buffer, extension) {
@@ -405,6 +572,8 @@ export function deferThirdPartyBoot(html) {
 
 export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
+  transformed = removeMetaKeywords(transformed);
+  transformed = normalizeDocumentTitles(transformed);
   // Keep release-owned browser enhancements on the same origin. Checked-in
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
