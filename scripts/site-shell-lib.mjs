@@ -43,6 +43,7 @@ export function renderHeader(shell, page) {
   const brand = shell.brand;
   return `${HEADER_START}
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="${escapeHtml(shell.version)}">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
       <nav class="nav" aria-label="Primary navigation">
         <a class="brand" href="${escapeHtml(brand.href)}">
           <img src="${escapeHtml(brand.logo)}" alt="" width="36" height="36" />
@@ -114,6 +115,13 @@ function ensureTopTarget(html) {
   });
 }
 
+function ensureMainTarget(html) {
+  return html.replace(/<main\b([^>]*)>/i, (tag, attributes) => {
+    if (/\bid\s*=/.test(attributes)) return tag;
+    return `<main${attributes} id="main-content">`;
+  });
+}
+
 function ensureStaticThemeStyles(html) {
   if (/href=["'][^"']*\/assets\/site-theme\.css/i.test(html)) return html;
   return html.replace(/<\/head>/i, '    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />\n  </head>');
@@ -143,5 +151,5 @@ export function applySiteShell(html, shell, page) {
     'standalone footer',
     page.path,
   );
-  return ensureStaticThemeScript(ensureStaticThemeStyles(ensureTopTarget(transformed)));
+  return ensureStaticThemeScript(ensureStaticThemeStyles(ensureMainTarget(ensureTopTarget(transformed))));
 }

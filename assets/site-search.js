@@ -408,13 +408,13 @@
             <h2 class="pf-result-title"><a class="pf-result-link" href="{{ meta.url | default(url) | safeUrl }}">{{ meta.title }}</a></h2>
             {{#if excerpt}}<p class="pf-result-excerpt">{{+ excerpt +}}</p>{{/if}}
             {{#if sub_results}}
-            <nav aria-label="Relevant sections">
+            <div class="pf-subresults">
               <ul class="pf-heading-chips">
                 {{#each sub_results as sub}}
                 <li class="pf-heading-chip"><a class="pf-heading-link" href="{{ sub.url | safeUrl }}">{{ sub.title }}</a>{{#if sub.excerpt}}<p class="pf-heading-excerpt">{{+ sub.excerpt +}}</p>{{/if}}</li>
                 {{/each}}
               </ul>
-            </nav>
+            </div>
             {{/if}}
           </article>
         </li>`;

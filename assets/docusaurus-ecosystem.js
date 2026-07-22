@@ -16,8 +16,9 @@
 
     let gateway = document.querySelector('.ecosystem-project-bar');
     if (!gateway) {
-      gateway = document.createElement('section');
+      gateway = document.createElement('aside');
       gateway.className = 'ecosystem-project-bar';
+      gateway.setAttribute('aria-label', 'Explore the 1200km research ecosystem');
       gateway.innerHTML = `
         <div class="ecosystem-project-inner">
           <div class="ecosystem-project-heading">

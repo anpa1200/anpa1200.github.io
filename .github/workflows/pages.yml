@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTICLE_ARCHIVE_COMMIT: 92ceaf7ea031c979da6d315aa3144eb9562c40d5
+  ARTICLE_ARCHIVE_COMMIT: c57eeaf021b15980ade6be72aeb96ce206489f09
 
 jobs:
   quality:
@@ -76,6 +76,7 @@ jobs:
         run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
       - name: Validate complete staged site
         run: |
+          npm run check-semantics -- --site "${RUNNER_TEMP}/site"
           npm run check-facts -- --site "${RUNNER_TEMP}/site"
           npm run check-seo -- --site "${RUNNER_TEMP}/site" --require-release-transform
           npm run check-links -- --site "${RUNNER_TEMP}/site"
@@ -114,6 +115,7 @@ jobs:
         run: npm run check-hygiene -- --site "${RUNNER_TEMP}/site"
       - name: Revalidate published sitemap and metadata
         run: |
+          npm run check-semantics -- --site "${RUNNER_TEMP}/site"
           npm run check-facts -- --site "${RUNNER_TEMP}/site"
           node scripts/check-content-schema.mjs --site "${RUNNER_TEMP}/site"
           node scripts/check-content-catalog.mjs --site "${RUNNER_TEMP}/site"
