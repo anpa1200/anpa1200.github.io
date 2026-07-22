@@ -24,14 +24,15 @@
     "controlled_vocabularies": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["primary_types", "primary_domains", "audiences", "statuses", "maturity", "evidence_levels"],
+      "required": ["primary_types", "primary_domains", "audiences", "statuses", "maturity", "evidence_levels", "collection_tiers"],
       "properties": {
         "primary_types": { "const": ["research", "case-study", "guide", "lab", "tool", "platform", "documentation", "article", "mirror", "contribution", "index", "profile", "policy"] },
         "primary_domains": { "const": ["threat-intelligence", "detection-engineering", "threat-hunting", "malware-analysis", "identity-security", "offensive-security", "cloud-security", "ai-security", "embedded-security", "application-security", "portfolio-governance", "cross-domain"] },
         "audiences": { "const": ["cti-analyst", "detection-engineer", "threat-hunter", "security-engineer", "security-leader", "platform-operator", "developer", "general"] },
         "statuses": { "const": ["released", "maintained", "current-development", "experimental", "superseded", "archived", "submitted", "accepted"] },
         "maturity": { "const": ["production", "stable", "beta", "experimental", "historical", "reference"] },
-        "evidence_levels": { "const": ["source-backed", "lab-validated", "release-evidence", "externally-accepted", "illustrative", "unverified"] }
+        "evidence_levels": { "const": ["source-backed", "lab-validated", "release-evidence", "externally-accepted", "illustrative", "unverified"] },
+        "collection_tiers": { "const": ["core", "reference", "archive"] }
       }
     },
     "canonical_policy": {
@@ -58,7 +59,7 @@
     "inventory": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["item_count", "indexable_count", "external_count", "by_primary_type", "by_primary_domain", "by_status", "by_evidence_level"],
+      "required": ["item_count", "indexable_count", "external_count", "by_primary_type", "by_primary_domain", "by_status", "by_evidence_level", "by_collection_tier"],
       "properties": {
         "item_count": { "type": "integer", "minimum": 1 },
         "indexable_count": { "type": "integer", "minimum": 0 },
@@ -66,7 +67,8 @@
         "by_primary_type": { "$ref": "#/$defs/counts" },
         "by_primary_domain": { "$ref": "#/$defs/counts" },
         "by_status": { "$ref": "#/$defs/counts" },
-        "by_evidence_level": { "$ref": "#/$defs/counts" }
+        "by_evidence_level": { "$ref": "#/$defs/counts" },
+        "by_collection_tier": { "$ref": "#/$defs/counts" }
       }
     },
     "items": {
@@ -95,7 +97,7 @@
     "collection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "name", "canonical_prefix", "sitemap_url", "primary_type", "primary_domain", "audience", "status", "maturity", "evidence_level", "applies_to", "source_url"],
+      "required": ["id", "name", "canonical_prefix", "sitemap_url", "primary_type", "primary_domain", "audience", "status", "maturity", "evidence_level", "collection_tier", "applies_to", "source_url"],
       "properties": {
         "id": { "type": "string", "pattern": "^collection:[a-z0-9:-]+$" },
         "name": { "type": "string", "minLength": 1 },
@@ -107,6 +109,7 @@
         "status": { "$ref": "#/$defs/status" },
         "maturity": { "$ref": "#/$defs/maturityValue" },
         "evidence_level": { "$ref": "#/$defs/evidenceLevel" },
+        "collection_tier": { "$ref": "#/$defs/collectionTier" },
         "applies_to": { "type": "string", "minLength": 1 },
         "source_url": { "type": "string", "format": "uri" }
       }
@@ -135,6 +138,11 @@
         "status",
         "maturity",
         "evidence_level",
+        "collection_tier",
+        "source_platform",
+        "source_repository",
+        "original_publication",
+        "canonical_owner",
         "applies_to",
         "canonical_url",
         "published_at",
@@ -153,6 +161,11 @@
         "status": { "$ref": "#/$defs/status" },
         "maturity": { "$ref": "#/$defs/maturityValue" },
         "evidence_level": { "$ref": "#/$defs/evidenceLevel" },
+        "collection_tier": { "$ref": "#/$defs/collectionTier" },
+        "source_platform": { "type": "string", "minLength": 1 },
+        "source_repository": { "type": "string", "format": "uri" },
+        "original_publication": { "type": "string", "format": "uri" },
+        "canonical_owner": { "type": "string", "minLength": 1 },
         "version": { "type": "string", "minLength": 1 },
         "applies_to": { "type": "string", "minLength": 1 },
         "canonical_url": { "type": "string", "format": "uri" },
@@ -188,6 +201,7 @@
     },
     "status": { "enum": ["released", "maintained", "current-development", "experimental", "superseded", "archived", "submitted", "accepted"] },
     "maturityValue": { "enum": ["production", "stable", "beta", "experimental", "historical", "reference"] },
-    "evidenceLevel": { "enum": ["source-backed", "lab-validated", "release-evidence", "externally-accepted", "illustrative", "unverified"] }
+    "evidenceLevel": { "enum": ["source-backed", "lab-validated", "release-evidence", "externally-accepted", "illustrative", "unverified"] },
+    "collectionTier": { "enum": ["core", "reference", "archive"] }
   }
 }

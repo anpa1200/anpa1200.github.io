@@ -66,6 +66,7 @@ export const VOCABULARIES = Object.freeze({
     'illustrative',
     'unverified',
   ],
+  collection_tiers: ['core', 'reference', 'archive'],
 });
 
 export const CANONICAL_POLICY = Object.freeze({
@@ -155,6 +156,86 @@ function collectionForUrl(url, config) {
   return [...config.declared_collections]
     .sort((a, b) => b.canonical_prefix.length - a.canonical_prefix.length)
     .find((collection) => url.startsWith(collection.canonical_prefix));
+}
+
+function githubRepository(value) {
+  try {
+    const url = new URL(value);
+    if (url.hostname.toLowerCase() !== 'github.com') return null;
+    const [owner, repository] = url.pathname.split('/').filter(Boolean);
+    return owner && repository ? `https://github.com/${owner}/${repository.replace(/\.git$/i, '')}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function platformForUrl(value) {
+  try {
+    const hostname = new URL(value).hostname.toLowerCase().replace(/^www\./, '');
+    return ({
+      '1200km.com': '1200km',
+      'attack.mitre.org': 'MITRE ATT&CK',
+      'github.com': 'GitHub',
+      'medium.com': 'Medium',
+      'infosecwriteups.com': 'InfoSec Write-ups',
+      'pypi.org': 'PyPI',
+    })[hostname] || hostname;
+  } catch {
+    return '1200km';
+  }
+}
+
+function canonicalOwner(value) {
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, '');
+    if (hostname === '1200km.com') return '1200km / Andrey Pautov';
+    if (hostname === 'github.com') return url.pathname.split('/').filter(Boolean)[0] || 'GitHub repository owner';
+    if (hostname === 'medium.com') return 'Andrey Pautov';
+    if (hostname === 'infosecwriteups.com') return 'InfoSec Write-ups / Andrey Pautov';
+    if (hostname === 'attack.mitre.org') return 'MITRE ATT&CK';
+    if (hostname === 'pypi.org') return 'anpa1200';
+    return hostname;
+  } catch {
+    return '1200km / Andrey Pautov';
+  }
+}
+
+function collectionTier(item, config, collection) {
+  if (['archived', 'superseded'].includes(item.status) || item.maturity === 'historical') return 'archive';
+  if (config.core_urls.includes(item.canonical_url) || item.featured) return 'core';
+  return collection?.collection_tier || 'reference';
+}
+
+function governedItem(item, config) {
+  const collection = item.collection_id
+    ? config.declared_collections.find((entry) => entry.id === item.collection_id)
+    : collectionForUrl(item.canonical_url, config);
+  const sourceCandidate = item.source_url || item.canonical_url;
+  const archiveRepository = collection?.id === 'collection:medium-export'
+    ? 'https://github.com/anpa1200/medium-blog-navigation'
+    : null;
+  const sourceRepository = item.source_repository
+    || archiveRepository
+    || githubRepository(collection?.source_url)
+    || githubRepository(item.canonical_url)
+    || githubRepository(item.source_url)
+    || 'https://github.com/anpa1200/anpa1200.github.io';
+  const originalPublication = item.original_publication
+    || item.source_url
+    || item.canonical_url;
+  const sourcePlatform = item.source_platform
+    || (collection?.id === 'collection:medium-export' && item.primary_type === 'index'
+      ? '1200km'
+      : platformForUrl(sourceCandidate));
+  return {
+    ...item,
+    source_platform: sourcePlatform,
+    source_repository: sourceRepository,
+    original_publication: originalPublication,
+    canonical_owner: item.canonical_owner || canonicalOwner(item.canonical_url),
+    collection_tier: item.collection_tier || collectionTier(item, config, collection),
+  };
 }
 
 function inferType(url, title, html, collection) {
@@ -293,7 +374,7 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
     indexable: !['external-index', 'nonindex-local'].includes(source),
     ...(collection ? { collection_id: collection.id } : {}),
   };
-  return applyOverride(item, config.overrides[canonical]);
+  return governedItem(applyOverride(item, config.overrides[canonical]), config);
 }
 
 function anchorSummary(html, offset, title) {
@@ -358,7 +439,8 @@ function counts(items, field) {
 }
 
 export function buildCatalog(items, config, scope = 'local-source-catalog') {
-  const sorted = [...items].sort((a, b) => a.canonical_url.localeCompare(b.canonical_url));
+  const sorted = items.map((item) => governedItem(item, config))
+    .sort((a, b) => a.canonical_url.localeCompare(b.canonical_url));
   return {
     $schema: './content-catalog.schema.json',
     catalog_version: config.catalog_version,
@@ -376,6 +458,7 @@ export function buildCatalog(items, config, scope = 'local-source-catalog') {
       by_primary_domain: counts(sorted, 'primary_domain'),
       by_status: counts(sorted, 'status'),
       by_evidence_level: counts(sorted, 'evidence_level'),
+      by_collection_tier: counts(sorted, 'collection_tier'),
     },
     items: sorted,
   };
@@ -387,6 +470,7 @@ export function catalogueSearchMetadata(item) {
     primaryDomain: item.primary_domain,
     status: item.status,
     evidenceLevel: item.evidence_level,
+    collectionTier: item.collection_tier,
   };
 }
 

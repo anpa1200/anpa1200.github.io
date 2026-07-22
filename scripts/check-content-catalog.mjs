@@ -79,6 +79,7 @@ if (!Array.isArray(catalog.items) || !catalog.items.length) fail('Content catalo
 
 const required = [
   'id', 'title', 'primary_type', 'primary_domain', 'audience', 'status', 'maturity', 'evidence_level',
+  'collection_tier', 'source_platform', 'source_repository', 'original_publication', 'canonical_owner',
   'applies_to', 'canonical_url', 'published_at', 'updated_at', 'summary', 'tags', 'featured', 'indexable',
 ];
 const ids = new Map();
@@ -94,6 +95,17 @@ for (const [index, item] of (catalog.items || []).entries()) {
   if (!VOCABULARIES.statuses.includes(item.status)) fail(`${label}: unknown status ${item.status}.`);
   if (!VOCABULARIES.maturity.includes(item.maturity)) fail(`${label}: unknown maturity ${item.maturity}.`);
   if (!VOCABULARIES.evidence_levels.includes(item.evidence_level)) fail(`${label}: unknown evidence_level ${item.evidence_level}.`);
+  if (!VOCABULARIES.collection_tiers.includes(item.collection_tier)) fail(`${label}: unknown collection_tier ${item.collection_tier}.`);
+  if (typeof item.source_platform !== 'string' || !item.source_platform.trim()) fail(`${label}: source_platform is required.`);
+  if (typeof item.canonical_owner !== 'string' || !item.canonical_owner.trim()) fail(`${label}: canonical_owner is required.`);
+  for (const key of ['source_repository', 'original_publication']) {
+    try {
+      const value = new URL(item[key]);
+      if (!['http:', 'https:'].includes(value.protocol)) throw new Error('unsupported protocol');
+    } catch {
+      fail(`${label}: ${key} must be an absolute HTTP(S) URL.`);
+    }
+  }
   if (!validDate(item.published_at) || !validDate(item.updated_at)) fail(`${label}: publication dates must be valid ISO dates or null.`);
   if (typeof item.title !== 'string' || !item.title.trim() || typeof item.summary !== 'string' || !item.summary.trim()) fail(`${label}: title and summary are required.`);
   if (typeof item.applies_to !== 'string' || !item.applies_to.trim()) fail(`${label}: applies_to is required.`);
@@ -147,6 +159,7 @@ for (const [index, item] of (catalog.items || []).entries()) {
   }
   if (item.primary_type === 'mirror' && !item.source_url) fail(`${label}: mirror item must identify source_url.`);
   if (/\b(?:AdversaryGraph|ThreatMapper)\s+v\d/i.test(item.title) && !item.version) fail(`${label}: version-specific item is missing version.`);
+  if (['archived', 'superseded'].includes(item.status) && item.collection_tier !== 'archive') fail(`${label}: archived or superseded content must use the archive tier.`);
 }
 
 for (const collection of catalog.declared_collections || []) {
@@ -156,6 +169,7 @@ for (const collection of catalog.declared_collections || []) {
   if (!VOCABULARIES.statuses.includes(collection.status)) fail(`${collection.id}: unknown status.`);
   if (!VOCABULARIES.maturity.includes(collection.maturity)) fail(`${collection.id}: unknown maturity.`);
   if (!VOCABULARIES.evidence_levels.includes(collection.evidence_level)) fail(`${collection.id}: unknown evidence level.`);
+  if (!VOCABULARIES.collection_tiers.includes(collection.collection_tier)) fail(`${collection.id}: unknown collection tier.`);
 }
 
 const aliasUrls = new Set();

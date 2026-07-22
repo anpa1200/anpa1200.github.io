@@ -330,12 +330,34 @@ try {
     `document.querySelector('[data-site-search-page] pagefind-input .pf-input')?.value === 'T1059.003' && new URL(document.querySelector('[data-site-search-results] .pf-result-link[href]')?.href || location.href).pathname === '/threat-matrix/techniques/T1059.003/'`,
     'full-page recovery after zero results'
   );
+  await evaluate(devtools, searchPage.sessionId, `(() => {
+    const input = document.querySelector('[data-site-search-page] pagefind-input .pf-input');
+    input.value = 'threat intelligence';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  })()`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `/\\bcore\\b/i.test(document.querySelector('[data-site-search-results] .pf-result:first-child .site-search-result-meta')?.textContent || '')`,
+    'broad search prefers governed core content'
+  );
+  await evaluate(devtools, searchPage.sessionId, `(() => {
+    const input = document.querySelector('[data-site-search-page] pagefind-input .pf-input');
+    input.value = 'Historical AdversaryGraph v4 Capability Map';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  })()`);
+  await waitForExpression(
+    devtools,
+    searchPage.sessionId,
+    `new URL(document.querySelector('[data-site-search-results] .pf-result-link[href]')?.href || location.href).pathname === '/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html'`,
+    'full historical title remains exactly retrievable'
+  );
   const searchFilters = await evaluate(
     devtools,
     searchPage.sessionId,
     `Array.from(document.querySelectorAll('[data-site-search-filters] pagefind-filter-dropdown')).map((item) => item.getAttribute('filter'))`,
   );
-  const expectedFilters = ['primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'version', 'source', 'updated_year', 'topic', 'section'];
+  const expectedFilters = ['primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'collection_tier', 'version', 'source', 'updated_year', 'topic', 'section'];
   if (JSON.stringify(searchFilters) !== JSON.stringify(expectedFilters)) {
     failures.push(`expected controlled search facets ${expectedFilters.join(', ')}, found ${searchFilters.join(', ')}`);
   }
