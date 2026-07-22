@@ -8,6 +8,7 @@ import {
   classifyContentType,
   classifyTopics,
   classifyUrl,
+  discoveryWeight,
   normalizeCanonical,
   parseSitemap,
   prepareHtmlForSearch,
@@ -62,6 +63,11 @@ test('search preprocessing accepts controlled catalogue facets', () => {
     audience: ['detection-engineer', 'threat-hunter'],
     status: 'maintained',
     evidence_level: 'source-backed',
+    collection_tier: 'core',
+    source_platform: 'GitHub',
+    source_repository: 'https://github.com/anpa1200/adversarygraph',
+    original_publication: 'https://1200km.com/example/',
+    canonical_owner: '1200km / Andrey Pautov',
     version: '6.0.0',
     source_url: 'https://github.com/anpa1200/adversarygraph',
     updated_at: '2026-07-21',
@@ -71,10 +77,15 @@ test('search preprocessing accepts controlled catalogue facets', () => {
   assert.match(prepared, /data-pagefind-filter="lifecycle\[content\]"/);
   assert.match(prepared, /data-pagefind-filter="status\[content\]"/);
   assert.match(prepared, /data-pagefind-filter="evidence_level\[content\]"/);
+  assert.match(prepared, /content="core" data-pagefind-filter="collection_tier\[content\]"/);
   assert.match(prepared, /content="detection-engineer" data-pagefind-filter="audience\[content\]"/);
   assert.match(prepared, /content="threat-hunter" data-pagefind-filter="audience\[content\]"/);
   assert.match(prepared, /content="6\.0\.0" data-pagefind-filter="version\[content\]"/);
   assert.match(prepared, /content="GitHub" data-pagefind-filter="source\[content\]"/);
+  assert.match(prepared, /content="https:\/\/github\.com\/anpa1200\/adversarygraph" data-pagefind-meta="source_repository\[content\]"/);
+  assert.match(prepared, /content="https:\/\/1200km\.com\/example\/" data-pagefind-meta="original_publication\[content\]"/);
+  assert.match(prepared, /content="1200km \/ Andrey Pautov" data-pagefind-meta="canonical_owner\[content\]"/);
+  assert.match(prepared, /data-pagefind-weight="6\.00"/);
   assert.match(prepared, /content="2026" data-pagefind-filter="updated_year\[content\]"/);
 });
 
@@ -91,6 +102,17 @@ test('search facets use deterministic content types and controlled topics', () =
     classifyTopics('https://1200km.com/guide/', '<title>Threat hunting with Sigma</title><meta name="description" content="Detection engineering">'),
     ['Threat hunting', 'Detection engineering'],
   );
+});
+
+test('broad-discovery weights prioritize tier, then evidence, without hiding archives', () => {
+  const weight = (collection_tier, evidence_level) => discoveryWeight({ collection_tier, evidence_level });
+  assert.ok(weight('core', 'source-backed') > weight('reference', 'externally-accepted'));
+  assert.ok(weight('reference', 'externally-accepted') > weight('reference', 'release-evidence'));
+  assert.ok(weight('reference', 'release-evidence') > weight('reference', 'lab-validated'));
+  assert.ok(weight('reference', 'lab-validated') > weight('reference', 'source-backed'));
+  assert.ok(weight('reference', 'source-backed') > weight('reference', 'illustrative'));
+  assert.ok(weight('reference', 'illustrative') > weight('reference', 'unverified'));
+  assert.ok(weight('archive', 'unverified') > 0);
 });
 
 test('search loader versions stay synchronized and the live index is not pinned to stale metadata', () => {

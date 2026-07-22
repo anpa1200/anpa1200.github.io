@@ -272,6 +272,7 @@ function searchDate(html) {
 }
 
 function sourceName(catalogItem, canonicalUrl) {
+  if (catalogItem?.source_platform) return catalogItem.source_platform;
   const sourceValue = catalogItem?.source_url || canonicalUrl;
   try {
     const source = new URL(sourceValue);
@@ -288,6 +289,20 @@ function sourceName(catalogItem, canonicalUrl) {
   } catch {
     return '1200km';
   }
+}
+
+export function discoveryWeight(catalogItem) {
+  if (!catalogItem) return null;
+  const tier = { core: 6, reference: 1, archive: 0.5 }[catalogItem.collection_tier] || 1;
+  const evidence = {
+    'externally-accepted': 1.35,
+    'release-evidence': 1.3,
+    'lab-validated': 1.2,
+    'source-backed': 1,
+    illustrative: 0.75,
+    unverified: 0.6,
+  }[catalogItem.evidence_level] || 1;
+  return Math.max(0.1, Math.min(10, tier * evidence));
 }
 
 function contentVersion(catalogItem) {
@@ -336,10 +351,14 @@ export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
     catalogItem?.status ? `<meta content="${escapeAttribute(catalogItem.status)}" data-pagefind-filter="lifecycle[content]" data-pagefind-meta="lifecycle[content]">` : '',
     catalogItem?.status ? `<meta content="${escapeAttribute(catalogItem.status)}" data-pagefind-filter="status[content]" data-pagefind-meta="status[content]">` : '',
     catalogItem?.evidence_level ? `<meta content="${escapeAttribute(catalogItem.evidence_level)}" data-pagefind-filter="evidence_level[content]" data-pagefind-meta="evidence_level[content]">` : '',
+    catalogItem?.collection_tier ? `<meta content="${escapeAttribute(catalogItem.collection_tier)}" data-pagefind-filter="collection_tier[content]" data-pagefind-meta="collection_tier[content]">` : '',
     ...(catalogItem?.audience || []).map((audience) => `<meta content="${escapeAttribute(audience)}" data-pagefind-filter="audience[content]">`),
     catalogItem?.audience?.length ? `<meta content="${escapeAttribute(catalogItem.audience.join(', '))}" data-pagefind-meta="audience[content]">` : '',
     `<meta content="${escapeAttribute(version)}" data-pagefind-filter="version[content]" data-pagefind-meta="version[content]">`,
     `<meta content="${escapeAttribute(source)}" data-pagefind-filter="source[content]" data-pagefind-meta="source[content]">`,
+    catalogItem?.source_repository ? `<meta content="${escapeAttribute(catalogItem.source_repository)}" data-pagefind-meta="source_repository[content]">` : '',
+    catalogItem?.original_publication ? `<meta content="${escapeAttribute(catalogItem.original_publication)}" data-pagefind-meta="original_publication[content]">` : '',
+    catalogItem?.canonical_owner ? `<meta content="${escapeAttribute(catalogItem.canonical_owner)}" data-pagefind-meta="canonical_owner[content]">` : '',
     `<meta content="${escapeAttribute(updatedYear)}" data-pagefind-filter="updated_year[content]" data-pagefind-meta="updated_year[content]">`,
     ...topics.map((topic) => `<meta content="${escapeAttribute(topic)}" data-pagefind-filter="topic[content]">`),
     `<meta content="${escapeAttribute(topics.join(', '))}" data-pagefind-meta="topics[content]">`,
@@ -350,7 +369,7 @@ export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
   // Docusaurus page. Docusaurus emits stable heading IDs at build time.
   let prepared = /\bid=["']__docusaurus["']/i.test(html) ? html : addHeadingIds(html);
   prepared = prepared.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${metadata}`);
-  prepared = markPagefindContent(prepared);
+  prepared = markPagefindContent(prepared, discoveryWeight(catalogItem));
   return prepared;
 }
 

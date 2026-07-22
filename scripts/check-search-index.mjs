@@ -82,26 +82,30 @@ async function checkQueries() {
     });
     await search.init();
     const filters = await search.filters();
-    for (const filter of ['content_type', 'primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'version', 'source', 'updated_year', 'topic', 'section']) {
+    for (const filter of ['content_type', 'primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'collection_tier', 'version', 'source', 'updated_year', 'topic', 'section']) {
       const minimumValues = filter === 'updated_year' ? 1 : 2;
       if (!filters[filter] || Object.keys(filters[filter]).length < minimumValues) failures.push(`search filter ${filter} is missing or incomplete`);
     }
     const checks = [
-      { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true },
-      { query: 'T1059.00', expectedPrefixes: ['/threat-matrix/techniques/T1059.0'], first: true },
-      { query: 'G0034', expectedPrefixes: ['/threat-matrix/actors/G0034/'], first: true },
-      { query: 'G0069', expectedPrefixes: ['/threat-matrix/actors/G0069/'], first: true },
+      { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK' },
+      { query: 'T1059.00', expectedPrefixes: ['/threat-matrix/techniques/T1059.0'], first: true, matchedTier: 'reference' },
+      { query: 'G0034', expectedPrefixes: ['/threat-matrix/actors/G0034/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK' },
+      { query: 'G0069', expectedPrefixes: ['/threat-matrix/actors/G0069/'], first: true, matchedTier: 'reference' },
       { query: 'MuddyWater', expectedPrefixes: ['/threat-matrix/actors/G0069/'] },
       { query: 'Kerberoasting', expectedPrefixes: ['/ITDR/'] },
       { query: 'Kerberosting', expectedPrefixes: ['/ITDR/'] },
-      { query: 'AdversaryGraph', expectedPrefixes: ['/adversarygraph/', '/adversarygraph-docs/'] },
-      { query: 'Operation Desert Hydra', expectedPrefixes: ['/operation-desert-hydra/', '/labs.html'], expectedUrls: ['/'] },
+      { query: 'AdversaryGraph', expectedPrefixes: ['/adversarygraph/', '/adversarygraph-docs/'], requiredTier: 'core' },
+      { query: 'Operation Desert Hydra', expectedPrefixes: ['/operation-desert-hydra/', '/labs.html'], expectedUrls: ['/'], requiredTier: 'core' },
       { query: 'RAG MCP', expectedPrefixes: ['/adversarygraph', '/ai-offensive.html'] },
       { query: 'AIDebug', expectedPrefixes: ['/external-validation.html', '/labs.html', '/ai-offensive.html'] },
       { query: 'detection validation', expectedPrefixes: ['/adversarygraph', '/labs.html', '/newest-detection-engineering-techniques/'] },
-      { query: 'IOC enrichment', expectedPrefixes: ['/adversarygraph'] },
+      { query: 'IOC enrichment', expectedPrefixes: ['/adversarygraph'], requiredTier: 'core' },
+      { query: 'threat intelligence', expectedPrefixes: ['/cti.html', '/adversarygraph/', '/threat-matrix/', '/cti-analyst-field-manual/'], broad: true },
+      { query: 'cloud security', expectedPrefixes: ['/pt-tools.html', '/labs.html', '/ITDR/docs/protocols/cloud-idp/', '/threat-matrix/techniques/'], broad: true },
+      { query: 'malware analysis', expectedPrefixes: ['/articles/', '/labs.html', '/guides.html', '/external-validation.html'], broad: true },
+      { query: 'Historical AdversaryGraph v4 Capability Map', expectedPrefixes: ['/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html'], requiredTier: 'archive' },
     ];
-    for (const { query, expectedPrefixes, expectedUrls = [], first = false } of checks) {
+    for (const { query, expectedPrefixes, expectedUrls = [], first = false, matchedTier, matchedSource, requiredTier, broad = false } of checks) {
       const result = await search.search(query);
       const top = await Promise.all(result.results.slice(0, 10).map((item) => item.data()));
       console.log(`Search quality "${query}": ${top.map((item) => item.url).join(', ') || '(no results)'}`);
@@ -115,6 +119,22 @@ async function checkQueries() {
       }
       if (first && expected !== 0) {
         failures.push(`identifier query "${query}" should rank its entity first (rank was ${expected + 1})`);
+      }
+      const matched = expected >= 0 ? top[expected] : null;
+      if (matchedTier && matched?.meta?.collection_tier !== matchedTier) {
+        failures.push(`query "${query}" expected matched tier ${matchedTier}, found ${matched?.meta?.collection_tier || '(missing)'}`);
+      }
+      if (matchedSource && matched?.meta?.source !== matchedSource) {
+        failures.push(`query "${query}" expected matched source ${matchedSource}, found ${matched?.meta?.source || '(missing)'}`);
+      }
+      if (requiredTier && !top.some((item) => item.meta?.collection_tier === requiredTier)) {
+        failures.push(`query "${query}" did not return required ${requiredTier} content in the top ten`);
+      }
+      if (broad && top[0]?.meta?.collection_tier === 'archive') {
+        failures.push(`broad query "${query}" ranked archive content first`);
+      }
+      if (broad && !top.slice(0, 5).some((item) => item.meta?.collection_tier === 'core')) {
+        failures.push(`broad query "${query}" did not surface curated core content in the top five`);
       }
     }
     const sectionResult = await search.search('Detection logic T1059.003');

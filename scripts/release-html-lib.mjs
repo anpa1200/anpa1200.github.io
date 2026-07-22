@@ -89,17 +89,22 @@ export function addHeadingIds(html) {
   });
 }
 
-export function markPagefindContent(html) {
+export function markPagefindContent(html, weight = null) {
+  const weightAttribute = Number.isFinite(weight) ? ` data-pagefind-weight="${weight.toFixed(2)}"` : '';
+  function mark(tag, attributes, name) {
+    let next = attributes;
+    if (!/\bdata-pagefind-body\b/i.test(next)) next += ' data-pagefind-body';
+    if (weightAttribute && !/\bdata-pagefind-weight\s*=/i.test(next)) next += weightAttribute;
+    return `<${name}${next}>`;
+  }
   let foundMain = false;
   const withMain = html.replace(/<main\b([^>]*)>/gi, (tag, attributes) => {
     foundMain = true;
-    if (/\bdata-pagefind-body\b/i.test(attributes)) return tag;
-    return `<main${attributes} data-pagefind-body>`;
+    return mark(tag, attributes, 'main');
   });
   if (foundMain) return withMain;
   return withMain.replace(/<body\b([^>]*)>/i, (tag, attributes) => {
-    if (/\bdata-pagefind-body\b/i.test(attributes)) return tag;
-    return `<body${attributes} data-pagefind-body>`;
+    return mark(tag, attributes, 'body');
   });
 }
 

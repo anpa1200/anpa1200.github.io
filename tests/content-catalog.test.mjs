@@ -19,6 +19,27 @@ test('catalogue uses scalar controlled primary classifications', () => {
     assert.equal(typeof item.primary_domain, 'string', item.id);
     assert.ok(VOCABULARIES.primary_types.includes(item.primary_type), item.id);
     assert.ok(VOCABULARIES.primary_domains.includes(item.primary_domain), item.id);
+    assert.ok(VOCABULARIES.collection_tiers.includes(item.collection_tier), item.id);
+  }
+});
+
+test('every item carries governed provenance independent of build origin', () => {
+  for (const item of catalog.items) {
+    assert.ok(item.source_platform, item.id);
+    assert.doesNotThrow(() => new URL(item.source_repository), item.id);
+    assert.doesNotThrow(() => new URL(item.original_publication), item.id);
+    assert.ok(item.canonical_owner, item.id);
+  }
+  const technique = catalog.items.find((item) => item.canonical_url === 'https://1200km.com/threat-matrix/techniques/T1059.003/');
+  assert.equal(technique?.source_platform, 'MITRE ATT&CK');
+  assert.equal(technique?.collection_tier, 'reference');
+});
+
+test('core, reference, and archive are distinct governed discovery tiers', () => {
+  assert.equal(catalog.items.find((item) => item.canonical_url === 'https://1200km.com/adversarygraph/')?.collection_tier, 'core');
+  assert.equal(catalog.items.find((item) => item.canonical_url === 'https://1200km.com/threat-matrix/techniques/T1059.003/')?.collection_tier, 'reference');
+  for (const item of catalog.items.filter((entry) => ['archived', 'superseded'].includes(entry.status))) {
+    assert.equal(item.collection_tier, 'archive', item.id);
   }
 });
 

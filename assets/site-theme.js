@@ -2,7 +2,7 @@
   const root = document.documentElement;
   const themeColor = document.querySelector('meta[name="theme-color"]');
   const media = window.matchMedia('(prefers-color-scheme: light)');
-  const searchAssetVersion = '20260721-5';
+  const searchAssetVersion = '20260722-1';
 
   function loadSiteSearch() {
     if (!document.getElementById('site-search-styles')) {
@@ -14,7 +14,7 @@
     }
     if (document.querySelector('script[data-site-search-loader], script[src*="/assets/site-search.js"]')) return;
     const script = document.createElement('script');
-    script.src = '/assets/site-search.js?v=20260721-5';
+    script.src = '/assets/site-search.js?v=20260722-1';
     script.defer = true;
     script.dataset.siteSearchLoader = 'true';
     document.head.appendChild(script);

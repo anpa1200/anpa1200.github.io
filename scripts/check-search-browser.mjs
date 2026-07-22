@@ -335,7 +335,7 @@ try {
     searchPage.sessionId,
     `Array.from(document.querySelectorAll('[data-site-search-filters] pagefind-filter-dropdown')).map((item) => item.getAttribute('filter'))`,
   );
-  const expectedFilters = ['primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'version', 'source', 'updated_year', 'topic', 'section'];
+  const expectedFilters = ['primary_type', 'primary_domain', 'audience', 'status', 'evidence_level', 'collection_tier', 'version', 'source', 'updated_year', 'topic', 'section'];
   if (JSON.stringify(searchFilters) !== JSON.stringify(expectedFilters)) {
     failures.push(`expected controlled search facets ${expectedFilters.join(', ')}, found ${searchFilters.join(', ')}`);
   }
