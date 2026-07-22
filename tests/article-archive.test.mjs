@@ -17,7 +17,8 @@ const articleIndexes = [
 
 test('Pages deploys the pinned article source into the canonical /articles route', () => {
   assert.match(workflow, /repository:\s*anpa1200\/medium-blog-navigation/);
-  assert.match(workflow, /ref:\s*[0-9a-f]{40}/);
+  assert.match(workflow, /ARTICLE_ARCHIVE_COMMIT:\s*[0-9a-f]{40}/);
+  assert.match(workflow, /ref:\s*\$\{\{\s*env\.ARTICLE_ARCHIVE_COMMIT\s*\}\}/);
   assert.match(workflow, /npm run validate:archive/);
   assert.match(workflow, /npm run build:embedded/);
   assert.match(workflow, /site\/articles/);
