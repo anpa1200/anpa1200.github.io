@@ -85,9 +85,14 @@ function renderShell() {
             <label class="searchbox" aria-label="Search actors, aliases, techniques, IDs, and descriptions">
               <span aria-hidden="true">⌕</span>
               <input id="global-search" type="search" placeholder="Search T1059, MuddyWater, PowerShell…" autocomplete="off" spellcheck="false" />
+              <button class="searchbox-button" type="button" aria-label="Search this workspace">Search</button>
             </label>
             <span class="pill">browser-only</span>
-            <a class="button" href="/search.html?q=AdversaryGraph">Search 1200km</a>
+            <form class="tm-search-scopes__global" action="/search.html" method="get" role="search">
+              <label for="tm-global-search">Search all 1200km research</label>
+              <input id="tm-global-search" name="q" type="search" value="AdversaryGraph" autocomplete="off" />
+              <button class="button" type="submit">Search all</button>
+            </form>
           </div>
         </header>
         <main class="main" id="workspace" tabindex="-1"></main>
@@ -108,6 +113,24 @@ function renderShell() {
           <a class="button" href="${DOCS_URL}">Read docs</a>
           <a class="button" href="${GITHUB_URL}">Deploy from GitHub</a>
           <button class="button ghost" type="button" data-close-modal>Continue in Light</button>
+        </div>
+      </section>
+    </div>
+    <div class="modal-backdrop" id="workspace-search-modal" role="dialog" aria-modal="true" aria-label="Search this workspace">
+      <section class="modal workspace-search-dialog">
+        <div class="modal-head">
+          <div>
+            <h2>Search this workspace</h2>
+            <p>Search actors, aliases, ATT&amp;CK techniques, IDs, and descriptions in the public light matrix.</p>
+          </div>
+          <button class="close-button" type="button" data-close-workspace-search>Close</button>
+        </div>
+        <div class="modal-body">
+          <label class="searchbox workspace-dialog-search" aria-label="Search this workspace">
+            <span aria-hidden="true">⌕</span>
+            <input id="workspace-dialog-input" type="search" placeholder="T1059, MuddyWater, PowerShell…" autocomplete="off" spellcheck="false" />
+          </label>
+          <p class="small-note">Results update the local matrix only. Use the separate global research search control to search all 1200km content.</p>
         </div>
       </section>
     </div>
@@ -171,8 +194,15 @@ function bindGlobalEvents() {
     }
     const exportButton = event.target.closest('[data-export-layer]');
     if (exportButton) exportNavigatorLayer();
+    const workspaceSearch = event.target.closest('.searchbox-button');
+    if (workspaceSearch) {
+      document.querySelector('#global-search')?.focus();
+      document.querySelector('#workspace')?.scrollIntoView({ block: 'start' });
+    }
     const close = event.target.closest('[data-close-modal]');
     if (close || event.target.id === 'full-modal') closeModal();
+    const closeWorkspace = event.target.closest('[data-close-workspace-search]');
+    if (closeWorkspace || event.target.id === 'workspace-search-modal') closeWorkspaceSearch();
   });
   document.addEventListener('change', async event => {
     if (event.target.id === 'domain-select') {
@@ -193,10 +223,22 @@ function bindGlobalEvents() {
       state.query = event.target.value.trim();
       render();
     }
+    if (event.target.id === 'workspace-dialog-input') {
+      state.query = event.target.value.trim();
+      const headerInput = document.querySelector('#global-search');
+      if (headerInput) headerInput.value = event.target.value;
+      render();
+    }
   });
   document.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      openWorkspaceSearch();
+      return;
+    }
     if (event.key === 'Escape') {
       closeModal();
+      closeWorkspaceSearch();
       closeSidebar();
     }
   });
@@ -455,6 +497,21 @@ function openFullVersionModal(module) {
 
 function closeModal() {
   document.querySelector('#full-modal')?.classList.remove('is-open');
+}
+
+function openWorkspaceSearch() {
+  const modal = document.querySelector('#workspace-search-modal');
+  const input = document.querySelector('#workspace-dialog-input');
+  const headerInput = document.querySelector('#global-search');
+  if (!modal || !input) return;
+  input.value = headerInput?.value || state.query || '';
+  modal.classList.add('is-open');
+  input.focus();
+  input.select();
+}
+
+function closeWorkspaceSearch() {
+  document.querySelector('#workspace-search-modal')?.classList.remove('is-open');
 }
 
 function closeSidebar() {

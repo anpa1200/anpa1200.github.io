@@ -198,7 +198,11 @@ const browser = spawn(chrome, [
   '--headless=new',
   '--no-sandbox',
   '--disable-gpu',
+  '--disable-dev-shm-usage',
+  '--disable-software-rasterizer',
   '--disable-background-networking',
+  '--no-first-run',
+  '--no-default-browser-check',
   '--remote-debugging-port=0',
   `--user-data-dir=${profile}`,
   'about:blank',
@@ -206,7 +210,7 @@ const browser = spawn(chrome, [
 
 let browserLogs = '';
 const websocketUrl = await new Promise((resolvePromise, reject) => {
-  const timeout = setTimeout(() => reject(new Error(`Chrome did not expose DevTools. ${browserLogs.slice(-2000)}`)), 15_000);
+  const timeout = setTimeout(() => reject(new Error(`Chrome did not expose DevTools. ${browserLogs.slice(-2000)}`)), 45_000);
   browser.stderr.setEncoding('utf8');
   browser.stderr.on('data', (chunk) => {
     browserLogs = `${browserLogs}${chunk}`.slice(-12_000);
