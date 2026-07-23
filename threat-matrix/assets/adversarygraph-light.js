@@ -290,10 +290,10 @@ function renderDiscover() {
           <div class="metric"><strong>${data.version}</strong><span>${escapeHtml(data.domain)} data version</span></div>
         </div>
       </div>
-      <aside class="notice">
+      <div class="notice">
         <strong>Light-version boundary</strong>
         <p>This page does not run AI analysis, query telemetry, sync private feeds, store investigations, execute malware, simulate attacks, or forward SIEM events. Those operations require the self-hosted AdversaryGraph deployment.</p>
-      </aside>
+      </div>
     </section>
     <section class="grid">
       <div class="panel card span-7">
@@ -568,7 +568,7 @@ function toast(message) {
 }
 
 function domainPicker() {
-  return `<label><span class="hidden">Domain</span><select class="select" id="domain-select">
+  return `<label><span class="hidden">Domain</span><select class="select" id="domain-select" aria-label="ATT&CK domain">
     <option value="mitre-data.json" ${state.domainFile === 'mitre-data.json' ? 'selected' : ''}>Enterprise</option>
     <option value="mitre-data-mobile.json" ${state.domainFile === 'mitre-data-mobile.json' ? 'selected' : ''}>Mobile</option>
     <option value="mitre-data-ics.json" ${state.domainFile === 'mitre-data-ics.json' ? 'selected' : ''}>ICS</option>
