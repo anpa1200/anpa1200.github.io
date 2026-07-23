@@ -1,7 +1,7 @@
 const FULL_VERSION_URL = 'https://1200km.com/adversarygraph/';
 const DOCS_URL = 'https://1200km.com/adversarygraph-docs/';
 const GITHUB_URL = 'https://github.com/anpa1200/adversarygraph';
-const FEATURE_GUIDES_URL = `${DOCS_URL}full-version-feature-guides/`;
+const FEATURE_GUIDES_URL = `${FULL_VERSION_URL}full-version-feature-guides.html`;
 
 const modules = [
   { group: 'Public workspace', id: 'discover', icon: '◆', name: 'Discover', meta: 'public intelligence overview', live: true },
@@ -10,28 +10,28 @@ const modules = [
   { group: 'Public workspace', id: 'compare', icon: '⇄', name: 'Compare', meta: 'group overlap analysis', live: true },
   { group: 'Public workspace', id: 'coverage', icon: '◫', name: 'Coverage Leads', meta: 'static detection gaps', live: true },
   { group: 'Public workspace', id: 'export', icon: '⇩', name: 'Layer Export', meta: 'Navigator JSON export', live: true },
-  { group: 'Analysis', id: 'analyze', icon: '✦', name: 'AI Analyze', meta: 'reports, logs, PDFs', docsPath: 'full-version-feature-guides/#analyze' },
-  { group: 'Analysis', id: 'reports-research', icon: '▤', name: 'Reports Research', meta: 'stored report sessions', docsPath: 'full-version-feature-guides/#reports-research' },
-  { group: 'Analysis', id: 'evidence-graph', icon: '⟠', name: 'Evidence Graph', meta: 'persistent evidence links', docsPath: 'full-version-feature-guides/#evidence-graph' },
-  { group: 'Operations', id: 'operations', icon: '☷', name: 'Operations', meta: 'cases and tasks', docsPath: 'full-version-feature-guides/#operations' },
-  { group: 'Operations', id: 'pipeline', icon: '↯', name: 'Pipeline', meta: 'workflow automation', docsPath: 'full-version-feature-guides/#pipeline' },
-  { group: 'Operations', id: 'observability', icon: '◌', name: 'Observability', meta: 'self-test and audit', docsPath: 'full-version-feature-guides/#observability' },
-  { group: 'Threat programs', id: 'threat-radar', icon: '◉', name: 'Threat Radar', meta: 'business relevance monitor', docsPath: 'full-version-feature-guides/#threat-radar' },
-  { group: 'Threat programs', id: 'asset-surface', icon: '▧', name: 'Asset Surface', meta: 'asset/CVE/IOC matching', docsPath: 'full-version-feature-guides/#asset-surface' },
-  { group: 'Threat programs', id: 'threat-hunting', icon: '⌕', name: 'Threat Hunting', meta: 'AI-assisted hunts', docsPath: 'full-version-feature-guides/#threat-hunting' },
-  { group: 'Threat programs', id: 'query-library', icon: '⌘', name: 'Query Library', meta: 'Sigma, SPL, KQL, YARA-L', docsPath: 'full-version-feature-guides/#query-library' },
-  { group: 'Intelligence feeds', id: 'ioc-library', icon: '●', name: 'IOC Library', meta: 'static URLhaus demo store', live: true, docsPath: 'full-version-feature-guides/#ioc-library' },
-  { group: 'Intelligence feeds', id: 'ioc-investigation', icon: '◍', name: 'IOC Investigation', meta: 'VT, OTX, urlscan, Shodan', docsPath: 'full-version-feature-guides/#ioc-investigation' },
-  { group: 'Intelligence feeds', id: 'cve', icon: '◇', name: 'CVE Intelligence', meta: 'static CISA KEV demo', live: true, docsPath: 'full-version-feature-guides/#cve' },
-  { group: 'Intelligence feeds', id: 'feeds', icon: '↻', name: 'Feeds Management', meta: 'keys and source sync', docsPath: 'full-version-feature-guides/#feeds' },
-  { group: 'Validation lab', id: 'attack-simulation', icon: '▶', name: 'Attack Simulation', meta: 'rule validation traffic', docsPath: 'full-version-feature-guides/#attack-simulation' },
-  { group: 'Validation lab', id: 'retrohunt', icon: '↺', name: 'RetroHunt', meta: 'historical validation jobs', docsPath: 'full-version-feature-guides/#retrohunt' },
-  { group: 'MalwareGraph', id: 'malware-analysis', icon: '☣', name: 'Malware Analysis', meta: 'static/dynamic workbench', docsPath: 'full-version-feature-guides/#malware-analysis' },
-  { group: 'MalwareGraph', id: 'malware-unpacker', icon: '▣', name: 'Malware Unpacker', meta: 'packing and strings', docsPath: 'full-version-feature-guides/#malware-unpacker' },
-  { group: 'MalwareGraph', id: 'dynamic-analysis', icon: '▸', name: 'Dynamic Analysis', meta: 'sandbox-backed execution', docsPath: 'full-version-feature-guides/#dynamic-analysis' },
-  { group: 'Admin', id: 'knowledge', icon: '▥', name: 'Knowledge Library', meta: 'public source map and RAG guide', live: true, docsPath: 'full-version-feature-guides/#knowledge' },
-  { group: 'Admin', id: 'statistics', icon: '▰', name: 'Statistics', meta: 'database analytics', docsPath: 'full-version-feature-guides/#statistics' },
-  { group: 'Admin', id: 'troubleshooting', icon: '?', name: 'Troubleshooting', meta: 'operator diagnostics', docsPath: 'full-version-feature-guides/#troubleshooting' },
+  { group: 'Analysis', id: 'analyze', icon: '✦', name: 'AI Analyze', meta: 'reports, logs, PDFs', docsPath: '#analyze' },
+  { group: 'Analysis', id: 'reports-research', icon: '▤', name: 'Reports Research', meta: 'stored report sessions', docsPath: '#reports-research' },
+  { group: 'Analysis', id: 'evidence-graph', icon: '⟠', name: 'Evidence Graph', meta: 'persistent evidence links', docsPath: '#evidence-graph' },
+  { group: 'Operations', id: 'operations', icon: '☷', name: 'Operations', meta: 'cases and tasks', docsPath: '#operations' },
+  { group: 'Operations', id: 'pipeline', icon: '↯', name: 'Pipeline', meta: 'workflow automation', docsPath: '#pipeline' },
+  { group: 'Operations', id: 'observability', icon: '◌', name: 'Observability', meta: 'self-test and audit', docsPath: '#observability' },
+  { group: 'Threat programs', id: 'threat-radar', icon: '◉', name: 'Threat Radar', meta: 'business relevance monitor', docsPath: '#threat-radar' },
+  { group: 'Threat programs', id: 'asset-surface', icon: '▧', name: 'Asset Surface', meta: 'asset/CVE/IOC matching', docsPath: '#asset-surface' },
+  { group: 'Threat programs', id: 'threat-hunting', icon: '⌕', name: 'Threat Hunting', meta: 'AI-assisted hunts', docsPath: '#threat-hunting' },
+  { group: 'Threat programs', id: 'query-library', icon: '⌘', name: 'Query Library', meta: 'Sigma, SPL, KQL, YARA-L', docsPath: '#query-library' },
+  { group: 'Intelligence feeds', id: 'ioc-library', icon: '●', name: 'IOC Library', meta: 'static URLhaus demo store', live: true, docsPath: '#ioc-library' },
+  { group: 'Intelligence feeds', id: 'ioc-investigation', icon: '◍', name: 'IOC Investigation', meta: 'VT, OTX, urlscan, Shodan', docsPath: '#ioc-investigation' },
+  { group: 'Intelligence feeds', id: 'cve', icon: '◇', name: 'CVE Intelligence', meta: 'static CISA KEV demo', live: true, docsPath: '#cve' },
+  { group: 'Intelligence feeds', id: 'feeds', icon: '↻', name: 'Feeds Management', meta: 'keys and source sync', docsPath: '#feeds' },
+  { group: 'Validation lab', id: 'attack-simulation', icon: '▶', name: 'Attack Simulation', meta: 'rule validation traffic', docsPath: '#attack-simulation' },
+  { group: 'Validation lab', id: 'retrohunt', icon: '↺', name: 'RetroHunt', meta: 'historical validation jobs', docsPath: '#retrohunt' },
+  { group: 'MalwareGraph', id: 'malware-analysis', icon: '☣', name: 'Malware Analysis', meta: 'static/dynamic workbench', docsPath: '#malware-analysis' },
+  { group: 'MalwareGraph', id: 'malware-unpacker', icon: '▣', name: 'Malware Unpacker', meta: 'packing and strings', docsPath: '#malware-unpacker' },
+  { group: 'MalwareGraph', id: 'dynamic-analysis', icon: '▸', name: 'Dynamic Analysis', meta: 'sandbox-backed execution', docsPath: '#dynamic-analysis' },
+  { group: 'Admin', id: 'knowledge', icon: '▥', name: 'Knowledge Library', meta: 'public source map and RAG guide', live: true, docsPath: '#knowledge' },
+  { group: 'Admin', id: 'statistics', icon: '▰', name: 'Statistics', meta: 'database analytics', docsPath: '#statistics' },
+  { group: 'Admin', id: 'troubleshooting', icon: '?', name: 'Troubleshooting', meta: 'operator diagnostics', docsPath: '#troubleshooting' },
 ];
 
 const state = {
@@ -448,7 +448,7 @@ function renderIocLibrary() {
             <h2>IOC Library demo</h2>
             <p>Read-only static IOC library for the public demo. Full AdversaryGraph adds feed scheduling, deduplication, enrichment, scoring, investigation history, and export.</p>
           </div>
-          <a class="button" href="${DOCS_URL}full-version-feature-guides/#ioc-library">Full guide</a>
+          <a class="button" href="${FEATURE_GUIDES_URL}#ioc-library">Full guide</a>
         </div>
         <div class="metrics">
           <div class="metric"><strong>${state.iocLibrary.items.length.toLocaleString('en-US')}</strong><span>URLhaus recent indicators bundled</span></div>
@@ -475,7 +475,7 @@ function renderCveLibrary() {
             <h2>CVE Intelligence demo</h2>
             <p>Read-only CISA KEV demo set. Full AdversaryGraph adds asset matching, CVSS/EPSS enrichment, references, remediation tracking, and report handoff.</p>
           </div>
-          <a class="button" href="${DOCS_URL}full-version-feature-guides/#cve">Full guide</a>
+          <a class="button" href="${FEATURE_GUIDES_URL}#cve">Full guide</a>
         </div>
         <div class="metrics">
           <div class="metric"><strong>${state.cveLibrary.items.length.toLocaleString('en-US')}</strong><span>known-exploited CVEs bundled</span></div>
@@ -497,7 +497,7 @@ function renderKnowledgeLibrary() {
       <div class="panel card span-7">
         <div class="card-head">
           <div><h2>Knowledge Library</h2><p>Public source map for the AdversaryGraph RAG corpus and analyst context sources.</p></div>
-          <a class="button" href="${DOCS_URL}full-version-feature-guides/#knowledge">Full guide</a>
+          <a class="button" href="${FEATURE_GUIDES_URL}#knowledge">Full guide</a>
         </div>
         <p>The public light page links to source material only. Full AdversaryGraph indexes reports, ATT&amp;CK, IOCs, CVEs, hunts, evidence, assets, and operator notes into a controlled local knowledge library for RAG-assisted analysis.</p>
         <div class="source-grid">
@@ -510,7 +510,7 @@ function renderKnowledgeLibrary() {
       <div class="notice span-5">
         <strong>Full-version boundary</strong>
         <p>Vector search, RAG answers, private uploads, and provider-backed AI assistance require the self-hosted AdversaryGraph deployment. This browser page does not upload documents or run retrieval.</p>
-        <div class="button-row"><button class="button primary" type="button" data-module="analyze">Open AI Analyze</button><a class="button" href="${DOCS_URL}unified-rag-mcp/">RAG/MCP guide</a></div>
+        <div class="button-row"><button class="button primary" type="button" data-module="analyze">Open AI Analyze</button><a class="button" href="${FEATURE_GUIDES_URL}#knowledge">RAG/MCP guide</a></div>
       </div>
     </section>
   `;
@@ -578,13 +578,13 @@ function moduleCard(module) {
     <span class="pill">${module.icon} full version</span>
     <strong>${escapeHtml(module.name)}</strong>
     <p>${escapeHtml(module.meta)}. Requires self-hosted backend services and operator-controlled data.</p>
-    <span class="module-card-link">Guide: ${escapeHtml(module.docsPath ? `${DOCS_URL}${module.docsPath}` : FEATURE_GUIDES_URL)}</span>
+    <span class="module-card-link">Guide: ${escapeHtml(module.docsPath ? `${FEATURE_GUIDES_URL}${module.docsPath}` : FEATURE_GUIDES_URL)}</span>
   </button>`;
 }
 
 function openFullVersionModal(module) {
   const modal = document.querySelector('#full-modal');
-  const docsHref = module.docsPath ? `${DOCS_URL}${module.docsPath}` : FEATURE_GUIDES_URL;
+  const docsHref = module.docsPath ? `${FEATURE_GUIDES_URL}${module.docsPath}` : FEATURE_GUIDES_URL;
   document.querySelector('#full-modal-title').textContent = `${module.name} is available in full AdversaryGraph`;
   document.querySelector('#full-modal-subtitle').textContent = module.meta;
   document.querySelector('#full-modal-body').innerHTML = `
