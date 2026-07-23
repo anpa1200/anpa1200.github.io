@@ -125,6 +125,7 @@ test('broad-discovery weights prioritize tier, then evidence, without hiding arc
 test('post-ranking governance applies only to broad discovery phrases', () => {
   assert.equal(shouldApplyDiscoveryGovernance('threat intelligence'), true);
   assert.equal(shouldApplyDiscoveryGovernance('Operation Desert Hydra'), true);
+  assert.equal(shouldApplyDiscoveryGovernance('AdversaryGraph'), true);
   assert.equal(shouldApplyDiscoveryGovernance('T1059.003'), false);
   assert.equal(shouldApplyDiscoveryGovernance('MuddyWater'), false);
   assert.equal(shouldApplyDiscoveryGovernance('Historical AdversaryGraph v4 Capability Map'), false);

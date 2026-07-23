@@ -38,7 +38,9 @@
 
   function shouldGovernDiscovery(term) {
     if (term === null || term === undefined || !String(term).trim()) return true;
-    const tokens = String(term).trim().split(/\s+/).filter(Boolean);
+    const normalized = String(term).trim().toLowerCase();
+    if (normalized === 'adversarygraph') return true;
+    const tokens = normalized.split(/\s+/).filter(Boolean);
     return tokens.length === 2 || tokens.length === 3;
   }
 

@@ -21,10 +21,13 @@ export function governanceBoost(item) {
 
 export function shouldApplyDiscoveryGovernance(term) {
   if (term === null || term === undefined || !String(term).trim()) return true;
-  const tokens = String(term).trim().split(/\s+/).filter(Boolean);
+  const normalized = String(term).trim().toLowerCase();
+  if (normalized === 'adversarygraph') return true;
+  const tokens = normalized.split(/\s+/).filter(Boolean);
   // Preserve Pagefind's exact identifier/alias order for one-token searches,
   // and exact/full-title behavior for long, specific searches. Governance is
-  // intended for broad discovery phrases, not lookup queries.
+  // intended for broad discovery phrases and exact flagship product discovery,
+  // not general one-token lookup queries.
   return tokens.length === 2 || tokens.length === 3;
 }
 
