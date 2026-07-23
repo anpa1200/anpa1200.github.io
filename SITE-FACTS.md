@@ -22,9 +22,10 @@ articles must not be used to establish a current version or metric.
 ## Product terminology
 
 - **AdversaryGraph** is the flagship self-hosted CTI-to-detection platform.
-- **Threat Matrix** is the approved name of the public, read-only browser
-  ATT&CK workspace at `/threat-matrix/`. It is associated with AdversaryGraph,
-  but it is not the complete self-hosted platform.
+- **Threat Matrix** is the approved name of the public AdversaryGraph Light
+  web workspace at `/threat-matrix/`. It provides browser-only ATT&CK
+  exploration and product-shaped module gates for full self-hosted
+  AdversaryGraph capabilities; it is not the complete self-hosted platform.
 - **AdversaryGraph Web** is a superseded alias for Threat Matrix. Redirect and
   historical references may preserve it only when the context is explicit.
 - **ThreatMapper** is a superseded historical product name. Compatibility URLs
