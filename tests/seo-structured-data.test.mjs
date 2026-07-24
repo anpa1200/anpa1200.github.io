@@ -6,8 +6,11 @@ import {
   SOFTWARE_ID,
   WEBSITE_ID,
   connectedGraphFromHtml,
+  addImageDimensions,
+  addLcpPreload,
   normalizeDocusaurusBrandLogoAlts,
   normalizeMetaDescriptions,
+  normalizeSocialImages,
   normalizeSeoTitle,
   transformReleaseHtml,
 } from '../scripts/release-html-lib.mjs';
@@ -47,6 +50,20 @@ test('homepage emits a WebPage connected to the stable AdversaryGraph entity', (
   assert.equal(website.name, '1200km Security Research');
   assert.equal(Object.hasOwn(website, 'potentialAction'), false);
   assert.equal(/<meta\b[^>]*name=["']keywords["']/i.test(output), false);
+});
+
+test('release images reserve space, lazy-load non-LCP media, and preload explicit LCP media', () => {
+  const fixtureRoot = new URL('..', import.meta.url).pathname;
+  const regular = addImageDimensions(
+    '<main><img src="/assets/ap-logo.png" alt="Evidence image"></main>',
+    { htmlPath: `${fixtureRoot}index.html`, siteRoot: fixtureRoot },
+  );
+  assert.match(regular, /width="\d+"/);
+  assert.match(regular, /height="\d+"/);
+  assert.match(regular, /loading="lazy"/);
+  assert.match(regular, /decoding="async"/);
+  const highPriority = '<html><head></head><body><img src="/hero.webp" alt="Research overview" fetchpriority="high" loading="eager"></body></html>';
+  assert.match(addLcpPreload(highPriority), /rel="preload" as="image" href="\/hero\.webp" fetchpriority="high"/);
 });
 
 test('an archive article receives connected article semantics and deterministic dates', () => {
@@ -101,6 +118,15 @@ test('metadata descriptions are unique-page prose rather than generic level labe
   const output = normalizeMetaDescriptions(input);
   assert.match(output, /content="IOC Enrichment\. Practical security guidance/);
   assert.doesNotMatch(output, /content="Level: Intermediate"/);
+});
+
+test('pages without a bespoke share image receive the governed social fallback', () => {
+  const input = '<html><head><title>Research Note | 1200km</title></head><body><main><h1>Research Note</h1></main></body></html>';
+  const output = normalizeSocialImages(input);
+  assert.match(output, /property="og:image" content="https:\/\/1200km\.com\/assets\/site-og-v2\.png"/);
+  assert.match(output, /name="twitter:image" content="https:\/\/1200km\.com\/assets\/site-og-v2\.png"/);
+  assert.match(output, /property="og:image:width" content="1200"/);
+  assert.match(output, /property="og:image:alt"/);
 });
 
 test('only a real Question and acceptedAnswer collection remains FAQPage', () => {

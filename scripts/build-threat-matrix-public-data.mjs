@@ -78,21 +78,6 @@ function transformAttackBundle(bundle, metadata) {
     if (child && parent) subtechniqueParents.set(child, parent);
   }
 
-  const mitigationsByTechnique = new Map();
-  for (const relationship of objects.filter((object) => object.type === 'relationship' && object.relationship_type === 'mitigates')) {
-    const mitigation = byStixId.get(relationship.source_ref);
-    const techniqueId = externalIdByStixId.get(relationship.target_ref);
-    if (!mitigation || !techniqueId) continue;
-    const mitigationItem = {
-      id: externalId(mitigation),
-      name: mitigation.name || 'Unnamed mitigation',
-      description: mitigation.description || '',
-    };
-    if (!mitigationItem.id) continue;
-    if (!mitigationsByTechnique.has(techniqueId)) mitigationsByTechnique.set(techniqueId, []);
-    mitigationsByTechnique.get(techniqueId).push(mitigationItem);
-  }
-
   const techniqueIdsByGroup = new Map();
   for (const relationship of objects.filter((object) => object.type === 'relationship' && object.relationship_type === 'uses')) {
     const source = byStixId.get(relationship.source_ref);
@@ -129,8 +114,7 @@ function transformAttackBundle(bundle, metadata) {
         tactic_ids: tacticIds,
         is_sub: Boolean(object.x_mitre_is_subtechnique || subtechniqueParents.has(id)),
         parent_id: subtechniqueParents.get(id) || null,
-        mitigations: dedupeById(mitigationsByTechnique.get(id) || []),
-        references: referencesFor(object).slice(0, 3),
+        references: primaryReferenceFor(object),
       };
     })
     .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
@@ -144,7 +128,7 @@ function transformAttackBundle(bundle, metadata) {
         name: object.name || id,
         aliases: [...new Set([...(object.aliases || []), ...(object.x_mitre_aliases || [])].filter(Boolean))].sort(),
         description: compactText(object.description, 1700),
-        references: referencesFor(object).slice(0, 5),
+        references: primaryReferenceFor(object),
         technique_ids: [...(techniqueIdsByGroup.get(id) || new Set())].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
       };
     })
@@ -256,9 +240,11 @@ function referencesFor(object) {
     .slice(0, 20);
 }
 
-function dedupeById(items) {
-  return [...new Map(items.filter((item) => item.id).map((item) => [item.id, item])).values()]
-    .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+function primaryReferenceFor(object) {
+  const references = referencesFor(object);
+  const preferred = references.find((reference) =>
+    reference.source === 'mitre-attack' || /attack\.mitre\.org/i.test(reference.url));
+  return [preferred || references[0]].filter(Boolean);
 }
 
 function normalizeUrlhausDate(value) {

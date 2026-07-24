@@ -331,6 +331,12 @@ for (const page of pages) {
       failures.push(`${page.rel}: meta description exceeds 160 characters (${description.length})`);
     }
   }
+  for (const key of ['og:image', 'twitter:image']) {
+    const imageUrl = findMetaContent(releaseHtml, key);
+    if (!/^https:\/\/1200km\.com\/\S+/i.test(imageUrl)) failures.push(`${page.rel}: ${key} is missing or is not an absolute canonical-host URL`);
+  }
+  if (!findMetaContent(releaseHtml, 'og:image:alt')) failures.push(`${page.rel}: og:image:alt is missing`);
+  if (!findMetaContent(releaseHtml, 'twitter:image:alt')) failures.push(`${page.rel}: twitter:image:alt is missing`);
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(releaseHtml);
   if (/<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: release HTML still blocks on an external web font`);
   if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: analytics was not deferred to user interaction`);

@@ -142,6 +142,23 @@ export function normalizeMetaDescriptions(html) {
   return transformed;
 }
 
+export function normalizeSocialImages(html) {
+  const fallback = factValue('site.default_social_image');
+  const image = metaContent(html, 'og:image') || fallback.url;
+  const title = pageTitle(html);
+  const usingFallback = image === fallback.url;
+  let transformed = html;
+  transformed = upsertMeta(transformed, 'property', 'og:image', image);
+  transformed = upsertMeta(transformed, 'name', 'twitter:image', metaContent(transformed, 'twitter:image') || image);
+  transformed = upsertMeta(transformed, 'property', 'og:image:alt', metaContent(transformed, 'og:image:alt') || (usingFallback ? fallback.alt : title));
+  transformed = upsertMeta(transformed, 'name', 'twitter:image:alt', metaContent(transformed, 'twitter:image:alt') || (usingFallback ? fallback.alt : title));
+  if (usingFallback) {
+    transformed = upsertMeta(transformed, 'property', 'og:image:width', String(fallback.width));
+    transformed = upsertMeta(transformed, 'property', 'og:image:height', String(fallback.height));
+  }
+  return transformed;
+}
+
 function escapeHtml(value = '') {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -614,17 +631,34 @@ function localImagePath(src, htmlPath, siteRoot) {
 export function addImageDimensions(html, { htmlPath, siteRoot }) {
   return html.replace(/<img\b[^>]*>/gi, (tag) => {
     const attributes = tagAttributes(tag);
-    if (!attributes.src || (attributes.width && attributes.height)) return tag;
+    if (!attributes.src) return tag;
     const path = localImagePath(attributes.src, htmlPath, siteRoot);
-    if (!path) return tag;
-    const dimensions = imageDimensions(readFileSync(path), extname(path));
-    if (!dimensions?.width || !dimensions?.height) return tag;
+    let dimensions = null;
+    if (path && (!attributes.width || !attributes.height)) {
+      dimensions = imageDimensions(readFileSync(path), extname(path));
+    }
+    const highPriority = attributes.fetchpriority === 'high'
+      || attributes.loading === 'eager'
+      || /\b(?:hero|cover|lcp)\b/i.test(`${attributes.class || ''} ${attributes.src}`);
     const additions = [
-      attributes.width ? '' : ` width="${dimensions.width}"`,
-      attributes.height ? '' : ` height="${dimensions.height}"`,
+      attributes.width || !dimensions?.width ? '' : ` width="${dimensions.width}"`,
+      attributes.height || !dimensions?.height ? '' : ` height="${dimensions.height}"`,
+      attributes.loading ? '' : ` loading="${highPriority ? 'eager' : 'lazy'}"`,
+      attributes.decoding ? '' : ' decoding="async"',
     ].join('');
     return tag.replace(/\s*\/?\s*>$/, (ending) => `${additions}${ending}`);
   });
+}
+
+export function addLcpPreload(html) {
+  if (/rel=["']preload["'][^>]+as=["']image["']/i.test(html)) return html;
+  const match = [...html.matchAll(/<img\b[^>]*>/gi)].find((candidate) =>
+    tagAttributes(candidate[0]).fetchpriority === 'high');
+  if (!match) return html;
+  const attributes = tagAttributes(match[0]);
+  if (!attributes.src || /^(?:data:|blob:)/i.test(attributes.src)) return html;
+  const preload = `    <link rel="preload" as="image" href="${escapeAttribute(attributes.src)}" fetchpriority="high" />\n`;
+  return html.replace(/<\/head>/i, () => `${preload}</head>`);
 }
 
 export function addRssDiscovery(html) {
@@ -767,6 +801,7 @@ export function transformReleaseHtml(html, options) {
   transformed = removeMetaKeywords(transformed);
   transformed = normalizeDocumentTitles(transformed);
   transformed = normalizeMetaDescriptions(transformed);
+  transformed = normalizeSocialImages(transformed);
   // Keep release-owned browser enhancements on the same origin. Checked-in
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
@@ -786,6 +821,7 @@ export function transformReleaseHtml(html, options) {
     transformed = addHeadingIds(transformed);
     transformed = markPagefindContent(transformed);
     transformed = addImageDimensions(transformed, options);
+    transformed = addLcpPreload(transformed);
     transformed = addArticleDiscovery(transformed, options);
   }
   transformed = addRssDiscovery(transformed);
