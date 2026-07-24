@@ -276,6 +276,96 @@ function layoutExpression(checkFixture) {
   })()`;
 }
 
+function threatMatrixInteractionExpression() {
+  return `(async () => {
+    const pause = (milliseconds) => new Promise((resolvePromise) => setTimeout(resolvePromise, milliseconds));
+    const round = (value) => Math.round(value * 10) / 10;
+    const containedHorizontally = (element) => {
+      if (!element) return false;
+      const rect = element.getBoundingClientRect();
+      return rect.left >= -1 && rect.right <= window.innerWidth + 1;
+    };
+    const heroHeading = document.querySelector('.hero h1');
+    const heroHeadingContained = !heroHeading || heroHeading.scrollWidth <= heroHeading.clientWidth + 1;
+
+    document.querySelector('[data-module="navigator"]')?.click();
+    await pause(100);
+
+    let viewport = document.querySelector('.matrix-viewport');
+    let track = document.querySelector('.matrix-track');
+    const tacticCount = document.querySelectorAll('.tactic-column').length;
+    const collapsedByDefault = document.querySelectorAll('.subtechnique-list').length === 0;
+    const matrixInitial = {
+      clientWidth: viewport?.clientWidth || 0,
+      clientHeight: viewport?.clientHeight || 0,
+      scrollWidth: viewport?.scrollWidth || 0,
+      scrollHeight: viewport?.scrollHeight || 0,
+      trackWidth: track ? round(track.getBoundingClientRect().width) : 0,
+      contained: containedHorizontally(viewport),
+    };
+
+    document.querySelector('.subtechnique-toggle')?.click();
+    await pause(100);
+    const expandedChildren = document.querySelectorAll('.subtechnique-list .technique-sub').length;
+
+    viewport = document.querySelector('.matrix-viewport');
+    if (viewport) {
+      viewport.scrollLeft = Math.min(120, Math.max(0, viewport.scrollWidth - viewport.clientWidth));
+      viewport.dispatchEvent(new Event('scroll'));
+    }
+    const firstTechnique = document.querySelector('.matrix-viewport .technique');
+    firstTechnique?.click();
+    await pause(100);
+
+    viewport = document.querySelector('.matrix-viewport');
+    const detail = document.querySelector('.navigator-detail');
+    const detailState = {
+      present: Boolean(detail),
+      contained: containedHorizontally(detail),
+      scrollLeft: viewport?.scrollLeft || 0,
+      scrollWidth: viewport?.scrollWidth || 0,
+      clientWidth: viewport?.clientWidth || 0,
+      scrollPreserved: !viewport || viewport.scrollWidth <= viewport.clientWidth || viewport.scrollLeft > 0,
+    };
+
+    const scaleBefore = Number.parseFloat(getComputedStyle(document.querySelector('.matrix-track')).getPropertyValue('--matrix-scale'));
+    document.querySelector('[data-matrix-action="zoom-out"]')?.click();
+    await pause(40);
+    const scaleAfter = Number.parseFloat(getComputedStyle(document.querySelector('.matrix-track')).getPropertyValue('--matrix-scale'));
+    document.querySelector('[data-matrix-action="fit"]')?.click();
+    await pause(80);
+    const fitScale = Number.parseFloat(getComputedStyle(document.querySelector('.matrix-track')).getPropertyValue('--matrix-scale'));
+
+    document.querySelector('[data-module="apt"]')?.click();
+    await pause(100);
+    const aptPanel = document.querySelector('.split-list-panel');
+    const aptList = document.querySelector('.apt-group-list');
+    const aptPanelRect = aptPanel?.getBoundingClientRect();
+    const aptListRect = aptList?.getBoundingClientRect();
+    const aptState = {
+      panelContained: containedHorizontally(aptPanel),
+      detailContained: containedHorizontally(document.querySelector('.split-detail-panel')),
+      listHeight: aptList?.clientHeight || 0,
+      listUsesPanel: aptPanelRect && aptListRect ? aptPanelRect.bottom - aptListRect.bottom < 28 : false,
+    };
+
+    return {
+      heroHeadingContained,
+      tacticCount,
+      collapsedByDefault,
+      expandedChildren,
+      matrixInitial,
+      detailState,
+      scaleBefore,
+      scaleAfter,
+      zoomChanged: Number.isFinite(scaleBefore) && Number.isFinite(scaleAfter) && scaleAfter < scaleBefore,
+      fitScale,
+      aptState,
+      horizontalOverflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > window.innerWidth + 1,
+    };
+  })()`;
+}
+
 await mkdir(screenshotRoot, { recursive: true });
 await new Promise((resolvePromise, reject) => {
   server.once('error', reject);
@@ -374,6 +464,46 @@ try {
         }
       }
 
+      if (name === 'threat-matrix' && ['390', '768', 'desktop', 'wide-desktop'].includes(viewport.label)) {
+        const workspaceState = await evaluate(devtools, sessionId, threatMatrixInteractionExpression());
+        results.push({ page: 'threat-matrix-interactions', viewport: viewport.label, ...workspaceState });
+        const minimumMatrixHeight = viewport.label === '390' ? 300 : 360;
+        if (workspaceState.tacticCount < 6) {
+          failures.push(`threat-matrix@${viewport.label}: Navigator rendered only ${workspaceState.tacticCount} tactic columns`);
+        }
+        if (!workspaceState.heroHeadingContained) {
+          failures.push(`threat-matrix@${viewport.label}: Discover heading overflows its content column`);
+        }
+        if (!workspaceState.collapsedByDefault || workspaceState.expandedChildren < 1) {
+          failures.push(`threat-matrix@${viewport.label}: sub-technique collapse/expand failed ${JSON.stringify(workspaceState)}`);
+        }
+        if (
+          workspaceState.matrixInitial.clientWidth < 240
+          || workspaceState.matrixInitial.clientHeight < minimumMatrixHeight
+          || workspaceState.matrixInitial.scrollWidth <= workspaceState.matrixInitial.clientWidth
+          || !workspaceState.matrixInitial.contained
+        ) {
+          failures.push(`threat-matrix@${viewport.label}: matrix viewport is not usable ${JSON.stringify(workspaceState.matrixInitial)}`);
+        }
+        if (!workspaceState.detailState.present || !workspaceState.detailState.contained || !workspaceState.detailState.scrollPreserved) {
+          failures.push(`threat-matrix@${viewport.label}: technique detail interaction failed ${JSON.stringify(workspaceState.detailState)}`);
+        }
+        if (!workspaceState.zoomChanged || !Number.isFinite(workspaceState.fitScale)) {
+          failures.push(`threat-matrix@${viewport.label}: zoom/fit controls failed ${JSON.stringify(workspaceState)}`);
+        }
+        if (
+          !workspaceState.aptState.panelContained
+          || !workspaceState.aptState.detailContained
+          || workspaceState.aptState.listHeight < 220
+          || !workspaceState.aptState.listUsesPanel
+        ) {
+          failures.push(`threat-matrix@${viewport.label}: APT split workspace is not fitted ${JSON.stringify(workspaceState.aptState)}`);
+        }
+        if (workspaceState.horizontalOverflow) {
+          failures.push(`threat-matrix@${viewport.label}: interactive views create page-level horizontal overflow`);
+        }
+      }
+
       const captureRegressionScreenshot = viewport.screenshot && (
         viewport.label === '390'
         || ['home', 'docs-long'].includes(name)
@@ -400,6 +530,31 @@ try {
             Buffer.from(navigationScreenshot.data, 'base64'),
           );
         }
+      }
+
+      if (name === 'threat-matrix' && ['390', 'wide-desktop'].includes(viewport.label)) {
+        if (viewport.label === 'wide-desktop') {
+          const aptScreenshot = await devtools.send('Page.captureScreenshot', {
+            format: 'png',
+            captureBeyondViewport: false,
+            fromSurface: true,
+          }, sessionId);
+          await writeFile(
+            join(screenshotRoot, 'threat-matrix-apt-wide-desktop.png'),
+            Buffer.from(aptScreenshot.data, 'base64'),
+          );
+        }
+        await evaluate(devtools, sessionId, `document.querySelector('[data-module="navigator"]')?.click()`);
+        await wait(120);
+        const matrixScreenshot = await devtools.send('Page.captureScreenshot', {
+          format: 'png',
+          captureBeyondViewport: false,
+          fromSurface: true,
+        }, sessionId);
+        await writeFile(
+          join(screenshotRoot, `threat-matrix-navigator-${viewport.label}.png`),
+          Buffer.from(matrixScreenshot.data, 'base64'),
+        );
       }
     }
   }

@@ -43,6 +43,10 @@ const state = {
   compareA: '',
   compareB: '',
   domainFile: 'mitre-data.json',
+  expandedTechniqueIds: new Set(),
+  matrixScale: 0.82,
+  matrixScroll: { left: 0, top: 0 },
+  aptListScrollTop: 0,
   iocLibrary: { items: [], source: {}, count: 0 },
   cveLibrary: { items: [], source: {}, count: 0 },
 };
@@ -165,10 +169,12 @@ async function loadDomain(file) {
   if (!response.ok) throw new Error(`Cannot load ${file}: HTTP ${response.status}`);
   state.data = await response.json();
   state.domainFile = file;
-  if (!state.data.techniques.some(t => t.id === state.selectedTechniqueId)) state.selectedTechniqueId = state.data.techniques[0]?.id || '';
+  if (!state.data.techniques.some(t => t.id === state.selectedTechniqueId)) state.selectedTechniqueId = '';
   if (!state.data.groups.some(g => g.id === state.selectedGroupId)) state.selectedGroupId = state.data.groups[0]?.id || '';
   if (!state.data.groups.some(g => g.id === state.compareA)) state.compareA = state.data.groups[0]?.id || '';
   if (!state.data.groups.some(g => g.id === state.compareB)) state.compareB = state.data.groups[1]?.id || state.data.groups[0]?.id || '';
+  state.expandedTechniqueIds.clear();
+  state.matrixScroll = { left: 0, top: 0 };
 }
 
 async function loadDemoLibraries() {
@@ -190,19 +196,55 @@ function bindGlobalEvents() {
         openFullVersionModal(module);
         return;
       }
+      captureActiveView();
       state.active = id;
       closeSidebar();
       render();
+      return;
+    }
+    const matrixAction = event.target.closest('[data-matrix-action]');
+    if (matrixAction) {
+      handleMatrixAction(matrixAction.dataset.matrixAction);
+      return;
+    }
+    const tacticToggle = event.target.closest('[data-tactic-toggle]');
+    if (tacticToggle) {
+      captureActiveView();
+      setTacticExpansion(tacticToggle.dataset.tacticToggle, tacticToggle.dataset.expand === 'true');
+      render();
+      return;
+    }
+    const subtechniqueToggle = event.target.closest('[data-toggle-subtechnique]');
+    if (subtechniqueToggle) {
+      captureActiveView();
+      const id = subtechniqueToggle.dataset.toggleSubtechnique;
+      if (state.expandedTechniqueIds.has(id)) state.expandedTechniqueIds.delete(id);
+      else state.expandedTechniqueIds.add(id);
+      render();
+      return;
+    }
+    const closeTechniqueDetail = event.target.closest('[data-close-technique-detail]');
+    if (closeTechniqueDetail) {
+      captureActiveView();
+      state.selectedTechniqueId = '';
+      render();
+      return;
     }
     const techniqueButton = event.target.closest('[data-technique-id]');
     if (techniqueButton) {
+      captureActiveView();
       state.selectedTechniqueId = techniqueButton.dataset.techniqueId;
+      if (state.active !== 'navigator') state.active = 'navigator';
       render();
+      return;
     }
     const groupButton = event.target.closest('[data-group-id]');
     if (groupButton) {
+      captureActiveView();
       state.selectedGroupId = groupButton.dataset.groupId;
+      if (state.active !== 'apt') state.active = 'apt';
       render();
+      return;
     }
     const exportButton = event.target.closest('[data-export-layer]');
     if (exportButton) exportNavigatorLayer();
@@ -280,6 +322,7 @@ function render() {
     knowledge: renderKnowledgeLibrary,
   }[state.active]?.() || renderDiscover();
   main.innerHTML = html;
+  requestAnimationFrame(restoreActiveView);
 }
 
 function renderDiscover() {
@@ -328,21 +371,41 @@ function renderDiscover() {
 }
 
 function renderNavigator() {
-  const selected = techniqueById(state.selectedTechniqueId) || filterTechniques()[0] || state.data.techniques[0];
-  if (selected) state.selectedTechniqueId = selected.id;
+  const selected = techniqueById(state.selectedTechniqueId);
   return `
-    <section class="grid">
-      <div class="panel card span-8">
+    <section class="navigator-workspace ${selected ? 'has-detail' : ''}">
+      <div class="panel card matrix-panel">
         <div class="card-head">
-          <div><h2>Navigator</h2><p>Browser-only ATT&amp;CK matrix. Use search to highlight techniques.</p></div>
+          <div><h2>Navigator</h2><p>Compact ATT&amp;CK matrix. Scroll or drag the canvas, zoom to fit, and expand sub-techniques when needed.</p></div>
           <div class="toolbar">${domainPicker()}<button class="button" type="button" data-export-layer>Export layer</button></div>
         </div>
-        <div class="matrix" aria-label="ATT&CK matrix">${renderMatrix()}</div>
+        <div class="matrix-controls" role="toolbar" aria-label="Matrix view controls">
+          <div class="matrix-control-group">
+            <button class="matrix-control" type="button" data-matrix-action="zoom-out" aria-label="Zoom matrix out">−</button>
+            <output class="matrix-scale" aria-live="polite">${Math.round(state.matrixScale * 100)}%</output>
+            <button class="matrix-control" type="button" data-matrix-action="zoom-in" aria-label="Zoom matrix in">+</button>
+            <button class="matrix-control" type="button" data-matrix-action="fit">Fit matrix</button>
+            <button class="matrix-control" type="button" data-matrix-action="reset">100%</button>
+          </div>
+          <div class="matrix-control-group">
+            <button class="matrix-control" type="button" data-matrix-action="expand-all">Expand sub-techniques</button>
+            <button class="matrix-control" type="button" data-matrix-action="collapse-all">Collapse all</button>
+          </div>
+          <span class="matrix-help">ATT&amp;CK ${escapeHtml(state.data.version)} · ${state.data.tactics.length} tactics</span>
+        </div>
+        <div class="matrix-viewport" tabindex="0" aria-label="ATT&CK matrix. Scroll horizontally and vertically to explore tactics.">
+          <div class="matrix-track">${renderMatrix()}</div>
+        </div>
       </div>
-      <div class="panel card span-4">
-        <div class="card-head"><div><h2>Technique detail</h2><p>Static ATT&amp;CK context from bundled public data.</p></div></div>
-        ${selected ? techniqueDetail(selected) : emptyState('Select a technique.')}
-      </div>
+      ${selected ? `
+        <aside class="panel card navigator-detail" aria-label="Selected technique detail">
+          <div class="card-head">
+            <div><h2>Technique detail</h2><p>Static ATT&amp;CK context from bundled public data.</p></div>
+            <button class="close-button" type="button" data-close-technique-detail aria-label="Close technique detail">Close</button>
+          </div>
+          ${techniqueDetail(selected)}
+        </aside>
+      ` : ''}
     </section>
   `;
 }
@@ -351,12 +414,12 @@ function renderAptLibrary() {
   const selected = groupById(state.selectedGroupId) || filterGroups()[0] || state.data.groups[0];
   if (selected) state.selectedGroupId = selected.id;
   return `
-    <section class="grid">
-      <div class="panel card span-5">
+    <section class="split-workspace apt-workspace">
+      <div class="panel card split-list-panel">
         <div class="card-head"><div><h2>APT Library</h2><p>Public ATT&amp;CK groups, aliases, and mapped techniques.</p></div>${domainPicker()}</div>
-        <div class="list">${filterGroups().map(groupCard).join('') || emptyState('No groups found.')}</div>
+        <div class="list workspace-list apt-group-list">${filterGroups().map(groupCard).join('') || emptyState('No groups found.')}</div>
       </div>
-      <div class="panel card span-7">
+      <div class="panel split-detail-panel">
         ${selected ? groupDetail(selected) : emptyState('Select a group.')}
       </div>
     </section>
@@ -520,26 +583,55 @@ function renderMatrix() {
   const hits = new Set(filterTechniques().map(t => t.id));
   return state.data.tactics.map(tactic => {
     const techniques = state.data.techniques.filter(t => !isSubTechnique(t) && techniqueInTactic(t, tactic));
-    return `<section class="tactic-column"><div class="tactic-title">${escapeHtml(tactic.name)}<span>${techniques.length}</span></div>${techniques.map(t => {
+    const expandable = techniques.filter(parent => state.data.techniques.some(child => child.parent_id === parent.id && techniqueInTactic(child, tactic)));
+    const allExpanded = expandable.length > 0 && expandable.every(parent => state.expandedTechniqueIds.has(parent.id));
+    return `<section class="tactic-column" data-tactic-column="${escapeHtml(tactic.shortname || tactic.id)}">
+      <header class="tactic-title">
+        <span class="tactic-name">${escapeHtml(tactic.name)}</span>
+        <span class="tactic-meta">${escapeHtml(tactic.id)} · ${techniques.length}</span>
+        ${expandable.length ? `
+          <button class="tactic-expand" type="button" data-tactic-toggle="${escapeHtml(tactic.shortname || tactic.id)}" data-expand="${allExpanded ? 'false' : 'true'}" aria-label="${allExpanded ? 'Collapse' : 'Expand'} sub-techniques in ${escapeHtml(tactic.name)}">
+            ${allExpanded ? '− subs' : '+ subs'}
+          </button>
+        ` : ''}
+      </header>
+      <div class="tactic-techniques">${techniques.map(t => {
       const children = state.data.techniques.filter(child => child.parent_id === t.id && techniqueInTactic(child, tactic));
+      const matchingChildren = state.query ? children.filter(child => hits.has(child.id)) : [];
+      const expanded = state.expandedTechniqueIds.has(t.id) || matchingChildren.length > 0;
       return `
-      <button class="technique ${hits.has(t.id) && state.query ? 'is-hit' : ''} ${state.selectedTechniqueId === t.id ? 'is-selected' : ''}" type="button" data-technique-id="${t.id}">
-        <span class="tech-id">${escapeHtml(t.id)}</span><span class="tech-name">${escapeHtml(t.name)}</span>
-      </button>
-      ${children.length ? `<div class="subtechnique-list">${children.slice(0, 24).map(child => `
-        <button class="technique technique-sub ${hits.has(child.id) && state.query ? 'is-hit' : ''} ${state.selectedTechniqueId === child.id ? 'is-selected' : ''}" type="button" data-technique-id="${child.id}">
-          <span class="tech-id">${escapeHtml(child.id)}</span><span class="tech-name">${escapeHtml(child.name)}</span>
-        </button>
-      `).join('')}${children.length > 24 ? `<span class="more-count">+${children.length - 24} more</span>` : ''}</div>` : ''}
+        <div class="technique-group">
+          <div class="technique-row">
+            <button class="technique ${children.length ? 'has-subtechniques' : ''} ${hits.has(t.id) && state.query ? 'is-hit' : ''} ${state.selectedTechniqueId === t.id ? 'is-selected' : ''}" type="button" data-technique-id="${t.id}">
+              <span class="tech-id">${escapeHtml(t.id)}</span><span class="tech-name">${escapeHtml(t.name)}</span>
+            </button>
+            ${children.length ? `
+              <button class="subtechnique-toggle" type="button" data-toggle-subtechnique="${escapeHtml(t.id)}" aria-expanded="${expanded}" aria-label="${expanded ? 'Collapse' : 'Expand'} ${children.length} sub-techniques for ${escapeHtml(t.name)}">
+                <span aria-hidden="true">${expanded ? '−' : '+'}</span><span class="subtechnique-count">${children.length}</span>
+              </button>
+            ` : ''}
+          </div>
+          ${children.length && expanded ? `<div class="subtechnique-list">${children.map(child => `
+            <button class="technique technique-sub ${hits.has(child.id) && state.query ? 'is-hit' : ''} ${state.selectedTechniqueId === child.id ? 'is-selected' : ''}" type="button" data-technique-id="${child.id}">
+              <span class="tech-id">${escapeHtml(child.id)}</span><span class="tech-name">${escapeHtml(child.name)}</span>
+            </button>
+          `).join('')}</div>` : ''}
+        </div>
     `;
-    }).join('') || `<p class="empty-column">No public techniques mapped.</p>`}</section>`;
+    }).join('') || `<p class="empty-column">No public techniques mapped.</p>`}</div>
+    </section>`;
   }).join('');
 }
 
 function techniqueDetail(technique) {
   const actors = state.data.groups.filter(group => (group.technique_ids || []).includes(technique.id)).slice(0, 12);
+  const mitreReference = (technique.references || []).find(reference => reference.source === 'mitre-attack' || /attack\.mitre\.org/.test(reference.url || ''));
   return `<article class="detail">
-    <div><div class="eyebrow">${escapeHtml(technique.id)}</div><h2>${escapeHtml(technique.name)}</h2></div>
+    <div>
+      <div class="eyebrow">${escapeHtml(technique.id)}</div>
+      <h2>${escapeHtml(technique.name)}</h2>
+      ${mitreReference ? `<a class="detail-source-link" href="${escapeHtml(mitreReference.url)}" rel="noopener">Open MITRE ATT&amp;CK reference ↗</a>` : ''}
+    </div>
     <div class="detail-section"><h3>Description</h3><p>${escapeHtml(shortText(technique.description, 900))}</p></div>
     <div class="detail-section"><h3>Detection guidance</h3><p>${escapeHtml(shortText(technique.detection || 'No public detection text in this bundled ATT&CK record.', 700))}</p></div>
     <div class="detail-section"><h3>Data sources</h3><div class="tag-list">${(technique.data_sources || []).slice(0, 16).map(tag).join('') || tag('Not specified')}</div></div>
@@ -549,9 +641,11 @@ function techniqueDetail(technique) {
 
 function groupDetail(group) {
   const techniques = (group.technique_ids || []).map(techniqueById).filter(Boolean);
+  const mitreReference = (group.references || []).find(reference => reference.source === 'mitre-attack' || /attack\.mitre\.org/.test(reference.url || ''));
   return `<article class="card">
     <div class="eyebrow">${escapeHtml(group.id)}</div>
     <h2>${escapeHtml(group.name)}</h2>
+    ${mitreReference ? `<a class="detail-source-link" href="${escapeHtml(mitreReference.url)}" rel="noopener">Open MITRE ATT&amp;CK group reference ↗</a>` : ''}
     <p>${escapeHtml(shortText(group.description, 850))}</p>
     <div class="detail-section"><h3>Aliases</h3><div class="tag-list">${(group.aliases || []).slice(0, 24).map(tag).join('') || tag('No aliases')}</div></div>
     <div class="detail-section"><h3>Mapped techniques (${techniques.length})</h3><div class="list">${techniques.slice(0, 80).map(techniqueCard).join('')}</div></div>
@@ -624,6 +718,142 @@ function closeWorkspaceSearch() {
 function closeSidebar() {
   document.querySelector('#sidebar')?.classList.remove('is-open');
   document.querySelector('#mobile-menu')?.setAttribute('aria-expanded', 'false');
+}
+
+function captureActiveView() {
+  const matrix = document.querySelector('.matrix-viewport');
+  if (matrix) state.matrixScroll = { left: matrix.scrollLeft, top: matrix.scrollTop };
+  const aptList = document.querySelector('.apt-group-list');
+  if (aptList) state.aptListScrollTop = aptList.scrollTop;
+}
+
+function restoreActiveView() {
+  if (state.active === 'navigator') {
+    const matrix = document.querySelector('.matrix-viewport');
+    const track = document.querySelector('.matrix-track');
+    if (!matrix) return;
+    if (track) track.style.setProperty('--matrix-scale', String(state.matrixScale));
+    matrix.scrollLeft = state.matrixScroll.left;
+    matrix.scrollTop = state.matrixScroll.top;
+    enableMatrixDrag(matrix);
+  }
+  if (state.active === 'apt') {
+    const aptList = document.querySelector('.apt-group-list');
+    if (aptList) {
+      aptList.scrollTop = state.aptListScrollTop;
+      aptList.addEventListener('scroll', () => {
+        if (aptList.isConnected) state.aptListScrollTop = aptList.scrollTop;
+      }, { passive: true });
+    }
+  }
+}
+
+function handleMatrixAction(action) {
+  if (action === 'zoom-in') {
+    setMatrixScale(state.matrixScale + 0.1);
+    return;
+  }
+  if (action === 'zoom-out') {
+    setMatrixScale(state.matrixScale - 0.1);
+    return;
+  }
+  if (action === 'reset') {
+    setMatrixScale(1);
+    return;
+  }
+  if (action === 'fit') {
+    fitMatrixToViewport();
+    return;
+  }
+  if (action === 'expand-all') {
+    captureActiveView();
+    for (const technique of state.data.techniques) {
+      if (!isSubTechnique(technique) && state.data.techniques.some(child => child.parent_id === technique.id)) {
+        state.expandedTechniqueIds.add(technique.id);
+      }
+    }
+    render();
+    return;
+  }
+  if (action === 'collapse-all') {
+    captureActiveView();
+    state.expandedTechniqueIds.clear();
+    render();
+  }
+}
+
+function setMatrixScale(nextScale) {
+  const viewport = document.querySelector('.matrix-viewport');
+  const track = document.querySelector('.matrix-track');
+  if (!viewport || !track) return;
+  const centerX = viewport.scrollLeft + (viewport.clientWidth / 2);
+  const centerY = viewport.scrollTop + (viewport.clientHeight / 2);
+  const previousScale = state.matrixScale;
+  state.matrixScale = Math.min(1.4, Math.max(0.35, Math.round(nextScale * 100) / 100));
+  track.style.setProperty('--matrix-scale', String(state.matrixScale));
+  const scaleOutput = document.querySelector('.matrix-scale');
+  if (scaleOutput) scaleOutput.textContent = `${Math.round(state.matrixScale * 100)}%`;
+  const ratio = state.matrixScale / previousScale;
+  viewport.scrollLeft = Math.max(0, (centerX * ratio) - (viewport.clientWidth / 2));
+  viewport.scrollTop = Math.max(0, (centerY * ratio) - (viewport.clientHeight / 2));
+  state.matrixScroll = { left: viewport.scrollLeft, top: viewport.scrollTop };
+}
+
+function fitMatrixToViewport() {
+  const viewport = document.querySelector('.matrix-viewport');
+  const track = document.querySelector('.matrix-track');
+  const lastColumn = track?.lastElementChild;
+  if (!viewport || !track || !lastColumn) return;
+  const naturalWidth = lastColumn.offsetLeft + lastColumn.offsetWidth + 16;
+  const fitScale = (viewport.clientWidth - 12) / naturalWidth;
+  setMatrixScale(Math.min(1, fitScale));
+  viewport.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
+  state.matrixScroll = { left: 0, top: 0 };
+}
+
+function setTacticExpansion(tacticId, expand) {
+  const tactic = state.data.tactics.find(item => [item.id, item.shortname].includes(tacticId));
+  if (!tactic) return;
+  const parents = state.data.techniques.filter(technique => !isSubTechnique(technique) && techniqueInTactic(technique, tactic));
+  for (const parent of parents) {
+    const hasChildren = state.data.techniques.some(child => child.parent_id === parent.id && techniqueInTactic(child, tactic));
+    if (!hasChildren) continue;
+    if (expand) state.expandedTechniqueIds.add(parent.id);
+    else state.expandedTechniqueIds.delete(parent.id);
+  }
+}
+
+function enableMatrixDrag(viewport) {
+  let drag = null;
+  viewport.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || event.target.closest('button, a, input, select')) return;
+    drag = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      left: viewport.scrollLeft,
+      top: viewport.scrollTop,
+    };
+    viewport.setPointerCapture(event.pointerId);
+    viewport.classList.add('is-dragging');
+  });
+  viewport.addEventListener('pointermove', event => {
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    viewport.scrollLeft = drag.left - (event.clientX - drag.x);
+    viewport.scrollTop = drag.top - (event.clientY - drag.y);
+  });
+  const endDrag = event => {
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    state.matrixScroll = { left: viewport.scrollLeft, top: viewport.scrollTop };
+    drag = null;
+    viewport.classList.remove('is-dragging');
+  };
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', endDrag);
+  viewport.addEventListener('scroll', () => {
+    if (!viewport.isConnected) return;
+    state.matrixScroll = { left: viewport.scrollLeft, top: viewport.scrollTop };
+  }, { passive: true });
 }
 
 function filterTechniques() {
@@ -746,7 +976,10 @@ function groupBy(items, getKey) {
   }, {});
 }
 function shortText(text, limit) {
-  const value = String(text || '').replace(/\s+/g, ' ').trim();
+  const value = String(text || '')
+    .replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
   return value.length > limit ? `${value.slice(0, limit - 1)}…` : value;
 }
 function slugify(value) {
