@@ -376,7 +376,7 @@ function renderNavigator() {
     <section class="navigator-workspace ${selected ? 'has-detail' : ''}">
       <div class="panel card matrix-panel">
         <div class="card-head">
-          <div><h2>Navigator</h2><p>Compact ATT&amp;CK matrix. Scroll or drag the canvas, zoom to fit, and expand sub-techniques when needed.</p></div>
+          <div><h2>Navigator</h2><p>Compact ATT&amp;CK matrix. Use the mouse wheel to zoom, drag to pan, and expand sub-techniques when needed.</p></div>
           <div class="toolbar">${domainPicker()}<button class="button" type="button" data-export-layer>Export layer</button></div>
         </div>
         <div class="matrix-controls" role="toolbar" aria-label="Matrix view controls">
@@ -391,9 +391,9 @@ function renderNavigator() {
             <button class="matrix-control" type="button" data-matrix-action="expand-all">Expand sub-techniques</button>
             <button class="matrix-control" type="button" data-matrix-action="collapse-all">Collapse all</button>
           </div>
-          <span class="matrix-help">ATT&amp;CK ${escapeHtml(state.data.version)} · ${state.data.tactics.length} tactics</span>
+          <span class="matrix-help">Mouse wheel zooms · drag pans · ATT&amp;CK ${escapeHtml(state.data.version)} · ${state.data.tactics.length} tactics</span>
         </div>
-        <div class="matrix-viewport" tabindex="0" aria-label="ATT&CK matrix. Scroll horizontally and vertically to explore tactics.">
+        <div class="matrix-viewport" tabindex="0" aria-label="ATT&CK matrix. Use the mouse wheel to zoom, drag to pan, or use the visible zoom controls.">
           <div class="matrix-track">${renderMatrix()}</div>
         </div>
       </div>
@@ -782,20 +782,27 @@ function handleMatrixAction(action) {
   }
 }
 
-function setMatrixScale(nextScale) {
+function setMatrixScale(nextScale, focalPoint = null) {
   const viewport = document.querySelector('.matrix-viewport');
   const track = document.querySelector('.matrix-track');
   if (!viewport || !track) return;
-  const centerX = viewport.scrollLeft + (viewport.clientWidth / 2);
-  const centerY = viewport.scrollTop + (viewport.clientHeight / 2);
+  const viewportRect = viewport.getBoundingClientRect();
+  const focusX = focalPoint
+    ? Math.min(viewport.clientWidth, Math.max(0, focalPoint.clientX - viewportRect.left))
+    : viewport.clientWidth / 2;
+  const focusY = focalPoint
+    ? Math.min(viewport.clientHeight, Math.max(0, focalPoint.clientY - viewportRect.top))
+    : viewport.clientHeight / 2;
+  const contentX = viewport.scrollLeft + focusX;
+  const contentY = viewport.scrollTop + focusY;
   const previousScale = state.matrixScale;
-  state.matrixScale = Math.min(1.4, Math.max(0.35, Math.round(nextScale * 100) / 100));
+  state.matrixScale = Math.min(1.4, Math.max(0.35, Math.round(nextScale * 1000) / 1000));
   track.style.setProperty('--matrix-scale', String(state.matrixScale));
   const scaleOutput = document.querySelector('.matrix-scale');
   if (scaleOutput) scaleOutput.textContent = `${Math.round(state.matrixScale * 100)}%`;
   const ratio = state.matrixScale / previousScale;
-  viewport.scrollLeft = Math.max(0, (centerX * ratio) - (viewport.clientWidth / 2));
-  viewport.scrollTop = Math.max(0, (centerY * ratio) - (viewport.clientHeight / 2));
+  viewport.scrollLeft = Math.max(0, (contentX * ratio) - focusX);
+  viewport.scrollTop = Math.max(0, (contentY * ratio) - focusY);
   state.matrixScroll = { left: viewport.scrollLeft, top: viewport.scrollTop };
 }
 
@@ -825,6 +832,18 @@ function setTacticExpansion(tacticId, expand) {
 
 function enableMatrixDrag(viewport) {
   let drag = null;
+  viewport.addEventListener('wheel', event => {
+    if (!event.deltaY) return;
+    event.preventDefault();
+    const deltaUnit = event.deltaMode === WheelEvent.DOM_DELTA_LINE
+      ? 16
+      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+        ? viewport.clientHeight
+        : 1;
+    const normalizedDelta = Math.min(160, Math.max(-160, event.deltaY * deltaUnit));
+    const nextScale = state.matrixScale * Math.exp(-normalizedDelta * 0.0015);
+    setMatrixScale(nextScale, { clientX: event.clientX, clientY: event.clientY });
+  }, { passive: false });
   viewport.addEventListener('pointerdown', event => {
     if (event.button !== 0 || event.target.closest('button, a, input, select')) return;
     drag = {

@@ -57,6 +57,7 @@ const viewports = [
   { label: '768', width: 768, height: 960, mobile: false },
   { label: 'desktop', width: 1440, height: 1000, mobile: false },
   { label: 'wide-desktop', width: 1920, height: 1080, mobile: false, screenshot: true },
+  { label: 'ultrawide', width: 2560, height: 1080, mobile: false },
   // A 1280px browser at 200% zoom exposes roughly a 640 CSS-pixel layout viewport.
   { label: 'zoom-200', width: 640, height: 900, mobile: false, screenshot: true, zoom: 2 },
 ];
@@ -325,13 +326,61 @@ function threatMatrixInteractionExpression() {
       scrollLeft: viewport?.scrollLeft || 0,
       scrollWidth: viewport?.scrollWidth || 0,
       clientWidth: viewport?.clientWidth || 0,
-      scrollPreserved: !viewport || viewport.scrollWidth <= viewport.clientWidth || viewport.scrollLeft > 0,
+      scrollPreserved: (
+        !viewport
+        || matrixInitial.scrollWidth <= matrixInitial.clientWidth
+        || viewport.scrollWidth <= viewport.clientWidth
+        || viewport.scrollLeft > 0
+      ),
+    };
+    const sidebarRect = document.querySelector('.sidebar')?.getBoundingClientRect();
+    const workspaceRect = document.querySelector('.workspace')?.getBoundingClientRect();
+    const mainRect = document.querySelector('.main')?.getBoundingClientRect();
+    const navigatorRect = document.querySelector('.navigator-workspace')?.getBoundingClientRect();
+    const mainStyle = document.querySelector('.main') ? getComputedStyle(document.querySelector('.main')) : null;
+    const workspaceFit = {
+      sidebarRight: sidebarRect ? round(sidebarRect.right) : null,
+      workspaceLeft: workspaceRect ? round(workspaceRect.left) : null,
+      workspaceRight: workspaceRect ? round(workspaceRect.right) : null,
+      mainLeft: mainRect ? round(mainRect.left) : null,
+      mainRight: mainRect ? round(mainRect.right) : null,
+      contentLeft: navigatorRect ? round(navigatorRect.left) : null,
+      contentRight: navigatorRect ? round(navigatorRect.right) : null,
+      paddingLeft: mainStyle ? round(Number.parseFloat(mainStyle.paddingLeft)) : null,
+      paddingRight: mainStyle ? round(Number.parseFloat(mainStyle.paddingRight)) : null,
+      shellFillsViewport: Boolean(
+        sidebarRect
+        && workspaceRect
+        && mainRect
+        && Math.abs(workspaceRect.left - sidebarRect.right) <= 1
+        && Math.abs(mainRect.left - workspaceRect.left) <= 1
+        && Math.abs(mainRect.right - window.innerWidth) <= 1
+      ),
+      contentFillsMain: Boolean(
+        mainRect
+        && navigatorRect
+        && mainStyle
+        && navigatorRect.left - mainRect.left <= Number.parseFloat(mainStyle.paddingLeft) + 1
+        && mainRect.right - navigatorRect.right <= Number.parseFloat(mainStyle.paddingRight) + 18
+      ),
     };
 
     const scaleBefore = Number.parseFloat(getComputedStyle(document.querySelector('.matrix-track')).getPropertyValue('--matrix-scale'));
     document.querySelector('[data-matrix-action="zoom-out"]')?.click();
     await pause(40);
     const scaleAfter = Number.parseFloat(getComputedStyle(document.querySelector('.matrix-track')).getPropertyValue('--matrix-scale'));
+    viewport = document.querySelector('.matrix-viewport');
+    const viewportRect = viewport?.getBoundingClientRect();
+    const wheelEvent = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      clientX: viewportRect ? viewportRect.left + (viewportRect.width * 0.35) : 0,
+      clientY: viewportRect ? viewportRect.top + (viewportRect.height * 0.35) : 0,
+      deltaY: -120,
+    });
+    const wheelPrevented = viewport ? !viewport.dispatchEvent(wheelEvent) : false;
+    await pause(40);
+    const wheelScaleAfter = Number.parseFloat(getComputedStyle(document.querySelector('.matrix-track')).getPropertyValue('--matrix-scale'));
     document.querySelector('[data-matrix-action="fit"]')?.click();
     await pause(80);
     const fitScale = Number.parseFloat(getComputedStyle(document.querySelector('.matrix-track')).getPropertyValue('--matrix-scale'));
@@ -356,9 +405,13 @@ function threatMatrixInteractionExpression() {
       expandedChildren,
       matrixInitial,
       detailState,
+      workspaceFit,
       scaleBefore,
       scaleAfter,
       zoomChanged: Number.isFinite(scaleBefore) && Number.isFinite(scaleAfter) && scaleAfter < scaleBefore,
+      wheelPrevented,
+      wheelScaleAfter,
+      wheelZoomChanged: Number.isFinite(wheelScaleAfter) && wheelScaleAfter > scaleAfter,
       fitScale,
       aptState,
       horizontalOverflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > window.innerWidth + 1,
@@ -464,7 +517,7 @@ try {
         }
       }
 
-      if (name === 'threat-matrix' && ['390', '768', 'desktop', 'wide-desktop'].includes(viewport.label)) {
+      if (name === 'threat-matrix' && ['390', '768', 'desktop', 'wide-desktop', 'ultrawide'].includes(viewport.label)) {
         const workspaceState = await evaluate(devtools, sessionId, threatMatrixInteractionExpression());
         results.push({ page: 'threat-matrix-interactions', viewport: viewport.label, ...workspaceState });
         const minimumMatrixHeight = viewport.label === '390' ? 300 : 360;
@@ -480,7 +533,7 @@ try {
         if (
           workspaceState.matrixInitial.clientWidth < 240
           || workspaceState.matrixInitial.clientHeight < minimumMatrixHeight
-          || workspaceState.matrixInitial.scrollWidth <= workspaceState.matrixInitial.clientWidth
+          || workspaceState.matrixInitial.trackWidth < 500
           || !workspaceState.matrixInitial.contained
         ) {
           failures.push(`threat-matrix@${viewport.label}: matrix viewport is not usable ${JSON.stringify(workspaceState.matrixInitial)}`);
@@ -488,7 +541,18 @@ try {
         if (!workspaceState.detailState.present || !workspaceState.detailState.contained || !workspaceState.detailState.scrollPreserved) {
           failures.push(`threat-matrix@${viewport.label}: technique detail interaction failed ${JSON.stringify(workspaceState.detailState)}`);
         }
-        if (!workspaceState.zoomChanged || !Number.isFinite(workspaceState.fitScale)) {
+        if (
+          ['desktop', 'wide-desktop', 'ultrawide'].includes(viewport.label)
+          && (!workspaceState.workspaceFit.shellFillsViewport || !workspaceState.workspaceFit.contentFillsMain)
+        ) {
+          failures.push(`threat-matrix@${viewport.label}: workspace does not dynamically fill the area beside the sidebar ${JSON.stringify(workspaceState.workspaceFit)}`);
+        }
+        if (
+          !workspaceState.zoomChanged
+          || !workspaceState.wheelPrevented
+          || !workspaceState.wheelZoomChanged
+          || !Number.isFinite(workspaceState.fitScale)
+        ) {
           failures.push(`threat-matrix@${viewport.label}: zoom/fit controls failed ${JSON.stringify(workspaceState)}`);
         }
         if (
@@ -532,15 +596,15 @@ try {
         }
       }
 
-      if (name === 'threat-matrix' && ['390', 'wide-desktop'].includes(viewport.label)) {
-        if (viewport.label === 'wide-desktop') {
+      if (name === 'threat-matrix' && ['390', 'wide-desktop', 'ultrawide'].includes(viewport.label)) {
+        if (['wide-desktop', 'ultrawide'].includes(viewport.label)) {
           const aptScreenshot = await devtools.send('Page.captureScreenshot', {
             format: 'png',
             captureBeyondViewport: false,
             fromSurface: true,
           }, sessionId);
           await writeFile(
-            join(screenshotRoot, 'threat-matrix-apt-wide-desktop.png'),
+            join(screenshotRoot, `threat-matrix-apt-${viewport.label}.png`),
             Buffer.from(aptScreenshot.data, 'base64'),
           );
         }
