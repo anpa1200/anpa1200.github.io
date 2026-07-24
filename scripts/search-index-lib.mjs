@@ -154,7 +154,7 @@ export function shouldExcludeUrl(value) {
   const url = normalizeSiteUrl(value);
   if (!url) return true;
   const path = url.pathname.toLowerCase();
-  if (path === '/cover-letter.html' || path.endsWith('/404.html') || path === '/404.html') return true;
+  if (path === '/cover-letter.html' || path === '/llms.txt' || path.endsWith('/404.html') || path === '/404.html') return true;
   return LEGACY_PREFIXES.some((prefix) => path.startsWith(prefix));
 }
 

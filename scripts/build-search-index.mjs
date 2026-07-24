@@ -335,7 +335,11 @@ if (canonicalSitemapOutput) {
   const parsed = parseSitemapEntries(inputXml, SITE_ORIGIN);
   if (parsed.isIndex) throw new Error('Canonical sitemap output requires a flat URL-set input.');
   const byUrl = new Map(parsed.entries.map((entry) => [entry.loc, entry]));
-  const entries = [...indexedUrls].sort().map((loc) => byUrl.get(loc) || { loc });
+  const auxiliary = parsed.entries.filter((entry) => new URL(entry.loc).pathname === '/llms.txt');
+  const entries = [
+    ...[...indexedUrls].sort().map((loc) => byUrl.get(loc) || { loc }),
+    ...auxiliary,
+  ].sort((a, b) => a.loc.localeCompare(b.loc));
   const xmlEscape = (value) => String(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

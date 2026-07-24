@@ -28,11 +28,23 @@ test('homepage emits a WebPage connected to the stable AdversaryGraph entity', (
   const graph = connectedGraphFromHtml(output);
   const page = objectById(graph, `${canonical}#webpage`);
   const software = objectById(graph, SOFTWARE_ID);
+  const person = objectById(graph, PERSON_ID);
+  const website = objectById(graph, WEBSITE_ID);
   assert.equal(page['@type'], 'WebPage');
   assert.deepEqual(page.isPartOf, { '@id': WEBSITE_ID });
   assert.deepEqual(page.mainEntity, { '@id': SOFTWARE_ID });
   assert.deepEqual(software.mainEntityOfPage, { '@id': page['@id'] });
   assert.deepEqual(software.author, { '@id': PERSON_ID });
+  assert.equal(software.name, 'AdversaryGraph');
+  assert.equal(software.alternateName, 'ThreatMapper');
+  assert.equal(software.softwareVersion, '6.0.0');
+  assert.equal(software.codeRepository, 'https://github.com/anpa1200/adversarygraph');
+  assert.equal(software.license, 'https://github.com/anpa1200/adversarygraph/blob/v6.0.0/LICENSE');
+  assert.equal(person.email, 'mailto:1200km@gmail.com');
+  assert.equal(person.contactPoint.email, 'mailto:1200km@gmail.com');
+  assert.ok(person.sameAs.includes('https://infosecwriteups.com/@1200km'));
+  assert.equal(website.name, '1200km Security Research');
+  assert.equal(Object.hasOwn(website, 'potentialAction'), false);
   assert.equal(/<meta\b[^>]*name=["']keywords["']/i.test(output), false);
 });
 

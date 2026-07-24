@@ -334,6 +334,8 @@ for (const page of pages) {
 }
 
 const canonicalUrls = new Set(pages.map((page) => page.canonical));
+const auxiliarySitemapUrls = new Set(['https://1200km.com/llms.txt']);
+const expectedLocalSitemapUrls = new Set([...canonicalUrls, ...auxiliarySitemapUrls]);
 const sitemapAllPath = join(siteRoot, 'sitemap-all.xml');
 const sitemapPath = join(siteRoot, 'sitemap.xml');
 if (!existsSync(sitemapAllPath) || !existsSync(sitemapPath)) failures.push('sitemap files are missing');
@@ -342,16 +344,16 @@ else {
   const complete = parseSitemapEntries(readFileSync(sitemapPath, 'utf8'));
   if (local.isIndex || complete.isIndex) failures.push('sitemaps must be flat URL sets generated from canonical pages');
   const localUrls = new Set(local.entries.map((entry) => entry.loc));
-  if (localUrls.size !== canonicalUrls.size) failures.push(`sitemap-all.xml has ${localUrls.size} URLs; expected ${canonicalUrls.size}`);
-  for (const url of canonicalUrls) if (!localUrls.has(url)) failures.push(`sitemap-all.xml is missing ${url}`);
+  if (localUrls.size !== expectedLocalSitemapUrls.size) failures.push(`sitemap-all.xml has ${localUrls.size} URLs; expected ${expectedLocalSitemapUrls.size}`);
+  for (const url of expectedLocalSitemapUrls) if (!localUrls.has(url)) failures.push(`sitemap-all.xml is missing ${url}`);
   for (const entry of local.entries) {
-    if (!canonicalUrls.has(entry.loc)) failures.push(`sitemap-all.xml contains a non-local/non-canonical URL: ${entry.loc}`);
+    if (!expectedLocalSitemapUrls.has(entry.loc)) failures.push(`sitemap-all.xml contains a non-local/non-canonical URL: ${entry.loc}`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.lastmod || '')) failures.push(`sitemap-all.xml has no accurate lastmod for ${entry.loc}`);
   }
   const completeUrls = new Set(complete.entries.map((entry) => entry.loc));
   if (completeUrls.size !== complete.entries.length) failures.push('sitemap.xml contains duplicate URLs');
-  if (completeUrls.size < canonicalUrls.size) failures.push('sitemap.xml does not cover all local canonical pages');
-  for (const url of canonicalUrls) if (!completeUrls.has(url)) failures.push(`sitemap.xml is missing local URL ${url}`);
+  if (completeUrls.size < expectedLocalSitemapUrls.size) failures.push('sitemap.xml does not cover all local canonical pages and discovery files');
+  for (const url of expectedLocalSitemapUrls) if (!completeUrls.has(url)) failures.push(`sitemap.xml is missing local URL ${url}`);
 }
 
 let catalogItemsByUrl = new Map();
@@ -382,17 +384,18 @@ if (!existsSync(robotsPath)) failures.push('robots.txt is missing');
 else {
   const robots = readFileSync(robotsPath, 'utf8');
   const groups = robotsGroups(robots);
-  const allowed = ['Googlebot', 'Bingbot', 'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Perplexity-User'];
-  const blocked = ['GPTBot', 'ClaudeBot', 'anthropic-ai', 'Google-Extended', 'CCBot', 'Applebot-Extended', 'FacebookBot', 'Bytespider', 'cohere-ai'];
+  const allowed = [
+    'Googlebot', 'Bingbot', 'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot',
+    'Claude-User', 'PerplexityBot', 'Perplexity-User', 'GPTBot', 'ClaudeBot',
+    'anthropic-ai', 'Google-Extended', 'CCBot', 'Applebot-Extended', 'FacebookBot',
+    'Bytespider', 'cohere-ai',
+  ];
   for (const agent of allowed) {
     const group = groups.find((item) => item.agents.includes(agent));
     if (!group?.rules.includes('allow:/')) failures.push(`robots.txt does not allow ${agent}`);
   }
-  for (const agent of blocked) {
-    const group = groups.find((item) => item.agents.includes(agent));
-    if (!group?.rules.includes('disallow:/')) failures.push(`robots.txt does not block training crawler ${agent}`);
-  }
-  if (!robots.includes('Policy: search=yes, user-triggered AI retrieval=yes, model training=no')) failures.push('robots.txt does not document the AI use policy');
+  if (!robots.includes('Policy: search=yes, user-triggered AI retrieval=yes, model training=yes')) failures.push('robots.txt does not document the AI use policy');
+  if (!robots.includes('# LLM guide: https://1200km.com/llms.txt')) failures.push('robots.txt does not advertise the LLM guide');
   const sitemapDirectives = robots.match(/^Sitemap:\s*\S+/gim) || [];
   if (sitemapDirectives.length !== 1 || sitemapDirectives[0] !== 'Sitemap: https://1200km.com/sitemap.xml') {
     failures.push('robots.txt must advertise exactly the generated canonical sitemap');

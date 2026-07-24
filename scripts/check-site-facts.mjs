@@ -338,7 +338,7 @@ const textSurfaceRequirements = new Map([
   ['index.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
   ['projects.md', [stableTag, 'Unreleased', 'Threat Matrix', 'ThreatMapper']],
   ['adversarygraph.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
-  ['llms.txt', [stableTag, 'Accepted external contributions: 8', 'Open external submissions: 31']],
+  ['llms.txt', [stableTag, 'Accepted external contributions: **8**', 'Open external submissions: **31**']],
   ['llms-full.txt', [stableTag, 'post-v6 work on `main` is Unreleased', 'Threat Matrix']],
   ['agent-index.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
   ['adversarygraph-docs/index.md', [`Current release: ${stableTag}.`]],

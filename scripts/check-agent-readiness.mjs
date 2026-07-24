@@ -70,14 +70,15 @@ for (const file of [
 }
 
 const robots = read('robots.txt');
-if (!robots.includes('Policy: search=yes, user-triggered AI retrieval=yes, model training=no')) failures.push('robots.txt is missing the documented AI use policy');
+if (!robots.includes('Policy: search=yes, user-triggered AI retrieval=yes, model training=yes')) failures.push('robots.txt is missing the documented AI use policy');
 for (const agent of ['OAI-SearchBot', 'Claude-SearchBot', 'PerplexityBot']) {
   if (!robots.includes(`User-agent: ${agent}`)) failures.push(`robots.txt is missing search agent ${agent}`);
 }
 for (const agent of ['GPTBot', 'ClaudeBot', 'Google-Extended']) {
-  if (!robots.includes(`User-agent: ${agent}`)) failures.push(`robots.txt is missing training control for ${agent}`);
+  if (!robots.includes(`User-agent: ${agent}`)) failures.push(`robots.txt is missing explicit AI crawler access for ${agent}`);
 }
 if (!robots.includes('Sitemap: https://1200km.com/sitemap.xml')) failures.push('robots.txt is missing canonical sitemap');
+if (!robots.includes('# LLM guide: https://1200km.com/llms.txt')) failures.push('robots.txt is missing the LLM guide discovery comment');
 
 const headers = read('_headers');
 for (const expected of [

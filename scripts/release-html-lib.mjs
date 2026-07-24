@@ -5,6 +5,16 @@ export const PERSON_ID = 'https://1200km.com/#person';
 export const WEBSITE_ID = 'https://1200km.com/#website';
 export const SOFTWARE_ID = 'https://1200km.com/#software';
 
+const SITE_FACTS = JSON.parse(
+  readFileSync(new URL('../data/site-facts.json', import.meta.url), 'utf8'),
+).facts;
+
+function factValue(key) {
+  const fact = SITE_FACTS[key];
+  if (!fact || !Object.hasOwn(fact, 'value')) throw new Error(`Missing authoritative site fact: ${key}`);
+  return structuredClone(fact.value);
+}
+
 const WEB_PAGE_TYPES = new Set([
   'AboutPage',
   'CollectionPage',
@@ -308,31 +318,47 @@ export function buildConnectedGraph(html, {
   const websiteSource = firstObjectWithType(objects, new Set(['WebSite'])) || {};
   const pageSource = firstObjectWithType(objects, WEB_PAGE_TYPES) || {};
 
+  const siteUrl = factValue('site.canonical_url');
+  const location = factValue('identity.location');
+  const publicEmail = factValue('contact.public_email');
+  const personName = factValue('identity.person_name');
   const person = {
     ...cloneWithoutContext(personSource),
     '@type': 'Person',
     '@id': PERSON_ID,
-    name: 'Andrey Pautov',
-    url: 'https://1200km.com/',
-    image: 'https://1200km.com/assets/ap-logo.png',
-    jobTitle: personSource.jobTitle || 'Threat Intelligence Research Engineer',
-    worksFor: personSource.worksFor || { '@type': 'Organization', name: 'XPLG' },
-    sameAs: personSource.sameAs || [
-      'https://github.com/anpa1200',
-      'https://medium.com/@1200km',
-      'https://www.linkedin.com/in/andrey-pautov/',
-    ],
+    name: personName,
+    url: siteUrl,
+    image: `${siteUrl}assets/ap-logo.png`,
+    jobTitle: factValue('identity.job_title'),
+    worksFor: { '@type': 'Organization', name: factValue('identity.employer') },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: location.locality,
+      addressCountry: location.country,
+    },
+    knowsAbout: factValue('identity.knows_about'),
+    email: `mailto:${publicEmail}`,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'professional inquiries',
+      email: `mailto:${publicEmail}`,
+    },
+    sameAs: factValue('identity.same_as'),
   };
   const website = {
     ...cloneWithoutContext(websiteSource),
     '@type': 'WebSite',
     '@id': WEBSITE_ID,
-    name: websiteSource.name || '1200km Security Research',
-    url: 'https://1200km.com/',
+    name: factValue('site.name'),
+    url: siteUrl,
+    description: factValue('site.description'),
     author: { '@id': PERSON_ID },
     publisher: { '@id': PERSON_ID },
     inLanguage: 'en',
   };
+  // Google's sitelinks search box is retired; the on-site search remains a
+  // normal accessible page and does not need SearchAction schema.
+  delete website.potentialAction;
 
   const specializedPageType = schemaTypes(pageSource).find((type) => (
     WEB_PAGE_TYPES.has(type)
@@ -388,6 +414,26 @@ export function buildConnectedGraph(html, {
     }
     normalized['@id'] = entityId;
     usedIds.add(entityId);
+    if (isAdversaryGraph) {
+      const license = factValue('adversarygraph.license');
+      Object.assign(normalized, {
+        name: factValue('adversarygraph.product_name'),
+        alternateName: factValue('products.threatmapper').name,
+        applicationCategory: 'SecurityApplication',
+        operatingSystem: factValue('adversarygraph.operating_system'),
+        url: 'https://1200km.com/adversarygraph/',
+        codeRepository: factValue('adversarygraph.repository_url'),
+        softwareVersion: factValue('adversarygraph.stable_release'),
+        releaseNotes: `${factValue('adversarygraph.repository_url')}/releases/tag/${factValue('adversarygraph.latest_release_tag')}`,
+        license: license.url,
+        usageInfo: SITE_FACTS['adversarygraph.license'].scope,
+        author: { '@id': PERSON_ID },
+        sameAs: [
+          factValue('adversarygraph.repository_url'),
+          factValue('adversarygraph.documentation_url'),
+        ],
+      });
+    }
     if (types.some((type) => PRIMARY_ENTITY_TYPES.has(type))) {
       normalized.author = normalized.author || { '@id': PERSON_ID };
       normalized.publisher = normalized.publisher || { '@id': PERSON_ID };
@@ -418,9 +464,21 @@ export function buildConnectedGraph(html, {
       ...(embeddedSoftware ? normalizeReferences(cloneWithoutContext(embeddedSoftware), true) : {}),
       '@type': 'SoftwareApplication',
       '@id': SOFTWARE_ID,
-      name: 'AdversaryGraph',
-      url: embeddedSoftware?.url || 'https://1200km.com/adversarygraph/',
-      applicationCategory: embeddedSoftware?.applicationCategory || 'SecurityApplication',
+      name: factValue('adversarygraph.product_name'),
+      alternateName: factValue('products.threatmapper').name,
+      url: 'https://1200km.com/adversarygraph/',
+      applicationCategory: 'SecurityApplication',
+      operatingSystem: factValue('adversarygraph.operating_system'),
+      codeRepository: factValue('adversarygraph.repository_url'),
+      softwareVersion: factValue('adversarygraph.stable_release'),
+      releaseNotes: `${factValue('adversarygraph.repository_url')}/releases/tag/${factValue('adversarygraph.latest_release_tag')}`,
+      license: factValue('adversarygraph.license').url,
+      usageInfo: SITE_FACTS['adversarygraph.license'].scope,
+      author: { '@id': PERSON_ID },
+      sameAs: [
+        factValue('adversarygraph.repository_url'),
+        factValue('adversarygraph.documentation_url'),
+      ],
     });
   }
 
