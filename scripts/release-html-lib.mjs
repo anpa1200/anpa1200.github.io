@@ -570,6 +570,47 @@ export function deferThirdPartyBoot(html) {
   return transformed;
 }
 
+const STANDALONE_CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com",
+  "worker-src 'self' blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
+  "frame-src 'none'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  'upgrade-insecure-requests',
+].join('; ');
+
+export function hardenStandaloneHead(html) {
+  let transformed = html.replace(
+    /\s*<script>\(function\(\)\{var t=localStorage\.getItem\(["']theme["']\)\|\|["']dark["'];document\.documentElement\.setAttribute\(["']data-theme["'],t\);\}\)\(\);<\/script>/i,
+    '',
+  );
+  transformed = transformed.replace(
+    /\s*<meta\b[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>/gi,
+    '',
+  );
+  transformed = transformed.replace(
+    /\s*<meta\b[^>]*name=["']referrer["'][^>]*>/gi,
+    '',
+  );
+  const securityMeta = [
+    `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(STANDALONE_CSP)}">`,
+    '<meta name="referrer" content="strict-origin-when-cross-origin">',
+    '<script src="/assets/theme-bootstrap.js"></script>',
+  ].join('\n    ');
+  const charset = /<meta\b[^>]*charset=["'][^"']+["'][^>]*>/i;
+  if (charset.test(transformed)) {
+    return transformed.replace(charset, (tag) => `${tag}\n    ${securityMeta}`);
+  }
+  return transformed.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${securityMeta}`);
+}
+
 export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
   transformed = removeMetaKeywords(transformed);
@@ -587,6 +628,7 @@ export function transformReleaseHtml(html, options) {
   // an indexing-only copy instead of changing the deployed application DOM.
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(transformed);
   if (!isDocusaurus) {
+    transformed = hardenStandaloneHead(transformed);
     transformed = addHeadingIds(transformed);
     transformed = markPagefindContent(transformed);
     transformed = addImageDimensions(transformed, options);

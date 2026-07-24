@@ -26,13 +26,15 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 22
           cache: npm
       - name: Install locked search tooling
         run: npm ci
+      - name: Audit dependency graph
+        run: npm audit --audit-level=high
       - name: Validate search source
         run: npm run check-release-source
       - name: Stage publishable site
@@ -51,7 +53,7 @@ jobs:
           npm run build-shell -- --site "${RUNNER_TEMP}/site"
           node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
       - name: Checkout canonical article archive source
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: anpa1200/medium-blog-navigation
           ref: ${{ env.ARTICLE_ARCHIVE_COMMIT }}
@@ -135,7 +137,7 @@ jobs:
           npm run check-hygiene -- --site "${RUNNER_TEMP}/site"
       - name: Preserve quality evidence
         if: ${{ always() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: site-quality-${{ github.run_id }}
           path: |
@@ -152,7 +154,16 @@ jobs:
             ${{ runner.temp }}/site/build.json
           if-no-files-found: ignore
           retention-days: 14
-      - uses: actions/upload-pages-artifact@v5
+      - name: Generate CycloneDX SBOM
+        run: npm sbom --sbom-format=cyclonedx > "${RUNNER_TEMP}/site-sbom.cdx.json"
+      - name: Preserve release SBOM
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: site-sbom-${{ github.run_id }}
+          path: ${{ runner.temp }}/site-sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: ${{ runner.temp }}/site
           include-hidden-files: true
@@ -169,8 +180,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/configure-pages@v6
-      - uses: actions/deploy-pages@v5
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+      - uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
         id: deployment
 
   production-verification:
@@ -179,8 +190,8 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 22
       - name: Verify custom-domain production identity and fingerprints
@@ -191,7 +202,7 @@ jobs:
           --report "${RUNNER_TEMP}/production-verification.json"
       - name: Preserve production diagnostics
         if: ${{ always() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: production-verification-${{ github.run_id }}
           path: ${{ runner.temp }}/production-verification.json

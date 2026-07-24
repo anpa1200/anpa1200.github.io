@@ -31,6 +31,29 @@ const JSON_WELL_KNOWN_PATHS = new Set([
   '/.well-known/skills/index.json',
 ]);
 
+const SECURITY_HEADERS = {
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com",
+    "worker-src 'self' blob:",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self'",
+    "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com",
+    "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
+    "frame-src 'none'",
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    'upgrade-insecure-requests',
+  ].join('; '),
+  'Permissions-Policy': 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Strict-Transport-Security': 'max-age=31536000',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+};
+
 function wantsMarkdown(request) {
   const accept = request.headers.get('accept') || '';
   return accept.toLowerCase().includes('text/markdown');
@@ -38,6 +61,7 @@ function wantsMarkdown(request) {
 
 function addDiscoveryHeaders(response, pathname) {
   const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
   if (pathname === '/' || pathname === '/index.html') {
     for (const link of HOME_LINKS) headers.append('Link', link);
   }
