@@ -18,7 +18,13 @@ export function loadSiteShell(root) {
   const path = join(root, 'data', 'site-shell.json');
   if (!existsSync(path)) throw new Error(`Site shell definition not found: ${path}`);
   const shell = JSON.parse(readFileSync(path, 'utf8'));
-  if (!shell.version || !shell.brand || shell.primary_navigation?.length !== 6 || !Array.isArray(shell.pages)) {
+  if (!shell.version
+    || !shell.brand
+    || !Array.isArray(shell.primary_navigation)
+    || shell.primary_navigation.length !== 4
+    || !Array.isArray(shell.secondary_navigation)
+    || shell.secondary_navigation.length < 1
+    || !Array.isArray(shell.pages)) {
     throw new Error('data/site-shell.json is missing required shell fields');
   }
   return shell;
@@ -39,6 +45,20 @@ function renderNavigationLinks(shell, page, indent = '            ') {
   }).join('\n');
 }
 
+function renderSecondaryNavigation(shell, page, indent = '              ') {
+  const active = shell.secondary_navigation.some((item) => item.id === page.active);
+  const links = shell.secondary_navigation.map((item) => {
+    const state = currentState(item, page);
+    return `${indent}  <a${state} href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>`;
+  }).join('\n');
+  return `${indent.slice(0, -2)}<details class="nav-more"${active ? ' data-active="true"' : ''}>
+${indent}<summary>More</summary>
+${indent}<div class="nav-more-list">
+${links}
+${indent}</div>
+${indent.slice(0, -2)}</details>`;
+}
+
 export function renderHeader(shell, page) {
   const brand = shell.brand;
   return `${HEADER_START}
@@ -55,7 +75,10 @@ export function renderHeader(shell, page) {
             <span class="nav-menu-text">Menu</span>
           </summary>
           <div class="nav-list" id="primary-nav-list">
+            <!-- site-shell:primary-navigation:start -->
 ${renderNavigationLinks(shell, page)}
+${renderSecondaryNavigation(shell, page)}
+            <!-- site-shell:primary-navigation:end -->
           </div>
         </details>
         <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
@@ -71,7 +94,9 @@ ${renderNavigationLinks(shell, page)}
 }
 
 export function renderFooter(shell, page) {
-  const globalLinks = shell.primary_navigation.map((item) =>
+  const about = shell.secondary_navigation.find((item) => item.id === 'about');
+  const footerNavigation = about ? [...shell.primary_navigation, about] : shell.primary_navigation;
+  const globalLinks = footerNavigation.map((item) =>
     `          <a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>`).join('\n');
   const informationLinks = shell.footer.site_information.map((item) => {
     const external = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';

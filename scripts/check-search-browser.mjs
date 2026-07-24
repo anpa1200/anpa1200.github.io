@@ -479,8 +479,8 @@ try {
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'AdversaryGraph', 'Labs', 'Library', 'Projects', 'About'])
-    || staticMobileState.footerCount !== 9
+  if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'About', 'CV', 'External validation'])
+    || staticMobileState.footerCount !== 8
     || !staticMobileState.privacy
     || staticMobileState.search !== '/search.html'
     || !staticMobileState.menuVisible
@@ -516,7 +516,8 @@ try {
     const header = document.querySelector('.site-header');
     const brand = document.querySelector('.site-header .brand');
     const sidebar = document.querySelector('.page-sidenav');
-    const primaryLinks = Array.from(document.querySelectorAll('.site-header .nav-list a'));
+    const primaryLinks = Array.from(document.querySelectorAll('.site-header .nav-list > a'));
+    const navigationLinks = Array.from(document.querySelectorAll('.site-header .nav-list a'));
     const triggerRect = trigger?.getBoundingClientRect();
     const heroRect = heroInput?.getBoundingClientRect();
     const themeRect = theme?.getBoundingClientRect();
@@ -530,7 +531,7 @@ try {
       triggerVisible: Boolean(triggerRect && triggerRect.width >= 180 && triggerRect.height >= 38 && (hit === trigger || trigger.contains(hit))),
       heroVisible: Boolean(heroRect && heroRect.width >= 500 && heroRect.height >= 44),
       headerHeight: headerRect?.height || 0,
-      primaryCount: primaryLinks.length,
+      primaryCount: primaryLinks.length + document.querySelectorAll('.site-header .nav-list > details').length,
       primaryRows: new Set(linkRects.map((rect) => Math.round(rect.top))).size,
       brandVisible: Boolean(brand && getComputedStyle(brand).display !== 'none'),
       sidebarVisible: Boolean(sidebarRect && sidebarRect.width >= 220 && sidebarRect.width <= 260 && getComputedStyle(sidebar).display !== 'none'),
@@ -542,7 +543,7 @@ try {
       overlapsLinks: overlaps(triggerRect, linksRect),
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
       center: triggerRect ? { x: triggerRect.left + triggerRect.width / 2, y: triggerRect.top + triggerRect.height / 2 } : null,
-      navigation: primaryLinks.map((link) => ({
+      navigation: navigationLinks.map((link) => ({
         label: link.textContent.trim(),
         path: new URL(link.href).pathname,
         current: link.getAttribute('aria-current'),
@@ -553,7 +554,7 @@ try {
   if (!desktopState.triggerVisible
     || !desktopState.heroVisible
     || desktopState.headerHeight > 72
-    || desktopState.primaryCount !== 6
+    || desktopState.primaryCount !== 5
     || desktopState.primaryRows !== 1
     || desktopState.brandVisible
     || !desktopState.sidebarVisible
@@ -567,16 +568,17 @@ try {
   }
   const canonicalNavigation = [
     { label: 'Research', path: '/cti.html', current: null },
-    { label: 'AdversaryGraph', path: '/adversarygraph/', current: null },
-    { label: 'Labs', path: '/labs.html', current: null },
     { label: 'Library', path: '/guides.html', current: null },
-    { label: 'Projects', path: '/projects.html', current: null },
+    { label: 'Products & Labs', path: '/projects.html', current: null },
+    { label: 'AdversaryGraph', path: '/adversarygraph/', current: null },
     { label: 'About', path: '/about.html', current: null },
+    { label: 'CV', path: '/cv.html', current: null },
+    { label: 'External validation', path: '/external-validation.html', current: null },
   ];
   if (JSON.stringify(staticControl.navigation) !== JSON.stringify(canonicalNavigation)
     || JSON.stringify(desktopState.navigation) !== JSON.stringify(staticControl.navigation)
     || JSON.stringify(desktopState.footerLinks) !== JSON.stringify(staticControl.footerLinks)
-    || staticControl.footerLinks.length !== 9
+    || staticControl.footerLinks.length !== 8
     || !staticControl.footerLinks.includes('/privacy.html')) {
     failures.push(`source/rendered shell mismatch: ${JSON.stringify({
       sourceNavigation: staticControl.navigation,
@@ -637,7 +639,7 @@ try {
   await waitForExpression(
     devtools,
     standardHome.sessionId,
-    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn')) && document.querySelectorAll('.site-header .nav-list a').length === 6`,
+    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn')) && document.querySelectorAll('.site-header .nav-list a').length === 7`,
     'standard desktop header readiness'
   );
   const standardHeaderState = await evaluate(devtools, standardHome.sessionId, `(() => {
@@ -655,7 +657,7 @@ try {
     return {
       height: rect(header)?.height || 0,
       brandVisible: Boolean(brandRect && brandRect.width > 0 && getComputedStyle(brand).display !== 'none'),
-      rows: new Set(Array.from(list.querySelectorAll('a')).map((link) => Math.round(link.getBoundingClientRect().top))).size,
+      rows: new Set(Array.from(list.querySelectorAll(':scope > a, :scope > details > summary')).map((control) => Math.round(control.getBoundingClientRect().top))).size,
       overlaps: overlaps(brandRect, listRect) || overlaps(brandRect, triggerRect) || overlaps(listRect, triggerRect) || overlaps(listRect, themeRect) || overlaps(triggerRect, themeRect),
       sidebarVisible: getComputedStyle(document.querySelector('.page-sidenav')).display !== 'none',
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
@@ -743,17 +745,37 @@ try {
   const mobileMenuState = await evaluate(devtools, homePage.sessionId, `(() => {
     const list = document.querySelector('.site-header .nav-list');
     const rect = list.getBoundingClientRect();
-    const links = Array.from(list.querySelectorAll('a'));
+    const links = Array.from(list.querySelectorAll(':scope > a, :scope > details > summary'));
     return {
       count: links.length,
+      secondaryCount: list.querySelectorAll('.nav-more-list a').length,
       minTargetHeight: Math.min(...links.map((link) => link.getBoundingClientRect().height)),
       withinViewport: rect.left >= -1 && rect.right <= window.innerWidth + 1 && rect.top >= -1 && rect.bottom <= window.innerHeight + 1,
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (mobileMenuState.count !== 6 || mobileMenuState.minTargetHeight < 44 || !mobileMenuState.withinViewport || mobileMenuState.overflow) {
+  if (mobileMenuState.count !== 5 || mobileMenuState.secondaryCount !== 3 || mobileMenuState.minTargetHeight < 44 || !mobileMenuState.withinViewport || mobileMenuState.overflow) {
     failures.push(`mobile navigation disclosure failed: ${JSON.stringify(mobileMenuState)}`);
   }
+  await evaluate(devtools, homePage.sessionId, `document.querySelector('.nav-more > summary').click()`);
+  await waitForExpression(
+    devtools,
+    homePage.sessionId,
+    `document.querySelector('.nav-more')?.open && Array.from(document.querySelectorAll('.nav-more-list a')).every((link) => link.getBoundingClientRect().height >= 44)`,
+    'mobile More disclosure'
+  );
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27,
+  }, homePage.sessionId);
+  await devtools.send('Input.dispatchKeyEvent', {
+    type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27,
+  }, homePage.sessionId);
+  await waitForExpression(
+    devtools,
+    homePage.sessionId,
+    `!document.querySelector('.nav-more')?.open && document.querySelector('details.nav-links')?.open && document.activeElement === document.querySelector('.nav-more > summary')`,
+    'mobile More Escape close and focus restoration'
+  );
   await devtools.send('Input.dispatchKeyEvent', {
     type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27,
   }, homePage.sessionId);
@@ -794,7 +816,7 @@ try {
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (mobileFooterState.links !== 9
+  if (mobileFooterState.links !== 8
     || JSON.stringify(mobileFooterState.labels) !== JSON.stringify(['Footer navigation', 'Site information'])
     || !mobileFooterState.privacy
     || !mobileFooterState.contained

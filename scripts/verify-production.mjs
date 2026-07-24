@@ -55,7 +55,7 @@ function pageChecks(path, body, articleCount) {
   const common = [{ label: 'current build ID', pass: buildMetaPresent(body) }];
   const checks = {
     '/': [...common,
-      { label: 'Selected Research', pass: body.includes('Selected Research') },
+      { label: 'Explore research', pass: body.includes('Explore research') },
       { label: 'AdversaryGraph hero action', pass: /class=["'][^"']*button[^"']*["'][^>]*href=["'][^"']*adversarygraph/i.test(body) },
     ],
     '/about.html': [...common,

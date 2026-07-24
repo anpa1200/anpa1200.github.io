@@ -6,6 +6,7 @@ import {
   SOFTWARE_ID,
   WEBSITE_ID,
   connectedGraphFromHtml,
+  normalizeDocusaurusBrandLogoAlts,
   normalizeSeoTitle,
   transformReleaseHtml,
 } from '../scripts/release-html-lib.mjs';
@@ -102,4 +103,11 @@ test('known generated title suffixes are shortened without truncating the conten
     normalizeSeoTitle('A deliberately long article title that must remain complete | 1200km'),
     'A deliberately long article title that must remain complete | 1200km',
   );
+});
+
+test('Docusaurus brand logos are decorative when adjacent title text names the site', () => {
+  const input = '<a class="navbar__brand" href="/docs/"><div class="navbar__logo"><img src="/logo.png" alt="1200km"></div><b class="navbar__title">Research guide</b></a>';
+  assert.match(normalizeDocusaurusBrandLogoAlts(input), /<img src="\/logo\.png" alt="">/);
+  const standalone = '<img src="/evidence.png" alt="AdversaryGraph investigation graph">';
+  assert.equal(normalizeDocusaurusBrandLogoAlts(standalone), standalone);
 });

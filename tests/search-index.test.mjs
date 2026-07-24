@@ -185,10 +185,11 @@ test('portfolio navigation is compact and search is click-only', () => {
   assert.match(html, /class="has-page-sidenav"/);
   assert.match(html, /class="skip-link"[^>]+href="#main-content"/);
 
-  const primary = html.match(/<div class="nav-list" id="primary-nav-list">([\s\S]*?)<\/div>/)?.[1] || '';
-  assert.equal((primary.match(/<a\b/g) || []).length, 6);
-  for (const label of ['Research', 'AdversaryGraph', 'Labs', 'Library', 'Projects', 'About']) {
-    assert.match(primary, new RegExp(`>${label}<`));
+  const primary = html.match(/<!-- site-shell:primary-navigation:start -->([\s\S]*?)<!-- site-shell:primary-navigation:end -->/)?.[1] || '';
+  assert.equal((primary.match(/<a\b/g) || []).length, 7);
+  assert.equal((primary.match(/<details class="nav-more"/g) || []).length, 1);
+  for (const label of ['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'About', 'CV', 'External validation']) {
+    assert.match(primary.replace(/&amp;/g, '&'), new RegExp(`>${label}<`));
   }
   assert.match(search, /setAttribute\('show-sub-results', 'true'\)/);
   assert.match(search, /pagefind-filter-dropdown/);

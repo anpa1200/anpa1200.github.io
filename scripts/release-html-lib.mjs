@@ -611,6 +611,19 @@ export function hardenStandaloneHead(html) {
   return transformed.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${securityMeta}`);
 }
 
+export function normalizeDocusaurusBrandLogoAlts(html) {
+  return html.replace(
+    /<a\b[^>]*class=["'][^"']*\bnavbar__brand\b[^"']*["'][^>]*>[\s\S]*?<\/a>/gi,
+    (brand) => {
+      if (!/\bnavbar__title\b/i.test(brand)) return brand;
+      return brand.replace(
+        /<img\b[^>]*>/gi,
+        (image) => replaceAttribute(image, 'alt', ''),
+      );
+    },
+  );
+}
+
 export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
   transformed = removeMetaKeywords(transformed);
@@ -627,7 +640,9 @@ export function transformReleaseHtml(html, options) {
   // Its headings already carry stable IDs; Pagefind adds its content marker to
   // an indexing-only copy instead of changing the deployed application DOM.
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(transformed);
-  if (!isDocusaurus) {
+  if (isDocusaurus) {
+    transformed = normalizeDocusaurusBrandLogoAlts(transformed);
+  } else {
     transformed = hardenStandaloneHead(transformed);
     transformed = addHeadingIds(transformed);
     transformed = markPagefindContent(transformed);

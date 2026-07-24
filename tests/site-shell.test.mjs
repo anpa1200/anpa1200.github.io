@@ -17,6 +17,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const shell = loadSiteShell(ROOT);
 const expectedLabels = shell.primary_navigation.map((item) => item.label);
 const expectedHrefs = shell.primary_navigation.map((item) => item.href);
+const expectedSecondaryLabels = shell.secondary_navigation.map((item) => item.label);
+const expectedSecondaryHrefs = shell.secondary_navigation.map((item) => item.href);
 
 function region(html, start, end) {
   return html.slice(html.indexOf(start), html.indexOf(end) + end.length);
@@ -26,14 +28,16 @@ function links(html) {
   return [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map((match) => ({
     attributes: match[1],
     href: match[1].match(/\bhref="([^"]+)"/)?.[1] || '',
-    label: match[2].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
+    label: match[2].replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim(),
   }));
 }
 
 test('every standalone page contains the generated canonical header and footer', () => {
   assert.equal(shell.pages.length, 24);
-  assert.deepEqual(expectedLabels, ['Research', 'AdversaryGraph', 'Labs', 'Library', 'Projects', 'About']);
+  assert.deepEqual(expectedLabels, ['Research', 'Library', 'Products & Labs', 'AdversaryGraph']);
+  assert.deepEqual(expectedSecondaryLabels, ['About', 'CV', 'External validation']);
   assert.ok(expectedHrefs.every((href) => href.startsWith('/')), 'primary destinations must be root-relative');
+  assert.ok(expectedSecondaryHrefs.every((href) => href.startsWith('/')), 'secondary destinations must be root-relative');
 
   for (const page of shell.pages) {
     const html = readFileSync(join(ROOT, page.path), 'utf8');
@@ -46,12 +50,17 @@ test('every standalone page contains the generated canonical header and footer',
     assert.match(html, /href="\/assets\/site-theme\.css\?v=20260721-shell"/, `${page.path}: shared shell CSS must be static`);
     assert.match(html, /src="\/assets\/site-theme\.js\?v=20260721-shell"/, `${page.path}: shared shell interactions must load statically`);
 
-    const primary = region(header, '<div class="nav-list" id="primary-nav-list">', '</div>');
-    const primaryLinks = links(primary);
-    assert.deepEqual(primaryLinks.map((link) => link.label), expectedLabels, `${page.path}: primary labels differ`);
-    assert.deepEqual(primaryLinks.map((link) => link.href), expectedHrefs, `${page.path}: primary destinations differ`);
+    const primary = region(header, '<!-- site-shell:primary-navigation:start -->', '<!-- site-shell:primary-navigation:end -->');
+    const direct = primary.slice(0, primary.indexOf('<details class="nav-more"'));
+    const directLinks = links(direct);
+    const allLinks = links(primary);
+    assert.deepEqual(directLinks.map((link) => link.label), expectedLabels, `${page.path}: primary labels differ`);
+    assert.deepEqual(directLinks.map((link) => link.href), expectedHrefs, `${page.path}: primary destinations differ`);
+    assert.deepEqual(allLinks.slice(expectedLabels.length).map((link) => link.label), expectedSecondaryLabels, `${page.path}: More labels differ`);
+    assert.deepEqual(allLinks.slice(expectedHrefs.length).map((link) => link.href), expectedSecondaryHrefs, `${page.path}: More destinations differ`);
+    assert.equal(directLinks.length + (primary.includes('<details class="nav-more"') ? 1 : 0), 5, `${page.path}: desktop top-level navigation must contain five controls`);
     assert.equal((primary.match(/aria-current=/g) || []).length, page.active ? 1 : 0, `${page.path}: active state differs`);
-    assert.doesNotMatch(primary, />\s*(?:CV|CTI|HexStrike|Offensive|PT Tools|Validation|GitHub|Medium)(?:\s*↗)?\s*</i, `${page.path}: obsolete menu item remains`);
+    assert.doesNotMatch(primary, />\s*(?:CTI|HexStrike|Offensive|PT Tools|GitHub|Medium)(?:\s*↗)?\s*</i, `${page.path}: obsolete menu item remains`);
 
     assert.match(footer, /aria-label="Footer navigation"/);
     assert.match(footer, /aria-label="Site information"/);
