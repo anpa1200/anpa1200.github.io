@@ -333,7 +333,7 @@ function renderDiscover() {
     <section class="hero">
       <div class="panel hero-copy">
         <div class="eyebrow">AdversaryGraph Light · public browser workspace</div>
-        <h1>ATT&amp;CK exploration with the AdversaryGraph product shape.</h1>
+        <h1>ATT&amp;CK exploration with the Adversary<wbr>Graph product shape.</h1>
         <p>Threat Matrix is the public light web version of AdversaryGraph. It uses the same dark analyst workbench layout and exposes real browser-only functions: matrix navigation, actor pivots, TTP search, overlap comparison, coverage leads, and Navigator-style layer export.</p>
         <p>Backend modules are shown as product-real buttons. When a feature requires local storage, API keys, AI providers, enrichment workers, MalwareGraph, attack-lab containers, or SIEM forwarding, the button opens a clear full-version disclaimer.</p>
         <div class="cta-row">
