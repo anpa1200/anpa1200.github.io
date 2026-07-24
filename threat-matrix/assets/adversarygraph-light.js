@@ -49,6 +49,7 @@ const state = {
   aptListScrollTop: 0,
   iocLibrary: { items: [], source: {}, count: 0 },
   cveLibrary: { items: [], source: {}, count: 0 },
+  libraryStatus: { ioc: 'idle', cve: 'idle' },
 };
 
 const root = document.querySelector('#root');
@@ -59,7 +60,7 @@ init().catch(error => {
 
 async function init() {
   renderShell();
-  await Promise.all([loadDomain('mitre-data.json'), loadDemoLibraries()]);
+  await loadDomain('mitre-data.json');
   bindGlobalEvents();
   render();
 }
@@ -177,13 +178,20 @@ async function loadDomain(file) {
   state.matrixScroll = { left: 0, top: 0 };
 }
 
-async function loadDemoLibraries() {
-  const [iocLibrary, cveLibrary] = await Promise.all([
-    fetch('./demo-data/iocs.json', { cache: 'force-cache' }).then(response => response.ok ? response.json() : null).catch(() => null),
-    fetch('./demo-data/cves.json', { cache: 'force-cache' }).then(response => response.ok ? response.json() : null).catch(() => null),
-  ]);
-  if (iocLibrary) state.iocLibrary = iocLibrary;
-  if (cveLibrary) state.cveLibrary = cveLibrary;
+async function loadDemoLibrary(kind) {
+  const config = kind === 'ioc'
+    ? { path: './demo-data/iocs.json', stateKey: 'iocLibrary' }
+    : { path: './demo-data/cves.json', stateKey: 'cveLibrary' };
+  if (state.libraryStatus[kind] === 'ready' || state.libraryStatus[kind] === 'loading') return;
+  state.libraryStatus[kind] = 'loading';
+  try {
+    const response = await fetch(config.path, { cache: 'force-cache' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    state[config.stateKey] = await response.json();
+    state.libraryStatus[kind] = 'ready';
+  } catch {
+    state.libraryStatus[kind] = 'error';
+  }
 }
 
 function bindGlobalEvents() {
@@ -200,6 +208,11 @@ function bindGlobalEvents() {
       state.active = id;
       closeSidebar();
       render();
+      const libraryKind = id === 'ioc-library' ? 'ioc' : id === 'cve' ? 'cve' : '';
+      if (libraryKind && state.libraryStatus[libraryKind] === 'idle') {
+        await loadDemoLibrary(libraryKind);
+        if (state.active === id) render();
+      }
       return;
     }
     const matrixAction = event.target.closest('[data-matrix-action]');
@@ -501,6 +514,8 @@ function renderExport() {
 }
 
 function renderIocLibrary() {
+  if (state.libraryStatus.ioc === 'loading') return loadingLibrary('IOC', 'URLhaus');
+  if (state.libraryStatus.ioc === 'error') return libraryLoadError('IOC');
   const items = filterIocs().slice(0, 120);
   const source = state.iocLibrary.source || {};
   return `
@@ -528,6 +543,8 @@ function renderIocLibrary() {
 }
 
 function renderCveLibrary() {
+  if (state.libraryStatus.cve === 'loading') return loadingLibrary('CVE', 'CISA KEV');
+  if (state.libraryStatus.cve === 'error') return libraryLoadError('CVE');
   const items = filterCves().slice(0, 120);
   const source = state.cveLibrary.source || {};
   return `
@@ -552,6 +569,14 @@ function renderCveLibrary() {
       </div>
     </section>
   `;
+}
+
+function loadingLibrary(label, source) {
+  return `<section class="panel card"><h2>Loading ${escapeHtml(label)} library…</h2><p>The static ${escapeHtml(source)} demo dataset is loaded only when this module is opened.</p></section>`;
+}
+
+function libraryLoadError(label) {
+  return `<section class="notice"><strong>${escapeHtml(label)} library unavailable</strong><p>The optional static demo dataset could not be loaded. The ATT&amp;CK workspace remains available; reload this page to retry.</p></section>`;
 }
 
 function renderKnowledgeLibrary() {

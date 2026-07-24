@@ -226,7 +226,9 @@ for (const alias of catalog.aliases || []) {
 }
 
 const sitemapName = catalog.scope === 'deployable-domain-catalog' ? 'sitemap.xml' : 'sitemap-all.xml';
-const sitemap = parseSitemapEntries(read(join(siteRoot, sitemapName))).entries.map((entry) => entry.loc);
+const sitemap = parseSitemapEntries(read(join(siteRoot, sitemapName))).entries
+  .map((entry) => entry.loc)
+  .filter((url) => new URL(url).pathname !== '/llms.txt');
 const sitemapSet = new Set(sitemap);
 for (const url of sitemap) if (!itemByAnyUrl.has(normalizeContentUrl(url))) fail(`${sitemapName}: indexed URL has no catalogue identity: ${url}.`);
 for (const item of catalog.items || []) {

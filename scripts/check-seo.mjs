@@ -14,6 +14,7 @@ import {
   PERSON_ID,
   SOFTWARE_ID,
   WEBSITE_ID,
+  editorialArticleDocument,
   parseJsonLd,
   stripHtml,
   tagAttributes,
@@ -285,6 +286,14 @@ if (existsSync(preliminarySitemapPath)) {
   }
 }
 
+const releaseTitles = new Map();
+const releaseDescriptions = new Map();
+const metadataReport = {
+  titles_over_60: [],
+  descriptions_under_70: [],
+  descriptions_over_160: [],
+};
+
 for (const page of pages) {
   const releaseHtml = requireReleaseTransform
     ? page.html
@@ -298,12 +307,36 @@ for (const page of pages) {
   if (/<meta\b[^>]*\bname=["']keywords["']/i.test(releaseHtml)) failures.push(`${page.rel}: legacy meta keywords are present`);
   const documentTitle = stripHtml(releaseHtml.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '');
   if (!documentTitle) failures.push(`${page.rel}: document title is missing`);
+  else {
+    if (releaseTitles.has(documentTitle)) {
+      failures.push(`${page.rel}: document title duplicates ${releaseTitles.get(documentTitle)} (${documentTitle})`);
+    } else releaseTitles.set(documentTitle, page.rel);
+    if (documentTitle.length > 60) metadataReport.titles_over_60.push({ page: page.rel, length: documentTitle.length });
+  }
   if (documentTitle.length > 115) failures.push(`${page.rel}: document title remains excessively long (${documentTitle.length} characters)`);
   if (/\|\s*AdversaryGraph Documentation\b|\|\s*ITDR\s*[–—-]\s*Identity Threat Detection/i.test(documentTitle)) {
     failures.push(`${page.rel}: document title retains a repetitive generated suffix`);
   }
   if ((documentTitle.match(/\|\s*1200km\b/gi) || []).length > 1) failures.push(`${page.rel}: document title repeats the site name`);
   if (/\|\s*1200km\s*\|/i.test(documentTitle)) failures.push(`${page.rel}: document title contains a duplicated site-name fragment`);
+  const description = findMetaContent(releaseHtml, 'description').trim();
+  if (!description) failures.push(`${page.rel}: release meta description is missing`);
+  else {
+    if (releaseDescriptions.has(description)) {
+      failures.push(`${page.rel}: meta description duplicates ${releaseDescriptions.get(description)}`);
+    } else releaseDescriptions.set(description, page.rel);
+    if (description.length < 70) metadataReport.descriptions_under_70.push({ page: page.rel, length: description.length });
+    if (description.length > 160) {
+      metadataReport.descriptions_over_160.push({ page: page.rel, length: description.length });
+      failures.push(`${page.rel}: meta description exceeds 160 characters (${description.length})`);
+    }
+  }
+  for (const key of ['og:image', 'twitter:image']) {
+    const imageUrl = findMetaContent(releaseHtml, key);
+    if (!/^https:\/\/\S+/i.test(imageUrl)) failures.push(`${page.rel}: ${key} is missing or is not an absolute HTTPS URL`);
+  }
+  if (!findMetaContent(releaseHtml, 'og:image:alt')) failures.push(`${page.rel}: og:image:alt is missing`);
+  if (!findMetaContent(releaseHtml, 'twitter:image:alt')) failures.push(`${page.rel}: twitter:image:alt is missing`);
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(releaseHtml);
   if (/<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: release HTML still blocks on an external web font`);
   if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: analytics was not deferred to user interaction`);
@@ -324,6 +357,10 @@ for (const page of pages) {
     && !/application\/rss\+xml[^>]+rel=["'][^"']*alternate/i.test(releaseHtml)) {
     failures.push(`${page.rel}: missing RSS discovery link`);
   }
+  if (requireReleaseTransform && editorialArticleDocument(page.canonical)) {
+    if (!/\bdata-content-freshness\b/i.test(releaseHtml)) failures.push(`${page.rel}: editorial article has no visible publication/update date`);
+    if (!/\bdata-article-discovery\b/i.test(releaseHtml)) failures.push(`${page.rel}: editorial article has no archive/related-content navigation`);
+  }
   checkImages(page.rel, releaseHtml, page.path, !isDocusaurus);
   checkGraph(
     page.rel,
@@ -334,6 +371,8 @@ for (const page of pages) {
 }
 
 const canonicalUrls = new Set(pages.map((page) => page.canonical));
+const auxiliarySitemapUrls = new Set(['https://1200km.com/llms.txt']);
+const expectedLocalSitemapUrls = new Set([...canonicalUrls, ...auxiliarySitemapUrls]);
 const sitemapAllPath = join(siteRoot, 'sitemap-all.xml');
 const sitemapPath = join(siteRoot, 'sitemap.xml');
 if (!existsSync(sitemapAllPath) || !existsSync(sitemapPath)) failures.push('sitemap files are missing');
@@ -342,16 +381,16 @@ else {
   const complete = parseSitemapEntries(readFileSync(sitemapPath, 'utf8'));
   if (local.isIndex || complete.isIndex) failures.push('sitemaps must be flat URL sets generated from canonical pages');
   const localUrls = new Set(local.entries.map((entry) => entry.loc));
-  if (localUrls.size !== canonicalUrls.size) failures.push(`sitemap-all.xml has ${localUrls.size} URLs; expected ${canonicalUrls.size}`);
-  for (const url of canonicalUrls) if (!localUrls.has(url)) failures.push(`sitemap-all.xml is missing ${url}`);
+  if (localUrls.size !== expectedLocalSitemapUrls.size) failures.push(`sitemap-all.xml has ${localUrls.size} URLs; expected ${expectedLocalSitemapUrls.size}`);
+  for (const url of expectedLocalSitemapUrls) if (!localUrls.has(url)) failures.push(`sitemap-all.xml is missing ${url}`);
   for (const entry of local.entries) {
-    if (!canonicalUrls.has(entry.loc)) failures.push(`sitemap-all.xml contains a non-local/non-canonical URL: ${entry.loc}`);
+    if (!expectedLocalSitemapUrls.has(entry.loc)) failures.push(`sitemap-all.xml contains a non-local/non-canonical URL: ${entry.loc}`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.lastmod || '')) failures.push(`sitemap-all.xml has no accurate lastmod for ${entry.loc}`);
   }
   const completeUrls = new Set(complete.entries.map((entry) => entry.loc));
   if (completeUrls.size !== complete.entries.length) failures.push('sitemap.xml contains duplicate URLs');
-  if (completeUrls.size < canonicalUrls.size) failures.push('sitemap.xml does not cover all local canonical pages');
-  for (const url of canonicalUrls) if (!completeUrls.has(url)) failures.push(`sitemap.xml is missing local URL ${url}`);
+  if (completeUrls.size < expectedLocalSitemapUrls.size) failures.push('sitemap.xml does not cover all local canonical pages and discovery files');
+  for (const url of expectedLocalSitemapUrls) if (!completeUrls.has(url)) failures.push(`sitemap.xml is missing local URL ${url}`);
 }
 
 let catalogItemsByUrl = new Map();
@@ -382,17 +421,18 @@ if (!existsSync(robotsPath)) failures.push('robots.txt is missing');
 else {
   const robots = readFileSync(robotsPath, 'utf8');
   const groups = robotsGroups(robots);
-  const allowed = ['Googlebot', 'Bingbot', 'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Perplexity-User'];
-  const blocked = ['GPTBot', 'ClaudeBot', 'anthropic-ai', 'Google-Extended', 'CCBot', 'Applebot-Extended', 'FacebookBot', 'Bytespider', 'cohere-ai'];
+  const allowed = [
+    'Googlebot', 'Bingbot', 'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot',
+    'Claude-User', 'PerplexityBot', 'Perplexity-User', 'GPTBot', 'ClaudeBot',
+    'anthropic-ai', 'Google-Extended', 'CCBot', 'Applebot-Extended', 'FacebookBot',
+    'Bytespider', 'cohere-ai',
+  ];
   for (const agent of allowed) {
     const group = groups.find((item) => item.agents.includes(agent));
     if (!group?.rules.includes('allow:/')) failures.push(`robots.txt does not allow ${agent}`);
   }
-  for (const agent of blocked) {
-    const group = groups.find((item) => item.agents.includes(agent));
-    if (!group?.rules.includes('disallow:/')) failures.push(`robots.txt does not block training crawler ${agent}`);
-  }
-  if (!robots.includes('Policy: search=yes, user-triggered AI retrieval=yes, model training=no')) failures.push('robots.txt does not document the AI use policy');
+  if (!robots.includes('Policy: search=yes, user-triggered AI retrieval=yes, model training=yes')) failures.push('robots.txt does not document the AI use policy');
+  if (!robots.includes('# LLM guide: https://1200km.com/llms.txt')) failures.push('robots.txt does not advertise the LLM guide');
   const sitemapDirectives = robots.match(/^Sitemap:\s*\S+/gim) || [];
   if (sitemapDirectives.length !== 1 || sitemapDirectives[0] !== 'Sitemap: https://1200km.com/sitemap.xml') {
     failures.push('robots.txt must advertise exactly the generated canonical sitemap');
@@ -464,3 +504,4 @@ if (failures.length) {
 }
 
 console.log(`SEO release validation passed for ${pages.length} canonical pages.`);
+console.log(`Metadata review: ${metadataReport.titles_over_60.length} titles over 60 characters; ${metadataReport.descriptions_under_70.length} descriptions under 70 characters; ${metadataReport.descriptions_over_160.length} descriptions over 160 characters.`);

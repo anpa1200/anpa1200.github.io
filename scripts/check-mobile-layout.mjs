@@ -263,6 +263,39 @@ function layoutExpression(checkFixture) {
       };
     }
 
+    const pathname = window.location.pathname;
+    const homeHeading = pathname === '/' ? document.querySelector('.hero h1') : null;
+    const homeHeadingStyle = homeHeading ? getComputedStyle(homeHeading) : null;
+    const homeActions = pathname === '/' ? document.querySelector('.hero .actions') : null;
+    const searchInput = pathname === '/search.html'
+      ? document.querySelector('[data-site-search-input] input, [data-site-search-input] .pf-input')
+      : null;
+    const searchHeading = pathname === '/search.html' ? document.querySelector('main > header h1') : null;
+    const p2 = {
+      home: homeHeading ? {
+        headingLines: round(homeHeading.getBoundingClientRect().height / Number.parseFloat(homeHeadingStyle.lineHeight)),
+        actionCount: homeActions?.querySelectorAll('.button').length || 0,
+        actionsInFirstViewport: (homeActions?.getBoundingClientRect().bottom || Infinity) <= window.innerHeight,
+        actionsBeforeSearch: Boolean(homeActions?.compareDocumentPosition(document.querySelector('.site-search-hero')) & Node.DOCUMENT_POSITION_FOLLOWING),
+      } : null,
+      search: searchInput && searchHeading ? {
+        inputGap: round(searchInput.getBoundingClientRect().top - searchHeading.getBoundingClientRect().bottom),
+        shortPlaceholder: searchInput.getAttribute('placeholder') === 'Actor, ATT&CK ID, topic…',
+        guidanceAfterResults: Boolean(
+          document.querySelector('[data-site-search-results]')
+            ?.compareDocumentPosition(document.querySelector('.site-search-guidance'))
+            & Node.DOCUMENT_POSITION_FOLLOWING
+        ),
+      } : null,
+      projectPrimaryActions: pathname === '/projects.html'
+        ? document.querySelectorAll('.hero .button-row .button').length
+        : null,
+      profilePrimaryActions: pathname === '/about.html'
+        ? document.querySelectorAll('.profile-hero .profile-actions .button').length
+        : null,
+      topLevelNavigationCount: document.querySelectorAll('.site-header .nav-list > a, .site-header .nav-list > details').length,
+    };
+
     return {
       viewport: window.innerWidth,
       scrollWidth: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth),
@@ -273,6 +306,7 @@ function layoutExpression(checkFixture) {
       controlOverflow,
       productTitle,
       fixture,
+      p2,
     };
   })()`;
 }
@@ -498,6 +532,30 @@ try {
       if (state.badWrap.length) failures.push(`${name}@${viewport.label}: ordinary prose uses emergency wrapping ${JSON.stringify(state.badWrap)}`);
       if (state.narrowProse.length) failures.push(`${name}@${viewport.label}: ordinary prose is unnecessarily narrow ${JSON.stringify(state.narrowProse)}`);
       if (state.controlOverflow.length) failures.push(`${name}@${viewport.label}: navigation or CTA overflow ${JSON.stringify(state.controlOverflow)}`);
+      if (state.p2.topLevelNavigationCount && state.p2.topLevelNavigationCount > 5) {
+        failures.push(`${name}@${viewport.label}: ${state.p2.topLevelNavigationCount} top-level navigation controls exceed the five-item IA`);
+      }
+      if (state.p2.home && viewport.width <= 430 && (
+        state.p2.home.headingLines > 4
+        || state.p2.home.actionCount !== 2
+        || !state.p2.home.actionsInFirstViewport
+        || !state.p2.home.actionsBeforeSearch
+      )) {
+        failures.push(`${name}@${viewport.label}: mobile hero hierarchy failed ${JSON.stringify(state.p2.home)}`);
+      }
+      if (state.p2.search && viewport.width <= 430 && (
+        state.p2.search.inputGap > 48
+        || !state.p2.search.shortPlaceholder
+        || !state.p2.search.guidanceAfterResults
+      )) {
+        failures.push(`${name}@${viewport.label}: mobile search-first hierarchy failed ${JSON.stringify(state.p2.search)}`);
+      }
+      if (state.p2.projectPrimaryActions !== null && state.p2.projectPrimaryActions !== 2) {
+        failures.push(`${name}@${viewport.label}: project hero should expose exactly two primary actions`);
+      }
+      if (state.p2.profilePrimaryActions !== null && state.p2.profilePrimaryActions !== 2) {
+        failures.push(`${name}@${viewport.label}: profile hero should expose exactly two primary actions`);
+      }
       if (name === 'adversarygraph' && (!state.productTitle?.singleLine || !state.productTitle?.contentContained)) {
         failures.push(`${name}@${viewport.label}: product title wraps or escapes its column ${JSON.stringify(state.productTitle)}`);
       }

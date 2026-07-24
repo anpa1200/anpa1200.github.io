@@ -129,7 +129,7 @@ function gitDate(path) {
 let articleArchiveVerifiedAt = '';
 try {
   const facts = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
-  articleArchiveVerifiedAt = isoDate(facts?.facts?.['content.medium_exported_articles']?.verified_at);
+  articleArchiveVerifiedAt = isoDate(facts?.facts?.['content.local_article_archive']?.verified_at);
 } catch {
   // A staged subtree can omit the main-site fact model; page metadata remains the fallback.
 }
@@ -280,6 +280,11 @@ for (const path of files) {
 
 const localEntries = new Map();
 const feedItems = [];
+const articlePages = pages.filter((page) => {
+  const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
+  const types = schemaTypes(parseJsonLd(page.html).objects);
+  return feedCandidate(rel, types, page.html);
+}).map((page) => ({ url: page.canonical, title: page.title }));
 
 for (const page of pages) {
   const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
@@ -308,12 +313,20 @@ for (const page of pages) {
       titleMap,
       htmlPath: page.path,
       siteRoot,
+      relatedArticles: articlePages
+        .filter((item) => item.url !== page.canonical)
+        .sort((a, b) => a.url.localeCompare(b.url))
+        .slice(0, 3),
     });
     await writeFile(page.path, transformed);
   }
 }
 
 const factModel = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
+localEntries.set('https://1200km.com/llms.txt', {
+  loc: 'https://1200km.com/llms.txt',
+  lastmod: isoDate(factModel.facts['site.description']?.verified_at),
+});
 const stableTag = factModel.facts['adversarygraph.latest_release_tag'];
 const stablePublished = factModel.facts['adversarygraph.release_published_at'];
 const developmentStatus = factModel.facts['adversarygraph.development_status'];

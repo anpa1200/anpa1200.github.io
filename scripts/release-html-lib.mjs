@@ -5,6 +5,16 @@ export const PERSON_ID = 'https://1200km.com/#person';
 export const WEBSITE_ID = 'https://1200km.com/#website';
 export const SOFTWARE_ID = 'https://1200km.com/#software';
 
+const SITE_FACTS = JSON.parse(
+  readFileSync(new URL('../data/site-facts.json', import.meta.url), 'utf8'),
+).facts;
+
+function factValue(key) {
+  const fact = SITE_FACTS[key];
+  if (!fact || !Object.hasOwn(fact, 'value')) throw new Error(`Missing authoritative site fact: ${key}`);
+  return structuredClone(fact.value);
+}
+
 const WEB_PAGE_TYPES = new Set([
   'AboutPage',
   'CollectionPage',
@@ -101,6 +111,51 @@ export function normalizeDocumentTitles(html) {
     if (!['og:title', 'twitter:title'].includes(key) || !attributes.content) return tag;
     return replaceAttribute(tag, 'content', normalizeSeoTitle(attributes.content));
   });
+  return transformed;
+}
+
+function conciseDescription(value, limit = 160) {
+  const text = decodeEntities(stripHtml(value)).replace(/\s+/g, ' ').trim();
+  if (text.length <= limit) return text;
+  const shortened = text.slice(0, limit - 1);
+  const boundary = shortened.lastIndexOf(' ');
+  return `${shortened.slice(0, boundary > limit * 0.72 ? boundary : limit - 1).replace(/[,:;\s]+$/, '')}…`;
+}
+
+export function normalizeMetaDescriptions(html) {
+  const title = pageTitle(html).replace(/\s+\|\s+(?:1200km|AdversaryGraph Docs|ITDR)$/i, '');
+  const current = metaContent(html, 'description');
+  if (!current) return html;
+  const generic = /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodeEntities(current));
+  const base = generic
+    ? `${title}. Practical security guidance with scope, evidence, and validation boundaries.`
+    : `${title}. ${decodeEntities(current)}`;
+  const description = conciseDescription(base);
+  let transformed = html;
+  for (const [attribute, key] of [
+    ['name', 'description'],
+    ['property', 'og:description'],
+    ['name', 'twitter:description'],
+  ]) {
+    transformed = upsertMeta(transformed, attribute, key, description);
+  }
+  return transformed;
+}
+
+export function normalizeSocialImages(html) {
+  const fallback = factValue('site.default_social_image');
+  const image = metaContent(html, 'og:image') || fallback.url;
+  const title = pageTitle(html);
+  const usingFallback = image === fallback.url;
+  let transformed = html;
+  transformed = upsertMeta(transformed, 'property', 'og:image', image);
+  transformed = upsertMeta(transformed, 'name', 'twitter:image', metaContent(transformed, 'twitter:image') || image);
+  transformed = upsertMeta(transformed, 'property', 'og:image:alt', metaContent(transformed, 'og:image:alt') || (usingFallback ? fallback.alt : title));
+  transformed = upsertMeta(transformed, 'name', 'twitter:image:alt', metaContent(transformed, 'twitter:image:alt') || (usingFallback ? fallback.alt : title));
+  if (usingFallback) {
+    transformed = upsertMeta(transformed, 'property', 'og:image:width', String(fallback.width));
+    transformed = upsertMeta(transformed, 'property', 'og:image:height', String(fallback.height));
+  }
   return transformed;
 }
 
@@ -253,6 +308,14 @@ function articleDocument(html, canonical, objects) {
     || /^\/articles\/[^/]+\.html$/i.test(pathname);
 }
 
+export function editorialArticleDocument(canonical) {
+  if (!canonical) return false;
+  const pathname = new URL(canonical).pathname;
+  return /^\/articles\/read\/\d{4}\/[^/]+\/?$/i.test(pathname)
+    || /^\/articles\/[^/]+\.html$/i.test(pathname)
+    || /^\/(?:newest-detection-engineering-techniques|embedded-systems-hardware-firmware)\/?$/i.test(pathname);
+}
+
 function metaContent(html, key) {
   for (const match of html.matchAll(/<meta\b[^>]*>/gi)) {
     const attributes = tagAttributes(match[0]);
@@ -308,31 +371,47 @@ export function buildConnectedGraph(html, {
   const websiteSource = firstObjectWithType(objects, new Set(['WebSite'])) || {};
   const pageSource = firstObjectWithType(objects, WEB_PAGE_TYPES) || {};
 
+  const siteUrl = factValue('site.canonical_url');
+  const location = factValue('identity.location');
+  const publicEmail = factValue('contact.public_email');
+  const personName = factValue('identity.person_name');
   const person = {
     ...cloneWithoutContext(personSource),
     '@type': 'Person',
     '@id': PERSON_ID,
-    name: 'Andrey Pautov',
-    url: 'https://1200km.com/',
-    image: 'https://1200km.com/assets/ap-logo.png',
-    jobTitle: personSource.jobTitle || 'Threat Intelligence Research Engineer',
-    worksFor: personSource.worksFor || { '@type': 'Organization', name: 'XPLG' },
-    sameAs: personSource.sameAs || [
-      'https://github.com/anpa1200',
-      'https://medium.com/@1200km',
-      'https://www.linkedin.com/in/andrey-pautov/',
-    ],
+    name: personName,
+    url: siteUrl,
+    image: `${siteUrl}assets/ap-logo.png`,
+    jobTitle: factValue('identity.job_title'),
+    worksFor: { '@type': 'Organization', name: factValue('identity.employer') },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: location.locality,
+      addressCountry: location.country,
+    },
+    knowsAbout: factValue('identity.knows_about'),
+    email: `mailto:${publicEmail}`,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'professional inquiries',
+      email: `mailto:${publicEmail}`,
+    },
+    sameAs: factValue('identity.same_as'),
   };
   const website = {
     ...cloneWithoutContext(websiteSource),
     '@type': 'WebSite',
     '@id': WEBSITE_ID,
-    name: websiteSource.name || '1200km Security Research',
-    url: 'https://1200km.com/',
+    name: factValue('site.name'),
+    url: siteUrl,
+    description: factValue('site.description'),
     author: { '@id': PERSON_ID },
     publisher: { '@id': PERSON_ID },
     inLanguage: 'en',
   };
+  // Google's sitelinks search box is retired; the on-site search remains a
+  // normal accessible page and does not need SearchAction schema.
+  delete website.potentialAction;
 
   const specializedPageType = schemaTypes(pageSource).find((type) => (
     WEB_PAGE_TYPES.has(type)
@@ -388,6 +467,26 @@ export function buildConnectedGraph(html, {
     }
     normalized['@id'] = entityId;
     usedIds.add(entityId);
+    if (isAdversaryGraph) {
+      const license = factValue('adversarygraph.license');
+      Object.assign(normalized, {
+        name: factValue('adversarygraph.product_name'),
+        alternateName: factValue('products.threatmapper').name,
+        applicationCategory: 'SecurityApplication',
+        operatingSystem: factValue('adversarygraph.operating_system'),
+        url: 'https://1200km.com/adversarygraph/',
+        codeRepository: factValue('adversarygraph.repository_url'),
+        softwareVersion: factValue('adversarygraph.stable_release'),
+        releaseNotes: `${factValue('adversarygraph.repository_url')}/releases/tag/${factValue('adversarygraph.latest_release_tag')}`,
+        license: license.url,
+        usageInfo: SITE_FACTS['adversarygraph.license'].scope,
+        author: { '@id': PERSON_ID },
+        sameAs: [
+          factValue('adversarygraph.repository_url'),
+          factValue('adversarygraph.documentation_url'),
+        ],
+      });
+    }
     if (types.some((type) => PRIMARY_ENTITY_TYPES.has(type))) {
       normalized.author = normalized.author || { '@id': PERSON_ID };
       normalized.publisher = normalized.publisher || { '@id': PERSON_ID };
@@ -418,9 +517,21 @@ export function buildConnectedGraph(html, {
       ...(embeddedSoftware ? normalizeReferences(cloneWithoutContext(embeddedSoftware), true) : {}),
       '@type': 'SoftwareApplication',
       '@id': SOFTWARE_ID,
-      name: 'AdversaryGraph',
-      url: embeddedSoftware?.url || 'https://1200km.com/adversarygraph/',
-      applicationCategory: embeddedSoftware?.applicationCategory || 'SecurityApplication',
+      name: factValue('adversarygraph.product_name'),
+      alternateName: factValue('products.threatmapper').name,
+      url: 'https://1200km.com/adversarygraph/',
+      applicationCategory: 'SecurityApplication',
+      operatingSystem: factValue('adversarygraph.operating_system'),
+      codeRepository: factValue('adversarygraph.repository_url'),
+      softwareVersion: factValue('adversarygraph.stable_release'),
+      releaseNotes: `${factValue('adversarygraph.repository_url')}/releases/tag/${factValue('adversarygraph.latest_release_tag')}`,
+      license: factValue('adversarygraph.license').url,
+      usageInfo: SITE_FACTS['adversarygraph.license'].scope,
+      author: { '@id': PERSON_ID },
+      sameAs: [
+        factValue('adversarygraph.repository_url'),
+        factValue('adversarygraph.documentation_url'),
+      ],
     });
   }
 
@@ -520,23 +631,90 @@ function localImagePath(src, htmlPath, siteRoot) {
 export function addImageDimensions(html, { htmlPath, siteRoot }) {
   return html.replace(/<img\b[^>]*>/gi, (tag) => {
     const attributes = tagAttributes(tag);
-    if (!attributes.src || (attributes.width && attributes.height)) return tag;
+    if (!attributes.src) return tag;
     const path = localImagePath(attributes.src, htmlPath, siteRoot);
-    if (!path) return tag;
-    const dimensions = imageDimensions(readFileSync(path), extname(path));
-    if (!dimensions?.width || !dimensions?.height) return tag;
+    let dimensions = null;
+    if (path && (!attributes.width || !attributes.height)) {
+      dimensions = imageDimensions(readFileSync(path), extname(path));
+    }
+    const highPriority = attributes.fetchpriority === 'high'
+      || attributes.loading === 'eager'
+      || /\b(?:hero|cover|lcp)\b/i.test(`${attributes.class || ''} ${attributes.src}`);
     const additions = [
-      attributes.width ? '' : ` width="${dimensions.width}"`,
-      attributes.height ? '' : ` height="${dimensions.height}"`,
+      attributes.width || !dimensions?.width ? '' : ` width="${dimensions.width}"`,
+      attributes.height || !dimensions?.height ? '' : ` height="${dimensions.height}"`,
+      attributes.loading ? '' : ` loading="${highPriority ? 'eager' : 'lazy'}"`,
+      attributes.decoding ? '' : ' decoding="async"',
     ].join('');
     return tag.replace(/\s*\/?\s*>$/, (ending) => `${additions}${ending}`);
   });
+}
+
+export function addLcpPreload(html) {
+  if (/rel=["']preload["'][^>]+as=["']image["']/i.test(html)) return html;
+  const match = [...html.matchAll(/<img\b[^>]*>/gi)].find((candidate) =>
+    tagAttributes(candidate[0]).fetchpriority === 'high');
+  if (!match) return html;
+  const attributes = tagAttributes(match[0]);
+  if (!attributes.src || /^(?:data:|blob:)/i.test(attributes.src)) return html;
+  const preload = `    <link rel="preload" as="image" href="${escapeAttribute(attributes.src)}" fetchpriority="high" />\n`;
+  return html.replace(/<\/head>/i, () => `${preload}</head>`);
 }
 
 export function addRssDiscovery(html) {
   if (/rel=["'][^"']*alternate[^"']*["'][^>]+application\/rss\+xml/i.test(html)
     || /type=["']application\/rss\+xml["'][^>]+rel=["'][^"']*alternate/i.test(html)) return html;
   return html.replace(/<\/head>/i, '    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />\n  </head>');
+}
+
+function formatVisibleDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return '';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${value}T00:00:00Z`));
+}
+
+export function addArticleDiscovery(html, {
+  canonical,
+  datePublished = '',
+  dateModified = '',
+  relatedArticles = [],
+  outsideHydrationRoot = false,
+} = {}) {
+  if (!editorialArticleDocument(canonical)) return html;
+  let transformed = html;
+  const dates = [
+    datePublished ? `<span>Published <time datetime="${escapeAttribute(datePublished)}">${escapeHtml(formatVisibleDate(datePublished))}</time></span>` : '',
+    dateModified ? `<span>Last updated <time datetime="${escapeAttribute(dateModified)}">${escapeHtml(formatVisibleDate(dateModified))}</time></span>` : '',
+  ].filter(Boolean).join(' · ');
+  const related = relatedArticles
+    .filter((item) => item?.url && item.url !== canonical && item.title)
+    .slice(0, 3);
+  const links = [
+    '<a href="/articles/">Research article archive</a>',
+    '<a href="/cti.html">Threat-intelligence research hub</a>',
+    ...related.map((item) => `<a href="${escapeAttribute(item.url)}">${escapeHtml(item.title)}</a>`),
+  ];
+  const navigation = `<nav class="article-discovery" data-article-discovery aria-label="Continue research"><h2 id="continue-research">Continue research</h2><div>${links.join('')}</div></nav>`;
+  if (outsideHydrationRoot) {
+    if (/\bdata-article-discovery\b/i.test(transformed)) return transformed;
+    const block = `<section class="container margin-vert--lg" aria-label="Article publication and related research">${dates ? `<p class="content-freshness" data-content-freshness>${dates}</p>` : ''}${navigation}</section>`;
+    return transformed.replace(/<\/body>/i, `${block}\n</body>`);
+  }
+  if (!/\bdata-content-freshness\b/i.test(transformed) && !/\bLast updated\b/i.test(stripHtml(transformed))) {
+    if (dates) {
+      const freshness = `<p class="content-freshness" data-content-freshness>${dates}</p>`;
+      transformed = transformed.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i, `$1\n${freshness}`);
+    }
+  }
+  if (!/\bdata-article-discovery\b/i.test(transformed)) {
+    if (/<\/article>/i.test(transformed)) transformed = transformed.replace(/<\/article>/i, `${navigation}\n</article>`);
+    else transformed = transformed.replace(/<\/main>/i, `${navigation}\n</main>`);
+  }
+  return transformed;
 }
 
 export function deferThirdPartyBoot(html) {
@@ -570,10 +748,65 @@ export function deferThirdPartyBoot(html) {
   return transformed;
 }
 
+const STANDALONE_CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com",
+  "worker-src 'self' blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
+  "frame-src 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  'upgrade-insecure-requests',
+].join('; ');
+
+export function hardenStandaloneHead(html) {
+  let transformed = html.replace(
+    /\s*<script>\(function\(\)\{var t=localStorage\.getItem\(["']theme["']\)\|\|["']dark["'];document\.documentElement\.setAttribute\(["']data-theme["'],t\);\}\)\(\);<\/script>/i,
+    '',
+  );
+  transformed = transformed.replace(
+    /\s*<meta\b[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>/gi,
+    '',
+  );
+  transformed = transformed.replace(
+    /\s*<meta\b[^>]*name=["']referrer["'][^>]*>/gi,
+    '',
+  );
+  const securityMeta = [
+    `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(STANDALONE_CSP)}">`,
+    '<meta name="referrer" content="strict-origin-when-cross-origin">',
+    '<script src="/assets/theme-bootstrap.js"></script>',
+  ].join('\n    ');
+  const charset = /<meta\b[^>]*charset=["'][^"']+["'][^>]*>/i;
+  if (charset.test(transformed)) {
+    return transformed.replace(charset, (tag) => `${tag}\n    ${securityMeta}`);
+  }
+  return transformed.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${securityMeta}`);
+}
+
+export function normalizeDocusaurusBrandLogoAlts(html) {
+  return html.replace(
+    /<a\b[^>]*class=["'][^"']*\bnavbar__brand\b[^"']*["'][^>]*>[\s\S]*?<\/a>/gi,
+    (brand) => {
+      if (!/\bnavbar__title\b/i.test(brand)) return brand;
+      return brand.replace(
+        /<img\b[^>]*>/gi,
+        (image) => replaceAttribute(image, 'alt', ''),
+      );
+    },
+  );
+}
+
 export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
   transformed = removeMetaKeywords(transformed);
   transformed = normalizeDocumentTitles(transformed);
+  transformed = normalizeMetaDescriptions(transformed);
+  transformed = normalizeSocialImages(transformed);
   // Keep release-owned browser enhancements on the same origin. Checked-in
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
@@ -586,10 +819,16 @@ export function transformReleaseHtml(html, options) {
   // Its headings already carry stable IDs; Pagefind adds its content marker to
   // an indexing-only copy instead of changing the deployed application DOM.
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(transformed);
-  if (!isDocusaurus) {
+  if (isDocusaurus) {
+    transformed = normalizeDocusaurusBrandLogoAlts(transformed);
+    transformed = addArticleDiscovery(transformed, { ...options, outsideHydrationRoot: true });
+  } else {
+    transformed = hardenStandaloneHead(transformed);
     transformed = addHeadingIds(transformed);
     transformed = markPagefindContent(transformed);
     transformed = addImageDimensions(transformed, options);
+    transformed = addLcpPreload(transformed);
+    transformed = addArticleDiscovery(transformed, options);
   }
   transformed = addRssDiscovery(transformed);
   transformed = replaceStructuredData(transformed, options);

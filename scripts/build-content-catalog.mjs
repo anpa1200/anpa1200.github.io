@@ -35,6 +35,7 @@ const check = args.includes('--check');
 const config = JSON.parse(await readFile(join(sourceRoot, 'data', 'content-catalog.config.json'), 'utf8'));
 const parsed = parseSitemapEntries(await readFile(sitemapPath, 'utf8'), SITE_ORIGIN);
 if (parsed.isIndex) throw new Error('Content catalogue requires a flat sitemap URL set.');
+const catalogueEntries = parsed.entries.filter((entry) => new URL(entry.loc).pathname !== '/llms.txt');
 
 function gitDate(path) {
   if (!path || !existsSync(path)) return null;
@@ -94,8 +95,8 @@ async function loadPage(entry) {
 const pages = [];
 const failures = [];
 const concurrency = remote ? 16 : 32;
-for (let offset = 0; offset < parsed.entries.length; offset += concurrency) {
-  const batch = await Promise.all(parsed.entries.slice(offset, offset + concurrency).map(async (entry) => {
+for (let offset = 0; offset < catalogueEntries.length; offset += concurrency) {
+  const batch = await Promise.all(catalogueEntries.slice(offset, offset + concurrency).map(async (entry) => {
     try {
       return await loadPage(entry);
     } catch (error) {

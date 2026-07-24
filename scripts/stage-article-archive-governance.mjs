@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 
@@ -31,8 +31,8 @@ const [catalog, archiveFacts, siteFacts] = await Promise.all([
 ]);
 
 if (!Array.isArray(catalog) || !catalog.length) throw new Error('Article catalog is empty or malformed.');
-const articleFact = siteFacts?.facts?.['content.medium_exported_articles'];
-if (!articleFact) throw new Error('The content.medium_exported_articles site fact is missing.');
+const articleFact = siteFacts?.facts?.['content.local_article_archive'];
+if (!articleFact) throw new Error('The content.local_article_archive site fact is missing.');
 if (articleFact.value !== catalog.length) {
   throw new Error(`Article fact reports ${articleFact.value}; validated catalog contains ${catalog.length}.`);
 }
@@ -67,6 +67,23 @@ await Promise.all([
   copyFile(reportPath, join(reportDirectory, 'article-canonical-migration.csv')),
 ]);
 
+const articleCssDirectory = join(siteRoot, 'articles', 'assets', 'css');
+const articleCssFiles = (await readdir(articleCssDirectory, { withFileTypes: true }))
+  .filter((entry) => entry.isFile() && entry.name.endsWith('.css'))
+  .map((entry) => join(articleCssDirectory, entry.name));
+let optimizedStylesheets = 0;
+for (const cssPath of articleCssFiles) {
+  const css = await readFile(cssPath, 'utf8');
+  const optimized = css.replace(
+    /\/articles\/assets\/images\/bg-cyber-[^)"']+\.png/g,
+    '/assets/bg-cyber.png',
+  );
+  if (optimized !== css) {
+    await writeFile(cssPath, optimized);
+    optimizedStylesheets += 1;
+  }
+}
+
 const statusCounts = catalog.reduce((counts, row) => {
   const status = row.canonical_migration_status || 'missing';
   counts[status] = (counts[status] || 0) + 1;
@@ -81,3 +98,4 @@ const buildRecord = {
 };
 await writeFile(join(dataDirectory, 'article-archive-build.json'), `${JSON.stringify(buildRecord, null, 2)}\n`);
 console.log(`Staged governed article catalog: ${catalog.length} articles from ${archiveCommit}.`);
+console.log(`Optimized article background delivery in ${optimizedStylesheets} stylesheet(s).`);

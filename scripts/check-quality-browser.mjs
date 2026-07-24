@@ -17,6 +17,7 @@ const reportPath = resolve(valueAfter('--report', `/tmp/1200km-browser-quality-$
 const chrome = process.env.CHROME_PATH || 'google-chrome';
 const axeSource = readFileSync(join(ROOT, 'node_modules', 'axe-core', 'axe.min.js'), 'utf8');
 const allowlist = JSON.parse(readFileSync(join(ROOT, 'data', 'accessibility-allowlist.json'), 'utf8'));
+const performanceBudgets = JSON.parse(readFileSync(join(ROOT, 'data', 'performance-budgets.json'), 'utf8'));
 
 if (!Array.isArray(allowlist.entries)) throw new Error('Accessibility allowlist must contain an entries array.');
 for (const entry of allowlist.entries) {
@@ -31,35 +32,35 @@ for (const entry of allowlist.entries) {
 if (!existsSync(join(site, 'index.html'))) throw new Error(`Site root not found at ${site}`);
 
 let pages = [
-  ['home', '/'],
-  ['about', '/about.html'],
-  ['cv', '/cv.html'],
-  ['selected-research', '/cti.html'],
-  ['library', '/guides.html'],
-  ['projects', '/projects.html'],
-  ['search', '/search.html?q=T1059.003'],
-  ['validation', '/external-validation.html'],
-  ['adversarygraph', '/adversarygraph/'],
-  ['threat-matrix', '/threat-matrix/'],
-  ['docs', '/adversarygraph-docs/full-flow/'],
+  ['home', '/', 'default'],
+  ['about', '/about.html', 'default'],
+  ['cv', '/cv.html', 'default'],
+  ['selected-research', '/cti.html', 'default'],
+  ['library', '/guides.html', 'default'],
+  ['projects', '/projects.html', 'default'],
+  ['search', '/search.html?q=T1059.003', 'default'],
+  ['validation', '/external-validation.html', 'default'],
+  ['adversarygraph', '/adversarygraph/', 'product'],
+  ['threat-matrix', '/threat-matrix/', 'interactive'],
+  ['docs', '/adversarygraph-docs/full-flow/', 'documentation'],
 ];
 
 const articleCatalogPath = join(site, 'data', 'article-catalog.json');
 if (existsSync(articleCatalogPath)) {
   const catalog = JSON.parse(readFileSync(articleCatalogPath, 'utf8'));
-  pages.push(['articles', '/articles/']);
+  pages.push(['articles', '/articles/', 'default']);
   const choices = [
-    ['article-normal', catalog.find((row) => row.images <= 2 && row.code_blocks <= 2)],
-    ['article-image-heavy', [...catalog].sort((a, b) => b.images - a.images)[0]],
-    ['article-code-heavy', [...catalog].sort((a, b) => b.code_blocks - a.code_blocks)[0]],
-    ['article-long-title', [...catalog].sort((a, b) => b.title.length - a.title.length)[0]],
-    ['article-historical', [...catalog].sort((a, b) => a.published_at.localeCompare(b.published_at))[0]],
+    ['article-normal', catalog.find((row) => row.images <= 2 && row.code_blocks <= 2), 'article'],
+    ['article-image-heavy', [...catalog].sort((a, b) => b.images - a.images)[0], 'image-heavy'],
+    ['article-code-heavy', [...catalog].sort((a, b) => b.code_blocks - a.code_blocks)[0], 'article'],
+    ['article-long-title', [...catalog].sort((a, b) => b.title.length - a.title.length)[0], 'article'],
+    ['article-historical', [...catalog].sort((a, b) => a.published_at.localeCompare(b.published_at))[0], 'article'],
   ];
   const selected = new Set();
-  for (const [label, row] of choices) {
+  for (const [label, row, budgetClass] of choices) {
     if (!row || selected.has(row.local_path)) continue;
     selected.add(row.local_path);
-    pages.push([label, `/articles/read/${row.local_path}/`]);
+    pages.push([label, `/articles/read/${row.local_path}/`, budgetClass]);
   }
 }
 const onlyPage = valueAfter('--only', '');
@@ -71,7 +72,16 @@ const viewports = [
   { label: 'desktop-dark', width: 1440, height: 1000, mobile: false, theme: 'dark' },
   { label: 'desktop-light', width: 1440, height: 1000, mobile: false, theme: 'light' },
 ];
-const budgets = { cls: 0.1, lcp_ms: 4000, transfer_bytes: 6 * 1024 * 1024 };
+const defaultBudget = performanceBudgets.default;
+if (!defaultBudget || !Number.isFinite(defaultBudget.cls)
+  || !Number.isFinite(defaultBudget.lcp_ms) || !Number.isFinite(defaultBudget.transfer_bytes)) {
+  throw new Error('Performance budget file has no complete default budget.');
+}
+function budgetFor(className) {
+  const override = className === 'default' ? {} : performanceBudgets.classes?.[className];
+  if (className !== 'default' && !override) throw new Error(`Unknown performance budget class: ${className}`);
+  return { ...defaultBudget, ...(override || {}) };
+}
 const contentTypes = {
   '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -212,7 +222,8 @@ try {
     await devtools.send('Page.navigate', { url: origin }, sessionId);
     await wait(150);
     await evaluate(devtools, sessionId, `localStorage.setItem('theme', ${JSON.stringify(viewport.theme)})`);
-    for (const [name, path] of pages) {
+    for (const [name, path, budgetClass] of pages) {
+      const budget = budgetFor(budgetClass);
       await devtools.send('Network.clearBrowserCache', {}, sessionId);
       await devtools.send('Page.navigate', { url: `${origin}${path}` }, sessionId);
       const deadline = Date.now() + 15_000;
@@ -235,6 +246,13 @@ try {
           layout_shifts: window.__quality?.shifts || [],
           lcp_ms: Math.round(window.__quality?.lcp || 0),
           transfer_bytes: Math.round(resources.reduce((total, entry) => total + (entry.transferSize || 0), 0)),
+          largest_resources: resources
+            .map((entry) => ({
+              url: new URL(entry.name, location.href).pathname,
+              transfer_bytes: Math.round(entry.transferSize || 0),
+            }))
+            .sort((left, right) => right.transfer_bytes - left.transfer_bytes)
+            .slice(0, 8),
           violations: audit.violations.map((item) => ({
             id: item.id, impact: item.impact, description: item.description,
             targets: item.nodes.slice(0, 5).map((node) => node.target.join(' ')),
@@ -242,20 +260,20 @@ try {
           })),
         };
       })()`);
-      results.push({ page: name, viewport: viewport.label, ...state });
+      results.push({ page: name, budget_class: budgetClass, budget, viewport: viewport.label, ...state });
       const blocking = state.violations.filter((item) =>
         ['moderate', 'serious', 'critical'].includes(item.impact) && !allowlisted(name, item));
       if (blocking.length) failures.push(`${name}@${viewport.label}: ${blocking.length} unallowlisted moderate/serious/critical axe violation(s): ${blocking.map((item) => item.id).join(', ')}`);
       if (state.h1Count !== 1) failures.push(`${name}@${viewport.label}: expected one h1, found ${state.h1Count}`);
       if (state.mainCount !== 1) failures.push(`${name}@${viewport.label}: expected one main landmark, found ${state.mainCount}`);
       if (state.horizontalOverflow) failures.push(`${name}@${viewport.label}: horizontal page overflow`);
-      if (state.cls > budgets.cls) failures.push(`${name}@${viewport.label}: CLS ${state.cls} exceeds ${budgets.cls}`);
-      if (state.lcp_ms > budgets.lcp_ms) failures.push(`${name}@${viewport.label}: local LCP ${state.lcp_ms}ms exceeds ${budgets.lcp_ms}ms`);
-      if (state.transfer_bytes > budgets.transfer_bytes) failures.push(`${name}@${viewport.label}: transfer ${state.transfer_bytes} exceeds ${budgets.transfer_bytes}`);
+      if (state.cls > budget.cls) failures.push(`${name}@${viewport.label}: CLS ${state.cls} exceeds ${budget.cls} (${budgetClass})`);
+      if (state.lcp_ms > budget.lcp_ms) failures.push(`${name}@${viewport.label}: local LCP ${state.lcp_ms}ms exceeds ${budget.lcp_ms}ms (${budgetClass})`);
+      if (state.transfer_bytes > budget.transfer_bytes) failures.push(`${name}@${viewport.label}: transfer ${state.transfer_bytes} exceeds ${budget.transfer_bytes} (${budgetClass})`);
     }
   }
 } finally {
-  await writeFile(reportPath, `${JSON.stringify({ generated_at: new Date().toISOString(), site, budgets, accessibility_allowlist: allowlist.entries, results, failures }, null, 2)}\n`);
+  await writeFile(reportPath, `${JSON.stringify({ generated_at: new Date().toISOString(), site, performance_budgets: performanceBudgets, accessibility_allowlist: allowlist.entries, results, failures }, null, 2)}\n`);
   socket.close();
   browser.kill('SIGTERM');
   server.close();

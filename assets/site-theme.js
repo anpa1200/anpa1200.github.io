@@ -50,6 +50,8 @@
     const summary = links.querySelector(':scope > .nav-menu-toggle');
     const list = links.querySelector(':scope > .nav-list');
     if (!summary || !list) return;
+    const more = list.querySelector(':scope > details.nav-more');
+    const moreSummary = more && more.querySelector(':scope > summary');
     const mobileNavigation = window.matchMedia('(max-width: 900px)');
     const syncNavigationMode = function () {
       if (!mobileNavigation.matches && links.open) links.open = false;
@@ -64,14 +66,25 @@
       links.dataset.navigationReady = 'true';
       links.addEventListener('toggle', function () {
         summary.setAttribute('aria-label', links.open ? 'Close navigation' : 'Open navigation');
+        if (!links.open && more) more.open = false;
       });
       list.addEventListener('click', function (event) {
-        if (event.target.closest('a') && mobileNavigation.matches) links.open = false;
+        if (event.target.closest('a') && mobileNavigation.matches) {
+          links.open = false;
+          if (more) more.open = false;
+        }
       });
       document.addEventListener('click', function (event) {
+        if (more?.open && !more.contains(event.target)) more.open = false;
         if (links.open && mobileNavigation.matches && !links.contains(event.target)) links.open = false;
       });
       document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && more?.open) {
+          more.open = false;
+          moreSummary?.focus();
+          event.stopImmediatePropagation();
+          return;
+        }
         if (event.key !== 'Escape' || !links.open || !mobileNavigation.matches) return;
         links.open = false;
         summary.focus();

@@ -127,6 +127,12 @@ if (techniquePages + actorPages !== fact('content.threat_matrix_entity_pages').v
 if (fact('content.field_guide_names').value.length !== fact('content.field_guides').value) {
   fail('Field-guide count does not equal the maintained field-guide list.');
 }
+if (fact('content.local_article_archive').value <= 0) {
+  fail('Local article archive count must be a positive, explicitly scoped value.');
+}
+if (!/not a claim about the current Medium publication total/i.test(fact('content.local_article_archive').scope)) {
+  fail('Local article archive fact must explicitly exclude the live Medium publication total.');
+}
 const registry = fact('products.portfolio_registry').value;
 if (!Array.isArray(registry) || !registry.some(item => item.name === 'AdversaryGraph' && item.status === 'maintained')
   || !registry.some(item => item.name === 'Threat Matrix' && item.status === 'maintained')
@@ -155,6 +161,8 @@ if (siteRoot === sourceRoot) {
   if (countIndexPages('threat-matrix/actors') !== actorPages) fail('Generated Threat Matrix actor page count disagrees with facts.');
   const localArticles = readdirSync(path.join(sourceRoot, 'articles')).filter(name => name.endsWith('.html') && name !== 'index.html').length;
   if (localArticles !== fact('content.local_companion_articles').value) fail('Local companion article count disagrees with facts.');
+  const listedLabs = (readFileSync(path.join(sourceRoot, 'labs.html'), 'utf8').match(/\bclass=["'][^"']*\blab-row\b[^"']*["']/g) || []).length;
+  if (listedLabs !== fact('content.listed_labs').value) fail('Listed lab count disagrees with labs.html.');
   const remoteSites = JSON.parse(readFileSync(path.join(sourceRoot, 'seo', 'remote-sitemaps.json'), 'utf8'));
   const excluded = new Set(['Live AdversaryGraph Documentation', '1200km Article Archive']);
   if (remoteSites.filter(item => !excluded.has(item.name)).length !== fact('content.field_guides').value) {
@@ -167,6 +175,7 @@ const requiredSurfaces = [
   'about.html',
   'cv.html',
   'projects.html',
+  'labs.html',
   'external-validation.html',
   'adversarygraph/index.html',
   'threat-matrix/index.html',
@@ -193,6 +202,7 @@ const adgSoftware = adgNodes.find(node => node['@type'] === 'SoftwareApplication
 if (!adgSoftware) fail('adversarygraph/index.html: SoftwareApplication JSON-LD is missing.');
 else {
   if (adgSoftware.name !== fact('adversarygraph.product_name').value) fail('AdversaryGraph JSON-LD product name disagrees with facts.');
+  if (adgSoftware.alternateName !== fact('products.threatmapper').value.name) fail('AdversaryGraph JSON-LD historical alias disagrees with facts.');
   if (adgSoftware.softwareVersion !== stable) fail('AdversaryGraph JSON-LD softwareVersion disagrees with facts.');
   if (!String(adgSoftware.releaseNotes || '').includes(stableTag)) fail('AdversaryGraph JSON-LD releaseNotes does not point to the stable tag notes.');
 }
@@ -201,14 +211,16 @@ const homeHtml = currentTexts.find(([name]) => name === 'index.html')?.[1] || ''
 const homeNodes = flattenJsonLd(parseJsonLd(homeHtml, 'index.html'));
 const homeSoftware = homeNodes.find(node => node['@type'] === 'SoftwareApplication' && node.name === 'AdversaryGraph');
 if (!homeSoftware || homeSoftware.softwareVersion !== stable) fail('Homepage AdversaryGraph structured data disagrees with the stable release fact.');
+else if (homeSoftware.alternateName !== fact('products.threatmapper').value.name) fail('Homepage AdversaryGraph structured data omits the governed historical alias.');
 
 const markerPattern = /data-site-fact=["']([^"']+)["'][^>]*data-fact-value=["']([^"']+)["']/gi;
 const requiredMarkers = new Map([
   ['adversarygraph.latest_release_tag', String(stableTag)],
   ['contributions.accepted_external', String(fact('contributions.accepted_external').value)],
   ['contributions.open_external', String(fact('contributions.open_external').value)],
-  ['content.medium_exported_articles', String(fact('content.medium_exported_articles').value)],
+  ['content.local_article_archive', String(fact('content.local_article_archive').value)],
   ['content.field_guides', String(fact('content.field_guides').value)],
+  ['content.listed_labs', String(fact('content.listed_labs').value)],
 ]);
 const foundMarkers = new Map();
 for (const [relativePath, html] of currentTexts) {
@@ -236,6 +248,36 @@ for (const absolute of allHtml) {
   if (phonePatterns.some(pattern => pattern.test(html))) {
     fail(`${path.relative(siteRoot, absolute)}: public HTML contains a phone number or tel link.`);
   }
+}
+
+const cname = read('CNAME').trim();
+if (cname !== '1200km.com') fail(`CNAME must publish only the canonical apex; found ${cname || '(empty)'}.`);
+
+const legacyRedirects = [
+  ['threatmapper.html', 'https://1200km.com/adversarygraph/'],
+  ['threatmapper/index.html', 'https://1200km.com/adversarygraph/'],
+  ['threatmapper-docs/index.html', 'https://1200km.com/adversarygraph-docs/'],
+  ['threatmapper-web.html', 'https://1200km.com/adversarygraph-web-guide.html'],
+  ['threatmapper-web-guide.html', 'https://1200km.com/adversarygraph-web-guide.html'],
+];
+for (const [relativePath, canonical] of legacyRedirects) {
+  const html = read(relativePath);
+  if (!/http-equiv=["']refresh["']/i.test(html)
+    || !/name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html)
+    || !html.includes(`rel="canonical" href="${canonical}"`)) {
+    fail(`${relativePath}: legacy alias must be a noindex compatibility redirect to ${canonical}.`);
+  }
+}
+
+const publicEmail = String(fact('contact.public_email').value);
+for (const relativePath of ['index.html', 'about.html', 'cv.html']) {
+  const html = read(relativePath);
+  if (!html.includes(`href="mailto:${publicEmail}"`)) fail(`${relativePath}: public Email control does not use the governed contact address.`);
+  if (/href=["']#["'][^>]*>\s*Email\s*</i.test(html)) fail(`${relativePath}: Email control still uses an inert fragment.`);
+}
+
+for (const [relativePath, , text] of currentTexts) {
+  if (/\b(?:52\+|150\+|15\+)\b/.test(text)) fail(`${relativePath}: ambiguous legacy content count remains.`);
 }
 
 const publicTextFiles = walk(siteRoot, file => /\.(?:html|md|txt|xml|json)$/i.test(file));
@@ -296,7 +338,7 @@ const textSurfaceRequirements = new Map([
   ['index.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
   ['projects.md', [stableTag, 'Unreleased', 'Threat Matrix', 'ThreatMapper']],
   ['adversarygraph.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
-  ['llms.txt', [stableTag, 'Accepted external contributions: 8', 'Open external submissions: 31']],
+  ['llms.txt', [stableTag, 'Accepted external contributions: **8**', 'Open external submissions: **31**']],
   ['llms-full.txt', [stableTag, 'post-v6 work on `main` is Unreleased', 'Threat Matrix']],
   ['agent-index.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
   ['adversarygraph-docs/index.md', [`Current release: ${stableTag}.`]],
