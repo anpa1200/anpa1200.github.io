@@ -113,6 +113,21 @@ test('ATT&CK technique pages do not receive editorial archive navigation', () =>
   assert.doesNotMatch(output, /data-content-freshness/);
 });
 
+test('Docusaurus archive articles receive discovery outside the hydration root', () => {
+  const canonical = 'https://1200km.com/articles/read/2026/example/';
+  const input = '<html lang="en"><head><title>Example</title><meta name="description" content="Example article description."></head><body><div id="__docusaurus"><main><article><h1>Example</h1></article></main></div></body></html>';
+  const output = transformReleaseHtml(input, {
+    canonical,
+    datePublished: '2026-01-01',
+    dateModified: '2026-02-02',
+  });
+  const rootEnd = output.indexOf('</div>');
+  const discovery = output.indexOf('data-article-discovery');
+  assert.ok(discovery > rootEnd);
+  assert.match(output, /data-content-freshness/);
+  assert.match(output, /Last updated/);
+});
+
 test('metadata descriptions are unique-page prose rather than generic level labels', () => {
   const input = '<html><head><title>IOC Enrichment | AdversaryGraph Docs</title><meta name="description" content="Level: Intermediate"><meta property="og:description" content="Level: Intermediate"></head><body><main><h1>IOC Enrichment</h1></main></body></html>';
   const output = normalizeMetaDescriptions(input);

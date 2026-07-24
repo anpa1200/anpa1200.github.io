@@ -682,29 +682,35 @@ export function addArticleDiscovery(html, {
   datePublished = '',
   dateModified = '',
   relatedArticles = [],
+  outsideHydrationRoot = false,
 } = {}) {
   if (!editorialArticleDocument(canonical)) return html;
   let transformed = html;
+  const dates = [
+    datePublished ? `<span>Published <time datetime="${escapeAttribute(datePublished)}">${escapeHtml(formatVisibleDate(datePublished))}</time></span>` : '',
+    dateModified ? `<span>Last updated <time datetime="${escapeAttribute(dateModified)}">${escapeHtml(formatVisibleDate(dateModified))}</time></span>` : '',
+  ].filter(Boolean).join(' · ');
+  const related = relatedArticles
+    .filter((item) => item?.url && item.url !== canonical && item.title)
+    .slice(0, 3);
+  const links = [
+    '<a href="/articles/">Research article archive</a>',
+    '<a href="/cti.html">Threat-intelligence research hub</a>',
+    ...related.map((item) => `<a href="${escapeAttribute(item.url)}">${escapeHtml(item.title)}</a>`),
+  ];
+  const navigation = `<nav class="article-discovery" data-article-discovery aria-label="Continue research"><h2 id="continue-research">Continue research</h2><div>${links.join('')}</div></nav>`;
+  if (outsideHydrationRoot) {
+    if (/\bdata-article-discovery\b/i.test(transformed)) return transformed;
+    const block = `<section class="container margin-vert--lg" aria-label="Article publication and related research">${dates ? `<p class="content-freshness" data-content-freshness>${dates}</p>` : ''}${navigation}</section>`;
+    return transformed.replace(/<\/body>/i, `${block}\n</body>`);
+  }
   if (!/\bdata-content-freshness\b/i.test(transformed) && !/\bLast updated\b/i.test(stripHtml(transformed))) {
-    const dates = [
-      datePublished ? `<span>Published <time datetime="${escapeAttribute(datePublished)}">${escapeHtml(formatVisibleDate(datePublished))}</time></span>` : '',
-      dateModified ? `<span>Last updated <time datetime="${escapeAttribute(dateModified)}">${escapeHtml(formatVisibleDate(dateModified))}</time></span>` : '',
-    ].filter(Boolean).join(' · ');
     if (dates) {
       const freshness = `<p class="content-freshness" data-content-freshness>${dates}</p>`;
       transformed = transformed.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i, `$1\n${freshness}`);
     }
   }
   if (!/\bdata-article-discovery\b/i.test(transformed)) {
-    const related = relatedArticles
-      .filter((item) => item?.url && item.url !== canonical && item.title)
-      .slice(0, 3);
-    const links = [
-      '<a href="/articles/">Research article archive</a>',
-      '<a href="/cti.html">Threat-intelligence research hub</a>',
-      ...related.map((item) => `<a href="${escapeAttribute(item.url)}">${escapeHtml(item.title)}</a>`),
-    ];
-    const navigation = `<nav class="article-discovery" data-article-discovery aria-label="Continue research"><h2 id="continue-research">Continue research</h2><div>${links.join('')}</div></nav>`;
     if (/<\/article>/i.test(transformed)) transformed = transformed.replace(/<\/article>/i, `${navigation}\n</article>`);
     else transformed = transformed.replace(/<\/main>/i, `${navigation}\n</main>`);
   }
@@ -751,7 +757,6 @@ const STANDALONE_CSP = [
   "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com",
   "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
   "frame-src 'none'",
-  "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -816,6 +821,7 @@ export function transformReleaseHtml(html, options) {
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(transformed);
   if (isDocusaurus) {
     transformed = normalizeDocusaurusBrandLogoAlts(transformed);
+    transformed = addArticleDiscovery(transformed, { ...options, outsideHydrationRoot: true });
   } else {
     transformed = hardenStandaloneHead(transformed);
     transformed = addHeadingIds(transformed);

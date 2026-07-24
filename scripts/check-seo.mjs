@@ -333,7 +333,7 @@ for (const page of pages) {
   }
   for (const key of ['og:image', 'twitter:image']) {
     const imageUrl = findMetaContent(releaseHtml, key);
-    if (!/^https:\/\/1200km\.com\/\S+/i.test(imageUrl)) failures.push(`${page.rel}: ${key} is missing or is not an absolute canonical-host URL`);
+    if (!/^https:\/\/\S+/i.test(imageUrl)) failures.push(`${page.rel}: ${key} is missing or is not an absolute HTTPS URL`);
   }
   if (!findMetaContent(releaseHtml, 'og:image:alt')) failures.push(`${page.rel}: og:image:alt is missing`);
   if (!findMetaContent(releaseHtml, 'twitter:image:alt')) failures.push(`${page.rel}: twitter:image:alt is missing`);

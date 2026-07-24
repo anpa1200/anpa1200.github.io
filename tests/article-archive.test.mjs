@@ -32,6 +32,8 @@ test('Pages deploys the pinned article source into the canonical /articles route
   );
   assert.match(archiveStager, /articleFact\.value !== catalog\.length/);
   assert.match(archiveStager, /canonical_status_counts/);
+  assert.match(archiveStager, /bg-cyber-\[\^\)"'\]\+\\\.png/);
+  assert.match(archiveStager, /\/assets\/bg-cyber\.png/);
 });
 
 test('article discovery pages use local reading URLs instead of publication URLs', () => {

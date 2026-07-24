@@ -21,7 +21,7 @@ test('release transformer places strict CSP before external theme bootstrap', ()
   assert.match(output, /<script src="\/assets\/theme-bootstrap\.js"><\/script>/);
   assert.doesNotMatch(output, /<script>\(function\(\)\{var t=localStorage/);
   const csp = output.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1] || '';
-  assert.match(csp, /frame-ancestors 'none'/);
+  assert.doesNotMatch(csp, /frame-ancestors/);
   assert.doesNotMatch(csp, /fonts\.(?:googleapis|gstatic)\.com/);
   assert.doesNotMatch(csp, /script-src[^;]*'unsafe-inline'/);
 });

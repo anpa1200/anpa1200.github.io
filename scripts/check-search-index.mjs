@@ -36,6 +36,9 @@ try {
   if (build.failedPages > (remote ? 12 : 0)) failures.push(`too many failed pages: ${build.failedPages}`);
   if ((build.skipped?.['stale-sitemap-url'] || 0) !== 0) failures.push(`stale sitemap URLs were indexed: ${build.skipped['stale-sitemap-url']}`);
   if (remote && build.canonicalSitemapPages !== build.indexedPages) failures.push('canonical sitemap coverage does not match the Pagefind index');
+  if (build.totalSitemapEntries !== build.indexedPages + (build.auxiliarySitemapPages || 0)) {
+    failures.push('total sitemap coverage disagrees with indexed and auxiliary discovery URLs');
+  }
 } catch (error) {
   failures.push(`invalid search-build.json: ${error.message}`);
 }

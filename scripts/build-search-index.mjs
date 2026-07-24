@@ -358,9 +358,11 @@ if (canonicalSitemapOutput) {
     '',
   ].join('\n');
   await writeFile(resolve(canonicalSitemapOutput), xml);
-  metadata.canonicalSitemapPages = entries.length;
+  metadata.canonicalSitemapPages = indexedUrls.size;
+  metadata.auxiliarySitemapPages = auxiliary.length;
+  metadata.totalSitemapEntries = entries.length;
   await writeFile(join(outputPath, 'search-build.json'), `${JSON.stringify(metadata, null, 2)}\n`);
-  log(`Wrote canonical sitemap with ${entries.length} indexed URLs to ${resolve(canonicalSitemapOutput)}.`);
+  log(`Wrote canonical sitemap with ${entries.length} URLs to ${resolve(canonicalSitemapOutput)}.`);
 }
 
 log(`Search index ready: ${indexedPages} pages at ${outputPath}.`);

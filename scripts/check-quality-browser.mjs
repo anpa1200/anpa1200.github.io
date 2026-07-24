@@ -246,6 +246,13 @@ try {
           layout_shifts: window.__quality?.shifts || [],
           lcp_ms: Math.round(window.__quality?.lcp || 0),
           transfer_bytes: Math.round(resources.reduce((total, entry) => total + (entry.transferSize || 0), 0)),
+          largest_resources: resources
+            .map((entry) => ({
+              url: new URL(entry.name, location.href).pathname,
+              transfer_bytes: Math.round(entry.transferSize || 0),
+            }))
+            .sort((left, right) => right.transfer_bytes - left.transfer_bytes)
+            .slice(0, 8),
           violations: audit.violations.map((item) => ({
             id: item.id, impact: item.impact, description: item.description,
             targets: item.nodes.slice(0, 5).map((node) => node.target.join(' ')),
