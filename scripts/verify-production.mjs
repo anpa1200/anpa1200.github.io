@@ -93,7 +93,7 @@ async function verifyOrigin(origin, attempt) {
   records.push(factsRecord);
   let facts;
   try { facts = JSON.parse(factsRecord.body); } catch { facts = null; }
-  const articleCount = facts?.facts?.['content.medium_exported_articles']?.value;
+  const articleCount = facts?.facts?.['content.local_article_archive']?.value;
   const identityChecks = [
     { label: 'build.json HTTP 200', pass: buildRecord.status === 200 },
     { label: 'build.json expected site commit', pass: build?.site_commit === expectedCommit },

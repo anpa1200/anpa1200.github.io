@@ -27,7 +27,7 @@ test('Pages deploys the pinned article source into the canonical /articles route
   const pinnedCommit = workflow.match(/ARTICLE_ARCHIVE_COMMIT:\s*([0-9a-f]{40})/)?.[1];
   assert.ok(pinnedCommit, 'workflow must pin a full article source commit');
   assert.ok(
-    facts['content.medium_exported_articles'].source.some((url) => url.includes(`/blob/${pinnedCommit}/`)),
+    facts['content.local_article_archive'].source.some((url) => url.includes(`/blob/${pinnedCommit}/`)),
     'article fact must cite the pinned catalog commit',
   );
   assert.match(archiveStager, /articleFact\.value !== catalog\.length/);
@@ -56,6 +56,6 @@ test('the old remote archive is not merged into the canonical sitemap', () => {
 
 test('article archive routes receive authoritative sitemap dates', () => {
   assert.match(metadataBuilder, /function archiveDate\(canonical\)/);
-  assert.match(metadataBuilder, /content\.medium_exported_articles/);
+  assert.match(metadataBuilder, /content\.local_article_archive/);
   assert.match(metadataBuilder, /archiveDate\(page\.canonical\)/);
 });

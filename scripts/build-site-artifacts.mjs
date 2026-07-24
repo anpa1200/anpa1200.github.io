@@ -129,7 +129,7 @@ function gitDate(path) {
 let articleArchiveVerifiedAt = '';
 try {
   const facts = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
-  articleArchiveVerifiedAt = isoDate(facts?.facts?.['content.medium_exported_articles']?.verified_at);
+  articleArchiveVerifiedAt = isoDate(facts?.facts?.['content.local_article_archive']?.verified_at);
 } catch {
   // A staged subtree can omit the main-site fact model; page metadata remains the fallback.
 }

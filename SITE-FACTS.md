@@ -43,10 +43,12 @@ not part of that tag.
 
 - Accepted contributions require an upstream merge record.
 - Open submissions remain pending and never contribute to the accepted total.
-- Medium content is reported as the number of preserved Markdown exports, not
-  as a live Medium publication or authorship claim.
+- The local article archive is reported as the number of preserved article
+  pages, not as a live Medium publication or authorship claim.
 - Field guides exclude AdversaryGraph product documentation and the Medium
   export archive.
+- Listed labs count the distinct rows maintained on `/labs.html`; Docusaurus
+  lab documents and unlisted repository experiments are outside that scope.
 - Threat Matrix entity pages are the sum of generated actor and technique /
   sub-technique pages.
 

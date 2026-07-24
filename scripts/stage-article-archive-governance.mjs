@@ -31,8 +31,8 @@ const [catalog, archiveFacts, siteFacts] = await Promise.all([
 ]);
 
 if (!Array.isArray(catalog) || !catalog.length) throw new Error('Article catalog is empty or malformed.');
-const articleFact = siteFacts?.facts?.['content.medium_exported_articles'];
-if (!articleFact) throw new Error('The content.medium_exported_articles site fact is missing.');
+const articleFact = siteFacts?.facts?.['content.local_article_archive'];
+if (!articleFact) throw new Error('The content.local_article_archive site fact is missing.');
 if (articleFact.value !== catalog.length) {
   throw new Error(`Article fact reports ${articleFact.value}; validated catalog contains ${catalog.length}.`);
 }
