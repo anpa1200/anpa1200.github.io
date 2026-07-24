@@ -440,7 +440,7 @@ export function replaceStructuredData(html, options) {
   const script = `\n    <script type="application/ld+json" data-site-graph>\n${payload.split('\n').map((line) => `      ${line}`).join('\n')}\n    </script>\n`;
   // Use a callback so `$&`, `$\`` and `$'` sequences inside CTI descriptions
   // are treated as literal JSON content rather than replacement tokens.
-  return withoutJsonLd.replace(/<\/head>/i, () => `${script}</head>`);
+  return withoutJsonLd.replace(/[ \t]*<\/head>/i, () => `${script}</head>`);
 }
 
 function upsertMeta(html, attribute, key, content) {
@@ -578,8 +578,8 @@ export function transformReleaseHtml(html, options) {
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
   transformed = transformed.replace(
-    /(["'])https:\/\/1200km\.com\/assets\/docusaurus-ecosystem\.js(?:\?[^"']*)?\1/gi,
-    '$1/assets/docusaurus-ecosystem.js$1',
+    /(["'])https:\/\/1200km\.com\/assets\/docusaurus-ecosystem\.js(\?[^"']*)?\1/gi,
+    '$1/assets/docusaurus-ecosystem.js$2$1',
   );
   // Docusaurus hydrates its server-rendered application tree. Mutating that
   // tree after the framework build creates avoidable React hydration errors.
