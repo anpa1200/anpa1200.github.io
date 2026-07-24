@@ -114,6 +114,34 @@ export function normalizeDocumentTitles(html) {
   return transformed;
 }
 
+function conciseDescription(value, limit = 160) {
+  const text = decodeEntities(stripHtml(value)).replace(/\s+/g, ' ').trim();
+  if (text.length <= limit) return text;
+  const shortened = text.slice(0, limit - 1);
+  const boundary = shortened.lastIndexOf(' ');
+  return `${shortened.slice(0, boundary > limit * 0.72 ? boundary : limit - 1).replace(/[,:;\s]+$/, '')}…`;
+}
+
+export function normalizeMetaDescriptions(html) {
+  const title = pageTitle(html).replace(/\s+\|\s+(?:1200km|AdversaryGraph Docs|ITDR)$/i, '');
+  const current = metaContent(html, 'description');
+  if (!current) return html;
+  const generic = /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodeEntities(current));
+  const base = generic
+    ? `${title}. Practical security guidance with scope, evidence, and validation boundaries.`
+    : `${title}. ${decodeEntities(current)}`;
+  const description = conciseDescription(base);
+  let transformed = html;
+  for (const [attribute, key] of [
+    ['name', 'description'],
+    ['property', 'og:description'],
+    ['name', 'twitter:description'],
+  ]) {
+    transformed = upsertMeta(transformed, attribute, key, description);
+  }
+  return transformed;
+}
+
 function escapeHtml(value = '') {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -261,6 +289,14 @@ function articleDocument(html, canonical, objects) {
   const pathname = new URL(canonical).pathname;
   return /^\/articles\/read\/\d{4}\/[^/]+\/?$/i.test(pathname)
     || /^\/articles\/[^/]+\.html$/i.test(pathname);
+}
+
+export function editorialArticleDocument(canonical) {
+  if (!canonical) return false;
+  const pathname = new URL(canonical).pathname;
+  return /^\/articles\/read\/\d{4}\/[^/]+\/?$/i.test(pathname)
+    || /^\/articles\/[^/]+\.html$/i.test(pathname)
+    || /^\/(?:newest-detection-engineering-techniques|embedded-systems-hardware-firmware)\/?$/i.test(pathname);
 }
 
 function metaContent(html, key) {
@@ -597,6 +633,50 @@ export function addRssDiscovery(html) {
   return html.replace(/<\/head>/i, '    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />\n  </head>');
 }
 
+function formatVisibleDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return '';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${value}T00:00:00Z`));
+}
+
+export function addArticleDiscovery(html, {
+  canonical,
+  datePublished = '',
+  dateModified = '',
+  relatedArticles = [],
+} = {}) {
+  if (!editorialArticleDocument(canonical)) return html;
+  let transformed = html;
+  if (!/\bdata-content-freshness\b/i.test(transformed) && !/\bLast updated\b/i.test(stripHtml(transformed))) {
+    const dates = [
+      datePublished ? `<span>Published <time datetime="${escapeAttribute(datePublished)}">${escapeHtml(formatVisibleDate(datePublished))}</time></span>` : '',
+      dateModified ? `<span>Last updated <time datetime="${escapeAttribute(dateModified)}">${escapeHtml(formatVisibleDate(dateModified))}</time></span>` : '',
+    ].filter(Boolean).join(' · ');
+    if (dates) {
+      const freshness = `<p class="content-freshness" data-content-freshness>${dates}</p>`;
+      transformed = transformed.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i, `$1\n${freshness}`);
+    }
+  }
+  if (!/\bdata-article-discovery\b/i.test(transformed)) {
+    const related = relatedArticles
+      .filter((item) => item?.url && item.url !== canonical && item.title)
+      .slice(0, 3);
+    const links = [
+      '<a href="/articles/">Research article archive</a>',
+      '<a href="/cti.html">Threat-intelligence research hub</a>',
+      ...related.map((item) => `<a href="${escapeAttribute(item.url)}">${escapeHtml(item.title)}</a>`),
+    ];
+    const navigation = `<nav class="article-discovery" data-article-discovery aria-label="Continue research"><h2 id="continue-research">Continue research</h2><div>${links.join('')}</div></nav>`;
+    if (/<\/article>/i.test(transformed)) transformed = transformed.replace(/<\/article>/i, `${navigation}\n</article>`);
+    else transformed = transformed.replace(/<\/main>/i, `${navigation}\n</main>`);
+  }
+  return transformed;
+}
+
 export function deferThirdPartyBoot(html) {
   let analyticsId = '';
   let transformed = html.replace(
@@ -686,6 +766,7 @@ export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
   transformed = removeMetaKeywords(transformed);
   transformed = normalizeDocumentTitles(transformed);
+  transformed = normalizeMetaDescriptions(transformed);
   // Keep release-owned browser enhancements on the same origin. Checked-in
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
@@ -705,6 +786,7 @@ export function transformReleaseHtml(html, options) {
     transformed = addHeadingIds(transformed);
     transformed = markPagefindContent(transformed);
     transformed = addImageDimensions(transformed, options);
+    transformed = addArticleDiscovery(transformed, options);
   }
   transformed = addRssDiscovery(transformed);
   transformed = replaceStructuredData(transformed, options);

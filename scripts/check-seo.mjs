@@ -14,6 +14,7 @@ import {
   PERSON_ID,
   SOFTWARE_ID,
   WEBSITE_ID,
+  editorialArticleDocument,
   parseJsonLd,
   stripHtml,
   tagAttributes,
@@ -285,6 +286,14 @@ if (existsSync(preliminarySitemapPath)) {
   }
 }
 
+const releaseTitles = new Map();
+const releaseDescriptions = new Map();
+const metadataReport = {
+  titles_over_60: [],
+  descriptions_under_70: [],
+  descriptions_over_160: [],
+};
+
 for (const page of pages) {
   const releaseHtml = requireReleaseTransform
     ? page.html
@@ -298,12 +307,30 @@ for (const page of pages) {
   if (/<meta\b[^>]*\bname=["']keywords["']/i.test(releaseHtml)) failures.push(`${page.rel}: legacy meta keywords are present`);
   const documentTitle = stripHtml(releaseHtml.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '');
   if (!documentTitle) failures.push(`${page.rel}: document title is missing`);
+  else {
+    if (releaseTitles.has(documentTitle)) {
+      failures.push(`${page.rel}: document title duplicates ${releaseTitles.get(documentTitle)} (${documentTitle})`);
+    } else releaseTitles.set(documentTitle, page.rel);
+    if (documentTitle.length > 60) metadataReport.titles_over_60.push({ page: page.rel, length: documentTitle.length });
+  }
   if (documentTitle.length > 115) failures.push(`${page.rel}: document title remains excessively long (${documentTitle.length} characters)`);
   if (/\|\s*AdversaryGraph Documentation\b|\|\s*ITDR\s*[–—-]\s*Identity Threat Detection/i.test(documentTitle)) {
     failures.push(`${page.rel}: document title retains a repetitive generated suffix`);
   }
   if ((documentTitle.match(/\|\s*1200km\b/gi) || []).length > 1) failures.push(`${page.rel}: document title repeats the site name`);
   if (/\|\s*1200km\s*\|/i.test(documentTitle)) failures.push(`${page.rel}: document title contains a duplicated site-name fragment`);
+  const description = findMetaContent(releaseHtml, 'description').trim();
+  if (!description) failures.push(`${page.rel}: release meta description is missing`);
+  else {
+    if (releaseDescriptions.has(description)) {
+      failures.push(`${page.rel}: meta description duplicates ${releaseDescriptions.get(description)}`);
+    } else releaseDescriptions.set(description, page.rel);
+    if (description.length < 70) metadataReport.descriptions_under_70.push({ page: page.rel, length: description.length });
+    if (description.length > 160) {
+      metadataReport.descriptions_over_160.push({ page: page.rel, length: description.length });
+      failures.push(`${page.rel}: meta description exceeds 160 characters (${description.length})`);
+    }
+  }
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(releaseHtml);
   if (/<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: release HTML still blocks on an external web font`);
   if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: analytics was not deferred to user interaction`);
@@ -323,6 +350,10 @@ for (const page of pages) {
   if (!/rel=["'][^"']*alternate[^"']*["'][^>]+application\/rss\+xml/i.test(releaseHtml)
     && !/application\/rss\+xml[^>]+rel=["'][^"']*alternate/i.test(releaseHtml)) {
     failures.push(`${page.rel}: missing RSS discovery link`);
+  }
+  if (requireReleaseTransform && editorialArticleDocument(page.canonical)) {
+    if (!/\bdata-content-freshness\b/i.test(releaseHtml)) failures.push(`${page.rel}: editorial article has no visible publication/update date`);
+    if (!/\bdata-article-discovery\b/i.test(releaseHtml)) failures.push(`${page.rel}: editorial article has no archive/related-content navigation`);
   }
   checkImages(page.rel, releaseHtml, page.path, !isDocusaurus);
   checkGraph(
@@ -467,3 +498,4 @@ if (failures.length) {
 }
 
 console.log(`SEO release validation passed for ${pages.length} canonical pages.`);
+console.log(`Metadata review: ${metadataReport.titles_over_60.length} titles over 60 characters; ${metadataReport.descriptions_under_70.length} descriptions under 70 characters; ${metadataReport.descriptions_over_160.length} descriptions over 160 characters.`);

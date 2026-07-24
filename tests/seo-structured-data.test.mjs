@@ -7,6 +7,7 @@ import {
   WEBSITE_ID,
   connectedGraphFromHtml,
   normalizeDocusaurusBrandLogoAlts,
+  normalizeMetaDescriptions,
   normalizeSeoTitle,
   transformReleaseHtml,
 } from '../scripts/release-html-lib.mjs';
@@ -78,6 +79,28 @@ test('an archive article receives connected article semantics and deterministic 
   assert.match(output, /<meta property="article:modified_time" content="2026-02-05"/);
   assert.match(output, /<title>Example Research \| 1200km<\/title>/);
   assert.equal(output.includes('legacy, keywords'), false);
+  assert.match(output, /data-content-freshness/);
+  assert.match(output, /data-article-discovery/);
+  assert.match(output, /id="continue-research"/);
+  assert.match(output, /Research article archive/);
+});
+
+test('ATT&CK technique pages do not receive editorial archive navigation', () => {
+  const canonical = 'https://1200km.com/threat-matrix/techniques/T1059/';
+  const input = `<!doctype html><html lang="en"><head><title>Command and Scripting Interpreter</title>
+    <meta name="description" content="ATT&CK technique reference.">
+    <script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'TechArticle' })}</script>
+  </head><body><nav></nav><main><article><h1>Command and Scripting Interpreter</h1></article></main></body></html>`;
+  const output = transformReleaseHtml(input, { canonical, dateModified: '2026-07-22' });
+  assert.doesNotMatch(output, /data-article-discovery/);
+  assert.doesNotMatch(output, /data-content-freshness/);
+});
+
+test('metadata descriptions are unique-page prose rather than generic level labels', () => {
+  const input = '<html><head><title>IOC Enrichment | AdversaryGraph Docs</title><meta name="description" content="Level: Intermediate"><meta property="og:description" content="Level: Intermediate"></head><body><main><h1>IOC Enrichment</h1></main></body></html>';
+  const output = normalizeMetaDescriptions(input);
+  assert.match(output, /content="IOC Enrichment\. Practical security guidance/);
+  assert.doesNotMatch(output, /content="Level: Intermediate"/);
 });
 
 test('only a real Question and acceptedAnswer collection remains FAQPage', () => {

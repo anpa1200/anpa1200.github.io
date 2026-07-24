@@ -280,6 +280,11 @@ for (const path of files) {
 
 const localEntries = new Map();
 const feedItems = [];
+const articlePages = pages.filter((page) => {
+  const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
+  const types = schemaTypes(parseJsonLd(page.html).objects);
+  return feedCandidate(rel, types, page.html);
+}).map((page) => ({ url: page.canonical, title: page.title }));
 
 for (const page of pages) {
   const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
@@ -308,6 +313,10 @@ for (const page of pages) {
       titleMap,
       htmlPath: page.path,
       siteRoot,
+      relatedArticles: articlePages
+        .filter((item) => item.url !== page.canonical)
+        .sort((a, b) => a.url.localeCompare(b.url))
+        .slice(0, 3),
     });
     await writeFile(page.path, transformed);
   }
