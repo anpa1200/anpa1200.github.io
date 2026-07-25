@@ -7,6 +7,10 @@ const pagePath = path.join(repoRoot, 'external-validation.html');
 const statsPath = path.join(repoRoot, 'assets', 'validation', 'stats.json');
 const cloneHistoryPath = path.join(repoRoot, 'assets', 'validation', 'clone-history.json');
 const factsPath = path.join(repoRoot, 'data', 'site-facts.json');
+const factsModel = JSON.parse(readFileSync(factsPath, 'utf8'));
+const adversaryGraphSourceRelease = factsModel.facts['adversarygraph.current_source_release'].value;
+const adversaryGraphSourceCommit = factsModel.facts['adversarygraph.current_source_commit'].value;
+const adversaryGraphSourceCi = factsModel.facts['adversarygraph.current_source_ci'].value;
 
 function runJson(command, args, fallback = null) {
   try {
@@ -146,6 +150,9 @@ ${stateRows}
 
 function repoStatsCard(repoKey, title, description) {
   const repo = stats.repositories[repoKey];
+  const sourceReleaseRow = repoKey === 'adversarygraph'
+    ? `\n              <li><span>Current source release</span><strong><a href="https://github.com/anpa1200/adversarygraph/blob/${escapeHtml(repo.source_commit)}/docs/release-notes/${escapeHtml(repo.source_release)}.md" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.source_release)}</a></strong></li>`
+    : '';
   return `          <article class="card">
             <h3><a href="${escapeHtml(repo.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
             <p>${escapeHtml(description)}</p>
@@ -153,7 +160,7 @@ function repoStatsCard(repoKey, title, description) {
               <li><span>Stars / forks</span><strong>${repo.stars} / ${repo.forks}</strong></li>
               <li><span>Watchers</span><strong>${repo.watchers}</strong></li>
               <li><span>Open issues</span><strong>${repo.open_issues}</strong></li>
-              <li><span>Latest release</span><strong><a href="${escapeHtml(repo.release_url || repo.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.release)}</a></strong></li>
+              <li><span>Latest published release</span><strong><a href="${escapeHtml(repo.release_url || repo.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.release)}</a></strong></li>${sourceReleaseRow}
               <li><span>Last pushed</span><strong>${formatDate(repo.pushed_at)}</strong></li>
             </ul>
           </article>`;
@@ -369,6 +376,9 @@ const stats = {
       pushed_at: repos.adversarygraph.pushed_at,
       release: releases.adversarygraph.tag,
       release_url: releases.adversarygraph.url,
+      source_release: adversaryGraphSourceRelease,
+      source_commit: adversaryGraphSourceCommit,
+      source_ci: adversaryGraphSourceCi,
     },
     aidebug: {
       url: repos.aidebug.html_url,
@@ -406,7 +416,6 @@ stats.totals = {
 mkdirSync(path.dirname(statsPath), { recursive: true });
 writeFileSync(statsPath, `${JSON.stringify(stats, null, 2)}\n`);
 
-const factsModel = JSON.parse(readFileSync(factsPath, 'utf8'));
 function refreshFact(key, value, status) {
   const item = factsModel.facts[key];
   if (!item) throw new Error(`Missing authoritative fact ${key}`);
@@ -456,9 +465,9 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<div><strong(?:\s+data-site-fact="adversarygraph\.latest_release_tag"\s+data-fact-value="v[^"]+")?>v[^<]+<\/strong><span>AdversaryGraph stable release<\/span><\/div>/,
-  `<div><strong data-site-fact="adversarygraph.latest_release_tag" data-fact-value="${stats.repositories.adversarygraph.release}">${stats.repositories.adversarygraph.release}</strong><span>AdversaryGraph stable release</span></div>`,
-  'AdversaryGraph release metric',
+  /<div><strong(?:\s+data-site-fact="adversarygraph\.(?:current_source_release|latest_release_tag)"\s+data-fact-value="v[^"]+")?>v[^<]+<\/strong><span>AdversaryGraph (?:validated source|stable) release<\/span><\/div>/,
+  `<div><strong data-site-fact="adversarygraph.current_source_release" data-fact-value="${adversaryGraphSourceRelease}">${adversaryGraphSourceRelease}</strong><span>AdversaryGraph validated source release</span></div>`,
+  'AdversaryGraph source release metric',
 );
 html = replaceOrThrow(
   html,
@@ -522,8 +531,8 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<span class="chip release">Release (?:<span data-site-fact="adversarygraph\.latest_release_tag" data-fact-value="v[^"]+">)?v[^<]+(?:<\/span>)?<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
-  `<span class="chip release">Release <span data-site-fact="adversarygraph.latest_release_tag" data-fact-value="${stats.repositories.adversarygraph.release}">${stats.repositories.adversarygraph.release}</span></span>$1<span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
+  /<span class="chip release">(?:Source )?Release (?:<span data-site-fact="adversarygraph\.(?:current_source_release|latest_release_tag)" data-fact-value="v[^"]+">)?v[^<]+(?:<\/span>)?<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
+  `<span class="chip release">Source release <span data-site-fact="adversarygraph.current_source_release" data-fact-value="${adversaryGraphSourceRelease}">${adversaryGraphSourceRelease}</span></span>$1<span class="chip">Published tag ${stats.repositories.adversarygraph.release}</span>\n              <span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
   'AdversaryGraph release chips',
 );
 html = replaceOrThrow(

@@ -6,21 +6,22 @@
 
 AdversaryGraph is the flagship project: a self-hosted CTI-to-detection workbench for ATT&CK mapping, IOC investigation, malware-analysis evidence, attack-surface review, detection-gap analysis, attack simulation documentation, SIEM validation documentation, and analyst reporting.
 
-The current development branch, after the immutable v6.0.0 release, adds a
-governed Unified RAG layer across 12 platform source types and a local stdio MCP
-server. Exact matching and PostgreSQL full-text search work without a model;
+The current v6.5.0 source release adds a governed Unified RAG layer across 12
+platform source types and a local stdio MCP server. Exact matching and PostgreSQL
+full-text search work without a model;
 private pgvector embeddings are optional. Business profiles constrain retrieval,
 answers cite indexed evidence, and Navigator output remains a checksum-bound,
 analyst-confirmed advisory proposal. Its audit state is persisted, but no named
 layer is saved or applied automatically. MCP exposes only
 four fixed read/propose tools and cannot reindex, confirm, or mutate platform
-state. This work is Unreleased and must not be attributed to v6.0.0.
+state. This work is merged and CI-validated in v6.5.0 source, but it is not part
+of the older immutable v6.0.0 tag.
 
 Project hub: https://1200km.com/adversarygraph/
 
-Stable release: v6.0.0.
+Current source release: v6.5.0. Latest published immutable release: v6.0.0.
 
-Current-development RAG/MCP source guide (Unreleased): https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md
+v6.5 RAG/MCP source guide: https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/unified-rag-and-mcp.md
 
 Authoritative facts and metric definitions: https://1200km.com/data/site-facts.json
 

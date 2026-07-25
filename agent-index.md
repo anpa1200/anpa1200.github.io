@@ -27,7 +27,7 @@ Core capabilities:
 - Investigation reporting
 - Analyst review workflow
 
-Current development after v6.0.0:
+Current v6.5.0 source-release capabilities:
 
 - Unified RAG over 12 governed source types: ATT&CK techniques, groups, and
   campaigns; actor intelligence; IOCs; CVEs; analysis reports; knowledge;
@@ -41,8 +41,8 @@ Current development after v6.0.0:
   `search_intelligence`, `ask_intelligence`, `get_indexed_entity`, and
   `propose_navigator_layer`
 
-These RAG/MCP capabilities are post-v6 and Unreleased. Do not describe them as
-part of the immutable v6.0.0 tag. RAG analysis requires `run_analysis`, profile
+These RAG/MCP capabilities are merged and CI-validated in the v6.5.0 source
+release, but are not part of the older immutable v6.0.0 tag. RAG analysis requires `run_analysis`, profile
 administration requires `manage_intel`, and index administration requires
 `manage_feeds`. MCP cannot reindex, confirm proposals, or mutate platform state.
 
@@ -53,7 +53,7 @@ administration requires `manage_intel`, and index administration requires
 - `/adversarygraph/` - Flagship platform page
 - `/adversarygraph-docs/` - Documentation root
 - `/adversarygraph-docs/capabilities/` - Capability overview
-- `https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md` - Unreleased current-development RAG/MCP source guide
+- `https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/unified-rag-and-mcp.md` - v6.5 RAG/MCP source guide
 - `/threat-matrix/` - Threat Matrix, the public read-only ATT&CK workspace associated with AdversaryGraph
 - `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
 - `/guides.html#detection` - Detection and SOC guide cluster

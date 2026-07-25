@@ -329,16 +329,19 @@ localEntries.set('https://1200km.com/llms.txt', {
 });
 const stableTag = factModel.facts['adversarygraph.latest_release_tag'];
 const stablePublished = factModel.facts['adversarygraph.release_published_at'];
+const sourceRelease = factModel.facts['adversarygraph.current_source_release'];
+const sourceMerged = factModel.facts['adversarygraph.current_source_merged_at'];
 const developmentStatus = factModel.facts['adversarygraph.development_status'];
-if (!stableTag || stableTag.status !== 'released' || !stablePublished || !developmentStatus) {
+if (!stableTag || stableTag.status !== 'released' || !stablePublished
+  || !sourceRelease || !sourceMerged || !developmentStatus) {
   throw new Error('Authoritative AdversaryGraph release facts are incomplete.');
 }
 feedItems.push({
   url: 'https://1200km.com/adversarygraph/',
-  title: `AdversaryGraph ${stableTag.value} Stable Release`,
-  description: `AdversaryGraph ${stableTag.value} is the latest stable release. ${developmentStatus.value}`,
-  published: stablePublished.value,
-  modified: localEntries.get('https://1200km.com/adversarygraph/')?.lastmod || stablePublished.value,
+  title: `AdversaryGraph ${sourceRelease.value} Validated Source Release`,
+  description: `AdversaryGraph ${sourceRelease.value} is merged and CI-validated on main; the latest published immutable GitHub release is ${stableTag.value}. ${developmentStatus.value}`,
+  published: sourceMerged.value,
+  modified: localEntries.get('https://1200km.com/adversarygraph/')?.lastmod || sourceMerged.value,
 });
 
 const remoteEntries = new Map();

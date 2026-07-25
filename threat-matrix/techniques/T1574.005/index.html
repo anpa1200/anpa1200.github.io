@@ -1,8 +1,20 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>T1574.005 Executable Installer File Permissions Weakness | AdversaryGraph</title><meta name="description" content="T1574.005 Executable Installer File Permissions Weakness: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1574.005/">
-  <meta property="og:title" content="T1574.005 Executable Installer File Permissions Weakness | AdversaryGraph"><meta property="og:description" content="T1574.005 Executable Installer File Permissions Weakness: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research."><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1574.005/"><meta property="og:type" content="article">
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script>
+    <script src="/assets/theme-bootstrap.js"></script><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>T1574.005 Executable Installer File Permissions Weakness | AdversaryGraph</title><meta name="description" content="Executable Installer File Permissions Weakness. Executable Installer File Permissions Weakness. T1574.005 Executable Installer File Permissions Weakness…"><link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1574.005/">
+  <meta property="og:title" content="T1574.005 Executable Installer File Permissions Weakness | AdversaryGraph"><meta property="og:description" content="Executable Installer File Permissions Weakness. Executable Installer File Permissions Weakness. T1574.005 Executable Installer File Permissions Weakness…"><meta property="og:url" content="https://1200km.com/threat-matrix/techniques/T1574.005/"><meta property="og:type" content="article">
   <style>body{margin:0;background:#0d1117;color:#d1d5db;font:16px/1.65 Inter,system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:32px 20px 80px}a{color:#60a5fa}nav{font-size:14px;color:#9ca3af;margin-bottom:32px}h1,h2{color:#fff;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.5rem)}h2{margin-top:36px}.meta,.muted{color:#9ca3af}.cta{display:inline-block;background:#dc2626;color:white;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.card{border:1px solid #263244;background:#111827;padding:14px;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:10px}.links a{border:1px solid #374151;padding:8px 12px;border-radius:5px;text-decoration:none}ul{padding-left:20px}</style>    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
     <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+    <meta name="twitter:description" content="Executable Installer File Permissions Weakness. Executable Installer File Permissions Weakness. T1574.005 Executable Installer File Permissions Weakness…" />
+    <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="article:modified_time" content="2026-06-27" />
 
     <script type="application/ld+json" data-site-graph>
       {
@@ -22,8 +34,32 @@
             "sameAs": [
               "https://github.com/anpa1200",
               "https://medium.com/@1200km",
-              "https://www.linkedin.com/in/andrey-pautov/"
-            ]
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ],
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            }
           },
           {
             "@type": "WebSite",
@@ -33,14 +69,18 @@
             "publisher": {
               "@id": "https://1200km.com/#person"
             },
-            "inLanguage": "en"
+            "inLanguage": "en",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            }
           },
           {
             "@type": "WebPage",
             "@id": "https://1200km.com/threat-matrix/techniques/T1574.005/#webpage",
             "url": "https://1200km.com/threat-matrix/techniques/T1574.005/",
             "name": "Executable Installer File Permissions Weakness",
-            "description": "T1574.005 Executable Installer File Permissions Weakness: description, detection logic, threat actors, correlated CTI reports, hunts, mitigations, and ecosystem research.",
+            "description": "Executable Installer File Permissions Weakness. Executable Installer File Permissions Weakness. T1574.005 Executable Installer File Permissions Weakness…",
             "isPartOf": {
               "@id": "https://1200km.com/#website"
             },
@@ -54,6 +94,10 @@
             "dateModified": "2026-06-27",
             "mainEntity": {
               "@id": "https://1200km.com/threat-matrix/techniques/T1574.005/#article"
+            },
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/site-og-v2.png"
             }
           },
           {
@@ -69,7 +113,7 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "The public browser workspace for the AdversaryGraph platform.",
+                "name": "Threat Matrix — AdversaryGraph Light",
                 "item": "https://1200km.com/threat-matrix/"
               },
               {
@@ -82,8 +126,8 @@
           },
           {
             "@type": "TechArticle",
-            "headline": "T1574.005 Executable Installer File Permissions Weakness",
-            "description": "Adversaries may execute their own malicious payloads by hijacking the binaries used by an installer. These processes may automatically execute specific binaries as part of their functionality or to perform other actions. If the permissions on the file system directory containing a target binary, or permissions on the binary itself, are improperly set, then the target binary may be overwritten with another binary using user-level permissions and executed by the original process. If the original process and thread are running under a higher permissions level, then the replaced binary will also execute under higher-level permissions, which could include SYSTEM.\n\nAnother variation of this technique can be performed by taking advantage of a weakness that is common in executable, self-extracting installers. During the installation process, it is common for installers to use a subdirectory within the %TEMP% directory to unpack binaries such as DLLs, EXEs, or other payloads. When installers create subdirectories and files they often do not set appropriate permissions to restrict write access, which allows for execution of untrusted code placed in the subdirectories or overwriting of binaries used in the installation process. This behavior is related to and may take advantage of DLL Search Order Hijacking.\n\nAdversaries may use this technique to replace legitimate binaries with malicious ones as a means of executing code at a higher permissions level. Some installers may also require elevated privileges that will result in privilege escalation when executing adversary controlled code. This behavior is related to Bypass User Account Control. Several examples of this weakness in existing common installers have been reported to software vendors.   If the executing process is set to run at a specific time or during a certain event (e.g., system bootup) then this technique can also be used for persistence.",
+            "headline": "Executable Installer File Permissions Weakness",
+            "description": "Executable Installer File Permissions Weakness. Executable Installer File Permissions Weakness. T1574.005 Executable Installer File Permissions Weakness…",
             "url": "https://1200km.com/threat-matrix/techniques/T1574.005/",
             "author": {
               "@id": "https://1200km.com/#person"
@@ -92,7 +136,11 @@
             "mainEntityOfPage": {
               "@id": "https://1200km.com/threat-matrix/techniques/T1574.005/#webpage"
             },
-            "dateModified": "2026-06-27"
+            "dateModified": "2026-06-27",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "image": "https://1200km.com/assets/site-og-v2.png"
           }
         ]
       }
