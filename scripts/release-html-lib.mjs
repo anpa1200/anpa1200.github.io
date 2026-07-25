@@ -135,10 +135,18 @@ export function normalizeMetaDescriptions(html) {
   const title = pageTitle(html).replace(/\s+\|\s+(?:1200km|AdversaryGraph Docs|ITDR)$/i, '');
   const current = metaContent(html, 'description');
   if (!current) return html;
-  const generic = /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodeEntities(current));
-  const base = generic
-    ? `${title}. Practical security guidance with scope, evidence, and validation boundaries.`
-    : `${title}. ${decodeEntities(current)}`;
+  const decodedCurrent = decodeEntities(current);
+  // Idempotency: a prior pass already prepends "<title>. " below. Without
+  // detecting that prefix, reprocessing an already-normalized page (routine
+  // on every content rebuild) re-prepends the title on every run, so the
+  // description grows and truncates a little more each time.
+  const alreadyPrefixed = decodedCurrent === title || decodedCurrent.startsWith(`${title}. `);
+  const generic = !alreadyPrefixed && /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodedCurrent);
+  const base = alreadyPrefixed
+    ? decodedCurrent
+    : generic
+      ? `${title}. Practical security guidance with scope, evidence, and validation boundaries.`
+      : `${title}. ${decodedCurrent}`;
   const description = conciseDescription(base);
   let transformed = html;
   for (const [attribute, key] of [
@@ -797,6 +805,14 @@ export function hardenStandaloneHead(html) {
   );
   transformed = transformed.replace(
     /\s*<meta\b[^>]*name=["']referrer["'][^>]*>/gi,
+    '',
+  );
+  // Idempotency: a prior pass through this transform already injects the
+  // canonical tag below. Without stripping it first, reprocessing an
+  // already-hardened page (routine on every content rebuild) accumulates one
+  // more duplicate <script> on every run instead of leaving a single copy.
+  transformed = transformed.replace(
+    /\s*<script\b[^>]*\bsrc=["']\/assets\/theme-bootstrap\.js["'][^>]*>\s*<\/script>/gi,
     '',
   );
   const securityMeta = [

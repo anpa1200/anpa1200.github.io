@@ -35,6 +35,22 @@ test('release transformer places strict CSP before external theme bootstrap', ()
   assert.doesNotMatch(csp, /script-src[^;]*'unsafe-inline'/);
 });
 
+test('release transformer is idempotent on an already-hardened page', () => {
+  const input = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const options = {
+    canonical: 'https://1200km.com/',
+    dateModified: '2026-07-24',
+    htmlPath: join(ROOT, 'index.html'),
+    siteRoot: ROOT,
+  };
+  const oncePassed = transformReleaseHtml(input, options);
+  const twicePassed = transformReleaseHtml(oncePassed, options);
+  const themeBootstrapMatches = twicePassed.match(/<script src="\/assets\/theme-bootstrap\.js"><\/script>/g) || [];
+  assert.equal(themeBootstrapMatches.length, 1, 'reprocessing must not accumulate duplicate theme-bootstrap script tags');
+  const cspMatches = twicePassed.match(/http-equiv="Content-Security-Policy"/g) || [];
+  assert.equal(cspMatches.length, 1, 'reprocessing must not accumulate duplicate CSP meta tags');
+});
+
 test('HTML element removal handles quoted delimiters and spaced closing tags', () => {
   const input = '<p>Before</p><script data-value=">">window.bad = true;</script ><p>After</p>';
   assert.equal(removeHtmlElements(input, 'script'), '<p>Before</p><p>After</p>');

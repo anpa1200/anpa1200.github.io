@@ -135,6 +135,14 @@ test('metadata descriptions are unique-page prose rather than generic level labe
   assert.doesNotMatch(output, /content="Level: Intermediate"/);
 });
 
+test('metadata description normalization is idempotent on an already-normalized page', () => {
+  const input = '<html><head><title>External Validation</title><h1>Public evidence for the 1200km security research ecosystem.</h1><meta name="description" content="Evidence-backed validation for 1200km."><meta property="og:description" content="Evidence-backed validation for 1200km."></head><body><main><h1>Public evidence for the 1200km security research ecosystem.</h1></main></body></html>';
+  const oncePassed = normalizeMetaDescriptions(input);
+  const twicePassed = normalizeMetaDescriptions(oncePassed);
+  assert.equal(oncePassed, twicePassed, 'reprocessing must not re-prepend the title onto an already-normalized description');
+  assert.doesNotMatch(twicePassed, /ecosystem\.\. Public evidence/);
+});
+
 test('pages without a bespoke share image receive the governed social fallback', () => {
   const input = '<html><head><title>Research Note | 1200km</title></head><body><main><h1>Research Note</h1></main></body></html>';
   const output = normalizeSocialImages(input);
