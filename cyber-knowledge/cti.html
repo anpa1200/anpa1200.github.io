@@ -243,6 +243,15 @@
       .featured-term .further-reading { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.86rem; color: var(--muted); }
       .featured-term .further-reading strong { color: var(--panel-ink); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; }
       [data-theme="dark"] .featured-term .further-reading strong { color: #f8fbff; }
+      .featured-term .guide-desc code {
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+        font-size: 0.86em;
+        background: var(--chip);
+        color: var(--panel-ink);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      [data-theme="dark"] .featured-term .guide-desc code { background: #162d52; color: #dbe8ff; }
 
       /* ── Footer ── */
       footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
@@ -599,35 +608,206 @@
           </p>
         </div>
 
-        <div class="guide-grid">
-          <div class="guide-list">
-            <div class="guide-item">
-              <span class="guide-title">Data vs. Information vs. Intelligence</span>
-              <p class="guide-desc">Data is a raw, unprocessed observation (a log line, a hash). Information is data organized into context. Intelligence is information analyzed against a specific requirement to produce an assessment a decision-maker can act on.</p>
-            </div>
-            <div class="guide-item">
-              <span class="guide-title">Threat vs. Vulnerability vs. Risk</span>
-              <p class="guide-desc">A threat is a potential cause of harm (an actor or event); a vulnerability is a weakness that could be exploited; risk is the likelihood and impact of a threat exploiting a vulnerability against a specific asset.</p>
-            </div>
-            <div class="guide-item">
-              <span class="guide-title">Indicator of Compromise (IOC)</span>
-              <p class="guide-desc">An observable artifact — hash, IP, domain, mutex, registry key — that suggests a system has already been compromised.</p>
-            </div>
-          </div>
-          <div class="guide-list">
-            <div class="guide-item">
-              <span class="guide-title">Indicator of Attack (IOA)</span>
-              <p class="guide-desc">A behavior-based signal that an attack is in progress or imminent, independent of any specific static artifact — for example, "process X spawns process Y, then makes an outbound connection."</p>
-            </div>
-            <div class="guide-item">
-              <span class="guide-title">Tactics, Techniques, and Procedures (TTPs)</span>
-              <p class="guide-desc">The "how" of an adversary. Tactics are the goal (e.g., persistence); techniques are the method (e.g., scheduled task); procedures are the specific implementation a given actor uses.</p>
-            </div>
-            <div class="guide-item">
-              <span class="guide-title">Threat Actor / Threat Group / Campaign</span>
-              <p class="guide-desc">A threat actor is an individual or group conducting malicious activity. A threat group is a tracked cluster of activity attributed, with varying confidence, to a common actor. A campaign is a bounded set of operations sharing goals, timeframe, or infrastructure.</p>
-            </div>
-          </div>
+        <div class="featured-term">
+          <span class="guide-title" id="data-information-intelligence">Data vs. Information vs. Intelligence</span>
+          <p class="guide-desc">
+            Data is a raw, unprocessed observation: a log line, a hash, an IP address someone saw once. Information is
+            data organized into context — a list of IPs grouped under "seen in this campaign." Intelligence is
+            information analyzed against a specific requirement to produce an assessment a decision-maker can act on.
+            The step that actually matters is the last one, and it is the one most self-taught analysts skip: turning
+            a pile of correlated observations into a claim you would defend under questioning.
+          </p>
+          <p class="guide-desc">
+            That defensibility comes from tradecraft most people never see written down. The
+            <a href="https://1200km.com/articles/read/2026/2026-05-18-cti-analyst-field-manual-complete-reference-ef2a370bb21f/" target="_blank" rel="noopener noreferrer">CTI Analyst Field Manual</a>
+            builds it from three separable layers: <strong>evidence labels</strong> that keep an observed fact from
+            quietly turning into an assumption as it gets passed around; <strong>source reliability</strong>, graded
+            on the classic Admiralty scale — reliability A through F for the source itself, credibility 1 through 6
+            for the specific information — so a rating like "B2" means something consistent across analysts instead
+            of a gut feeling; and <strong>confidence language</strong>, where words like "likely" or "almost
+            certainly" map to a defined probability range instead of decorating a sentence. The manual is explicit
+            that these ratings are review prompts, not mathematical truth — they exist to force the question "why do
+            I believe this," not to launder a guess into a number.
+          </p>
+          <p class="guide-desc">
+            The manual draws one more line that is easy to blur under deadline pressure: <strong>finished
+            intelligence versus research notes</strong>. Research notes are where an analyst thinks out loud — half-
+            confirmed leads, open questions, dead ends. Finished intelligence is what actually gets handed to a
+            consumer, and it has to survive contact with someone who was not in the room while it was produced. If
+            you cannot tell which one a document is, neither can the person reading it. The companion piece,
+            <a href="https://1200km.com/articles/read/2026/2026-05-10-applying-sherman-kent-s-analytic-discipline-to-cti-a-practical-analyst-guide-33142ad7553b/" target="_blank" rel="noopener noreferrer">Applying Sherman Kent's Analytic Discipline to CTI</a>,
+            goes deeper on the estimative-language side of this — including four worked "bad example, then corrected"
+            pairs that show exactly how vague hedging gets rewritten into a defensible claim.
+          </p>
+          <p class="further-reading">
+            <strong>Further reading on 1200km:</strong>
+            <a href="https://1200km.com/articles/read/2026/2026-05-18-cti-analyst-field-manual-complete-reference-ef2a370bb21f/" target="_blank" rel="noopener noreferrer">CTI Analyst Field Manual</a> ·
+            <a href="https://1200km.com/articles/read/2026/2026-05-10-applying-sherman-kent-s-analytic-discipline-to-cti-a-practical-analyst-guide-33142ad7553b/" target="_blank" rel="noopener noreferrer">Applying Sherman Kent's Analytic Discipline to CTI</a>
+          </p>
+        </div>
+
+        <div class="featured-term">
+          <span class="guide-title" id="threat-vulnerability-risk">Threat vs. Vulnerability vs. Risk</span>
+          <p class="guide-desc">
+            A threat is a potential cause of harm — an actor or an event. A vulnerability is a weakness that could be
+            exploited. Risk is the likelihood and impact of a threat actually exploiting that vulnerability against a
+            specific asset you own. Said as one sentence, that sounds obvious. Said as a scanner output with 400
+            "Critical" findings and one Tuesday to triage them, it is the difference between a defensible prioritization
+            and a wall of red numbers nobody trusts.
+          </p>
+          <p class="guide-desc">
+            <a href="https://1200km.com/articles/read/2026/2026-03-24-cvss-v4-0-the-practical-field-guide-for-vulnerability-management-5b5a59728456/" target="_blank" rel="noopener noreferrer">CVSS v4.0: The Practical Field Guide for Vulnerability Management</a>
+            is built almost entirely around this triad, and its central lesson is that a single CVSS score conflates
+            all three layers into one number and then everyone acts surprised when prioritizing by that number alone
+            goes wrong. The guide walks through a scoring lifecycle that keeps the layers separate instead:
+            <strong>CVSS-B</strong> (Base) scores the vulnerability in isolation — how bad this flaw is in the abstract,
+            independent of whether anyone is using it. <strong>CVSS-BT</strong> (Base + Threat) folds in whether it is
+            actually being exploited in the wild, using feeds like CISA's KEV catalog and EPSS probability scores —
+            that is the actor-driven "threat" layer arriving on top of the raw vulnerability. <strong>CVSS-BTE</strong>
+            (Base + Threat + Environmental) finally asks the risk question: given this vulnerability, and given that
+            it is being exploited, what does that actually mean for <em>this</em> asset in <em>this</em> environment?
+            A critical flaw in an internet-facing system with real user data is not the same risk as the identical
+            flaw on an air-gapped lab machine, even though both start from the same Base score.
+          </p>
+          <p class="guide-desc">
+            The article's worked examples make the gap concrete rather than theoretical: Log4Shell's score moving as
+            exploitation evidence accumulated over 72 hours, and one firmware assessment where eighteen findings
+            scored "Critical" on Base alone collapsed to Medium once environmental context was actually applied. That
+            is the threat/vulnerability/risk distinction doing real prioritization work, not just vocabulary.
+          </p>
+          <p class="further-reading">
+            <strong>Further reading on 1200km:</strong>
+            <a href="https://1200km.com/articles/read/2026/2026-03-24-cvss-v4-0-the-practical-field-guide-for-vulnerability-management-5b5a59728456/" target="_blank" rel="noopener noreferrer">CVSS v4.0: The Practical Field Guide for Vulnerability Management</a>
+          </p>
+        </div>
+
+        <div class="featured-term">
+          <span class="guide-title" id="indicator-of-compromise">Indicator of Compromise (IOC)</span>
+          <p class="guide-desc">
+            An IOC is an observable artifact — a hash, an IP, a domain, a mutex, a registry key — that suggests a
+            system has already been compromised. It is evidence of the past tense: something happened, and this
+            artifact is the residue. That makes IOCs cheap to collect, easy to share, and trivial for a competent
+            adversary to invalidate the moment they are published.
+          </p>
+          <p class="guide-desc">
+            The Pyramid of Pain, covered in detail in the
+            <a href="https://1200km.com/articles/read/2026/2026-05-18-cti-analyst-field-manual-complete-reference-ef2a370bb21f/" target="_blank" rel="noopener noreferrer">CTI Analyst Field Manual</a>,
+            puts hash values and IP addresses at the bottom of the pyramid for exactly this reason: they are the
+            easiest thing for an adversary to change and cost them almost nothing to rotate. That does not make IOCs
+            useless — the manual is explicit that they are the right tool for triage, scoping, and retroactive
+            search ("has this hash ever touched our environment") — it means they are the wrong tool for durable
+            detection strategy. Building a program around IOC feeds alone means you are always reacting to
+            yesterday's infrastructure, which is precisely the failure mode
+            <a href="https://1200km.com/articles/read/2026/2026-04-14-from-threat-intelligence-to-detection-a-practitioner-s-guide-2d930b168426/" target="_blank" rel="noopener noreferrer">"Why IOC-Only Detection Fails"</a>
+            walks through: by the time a public report lists an IP or hash, an adversary who has been operating for
+            more than a week has almost certainly already burned it.
+          </p>
+          <p class="further-reading">
+            <strong>Further reading on 1200km:</strong>
+            <a href="https://1200km.com/articles/read/2026/2026-05-18-cti-analyst-field-manual-complete-reference-ef2a370bb21f/" target="_blank" rel="noopener noreferrer">CTI Analyst Field Manual — Pyramid of Pain</a> ·
+            <a href="https://1200km.com/articles/read/2026/2026-04-14-from-threat-intelligence-to-detection-a-practitioner-s-guide-2d930b168426/" target="_blank" rel="noopener noreferrer">From Threat Intelligence to Detection</a>
+          </p>
+        </div>
+
+        <div class="featured-term">
+          <span class="guide-title" id="indicator-of-attack">Indicator of Attack (IOA)</span>
+          <p class="guide-desc">
+            Where an IOC is evidence something already happened, an IOA is a behavior-based signal that an attack is
+            in progress or imminent, independent of any specific static artifact — for example, "an Office process
+            spawns a script interpreter, which then makes an outbound connection to a newly registered domain." No
+            hash required; the pattern is the indicator.
+          </p>
+          <p class="guide-desc">
+            This is the upper end of the same Pyramid of Pain: tools, TTPs, and behaviors sit at the top precisely
+            because they are what an adversary can least afford to change. Swapping a hash costs an adversary a
+            recompile. Swapping the underlying tradecraft — the tooling, the sequencing, the operational habits —
+            costs them retraining, retooling, and risk. That is what makes IOA-driven detection durable in a way
+            IOC-driven detection structurally cannot be, and it is the same principle behind the layered detection
+            model in
+            <a href="https://1200km.com/articles/read/2026/2026-04-14-from-threat-intelligence-to-detection-a-practitioner-s-guide-2d930b168426/" target="_blank" rel="noopener noreferrer">From Threat Intelligence to Detection</a>:
+            atomic IOC rules at the bottom for triage, behavioral and TTP-based rules layered above them for anything
+            that actually has to hold up over time. The TTP module right after this one is where that behavior
+            actually gets named using a shared vocabulary — ATT&amp;CK.
+          </p>
+          <p class="further-reading">
+            <strong>Further reading on 1200km:</strong>
+            <a href="https://1200km.com/articles/read/2026/2026-05-18-cti-analyst-field-manual-complete-reference-ef2a370bb21f/" target="_blank" rel="noopener noreferrer">CTI Analyst Field Manual — Pyramid of Pain</a> ·
+            <a href="https://1200km.com/articles/read/2026/2026-04-14-from-threat-intelligence-to-detection-a-practitioner-s-guide-2d930b168426/" target="_blank" rel="noopener noreferrer">From Threat Intelligence to Detection</a>
+          </p>
+        </div>
+
+        <div class="featured-term">
+          <span class="guide-title" id="ttps">Tactics, Techniques, and Procedures (TTPs)</span>
+          <p class="guide-desc">
+            TTPs are the "how" of an adversary, described at three levels of resolution. A <strong>tactic</strong> is
+            the goal, not a step — "why" the adversary is doing something (e.g. Credential Access, Persistence). A
+            <strong>technique</strong> is the specific method used to accomplish that goal. A <strong>procedure</strong>
+            is the exact implementation a given actor uses — the specific tool, the specific command line, the
+            specific order of operations.
+          </p>
+          <p class="guide-desc">
+            <a href="https://1200km.com/articles/read/2026/2026-03-19-att-and-ck-as-a-working-tool-theory-and-hands-on-practical-usage-d63835c9f101/" target="_blank" rel="noopener noreferrer">ATT&amp;CK as a Working Tool</a>
+            makes a point that trips up a lot of newcomers to the framework: ATT&amp;CK's 14 tactics are adversary
+            <em>goals</em>, not a linear kill-chain sequence — an intrusion does not march through them in order, and
+            an actor can revisit the same tactic repeatedly. Techniques sit below tactics as the "core analytical
+            unit" of the framework: when a CTI analyst says "map this behavior to ATT&amp;CK," they mean identifying
+            which techniques were observed. <strong>T1003 — OS Credential Dumping</strong> is a good worked example
+            of why the framework then needed sub-techniques: T1003 alone is too broad to drive a specific detection,
+            but splitting it into <strong>T1003.001 (LSASS Memory)</strong>, extracted with tools like Mimikatz's
+            <code>sekurlsa::logonpasswords</code> or ProcDump, versus <strong>T1003.003 (NTDS)</strong>, extracted with
+            <code>ntdsutil</code> or <code>secretsdump</code>, gives each variant a distinct, buildable detection
+            profile — which is exactly the procedure layer of TTPs made concrete.
+          </p>
+          <p class="guide-desc">
+            This is also the vocabulary that makes IOA-style behavioral detection legible across a team: "TTP-based
+            rule" and "T1003.001" mean the same specific thing to a CTI analyst, a detection engineer, and a threat
+            hunter, which is the entire point of a shared framework instead of prose descriptions that drift between
+            reports.
+          </p>
+          <p class="further-reading">
+            <strong>Further reading on 1200km:</strong>
+            <a href="https://1200km.com/articles/read/2026/2026-03-19-att-and-ck-as-a-working-tool-theory-and-hands-on-practical-usage-d63835c9f101/" target="_blank" rel="noopener noreferrer">ATT&amp;CK as a Working Tool: Theory and Hands-On Practical Usage</a> ·
+            <a href="/guides.html#cti">Tools by MITRE ATT&amp;CK Guide (Library)</a>
+          </p>
+        </div>
+
+        <div class="featured-term">
+          <span class="guide-title" id="threat-actor-group-campaign">Threat Actor / Threat Group / Campaign</span>
+          <p class="guide-desc">
+            A threat actor is an individual or group conducting malicious activity. A threat group is a tracked
+            cluster of activity attributed, with varying confidence, to a common actor — "cluster" is the operative
+            word, because what analysts actually observe is correlated behavior, not a verified identity. A campaign
+            is a bounded set of operations sharing goals, timeframe, or infrastructure, which may or may not map
+            cleanly onto a single group.
+          </p>
+          <p class="guide-desc">
+            <a href="https://1200km.com/articles/read/2026/2026-03-20-attribution-methodology-how-to-build-defend-and-challenge-a-threat-actor-attribution-071066437ced/" target="_blank" rel="noopener noreferrer">Attribution Methodology: How to Build, Defend, and Challenge a Threat Actor Attribution</a>
+            treats this distinction as load-bearing rather than semantic, separating <strong>cluster-level</strong>
+            attribution (this set of activity is internally consistent and probably one actor) from
+            <strong>incident-level</strong> attribution (this specific intrusion was that actor) — the first is
+            usually far more defensible than the second. It ranks evidence for making either claim from weakest to
+            strongest: IOC overlap is the weakest signal (too easy to share, reuse, or plant), infrastructure reuse is
+            stronger but still explainable by shared tooling or resold access, TTP consistency is the real behavioral
+            fingerprint, and operator mistakes — a reused personal email, a misconfigured VPN leaking a real
+            source IP — are the strongest evidence of all, precisely because they are the hardest for an adversary to
+            fake or avoid. The same guide devotes a full worked exercise to attributing APT29 / Cozy Bear / SVR
+            end to end using exactly this evidence ladder.
+          </p>
+          <p class="guide-desc">
+            None of this is theoretical on this site — the CTI research case studies on
+            <a href="https://1200km.com/articles/read/2026/2026-03-06-cti-research-handala-hack-group-aka-handala-hack-team-ddbdd294cfb8/" target="_blank" rel="noopener noreferrer">Handala Hack Group</a>,
+            <a href="https://1200km.com/articles/read/2026/2026-03-07-cti-research-sandworm-apt44-649332e8af44/" target="_blank" rel="noopener noreferrer">Sandworm / APT44</a>, and
+            <a href="https://1200km.com/articles/read/2026/2026-03-09-cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061/" target="_blank" rel="noopener noreferrer">MuddyWater / Seedworm</a>
+            are exactly this kind of actor and group tracking applied to real, currently active clusters — a good
+            next stop once the methodology above makes sense on paper.
+          </p>
+          <p class="further-reading">
+            <strong>Further reading on 1200km:</strong>
+            <a href="https://1200km.com/articles/read/2026/2026-03-20-attribution-methodology-how-to-build-defend-and-challenge-a-threat-actor-attribution-071066437ced/" target="_blank" rel="noopener noreferrer">Attribution Methodology</a> ·
+            <a href="https://1200km.com/articles/read/2026/2026-03-06-cti-research-handala-hack-group-aka-handala-hack-team-ddbdd294cfb8/" target="_blank" rel="noopener noreferrer">CTI Research: Handala Hack Group</a> ·
+            <a href="https://1200km.com/articles/read/2026/2026-03-07-cti-research-sandworm-apt44-649332e8af44/" target="_blank" rel="noopener noreferrer">CTI Research: Sandworm / APT44</a> ·
+            <a href="https://1200km.com/articles/read/2026/2026-03-09-cti-research-muddywater-seedworm-mango-sandstorm-ebf6af5ba061/" target="_blank" rel="noopener noreferrer">CTI Research: MuddyWater / Seedworm</a>
+          </p>
         </div>
       </section>
 
