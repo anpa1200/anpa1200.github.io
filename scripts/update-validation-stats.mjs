@@ -184,8 +184,8 @@ function renderValidationSignal() {
               <li><span>Closed unmerged GitHub PRs</span><strong>${stats.github.closed_unmerged_prs}</strong></li>
             </ul>
             <div class="links">
-              <a href="https://github.com/pulls?q=is%3Apr+author%3Aanpa1200+is%3Aopen" target="_blank" rel="noopener noreferrer">Open PR search</a>
-              <a href="https://github.com/pulls?q=is%3Apr+author%3Aanpa1200+is%3Amerged" target="_blank" rel="noopener noreferrer">Merged PR search</a>
+              <a href="https://github.com/search?q=is%3Apr+author%3Aanpa1200+is%3Aopen&type=pullrequests" target="_blank" rel="noopener noreferrer">Open PR search</a>
+              <a href="https://github.com/search?q=is%3Apr+author%3Aanpa1200+is%3Amerged&type=pullrequests" target="_blank" rel="noopener noreferrer">Merged PR search</a>
             </div>
           </article>
           <article class="card">
@@ -531,8 +531,8 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<span class="chip release">(?:Source )?Release (?:<span data-site-fact="adversarygraph\.(?:current_source_release|latest_release_tag)" data-fact-value="v[^"]+">)?v[^<]+(?:<\/span>)?<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
-  `<span class="chip release">Source release <span data-site-fact="adversarygraph.current_source_release" data-fact-value="${adversaryGraphSourceRelease}">${adversaryGraphSourceRelease}</span></span>$1<span class="chip">Published tag ${stats.repositories.adversarygraph.release}</span>\n              <span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
+  /<span class="chip release">(?:Source )?[Rr]elease (?:<span data-site-fact="adversarygraph\.(?:current_source_release|latest_release_tag)" data-fact-value="v[^"]+">)?v[^<]+(?:<\/span>)?<\/span>(\s+<span class="chip accepted">Green CI<\/span>[\s\S]*?)(?:\s*<span class="chip">Published tag v[^<]+<\/span>)?\s*<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
+  `<span class="chip release">Source release <span data-site-fact="adversarygraph.current_source_release" data-fact-value="${adversaryGraphSourceRelease}">${adversaryGraphSourceRelease}</span></span>$1\n              <span class="chip">Published tag ${stats.repositories.adversarygraph.release}</span>\n              <span class="chip">${stats.repositories.adversarygraph.stars} stars</span>\n              <span class="chip">${stats.repositories.adversarygraph.forks} fork${stats.repositories.adversarygraph.forks === 1 ? '' : 's'}</span>`,
   'AdversaryGraph release chips',
 );
 html = replaceOrThrow(
