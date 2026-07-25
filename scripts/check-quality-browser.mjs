@@ -41,6 +41,7 @@ let pages = [
   ['search', '/search.html?q=T1059.003', 'default'],
   ['validation', '/external-validation.html', 'default'],
   ['adversarygraph', '/adversarygraph/', 'product'],
+  ['adversarygraph-full-guide', '/adversarygraph/full-version-feature-guides.html', 'default'],
   ['threat-matrix', '/threat-matrix/', 'interactive'],
   ['docs', '/adversarygraph-docs/full-flow/', 'documentation'],
 ];

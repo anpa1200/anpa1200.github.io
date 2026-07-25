@@ -27,6 +27,7 @@ const pages = [
   ['labs', '/labs.html'],
   ['validation', '/external-validation.html'],
   ['adversarygraph', '/adversarygraph/'],
+  ['adversarygraph-full-guide', '/adversarygraph/full-version-feature-guides.html'],
   ['search', '/search.html'],
   ['docs-long', '/adversarygraph-docs/full-flow/'],
   ['threat-matrix', '/threat-matrix/'],
