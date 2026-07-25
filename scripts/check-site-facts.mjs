@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { htmlTextContent, transformHtmlElements } from './html-token-utils.mjs';
 
 const sourceRoot = path.resolve(new URL('.', import.meta.url).pathname, '..');
 const siteFlag = process.argv.indexOf('--site');
@@ -43,14 +44,17 @@ function fact(key) {
 
 function parseJsonLd(html, relativePath) {
   const documents = [];
-  const pattern = /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
-  for (const match of html.matchAll(pattern)) {
+  transformHtmlElements(html, 'script', (element) => {
+    if (!/\btype\s*=\s*["']application\/ld\+json["']/i.test(element.openTag)) {
+      return element.full;
+    }
     try {
-      documents.push(JSON.parse(match[1]));
+      documents.push(JSON.parse(element.content));
     } catch (error) {
       fail(`${relativePath}: invalid JSON-LD (${error.message})`);
     }
-  }
+    return element.full;
+  });
   return documents;
 }
 
@@ -65,10 +69,7 @@ function flattenJsonLd(value, output = []) {
 }
 
 function visibleText(html) {
-  return html
-    .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
+  return htmlTextContent(html)
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
