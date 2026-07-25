@@ -2,7 +2,9 @@
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench for analysts and detection engineers.
 
-Current release: v6.0.0.
+Current source release: v6.5.0.
+
+Latest published tag: v6.0.0.
 
 ## Core Capabilities
 
@@ -20,6 +22,10 @@ Current release: v6.0.0.
 - Detection-gap and telemetry-readiness review
 - Controlled attack simulation documentation
 - SIEM validation documentation
+- Governed Threat Hunting and Query Library
+- Unified Intelligence RAG and local advisory MCP
+- SOC group and module-level access control
+- Authorized asset exposure assessment and discovered-surface promotion
 - Analyst-ready reports and exports
 
 ## Public Agent Guidance

@@ -10,7 +10,7 @@ Explain AdversaryGraph using public documentation.
 - https://1200km.com/data/site-facts.json
 - https://1200km.com/adversarygraph-docs/
 - https://1200km.com/adversarygraph-docs/capabilities/
-- https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md (Unreleased current-development source guide)
+- https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/unified-rag-and-mcp.md (v6.5 source guide)
 - https://github.com/anpa1200/adversarygraph
 
 ## Key Concepts
@@ -55,8 +55,9 @@ Explain these controls:
 - RAG analysis uses `run_analysis`; profile administration uses `manage_intel`;
   index administration uses `manage_feeds`.
 
-Always label Unified RAG and MCP as post-v6, Unreleased current development.
-Never claim that these features shipped in the immutable v6.0.0 release.
+Label Unified RAG and MCP as included in the merged, CI-validated v6.5.0 source
+release. Do not claim that these features shipped in the older immutable v6.0.0
+release, and do not claim a v6.5.0 tag exists until it is published.
 
 ## Safety Boundary
 

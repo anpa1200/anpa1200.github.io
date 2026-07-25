@@ -19,7 +19,7 @@ function objectById(graph, id) {
   return graph.find((object) => object['@id'] === id);
 }
 
-test('homepage emits a WebPage connected to the stable AdversaryGraph entity', () => {
+test('homepage emits a WebPage connected to the current AdversaryGraph source entity', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const canonical = 'https://1200km.com/';
   const output = transformReleaseHtml(html, {
@@ -41,9 +41,9 @@ test('homepage emits a WebPage connected to the stable AdversaryGraph entity', (
   assert.deepEqual(software.author, { '@id': PERSON_ID });
   assert.equal(software.name, 'AdversaryGraph');
   assert.equal(software.alternateName, 'ThreatMapper');
-  assert.equal(software.softwareVersion, '6.0.0');
+  assert.equal(software.softwareVersion, '6.5.0');
   assert.equal(software.codeRepository, 'https://github.com/anpa1200/adversarygraph');
-  assert.equal(software.license, 'https://github.com/anpa1200/adversarygraph/blob/v6.0.0/LICENSE');
+  assert.equal(software.license, 'https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/LICENSE');
   assert.equal(person.email, 'mailto:1200km@gmail.com');
   assert.equal(person.contactPoint.email, 'mailto:1200km@gmail.com');
   assert.ok(person.sameAs.includes('https://infosecwriteups.com/@1200km'));

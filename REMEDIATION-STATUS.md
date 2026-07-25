@@ -7,7 +7,7 @@ Last updated: 2026-07-22
 - Main-site baseline commit: `723770f8b4d3fca8e3547eb38c272205108849cf`
 - Production-identity deployment commit: `74c6eeec8dbe545bebf0475e0adf633ed649019d`
 - Governed article-archive commit: `c57eeaf021b15980ade6be72aeb96ce206489f09`
-- Latest stable AdversaryGraph release: `v6.0.0`, published 2026-07-17 ([release](https://github.com/anpa1200/adversarygraph/releases/tag/v6.0.0))
+- Current AdversaryGraph source release: `v6.5.0`, merged and CI-validated 2026-07-25 ([source notes](https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/release-notes/v6.5.0.md)); latest published immutable release: `v6.0.0`, published 2026-07-17 ([release](https://github.com/anpa1200/adversarygraph/releases/tag/v6.0.0))
 - Latest successful Pages run before remediation: [29869441714](https://github.com/anpa1200/anpa1200.github.io/actions/runs/29869441714)
 - Pages artifact digest before remediation: `sha256:dce8e2d59f906d43f6e07956c783d2c0b483383ee3c5e42876550aab7edf671b`
 - Production build ID before remediation: unavailable; `/build.json` returned HTTP 404 on both the custom domain and GitHub Pages origin.
@@ -32,7 +32,7 @@ but there was no deterministic origin-to-artifact proof.
 | 5 — structured data and SEO | Complete | [PR #13](https://github.com/anpa1200/anpa1200.github.io/pull/13) is merged. [Production run 29901072593](https://github.com/anpa1200/anpa1200.github.io/actions/runs/29901072593) passed the complete quality, deployment, and custom-domain verification gates for commit `6ed3f5c`, article source `c57eeaf`, and artifact `sha256:a9328360e7ca7fd175aa140062a06fd89a21c068af5cdca62ee66ded314e6cfb`. |
 | 6 — taxonomy and lifecycle | In progress | Publication status and editorial lifecycle are being separated; generated ATT&CK references and the 177-article archive are receiving explicit governed classifications and an auditable distribution report. |
 | 7 — editorial UX | Pending | Requires generated-output and viewport review. |
-| 8 — AdversaryGraph presentation | Pending | Stable/released ordering requires review against the v6.0.0 tag. |
+| 8 — AdversaryGraph presentation | In progress | Current v6.5.0 source evidence is separated from the published v6.0.0 tag boundary. |
 | 9 — validation and adoption | Pending | Permission-backed adoption inventory remains authoritative. |
 | 10 — CSS maintainability | Pending | Requires source-family inventory before extraction. |
 | 11 — complete quality gates | Pending | Will consolidate phase-specific enforcement. |

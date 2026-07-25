@@ -17,6 +17,8 @@ function value(key) {
 
 const releaseTag = value('adversarygraph.latest_release_tag');
 const releaseDate = value('adversarygraph.release_published_at').slice(0, 10);
+const sourceRelease = value('adversarygraph.current_source_release');
+const sourceCommit = value('adversarygraph.current_source_commit');
 const workspace = value('products.public_attack_workspace');
 const output = `# ${value('site.name')} — ${value('identity.person_name')}
 
@@ -35,15 +37,16 @@ Use this file as a curated discovery map. Follow the linked source pages for evi
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly named ThreatMapper.
 
-- Current immutable release: **${releaseTag}**, published ${releaseDate}
-- Current development: **Unreleased** work after ${releaseTag}; do not attribute it to the release tag
+- Current source release: **${sourceRelease}**, merged and CI-validated on \`main\` at commit \`${sourceCommit.slice(0, 7)}\`
+- Latest published immutable GitHub release: **${releaseTag}**, published ${releaseDate}
+- Publication boundary: ${sourceRelease} is not an immutable tag until the protected release workflow publishes it
 - [Product hub](https://1200km.com/adversarygraph/)
 - [Documentation](${value('adversarygraph.documentation_url')})
 - [Source and releases](${value('adversarygraph.repository_url')})
 - [Capabilities](https://1200km.com/adversarygraph-docs/capabilities/)
 - [Case studies and validation](https://1200km.com/adversarygraph-docs/case-studies-validation/)
 - [Attack simulation and SIEM validation](https://1200km.com/adversarygraph-docs/attack-simulation/)
-- [Current-development RAG and MCP source guide](https://github.com/anpa1200/adversarygraph/blob/main/docs/unified-rag-and-mcp.md)
+- [RAG and MCP source guide](https://github.com/anpa1200/adversarygraph/blob/${sourceCommit}/docs/unified-rag-and-mcp.md)
 
 ## Research and field manuals
 

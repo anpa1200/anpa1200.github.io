@@ -68,3 +68,23 @@ test('generated AdversaryGraph docs load the post-bundle typography correction',
   assert.match(override, /\.theme-doc-markdown a\[href\^="http"\][\s\S]*?overflow-wrap:\s*anywhere;/);
   assert.match(override, /\.theme-doc-markdown table\s*\{[^}]*overflow-x:\s*auto;/s);
 });
+
+test('AdversaryGraph full-version guide uses one continuous document column', () => {
+  const source = readFileSync(
+    join(ROOT, 'adversarygraph', 'full-version-feature-guides.html'),
+    'utf8',
+  );
+  assert.match(source, /\.page-shell\s*\{[^}]*display:\s*block;/s);
+  assert.match(source, /\.module-grid\s*\{[^}]*display:\s*block;/s);
+  assert.match(source, /\.toc-panel\s*>\s*div\s*\{[^}]*columns:\s*1;/s);
+  assert.doesNotMatch(
+    source,
+    /\.module-grid\s*\{[^}]*grid-template-columns:/s,
+    'module cards must not return to a multi-column grid',
+  );
+  assert.doesNotMatch(
+    source,
+    /\.toc-panel\s*>\s*div\s*\{[^}]*columns:\s*[2-9]/s,
+    'table of contents must remain a single vertical list',
+  );
+});

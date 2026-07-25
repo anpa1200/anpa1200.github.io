@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { htmlTextContent, transformHtmlElements } from './html-token-utils.mjs';
 
 const sourceRoot = path.resolve(new URL('.', import.meta.url).pathname, '..');
 const siteFlag = process.argv.indexOf('--site');
@@ -43,14 +44,17 @@ function fact(key) {
 
 function parseJsonLd(html, relativePath) {
   const documents = [];
-  const pattern = /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
-  for (const match of html.matchAll(pattern)) {
+  transformHtmlElements(html, 'script', (element) => {
+    if (!/\btype\s*=\s*["']application\/ld\+json["']/i.test(element.openTag)) {
+      return element.full;
+    }
     try {
-      documents.push(JSON.parse(match[1]));
+      documents.push(JSON.parse(element.content));
     } catch (error) {
       fail(`${relativePath}: invalid JSON-LD (${error.message})`);
     }
-  }
+    return element.full;
+  });
   return documents;
 }
 
@@ -65,10 +69,7 @@ function flattenJsonLd(value, output = []) {
 }
 
 function visibleText(html) {
-  return html
-    .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
+  return htmlTextContent(html)
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
@@ -115,8 +116,16 @@ if (siteRoot !== sourceRoot) {
 
 const stable = fact('adversarygraph.stable_release').value;
 const stableTag = fact('adversarygraph.latest_release_tag').value;
+const sourceRelease = fact('adversarygraph.current_source_release').value;
+const sourceVersion = String(sourceRelease).replace(/^v/, '');
+const sourceCommit = fact('adversarygraph.current_source_commit').value;
 if (stableTag !== `v${stable}`) fail('Stable release and latest release tag disagree.');
 if (fact('adversarygraph.stable_release').status !== 'released') fail('Stable release must have released status.');
+if (!/^v\d+\.\d+\.\d+$/.test(sourceRelease)) fail('Current source release must be a v-prefixed semantic version.');
+if (!/^[0-9a-f]{40}$/.test(sourceCommit)) fail('Current source commit must be a full Git commit SHA.');
+if (fact('adversarygraph.current_source_release').status !== 'current-development') {
+  fail('Current source release must remain current-development until its immutable GitHub release is published.');
+}
 if (fact('adversarygraph.development_status').status !== 'current-development') fail('Development status must be current-development.');
 
 const techniquePages = fact('content.threat_matrix_technique_pages').value;
@@ -153,6 +162,11 @@ if (stats.github?.closed_unmerged_prs !== fact('contributions.closed_unmerged_ex
 }
 if (stats.repositories?.adversarygraph?.release !== stableTag) {
   fail('AdversaryGraph release fact disagrees with assets/validation/stats.json.');
+}
+if (stats.repositories?.adversarygraph?.source_release !== sourceRelease
+  || stats.repositories?.adversarygraph?.source_commit !== sourceCommit
+  || stats.repositories?.adversarygraph?.source_ci !== fact('adversarygraph.current_source_ci').value) {
+  fail('AdversaryGraph source-release evidence disagrees with assets/validation/stats.json.');
 }
 
 if (siteRoot === sourceRoot) {
@@ -203,19 +217,20 @@ if (!adgSoftware) fail('adversarygraph/index.html: SoftwareApplication JSON-LD i
 else {
   if (adgSoftware.name !== fact('adversarygraph.product_name').value) fail('AdversaryGraph JSON-LD product name disagrees with facts.');
   if (adgSoftware.alternateName !== fact('products.threatmapper').value.name) fail('AdversaryGraph JSON-LD historical alias disagrees with facts.');
-  if (adgSoftware.softwareVersion !== stable) fail('AdversaryGraph JSON-LD softwareVersion disagrees with facts.');
-  if (!String(adgSoftware.releaseNotes || '').includes(stableTag)) fail('AdversaryGraph JSON-LD releaseNotes does not point to the stable tag notes.');
+  if (adgSoftware.softwareVersion !== sourceVersion) fail('AdversaryGraph JSON-LD softwareVersion disagrees with the current source release.');
+  if (!String(adgSoftware.releaseNotes || '').includes(sourceCommit)) fail('AdversaryGraph JSON-LD releaseNotes does not point to the reviewed source commit.');
 }
 
 const homeHtml = currentTexts.find(([name]) => name === 'index.html')?.[1] || '';
 const homeNodes = flattenJsonLd(parseJsonLd(homeHtml, 'index.html'));
 const homeSoftware = homeNodes.find(node => node['@type'] === 'SoftwareApplication' && node.name === 'AdversaryGraph');
-if (!homeSoftware || homeSoftware.softwareVersion !== stable) fail('Homepage AdversaryGraph structured data disagrees with the stable release fact.');
+if (!homeSoftware || homeSoftware.softwareVersion !== sourceVersion) fail('Homepage AdversaryGraph structured data disagrees with the current source release fact.');
 else if (homeSoftware.alternateName !== fact('products.threatmapper').value.name) fail('Homepage AdversaryGraph structured data omits the governed historical alias.');
 
 const markerPattern = /data-site-fact=["']([^"']+)["'][^>]*data-fact-value=["']([^"']+)["']/gi;
 const requiredMarkers = new Map([
   ['adversarygraph.latest_release_tag', String(stableTag)],
+  ['adversarygraph.current_source_release', String(sourceRelease)],
   ['contributions.accepted_external', String(fact('contributions.accepted_external').value)],
   ['contributions.open_external', String(fact('contributions.open_external').value)],
   ['content.local_article_archive', String(fact('content.local_article_archive').value)],
@@ -280,24 +295,13 @@ for (const [relativePath, , text] of currentTexts) {
   if (/\b(?:52\+|150\+|15\+)\b/.test(text)) fail(`${relativePath}: ambiguous legacy content count remains.`);
 }
 
-const publicTextFiles = walk(siteRoot, file => /\.(?:html|md|txt|xml|json)$/i.test(file));
-const brokenDevelopmentPath = '1200km.com/adversarygraph-docs/unified-rag-mcp/';
-for (const absolute of publicTextFiles) {
-  const relative = path.relative(siteRoot, absolute);
-  if (relative === 'SITE-FACTS.md'
-    || relative === 'data/content-catalog.json'
-    || relative === 'data/content-catalog.config.json'
-    || relative.startsWith('adversarygraph-docs/unified-rag-mcp')) continue;
-  if (readFileSync(absolute, 'utf8').includes(brokenDevelopmentPath)) {
-    fail(`${relative}: links to the undeployed Unified RAG/MCP Docusaurus route.`);
-  }
-}
-
 const docsOutputRoot = path.join(siteRoot, 'adversarygraph-docs');
 for (const absolute of walk(docsOutputRoot, file => /\.(?:html|md|js)$/i.test(file))) {
   const content = readFileSync(absolute, 'utf8');
   if (/Current release:\s*(?:<strong>)?(?:AdversaryGraph\s+)?v5\.9\.1/i.test(content)
     || /Current v5\.x releases/i.test(content)
+    || /AdversaryGraph v6\.0\.0 is the current stable release/i.test(content)
+    || /Current release:\s*(?:<strong>)?v6\.0\.0/i.test(content)
     || /\bAdversaryGraph AI\b(?!\s+Analysis)/i.test(content)) {
     fail(`${path.relative(siteRoot, absolute)}: stale current-version or product-name content remains in documentation output.`);
   }
@@ -326,23 +330,23 @@ const threatMatrixPlatform = threatMatrixNodes.find(node => node['@id'] === 'htt
 if (!threatMatrixApplication) fail('Threat Matrix WebApplication JSON-LD is missing.');
 else {
   const connectedRelationship = threatMatrixApplication.isPartOf?.['@id'] === 'https://1200km.com/#software'
-    && threatMatrixPlatform?.softwareVersion === stable;
+    && threatMatrixPlatform?.softwareVersion === sourceVersion;
   const sourceRelationship = threatMatrixApplication.isPartOf?.name === 'AdversaryGraph'
-    && threatMatrixApplication.isPartOf?.softwareVersion === stable;
+    && threatMatrixApplication.isPartOf?.softwareVersion === sourceVersion;
   if (!connectedRelationship && !sourceRelationship) {
     fail('Threat Matrix structured data disagrees with the AdversaryGraph relationship or stable release fact.');
   }
 }
 
 const textSurfaceRequirements = new Map([
-  ['index.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
-  ['projects.md', [stableTag, 'Unreleased', 'Threat Matrix', 'ThreatMapper']],
-  ['adversarygraph.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
-  ['llms.txt', [stableTag, 'Accepted external contributions: **8**', 'Open external submissions: **31**']],
-  ['llms-full.txt', [stableTag, 'post-v6 work on `main` is Unreleased', 'Threat Matrix']],
-  ['agent-index.md', [stableTag, 'Unreleased', 'data/site-facts.json']],
-  ['adversarygraph-docs/index.md', [`Current release: ${stableTag}.`]],
-  ['adversarygraph-docs/capabilities.md', [`Current release: ${stableTag}.`]],
+  ['index.md', [sourceRelease, stableTag, 'data/site-facts.json']],
+  ['projects.md', [sourceRelease, stableTag, 'Threat Matrix', 'ThreatMapper']],
+  ['adversarygraph.md', [sourceRelease, stableTag, 'data/site-facts.json']],
+  ['llms.txt', [sourceRelease, stableTag, 'Accepted external contributions: **8**', 'Open external submissions: **31**']],
+  ['llms-full.txt', [sourceRelease, stableTag, 'Threat Matrix']],
+  ['agent-index.md', [sourceRelease, stableTag, 'data/site-facts.json']],
+  ['adversarygraph-docs/index.md', [`Current source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
+  ['adversarygraph-docs/capabilities.md', [`Current source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
 ]);
 for (const [relativePath, values] of textSurfaceRequirements) {
   const content = read(relativePath);
@@ -350,7 +354,8 @@ for (const [relativePath, values] of textSurfaceRequirements) {
 }
 
 const feed = read('feed.xml');
-if (!feed.includes(`AdversaryGraph ${stableTag} Stable Release`)) fail('feed.xml: stable AdversaryGraph release item is missing.');
+if (!feed.includes(`AdversaryGraph ${sourceRelease} Validated Source Release`)) fail('feed.xml: current AdversaryGraph source release item is missing.');
+if (!feed.includes(`latest published immutable GitHub release is ${stableTag}`)) fail('feed.xml: published AdversaryGraph tag boundary is missing.');
 if (!feed.includes('Historical: AdversaryGraph v4 Capability Map')) fail('feed.xml: version-specific v4 item is not labelled historical.');
 const catalog = read('.well-known/api-catalog');
 if (!catalog.includes('https://1200km.com/data/site-facts.json')) fail('API catalog does not expose the authoritative fact model.');
@@ -373,4 +378,4 @@ if (failures.length) {
 }
 
 console.log(`Site fact consistency passed for ${path.relative(sourceRoot, siteRoot) || '.'}`);
-console.log(`Stable ${stableTag}; ${fact('contributions.accepted_external').value} accepted contributions; ${fact('contributions.open_external').value} open submissions.`);
+console.log(`Source ${sourceRelease}; published ${stableTag}; ${fact('contributions.accepted_external').value} accepted contributions; ${fact('contributions.open_external').value} open submissions.`);

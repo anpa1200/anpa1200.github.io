@@ -10,7 +10,8 @@ lifecycle status. `data/site-facts.schema.json` defines the required shape.
 Use sources in this order when a claim conflicts:
 
 1. An immutable GitHub release or tag for released software.
-2. The current repository `CHANGELOG.md` and `README.md` for unreleased work.
+2. The current repository `VERSION`, release notes, `CHANGELOG.md`, and
+   `README.md` for a merged source release that is not yet an immutable tag.
 3. A merged upstream pull/merge request for an accepted contribution.
 4. An open upstream pull/merge request for a submitted contribution.
 5. An explicitly maintained data file or a reproducible local file count.
@@ -34,10 +35,12 @@ articles must not be used to establish a current version or metric.
 
 ## Release boundary
 
-The latest stable AdversaryGraph release is the latest non-draft,
-non-prerelease GitHub release. At the 2026-07-21 verification snapshot that is
-`v6.0.0`. Changes listed under `Unreleased` on `main` are current development,
-not part of that tag.
+AdversaryGraph has two explicit release facts. The current merged and
+CI-validated source release is `v6.5.0` at commit
+`aeee13dcaec1e2993b9f0969290c9ee414bb4cf6`. The latest non-draft,
+non-prerelease immutable GitHub release is still `v6.0.0`. Until the protected
+v6.5.0 tag workflow publishes successfully, pages must state both facts and
+must not link to or imply the existence of a v6.5.0 GitHub release tag.
 
 ## Count definitions
 
@@ -62,11 +65,9 @@ deployed v6.0.0 documentation from commit
 `29574898051`. The project Pages route and the root-site mirror therefore came
 from different build inputs and disagreed.
 
-Post-v6 Unified RAG/MCP documentation exists on AdversaryGraph `main`, but its
-Docusaurus page was present only in an uncommitted local documentation checkout
-and returned 404 on the public project Pages deployment. Current-development
-links therefore point to the public source guide in the AdversaryGraph
-repository until the documentation project publishes that route.
+Unified RAG/MCP is part of the v6.5.0 source release. A static documentation
+route is included in this root-site deployable output; links to the
+authoritative source guide are pinned to the reviewed v6.5.0 source commit.
 
 GitHub's Pages API reports the main 1200km site as a workflow build sourced
 from `main` at repository root; the last inspected successful deployment was

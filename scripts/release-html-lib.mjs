@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
+import { transformHtmlElements } from './html-token-utils.mjs';
 
 export const PERSON_ID = 'https://1200km.com/#person';
 export const WEBSITE_ID = 'https://1200km.com/#website';
@@ -39,14 +40,22 @@ const PRIMARY_ENTITY_TYPES = new Set([
 const ARTICLE_TYPES = new Set(['Article', 'BlogPosting', 'TechArticle']);
 
 export function decodeEntities(value = '') {
-  return value
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&#(\d+);/g, (_, number) => String.fromCodePoint(Number(number)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, number) => String.fromCodePoint(Number.parseInt(number, 16)));
+  const named = {
+    amp: '&',
+    apos: "'",
+    gt: '>',
+    lt: '<',
+    quot: '"',
+  };
+  return String(value).replace(/&(#x[0-9a-f]+|#\d+|amp|apos|gt|lt|quot);/gi, (match, entity) => {
+    if (!entity.startsWith('#')) return named[entity.toLowerCase()] ?? match;
+    const hexadecimal = entity[1]?.toLowerCase() === 'x';
+    const number = Number.parseInt(entity.slice(hexadecimal ? 2 : 1), hexadecimal ? 16 : 10);
+    if (!Number.isInteger(number) || number < 0 || number > 0x10ffff || (number >= 0xd800 && number <= 0xdfff)) {
+      return match;
+    }
+    return String.fromCodePoint(number);
+  });
 }
 
 export function stripHtml(value = '') {
@@ -222,16 +231,20 @@ function schemaTypes(value) {
 export function parseJsonLd(html) {
   const objects = [];
   const failures = [];
-  for (const match of html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+  transformHtmlElements(html, 'script', (element) => {
+    if ((tagAttributes(element.openTag).type || '').toLowerCase() !== 'application/ld+json') {
+      return element.full;
+    }
     try {
-      const parsed = JSON.parse(match[1]);
+      const parsed = JSON.parse(element.content);
       if (Array.isArray(parsed)) objects.push(...parsed);
       else if (Array.isArray(parsed?.['@graph'])) objects.push(...parsed['@graph']);
       else if (parsed && typeof parsed === 'object') objects.push(parsed);
     } catch (error) {
       failures.push(error.message);
     }
-  }
+    return element.full;
+  });
   return { objects, failures };
 }
 
@@ -476,8 +489,8 @@ export function buildConnectedGraph(html, {
         operatingSystem: factValue('adversarygraph.operating_system'),
         url: 'https://1200km.com/adversarygraph/',
         codeRepository: factValue('adversarygraph.repository_url'),
-        softwareVersion: factValue('adversarygraph.stable_release'),
-        releaseNotes: `${factValue('adversarygraph.repository_url')}/releases/tag/${factValue('adversarygraph.latest_release_tag')}`,
+        softwareVersion: factValue('adversarygraph.current_source_release').replace(/^v/, ''),
+        releaseNotes: `${factValue('adversarygraph.repository_url')}/blob/${factValue('adversarygraph.current_source_commit')}/docs/release-notes/v6.5.0.md`,
         license: license.url,
         usageInfo: SITE_FACTS['adversarygraph.license'].scope,
         author: { '@id': PERSON_ID },
@@ -523,8 +536,8 @@ export function buildConnectedGraph(html, {
       applicationCategory: 'SecurityApplication',
       operatingSystem: factValue('adversarygraph.operating_system'),
       codeRepository: factValue('adversarygraph.repository_url'),
-      softwareVersion: factValue('adversarygraph.stable_release'),
-      releaseNotes: `${factValue('adversarygraph.repository_url')}/releases/tag/${factValue('adversarygraph.latest_release_tag')}`,
+      softwareVersion: factValue('adversarygraph.current_source_release').replace(/^v/, ''),
+      releaseNotes: `${factValue('adversarygraph.repository_url')}/blob/${factValue('adversarygraph.current_source_commit')}/docs/release-notes/v6.5.0.md`,
       license: factValue('adversarygraph.license').url,
       usageInfo: SITE_FACTS['adversarygraph.license'].scope,
       author: { '@id': PERSON_ID },
@@ -543,7 +556,11 @@ export function buildConnectedGraph(html, {
 
 export function replaceStructuredData(html, options) {
   const graph = buildConnectedGraph(html, options);
-  let withoutJsonLd = html.replace(/\s*<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
+  let withoutJsonLd = transformHtmlElements(html, 'script', (element) => (
+    (tagAttributes(element.openTag).type || '').toLowerCase() === 'application/ld+json'
+      ? ''
+      : element.full
+  ));
   const article = graph['@graph'].find((object) => schemaTypes(object).some((type) => ARTICLE_TYPES.has(type)));
   if (article?.datePublished) withoutJsonLd = upsertMeta(withoutJsonLd, 'property', 'article:published_time', article.datePublished);
   if (article?.dateModified) withoutJsonLd = upsertMeta(withoutJsonLd, 'property', 'article:modified_time', article.dateModified);
@@ -719,20 +736,26 @@ export function addArticleDiscovery(html, {
 
 export function deferThirdPartyBoot(html) {
   let analyticsId = '';
-  let transformed = html.replace(
-    /\s*<script\b[^>]*src=["']https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=([^"'&]+)[^"']*["'][^>]*>\s*<\/script>/gi,
-    (_, id) => {
-      analyticsId ||= decodeEntities(id);
-      return '';
-    },
-  );
-  transformed = transformed.replace(
-    /\s*<script\b(?![^>]*\bsrc=)[^>]*>(?:(?!<\/script>)[\s\S])*?\bgtag\s*\(\s*["']config["']\s*,\s*["'](G-[A-Z0-9]+)["'](?:(?!<\/script>)[\s\S])*?<\/script>/gi,
-    (_, id) => {
-      analyticsId ||= id;
-      return '';
-    },
-  );
+  let transformed = transformHtmlElements(html, 'script', (element) => {
+    const attributes = tagAttributes(element.openTag);
+    if (attributes.src) {
+      try {
+        const source = new URL(attributes.src);
+        if (source.origin === 'https://www.googletagmanager.com' && source.pathname === '/gtag/js') {
+          analyticsId ||= source.searchParams.get('id') || '';
+          return '';
+        }
+      } catch {
+        return element.full;
+      }
+      return element.full;
+    }
+
+    const config = element.content.match(/\bgtag\s*\(\s*["']config["']\s*,\s*["'](G-[A-Z0-9]+)["']/i);
+    if (!config) return element.full;
+    analyticsId ||= config[1];
+    return '';
+  });
 
   // The local CSS already declares a professional system-font fallback stack.
   // Avoid a late web-font swap, which delays text LCP and causes needless work.
