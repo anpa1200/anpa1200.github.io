@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Red Team / Offensive Security — Cyber Knowledge | 1200km</title>
+    <meta name="description" content="Red Team / Offensive Security. Syllabus in progress: adversary emulation, penetration testing, exploit tradecraft, recon, initial access, privilege escalation…" />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="Red Team / Offensive Security — Cyber Knowledge | 1200km" />
+    <meta property="og:description" content="Red Team / Offensive Security. Syllabus in progress: adversary emulation, penetration testing, exploit tradecraft, recon, initial access, privilege escalation…" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://1200km.com/cyber-knowledge/red-team.html" />
+    <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
+    <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Red Team / Offensive Security — Cyber Knowledge | 1200km" />
+    <meta name="twitter:description" content="Red Team / Offensive Security. Syllabus in progress: adversary emulation, penetration testing, exploit tradecraft, recon, initial access, privilege escalation…" />
+    <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <link rel="canonical" href="https://1200km.com/cyber-knowledge/red-team.html" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="icon" href="/assets/ap-logo.png" type="image/png" />
+    <style>
+      :root {
+        --bg: #050c1a;
+        --panel: #ffffff;
+        --panel-translucent: rgba(255,255,255,0.82);
+        --panel-ink: #172033;
+        --panel-ink-soft: #2d3a4f;
+        --panel-muted: #5a6f8f;
+        --text: #cdd9ee;
+        --muted: #7a96bc;
+        --line: #1a3060;
+        --accent: #0f62fe;
+        --accent-soft: #93c5fd;
+        --accent-dark: #054ada;
+        --ok: #34d399;
+        --warn: #b45309;
+        --red: #ef4444;
+        --chip: #0d1f3c;
+        --chip-strong: #162d52;
+        --shadow: 0 14px 34px rgba(0,0,0,0.45);
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.58;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { color: var(--accent-dark); text-decoration: underline; }
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.92);
+        backdrop-filter: blur(12px);
+      }
+      .nav, .page-hero-inner, main, .footer-inner {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+      .nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand img { width: 36px; height: 36px; border-radius: 10px; }
+      .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
+      .nav-links a.active { color: var(--accent); font-weight: 600; }
+      .page-hero {
+        background: linear-gradient(120deg, rgba(15,98,254,0.10), rgba(0,122,90,0.08)), #ffffff;
+        border-bottom: 1px solid var(--line);
+      }
+      .page-hero-inner { padding: 64px 0 52px; }
+      .page-eyebrow {
+        color: var(--accent-dark);
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+      .page-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
+      .page-lead { max-width: 760px; margin: 16px 0 0; color: var(--muted); font-size: 1.07rem; }
+      .page-hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 18px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text);
+        background: var(--panel);
+        text-decoration: none;
+        transition: border-color 0.14s, background 0.14s;
+      }
+      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
+      .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+      .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+      .notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 28px 0 0;
+        padding: 14px 18px;
+        border: 1px solid rgba(180, 83, 9, 0.4);
+        border-radius: 10px;
+        background: rgba(180, 83, 9, 0.1);
+        color: #b45309;
+        font-size: 0.92rem;
+        font-weight: 600;
+        max-width: 760px;
+      }
+      [data-theme="dark"] .notice {
+        background: rgba(245, 158, 11, 0.12);
+        border-color: rgba(245, 158, 11, 0.35);
+        color: #f59e0b;
+      }
+      .notice strong { font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
+      .notice p { margin: 4px 0 0; font-weight: 500; color: var(--muted); }
+      main { padding: 56px 0 72px; }
+      .placeholder-panel {
+        max-width: 720px;
+        padding: 26px 28px;
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+        color: var(--panel-muted);
+      }
+      [data-theme="dark"] .placeholder-panel {
+        background: rgba(8, 19, 38, 0.84);
+        border-color: rgba(147, 197, 253, 0.28);
+        color: #b8c9e3;
+      }
+      .placeholder-panel h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--panel-ink); }
+      [data-theme="dark"] .placeholder-panel h2 { color: #f8fbff; }
+      footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
+      @media (max-width: 720px) {
+        .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: min(1080px, calc(100% - 32px)); }
+        .nav, .page-hero-inner, main, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
+        .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 8px 14px; width: 100%; }
+        .button { flex-shrink: 0; }
+        .page-hero-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 10px; max-width: 100%; }
+        .page-title, .page-lead, .page-eyebrow { max-width: 100%; overflow-wrap: break-word; }
+      }
+      [data-theme="dark"] footer, [data-theme="dark"] .footer {
+        background: rgba(5,12,26,0.96) !important;
+        border-top-color: #1a3060 !important;
+        color: #7a96bc !important;
+      }
+      [data-theme="dark"] .page-hero {
+        background: linear-gradient(135deg, rgba(15,98,254,0.12), rgba(0,122,90,0.06)), #050c1a !important;
+        border-bottom-color: #1a3060 !important;
+      }
+      [data-theme="light"] {
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --panel-translucent: rgba(255,255,255,0.97);
+        --panel-ink: #172033;
+        --panel-ink-soft: #2d3a4f;
+        --panel-muted: #5b667a;
+        --text: #172033;
+        --muted: #5b667a;
+        --line: #dbe4ef;
+        --accent: #0f62fe;
+        --accent-soft: #3a7dff;
+        --accent-dark: #054ada;
+        --ok: #007a5a;
+        --warn: #b45309;
+        --red: #b91c1c;
+        --chip: #eef4ff;
+        --chip-strong: #dbe9ff;
+        --shadow: 0 14px 34px rgba(24,38,69,0.09);
+      }
+      [data-theme="light"] body { background: #f0f4ff !important; background-image: none !important; }
+      [data-theme="light"] .site-header { background: rgba(255,255,255,0.96) !important; border-bottom: 1px solid #dbe4ef; }
+      [data-theme="light"] footer, [data-theme="light"] .footer { background: rgba(255,255,255,0.96) !important; border-top: 1px solid #dbe4ef; }
+      .theme-btn {
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: border-color 0.15s, color 0.15s;
+        flex-shrink: 0;
+        font-family: inherit;
+      }
+      .theme-btn:hover { border-color: var(--accent); color: var(--accent-soft); }
+    </style>
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
+    <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
+    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+
+    
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/cyber-knowledge/red-team.html#webpage",
+            "url": "https://1200km.com/cyber-knowledge/red-team.html",
+            "name": "Red Team / Offensive Security",
+            "description": "Red Team / Offensive Security. Syllabus in progress: adversary emulation, penetration testing, exploit tradecraft, recon, initial access, privilege escalation…",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/cyber-knowledge/red-team.html#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "dateModified": "2026-07-25",
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/site-og-v2.png"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/cyber-knowledge/red-team.html#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Cyber Knowledge",
+                "item": "https://1200km.com/cyber-knowledge/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Red Team / Offensive Security",
+                "item": "https://1200km.com/cyber-knowledge/red-team.html"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+</head>
+  <body id="top">
+
+    <!-- site-shell:header:start -->
+    <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
+          <span class="brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <details class="nav-links" data-mobile-navigation>
+          <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
+            <span class="nav-menu-text">Menu</span>
+          </summary>
+          <div class="nav-list" id="primary-nav-list">
+            <!-- site-shell:primary-navigation:start -->
+            <a href="/cti.html">Research</a>
+            <a href="/guides.html">Library</a>
+            <a href="/projects.html">Products &amp; Labs</a>
+            <a class="nav-flagship" href="/adversarygraph/">AdversaryGraph</a>
+            <details class="nav-more" data-active="true">
+              <summary>More</summary>
+              <div class="nav-more-list">
+                <a class="active" aria-current="location" href="/cyber-knowledge/">Cyber Knowledge</a>
+                <a href="/about.html">About</a>
+                <a href="/cv.html">CV</a>
+                <a href="/external-validation.html">External validation</a>
+              </div>
+            </details>
+            <!-- site-shell:primary-navigation:end -->
+          </div>
+        </details>
+        <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">
+            <span aria-hidden="true" class="site-search-fallback-icon"></span>
+            <span class="site-search-fallback-text">Search research</span>
+          </a>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+    <!-- site-shell:header:end -->
+
+    <main data-pagefind-body id="main-content">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain syllabus</p>
+          <h1 class="page-title" id="red-team">Red Team / Offensive Security</h1>
+          <p class="page-lead">Adversary emulation, penetration testing, and exploit tradecraft: reconnaissance, initial access, privilege escalation, lateral movement, and reporting.</p>
+          <div class="notice" role="note">
+            <div>
+              <strong>Under construction</strong>
+              <p>This domain syllabus has not been written yet. Start with the CTI syllabus, which is live, while this page is built out.</p>
+            </div>
+          </div>
+          <div class="page-hero-links">
+            <a class="button primary" href="/cyber-knowledge/cti.html">Read the CTI syllabus →</a>
+            <a class="button" href="/cyber-knowledge/">← Back to Cyber Knowledge</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="placeholder-panel">
+        <h2 id="coming-soon">Coming soon</h2>
+        <p>The full zero-to-hero syllabus for Red Team / Offensive Security — terminology, frameworks, tools, and a recommended learning order — is being written next. Check back soon, or follow the CTI domain as a model for how each syllabus page will be structured.</p>
+      </div>
+    </main>
+
+    <!-- site-shell:footer:start -->
+    <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
+      <div class="shared-footer-inner">
+        <a class="shared-footer-brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="32" height="32" />
+          <span><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <nav class="shared-footer-links" aria-label="Footer navigation">
+          <a href="/cti.html">Research</a>
+          <a href="/guides.html">Library</a>
+          <a href="/projects.html">Products &amp; Labs</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/about.html">About</a>
+        </nav>
+        <nav class="shared-footer-meta" aria-label="Site information">
+          <a href="/privacy.html">Privacy / Data Handling</a>
+          <a href="/about.html#contact">Contact</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></a>
+        </nav>
+      </div>
+      <div class="shared-footer-bottom">
+        <span>© 2026 Andrey Pautov · Original research and tooling</span>
+        <a href="#top" data-back-to-top>Back to top ↑</a>
+      </div>
+    </footer>
+    <!-- site-shell:footer:end -->
+
+  </body>
+</html>
