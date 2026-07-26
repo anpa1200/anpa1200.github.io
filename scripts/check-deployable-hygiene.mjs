@@ -19,6 +19,8 @@ const secretPatterns = [
   ['Slack token', /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/],
 ];
 const israeliMobile = /(?:\+?972[\s().-]*(?:0[\s().-]*)?|\b0)5\d(?:[\s().-]*\d){7}\b/;
+// cv.html and cover-letter.html deliberately publish a phone number as a contact channel.
+const phoneNumberAllowed = new Set(['cv.html', 'cover-letter.html']);
 
 function walk(dir) {
   const files = [];
@@ -37,7 +39,7 @@ for (const file of walk(site)) {
   if (!textExtensions.has(extname(file).toLowerCase()) || statSync(file).size > 15_000_000) continue;
   const text = readFileSync(file, 'utf8');
   for (const [label, pattern] of secretPatterns) if (pattern.test(text)) failures.push(`${rel}: possible ${label}`);
-  if (extname(file).toLowerCase() === '.html' && (israeliMobile.test(text) || /href=["']tel:/i.test(text))) {
+  if (extname(file).toLowerCase() === '.html' && !phoneNumberAllowed.has(rel) && (israeliMobile.test(text) || /href=["']tel:/i.test(text))) {
     failures.push(`${rel}: public HTML contains a phone number or telephone link`);
   }
   if (extname(file).toLowerCase() === '.json') {

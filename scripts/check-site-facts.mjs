@@ -1,4 +1,3 @@
-import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
@@ -258,10 +257,15 @@ const phonePatterns = [
   /href\s*=\s*["']tel:/i,
   /(?:\+?972[\s().-]*(?:0[\s().-]*)?|\b0)5\d(?:[\s().-]*\d){7}\b/,
 ];
+// cv.html and cover-letter.html deliberately publish a phone number as a contact channel.
+// Every other page is still checked so a phone number can't leak in unnoticed elsewhere.
+const phoneNumberAllowed = new Set(['cv.html', 'cover-letter.html']);
 for (const absolute of allHtml) {
+  const relativePath = path.relative(siteRoot, absolute);
+  if (phoneNumberAllowed.has(relativePath)) continue;
   const html = readFileSync(absolute, 'utf8');
   if (phonePatterns.some(pattern => pattern.test(html))) {
-    fail(`${path.relative(siteRoot, absolute)}: public HTML contains a phone number or tel link.`);
+    fail(`${relativePath}: public HTML contains a phone number or tel link.`);
   }
 }
 
@@ -359,17 +363,6 @@ if (!feed.includes(`latest published immutable GitHub release is ${stableTag}`))
 if (!feed.includes('Historical: AdversaryGraph v4 Capability Map')) fail('feed.xml: version-specific v4 item is not labelled historical.');
 const catalog = read('.well-known/api-catalog');
 if (!catalog.includes('https://1200km.com/data/site-facts.json')) fail('API catalog does not expose the authoritative fact model.');
-
-for (const pdfName of ['cv.pdf', 'cover-letter.pdf']) {
-  const absolute = path.join(siteRoot, pdfName);
-  if (!existsSync(absolute)) continue;
-  try {
-    const text = execFileSync('pdftotext', [absolute, '-'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    if (phonePatterns[1].test(text)) fail(`${pdfName}: public PDF contains a phone number.`);
-  } catch {
-    // HTML privacy remains mandatory in CI; PDF text inspection runs when pdftotext is available.
-  }
-}
 
 if (failures.length) {
   console.error(`Site fact consistency failed with ${failures.length} issue${failures.length === 1 ? '' : 's'}:`);
