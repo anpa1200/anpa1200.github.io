@@ -55,6 +55,8 @@ administration requires `manage_intel`, and index administration requires
 - `/adversarygraph-docs/capabilities/` - Capability overview
 - `https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/unified-rag-and-mcp.md` - v6.5 RAG/MCP source guide
 - `/threat-matrix/` - Threat Matrix, the public read-only ATT&CK workspace associated with AdversaryGraph
+- `/cyber-knowledge/` - Cyber Knowledge syllabus hub, one page per security domain
+- `/cyber-knowledge/cti.html` - Zero-to-hero CTI syllabus: 10 modules, 69 defined terms, each with an anchor id and Schema.org DefinedTerm markup
 - `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
 - `/guides.html#detection` - Detection and SOC guide cluster
 - `/articles/` - Local article archive
