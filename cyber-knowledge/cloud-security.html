@@ -6,12 +6,12 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <script src="/assets/theme-bootstrap.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cloud Security — Cyber Knowledge | 1200km</title>
-    <meta name="description" content="Cloud Security. Syllabus in progress: shared-responsibility models, IAM misconfiguration, container/Kubernetes security, cloud-native detection…" />
+    <title>Cloud Security — Multi-Cloud Field Guide | 1200km</title>
+    <meta name="description" content="A practical 14-module cloud-security field guide covering shared responsibility, landing zones, IAM, network and data protection, IaC, containers, Kubernetes, detection, posture management, incident response, SaaS, multi-cloud, AI, labs, and case studies." />
     <meta name="author" content="Andrey Pautov" />
-    <meta property="og:title" content="Cloud Security — Cyber Knowledge | 1200km" />
-    <meta property="og:description" content="Cloud Security. Syllabus in progress: shared-responsibility models, IAM misconfiguration, container/Kubernetes security, cloud-native detection…" />
-    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cloud Security — Multi-Cloud Field Guide | 1200km" />
+    <meta property="og:description" content="A practitioner guide for securing AWS, Azure, Google Cloud, SaaS, containers, Kubernetes, delivery pipelines, and AI workloads through evidence-driven controls and validation." />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="https://1200km.com/cyber-knowledge/cloud-security.html" />
     <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
     <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
@@ -19,8 +19,8 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Cloud Security — Cyber Knowledge | 1200km" />
-    <meta name="twitter:description" content="Cloud Security. Syllabus in progress: shared-responsibility models, IAM misconfiguration, container/Kubernetes security, cloud-native detection…" />
+    <meta name="twitter:title" content="Cloud Security — Multi-Cloud Field Guide | 1200km" />
+    <meta name="twitter:description" content="A 14-module field guide to cloud governance, identity, workloads, data, Kubernetes, detection, incident response, AI systems, and verifiable operations." />
     <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
     <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <link rel="canonical" href="https://1200km.com/cyber-knowledge/cloud-security.html" />
@@ -30,11 +30,6 @@
     <style>
       :root {
         --bg: #050c1a;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.82);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5a6f8f;
         --text: #cdd9ee;
         --muted: #7a96bc;
         --line: #1a3060;
@@ -42,11 +37,10 @@
         --accent-soft: #93c5fd;
         --accent-dark: #054ada;
         --ok: #34d399;
-        --warn: #b45309;
+        --warn: #f59e0b;
         --red: #ef4444;
         --chip: #0d1f3c;
         --chip-strong: #162d52;
-        --shadow: 0 14px 34px rgba(0,0,0,0.45);
       }
       * { box-sizing: border-box; }
       html { scroll-behavior: smooth; }
@@ -55,19 +49,19 @@
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         color: var(--text);
         background: var(--bg);
-        line-height: 1.58;
+        line-height: 1.62;
       }
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { color: var(--accent-dark); text-decoration: underline; }
+      a { color: var(--accent-soft); text-decoration: none; }
+      a:hover { color: var(--accent); text-decoration: underline; }
       .site-header {
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 20;
         border-bottom: 1px solid var(--line);
-        background: rgba(5,12,26,0.92);
+        background: rgba(5,12,26,0.94);
         backdrop-filter: blur(12px);
       }
-      .nav, .page-hero-inner, main, .footer-inner {
+      .nav, .page-hero-inner, .footer-inner {
         width: min(1080px, calc(100% - 32px));
         margin: 0 auto;
       }
@@ -91,115 +85,282 @@
       .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
       .nav-links a.active { color: var(--accent); font-weight: 600; }
       .page-hero {
-        background: linear-gradient(120deg, rgba(15,98,254,0.10), rgba(0,122,90,0.08)), #ffffff;
+        background: linear-gradient(120deg, rgba(15,98,254,0.14), rgba(52,211,153,0.07)), #050c1a;
         border-bottom: 1px solid var(--line);
       }
       .page-hero-inner { padding: 64px 0 52px; }
       .page-eyebrow {
-        color: var(--accent-dark);
+        color: var(--accent-soft);
         font-size: 0.76rem;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: 0.09em;
         text-transform: uppercase;
         margin: 0 0 12px;
       }
-      .page-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
-      .page-lead { max-width: 760px; margin: 16px 0 0; color: var(--muted); font-size: 1.07rem; }
+      .page-title { margin: 0; font-size: clamp(2rem, 5vw, 3.7rem); line-height: 1.05; max-width: 960px; }
+      .page-lead { max-width: 880px; margin: 18px 0 0; color: var(--text); font-size: 1.08rem; }
       .page-hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
       .button {
         display: inline-flex;
         align-items: center;
-        padding: 8px 18px;
+        justify-content: center;
+        padding: 9px 17px;
         border: 1px solid var(--line);
-        border-radius: 6px;
+        border-radius: 7px;
         font-size: 0.88rem;
-        font-weight: 700;
+        font-weight: 750;
         color: var(--text);
-        background: var(--panel);
+        background: var(--chip);
         text-decoration: none;
-        transition: border-color 0.14s, background 0.14s;
       }
-      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
+      .button:hover { border-color: var(--accent); background: var(--chip-strong); text-decoration: none; color: var(--text); }
       .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
       .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
       .notice {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
         margin: 28px 0 0;
-        padding: 14px 18px;
-        border: 1px solid rgba(180, 83, 9, 0.4);
+        padding: 15px 18px;
+        border: 1px solid rgba(245,158,11,0.42);
         border-radius: 10px;
-        background: rgba(180, 83, 9, 0.1);
-        color: #b45309;
-        font-size: 0.92rem;
-        font-weight: 600;
-        max-width: 760px;
+        background: rgba(245,158,11,0.10);
+        max-width: 880px;
       }
-      [data-theme="dark"] .notice {
-        background: rgba(245, 158, 11, 0.12);
-        border-color: rgba(245, 158, 11, 0.35);
-        color: #f59e0b;
+      .notice strong { color: #fbbf24; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
+      .notice p { margin: 4px 0 0; color: var(--text); font-size: 0.92rem; }
+      .guide-nav {
+        position: sticky;
+        top: 64px;
+        z-index: 15;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.96);
+        backdrop-filter: blur(12px);
       }
-      .notice strong { font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
-      .notice p { margin: 4px 0 0; font-weight: 500; color: var(--muted); }
-      main { padding: 56px 0 72px; }
-      .placeholder-panel {
-        max-width: 720px;
-        padding: 26px 28px;
-        border: 1px dashed var(--line);
-        border-radius: 14px;
-        background: var(--panel);
-        color: var(--panel-muted);
+      .guide-nav-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: flex;
+        gap: 8px;
+        padding: 10px 0;
+        overflow-x: auto;
+        scrollbar-width: thin;
       }
-      [data-theme="dark"] .placeholder-panel {
-        background: rgba(8, 19, 38, 0.84);
-        border-color: rgba(147, 197, 253, 0.28);
-        color: #b8c9e3;
+      .guide-nav a {
+        flex: 0 0 auto;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
       }
-      .placeholder-panel h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--panel-ink); }
-      [data-theme="dark"] .placeholder-panel h2 { color: #f8fbff; }
+      .guide-nav a:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+      .guide-layout {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+        gap: 28px;
+        padding: 42px 0 72px;
+      }
+      .toc {
+        position: sticky;
+        top: 122px;
+        align-self: start;
+        max-height: calc(100vh - 142px);
+        overflow-y: auto;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(8,19,38,0.88);
+        scrollbar-width: thin;
+      }
+      .toc h2 { margin: 0 0 12px; font-size: 1rem; }
+      .toc ol, .toc ul { margin: 0; padding-left: 1.25rem; }
+      .toc li { margin: 7px 0; color: var(--muted); font-size: 0.82rem; }
+      .toc a { color: var(--muted); }
+      .toc a:hover { color: var(--accent-soft); }
+      .guide-content { min-width: 0; }
+      .guide-content > section { scroll-margin-top: 128px; margin-bottom: 54px; }
+      .section-kicker {
+        margin: 0 0 5px;
+        color: var(--accent-soft);
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+      }
+      .guide-content h2 { margin: 0 0 12px; font-size: clamp(1.6rem, 3vw, 2.25rem); line-height: 1.16; }
+      .guide-content h3 { margin: 0 0 10px; font-size: 1.18rem; line-height: 1.3; }
+      .guide-content h4 { margin: 15px 0 6px; font-size: 0.98rem; }
+      .section-intro { margin: 0 0 20px; color: var(--muted); font-size: 1rem; max-width: 78ch; }
+      .outcome-grid, .term-grid, .two-col, .case-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .outcome-card, .term-grid > div, .practice-block, .case-study, .reference-article, .template-record {
+        min-width: 0;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(8,19,38,0.72);
+      }
+      .outcome-card h3, .term-grid h3 { margin-bottom: 6px; }
+      .outcome-card p, .term-grid p, .practice-block p, .case-study p, .reference-article p, .template-record p { margin: 7px 0; }
+      .engagement-map, .lab-group {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: linear-gradient(145deg, rgba(15,98,254,0.09), rgba(8,19,38,0.84));
+      }
+      .module {
+        margin-bottom: 18px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(8,19,38,0.74);
+        scroll-margin-top: 128px;
+      }
+      .module-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .module-index {
+        flex: 0 0 auto;
+        padding: 4px 8px;
+        border: 1px solid var(--accent);
+        border-radius: 999px;
+        color: var(--accent-soft);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .module h3 { margin: 0; font-size: 1.26rem; }
+      .module-purpose { color: var(--muted); margin: 12px 0; }
+      .workflow { margin: 12px 0 0; padding-left: 1.25rem; }
+      .workflow li { margin: 7px 0; }
+      .evidence-note, .safety-note, .analysis-note {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-left: 3px solid var(--ok);
+        border-radius: 5px;
+        background: rgba(52,211,153,0.07);
+      }
+      .safety-note { border-left-color: var(--red); background: rgba(239,68,68,0.08); }
+      .analysis-note { border-left-color: var(--accent); background: rgba(15,98,254,0.08); }
+      .further-reading {
+        margin-top: 14px !important;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+      .tag {
+        padding: 3px 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--accent-soft);
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+      .definition-table, .tool-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+        font-size: 0.86rem;
+      }
+      .definition-table th, .definition-table td, .tool-table th, .tool-table td {
+        padding: 10px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+      .definition-table th, .tool-table th { color: var(--text); background: rgba(13,31,60,0.8); }
+      .table-scroll { width: 100%; min-width: 0; overflow-x: auto; max-width: 100%; }
+      pre {
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 12px 0;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #020817;
+        color: #d7e4ff;
+        font: 0.78rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      code, kbd { overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      :not(pre) > code { padding: 0.08em 0.32em; border-radius: 4px; background: rgba(13,31,60,0.82); }
+      .case-study { border-top: 3px solid var(--accent); }
+      .case-study h4 { margin: 16px 0 6px; }
+      .case-study ul, .reference-article ul, .practice-block ul { margin: 8px 0 0; padding-left: 1.25rem; }
+      .case-study li, .reference-article li, .practice-block li { margin: 5px 0; }
+      .checklist { list-style: none; padding: 0 !important; }
+      .checklist li { position: relative; padding-left: 1.6rem; }
+      .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--ok); font-weight: 800; }
+      .reference-list { display: grid; gap: 10px; padding: 0; list-style: none; }
+      .reference-list li { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+      .reference-list li:last-child { border-bottom: 0; }
+      .path-line { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin: 12px 0; }
+      .path-line span { padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.75rem; }
+      .path-line i { color: var(--muted); font-style: normal; }
+      .updated-note { color: var(--muted); font-size: 0.78rem; }
       footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
       @media (max-width: 720px) {
         .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: min(1080px, calc(100% - 32px)); }
-        .nav, .page-hero-inner, main, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
+        .nav, .page-hero-inner, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
         .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 8px 14px; width: 100%; }
         .button { flex-shrink: 0; }
         .page-hero-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 10px; max-width: 100%; }
         .page-title, .page-lead, .page-eyebrow { max-width: 100%; overflow-wrap: break-word; }
+        .guide-nav { top: 0; position: relative; }
+        .guide-nav-inner, .guide-layout { width: calc(100vw - 24px); max-width: calc(100vw - 24px); }
+        .guide-layout { display: block; padding-top: 20px; }
+        .toc { position: relative; top: auto; max-height: 22rem; margin-bottom: 20px; }
+        .outcome-grid, .term-grid, .two-col, .case-grid { grid-template-columns: 1fr; }
+        .engagement-map, .lab-group { padding: 16px; }
+        .module-header { align-items: start; flex-direction: column; gap: 8px; }
+        .definition-table, .tool-table { min-width: 680px; }
+        .practice-block, .case-study, .reference-article, .template-record, .module { padding: 14px; }
       }
-      [data-theme="dark"] footer, [data-theme="dark"] .footer {
-        background: rgba(5,12,26,0.96) !important;
-        border-top-color: #1a3060 !important;
-        color: #7a96bc !important;
+      @media (min-width: 721px) and (max-width: 980px) {
+        .guide-layout { display: block; }
+        .toc { position: relative; top: auto; max-height: 24rem; margin-bottom: 20px; }
+        .outcome-grid, .term-grid, .case-grid { grid-template-columns: 1fr; }
       }
-      [data-theme="dark"] .page-hero {
-        background: linear-gradient(135deg, rgba(15,98,254,0.12), rgba(0,122,90,0.06)), #050c1a !important;
-        border-bottom-color: #1a3060 !important;
-      }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
       [data-theme="light"] {
-        --bg: #f6f8fb;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.97);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5b667a;
+        --bg: #f0f4ff;
         --text: #172033;
-        --muted: #5b667a;
-        --line: #dbe4ef;
+        --muted: #53647e;
+        --line: #cad7eb;
         --accent: #0f62fe;
-        --accent-soft: #3a7dff;
+        --accent-soft: #1459c7;
         --accent-dark: #054ada;
         --ok: #007a5a;
-        --warn: #b45309;
+        --warn: #9a5800;
         --red: #b91c1c;
         --chip: #eef4ff;
         --chip-strong: #dbe9ff;
-        --shadow: 0 14px 34px rgba(24,38,69,0.09);
       }
       [data-theme="light"] body { background: #f0f4ff !important; background-image: none !important; }
-      [data-theme="light"] .site-header { background: rgba(255,255,255,0.96) !important; border-bottom: 1px solid #dbe4ef; }
-      [data-theme="light"] footer, [data-theme="light"] .footer { background: rgba(255,255,255,0.96) !important; border-top: 1px solid #dbe4ef; }
+      [data-theme="light"] .site-header, [data-theme="light"] .guide-nav { background: rgba(255,255,255,0.97) !important; }
+      [data-theme="light"] .page-hero { background: linear-gradient(135deg, rgba(15,98,254,0.10), rgba(0,122,90,0.05)), #f8fbff; }
+      [data-theme="light"] .toc,
+      [data-theme="light"] .outcome-card,
+      [data-theme="light"] .term-grid > div,
+      [data-theme="light"] .practice-block,
+      [data-theme="light"] .case-study,
+      [data-theme="light"] .reference-article,
+      [data-theme="light"] .template-record,
+      [data-theme="light"] .module { background: rgba(255,255,255,0.94); }
+      [data-theme="light"] .definition-table th, [data-theme="light"] .tool-table th { background: #eef4ff; }
+      [data-theme="light"] :not(pre) > code { background: #e5edfa; }
+      [data-theme="light"] footer { background: rgba(255,255,255,0.96); }
       .theme-btn {
         background: none;
         border: 1px solid var(--line);
@@ -213,7 +374,6 @@
         align-items: center;
         justify-content: center;
         padding: 0;
-        transition: border-color 0.15s, color 0.15s;
         flex-shrink: 0;
         font-family: inherit;
       }
@@ -222,9 +382,6 @@
     <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
     <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
     <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
-
-    
-
     <script type="application/ld+json" data-site-graph>
       {
         "@context": "https://schema.org",
@@ -236,38 +393,22 @@
             "url": "https://1200km.com/",
             "image": "https://1200km.com/assets/ap-logo.png",
             "jobTitle": "Threat Intelligence Research Engineer",
-            "worksFor": {
-              "@type": "Organization",
-              "name": "XPLG"
-            },
             "sameAs": [
               "https://github.com/anpa1200",
               "https://medium.com/@1200km",
               "https://www.linkedin.com/in/andrey-pautov/",
               "https://infosecwriteups.com/@1200km"
             ],
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Tel Aviv",
-              "addressCountry": "IL"
-            },
-            "email": "mailto:1200km@gmail.com",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "contactType": "professional inquiries",
-              "email": "mailto:1200km@gmail.com"
-            },
             "knowsAbout": [
-              "Cyber Threat Intelligence",
-              "Detection Engineering",
-              "MITRE ATT&CK",
-              "Threat Hunting",
-              "Malware Analysis",
-              "OpenCTI",
-              "SIEM Validation",
-              "Adversary Simulation",
-              "Reverse Engineering",
-              "Cloud Security"
+              "Cloud Security",
+              "AWS Security",
+              "Azure Security",
+              "Google Cloud Security",
+              "Cloud IAM",
+              "Kubernetes Security",
+              "Container Security",
+              "Cloud Detection Engineering",
+              "Cloud Incident Response"
             ]
           },
           {
@@ -275,32 +416,24 @@
             "@id": "https://1200km.com/#website",
             "name": "1200km Security Research",
             "url": "https://1200km.com/",
-            "publisher": {
-              "@id": "https://1200km.com/#person"
-            },
-            "inLanguage": "en",
-            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
-            "author": {
-              "@id": "https://1200km.com/#person"
-            }
+            "publisher": {"@id": "https://1200km.com/#person"},
+            "inLanguage": "en"
           },
           {
-            "@type": "WebPage",
+            "@type": ["WebPage", "TechArticle"],
             "@id": "https://1200km.com/cyber-knowledge/cloud-security.html#webpage",
             "url": "https://1200km.com/cyber-knowledge/cloud-security.html",
-            "name": "Cloud Security",
-            "description": "Cloud Security. Syllabus in progress: shared-responsibility models, IAM misconfiguration, container/Kubernetes security, cloud-native detection…",
-            "isPartOf": {
-              "@id": "https://1200km.com/#website"
-            },
-            "breadcrumb": {
-              "@id": "https://1200km.com/cyber-knowledge/cloud-security.html#breadcrumb"
-            },
-            "author": {
-              "@id": "https://1200km.com/#person"
-            },
+            "name": "Cloud Security — Multi-Cloud Field Guide",
+            "headline": "Cloud Security — Multi-Cloud Field Guide",
+            "description": "A practical 14-module field guide to multi-cloud governance, identity, network, data, workload, supply-chain, container, Kubernetes, detection, posture, incident response, SaaS, and AI security.",
+            "isPartOf": {"@id": "https://1200km.com/#website"},
+            "breadcrumb": {"@id": "https://1200km.com/cyber-knowledge/cloud-security.html#breadcrumb"},
+            "author": {"@id": "https://1200km.com/#person"},
             "inLanguage": "en",
-            "dateModified": "2026-07-25",
+            "datePublished": "2026-07-27",
+            "dateModified": "2026-07-27",
+            "proficiencyLevel": "Intermediate to advanced",
+            "about": ["Cloud security", "Cloud IAM", "Kubernetes security", "Cloud detection and response"],
             "primaryImageOfPage": {
               "@type": "ImageObject",
               "url": "https://1200km.com/assets/site-og-v2.png"
@@ -310,32 +443,16 @@
             "@type": "BreadcrumbList",
             "@id": "https://1200km.com/cyber-knowledge/cloud-security.html#breadcrumb",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://1200km.com/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Cyber Knowledge",
-                "item": "https://1200km.com/cyber-knowledge/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "Cloud Security",
-                "item": "https://1200km.com/cyber-knowledge/cloud-security.html"
-              }
+              {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://1200km.com/"},
+              {"@type": "ListItem", "position": 2, "name": "Cyber Knowledge", "item": "https://1200km.com/cyber-knowledge/"},
+              {"@type": "ListItem", "position": 3, "name": "Cloud Security", "item": "https://1200km.com/cyber-knowledge/cloud-security.html"}
             ]
           }
         ]
       }
     </script>
-</head>
+  </head>
   <body id="top">
-
     <!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -379,27 +496,635 @@
     <!-- site-shell:header:end -->
 
     <main data-pagefind-body id="main-content">
-      <div class="page-hero">
+      <section class="page-hero" aria-labelledby="cloud-security-title">
         <div class="page-hero-inner">
-          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain syllabus</p>
-          <h1 class="page-title" id="cloud-security">Cloud Security</h1>
-          <p class="page-lead">Shared-responsibility models, IAM misconfiguration, container/Kubernetes security, and cloud-native detection across AWS, Azure, and GCP.</p>
+          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain 08 · Practitioner field guide</p>
+          <h1 class="page-title" id="cloud-security-title">Cloud Security</h1>
+          <p class="page-lead">Cloud security is the disciplined operation of identities, data, workloads, control planes, delivery systems, providers, and evidence across continuously changing infrastructure. This 14-module field guide covers AWS, Azure, Google Cloud, SaaS, containers, Kubernetes, multi-cloud detection and response, and AI systems without pretending that a compliance badge, posture score, or provider default proves a workload is secure.</p>
           <div class="notice" role="note">
             <div>
-              <strong>Under construction</strong>
-              <p>This domain syllabus has not been written yet. Start with the CTI syllabus, which is live, while this page is built out.</p>
+              <strong>Authorization and cost boundary</strong>
+              <p>Use only cloud tenants, accounts, subscriptions, projects, clusters, and applications you own or are explicitly authorized to assess. Scanning, attack simulation, log export, snapshots, and test deployments can create cost, service impact, sensitive records, provider alerts, and legal obligations. Define scope, budget limits, cleanup, evidence handling, and rollback first.</p>
             </div>
           </div>
           <div class="page-hero-links">
-            <a class="button primary" href="/cyber-knowledge/cti.html">Read the CTI syllabus →</a>
-            <a class="button" href="/cyber-knowledge/">← Back to Cyber Knowledge</a>
+            <a class="button primary" href="#learning-path">Start the learning path</a>
+            <a class="button" href="#case-studies">Open case studies</a>
+            <a class="button" href="#labs">Build the lab</a>
+            <a class="button" href="/labs.html#cloud-labs">Cloud &amp; Kubernetes labs</a>
           </div>
+          <p class="updated-note">Published and source-checked 27 July 2026. Multi-cloud concepts are normalized here; provider-specific controls must be verified against the current service and region documentation.</p>
         </div>
-      </div>
+      </section>
 
-      <div class="placeholder-panel">
-        <h2 id="coming-soon">Coming soon</h2>
-        <p>The full zero-to-hero syllabus for Cloud Security — terminology, frameworks, tools, and a recommended learning order — is being written next. Check back soon, or follow the CTI domain as a model for how each syllabus page will be structured.</p>
+      <nav class="guide-nav" aria-label="Cloud Security guide sections">
+        <div class="guide-nav-inner">
+          <a href="#orientation">Orientation</a>
+          <a href="#learning-path">14 modules</a>
+          <a href="#tooling">Tools</a>
+          <a href="#control-record">Control record</a>
+          <a href="#case-studies">Cases</a>
+          <a href="#labs">Labs</a>
+          <a href="#failure-atlas">Failure atlas</a>
+          <a href="#references">References</a>
+        </div>
+      </nav>
+
+      <div class="guide-layout">
+        <aside class="toc" aria-label="Table of contents">
+          <h2>Table of contents</h2>
+          <ol>
+            <li><a href="#orientation">Operating model and outcomes</a></li>
+            <li><a href="#core-language">Core cloud-security language</a></li>
+            <li><a href="#learning-path">Fourteen-module learning path</a></li>
+            <li><a href="#module-1">Responsibility and governance</a></li>
+            <li><a href="#module-2">Organizations and landing zones</a></li>
+            <li><a href="#module-3">Human and workload identity</a></li>
+            <li><a href="#module-4">Network, edge, and zero trust</a></li>
+            <li><a href="#module-5">Data, keys, and recovery</a></li>
+            <li><a href="#module-6">Compute, PaaS, serverless, and SaaS</a></li>
+            <li><a href="#module-7">IaC and delivery supply chain</a></li>
+            <li><a href="#module-8">Containers and images</a></li>
+            <li><a href="#module-9">Kubernetes security</a></li>
+            <li><a href="#module-10">Logging, detection, and ATT&amp;CK</a></li>
+            <li><a href="#module-11">Posture, exposure, and vulnerabilities</a></li>
+            <li><a href="#module-12">Incident response and forensics</a></li>
+            <li><a href="#module-13">Multi-cloud, SaaS, suppliers, and assurance</a></li>
+            <li><a href="#module-14">Cloud AI, agents, RAG, and MCP</a></li>
+            <li><a href="#tooling">Tool-selection matrix</a></li>
+            <li><a href="#control-record">Architecture/control record</a></li>
+            <li><a href="#case-studies">Six worked cases</a></li>
+            <li><a href="#labs">Twelve-lab sequence</a></li>
+            <li><a href="#failure-atlas">Failure atlas and readiness gate</a></li>
+            <li><a href="#references">Standards and first-party reading</a></li>
+          </ol>
+        </aside>
+
+        <article class="guide-content">
+          <section id="orientation">
+            <p class="section-kicker">Secure the operating system of the business</p>
+            <h2>Operating model and learning outcomes</h2>
+            <p class="section-intro">The cloud control plane can create, connect, copy, expose, and destroy infrastructure in seconds. Security therefore depends on enforceable organization design, identity, policy, delivery, telemetry, and recovery—not only firewall rules or one-time configuration reviews.</p>
+            <div class="outcome-grid">
+              <div class="outcome-card">
+                <h3>Assign every responsibility</h3>
+                <p>Translate each provider/service shared-responsibility model into named customer, provider, supplier, and workload-owner controls. Verify inherited controls instead of assuming “the provider handles security.”</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Make identity the control plane</h3>
+                <p>Govern workforce, administrator, workload, service, pipeline, application, support, and emergency identities with least privilege, short-lived credentials, separation of duties, and traceable sessions.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Build guardrails into delivery</h3>
+                <p>Use organization policy, reusable infrastructure modules, CI/CD identity, policy-as-code, artifact provenance, deployment controls, runtime protections, and drift response to prevent entire classes of exposure.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Detect and recover from reality</h3>
+                <p>Collect control-plane, identity, data, network, workload, container, Kubernetes, application, and pipeline evidence. Exercise isolation, credential revocation, immutable backup, forensic collection, and restoration.</p>
+              </div>
+            </div>
+            <div class="engagement-map">
+              <h3>Cloud security is a continuous control loop</h3>
+              <div class="path-line" aria-label="Cloud security operating loop">
+                <span>Business and data</span><i>→</i><span>Responsibility</span><i>→</i><span>Architecture</span><i>→</i><span>Policy and delivery</span><i>→</i><span>Runtime</span><i>→</i><span>Evidence</span><i>→</i><span>Response</span><i>↺</i><span>Improvement</span>
+              </div>
+              <p>A secure landing zone cannot rescue an unsafe application; a secure application cannot compensate for an organization-wide administrator credential; and a posture scanner cannot prove that detections or recovery work. Connect each layer to explicit owners, tests, evidence, and failure handling.</p>
+            </div>
+          </section>
+
+          <section id="core-language">
+            <p class="section-kicker">Use precise nouns</p>
+            <h2>Core cloud-security language</h2>
+            <div class="term-grid">
+              <div><h3>Control plane and data plane</h3><p>The control plane creates and configures resources, identities, policy, and access. The data plane processes or stores workload data. Services differ: a permission that sounds read-only may expose data-plane actions, tokens, logs, or connection paths.</p></div>
+              <div><h3>Account, subscription, project, tenant</h3><p>Providers use different administrative containers. Normalize them as resource boundaries only after preserving the provider-native identifier, organization hierarchy, region, owner, environment, billing, and policy inheritance.</p></div>
+              <div><h3>Human and workload identity</h3><p>Human identities act for people; workload identities act for code, services, pipelines, functions, containers, and agents. Both need authentication, authorization, lifecycle, monitoring, and an accountable owner.</p></div>
+              <div><h3>Landing zone</h3><p>A landing zone is the governed foundation for organization hierarchy, identity, network, logging, security services, deployment, billing, and policy. It is a starting architecture—not a permanent certificate of security.</p></div>
+              <div><h3>Posture, exposure, and exploitability</h3><p>Posture describes configuration/control state. Exposure describes reachability or access paths. Exploitability depends on actual product, version, control context, preconditions, and behavior. A finding may concern one without proving the others.</p></div>
+              <div><h3>Inherited, shared, and customer controls</h3><p>Inherited controls are performed by another party for an applicable service/scope; shared controls divide activities; customer controls remain yours. Responsibility changes by provider, service model, feature, region, and contract.</p></div>
+            </div>
+            <div class="analysis-note"><strong>Evidence ladder:</strong> distinguish <em>provider statement</em>, <em>organization policy</em>, <em>deployed configuration</em>, <em>runtime observation</em>, <em>control test</em>, <em>detection evidence</em>, <em>response exercise</em>, and <em>risk decision</em>. One layer does not automatically prove the next.</div>
+          </section>
+
+          <section id="learning-path">
+            <p class="section-kicker">Practitioner curriculum</p>
+            <h2>Fourteen-module cloud-security learning path</h2>
+            <p class="section-intro">Complete these modules against one representative workload, then expand across the portfolio. Every module produces an artifact that can be reviewed, tested, versioned, and handed to engineering or operations.</p>
+
+            <div class="module" id="module-1">
+              <div class="module-header"><div><h3>Shared responsibility, governance, and service ownership</h3><p class="module-purpose">Convert broad provider language into an operating agreement for every service and data flow.</p></div><span class="module-index">Module 01</span></div>
+              <ol class="workflow">
+                <li>Inventory providers, tenants/organizations, accounts/subscriptions/projects, regions, services, SaaS applications, marketplaces, support plans, domains, identity providers, and critical integrations. Assign a business and technical owner.</li>
+                <li>For each service, record service model, data handled, control plane, data plane, provider/customer/supplier responsibilities, configurable security features, defaults, required logs, backup, support escalation, and exit/deletion process.</li>
+                <li>Define cloud governance: approved services and regions, resource ownership, data classification/residency, cost/budget controls, exception process, tagging/labels, lifecycle, supplier review, incident authority, and evidence retention.</li>
+                <li>Establish a cloud center of enablement or equivalent collaboration among platform, security, identity, network, application, data, SRE, privacy, legal, procurement, and finance. Central guardrails must not make workload teams unaccountable.</li>
+                <li>Map organizational requirements to verifiable controls. Use the current <a href="https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1">CSA Cloud Controls Matrix 4.1</a> when a vendor-neutral cloud control catalogue is useful; tailor applicability and evidence rather than copying every control.</li>
+                <li>Define risk acceptance with owner, affected assets/data, evidence, compensating controls, expiry, review trigger, and remediation path. A provider compliance report does not accept customer workload risk.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> cloud/service registry, responsibility matrix, ownership map, approved-service/region policy, control applicability, evidence sources, exception register, and decommission/exit plan.</div>
+              <p class="further-reading"><strong>Provider baselines:</strong> compare the <a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html">AWS shared-responsibility model</a>, <a href="https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility">Azure shared responsibility</a>, and <a href="https://docs.cloud.google.com/architecture/framework/security/shared-responsibility-shared-fate">Google Cloud shared responsibility/shared fate</a>. The division varies by service; none transfers responsibility for your identities and data.</p>
+            </div>
+
+            <div class="module" id="module-2">
+              <div class="module-header"><div><h3>Organizations, landing zones, policy, inventory, and cost guardrails</h3><p class="module-purpose">Build a governed foundation that constrains blast radius and makes every resource discoverable.</p></div><span class="module-index">Module 02</span></div>
+              <ol class="workflow">
+                <li>Design organization/management hierarchy around security and operational boundaries—not the reporting chart alone. Separate production, non-production, security/log archive, shared services, identity, networking, sandbox, and suspended/quarantine areas.</li>
+                <li>Use distinct accounts/subscriptions/projects and provider-native policy inheritance to limit regions, public exposure, unsupported services, root/owner activity, weak authentication, unencrypted storage, external principals, unmanaged keys, and log deletion where supported.</li>
+                <li>Centralize organization-wide activity/audit, identity, configuration, security findings, DNS/flow, billing, and service logs into protected security/logging boundaries. Test new-region and newly enabled service coverage.</li>
+                <li>Establish asset inventory from provider APIs, configuration/change services, resource graph, DNS/certificates, deployment state, registries, repositories, CMDB, and external exposure. Preserve provider-native IDs and relationships; names/tags can collide or drift.</li>
+                <li>Require ownership, environment, application/service, data class, cost center, lifecycle, internet exposure, recovery tier, and repository/pipeline metadata through policy and automation. Define quarantine for unowned or policy-violating resources.</li>
+                <li>Use budgets, anomaly detection, quotas, and rate/service limits to detect abuse and prevent runaway automation. Cost controls are security controls for cryptomining, denial-of-wallet, compromised keys, and AI resource abuse.</li>
+                <li>Bootstrap the landing zone through reviewed, versioned infrastructure code with protected state, independent logging, break-glass recovery, and a tested update path. Avoid circular dependencies on the identity/network it must recover.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> organization diagram, policy hierarchy, account-vending workflow, inventory graph, mandatory metadata policy, centralized logs, budget/quota alerts, landing-zone code, and recovery procedure.</div>
+            </div>
+
+            <div class="module" id="module-3">
+              <div class="module-header"><div><h3>Human, workload, pipeline, and emergency identity</h3><p class="module-purpose">Replace ambient privilege and long-lived keys with explicit, attributable, short-lived access.</p></div><span class="module-index">Module 03</span></div>
+              <ol class="workflow">
+                <li>Federate workforce identities from an authoritative identity provider; prohibit routine shared accounts and unmanaged local users. Enforce phishing-resistant MFA where possible, device/context conditions, session lifetime, and monitored recovery.</li>
+                <li>Separate everyday and privileged identities. Use just-in-time/time-bound elevation, approval for high-impact roles, privilege eligibility, session logging, and independent review. Inventory root/owner/global-admin access and eliminate routine use.</li>
+                <li>Model effective authorization across direct grants, groups, nested groups, resource policies, role trust, service control/organization policy, permissions boundaries, conditional policies, delegation, impersonation, and cross-account/tenant/project access.</li>
+                <li>Prefer provider-managed workload identity, federation, and short-lived tokens over static service-account keys or embedded secrets. Bind identity to the exact workload, environment, audience, repository/pipeline, and action required.</li>
+                <li>Control pipeline and automation identity: protected branches/environments, OIDC subject/audience conditions, minimal deployment roles, artifact identity, approval, concurrency, credential-free runners, and separation between build and production administration.</li>
+                <li>Govern secrets and keys by owner, consumer, purpose, environment, scope, creation, storage, access, rotation, revocation, recovery, audit, and destruction. Do not treat encryption as a substitute for authorization or secret lifecycle.</li>
+                <li>Maintain break-glass identities isolated from normal federation, strongly protected, monitored, tested, and used only under documented conditions. Ensure response does not depend on a compromised primary identity plane.</li>
+                <li>Review dormant, external, support, service, application, marketplace, workload, and machine identities. Revoke access automatically when owner, workload, contract, repository, or environment expires.</li>
+              </ol>
+              <div class="analysis-note"><strong>Least privilege is empirical:</strong> role names and policy simulators are not enough. Compare granted permissions with observed legitimate use, sensitive action paths, privilege-escalation combinations, and emergency requirements before reducing safely.</div>
+              <div class="evidence-note"><strong>Output:</strong> identity inventory and graph, privileged-access workflow, effective-permission reviews, workload/pipeline federation design, secret/key register, break-glass exercise, and access-removal evidence.</div>
+            </div>
+
+            <div class="module" id="module-4">
+              <div class="module-header"><div><h3>Network, edge, service communication, hybrid access, and zero trust</h3><p class="module-purpose">Authorize flows to resources and services rather than trusting an address because it is “inside.”</p></div><span class="module-index">Module 04</span></div>
+              <ol class="workflow">
+                <li>Build a data-flow and trust-boundary model for users, administrators, workloads, APIs, control-plane endpoints, third parties, on-premises, internet, private service access, DNS, management, and egress.</li>
+                <li>Default-deny network paths where operationally feasible; explicitly authorize ingress, east-west, hybrid, management, and egress by source identity/context, destination resource/service, protocol, port, environment, and business purpose.</li>
+                <li>Protect internet edges with managed DDoS, CDN, WAF/API gateway, TLS/certificate automation, bot/abuse controls, origin restriction, rate/resource limits, secure headers, and validated client/source attribution. Edge controls do not fix application authorization.</li>
+                <li>Use private endpoints/service access deliberately. Review provider DNS zones, route tables, peering/transit, shared VPC/VNet, security groups/firewalls, load balancers, NAT, proxies, and service endpoints for transitive or unintended access.</li>
+                <li>Control egress using destinations, DNS, proxies, service perimeters, network policy, endpoint policy, and workload identity. Account for package repositories, telemetry, backups, provider APIs, webhooks, and incident tooling before enforcing.</li>
+                <li>Harden metadata/instance identity access, proxy headers, redirects, URL-fetching services, and server-side request functions against SSRF and credential theft. Require current provider protections and test application-layer bypasses.</li>
+                <li>For cloud-native zero trust, authenticate and authorize user, workload, service, and device context at each resource boundary; use short-lived service identity and policy. Network segmentation remains useful but does not grant trust by itself.</li>
+                <li>Log edge, DNS, flow, firewall, load balancer, API gateway, service mesh, and control-plane decisions with resource and identity context. Test what encryption, NAT, proxies, sampling, and managed-service abstraction hide.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> flow inventory, approved connectivity matrix, edge/origin design, private-service and hybrid routes, egress policy, metadata/SSRF tests, zero-trust decision points, and network visibility map.</div>
+              <p class="further-reading"><strong>Architecture baseline:</strong> <a href="https://csrc.nist.gov/pubs/sp/800/207/final">NIST SP 800-207</a> removes implicit trust based on network location; <a href="https://csrc.nist.gov/pubs/sp/800/207/a/final">SP 800-207A</a> applies identity-tier and network-tier policy to multi-cloud cloud-native applications.</p>
+            </div>
+
+            <div class="module" id="module-5">
+              <div class="module-header"><div><h3>Data classification, storage, cryptography, keys, backup, and deletion</h3><p class="module-purpose">Protect the complete data lifecycle and prove that recovery and deletion work under cloud failure modes.</p></div><span class="module-index">Module 05</span></div>
+              <ol class="workflow">
+                <li>Inventory data sets, owners, subjects, classification, purpose, legal/contractual basis, residency, tenants, systems of record, replicas, caches, logs, analytics, snapshots, exports, AI indexes, and deletion obligations.</li>
+                <li>Authorize data access at every layer: organization/resource policy, identity, object/table/row/column, service endpoint, application authorization, sharing link, backup, support, analytics, and administrative tooling. Test cross-tenant and cross-environment isolation.</li>
+                <li>Block unintended public or external sharing using organization policy, account-level controls, resource policy validation, automated exposure checks, and change alerts. “Public access blocked” must cover all relevant paths, not only one ACL.</li>
+                <li>Use encryption in transit and at rest with clear key ownership and threat model. Decide when provider-managed, customer-managed, external/HSM, or confidential-computing controls are justified; document availability, recovery, rotation, revocation, and cost tradeoffs.</li>
+                <li>Separate key administration, data access, and audit. Restrict decrypt/sign operations by workload, context, region, and purpose; log and alert on policy changes, unusual use, disabled/deleted keys, failed decrypts, and emergency access.</li>
+                <li>Design backups for ransomware and operator/provider failure: separate identity and account/project, immutability/object lock where supported, versioning, deletion protection, encryption/key survivability, offline/export needs, inventory, and tested restore.</li>
+                <li>Define retention and deletion across primary stores, replicas, snapshots, backups, logs, caches, search indexes, queues, exports, test data, support bundles, AI embeddings, and suppliers. Record provider limitations and verification evidence.</li>
+                <li>Prevent sensitive values in logs, tags, resource names, metadata, environment variables, tickets, prompts, CI output, container layers, or crash dumps. Discovery and DLP support review but do not replace data-flow design.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> cloud data map, access and isolation tests, public-sharing controls, key architecture and recovery drill, immutable backup/restore evidence, retention/deletion workflow, and sensitive-data leakage tests.</div>
+            </div>
+
+            <div class="module" id="module-6">
+              <div class="module-header"><div><h3>Compute, managed services, serverless, SaaS, and workload hardening</h3><p class="module-purpose">Apply the right control set to each abstraction instead of copying virtual-machine assumptions everywhere.</p></div><span class="module-index">Module 06</span></div>
+              <ol class="workflow">
+                <li>For every workload component, document the service model, execution identity, code/artifact source, patch boundary, configuration, network path, data, storage, admin plane, logs, backup, quotas, tenancy, and provider/customer responsibilities.</li>
+                <li>For virtual machines, use hardened signed images, minimal packages/services, secure boot/attestation where required, encrypted disks, protected metadata, managed patching, EDR/runtime telemetry, no public administration, immutable replacement, and image retirement.</li>
+                <li>For managed databases, queues, object stores, analytics, integration, and PaaS, control public endpoints, authentication, authorization, tenant/database roles, encryption, backup/PITR, extensions, export/import, service identity, network policy, audit, and provider maintenance.</li>
+                <li>For serverless/functions, constrain triggers, invocation authorization, runtime/service identity, concurrency, duration, memory, temporary storage, environment/secrets, dependencies/layers, outbound destinations, dead-letter/retry behavior, and event replay/idempotency.</li>
+                <li>For SaaS, govern federation, MFA, administrators, application consent, API tokens, integrations, sharing, guest/external users, audit retention, data export, backup, eDiscovery, support access, lifecycle, and offboarding.</li>
+                <li>Harden application/API behavior—input, identity, authorization, secrets, SSRF, file/URL handling, rate/resource limits, session, error/logging, and tenant isolation. Managed hosting does not secure application logic.</li>
+                <li>Use availability zones/regions, deployment stamps/cells, circuit breakers, quotas, graceful degradation, and tested failover according to business requirements. Security controls must fail safely without making recovery impossible.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> per-service responsibility/control profile, hardened image/runtime baseline, managed-service configuration tests, serverless abuse tests, SaaS access review, and resilience/failover evidence.</div>
+              <p class="further-reading"><strong>Application layer:</strong> the <a href="/cyber-knowledge/secure-code.html">Secure Code &amp; Application Security field guide</a> covers application, API, parser, cryptography, supply-chain, and AI-system controls that remain customer responsibilities in managed cloud services.</p>
+            </div>
+
+            <div class="module" id="module-7">
+              <div class="module-header"><div><h3>Infrastructure as code, CI/CD, artifact provenance, and policy as code</h3><p class="module-purpose">Make reviewed code and verified artifacts the controlled path into the cloud.</p></div><span class="module-index">Module 07</span></div>
+              <ol class="workflow">
+                <li>Declare infrastructure, organization policy, IAM, network, logging, data controls, clusters, applications, and detections as versioned code where practical. Define the exceptions that require imperative changes and how they are reconciled.</li>
+                <li>Protect source, branches, tags, environments, workflows/actions/plugins, runners, variables, artifacts, modules, package registries, state, plans, and deployment identities. Untrusted pull-request code must not receive privileged cloud credentials.</li>
+                <li>Use short-lived workload federation/OIDC from a tightly constrained repository, branch/tag/environment, workflow, audience, and subject. Separate build, test, release, production deploy, and cloud administration permissions.</li>
+                <li>Pin modules, actions, images, providers, and dependencies to reviewed immutable identities; verify provenance/signatures where supported; generate an SBOM from the built artifact; and retain exact inputs and resolved versions.</li>
+                <li>Review plan/change impact: new public paths, principals, trust, privileges, data stores, keys, regions, logs, deletion/replace actions, provider enablement, quotas, cost, drift, and rollback. Protect the plan from secrets and untrusted modification.</li>
+                <li>Apply policy as code at authoring, pull request, admission/deployment, and runtime/configuration layers. Policies need tests, versioning, owners, severity, exemptions with expiry, rollout mode, observability, and safe failure handling.</li>
+                <li>Secure remote state and locks with separate identity, encryption, versioning, audit, restricted access, backup, and break-glass recovery. State can contain resource identifiers and sensitive values even when marked “sensitive” in output.</li>
+                <li>Detect and reconcile drift; distinguish approved emergency changes, provider-managed mutation, dynamic data, and unauthorized configuration. Do not automatically overwrite an active incident or valid hotfix without review.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> protected delivery design, federated pipeline trust, pinned dependency/provenance record, reviewed plan, tested policies, secured state, deployment audit, rollback, and drift workflow.</div>
+              <p class="further-reading"><strong>Hands-on:</strong> the <a href="/articles/read/2026/2026-03-13-building-a-vulnerable-cloud-pentest-lab-with-terraform-9858ac96b29e">Vulnerable Cloud Lab with Terraform</a> demonstrates reproducible AWS/GCP lab deployment and destroy-when-done handling. It is intentionally insecure training infrastructure, not a production baseline.</p>
+            </div>
+
+            <div class="module" id="module-8">
+              <div class="module-header"><div><h3>Container image, registry, runtime, and host security</h3><p class="module-purpose">Protect the image lifecycle and limit what a compromised container can reach or control.</p></div><span class="module-index">Module 08</span></div>
+              <ol class="workflow">
+                <li>Start with minimal maintained base images; pin by digest; remove package managers, build tools, caches, credentials, source, and unnecessary binaries from runtime stages; use a non-root user and read-only file system where possible.</li>
+                <li>Scan operating-system and application packages, secrets, malware, licenses, configuration, and provenance at build and registry time. Prioritize by deployed digest, reachability, exposure, privilege, exploit evidence, and business impact—not CVSS alone.</li>
+                <li>Generate and retain SBOM, provenance, signature/attestation, build identity, tests, scanner results, and policy decision for each immutable artifact. Rebuild rather than patching running containers manually.</li>
+                <li>Restrict registry push/pull/delete, cross-account sharing, replication, anonymous/public access, mutable tags, retention, signing keys, webhooks, and lifecycle rules. Monitor new repositories, policy changes, unusual pulls, and deletion.</li>
+                <li>At runtime drop capabilities, prevent privilege escalation, apply seccomp/AppArmor/SELinux where supported, limit devices, host namespaces, host paths, sockets, kernel interfaces, sysctls, and resource consumption. Avoid privileged containers.</li>
+                <li>Separate sensitive workloads on appropriately isolated nodes/runtimes. Keep host/container runtime/kernel patched, protect runtime sockets and metadata, monitor workload behavior, and design for immutable replacement.</li>
+                <li>Control secrets and workload identity without baking them into image layers or broad environment variables. Use short-lived identity and mounted files/provider integrations with tight permission and audit.</li>
+                <li>Preserve image digest, deployment manifest, runtime ID, node, identity, network, process/file events, and ephemeral storage during incidents. A tag name does not uniquely identify what ran.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> hardened image recipe, build-derived SBOM/provenance/signature, registry policy, runtime security profile, host isolation plan, identity/secret tests, and container incident collection procedure.</div>
+              <p class="further-reading"><strong>Foundation:</strong> <a href="https://csrc.nist.gov/pubs/sp/800/190/final">NIST SP 800-190</a> describes image, registry, orchestrator, container, and host risks. It was published in 2017, so combine its principles with current runtime, orchestrator, and provider documentation.</p>
+            </div>
+
+            <div class="module" id="module-9">
+              <div class="module-header"><div><h3>Kubernetes control plane, RBAC, workload, network, and admission security</h3><p class="module-purpose">Treat the Kubernetes API, service accounts, workload creation, and nodes as privilege-bearing security boundaries.</p></div><span class="module-index">Module 09</span></div>
+              <ol class="workflow">
+                <li>Define provider/customer responsibility for managed or self-managed control plane, etcd, nodes, upgrades, certificates, audit, identity, networking, storage, admission, autoscaling, backup, and support. Record cluster version and lifecycle.</li>
+                <li>Restrict API-server reachability; federate human authentication; disable anonymous/legacy access where possible; use least-privilege RBAC; review cluster-admin, impersonate, bind, escalate, approve, token, secret, exec/attach, port-forward, node/proxy, CSR, and webhook powers.</li>
+                <li>Use dedicated service accounts, disable automatic token mounting when unnecessary, use bounded short-lived tokens/workload identity, restrict token audiences, and prevent workloads from reading unrelated namespace or cloud credentials.</li>
+                <li>Enforce Pod Security Standards—prefer Restricted for ordinary workloads—and add policy/admission controls for images/digests, signatures, registries, privilege, capabilities, root, host namespaces/paths/ports, seccomp, resources, probes, and approved exceptions.</li>
+                <li>Apply namespace/tenant boundaries, quotas, limit ranges, default-deny NetworkPolicy, controlled ingress/egress, DNS policy, service-mesh identity if used, sensitive-node isolation, and stronger sandbox/runtime classes where the threat model requires them.</li>
+                <li>Encrypt Secrets/appropriate API data at rest, restrict etcd and backup access, use external secret integrations when justified, avoid ConfigMaps/environment for confidential data, and monitor secret/token access.</li>
+                <li>Protect nodes and kubelets: minimal OS, patching, secure bootstrap, restricted metadata, no unnecessary SSH, runtime/socket protection, node authorization/restriction, workload isolation, image cleanup, EDR/runtime telemetry, and controlled debugging.</li>
+                <li>Enable and protect Kubernetes audit logs with a tested policy. Collect control plane, authentication, admission, scheduler, controller, kubelet, runtime, workload, network, DNS, registry, cloud identity, and deployment records into searchable storage.</li>
+                <li>Back up cluster state and application data; test rebuilding the cluster and restoring state under compromised-identity conditions. GitOps/IaC helps reconstruction but does not automatically back up persistent data or secrets.</li>
+              </ol>
+              <div class="safety-note"><strong>RBAC trap:</strong> the ability to create workloads can become privilege escalation through service accounts, node access, host paths, secrets, or powerful admission/runtime configurations. “Can create Pods” is not a low-risk developer permission by default.</div>
+              <div class="evidence-note"><strong>Output:</strong> cluster responsibility/version profile, API exposure and identity design, RBAC escalation review, Pod/admission policy tests, network and node controls, audit pipeline, and rebuild/restore exercise.</div>
+              <p class="further-reading"><strong>Current project guidance:</strong> use the official <a href="https://kubernetes.io/docs/concepts/security/security-checklist/">Kubernetes Security Checklist</a> and <a href="https://kubernetes.io/docs/concepts/security/rbac-good-practices/">RBAC Good Practices</a>. Then practice safely with the <a href="/articles/read/2026/2026-02-02-building-a-vulnerable-kubernetes-lab-a-complete-guide-to-25-critical-security-issues-fae4fc8e3a91">1200km Kubernetes Security Lab</a>.</p>
+            </div>
+
+            <div class="module" id="module-10">
+              <div class="module-header"><div><h3>Cloud logging, detection engineering, ATT&amp;CK, and response automation</h3><p class="module-purpose">Collect the evidence needed to detect control-plane and workload abuse, then validate each analytic against real data.</p></div><span class="module-index">Module 10</span></div>
+              <ol class="workflow">
+                <li>Build a telemetry contract for organization, account/project/subscription, identity/federation, control plane, configuration, key/secret, storage/data access, network/DNS/edge, compute, database, SaaS, container/Kubernetes, application, CI/CD, security, and billing sources.</li>
+                <li>For each source record scope, enablement/defaults, regions, event categories, data-access events, exclusions, latency, sampling, schema/version, identity/resource IDs, clock, retention, integrity, cost, export, and outage behavior.</li>
+                <li>Centralize logs into a separately governed security boundary with least-privilege writers/readers, encryption, version/immutability where required, health monitoring, volume/budget controls, and independent alerting on disabled/deleted/changed logging.</li>
+                <li>Engineer detections for new privileged identity/trust, access-key/service-account key creation, MFA/conditional-access change, unusual federation/session, policy/RBAC escalation, public sharing/exposure, logging impairment, key/secret access, snapshot/export, security-control change, suspicious deployment/image, data staging/exfiltration, cryptomining, and destructive recovery actions.</li>
+                <li>Use MITRE ATT&amp;CK’s cloud platforms to organize behavior and coverage. Map exact procedure, platform, data source, required fields, detection logic, assumptions, and test—not just a technique ID.</li>
+                <li>Build known-good and known-bad fixtures in a lab; execute authorized simulations; verify raw event generation, ingestion, normalization, query, alert, entity mapping, enrichment, case routing, and responder action.</li>
+                <li>Control automated response by scope, confidence, impact, prerequisites, approval, rate/concurrency, idempotency, timeout, rollback, audit, and safe failure. Start with enrichment/notification before destructive actions.</li>
+                <li>Measure source health, field completeness, rule execution, latency, alert quality, coverage gaps, stale identities/resources, failed automation, and untested changes. “Logging enabled” is not “detection works.”</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> telemetry/data contract, protected log architecture, detection catalogue, ATT&amp;CK procedure mappings, fixtures/simulation traces, end-to-end test results, automation safeguards, and coverage/health dashboard.</div>
+              <p class="further-reading"><strong>First-party detection practice:</strong> read <a href="/articles/read/2026/2026-02-11-kubernetes-logging-and-monitoring-complete-guide-2ce9d4bdba80">Kubernetes Logging and Monitoring</a>. Use <a href="/adversarygraph/">AdversaryGraph</a> for reviewed ATT&amp;CK, evidence, hunting, and validation workflows—not as proof that provider telemetry exists.</p>
+            </div>
+
+            <div class="module" id="module-11">
+              <div class="module-header"><div><h3>Posture management, exposure, vulnerabilities, attack paths, and validation</h3><p class="module-purpose">Prioritize cloud risk from verified context rather than treating every scanner result or graph edge as compromise.</p></div><span class="module-index">Module 11</span></div>
+              <ol class="workflow">
+                <li>Continuously inventory resources, identities, policies, network paths, data stores, images/packages, certificates/domains, public endpoints, vulnerabilities, sensitive data, logs, backups, and owners from authoritative provider APIs and deployment sources.</li>
+                <li>Normalize CSPM/CNAPP/CIEM/KSPM/vulnerability/exposure findings while preserving provider-native ID, source, rule/version, observation time, configuration evidence, scope, status, and remediation history. Deduplicate mirrors without losing independent corroboration.</li>
+                <li>Validate the exact resource and configuration. Account for provider defaults, inherited policy, effective authorization, route/load-balancer/DNS state, application controls, compensating protections, feature/region behavior, and scanner permission gaps.</li>
+                <li>Separate misconfiguration, vulnerability, public reachability, effective privilege, sensitive data, attack path, known exploitation, and observed malicious activity. Each supports a different conclusion and response.</li>
+                <li>Prioritize with business service, data class, internet/external exposure, exploitability, privilege, lateral reach, blast radius, deployed version, known exploitation, detection/recovery, owner, and age. Document uncertainty and rejected false positives.</li>
+                <li>Model attack paths as hypotheses across external access, workload identity, trust/impersonation, policies, secrets, metadata, pipelines, network, data, backups, and other clouds/SaaS. Validate safely before asserting the path is usable.</li>
+                <li>Remediate at the highest reusable layer: organization policy, identity pattern, landing-zone module, secure image, pipeline, admission rule, application control, or approved service template. Verify deployed state and monitor recurrence.</li>
+                <li>Use authorized attack simulation to validate prevention and detection, with dedicated lab accounts/projects, test identities/data, cost caps, cleanup, provider terms, and evidence. Never assume a tool’s “success” proves real data access or business impact.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> normalized finding record, effective configuration evidence, exposure/privilege/data context, validated attack-path hypothesis, prioritization rationale, reusable remediation, deployed verification, and recurrence control.</div>
+              <p class="further-reading"><strong>Authorized assessment:</strong> <a href="https://github.com/anpa1200/stratus-ai">StratusAI</a> is a maintained AWS/GCP assessment and simulation project; read its <a href="/articles/read/2026/2026-03-14-stratusai-i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-here-s-everything-89c6702d3b84">project article</a>. Findings require operator validation and explicit scope.</p>
+            </div>
+
+            <div class="module" id="module-12">
+              <div class="module-header"><div><h3>Cloud incident response, forensics, containment, and recovery</h3><p class="module-purpose">Prepare clean access, provider-native evidence, credential containment, and restoration before an incident spans regions and services.</p></div><span class="module-index">Module 12</span></div>
+              <ol class="workflow">
+                <li>Prepare a security/forensic account, cross-account roles, independent identity, immutable evidence storage, encryption, organization-wide log access, automation, regional coverage, quotas, snapshots, provider contacts, and clean communication.</li>
+                <li>Record case authority, tenant/account/project/subscription, resource and principal IDs, regions, session/token, API request IDs, source, user agent, raw and normalized timestamps, evidence export query, object version/hash, collector, and limitations.</li>
+                <li>Preserve identity/federation, control plane, configuration, data-access, key/secret, network/DNS, workload/application, container/Kubernetes, pipeline/repository, billing, support, security finding, snapshot, and backup evidence before retention expires.</li>
+                <li>Contain the full trust graph: sessions/tokens, human/workload/pipeline identities, keys/secrets, role trust, federation, application consent, policies, cross-account access, network/egress, exposed resources, and compromised delivery paths.</li>
+                <li>Snapshot or copy disks, objects, images, logs, serverless/package artifacts, manifests, persistent volumes, and relevant runtime state into the forensic boundary. Separate collection from analysis and avoid attaching affected storage to normal systems.</li>
+                <li>Scope organization-wide and cross-region activity, newly enabled services, replicated resources, related identities, marketplace/SaaS integrations, domains/certificates, and other clouds. Provider abstractions and short-lived resources demand API evidence.</li>
+                <li>Eradicate entry point, persistence, trust abuse, malicious resources, poisoned artifacts, vulnerable configuration, and exposed credentials. Rebuild from verified code/images and rotate secrets in dependency order.</li>
+                <li>Restore control plane, identity, logging, security services, network, workloads, data, and business flows through staged criteria. Validate backup/key availability, provenance, access, detection, monitoring, cost, and rollback.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> cloud IR playbook, clean-access exercise, evidence inventory and custody, principal/resource/session graph, containment decision log, forensic snapshots/exports, trusted rebuild, recovery tests, and post-incident actions.</div>
+              <p class="further-reading"><strong>Integrated practice:</strong> use the <a href="/cyber-knowledge/dfir.html">DFIR field guide</a> and <a href="/adversarygraph-docs/use-cases/investigation-cloud-incident/">AdversaryGraph cloud-incident workflow</a> to preserve the boundary between source evidence, enrichment, inference, and decision.</p>
+            </div>
+
+            <div class="module" id="module-13">
+              <div class="module-header"><div><h3>Multi-cloud, SaaS, suppliers, compliance, and continuous assurance</h3><p class="module-purpose">Standardize outcomes and evidence without hiding provider-specific controls, contracts, and failure modes.</p></div><span class="module-index">Module 13</span></div>
+              <ol class="workflow">
+                <li>Define common control outcomes for ownership, identity, privileged access, workload identity, network, data, keys, logging, vulnerabilities, delivery, backup, incident response, deletion, and supplier access. Map provider-native implementations beneath them.</li>
+                <li>Preserve provider-native identifiers, APIs, policy semantics, regions, event schemas, defaults, and evidence. A normalized field improves correlation but can erase a critical distinction unless the original remains linked.</li>
+                <li>Govern cross-cloud connections and identity federation: trust anchors, issuers, audiences, subjects, certificates, DNS, network transit, egress, secrets, replication, data transfer, logging, and revocation. Avoid one broad identity spanning all providers.</li>
+                <li>Assess SaaS and suppliers for service/data flow, sub-processors, locations, shared responsibilities, identity, admin/support access, integrations/tokens, encryption/key options, logging/export/API, retention/deletion, backup/recovery, incident notification, assurance evidence, exit, and concentration risk.</li>
+                <li>Map controls to applicable obligations and contracts with owner, scope, implementation, inherited/shared/customer responsibility, evidence, collection cadence, exceptions, and test. Do not claim compliance from a tool score or provider certification alone.</li>
+                <li>Use provider attestations, CSA STAR/CAIQ where appropriate, penetration-test summaries, architecture, control evidence, incidents, service health, support history, and contract terms as different evidence types. Review applicability and period.</li>
+                <li>Continuously assure high-risk controls through API evidence and tests while protecting credentials, costs, rate limits, and sensitive results. Maintain human review for exceptions and business-context decisions.</li>
+                <li>Plan portability and exit: data and key export, identity removal, domain/certificate transfer, workload reconstruction, dependency replacement, evidence retention, deletion verification, cost, time, and business acceptance.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> provider-neutral control model with native mappings, federation/connection register, SaaS/supplier assessment, compliance evidence matrix, continuous-control tests, concentration-risk review, and tested exit plan.</div>
+            </div>
+
+            <div class="module" id="module-14">
+              <div class="module-header"><div><h3>Cloud AI/ML, agents, RAG, MCP, and autonomous operations</h3><p class="module-purpose">Secure data, model, retrieval, tool, identity, and action paths without granting a probabilistic component unchecked cloud authority.</p></div><span class="module-index">Module 14</span></div>
+              <ol class="workflow">
+                <li>Inventory model providers/versions, endpoints, training/tuning/evaluation data, prompts/system instructions, retrieval sources, embeddings/vector stores, agents, plugins, MCP/A2A servers, tools, workload identities, secrets, outputs, logs, safety controls, and retained content.</li>
+                <li>Assign shared responsibility for base model, managed platform, customer data, application, retrieval, identity, tools, actions, moderation, monitoring, incident response, and deletion. Provider model safety does not secure your authorization or tool integrations.</li>
+                <li>Classify prompts, files, retrieved content, model outputs, feedback, traces, and training data. Apply region/residency, encryption, tenant isolation, access, retention, deletion, DLP, privacy, copyright, and provider training/use settings.</li>
+                <li>Use per-workload or propagated user identity and short-lived tokens. Avoid broad service accounts shared by every agent. Authorize retrieval and each tool/resource action independently from the model’s text.</li>
+                <li>For RAG, apply security trimming before retrieval and before response; preserve source identity/version/citation; isolate tenants and classifications; validate ingestion; detect poisoning; and reconcile additions, updates, deletions, and access changes.</li>
+                <li>For MCP/tools, allowlist server, tool, target, action, and data; validate strict input/output schemas; isolate execution; restrict network/file/cloud access; cap time/cost/concurrency; record calls; and require human approval for consequential changes.</li>
+                <li>Test prompt injection, indirect instruction in documents/web/logs, data leakage, cross-tenant retrieval, tool confusion, identity substitution, excessive agency, insecure generated code, resource exhaustion/denial of wallet, poisoned model/artifact, and unavailable provider.</li>
+                <li>Protect ML pipelines, feature stores, notebooks, registries, artifacts, deployment endpoints, evaluation sets, GPUs/accelerators, and supply chain like other privileged delivery systems. Pin and verify model/artifact identity where possible.</li>
+                <li>Log provider/model/version, prompt/template, data classification, source IDs, retrieval, tool calls, policy/authorization, approvals, output, cost/token/resource use, reviewer, and final disposition without leaking secrets or prohibited content.</li>
+              </ol>
+              <div class="safety-note"><strong>Authority boundary:</strong> an AI agent may propose a cloud change; it must not grant itself permissions, approve its own request, silently expand scope, or execute destructive/high-impact actions without deterministic policy and required human approval.</div>
+              <div class="evidence-note"><strong>Output:</strong> AI system/data-flow inventory, shared-responsibility model, retrieval ACL tests, agent identity design, MCP/tool contracts, abuse evaluation set, cost/safety controls, audit schema, incident plan, and human-approval record.</div>
+              <p class="further-reading"><strong>Ecosystem:</strong> review the <a href="/adversarygraph-docs/unified-rag-mcp/">AdversaryGraph RAG/MCP guide</a>, <a href="/ai-offensive.html">AI in Offensive Security</a>, and <a href="/hexstrike.html">HexStrike research</a>. These are implementation and testing resources, not automatic assurance claims.</p>
+            </div>
+          </section>
+
+          <section id="tooling">
+            <p class="section-kicker">Select by decision and evidence</p>
+            <h2>Cloud-security tool-selection matrix</h2>
+            <p class="section-intro">Prefer provider APIs and authoritative configuration as evidence. Third-party tools add normalization, graphing, policy, and scale, but their permissions, freshness, coverage, and interpretation must be visible.</p>
+            <div class="table-scroll">
+              <table class="tool-table">
+                <thead><tr><th>Capability</th><th>Examples</th><th>Best question</th><th>Evidence and common limit</th></tr></thead>
+                <tbody>
+                  <tr><td>Inventory/configuration</td><td>AWS Config/Resource Explorer, Azure Resource Graph/Policy, Google Cloud Asset Inventory/Organization Policy</td><td>What exists, who owns it, how is it configured, and what changed?</td><td>Native IDs and config/change history. Scope, permissions, regions, and unsupported resources can create blind spots.</td></tr>
+                  <tr><td>Identity/effective access</td><td>Provider IAM analyzers, access reviews, CIEM/graph tools, policy simulators</td><td>Who or what can perform which sensitive action through direct and indirect trust?</td><td>Policies and path. Simulators may not capture application authorization, runtime conditions, or future role chaining.</td></tr>
+                  <tr><td>Posture/policy</td><td>AWS Security Hub, Defender for Cloud, Security Command Center, OPA/Conftest, Checkov, tfsec</td><td>Which deployed or planned configurations violate a defined policy?</td><td>Resource/rule/version and config. A failed check does not prove exposure or exploitation.</td></tr>
+                  <tr><td>Vulnerability/image</td><td>Provider scanners, Trivy, Grype, OSV-Scanner, Syft/CycloneDX</td><td>Which resolved packages/images have relevant advisories and what was actually deployed?</td><td>Digest/SBOM/advisory. Version match alone does not prove reachability or exploitability.</td></tr>
+                  <tr><td>Attack-path analysis</td><td>Provider exposure/access analyzers, PMapper, Cartography, BloodHound cloud connectors, CNAPP graphs</td><td>Which identity, network, secret, workload, and data relationships may compose a path?</td><td>Versioned graph and edge sources. A possible edge/path must be validated safely.</td></tr>
+                  <tr><td>Kubernetes posture</td><td>kube-bench, Kubescape, kube-linter, Kyverno, Gatekeeper, provider posture services</td><td>Do cluster and workload settings meet a tested baseline?</td><td>Cluster/version/policy/result. Benchmark alignment does not prove runtime isolation or detection.</td></tr>
+                  <tr><td>Runtime</td><td>Provider workload protection, Falco, Tetragon, EDR/eBPF/runtime platforms</td><td>What behavior is occurring inside workloads/nodes and does it violate policy?</td><td>Event/sensor coverage. Kernel/runtime support, encryption, and sampling influence visibility.</td></tr>
+                  <tr><td>Logging/detection</td><td>CloudTrail, Azure Activity/Entra/Defender, Google Cloud Audit Logs/SCC, Kubernetes audit, SIEM/Sigma/YARA-L</td><td>Which identity changed or accessed which resource, from where, and was it detected?</td><td>Raw event plus query/rule/test. Default logging often omits data-access or regional sources.</td></tr>
+                  <tr><td>Infrastructure delivery</td><td>Terraform/OpenTofu, CloudFormation, Bicep/ARM, Pulumi, GitOps, cosign/SLSA tooling</td><td>Is deployed infrastructure traceable to reviewed code and verified artifacts?</td><td>Plan, commit, identity, provenance, deployment. Drift and console changes can diverge.</td></tr>
+                  <tr><td>Authorized simulation</td><td>Stratus Red Team, Atomic Red Team cloud tests, StratusAI, purpose-built lab scripts</td><td>Do prevention, logging, detection, response, and cleanup work end to end?</td><td>Scope, commands, raw events, alerts, response and teardown. Simulator success is not business compromise.</td></tr>
+                  <tr><td>Forensics/response</td><td>Provider snapshots/exports, security account automation, Velociraptor/osquery for hosts, Kubernetes collection</td><td>Can the team preserve evidence and contain/recover with clean access?</td><td>Immutable export/snapshot and transcript. Managed services limit infrastructure visibility.</td></tr>
+                  <tr><td>AI assistance</td><td>Approved cloud LLM, access-trimmed RAG, schema-constrained MCP tools</td><td>Can a model accelerate explanation, query, triage, and remediation proposals safely?</td><td>Citations, model/prompt/tool/authorization and reviewer. Output remains unverified.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="control-record">
+            <p class="section-kicker">Reusable artifact</p>
+            <h2>Cloud architecture and control record</h2>
+            <p class="section-intro">Use one record per workload/control decision and link it to provider-native evidence. Keep the previous version when a decision changes.</p>
+            <div class="template-record">
+              <pre><code>workload:
+  id:
+  name:
+  business_owner:
+  technical_owner:
+  environment:
+  criticality_and_recovery_tier:
+  provider_tenant_org_account_project:
+  regions:
+  services:
+  repository_pipeline_artifacts:
+  data_classes_and_residency:
+  external_and_hybrid_connections:
+
+responsibility:
+  control_outcome:
+  provider_responsibility:
+  customer_platform_responsibility:
+  workload_team_responsibility:
+  supplier_or_customer_responsibility:
+  contract_or_service_document:
+  unresolved_gap:
+
+implementation:
+  architecture_decision:
+  organization_policy:
+  identity_and_effective_permissions:
+  network_and_edge:
+  data_key_backup_deletion:
+  workload_runtime:
+  delivery_and_provenance:
+  logging_detection_response:
+  exceptions_and_expiry:
+
+verification:
+  evidence_ids_and_native_resource_ids:
+  configuration_observed_at_utc:
+  source_api_query_and_version:
+  test_case:
+  expected_result:
+  actual_result:
+  failures_or_blind_spots:
+  reviewer:
+  decision:
+  next_review_or_trigger:</code></pre>
+              <p><strong>Version, do not overwrite:</strong> a provider feature, policy, workload, identity, region, contract, or threat-model change should create a new reviewed record linked to the prior decision and deployed evidence.</p>
+            </div>
+          </section>
+
+          <section id="case-studies">
+            <p class="section-kicker">Worked analytical patterns</p>
+            <h2>Six end-to-end cloud-security case studies</h2>
+            <p class="section-intro">These are controlled training patterns. Use synthetic identities and data in isolated lab accounts/projects/subscriptions; do not reproduce them against third-party environments.</p>
+            <div class="case-grid">
+              <article class="case-study">
+                <h3>1. Public object storage with customer exports</h3>
+                <p><strong>Finding:</strong> a posture tool reports a storage bucket/container as public and identifies sensitive-looking filenames.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Preserve resource ID, account/project, policy/ACL, public-access controls, website/CDN/origin paths, object inventory/metadata, classification, logs, owner, and observation time.</li>
+                  <li>Validate effective anonymous/external access with an authorized minimal request; avoid downloading sensitive content. Check resource, account, organization, signed URL, CDN, cross-account, and application paths.</li>
+                  <li>Determine exposure start, objects affected, access logs, search/index/cache behavior, replication/backups, and whether external access occurred. Absence of disabled data-access logs is unknown.</li>
+                  <li>Block exposure at the reusable policy layer, preserve evidence, rotate exposed secrets if present, notify data/legal/privacy owners, and verify every access path and derivative copy.</li>
+                  <li>Add organization policy, IaC test, change alert, owner/classification requirement, and safe synthetic regression.</li>
+                </ol>
+                <p><strong>Do not claim:</strong> “public” automatically proves data was read, or “no access logs” proves it was not.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>2. Leaked static access key and cross-account role abuse</h3>
+                <p><strong>Finding:</strong> secret scanning finds a cloud key in repository history; audit logs show role assumption into production.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Revoke or disable under incident authority while preserving key metadata, repository history, pipeline logs, IAM policies/trust, sessions, request IDs, and affected resources.</li>
+                  <li>Trace key creation, owners, repositories/artifacts/logs/images where exposed, API activity, role chain, source, user agent, regions, newly enabled services, data/key/secret access, and persistence.</li>
+                  <li>Contain sessions, keys, role trust, pipeline identity, downstream secrets, and malicious resources. A key rotation alone does not invalidate every temporary session or delegated path.</li>
+                  <li>Replace static credentials with tightly conditioned workload federation; remove key-creation permissions, scan history/artifacts, and test revocation plus detection.</li>
+                </ol>
+                <p><strong>Evidence boundary:</strong> source IP and access-key identity support session activity; they do not by themselves identify the human actor.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>3. Kubernetes service-account escalation</h3>
+                <p><strong>Finding:</strong> an internet-facing pod is compromised and its service account can create workloads in the namespace.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Preserve ingress/WAF, application, Kubernetes audit, workload manifest/digest, service account/token, RBAC, admission, network, runtime, node, cloud identity, registry, and deployment evidence.</li>
+                  <li>Evaluate whether workload creation enables another service account, secret mount, hostPath/privilege, host network/PID, node scheduling, metadata, admission bypass, or cross-namespace/cloud access.</li>
+                  <li>Contain ingress and service/cloud identity; revoke/rotate tokens and exposed secrets; quarantine affected workload/node where justified; preserve volatile runtime state.</li>
+                  <li>Fix the application and RBAC path, disable token automount, enforce Restricted Pod Security/admission and egress, pin verified images, rebuild, and test audit/detection.</li>
+                </ol>
+                <p><strong>Lab:</strong> reproduce the path only in the <a href="/articles/read/2026/2026-02-02-building-a-vulnerable-kubernetes-lab-a-complete-guide-to-25-critical-security-issues-fae4fc8e3a91">intentionally vulnerable Kubernetes lab</a>.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>4. CI OIDC trust permits an unreviewed deployment</h3>
+                <p><strong>Finding:</strong> a pipeline can obtain a production role from more branches, repositories, or workflows than intended.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Preserve identity-provider trust, OIDC claims/conditions, repository/workflow/environment settings, branch protection, runner, artifact, deployment, and cloud audit evidence.</li>
+                  <li>Enumerate who can change workflow code, trigger it, approve environment, influence reusable actions/dependencies, control runners, publish artifacts, and satisfy subject/audience conditions.</li>
+                  <li>Constrain issuer, audience, organization/repository, ref/environment, workflow identity, and session duration; separate build from deploy; require protected environment approval and verified artifact identity.</li>
+                  <li>Test allowed and denied claim sets, fork/pull-request behavior, reusable workflows, tag/branch patterns, compromised runner assumptions, and rollback.</li>
+                </ol>
+                <p><strong>Do not claim:</strong> “OIDC means no secrets” implies safe federation. An overbroad trust policy is a credential-issuance vulnerability.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>5. Serverless SSRF reaches workload credentials</h3>
+                <p><strong>Finding:</strong> a function or managed application fetches user-supplied URLs and can be redirected toward metadata or private service endpoints.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Map input, parser/canonicalization, DNS, redirects, proxy, egress, private endpoints, metadata/identity protections, execution role, secrets, and accessible APIs/data.</li>
+                  <li>Validate with a controlled callback and synthetic target—never request real credentials. Test alternate schemes, encodings, IPv4/IPv6, DNS rebinding defenses, redirects, and provider-specific metadata requirements.</li>
+                  <li>Restrict destinations at application and network/egress layers; validate each redirect/resolution; use minimal workload identity; apply endpoint/resource policies, time/size limits, and safe response handling.</li>
+                  <li>Test logging and detection from function invocation through DNS/flow/proxy and denied metadata/private API access; rotate if real credentials may have been exposed.</li>
+                </ol>
+                <p><strong>Do not claim:</strong> URL allowlisting or a blocked literal metadata address proves SSRF is fixed across canonicalization, redirects, DNS, IPv6, proxies, and private services.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>6. Ransomware targets snapshots, keys, and backups</h3>
+                <p><strong>Finding:</strong> a privileged session changes backup retention, disables a key, and begins deleting snapshots across regions.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Declare an incident; protect security logging, identity, organization policy, key management, backup vaults/accounts/projects, and clean response access.</li>
+                  <li>Preserve authentication/session, role elevation, API request IDs, key/backup policy, deletion/recovery settings, object/version, cross-region replication, billing, and provider support records.</li>
+                  <li>Revoke the complete identity/session/trust path; apply temporary organization controls; isolate destructive automation; preserve evidence; engage provider support where recoverability windows matter.</li>
+                  <li>Recover keys and backups under tested procedures; rebuild control plane and workloads from verified code/artifacts; rotate credentials; validate data integrity and business flows.</li>
+                  <li>Implement separate backup identity/boundary, immutability, deletion protection, multi-person approval, recovery testing, and alerts on destructive or policy-changing actions.</li>
+                </ol>
+                <p><strong>Acceptance:</strong> a backup is not trusted until restoration, key access, application consistency, identity, and business validation succeed.</p>
+              </article>
+            </div>
+          </section>
+
+          <section id="labs">
+            <p class="section-kicker">Practice safely and destroy completely</p>
+            <h2>Twelve-lab cloud-security progression</h2>
+            <p class="section-intro">Create dedicated lab organizations/accounts/projects/subscriptions, synthetic identities/data, strict budgets/quotas, and verified teardown. Never connect intentionally vulnerable labs to production, corporate identity, normal endpoints, or valuable data.</p>
+            <div class="lab-group">
+              <div class="two-col">
+                <div class="practice-block">
+                  <h3>Labs 1–4: foundation and identity</h3>
+                  <ol>
+                    <li><strong>Responsibility matrix:</strong> choose VM, object storage, managed database, function, SaaS, and Kubernetes services; assign provider/customer/workload controls and evidence.</li>
+                    <li><strong>Landing zone:</strong> create sandbox, security/logging, and workload boundaries with organization policy, centralized audit, inventory tags, budget alerts, and break-glass access.</li>
+                    <li><strong>Effective IAM:</strong> build direct, group, resource-policy, role-trust, impersonation, and conditional grants; graph effective access and remove an escalation path.</li>
+                    <li><strong>Workload federation:</strong> deploy from a test repository using OIDC/short-lived identity; prove a permitted environment succeeds and branch/fork/audience variations fail.</li>
+                  </ol>
+                </div>
+                <div class="practice-block">
+                  <h3>Labs 5–8: network, data, delivery, and runtime</h3>
+                  <ol start="5">
+                    <li><strong>Flow and egress:</strong> build public edge, private service, workload, admin, and egress paths; enforce minimum flows and validate DNS/flow/firewall evidence.</li>
+                    <li><strong>Data/key/recovery:</strong> create synthetic sensitive objects, block public access, apply key separation, immutable/versioned backup, delete/restore, and verify evidence.</li>
+                    <li><strong>IaC policy:</strong> introduce an insecure Terraform change; catch it in plan/policy, deploy a corrected version, detect drift, and reconcile without losing the record.</li>
+                    <li><strong>Container chain:</strong> build a minimal image, create SBOM/provenance/signature, scan, enforce digest/admission, run non-root with reduced capability, and preserve runtime evidence.</li>
+                  </ol>
+                </div>
+                <div class="practice-block">
+                  <h3>Labs 9–12: Kubernetes, detection, IR, and AI</h3>
+                  <ol start="9">
+                    <li><strong>Kubernetes escalation:</strong> in the isolated vulnerable lab, trace a Pod-creation/RBAC path, apply Pod Security/admission/network/service-account controls, and regression test.</li>
+                    <li><strong>Detection chain:</strong> run one authorized cloud simulation and verify native event, centralized ingestion, fields, ATT&amp;CK mapping, alert, case, responder action, and cleanup.</li>
+                    <li><strong>Cloud IR:</strong> use a synthetic key-abuse scenario; collect immutable audit/snapshot evidence, contain sessions/trust, rebuild from code, restore data, and produce a timeline.</li>
+                    <li><strong>AI agent boundary:</strong> let an approved agent propose a cloud change through a schema-constrained MCP tool; test prompt injection, least privilege, denied target, cost cap, approval, audit, and rollback.</li>
+                  </ol>
+                </div>
+                <div class="practice-block">
+                  <h3>Score every lab</h3>
+                  <ul class="checklist">
+                    <li>Scope, authorization, provider terms, budget, data, and cleanup are explicit.</li>
+                    <li>Provider-native resource and principal IDs are preserved.</li>
+                    <li>Configuration and effective access are independently verified.</li>
+                    <li>Raw logs, query/rule, alert, decision, and response remain linked.</li>
+                    <li>Failure, partial coverage, region, permissions, and cost are recorded.</li>
+                    <li>Remediation occurs at a reusable policy/code layer.</li>
+                    <li>Rollback, teardown, and post-destroy inventory are verified.</li>
+                    <li>Claims distinguish posture, exposure, exploitability, and compromise.</li>
+                  </ul>
+                </div>
+              </div>
+              <p class="further-reading"><strong>Lab library:</strong> use the <a href="/labs.html#cloud-labs">1200km Cloud &amp; Kubernetes lab index</a>, <a href="/articles/read/2026/2026-01-29-building-a-vulnerable-gcp-pentest-lab-with-terraform-9d1edfcd8eff">GCP Terraform lab</a>, and <a href="/articles/read/2026/2026-01-31-a-complete-cloud-penetration-testing-walkthrough-1914f687d7fd">AWS/GCP walkthrough</a> only in isolated authorized environments.</p>
+            </div>
+          </section>
+
+          <section id="failure-atlas">
+            <p class="section-kicker">What fails in real cloud programs</p>
+            <h2>Failure atlas and production readiness gate</h2>
+            <div class="table-scroll">
+              <table class="definition-table">
+                <thead><tr><th>Failure pattern</th><th>Why it fails</th><th>Corrective control</th></tr></thead>
+                <tbody>
+                  <tr><td>“The provider secures it”</td><td>Identity, data, configuration, application, logging, and response remain customer/shared responsibilities.</td><td>Create a per-service responsibility matrix with owners, implementation, and tested evidence.</td></tr>
+                  <tr><td>One production account/project</td><td>Privilege, policy, billing, logging, backup, and incident blast radius converge.</td><td>Use governed organization hierarchy and separate security/logging, backup, production, non-production, and sandbox boundaries.</td></tr>
+                  <tr><td>Administrator role for automation</td><td>One pipeline, agent, or key compromise controls the environment.</td><td>Use short-lived, tightly conditioned workload identity and separate build/deploy/admin roles.</td></tr>
+                  <tr><td>“Private subnet equals trusted”</td><td>Compromised workloads, peering, routes, metadata, service endpoints, and identities cross network boundaries.</td><td>Authorize resources by identity/context and explicit flows; retain segmentation as defense in depth.</td></tr>
+                  <tr><td>Encryption checkbox</td><td>Overbroad access, key administrators, exports, logs, backups, or application exposure can still disclose data.</td><td>Design authorization, key separation/lifecycle, data flows, monitoring, backup, and deletion together.</td></tr>
+                  <tr><td>Public endpoint disabled</td><td>CDN/origin, signed URL, external principal, proxy, hybrid path, or application sharing may still expose data.</td><td>Validate every effective access path and block at organization, resource, network, and application layers.</td></tr>
+                  <tr><td>Scanner score as risk</td><td>A rule match omits effective permission, reachability, data, exploitability, business impact, and compensating controls.</td><td>Preserve finding evidence and add contextual validation with a documented decision.</td></tr>
+                  <tr><td>Cloud logs enabled by default</td><td>Data events, regions, SaaS, Kubernetes, short retention, exclusions, and new services may be missing.</td><td>Maintain a telemetry contract and end-to-end event/alert/response tests.</td></tr>
+                  <tr><td>Mutable image tags</td><td>What was scanned, approved, deployed, and investigated can differ.</td><td>Use digests, SBOM, provenance/signature, immutable deployment records, and admission policy.</td></tr>
+                  <tr><td>Namespace is strong tenancy</td><td>Cluster roles, service accounts, nodes, network, admission, secrets, and control plane can cross boundaries.</td><td>Threat-model tenancy and use separate clusters/accounts or stronger isolation where required.</td></tr>
+                  <tr><td>Backup exists</td><td>Compromised identity/keys, deletion policy, corrupted data, or untested dependencies can prevent recovery.</td><td>Separate and protect backups/keys; perform complete restoration and business validation.</td></tr>
+                  <tr><td>AI agent has one broad cloud role</td><td>Prompt injection or model/tool error gains the agent’s entire blast radius.</td><td>Propagate user/workload identity, scope tools and targets, enforce deterministic policy, approval, cost caps, audit, and rollback.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="practice-block">
+              <h3>Minimum production readiness gate</h3>
+              <ul class="checklist">
+                <li>Every provider, tenant, account/project/subscription, service, integration, region, and workload has an owner and inventory record.</li>
+                <li>Shared responsibilities are documented per service and mapped to customer implementation and current evidence.</li>
+                <li>Organization hierarchy, logging/security/backup boundaries, policy inheritance, metadata, budgets, and break-glass access are tested.</li>
+                <li>Human, privileged, workload, pipeline, support, external, and emergency identities use least privilege and governed lifecycle.</li>
+                <li>Approved ingress, egress, hybrid, control-plane, private-service, metadata, and tenant flows are documented and tested.</li>
+                <li>Data classification, access, public-sharing prevention, key separation, immutable backup, restore, retention, and deletion work.</li>
+                <li>Infrastructure code, state, dependencies, artifacts, images, provenance, policies, deployment identity, drift, and rollback are protected.</li>
+                <li>Containers and Kubernetes enforce tested image, RBAC, service-account, Pod, admission, network, secret, node, audit, and recovery controls.</li>
+                <li>Telemetry contracts cover identity, control/data plane, network, workload, container/Kubernetes, application, pipeline, security, and cost.</li>
+                <li>High-risk detections and response automations have fixtures, end-to-end tests, approvals, safe failure, rollback, and health monitoring.</li>
+                <li>Cloud IR can operate through clean access, preserve cross-region/provider-native evidence, contain identity/trust, and restore trusted service.</li>
+                <li>SaaS, suppliers, cross-cloud federation, compliance evidence, concentration risk, exit, and deletion are governed.</li>
+                <li>Cloud AI/RAG/agents/MCP have data handling, source authorization, identity propagation, tool policy, abuse testing, cost controls, audit, and human approval.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section id="references">
+            <p class="section-kicker">Authoritative baselines and ecosystem practice</p>
+            <h2>Standards, provider guidance, and first-party reading</h2>
+            <div class="two-col">
+              <div class="reference-article">
+                <h3>Primary and current guidance</h3>
+                <ul class="reference-list">
+                  <li><a href="https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1">CSA Cloud Controls Matrix 4.1</a> — the current vendor-neutral cloud control framework released in January 2026.</li>
+                  <li><a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html">AWS Well-Architected Security Pillar</a> — service-dependent shared responsibility and security design guidance.</li>
+                  <li><a href="https://learn.microsoft.com/en-us/azure/well-architected/security/">Azure Well-Architected Security Pillar</a> — security design principles and workload recommendations.</li>
+                  <li><a href="https://docs.cloud.google.com/architecture/framework/security">Google Cloud Well-Architected Security, Privacy, and Compliance</a> — principles across governance, IAM, data, operations, application, AI, and logging.</li>
+                  <li><a href="https://csrc.nist.gov/pubs/sp/800/207/final">NIST SP 800-207</a> and <a href="https://csrc.nist.gov/pubs/sp/800/207/a/final">SP 800-207A</a> — zero trust and application/service identity in multi-cloud cloud-native systems.</li>
+                  <li><a href="https://csrc.nist.gov/pubs/sp/800/190/final">NIST SP 800-190</a> — container image, registry, orchestrator, runtime, and host risk foundation.</li>
+                  <li><a href="https://kubernetes.io/docs/concepts/security/">Kubernetes Security documentation</a> — current upstream controls for API access, Pod security, secrets, network, admission, audit, and workload isolation.</li>
+                  <li><a href="https://attack.mitre.org/matrices/enterprise/cloud/">MITRE ATT&amp;CK Cloud Matrix</a> — behavior reference across Office Suite, Identity Provider, SaaS, and IaaS platforms.</li>
+                </ul>
+              </div>
+              <div class="reference-article">
+                <h3>1200km and AdversaryGraph practice</h3>
+                <ul class="reference-list">
+                  <li><a href="/articles/read/2026/2026-03-13-building-a-vulnerable-cloud-pentest-lab-with-terraform-9858ac96b29e">Building a Vulnerable Cloud Lab with Terraform</a> — disposable AWS/GCP training infrastructure.</li>
+                  <li><a href="/articles/read/2026/2026-02-09-gcp-penetration-testing-a-step-by-step-attack-guide-9e39bc3eb96d">GCP Penetration Testing</a> and <a href="/articles/read/2026/2026-01-31-a-complete-cloud-penetration-testing-walkthrough-1914f687d7fd">the complete cloud walkthrough</a> — authorized attack-path practice.</li>
+                  <li><a href="/articles/read/2026/2026-02-02-building-a-vulnerable-kubernetes-lab-a-complete-guide-to-25-critical-security-issues-fae4fc8e3a91">Kubernetes Security Lab</a> and <a href="/articles/read/2026/2026-02-11-kubernetes-logging-and-monitoring-complete-guide-2ce9d4bdba80">Kubernetes Logging and Monitoring</a> — isolated cluster hardening and evidence.</li>
+                  <li><a href="/articles/read/2026/2026-03-14-stratusai-i-built-an-ai-powered-cloud-security-scanner-for-aws-and-gcp-here-s-everything-89c6702d3b84">StratusAI</a> — source-backed AWS/GCP assessment and simulation workflow requiring analyst validation.</li>
+                  <li><a href="/adversarygraph/">AdversaryGraph</a>, <a href="/adversarygraph-docs/use-cases/investigation-cloud-incident/">cloud incident investigation</a>, and <a href="/adversarygraph-docs/use-cases/investigation-apt-campaign-cluster/">campaign clustering</a> — evidence-linked investigation and ATT&amp;CK context.</li>
+                  <li><a href="/cyber-knowledge/dfir.html">DFIR</a>, <a href="/cyber-knowledge/secure-code.html">Secure Code</a>, <a href="/cyber-knowledge/red-team.html">Red Team</a>, and <a href="/cyber-knowledge/blue-team.html">Blue Team</a> — incident, application, authorized simulation, and defensive operations handoffs.</li>
+                  <li><a href="/labs.html#cloud-labs">Cloud &amp; Kubernetes labs</a> and <a href="/guides.html#cloud-k8s-ad">cloud/Kubernetes guides</a> — the maintained site indexes for hands-on material.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="analysis-note"><strong>Maintenance note:</strong> cloud services, default settings, IAM semantics, audit schemas, regions, Kubernetes versions, provider terms, and AI capabilities change quickly. Pin runbooks and tests to current service/version documentation and re-verify after every material change.</div>
+          </section>
+        </article>
       </div>
     </main>
 
@@ -429,6 +1154,5 @@
       </div>
     </footer>
     <!-- site-shell:footer:end -->
-
   </body>
 </html>
