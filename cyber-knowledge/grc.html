@@ -6,12 +6,12 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <script src="/assets/theme-bootstrap.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Governance, Risk &amp; Compliance (GRC) — Cyber Knowledge | 1200km</title>
-    <meta name="description" content="Governance, Risk &amp; Compliance (GRC). Governance, Risk &amp; Compliance. Syllabus in progress: risk assessment, security frameworks, audit, and the policy layer…" />
+    <title>Governance, Risk &amp; Compliance — Practitioner Field Guide | 1200km</title>
+    <meta name="description" content="A practical 14-module GRC field guide covering cyber governance, scenario-based risk, NIST CSF 2.0, ISO/IEC 27001, controls, evidence, audit, privacy, suppliers, resilience, metrics, cloud, DevSecOps, AI governance, labs, and case studies." />
     <meta name="author" content="Andrey Pautov" />
-    <meta property="og:title" content="Governance, Risk &amp; Compliance (GRC) — Cyber Knowledge | 1200km" />
-    <meta property="og:description" content="Governance, Risk &amp; Compliance (GRC). Governance, Risk &amp; Compliance. Syllabus in progress: risk assessment, security frameworks, audit, and the policy layer…" />
-    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Governance, Risk &amp; Compliance — Practitioner Field Guide | 1200km" />
+    <meta property="og:description" content="Turn governance and compliance obligations into owned controls, decision-quality evidence, measurable risk treatment, and continuously verified operations." />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="https://1200km.com/cyber-knowledge/grc.html" />
     <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
     <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
@@ -19,8 +19,8 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Governance, Risk &amp; Compliance (GRC) — Cyber Knowledge | 1200km" />
-    <meta name="twitter:description" content="Governance, Risk &amp; Compliance (GRC). Governance, Risk &amp; Compliance. Syllabus in progress: risk assessment, security frameworks, audit, and the policy layer…" />
+    <meta name="twitter:title" content="Governance, Risk &amp; Compliance — Practitioner Field Guide | 1200km" />
+    <meta name="twitter:description" content="A 14-module guide to cyber governance, risk decisions, control design, evidence, audit, supplier assurance, resilience, automation, and AI governance." />
     <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
     <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <link rel="canonical" href="https://1200km.com/cyber-knowledge/grc.html" />
@@ -30,44 +30,47 @@
     <style>
       :root {
         --bg: #050c1a;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.82);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5a6f8f;
-        --text: #cdd9ee;
-        --muted: #7a96bc;
+        --surface: #081326;
+        --surface-2: #0d1f3c;
+        --text: #d8e2f3;
+        --muted: #94a9c7;
         --line: #1a3060;
-        --accent: #0f62fe;
+        --accent: #4f8fff;
         --accent-soft: #93c5fd;
-        --accent-dark: #054ada;
+        --accent-dark: #0f62fe;
         --ok: #34d399;
-        --warn: #b45309;
-        --red: #ef4444;
-        --chip: #0d1f3c;
-        --chip-strong: #162d52;
-        --shadow: 0 14px 34px rgba(0,0,0,0.45);
+        --warn: #f59e0b;
+        --danger: #fb7185;
+        --purple: #c4b5fd;
       }
       * { box-sizing: border-box; }
       html { scroll-behavior: smooth; }
       body {
         margin: 0;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        overflow-x: clip;
         color: var(--text);
         background: var(--bg);
-        line-height: 1.58;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.62;
       }
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { color: var(--accent-dark); text-decoration: underline; }
+      a { color: var(--accent-soft); text-decoration: none; }
+      a:hover { color: var(--accent); text-decoration: underline; }
+      code {
+        padding: 0.08em 0.3em;
+        border-radius: 4px;
+        color: #bfdbfe;
+        background: #102443;
+        overflow-wrap: anywhere;
+      }
       .site-header {
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 30;
         border-bottom: 1px solid var(--line);
-        background: rgba(5,12,26,0.92);
+        background: rgba(5,12,26,0.95);
         backdrop-filter: blur(12px);
       }
-      .nav, .page-hero-inner, main, .footer-inner {
+      .nav, .page-hero-inner, .footer-inner {
         width: min(1080px, calc(100% - 32px));
         margin: 0 auto;
       }
@@ -82,149 +85,373 @@
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        font-weight: 700;
         color: var(--text);
-        text-decoration: none;
+        font-weight: 750;
       }
-      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand:hover { color: var(--text); text-decoration: none; }
       .brand img { width: 36px; height: 36px; border-radius: 10px; }
       .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
-      .nav-links a.active { color: var(--accent); font-weight: 600; }
+      .nav-links a.active { color: var(--accent); font-weight: 700; }
       .page-hero {
-        background: linear-gradient(120deg, rgba(15,98,254,0.10), rgba(0,122,90,0.08)), #ffffff;
         border-bottom: 1px solid var(--line);
+        background:
+          radial-gradient(circle at 85% 22%, rgba(79,143,255,0.15), transparent 28%),
+          linear-gradient(135deg, rgba(15,98,254,0.11), rgba(52,211,153,0.055)),
+          #050c1a;
       }
-      .page-hero-inner { padding: 64px 0 52px; }
+      .page-hero-inner { padding: 66px 0 54px; }
       .page-eyebrow {
-        color: var(--accent-dark);
+        margin: 0 0 12px;
+        color: var(--accent-soft);
         font-size: 0.76rem;
-        font-weight: 600;
+        font-weight: 800;
         letter-spacing: 0.09em;
         text-transform: uppercase;
-        margin: 0 0 12px;
       }
-      .page-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
-      .page-lead { max-width: 760px; margin: 16px 0 0; color: var(--muted); font-size: 1.07rem; }
+      .page-title {
+        max-width: 960px;
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3.7rem);
+        line-height: 1.05;
+      }
+      .page-lead {
+        max-width: 880px;
+        margin: 18px 0 0;
+        color: var(--text);
+        font-size: 1.08rem;
+      }
+      .notice {
+        max-width: 900px;
+        margin-top: 28px;
+        padding: 16px 18px;
+        border: 1px solid rgba(245,158,11,0.42);
+        border-radius: 10px;
+        background: rgba(245,158,11,0.09);
+      }
+      .notice strong {
+        color: #fbbf24;
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .notice p { margin: 5px 0 0; color: var(--text); font-size: 0.93rem; }
       .page-hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
       .button {
         display: inline-flex;
+        min-height: 42px;
         align-items: center;
-        padding: 8px 18px;
+        justify-content: center;
+        padding: 9px 17px;
         border: 1px solid var(--line);
-        border-radius: 6px;
-        font-size: 0.88rem;
-        font-weight: 700;
+        border-radius: 7px;
         color: var(--text);
-        background: var(--panel);
-        text-decoration: none;
-        transition: border-color 0.14s, background 0.14s;
+        background: var(--surface-2);
+        font-size: 0.88rem;
+        font-weight: 750;
       }
-      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
-      .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-      .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
-      .notice {
+      .button:hover { border-color: var(--accent); color: var(--text); background: #162d52; text-decoration: none; }
+      .button.primary { border-color: var(--accent-dark); color: #fff; background: var(--accent-dark); }
+      .guide-nav {
+        position: sticky;
+        top: 64px;
+        z-index: 20;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.96);
+        backdrop-filter: blur(12px);
+      }
+      .guide-nav-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: flex;
+        gap: 8px;
+        padding: 10px 0;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+      .guide-nav a {
+        flex: 0 0 auto;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .guide-nav a:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+      .guide-layout {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+        gap: 28px;
+        padding: 42px 0 72px;
+      }
+      .toc {
+        position: sticky;
+        top: 122px;
+        align-self: start;
+        max-height: calc(100vh - 142px);
+        overflow-y: auto;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(8,19,38,0.88);
+        scrollbar-width: thin;
+      }
+      .toc h2 { margin: 0 0 12px; font-size: 1rem; }
+      .toc ol, .toc ul { margin: 0; padding-left: 1.25rem; }
+      .toc li { margin: 7px 0; color: var(--muted); font-size: 0.82rem; }
+      .toc a { color: var(--muted); }
+      .toc a:hover { color: var(--accent-soft); }
+      .toc-group {
+        display: block;
+        margin: 15px 0 3px;
+        color: var(--accent-soft);
+        font-size: 0.69rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .guide-content { min-width: 0; }
+      .guide-content > section { scroll-margin-top: 128px; margin-bottom: 54px; }
+      .section-kicker {
+        margin: 0 0 5px;
+        color: var(--accent-soft);
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+      }
+      .guide-content h2 {
+        margin: 0 0 12px;
+        font-size: clamp(1.6rem, 3vw, 2.25rem);
+        line-height: 1.16;
+      }
+      .guide-content h3 { margin: 0 0 10px; font-size: 1.18rem; line-height: 1.3; }
+      .guide-content h4 { margin: 15px 0 6px; font-size: 0.98rem; }
+      .section-intro { max-width: 78ch; margin: 0 0 20px; color: var(--muted); font-size: 1rem; }
+      .outcome-grid, .term-grid, .two-col, .case-grid, .lab-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .outcome-card, .term-grid > div, .practice-block, .case-study, .reference-article, .template-record {
+        min-width: 0;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(8,19,38,0.82);
+      }
+      .outcome-card h3, .term-grid h3, .template-record h3 { margin-bottom: 7px; }
+      .outcome-card p, .term-grid p, .practice-block p, .reference-article p, .template-record p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .module {
+        scroll-margin-top: 128px;
+        margin: 0 0 18px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(8,19,38,0.94), rgba(13,31,60,0.62));
+      }
+      .module-header {
         display: flex;
         align-items: flex-start;
-        gap: 12px;
-        margin: 28px 0 0;
-        padding: 14px 18px;
-        border: 1px solid rgba(180, 83, 9, 0.4);
-        border-radius: 10px;
-        background: rgba(180, 83, 9, 0.1);
-        color: #b45309;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 10px;
+      }
+      .module-number {
+        flex: 0 0 auto;
+        padding: 4px 8px;
+        border: 1px solid rgba(79,143,255,0.5);
+        border-radius: 999px;
+        color: var(--accent-soft);
+        font-size: 0.7rem;
+        font-weight: 850;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .module > p { color: var(--muted); }
+      .module ul, .module ol, .case-study ul, .case-study ol { padding-left: 1.25rem; }
+      .module li, .case-study li { margin: 7px 0; }
+      .workflow {
+        margin: 14px 0 0;
+        padding: 14px 16px;
+        border-left: 3px solid var(--accent);
+        border-radius: 0 8px 8px 0;
+        background: rgba(15,98,254,0.08);
+      }
+      .workflow strong { color: #bfdbfe; }
+      .evidence-note, .boundary, .acceptance {
+        margin: 14px 0 0;
+        padding: 13px 15px;
+        border-radius: 8px;
         font-size: 0.92rem;
-        font-weight: 600;
-        max-width: 760px;
       }
-      [data-theme="dark"] .notice {
-        background: rgba(245, 158, 11, 0.12);
-        border-color: rgba(245, 158, 11, 0.35);
-        color: #f59e0b;
+      .evidence-note { border: 1px solid rgba(52,211,153,0.34); background: rgba(52,211,153,0.07); }
+      .evidence-note strong { color: #6ee7b7; }
+      .boundary { border: 1px solid rgba(245,158,11,0.34); background: rgba(245,158,11,0.07); }
+      .boundary strong { color: #fbbf24; }
+      .acceptance { border: 1px solid rgba(196,181,253,0.35); background: rgba(139,92,246,0.07); }
+      .acceptance strong { color: var(--purple); }
+      .further-reading { margin: 13px 0 0; color: var(--muted); font-size: 0.9rem; }
+      .table-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
       }
-      .notice strong { font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
-      .notice p { margin: 4px 0 0; font-weight: 500; color: var(--muted); }
-      main { padding: 56px 0 72px; }
-      .placeholder-panel {
-        max-width: 720px;
-        padding: 26px 28px;
-        border: 1px dashed var(--line);
-        border-radius: 14px;
-        background: var(--panel);
-        color: var(--panel-muted);
+      table { width: 100%; min-width: 760px; border-collapse: collapse; background: rgba(8,19,38,0.75); }
+      th, td { padding: 12px 13px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+      th {
+        color: var(--accent-soft);
+        background: #09162b;
+        font-size: 0.73rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
       }
-      [data-theme="dark"] .placeholder-panel {
-        background: rgba(8, 19, 38, 0.84);
-        border-color: rgba(147, 197, 253, 0.28);
-        color: #b8c9e3;
+      td { color: var(--muted); font-size: 0.9rem; }
+      tr:last-child td { border-bottom: 0; }
+      .case-study { border-left: 3px solid var(--danger); }
+      .case-study h3 { color: #fecdd3; }
+      .case-meta { margin: 0 0 10px; color: var(--muted); font-size: 0.82rem; }
+      .decision-gate {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid rgba(52,211,153,0.35);
+        border-radius: 8px;
+        background: rgba(52,211,153,0.07);
       }
-      .placeholder-panel h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--panel-ink); }
-      [data-theme="dark"] .placeholder-panel h2 { color: #f8fbff; }
-      footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
+      .decision-gate strong { color: #6ee7b7; }
+      .failure-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 0;
+        list-style: none;
+      }
+      .failure-list li {
+        margin: 0;
+        padding: 14px;
+        border: 1px solid rgba(251,113,133,0.27);
+        border-radius: 8px;
+        background: rgba(251,113,133,0.05);
+      }
+      .failure-list strong { display: block; margin-bottom: 4px; color: #fecdd3; }
+      .checklist {
+        display: grid;
+        gap: 8px;
+        padding: 0;
+        list-style: none;
+      }
+      .checklist li {
+        position: relative;
+        margin: 0;
+        padding: 11px 13px 11px 39px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(8,19,38,0.7);
+      }
+      .checklist li::before {
+        content: "✓";
+        position: absolute;
+        left: 14px;
+        color: var(--ok);
+        font-weight: 900;
+      }
+      .reference-list { display: grid; gap: 12px; }
+      .reference-article h3 { font-size: 1rem; }
+      .site-footer { border-top: 1px solid var(--line); color: var(--muted); }
+      @media (max-width: 900px) {
+        .guide-layout { grid-template-columns: 1fr; }
+        .toc { position: static; max-height: none; }
+        .outcome-grid, .term-grid, .two-col, .case-grid, .lab-grid { grid-template-columns: 1fr; }
+      }
       @media (max-width: 720px) {
-        .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: min(1080px, calc(100% - 32px)); }
-        .nav, .page-hero-inner, main, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
-        .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 8px 14px; width: 100%; }
-        .button { flex-shrink: 0; }
-        .page-hero-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 10px; max-width: 100%; }
-        .page-title, .page-lead, .page-eyebrow { max-width: 100%; overflow-wrap: break-word; }
+        .nav { min-height: 58px; }
+        .guide-nav { top: 58px; }
+        .page-hero-inner { padding: 46px 0 40px; }
+        .page-title { font-size: clamp(2rem, 12vw, 3rem); }
+        .page-hero-links { display: grid; grid-template-columns: 1fr; }
+        .button { width: 100%; }
+        .guide-layout { width: calc(100% - 24px); padding-top: 28px; }
+        .guide-nav-inner { width: calc(100% - 24px); }
+        .module { padding: 17px; }
+        .module-header { display: block; }
+        .module-number { display: inline-block; margin-bottom: 8px; }
+        .failure-list { grid-template-columns: 1fr; }
+        .page-lead, .section-intro, .module p, .module li, .case-study p, .case-study li {
+          max-width: none;
+          overflow-wrap: normal;
+          word-break: normal;
+        }
+        a, code, td { overflow-wrap: anywhere; }
       }
-      [data-theme="dark"] footer, [data-theme="dark"] .footer {
-        background: rgba(5,12,26,0.96) !important;
-        border-top-color: #1a3060 !important;
-        color: #7a96bc !important;
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
       }
-      [data-theme="dark"] .page-hero {
-        background: linear-gradient(135deg, rgba(15,98,254,0.12), rgba(0,122,90,0.06)), #050c1a !important;
-        border-bottom-color: #1a3060 !important;
+      @media print {
+        .site-header, .guide-nav, .toc, .page-hero-links, .site-footer { display: none !important; }
+        body { color: #111; background: #fff; font-size: 10pt; }
+        .page-hero { border: 0; background: #fff; }
+        .page-hero-inner, .guide-layout { width: 100%; padding: 0; }
+        .guide-layout { display: block; }
+        .module, .case-study, .practice-block, .template-record { break-inside: avoid; color: #111; background: #fff; }
+        a { color: #111; text-decoration: underline; }
       }
       [data-theme="light"] {
-        --bg: #f6f8fb;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.97);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5b667a;
+        --bg: #f0f4ff;
+        --surface: #ffffff;
+        --surface-2: #eef4ff;
         --text: #172033;
-        --muted: #5b667a;
-        --line: #dbe4ef;
+        --muted: #53627a;
+        --line: #ccd9eb;
         --accent: #0f62fe;
-        --accent-soft: #3a7dff;
+        --accent-soft: #1559cf;
         --accent-dark: #054ada;
         --ok: #007a5a;
-        --warn: #b45309;
-        --red: #b91c1c;
-        --chip: #eef4ff;
-        --chip-strong: #dbe9ff;
-        --shadow: 0 14px 34px rgba(24,38,69,0.09);
+        --warn: #9a5b00;
+        --danger: #b4233b;
+        --purple: #5b36a6;
       }
-      [data-theme="light"] body { background: #f0f4ff !important; background-image: none !important; }
-      [data-theme="light"] .site-header { background: rgba(255,255,255,0.96) !important; border-bottom: 1px solid #dbe4ef; }
-      [data-theme="light"] footer, [data-theme="light"] .footer { background: rgba(255,255,255,0.96) !important; border-top: 1px solid #dbe4ef; }
+      [data-theme="light"] body { background: var(--bg); }
+      [data-theme="light"] .site-header,
+      [data-theme="light"] .guide-nav { background: rgba(255,255,255,0.96); }
+      [data-theme="light"] .page-hero { background: linear-gradient(135deg, #eef4ff, #f4fbf8); }
+      [data-theme="light"] .toc,
+      [data-theme="light"] .module,
+      [data-theme="light"] .outcome-card,
+      [data-theme="light"] .term-grid > div,
+      [data-theme="light"] .practice-block,
+      [data-theme="light"] .case-study,
+      [data-theme="light"] .reference-article,
+      [data-theme="light"] .template-record,
+      [data-theme="light"] table,
+      [data-theme="light"] .checklist li { background: #fff; }
+      [data-theme="light"] th { background: #eef4ff; }
+      [data-theme="light"] code { color: #163f80; background: #e5eefc; }
       .theme-btn {
-        background: none;
-        border: 1px solid var(--line);
-        border-radius: 6px;
         width: 32px;
         height: 32px;
-        cursor: pointer;
-        color: var(--muted);
-        font-size: 1rem;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
-        transition: border-color 0.15s, color 0.15s;
-        flex-shrink: 0;
-        font-family: inherit;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        background: none;
+        cursor: pointer;
+        font: inherit;
       }
-      .theme-btn:hover { border-color: var(--accent); color: var(--accent-soft); }
+      .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
     </style>
     <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
     <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
     <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
-
-    
-
     <script type="application/ld+json" data-site-graph>
       {
         "@context": "https://schema.org",
@@ -236,38 +463,21 @@
             "url": "https://1200km.com/",
             "image": "https://1200km.com/assets/ap-logo.png",
             "jobTitle": "Threat Intelligence Research Engineer",
-            "worksFor": {
-              "@type": "Organization",
-              "name": "XPLG"
-            },
             "sameAs": [
               "https://github.com/anpa1200",
               "https://medium.com/@1200km",
               "https://www.linkedin.com/in/andrey-pautov/",
               "https://infosecwriteups.com/@1200km"
             ],
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Tel Aviv",
-              "addressCountry": "IL"
-            },
-            "email": "mailto:1200km@gmail.com",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "contactType": "professional inquiries",
-              "email": "mailto:1200km@gmail.com"
-            },
             "knowsAbout": [
-              "Cyber Threat Intelligence",
-              "Detection Engineering",
-              "MITRE ATT&CK",
-              "Threat Hunting",
-              "Malware Analysis",
-              "OpenCTI",
-              "SIEM Validation",
-              "Adversary Simulation",
-              "Reverse Engineering",
-              "Cloud Security"
+              "Cybersecurity governance",
+              "Cyber risk management",
+              "Security controls",
+              "NIST Cybersecurity Framework",
+              "ISO/IEC 27001",
+              "Security assurance",
+              "Third-party risk",
+              "AI governance"
             ]
           },
           {
@@ -275,32 +485,24 @@
             "@id": "https://1200km.com/#website",
             "name": "1200km Security Research",
             "url": "https://1200km.com/",
-            "publisher": {
-              "@id": "https://1200km.com/#person"
-            },
-            "inLanguage": "en",
-            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
-            "author": {
-              "@id": "https://1200km.com/#person"
-            }
+            "publisher": {"@id": "https://1200km.com/#person"},
+            "inLanguage": "en"
           },
           {
-            "@type": "WebPage",
+            "@type": ["WebPage", "TechArticle"],
             "@id": "https://1200km.com/cyber-knowledge/grc.html#webpage",
             "url": "https://1200km.com/cyber-knowledge/grc.html",
-            "name": "Governance, Risk & Compliance (GRC)",
-            "description": "Governance, Risk & Compliance (GRC). Governance, Risk & Compliance. Syllabus in progress: risk assessment, security frameworks, audit, and the policy layer…",
-            "isPartOf": {
-              "@id": "https://1200km.com/#website"
-            },
-            "breadcrumb": {
-              "@id": "https://1200km.com/cyber-knowledge/grc.html#breadcrumb"
-            },
-            "author": {
-              "@id": "https://1200km.com/#person"
-            },
+            "name": "Governance, Risk & Compliance — Practitioner Field Guide",
+            "headline": "Governance, Risk & Compliance — Practitioner Field Guide",
+            "description": "A practical 14-module field guide to cyber governance, risk decisions, control design, evidence, audit, legal and contractual obligations, suppliers, privacy, resilience, metrics, cloud, DevSecOps, and AI governance.",
+            "isPartOf": {"@id": "https://1200km.com/#website"},
+            "breadcrumb": {"@id": "https://1200km.com/cyber-knowledge/grc.html#breadcrumb"},
+            "author": {"@id": "https://1200km.com/#person"},
             "inLanguage": "en",
-            "dateModified": "2026-07-25",
+            "datePublished": "2026-07-27",
+            "dateModified": "2026-07-27",
+            "proficiencyLevel": "Intermediate to advanced",
+            "about": ["Cybersecurity governance", "Cyber risk management", "Compliance", "Security assurance"],
             "primaryImageOfPage": {
               "@type": "ImageObject",
               "url": "https://1200km.com/assets/site-og-v2.png"
@@ -310,32 +512,16 @@
             "@type": "BreadcrumbList",
             "@id": "https://1200km.com/cyber-knowledge/grc.html#breadcrumb",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://1200km.com/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Cyber Knowledge",
-                "item": "https://1200km.com/cyber-knowledge/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "Governance, Risk & Compliance (GRC)",
-                "item": "https://1200km.com/cyber-knowledge/grc.html"
-              }
+              {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://1200km.com/"},
+              {"@type": "ListItem", "position": 2, "name": "Cyber Knowledge", "item": "https://1200km.com/cyber-knowledge/"},
+              {"@type": "ListItem", "position": 3, "name": "Governance, Risk & Compliance", "item": "https://1200km.com/cyber-knowledge/grc.html"}
             ]
           }
         ]
       }
     </script>
-</head>
+  </head>
   <body id="top">
-
     <!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -381,25 +567,567 @@
     <main data-pagefind-body id="main-content">
       <div class="page-hero">
         <div class="page-hero-inner">
-          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain syllabus</p>
-          <h1 class="page-title" id="grc">Governance, Risk &amp; Compliance (GRC)</h1>
-          <p class="page-lead">Risk assessment, security frameworks (NIST CSF, ISO 27001), audit, and the policy/compliance layer that funds and governs everything else.</p>
+          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain 09 · Practitioner field guide</p>
+          <h1 class="page-title" id="grc">Governance, Risk &amp; Compliance</h1>
+          <p class="page-lead">GRC is the operating system for accountable security decisions. It connects business objectives, uncertainty, authority, controls, evidence, assurance, obligations, and improvement. This guide treats compliance as a constraint and evidence need—not a substitute for security—and turns governance documents into testable operating practice.</p>
           <div class="notice" role="note">
-            <div>
-              <strong>Under construction</strong>
-              <p>This domain syllabus has not been written yet. Start with the CTI syllabus, which is live, while this page is built out.</p>
-            </div>
+            <strong>Not legal, certification, or audit advice</strong>
+            <p>Applicability, reporting duties, contractual interpretation, assessment scope, auditor independence, and certification decisions depend on organization, jurisdiction, sector, contract, and current authoritative text. Use qualified legal counsel, privacy professionals, auditors, and regulators where required. A control mapping is not proof of implementation, effectiveness, or compliance.</p>
           </div>
           <div class="page-hero-links">
-            <a class="button primary" href="/cyber-knowledge/cti.html">Read the CTI syllabus →</a>
-            <a class="button" href="/cyber-knowledge/">← Back to Cyber Knowledge</a>
+            <a class="button primary" href="#learning-path">Start the learning path</a>
+            <a class="button" href="#cases">Open case studies</a>
+            <a class="button" href="#labs">Build the labs</a>
+            <a class="button" href="/cyber-knowledge/">Cyber Knowledge index</a>
           </div>
         </div>
       </div>
 
-      <div class="placeholder-panel">
-        <h2 id="coming-soon">Coming soon</h2>
-        <p>The full zero-to-hero syllabus for Governance, Risk &amp; Compliance (GRC) — terminology, frameworks, tools, and a recommended learning order — is being written next. Check back soon, or follow the CTI domain as a model for how each syllabus page will be structured.</p>
+      <nav class="guide-nav" aria-label="Guide sections">
+        <div class="guide-nav-inner">
+          <a href="#orientation">Orientation</a>
+          <a href="#learning-path">14 modules</a>
+          <a href="#frameworks">Framework matrix</a>
+          <a href="#cases">Cases</a>
+          <a href="#labs">Labs</a>
+          <a href="#failures">Failure atlas</a>
+          <a href="#readiness">Readiness gate</a>
+          <a href="#references">References</a>
+        </div>
+      </nav>
+
+      <div class="guide-layout">
+        <aside class="toc" aria-label="Table of contents">
+          <h2>Table of contents</h2>
+          <span class="toc-group">Start here</span>
+          <ol>
+            <li><a href="#orientation">Purpose, boundaries, and outcomes</a></li>
+            <li><a href="#operating-model">GRC operating model</a></li>
+          </ol>
+          <span class="toc-group">Fourteen modules</span>
+          <ol>
+            <li><a href="#module-1">Governance and context</a></li>
+            <li><a href="#module-2">Scope, services, assets, and data</a></li>
+            <li><a href="#module-3">Scenario-based risk assessment</a></li>
+            <li><a href="#module-4">Frameworks, profiles, and crosswalks</a></li>
+            <li><a href="#module-5">Policy, standards, and exceptions</a></li>
+            <li><a href="#module-6">Control design and ownership</a></li>
+            <li><a href="#module-7">Evidence, testing, and audit</a></li>
+            <li><a href="#module-8">Legal, regulatory, and contractual duties</a></li>
+            <li><a href="#module-9">Third-party and supply-chain risk</a></li>
+            <li><a href="#module-10">Privacy and data governance</a></li>
+            <li><a href="#module-11">Resilience and incident governance</a></li>
+            <li><a href="#module-12">Metrics, reporting, and maturity</a></li>
+            <li><a href="#module-13">Cloud, DevSecOps, and product governance</a></li>
+            <li><a href="#module-14">AI governance and GRC automation</a></li>
+          </ol>
+          <span class="toc-group">Practice</span>
+          <ul>
+            <li><a href="#frameworks">Framework decision matrix</a></li>
+            <li><a href="#artifacts">Core artifact templates</a></li>
+            <li><a href="#cases">Six end-to-end cases</a></li>
+            <li><a href="#labs">Twelve-lab sequence</a></li>
+            <li><a href="#failures">Failure atlas</a></li>
+            <li><a href="#readiness">Program readiness gate</a></li>
+            <li><a href="#references">Primary references</a></li>
+          </ul>
+        </aside>
+
+        <article class="guide-content">
+          <section id="orientation">
+            <p class="section-kicker">Orientation</p>
+            <h2>Security governance should improve decisions, not generate decorative paperwork</h2>
+            <p class="section-intro">A mature GRC program helps the right person make a bounded decision with current evidence, then records ownership, conditions, due dates, and outcomes. It does not claim that a spreadsheet cell, policy signature, scanner result, framework score, or audit report proves the organization is secure.</p>
+            <div class="outcome-grid">
+              <div class="outcome-card">
+                <h3>Governance</h3>
+                <p>Set direction, authority, risk criteria, accountability, escalation paths, resource expectations, and oversight. Governance decides what must be true and who may decide when it is not.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Risk management</h3>
+                <p>Describe plausible scenarios, analyze likelihood and impact with uncertainty, choose treatment, fund work, track residual exposure, and revisit the decision when assumptions change.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Compliance</h3>
+                <p>Identify applicable legal, regulatory, contractual, policy, and standard requirements; map them to owned controls and evidence; validate rather than self-declare.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Assurance</h3>
+                <p>Evaluate whether controls are suitably designed, implemented, and operating over the relevant scope and period. Preserve method, sample, exceptions, limitations, and reviewer independence.</p>
+              </div>
+            </div>
+            <div class="term-grid" style="margin-top:14px">
+              <div><h3>Requirement</h3><p>An obligation or expected outcome from an authoritative source. Record exact source, edition, jurisdiction, applicability, effective date, owner, and interpretation.</p></div>
+              <div><h3>Control</h3><p>A specific measure intended to modify risk or achieve an outcome. A control needs an owner, frequency or trigger, implementation, evidence, test, failure response, and dependencies.</p></div>
+              <div><h3>Evidence</h3><p>A source-attributed record supporting a claim at a time and scope. Evidence quality depends on provenance, completeness, integrity, relevance, period, and reproducibility.</p></div>
+              <div><h3>Finding</h3><p>A supported gap or exception produced by a defined assessment. It is not automatically a risk rating; connect it to affected objectives, scenarios, controls, owners, and remediation.</p></div>
+            </div>
+          </section>
+
+          <section id="operating-model">
+            <p class="section-kicker">Operating model</p>
+            <h2>One traceable chain from objective to evidence</h2>
+            <p class="section-intro">Use a durable relationship rather than isolated documents: business objective → service or decision scope → scenario → requirement or risk criterion → control objective → control implementation → evidence → test → exception or finding → treatment → accountable decision → continuous monitoring.</p>
+            <div class="table-scroll" role="region" aria-label="GRC operating model table" tabindex="0">
+              <table>
+                <thead><tr><th>Layer</th><th>Question</th><th>Minimum record</th><th>Failure to avoid</th></tr></thead>
+                <tbody>
+                  <tr><td>Direction</td><td>What outcome matters and what level of uncertainty is acceptable?</td><td>Objective, risk appetite/tolerance, decision authority, escalation threshold</td><td>Generic “zero risk” statements that cannot guide trade-offs</td></tr>
+                  <tr><td>Context</td><td>Which service, data, people, provider, and jurisdiction are in scope?</td><td>Boundary, owners, dependencies, classification, environment, assumptions</td><td>Scoring a control without knowing what it protects</td></tr>
+                  <tr><td>Scenario</td><td>What could happen, through which conditions, and with what consequence?</td><td>Threat event, path, affected objective, existing controls, likelihood/impact ranges</td><td>Treating every vulnerability or audit exception as the same risk</td></tr>
+                  <tr><td>Control</td><td>What measure changes the scenario or fulfills an obligation?</td><td>Objective, implementation, owner, frequency, dependencies, expected evidence</td><td>Copying framework text as if it were an implemented control</td></tr>
+                  <tr><td>Assurance</td><td>How do we know it was designed and operated as claimed?</td><td>Test method, population, sample, period, evidence, result, limitation</td><td>Accepting a screenshot without provenance or period coverage</td></tr>
+                  <tr><td>Decision</td><td>What response is authorized, funded, time-bounded, and monitored?</td><td>Treatment, owner, approver, due date, residual risk, triggers, next review</td><td>Calling inactivity “risk acceptance” without authority or expiry</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="learning-path">
+            <p class="section-kicker">Learning path</p>
+            <h2>Fourteen-module GRC practitioner sequence</h2>
+            <p class="section-intro">Complete the modules in order for a new program. Experienced teams can use them as an assessment map, but the dependencies remain: controls without context are arbitrary, evidence without a claim is noise, and metrics without a decision are reporting theatre.</p>
+
+            <div class="module" id="module-1">
+              <div class="module-header"><div><h3>Governance, organizational context, and accountable authority</h3></div><span class="module-number">Module 01</span></div>
+              <p>Start with mission, strategy, customers, critical services, safety and privacy consequences, financial constraints, external obligations, and the decisions leaders need to make. Define governance bodies by purpose: board or governing authority oversight, executive ownership, enterprise-risk integration, security leadership, service ownership, control ownership, independent assurance, and operational execution.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Decision rights</h4><p>For risk treatment, policy approval, exceptions, emergency change, supplier onboarding, incident declaration, regulatory notification, evidence release, and production acceptance, name who recommends, who decides, who executes, who must be consulted, and who must be informed. A RACI can support this, but it does not replace explicit approval thresholds or delegated authority.</p></div>
+                <div class="practice-block"><h4>Risk appetite and tolerance</h4><p>Translate broad statements into scenario-aware boundaries: affected service tier, data class, maximum outage, concentration, loss range, user harm, safety impact, legal exposure, compensating conditions, and escalation threshold. Keep appetite—the amount and type of risk an organization is willing to pursue or retain—distinct from operational tolerance and a specific acceptance.</p></div>
+              </div>
+              <div class="workflow"><strong>Workflow:</strong> interview business and technical owners; record objectives and critical decisions; map governance forums; define decision and escalation rights; document risk criteria; test the model against three realistic scenarios; approve and publish the operating charter.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> governance charter, authority matrix, meeting cadence, risk criteria, approved appetite/tolerance statements, escalation path, decision log, and proof that actions are assigned and followed.</div>
+              <div class="boundary"><strong>Boundary:</strong> “Three lines” and committee structures are organizing concepts, not universal legal requirements. Adapt independence and accountability to the organization while preserving clear ownership and challenge.</div>
+              <div class="acceptance"><strong>Accept when:</strong> a real scenario can be routed to one accountable decision-maker, with known consultation, threshold, evidence, due date, and oversight.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://www.nist.gov/publications/nist-cybersecurity-framework-csf-20" target="_blank" rel="noopener noreferrer">NIST CSF 2.0</a> · <a href="https://www.coso.org/enterprise-risk-management" target="_blank" rel="noopener noreferrer">COSO Enterprise Risk Management</a></p>
+            </div>
+
+            <div class="module" id="module-2">
+              <div class="module-header"><div><h3>Scope, business services, assets, dependencies, and data</h3></div><span class="module-number">Module 02</span></div>
+              <p>GRC scope is not a list of hostnames. Model the business service and the technical, human, physical, supplier, identity, data, and recovery dependencies required to deliver it. Record legal entities, locations, jurisdictions, customers, environments, trust boundaries, shared services, inherited controls, exclusions, and the rationale for each boundary.</p>
+              <ul>
+                <li><strong>Service map:</strong> owner, users, business process, availability and integrity needs, data inputs/outputs, upstream/downstream services, manual fallback, peak periods, and recovery dependencies.</li>
+                <li><strong>Asset and identity inventory:</strong> authoritative source, immutable identifier, lifecycle state, environment, owner, administrator, exposure, technology, version where material, and last verification.</li>
+                <li><strong>Data inventory:</strong> category, subject or source, purpose, legal basis where applicable, sensitivity, residency, processor/controller role, access, flow, retention, deletion, backup, and transfer.</li>
+                <li><strong>Boundary record:</strong> included/excluded components, shared responsibility, external services, assumptions, constraints, diagrams, change trigger, and approver.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> select a business service; reconcile CMDB/cloud/identity/source repositories; draw data and trust flows; trace the authentication, deployment, telemetry, backup, and supplier paths; validate with owners; record unknowns as gaps rather than inferred facts.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> dated service and data-flow diagrams, inventory exports, ownership attestations backed by system records, dependency list, scope statement, exclusion rationale, and reconciliation report.</div>
+              <div class="boundary"><strong>Boundary:</strong> ownership cannot be inferred from a public IP, DNS name, account label, or billing tag alone. Shared infrastructure and aliases require provider/account/resource evidence.</div>
+              <div class="acceptance"><strong>Accept when:</strong> an assessor and incident responder can identify what is protected, why it matters, who owns it, where data flows, which controls are inherited, and what remains unknown.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/cyber-knowledge/cloud-security.html">Cloud Security field guide</a> · <a href="/ITDR/docs/identity-foundations/identity-attack-surface/">Identity attack surface</a></p>
+            </div>
+
+            <div class="module" id="module-3">
+              <div class="module-header"><div><h3>Scenario-based cyber risk assessment and treatment</h3></div><span class="module-number">Module 03</span></div>
+              <p>A useful risk statement connects a cause and threat event to an affected service or objective through conditions and control performance, then describes consequences. “Critical CVE,” “vendor risk,” or “phishing” is not enough. Use ranges and confidence where data is uncertain; do not manufacture precision with arbitrary multiplication.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Analysis structure</h4><p>Record scenario, threat source/event, vulnerabilities or predisposing conditions, exposed assets, affected objectives, existing controls and effectiveness, likelihood reasoning, impact dimensions, time horizon, uncertainty, evidence, assumptions, and plausible alternatives. Keep inherent, current/residual, and target states clearly defined.</p></div>
+                <div class="practice-block"><h4>Treatment choices</h4><p>Avoid, reduce, transfer/share, or retain/accept risk. Each response needs an accountable owner, funded actions, dependencies, due date, interim controls, target state, residual exposure, approval authority, monitoring indicators, review/expiry date, and triggers for reopening.</p></div>
+              </div>
+              <h4>Qualitative and quantitative methods</h4>
+              <p>Qualitative scales can support prioritization when definitions, examples, calibration, and uncertainty are explicit. Quantitative analysis can use ranges for event frequency and loss magnitude, scenario simulation, and sensitivity analysis. Neither method removes judgment. Preserve source quality, model assumptions, correlation, tail conditions, and the decision the estimate supports.</p>
+              <div class="workflow"><strong>Workflow:</strong> frame purpose and decision → set scope/time horizon → build scenarios from threat, architecture, incident, supplier, and control evidence → estimate with documented scales/ranges → challenge assumptions → compare response options → approve treatment → monitor indicators and triggers.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> scenario record, source citations, model/version, scale definitions, workshops and participants, uncertainty, treatment plan, approval, residual risk, and next review.</div>
+              <div class="boundary"><strong>Boundary:</strong> CVSS estimates technical vulnerability severity under defined assumptions. It is not business risk, proof of exposure, exploitability in the local environment, or the organization’s loss estimate.</div>
+              <div class="acceptance"><strong>Accept when:</strong> another reviewer can reproduce the reasoning, identify the assumptions that drive the result, and understand why the selected treatment is proportionate.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://csrc.nist.gov/pubs/sp/800/30/r1/final" target="_blank" rel="noopener noreferrer">NIST SP 800-30 Rev. 1</a> · <strong>1200km:</strong> <a href="/adversarygraph-docs/use-cases/defense-executive-risk-coverage-report/">AdversaryGraph executive risk and coverage report</a></p>
+            </div>
+
+            <div class="module" id="module-4">
+              <div class="module-header"><div><h3>Frameworks, profiles, baselines, and crosswalk discipline</h3></div><span class="module-number">Module 04</span></div>
+              <p>Select a framework because it supports a decision or obligation, not because it is popular. NIST CSF 2.0 describes high-level cybersecurity outcomes; ISO/IEC 27001:2022 defines requirements for an information security management system; ISO/IEC 27002:2022 provides control guidance; NIST RMF and SP 800-53/53A provide a structured control lifecycle and assessment resources; CIS Controls v8.1 offers a prioritized safeguard set. These artifacts serve different purposes.</p>
+              <ul>
+                <li>Create a <strong>Current Profile</strong> from evidenced outcomes and a <strong>Target Profile</strong> from business need, threat, obligation, and risk—not from a desire for every cell to be “fully implemented.”</li>
+                <li>Use tiers or maturity models to characterize process rigor only when criteria are defined. Do not convert them into certification or universal security grades.</li>
+                <li>Crosswalk at the outcome level, preserve direction and edition, and document partial/conditional relationships. One source requirement may map to several controls; one control may support several outcomes.</li>
+                <li>Keep authoritative source text and licensed content under its terms. Store identifiers and organization-specific implementation statements without reproducing restricted standards improperly.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> define use case → choose authoritative edition → scope outcomes → build current evidence-based profile → identify target outcomes → map organization controls → record relationship strength and caveat → review with control owners and qualified assessors → version and maintain.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> source register, editions, licensing notes, profile, crosswalk, mapping rationale, control catalogue, gap decisions, owner review, and change log.</div>
+              <div class="boundary"><strong>Boundary:</strong> mapping “control A supports requirement B” is not a conclusion that A is designed suitably, operating effectively, or sufficient for B. Never advertise mapped coverage as certification.</div>
+              <div class="acceptance"><strong>Accept when:</strong> each priority outcome links to an owned implementation and testable evidence, while partial mappings and unsupported outcomes remain visible.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener noreferrer">NIST CSF 2.0 resources</a> · <a href="https://www.iso.org/standard/27001" target="_blank" rel="noopener noreferrer">ISO/IEC 27001:2022</a> · <a href="https://www.cisecurity.org/controls/v8-1" target="_blank" rel="noopener noreferrer">CIS Controls v8.1</a></p>
+            </div>
+
+            <div class="module" id="module-5">
+              <div class="module-header"><div><h3>Policy architecture, standards, procedures, and exceptions</h3></div><span class="module-number">Module 05</span></div>
+              <p>Build a document hierarchy in which each layer has a distinct job. Policy sets mandatory direction and authority. Standards define measurable requirements. Procedures describe execution. Guidelines provide optional advice. Control records describe how an outcome is achieved. Runbooks guide time-sensitive work. Records prove what happened. Avoid copying technical configuration into policy or writing a policy so vague that no exception can be detected.</p>
+              <ul>
+                <li><strong>Policy metadata:</strong> owner, approver, purpose, scope, audience, authority, mandatory statements, roles, exceptions, enforcement, related documents, effective/review dates, and version.</li>
+                <li><strong>Standard language:</strong> testable subject, action, object, condition, threshold, frequency, evidence, and accountable role. Replace “regularly,” “appropriate,” and “where possible” with defined criteria or a documented risk decision.</li>
+                <li><strong>Exception workflow:</strong> exact requirement, scope, business rationale, scenario, interim controls, exposure, approver, owner, expiry, review trigger, remediation, and closure evidence.</li>
+                <li><strong>Lifecycle:</strong> draft, expert review, stakeholder consultation, approval, publication, acknowledgement/training where needed, implementation, monitoring, exception, scheduled/event-driven review, supersession, and archive.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> map requirements and risks → draft outcome-focused policy → derive measurable standards → validate operational feasibility → approve → publish in one controlled repository → connect controls/tests → monitor exceptions and review triggers.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> approved version, revision history, distribution, acknowledgements where meaningful, implementation records, exception register, superseded archive, and review decisions.</div>
+              <div class="boundary"><strong>Boundary:</strong> an employee acknowledgement proves receipt or an action in a system; it does not prove understanding, control performance, or legally valid consent for unrelated processing.</div>
+              <div class="acceptance"><strong>Accept when:</strong> a scoped team can determine the applicable rule, implement it, produce evidence, request a time-bounded exception, and identify the current authoritative version.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/privacy.html">Privacy and Data Handling policy</a> · <a href="/cyber-knowledge/secure-code.html">Secure Code field guide</a></p>
+            </div>
+
+            <div class="module" id="module-6">
+              <div class="module-header"><div><h3>Control design, ownership, inheritance, and lifecycle</h3></div><span class="module-number">Module 06</span></div>
+              <p>A control record should describe an actual mechanism rather than repeat a framework sentence. Separate preventive, detective, corrective, recovery, deterrent, and governance intent; manual, automated, and hybrid operation; entity-level, common, inherited, and system-specific responsibility; and design suitability from implementation and operating effectiveness.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Control specification</h4><p>Unique ID; objective; risk/requirement links; scoped population; owner/operator; mechanism; frequency or trigger; system/source; prerequisites; input; expected output; evidence; test; thresholds; exception/failure response; dependencies; change trigger; and retirement criteria.</p></div>
+                <div class="practice-block"><h4>Ownership model</h4><p>The control owner is accountable for design and performance; operators execute; service owners own service risk; evidence custodians preserve records; assessors evaluate; risk owners decide treatment. Combining roles may be necessary in a small organization, but conflicts and independent challenge should be documented.</p></div>
+              </div>
+              <p>For automated controls, validate code/configuration version, target population, permissions, scheduler/trigger, failure mode, monitoring, excluded resources, data freshness, and change control. For manual controls, define population completeness, sampling, reviewer competency, segregation, timing, evidence, and escalation. Inherited controls require a service description, provider responsibility, customer responsibility, applicability condition, and evidence route.</p>
+              <div class="workflow"><strong>Workflow:</strong> start from a scenario or requirement → define control objective → choose mechanism → assign owner and operator → identify population/dependencies → define evidence and test → implement → baseline → assess design → monitor operation → handle exceptions → retire only after dependencies move.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> approved control record, configuration/code reference, population source, operator record, system-generated output, test result, exception/failure response, and owner review.</div>
+              <div class="boundary"><strong>Boundary:</strong> “automated” does not mean complete or reliable. Automation can consistently execute the wrong logic against an incomplete population and produce persuasive bad evidence.</div>
+              <div class="acceptance"><strong>Accept when:</strong> the control’s objective, population, mechanism, owner, evidence, test, failure response, and dependencies are explicit enough for an independent reviewer to assess.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://csrc.nist.gov/pubs/sp/800/37/r2/final" target="_blank" rel="noopener noreferrer">NIST SP 800-37 Rev. 2</a> · <a href="https://csrc.nist.gov/pubs/sp/800/53/a/r5/final" target="_blank" rel="noopener noreferrer">NIST SP 800-53A Rev. 5</a></p>
+            </div>
+
+            <div class="module" id="module-7">
+              <div class="module-header"><div><h3>Evidence engineering, control testing, audit, and assurance</h3></div><span class="module-number">Module 07</span></div>
+              <p>Design evidence with the control, not just before an audit. A good evidence object supports a precise claim and carries source, collection method, actor/system, timestamp and period, scope/population, integrity or repository controls, retention/classification, and interpretation limits. Screenshots can explain context; structured source exports and reproducible queries are usually stronger for population and period claims.</p>
+              <ul>
+                <li><strong>Design assessment:</strong> would the specified control, if performed as designed, reasonably achieve the objective within scope?</li>
+                <li><strong>Implementation assessment:</strong> is the control deployed and configured in the relevant population?</li>
+                <li><strong>Operating assessment:</strong> did it operate with sufficient consistency, frequency, quality, and response during the assessment period?</li>
+                <li><strong>Evidence test:</strong> provenance, completeness, accuracy, relevance, period, population, access, change history, and reproducibility.</li>
+                <li><strong>Finding record:</strong> criterion, condition, cause, consequence/risk relationship, evidence, scope, severity method, owner response, action, due date, validation, and closure authority.</li>
+              </ul>
+              <p>Define the population before choosing samples. Explain sampling method, size, coverage, period, and limitations; investigate exceptions rather than silently substituting another item. Preserve positive and negative evidence. A “no exception” result is bounded by the test design and evidence, not proof that no failure exists.</p>
+              <div class="workflow"><strong>Workflow:</strong> define objective and criteria → establish scope/population/period → assess independence and competency → design procedures → request evidence securely → validate source and completeness → test → discuss factual accuracy without negotiating evidence away → report → track → independently validate closure.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> assessment plan, criteria/edition, independence declaration, population, sample rationale, workpapers, source references, exceptions, review notes, report, management response, and closure test.</div>
+              <div class="boundary"><strong>Boundary:</strong> a SOC report or certification is scoped assurance, not a guarantee. Review report type, system description, period, auditor opinion, exceptions, subservice method, complementary user-entity controls, and whether your service/use is covered.</div>
+              <div class="acceptance"><strong>Accept when:</strong> a reviewer can trace each conclusion to protected evidence and reproduce the test, while limitations, exceptions, and management decisions remain visible.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://www.aicpa-cima.com/soc" target="_blank" rel="noopener noreferrer">AICPA SOC suite overview</a> · <strong>1200km:</strong> <a href="/external-validation.html">External validation register</a> · <a href="/adversarygraph-docs/observability-security-validation/">AdversaryGraph security validation</a></p>
+            </div>
+
+            <div class="module" id="module-8">
+              <div class="module-header"><div><h3>Legal, regulatory, contractual, and sector obligations</h3></div><span class="module-number">Module 08</span></div>
+              <p>Create an obligations register with counsel and qualified specialists. For every source, record official title, jurisdiction, entity/product/service applicability, role, relevant provision, effective/application dates, regulator or counterparty, interpretation owner, required outcome, reporting/notification route, record retention, evidence, mapped controls, and change monitoring. Do not rely on marketing summaries as the source of truth.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Applicability analysis</h4><p>Separate “we operate in a region,” “we offer a regulated service,” “we process covered data,” “a contract incorporates a standard,” and “an assessor/counterparty requires evidence.” Document legal entity and service scope, thresholds, exemptions, national implementation, cross-border effects, customer role, and legal interpretation.</p></div>
+                <div class="practice-block"><h4>Notification governance</h4><p>Predefine who recognizes a potentially reportable event, preserves facts, contacts counsel/privacy/regulatory teams, determines the applicable clock, approves content, coordinates customer/provider duties, records decisions, updates notices, and protects privilege where applicable. Do not hard-code one deadline across all regimes.</p></div>
+              </div>
+              <p>Examples that may be relevant depending on context include Regulation (EU) 2016/679 (GDPR), Directive (EU) 2022/2555 (NIS2 and national transposition), Regulation (EU) 2022/2554 (DORA, applicable since 17 January 2025), and PCI DSS v4.0.1 for scoped account-data environments and validation arrangements. They differ in legal character, scope, roles, requirements, assurance, and enforcement.</p>
+              <div class="workflow"><strong>Workflow:</strong> collect official and contractual sources → determine applicability with owners/counsel → extract obligations without losing context → map to controls/evidence → identify conflicts/gaps → approve interpretations → monitor changes → test reporting and record-keeping paths.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> authoritative source links/copies where permitted, applicability memo, obligations register, counsel/owner review, control mapping, notification matrix, contract clauses, assessment records, and change log.</div>
+              <div class="boundary"><strong>Boundary:</strong> this guide does not determine applicability or legal sufficiency. Framework implementation, certification, and technical controls do not by themselves establish compliance with law or contract.</div>
+              <div class="acceptance"><strong>Accept when:</strong> each applicable obligation has an interpretation owner, controlled mapping, operating evidence, change monitor, and tested escalation/notification path.</div>
+              <p class="further-reading"><strong>Official:</strong> <a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener noreferrer">GDPR</a> · <a href="https://eur-lex.europa.eu/eli/dir/2022/2555/oj?locale=en" target="_blank" rel="noopener noreferrer">NIS2</a> · <a href="https://eur-lex.europa.eu/eli/reg/2022/2554/oj" target="_blank" rel="noopener noreferrer">DORA</a> · <a href="https://www.pcisecuritystandards.org/document_library/?class=pcidss&amp;doc=pci_dss" target="_blank" rel="noopener noreferrer">PCI DSS v4.0.1 library</a></p>
+            </div>
+
+            <div class="module" id="module-9">
+              <div class="module-header"><div><h3>Third-party, service-provider, and software supply-chain risk</h3></div><span class="module-number">Module 09</span></div>
+              <p>Manage suppliers according to service criticality, data, access, integration, concentration, substitution difficulty, fourth parties, geography, financial/operational dependency, and failure scenario—not one universal questionnaire. Cover the complete lifecycle: demand, selection, due diligence, contracting, onboarding, operation/change, incident, renewal, exit, data return/destruction, and residual access removal.</p>
+              <ul>
+                <li><strong>Pre-contract:</strong> service architecture, data flow, identities/integration, development and update path, hosting, subprocessors, resilience, incident history where available, assurance reports, vulnerability handling, and regulatory/customer duties.</li>
+                <li><strong>Contract:</strong> security/privacy obligations, permitted use, audit/evidence rights, incident cooperation and notification, vulnerability disclosure, logging, retention, subprocessor change, location/transfer, continuity, deletion/return, termination assistance, liability negotiated by authorized parties, and conflict precedence.</li>
+                <li><strong>Continuous monitoring:</strong> material service/product changes, ownership, control reports, exceptions, certificates, incidents, exposed assets, critical vulnerabilities, dependencies, financial/operational signals, fourth-party concentration, and remediation commitments.</li>
+                <li><strong>Software supply chain:</strong> source and build controls, dependencies, provenance, signed artifacts, SBOM where useful, vulnerability response, maintainer/project risk, distribution/update integrity, and reproducible evidence.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> classify service → build scenario-led due diligence → verify evidence → document open conditions → negotiate controls → approve by risk authority → onboard with minimum access → monitor → reassess on change → execute tested exit and deletion.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> inventory, criticality rationale, data/architecture flow, assessment, assurance reports and review, contract requirements, exceptions, monitoring records, incidents, access inventory, exit/deletion proof, and residual-risk decision.</div>
+              <div class="boundary"><strong>Boundary:</strong> a questionnaire response, certificate, penetration-test summary, or public security page is evidence input—not proof that your exact service, configuration, data, and use are covered.</div>
+              <div class="acceptance"><strong>Accept when:</strong> critical suppliers have an accountable owner, verified service boundary, scenario-led controls, contract route, monitored dependencies, incident path, and executable exit plan.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final" target="_blank" rel="noopener noreferrer">NIST SP 800-161 Rev. 1</a> · <a href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener noreferrer">NIST SSDF 1.1</a> · <strong>1200km:</strong> <a href="/cyber-knowledge/secure-code.html">Secure Code supply-chain modules</a></p>
+            </div>
+
+            <div class="module" id="module-10">
+              <div class="module-header"><div><h3>Privacy engineering and data governance</h3></div><span class="module-number">Module 10</span></div>
+              <p>Privacy and security overlap but are not equivalent. A confidential, accurate, available system can still create privacy risk through unjustified collection, incompatible use, excessive retention, opaque decisions, re-identification, unwanted observation, unfair impact, or inability to exercise rights. Connect privacy governance to product, legal, data, security, procurement, AI, and incident lifecycles.</p>
+              <ul>
+                <li>Maintain processing and data inventories by purpose, source, categories, people affected, legal basis/authority where applicable, recipients, transfers, decisions, retention, rights, controls, and owner.</li>
+                <li>Use privacy-by-design gates for purpose specification, data minimization, access, transparency, user choice where appropriate, accuracy, retention/deletion, de-identification, model/training use, monitoring, and change.</li>
+                <li>Conduct impact assessments when organizational or legal criteria are met. Describe the processing, necessity/proportionality, people and potential harms, stakeholder input, measures, residual risk, approval, and review triggers.</li>
+                <li>Test deletion across primary stores, indexes, caches, exports, analytics, model/RAG stores, backups under policy, and supplier systems. Record exceptions and restoration behavior.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> map purpose and data flow → identify roles/obligations → assess privacy risks to people → minimize/design controls → approve → implement → test rights/retention/incident paths → monitor new uses, integrations, and model behavior.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> processing register, data map, classification, impact assessment, notices/consent or other basis records as applicable, retention schedule, rights cases, access review, deletion test, vendor terms, and incident decisions.</div>
+              <div class="boundary"><strong>Boundary:</strong> consent is not the universal basis for processing, encryption is not complete privacy governance, and anonymization should not be claimed without a robust context-specific re-identification assessment.</div>
+              <div class="acceptance"><strong>Accept when:</strong> the organization can explain why data is used, where it moves, who can act on it, how long it persists, which risks affect people, and how controls and rights operate in practice.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://www.nist.gov/privacy-framework/privacy-framework" target="_blank" rel="noopener noreferrer">NIST Privacy Framework</a> · <strong>1200km:</strong> <a href="/privacy.html">Privacy and Data Handling</a></p>
+            </div>
+
+            <div class="module" id="module-11">
+              <div class="module-header"><div><h3>Operational resilience, continuity, crisis, and incident governance</h3></div><span class="module-number">Module 11</span></div>
+              <p>Resilience governance begins with business impact and service dependency, then connects prevention, detection, response, recovery, communication, and learning. RTO and RPO are business requirements or targets, not facts until architecture and tests demonstrate capability. A backup job success event is not proof of recoverability.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Business impact analysis</h4><p>Identify service, maximum tolerable disruption, impact over time, minimum service level, recovery sequence, people, facilities, technology, data, suppliers, manual workarounds, peak/blackout periods, interdependencies, RTO/RPO targets, and decision owners.</p></div>
+                <div class="practice-block"><h4>Incident and crisis authority</h4><p>Define declaration criteria, incident commander, technical/forensic/legal/privacy/regulatory/customer roles, evidence handling, containment authority, emergency access/change, communications approval, notification analysis, executive escalation, recovery acceptance, and post-incident action governance.</p></div>
+              </div>
+              <p>Exercise plans at increasing depth: discussion tabletop, communications drill, technical failover, restore test, supplier interruption, identity/control-plane compromise, data-corruption recovery, and full service exercise where safe. Record assumptions, injected facts, decisions, timing, observed capability, safety stops, gaps, owners, and retest.</p>
+              <div class="workflow"><strong>Workflow:</strong> conduct BIA → define continuity/recovery strategy → build plans/runbooks → establish crisis and incident authority → protect recovery assets → exercise → measure actual recovery → remediate → retest → update risk and obligations.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> approved BIA, dependency map, plans, contact/authority records, backup immutability/access proof, restoration records, actual RTO/RPO results, exercise log, communications, findings, and closure tests.</div>
+              <div class="boundary"><strong>Boundary:</strong> tabletop success shows that participants discussed a scenario under exercise conditions. It does not prove technical recovery, provider capacity, data integrity, or real-incident behavior.</div>
+              <div class="acceptance"><strong>Accept when:</strong> priority services have tested recovery paths and leaders can make time-critical declarations, containment, communications, notification, and recovery decisions with current evidence.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/cyber-knowledge/dfir.html">DFIR field guide</a> · <a href="/cyber-knowledge/blue-team.html">Blue Team field guide</a> · <a href="/adversarygraph-docs/attack-simulation/">AdversaryGraph attack simulation and validation</a></p>
+            </div>
+
+            <div class="module" id="module-12">
+              <div class="module-header"><div><h3>Metrics, KRIs, reporting, and maturity without vanity scores</h3></div><span class="module-number">Module 12</span></div>
+              <p>A metric should support an owner’s decision. Define purpose, audience, decision/action threshold, numerator/denominator, population, source, query or calculation, units, cadence, owner, target/range, data-quality rule, segmentation, limitations, and anti-gaming review. Pair lagging outcomes with leading indicators and control health; show uncertainty and denominator changes.</p>
+              <ul>
+                <li><strong>Risk indicators:</strong> changes in exposure or assumptions—critical supplier concentration, unsupported critical services, privileged identities outside controls, recovery gaps, control failures, open exceptions beyond tolerance.</li>
+                <li><strong>Performance indicators:</strong> service/process execution—assessment cycle time, remediation flow, evidence freshness, control-test completion, response/recovery time, supplier reassessment coverage.</li>
+                <li><strong>Effectiveness measures:</strong> whether the control changes the scenario—validated attack detection, restore success and integrity, prevented unauthorized action, reduced exploitable path, decision accuracy.</li>
+                <li><strong>Assurance indicators:</strong> population coverage, evidence failure, exception recurrence, sample exception rate with caveats, stale ownership, untested control changes, closure validation quality.</li>
+              </ul>
+              <p>Use maturity to discuss repeatability, integration, measurement, adaptation, and governance—not to replace scenario risk. An average score hides critical weaknesses and assumes arbitrary arithmetic between unlike outcomes. Report priority exceptions, trend, scenario exposure, decisions needed, and conditions that would change the conclusion.</p>
+              <div class="workflow"><strong>Workflow:</strong> identify decision/audience → define measure and action threshold → validate source/population → baseline → review for perverse incentives → publish with context → record decision/action → test whether the metric improved outcomes → retire metrics that do not.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> metric dictionary, source/query/version, data-quality checks, dashboard/report snapshot, narrative limits, meeting decision, assigned action, and follow-up outcome.</div>
+              <div class="boundary"><strong>Boundary:</strong> counts of policies, controls, tools, alerts, training completions, or green framework cells are not security outcomes without an explicit relationship to risk, effectiveness, and decisions.</div>
+              <div class="acceptance"><strong>Accept when:</strong> every executive metric has a named decision owner and threshold, can be reproduced from governed data, and produces a recorded action or is retired.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/adversarygraph-docs/use-cases/defense-executive-risk-coverage-report/">Executive risk and coverage report</a> · <a href="/adversarygraph-docs/case-studies-validation/">Validation case studies</a></p>
+            </div>
+
+            <div class="module" id="module-13">
+              <div class="module-header"><div><h3>Cloud, DevSecOps, product, and control-as-code governance</h3></div><span class="module-number">Module 13</span></div>
+              <p>Modern control evidence often lives in cloud APIs, source control, CI/CD, identity providers, infrastructure code, artifact registries, deployment systems, telemetry, and issue trackers. Govern the change path rather than collecting an annual screenshot. Preserve provider/account/project, resource identity, code and policy version, actor/workload identity, review, build provenance, deployment, exceptions, and runtime result.</p>
+              <ul>
+                <li><strong>Cloud:</strong> organization hierarchy, landing zones, guardrails, workload identity, shared responsibility, inherited/customer controls, logging, regions/residency, provider changes, break-glass, and exit.</li>
+                <li><strong>Product governance:</strong> security requirements, threat model, abuse cases, privacy/data review, architecture decision, secure development practices, dependency/provenance, testing, release acceptance, vulnerability response, and end of life.</li>
+                <li><strong>Policy/control as code:</strong> versioned requirement, typed input, deterministic evaluation, test fixtures, exceptions, deployment scope, failure mode, monitoring, evidence output, rollback, and human decision for ambiguous cases.</li>
+                <li><strong>Release evidence:</strong> exact commit/artifact digest, build environment, dependencies, tests, findings/waivers, approvals, image/deployment identity, rollout health, and rollback readiness.</li>
+              </ul>
+              <p>Automated evidence collection should use least-privileged read access, documented APIs, bounded populations, secure secret handling, immutable timestamps where possible, schema validation, failure alerts, and reconciliation. Never infer “not applicable” from a missing API result; distinguish absent, inaccessible, unsupported, stale, and failed.</p>
+              <div class="workflow"><strong>Workflow:</strong> define outcome → identify system-of-record source → encode guardrail/test → validate against positive/negative fixtures → deploy with monitor/rollback → capture structured evidence → route exception → correlate runtime effectiveness → review when code/provider/service changes.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> architecture/threat model, source commit, review, policy/test version, CI result, artifact provenance, deployment record, cloud audit/resource ID, runtime validation, exception, and rollback exercise.</div>
+              <div class="boundary"><strong>Boundary:</strong> a successful pipeline means the configured jobs passed for that source and environment. It does not prove complete requirements, trustworthy dependencies, production equivalence, or absence of unknown vulnerabilities.</div>
+              <div class="acceptance"><strong>Accept when:</strong> one production release can be traced from approved requirement through code, build, artifact, deployment, runtime control, evidence, and rollback without manual reconstruction.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/cyber-knowledge/cloud-security.html">Cloud Security</a> · <a href="/cyber-knowledge/secure-code.html">Secure Code</a> · <a href="/adversarygraph-docs/security/">AdversaryGraph security model</a> · <a href="/adversarygraph-docs/observability-security-validation/">Release/security validation</a></p>
+            </div>
+
+            <div class="module" id="module-14">
+              <div class="module-header"><div><h3>AI governance, machine-readable controls, and safe GRC automation</h3></div><span class="module-number">Module 14</span></div>
+              <p>Govern AI as a socio-technical system and a supplier/data/tool chain. Inventory use cases, models/providers, versions, data, retrieval sources, prompts/policies, users, decisions, outputs, integrations, agents/tools, evaluation, monitoring, and retirement. Classify whether AI summarizes, recommends, ranks, generates, retrieves, or acts; the authority and harm model changes across those roles.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>AI risk record</h4><p>Purpose and prohibited uses; affected people/services; decision significance; model/provider; data lineage and authorization; privacy/IP/security/safety/fairness risks; threat model; human oversight; evaluation set and thresholds; failure handling; transparency; incident/appeal; monitoring; change and retirement.</p></div>
+                <div class="practice-block"><h4>GRC assistant guardrails</h4><p>Approved sources and access control before retrieval; source/version citations; prompt-injection isolation; no invented control status; structured output schemas; confidence/unknown fields; human review; no autonomous acceptance/closure; data minimization; audit trail; provider policy; cost and kill switch.</p></div>
+              </div>
+              <p>Use machine-readable structures to improve consistency, not to automate accountability away. NIST OSCAL provides XML, JSON, and YAML models for catalogues, profiles, system security plans, assessment plans/results, and plans of action and milestones. Adoption requires schema/version governance, identifiers, validation, access controls, mappings, source preservation, and integration ownership.</p>
+              <p>An AI assistant may draft a control description, summarize evidence, propose a mapping, find inconsistent dates, or generate assessment questions. It must not assert that a control operates, a requirement applies, a risk is accepted, or a finding is closed without authorized evidence and decision. Evaluate citation accuracy, omission, unsupported inference, stale sources, permission leakage, prompt injection, repeatability, and reviewer overreliance.</p>
+              <div class="workflow"><strong>Workflow:</strong> inventory use case → classify decision/effect → map data and tool paths → assess risks/obligations → define policy and human authority → evaluate offline → approve limited deployment → monitor quality/security/cost → incident and rollback test → reassess on model, prompt, data, tool, or provider change.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> AI system card, inventory, source/model/prompt/tool versions, access policy, data approval, evaluation datasets/results, red-team findings, reviewer decisions, output citations, incident logs, provider changes, and retirement/deletion proof.</div>
+              <div class="boundary"><strong>Boundary:</strong> NIST AI RMF 1.0 is voluntary and is being revised. A framework mapping, model benchmark, vendor assurance statement, or “human in the loop” label does not establish legal compliance or effective oversight.</div>
+              <div class="acceptance"><strong>Accept when:</strong> the organization can identify every material AI use, reconstruct one output and tool action, prove source access, show evaluation and reviewer authority, stop the system, and correct downstream records.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer">NIST AI RMF</a> · <a href="https://csrc.nist.gov/projects/open-security-controls-assessment-language" target="_blank" rel="noopener noreferrer">NIST OSCAL</a> · <strong>1200km:</strong> <a href="/adversarygraph-docs/unified-rag-mcp/">AdversaryGraph Unified RAG and MCP</a></p>
+            </div>
+          </section>
+
+          <section id="frameworks">
+            <p class="section-kicker">Framework decision support</p>
+            <h2>Choose the artifact for the job</h2>
+            <p class="section-intro">This is a use-oriented comparison, not a cross-certification claim. Confirm the current authoritative edition, license, sector profile, and assessment expectations before adoption.</p>
+            <div class="table-scroll" role="region" aria-label="GRC frameworks comparison" tabindex="0">
+              <table>
+                <thead><tr><th>Source</th><th>Primary role</th><th>Useful output</th><th>Do not claim</th></tr></thead>
+                <tbody>
+                  <tr><td>NIST CSF 2.0</td><td>High-level cybersecurity outcomes across Govern, Identify, Protect, Detect, Respond, Recover</td><td>Organizational Current/Target Profiles, priorities, communication, tier context</td><td>That a profile or tier is certification, a prescribed control implementation, or proof of effectiveness</td></tr>
+                  <tr><td>ISO/IEC 27001:2022</td><td>Requirements for establishing, implementing, maintaining, and continually improving an ISMS</td><td>ISMS scope, risk process, objectives, controlled management-system evidence</td><td>Certification without an accredited certification process and exact certified scope</td></tr>
+                  <tr><td>ISO/IEC 27002:2022</td><td>Information security control guidance</td><td>Control design/reference input tailored to risks and context</td><td>That guidance copied into a catalogue is implemented or sufficient</td></tr>
+                  <tr><td>NIST RMF / SP 800-53 / 53A</td><td>Lifecycle risk management, security/privacy controls, and assessment procedures</td><td>Categorization, tailored baseline, implementation, assessment, authorization, monitoring</td><td>Universal applicability outside the selected context or an authorization based on mapping alone</td></tr>
+                  <tr><td>CIS Controls v8.1</td><td>Prioritized safeguards with implementation groups</td><td>Practical implementation backlog and baseline discussion</td><td>That implementation groups equal business risk tolerance or regulatory compliance</td></tr>
+                  <tr><td>NIST Privacy Framework 1.0</td><td>Privacy risk management through enterprise-risk structure</td><td>Privacy Current/Target Profiles, roles, prioritized activities</td><td>That security controls alone resolve privacy risk or the voluntary framework has force of law</td></tr>
+                  <tr><td>NIST AI RMF 1.0 / GenAI Profile</td><td>Voluntary AI risk governance, mapping, measurement, and management</td><td>AI use-case risk record, lifecycle controls, evaluation and monitoring plan</td><td>Legal compliance, model safety, or completeness—especially while AI RMF 1.0 revision is underway</td></tr>
+                  <tr><td>OSCAL</td><td>Machine-readable representation of control and assessment information</td><td>Validated catalogues, profiles, plans, assessment results, POA&amp;M exchange</td><td>That valid syntax means correct control design, evidence quality, or authorization</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="artifacts">
+            <p class="section-kicker">Reusable records</p>
+            <h2>Core GRC artifact templates</h2>
+            <p class="section-intro">Keep each artifact normalized and link by stable identifier. Avoid one spreadsheet that mixes requirements, risks, controls, tests, findings, treatment, and evidence into ambiguous rows.</p>
+            <div class="lab-grid">
+              <div class="template-record"><h3>Risk scenario</h3><p>ID; objective/service; cause/threat event; path/conditions; assets/data; consequences; current controls; likelihood/impact ranges; uncertainty; owner; treatment; residual/target state; approval; review triggers; sources.</p></div>
+              <div class="template-record"><h3>Requirement / obligation</h3><p>ID; authoritative source; edition; provision; jurisdiction; scope/applicability; interpretation owner; effective date; required outcome; reporting/retention; mapped controls; evidence; change monitoring.</p></div>
+              <div class="template-record"><h3>Control record</h3><p>ID; objective; scope/population; risk and requirement links; owner/operator; implementation; frequency/trigger; dependencies; evidence; test; failure/exception response; review and retirement.</p></div>
+              <div class="template-record"><h3>Evidence object</h3><p>ID; claim/control/test; source; collection method; actor/system; timestamp and period; population; integrity; classification; storage/retention; reviewer; limitations; related records.</p></div>
+              <div class="template-record"><h3>Finding and action</h3><p>Criterion; condition; evidence; affected scope; cause; consequence; risk relationship; rating method; owner response; remediation; interim control; due date; validator; closure evidence; status history.</p></div>
+              <div class="template-record"><h3>Exception / acceptance</h3><p>Requirement/risk; exact scope; rationale; scenarios; interim controls; exposure; accountable owner; authorized approver; start/expiry; monitoring; remediation; reopen triggers; closure decision.</p></div>
+            </div>
+          </section>
+
+          <section id="cases">
+            <p class="section-kicker">Applied practice</p>
+            <h2>Six end-to-end GRC case studies</h2>
+            <p class="section-intro">Each case begins with a decision and finishes with evidence, ownership, residual uncertainty, and a verification loop. Names and conditions are illustrative; adapt them to the actual organization and authoritative requirements.</p>
+            <div class="case-grid">
+              <div class="case-study">
+                <h3>Case 1 — Onboard a SaaS provider handling sensitive customer records</h3>
+                <p class="case-meta">Supplier risk · privacy · identity · contract · resilience</p>
+                <ol>
+                  <li>Define business owner, purpose, user population, data categories, regions, integrations, administrative roles, decision deadline, alternatives, and service criticality.</li>
+                  <li>Map data/control flows: SSO/SCIM, support access, APIs, exports, subprocessors, backups, telemetry, keys, incident channel, deletion, and exit.</li>
+                  <li>Build scenarios: tenant crossover, privileged support misuse, token compromise, provider outage, destructive change, subprocessor incident, incomplete deletion, and lock-in.</li>
+                  <li>Review current assurance evidence in scope: service description, opinion/period/exceptions, complementary controls, penetration-test summary, continuity evidence, privacy terms, and architecture.</li>
+                  <li>Map contractual and internal requirements; negotiate evidence, incident cooperation, subprocessor, logging, data use/location, return/deletion, access, and exit terms.</li>
+                  <li>Record unresolved conditions, interim controls, accountable acceptance, expiry, onboarding requirements, and monitoring triggers.</li>
+                  <li>Provision least-privileged SSO/SCIM and admin roles; validate audit export, break-glass, backup/export, deprovisioning, and support path with test identities.</li>
+                  <li>Reassess on renewal, material change, new subprocessor, incident, assurance exception, service expansion, or control failure.</li>
+                </ol>
+                <div class="decision-gate"><strong>Decision gate:</strong> approve only when the service boundary, risk owner, contractual route, required customer controls, evidence gaps, interim measures, and exit path are explicit—not because a vendor score is green.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 2 — Decide whether ransomware recovery risk is acceptable</h3>
+                <p class="case-meta">Scenario risk · resilience · testing · executive decision</p>
+                <ol>
+                  <li>Select one critical service and establish business owner, maximum tolerable disruption, impact over time, minimum operation, recovery order, RTO/RPO targets, and dependencies.</li>
+                  <li>Construct scenarios including endpoint/admin compromise, identity/control-plane takeover, backup credential theft, deletion or encryption, data corruption, supplier outage, and extortion.</li>
+                  <li>Verify backup architecture: isolation/immutability, identities, keys, retention, coverage, monitoring, deletion protection, provider dependencies, and clean recovery environment.</li>
+                  <li>Run a controlled restoration with representative data and services; measure actual recovery, integrity validation, identity recovery, network isolation, secret rotation, and business acceptance.</li>
+                  <li>Compare tested capability to impact targets; document untested assumptions, single points, manual dependencies, cost, and alternative treatments.</li>
+                  <li>Present choices: fund architectural improvement, change service target, add interim controls, transfer a bounded component, or accept residual exposure under authorized conditions.</li>
+                  <li>Set KRIs and reopen triggers for failed jobs/restores, dependency or identity changes, capacity shortfall, new extortion scenario, and overdue remediation.</li>
+                </ol>
+                <div class="decision-gate"><strong>Decision gate:</strong> acceptance must cite the tested recovery evidence and remaining scenario, carry authorized ownership and expiry, and never be inferred from backup-job success.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 3 — Build one evidence-based NIST CSF / ISO control view</h3>
+                <p class="case-meta">Frameworks · scope · crosswalk · assurance</p>
+                <ol>
+                  <li>Define why the view is needed: improvement planning, customer communication, ISMS design, internal audit, or regulatory mapping. Choose exact authoritative editions.</li>
+                  <li>Select a service/system boundary and build a CSF Current Profile from evidenced outcomes, not owner self-ratings.</li>
+                  <li>Define the Target Profile using objectives, scenarios, obligations, customers, and available resources.</li>
+                  <li>Link relevant ISO/IEC 27001 requirements and organization controls; preserve mapping direction, rationale, partial relationships, and licensing constraints.</li>
+                  <li>Normalize control records with owner, implementation, scope/population, evidence, test, and failure response. Do not paste standard text as implementation.</li>
+                  <li>Assess evidence and control design/operation; identify unsupported outcomes and dependencies.</li>
+                  <li>Create a prioritized plan based on risk and obligation rather than averaging framework cells; assign owners, milestones, interim measures, and validation.</li>
+                  <li>Review mappings when standards, systems, service scope, controls, or risks change.</li>
+                </ol>
+                <div class="decision-gate"><strong>Decision gate:</strong> publish the view only with scope, source editions, mapping caveats, evidence date, unsupported outcomes, and a statement that it is not certification.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 4 — Govern CI/CD and software supply-chain exposure</h3>
+                <p class="case-meta">Product security · supplier risk · release evidence</p>
+                <ol>
+                  <li>Map source repositories, maintainers, branch/review rules, CI identities, runners, dependencies, registries, signing, deployment identities, environments, and emergency paths.</li>
+                  <li>Build scenarios: maintainer compromise, malicious dependency/update, workflow injection, over-broad OIDC trust, poisoned runner/cache, artifact substitution, secret exposure, and release-account takeover.</li>
+                  <li>Define controls for protected change, isolated execution, ephemeral least privilege, dependency provenance, artifact digest/signature, secret brokerage, environment approval, release identity, monitoring, and rollback.</li>
+                  <li>Generate evidence from source and build systems tied to the exact commit and artifact rather than screenshots of settings.</li>
+                  <li>Validate negative tests: unreviewed change blocked, wrong repository/ref cannot assume role, unsigned/wrong digest rejected, secret unavailable to untrusted builds, rollback deploys known artifact.</li>
+                  <li>Record suppliers and open-source dependencies by criticality, update policy, advisory source, maintenance risk, SBOM/provenance use, and incident contact.</li>
+                  <li>Route exceptions through a time-bounded decision and retest after pipeline, runner, provider, or identity changes.</li>
+                </ol>
+                <div class="decision-gate"><strong>Decision gate:</strong> release assurance must bind requirement, commit, build, artifact, deployment, runtime validation, and rollback. A generic “CI passed” badge is insufficient.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 5 — Govern a potentially reportable cyber incident</h3>
+                <p class="case-meta">Incident governance · legal/privacy · evidence · communications</p>
+                <ol>
+                  <li>Activate the incident authority model and preserve a factual timeline, scope, affected services/data/people, legal entities, jurisdictions, suppliers, customers, and evidence sources.</li>
+                  <li>Separate known, assessed, disputed, and unknown facts. Record source and time for every material statement.</li>
+                  <li>Use the obligations register to identify potentially applicable law, regulation, contract, insurance, customer, and sector routes; involve qualified counsel and privacy/regulatory owners.</li>
+                  <li>Determine relevant thresholds, clock start, content, recipient, update, and evidence requirements from current authoritative sources; do not reuse one regime’s deadline.</li>
+                  <li>Coordinate containment and investigation with evidence preservation, affected-party protection, provider/customer cooperation, and communication approval.</li>
+                  <li>Record the notification/non-notification decision, authority, facts available, assumptions, timestamps, drafts/submissions, acknowledgements, corrections, and follow-up.</li>
+                  <li>After recovery, update scenarios, controls, suppliers, metrics, plans, and obligations; validate corrective actions independently.</li>
+                </ol>
+                <div class="decision-gate"><strong>Decision gate:</strong> legal/regulatory reporting decisions belong to authorized qualified roles and must be reconstructed from the facts and authoritative obligations available at the time.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 6 — Approve an AI assistant for security and GRC evidence</h3>
+                <p class="case-meta">AI governance · RAG/MCP · privacy · human authority</p>
+                <ol>
+                  <li>Define bounded uses: retrieve approved controls, summarize evidence, draft questions, identify inconsistencies, or propose mappings. Explicitly prohibit autonomous applicability, compliance, acceptance, closure, or external action.</li>
+                  <li>Inventory provider/model/version, prompts/policies, RAG collections, embeddings/vector store, user groups, source permissions, logs, retention, tools/MCP servers, network, and downstream systems.</li>
+                  <li>Threat-model data leakage, cross-user retrieval, stale/poisoned sources, direct/indirect prompt injection, fabricated citation, unsupported inference, tool misuse, cost/availability, and reviewer automation bias.</li>
+                  <li>Enforce authorization before retrieval, source/version citations, output schema, untrusted-content boundaries, tool allowlists, read/write separation, human approval, redaction, audit IDs, and kill switch.</li>
+                  <li>Build evaluation sets with correct/incorrect mappings, contradictory evidence, expired policies, inaccessible sources, injection text, missing facts, and high-impact decisions that must be refused/escalated.</li>
+                  <li>Pilot with low-impact records, measure citation/support and reviewer corrections, investigate failures, and approve only the observed capability and user group.</li>
+                  <li>Monitor model/provider/prompt/source/tool changes; retain reconstructable decisions; run incident, rollback, data-deletion, and provider-exit exercises.</li>
+                </ol>
+                <div class="decision-gate"><strong>Decision gate:</strong> the assistant is acceptable only when it cannot turn generated text into control truth or action without source evidence, policy enforcement, and accountable human approval.</div>
+              </div>
+            </div>
+          </section>
+
+          <section id="labs">
+            <p class="section-kicker">Hands-on progression</p>
+            <h2>Twelve-lab GRC sequence</h2>
+            <p class="section-intro">Use synthetic or explicitly authorized systems and sanitized records. Each lab must produce a decision artifact, evidence package, limitations, and cleanup—not only a document template.</p>
+            <div class="lab-grid">
+              <div class="template-record"><h3>Lab 1 — Governance charter</h3><p>Create mission-linked security objectives, governance forums, decision rights, escalation thresholds, risk criteria, and a RACI/authority matrix. Test it by routing two conflicting risk decisions.</p></div>
+              <div class="template-record"><h3>Lab 2 — Service and data boundary</h3><p>Model one application across user, identity, CI/CD, cloud, data, telemetry, supplier, and recovery paths. Reconcile the diagram to system inventories and record unresolved ownership.</p></div>
+              <div class="template-record"><h3>Lab 3 — Scenario risk register</h3><p>Write three scenario-based records with ranges, uncertainty, current controls, alternative explanations, treatment options, accountable approval, review triggers, and cross-scenario dependencies.</p></div>
+              <div class="template-record"><h3>Lab 4 — CSF Current/Target Profile</h3><p>Create a scoped NIST CSF 2.0 Current Profile from evidence and a Target Profile from objectives/risk. Build a caveated mapping to organization controls and prioritize outcomes.</p></div>
+              <div class="template-record"><h3>Lab 5 — Policy and exception</h3><p>Write one outcome-focused policy and measurable standard. Process a realistic temporary exception with scenario, interim controls, owner, approver, expiry, monitor, and closure evidence.</p></div>
+              <div class="template-record"><h3>Lab 6 — Control and evidence design</h3><p>Specify one automated and one manual control, including population, dependencies, evidence, test, failure response, and inheritance. Generate and validate evidence from a lab system.</p></div>
+              <div class="template-record"><h3>Lab 7 — Internal audit workpaper</h3><p>Define criteria, scope, period, population, sample, procedures, source validation, exceptions, reviewer notes, finding, management response, and independent closure test.</p></div>
+              <div class="template-record"><h3>Lab 8 — Supplier assessment</h3><p>Assess a fictional critical SaaS service using architecture/data flows and scenario-led evidence. Review a mock SOC report excerpt, contract requirements, customer controls, residual gaps, and exit plan.</p></div>
+              <div class="template-record"><h3>Lab 9 — BIA and recovery exercise</h3><p>Set service impact and recovery targets, map dependencies, run a controlled restore or tabletop with timed decisions, compare observed capability, and create funded corrective actions.</p></div>
+              <div class="template-record"><h3>Lab 10 — Executive metrics</h3><p>Build five decision-linked metrics with numerator/denominator, data source/query, action threshold, limitations, owner, trend, and a simulated meeting decision. Remove one vanity metric.</p></div>
+              <div class="template-record"><h3>Lab 11 — Release evidence chain</h3><p>Trace requirement → source change → review → CI test → artifact digest → deployment → runtime check → rollback in a disposable project. Test one policy-as-code failure and exception.</p></div>
+              <div class="template-record"><h3>Lab 12 — AI GRC assistant evaluation</h3><p>Use a local/synthetic document set to test permission-filtered RAG, source citations, contradictory evidence, stale policy, prompt injection, schema validation, human approval, audit, and kill switch.</p></div>
+            </div>
+            <p class="further-reading"><strong>Supporting ecosystem:</strong> <a href="/projects.html">1200km projects</a> · <a href="https://github.com/anpa1200/AuditAI" target="_blank" rel="noopener noreferrer">AuditAI</a> for authorized Linux assessment evidence—not compliance conclusions · <a href="/adversarygraph/">AdversaryGraph</a> for threat, control-coverage, investigation, validation, and evidence workflows.</p>
+          </section>
+
+          <section id="failures">
+            <p class="section-kicker">Failure atlas</p>
+            <h2>Common ways GRC loses credibility</h2>
+            <ul class="failure-list">
+              <li><strong>Compliance equals security</strong>A passed assessment is treated as proof against threats outside scope, period, criteria, samples, or evidence.</li>
+              <li><strong>Framework arithmetic</strong>Unlike outcomes are averaged into a maturity percentage that hides critical service and scenario gaps.</li>
+              <li><strong>Control text as implementation</strong>A framework statement is pasted into a catalogue without mechanism, owner, population, evidence, or test.</li>
+              <li><strong>Screenshot assurance</strong>A point-in-time image without source, timestamp, population, change history, or reproduction supports a period-wide claim.</li>
+              <li><strong>Risk register cemetery</strong>Rows have red/amber/green scores but no scenario, authority, treatment funding, expiry, monitoring, or reopen trigger.</li>
+              <li><strong>Permanent exception</strong>A waiver has no interim control, accountable approver, expiration, remediation, or automatic escalation.</li>
+              <li><strong>Questionnaire trust</strong>Supplier self-answers are accepted without service boundaries, evidence review, contract conditions, or continuous change monitoring.</li>
+              <li><strong>Control owner confusion</strong>The assessor, operator, service owner, and risk acceptor are conflated, eliminating accountability and independent challenge.</li>
+              <li><strong>Tool-driven evidence</strong>An integration reports green when access fails, scope is incomplete, data is stale, or the API excludes unmanaged resources.</li>
+              <li><strong>Regulation by blog post</strong>Applicability and deadlines are copied from summaries instead of current authoritative text and qualified interpretation.</li>
+              <li><strong>Metrics without decisions</strong>Dashboards show counts and percentages with no denominator, threshold, owner, action, or outcome review.</li>
+              <li><strong>AI-generated truth</strong>An LLM mapping or summary is stored as control status without source support, version, permission, validation, and human authority.</li>
+            </ul>
+          </section>
+
+          <section id="readiness">
+            <p class="section-kicker">Acceptance criteria</p>
+            <h2>Program readiness gate</h2>
+            <p class="section-intro">A program is ready for operational reliance only when these statements can be demonstrated for the chosen scope. “Documented” means current, approved where required, linked to evidence, and used in real decisions.</p>
+            <ul class="checklist">
+              <li>Business objectives, critical services, stakeholders, risk criteria, governance bodies, decision rights, and escalation thresholds are defined and exercised.</li>
+              <li>System/service/data/supplier boundaries have owners, dependencies, authoritative inventories, flow diagrams, inherited controls, assumptions, and change triggers.</li>
+              <li>Risk records are scenario-based, source-backed, uncertainty-aware, treated by accountable owners, time-bounded, monitored, and reopened when conditions change.</li>
+              <li>Frameworks and standards have exact authoritative editions and purposes; profiles and crosswalks preserve scope, direction, partial mappings, licensing, and limitations.</li>
+              <li>Policies and standards are measurable, current, versioned, discoverable, implemented, and supported by a governed exception lifecycle.</li>
+              <li>Controls have unique identity, objective, scope/population, owner/operator, mechanism, dependencies, evidence, test, failure response, and retirement criteria.</li>
+              <li>Evidence has provenance, period, population, access/integrity/retention controls, relevance, reproducibility, and known limitations.</li>
+              <li>Assessment and audit distinguish design, implementation, and operation; sampling and independence are explicit; findings and closure remain traceable.</li>
+              <li>Legal, regulatory, contractual, and privacy obligations have qualified interpretation, applicability, owners, controls, evidence, change monitoring, and tested notification routes.</li>
+              <li>Critical suppliers and software dependencies have lifecycle risk treatment, assurance review, contractual controls, incident/monitoring paths, access governance, and exit capability.</li>
+              <li>Priority services have tested continuity, restore, identity/control-plane recovery, crisis authority, communications, and measured recovery capability.</li>
+              <li>Metrics are reproducible and decision-linked; dashboards show scope, denominator, uncertainty, thresholds, owners, actions, and anti-gaming controls.</li>
+              <li>Cloud/product/release governance ties requirements to code/configuration, exact artifacts, deployments, runtime validation, exceptions, and rollback.</li>
+              <li>AI and GRC automation enforce authorization before retrieval/action, provenance, source/version citations, evaluation, typed tools, human authority, audit, incident response, and shutdown.</li>
+            </ul>
+          </section>
+
+          <section id="references">
+            <p class="section-kicker">Sources and ecosystem</p>
+            <h2>Primary references and 1200km implementation paths</h2>
+            <p class="section-intro">Verify editions and applicability at the time of use. Some standards are licensed; link to the publisher rather than reproducing protected text.</p>
+            <div class="reference-list">
+              <div class="reference-article">
+                <h3>Core governance, risk, controls, and assurance</h3>
+                <p><a href="https://www.nist.gov/publications/nist-cybersecurity-framework-csf-20" target="_blank" rel="noopener noreferrer">NIST CSF 2.0</a> · <a href="https://www.nist.gov/cyberframework/quick-start-guides" target="_blank" rel="noopener noreferrer">CSF Quick Start Guides</a> · <a href="https://csrc.nist.gov/pubs/sp/800/30/r1/final" target="_blank" rel="noopener noreferrer">SP 800-30 Rev. 1</a> · <a href="https://csrc.nist.gov/pubs/sp/800/37/r2/final" target="_blank" rel="noopener noreferrer">SP 800-37 Rev. 2</a> · <a href="https://csrc.nist.gov/pubs/sp/800/53/a/r5/final" target="_blank" rel="noopener noreferrer">SP 800-53A Rev. 5</a> · <a href="https://www.iso.org/standard/27001" target="_blank" rel="noopener noreferrer">ISO/IEC 27001:2022</a> · <a href="https://www.iso.org/standard/iso-iec-27000-family" target="_blank" rel="noopener noreferrer">ISO/IEC 27000 family</a> · <a href="https://www.cisecurity.org/controls/v8-1" target="_blank" rel="noopener noreferrer">CIS Controls v8.1</a> · <a href="https://www.aicpa-cima.com/soc" target="_blank" rel="noopener noreferrer">AICPA SOC suite</a>.</p>
+              </div>
+              <div class="reference-article">
+                <h3>Privacy, supply chain, software, AI, and automation</h3>
+                <p><a href="https://www.nist.gov/privacy-framework/privacy-framework" target="_blank" rel="noopener noreferrer">NIST Privacy Framework</a> · <a href="https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final" target="_blank" rel="noopener noreferrer">NIST SP 800-161 Rev. 1</a> · <a href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener noreferrer">NIST SSDF 1.1</a> · <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer">NIST AI RMF</a> · <a href="https://csrc.nist.gov/pubs/sp/800/218/a/final" target="_blank" rel="noopener noreferrer">NIST SP 800-218A</a> · <a href="https://csrc.nist.gov/projects/open-security-controls-assessment-language" target="_blank" rel="noopener noreferrer">NIST OSCAL</a>.</p>
+              </div>
+              <div class="reference-article">
+                <h3>Selected authoritative obligation sources</h3>
+                <p><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener noreferrer">Regulation (EU) 2016/679 — GDPR</a> · <a href="https://eur-lex.europa.eu/eli/dir/2022/2555/oj?locale=en" target="_blank" rel="noopener noreferrer">Directive (EU) 2022/2555 — NIS2</a> · <a href="https://eur-lex.europa.eu/eli/reg/2022/2554/oj" target="_blank" rel="noopener noreferrer">Regulation (EU) 2022/2554 — DORA</a> · <a href="https://www.pcisecuritystandards.org/document_library/?class=pcidss&amp;doc=pci_dss" target="_blank" rel="noopener noreferrer">PCI SSC document library — PCI DSS v4.0.1</a>. Use qualified interpretation and applicable national/sector sources.</p>
+              </div>
+              <div class="reference-article">
+                <h3>1200km practical implementation ecosystem</h3>
+                <p><a href="/cyber-knowledge/cloud-security.html">Cloud Security</a> · <a href="/cyber-knowledge/secure-code.html">Secure Code</a> · <a href="/cyber-knowledge/blue-team.html">Blue Team</a> · <a href="/cyber-knowledge/dfir.html">DFIR</a> · <a href="/ITDR/docs/iga/iga-overview/">Identity Governance &amp; Administration</a> · <a href="/adversarygraph-docs/use-cases/defense-executive-risk-coverage-report/">Executive risk and coverage reporting</a> · <a href="/adversarygraph-docs/use-cases/investigation-third-party-report-validation/">Third-party report validation</a> · <a href="/adversarygraph-docs/attack-simulation/">Attack simulation and control validation</a> · <a href="/adversarygraph-docs/authentication-and-users/">Authentication, RBAC, and audit</a> · <a href="/adversarygraph-docs/unified-rag-mcp/">Unified RAG and MCP governance</a> · <a href="/external-validation.html">External validation</a>.</p>
+              </div>
+            </div>
+            <div class="boundary"><strong>Maintenance note:</strong> standards, laws, national transposition, regulatory guidance, contracts, cloud services, AI frameworks, and assessment expectations change. Record the exact authoritative edition and verification date in each obligation, profile, mapping, audit, and decision.</div>
+          </section>
+        </article>
       </div>
     </main>
 
@@ -429,6 +1157,5 @@
       </div>
     </footer>
     <!-- site-shell:footer:end -->
-
   </body>
 </html>

@@ -35,6 +35,7 @@ export const VOCABULARIES = Object.freeze({
     'identity-security',
     'offensive-research',
     'cloud-security',
+    'security-governance',
     'ai-security',
     'application-security',
     'network-security',
@@ -300,6 +301,7 @@ function inferDomain(url, title, html, collection) {
   if (/embedded|firmware|hardware|uefi|bmc/i.test(text)) return 'application-security';
   if (/malware|reverse engineering|debugger|unpack/i.test(text)) return 'malware-analysis';
   if (/threat hunt|hunting hypoth|hunt quer/i.test(text)) return 'threat-hunting';
+  if (/\bgrc\b|governance,? risk|risk (management|assessment)|compliance|security assurance/i.test(text)) return 'security-governance';
   if (/detection|sigma|telemetry|siem|anomaly/i.test(text)) return 'detection-engineering';
   if (/cloud|kubernetes|aws|azure|gcp/i.test(text)) return 'cloud-security';
   if (/pentest|penetration|offensive|hexstrike|exploit|password crack|aircrack|hydra|sqlmap|metasploit|nmap|burp/i.test(text)) return 'offensive-research';
@@ -320,6 +322,7 @@ function defaultsForType(primaryType, primaryDomain) {
     'identity-security': ['security-engineer', 'detection-engineer'],
     'offensive-research': ['security-engineer'],
     'cloud-security': ['security-engineer', 'detection-engineer'],
+    'security-governance': ['security-leader', 'security-engineer'],
     'ai-security': ['security-engineer', 'developer'],
     'application-security': ['security-engineer', 'developer'],
     'network-security': ['security-engineer'],
