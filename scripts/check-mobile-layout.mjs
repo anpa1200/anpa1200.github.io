@@ -31,6 +31,7 @@ const pages = [
   ['search', '/search.html'],
   ['cyber-knowledge-vulnerability-research', '/cyber-knowledge/vulnerability-research.html'],
   ['cyber-knowledge-malware-analysis', '/cyber-knowledge/malware-analysis.html'],
+  ['cyber-knowledge-secure-code', '/cyber-knowledge/secure-code.html'],
   ['docs-long', '/adversarygraph-docs/full-flow/'],
   ['threat-matrix', '/threat-matrix/'],
 ];
