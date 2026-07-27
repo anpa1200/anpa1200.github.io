@@ -7,11 +7,11 @@
     <script src="/assets/theme-bootstrap.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Blue Team / Defensive Security — Cyber Knowledge | 1200km</title>
-    <meta name="description" content="Blue Team / Defensive Security. Syllabus in progress: SOC operations, detection engineering, threat hunting, and incident handling…" />
+    <meta name="description" content="A 14-module Blue Team field guide covering security operations, telemetry, detection engineering, threat hunting, EDR, NDR, ITDR, cloud defense, incident response, AI-assisted analysis, validation, labs, and governance." />
     <meta name="author" content="Andrey Pautov" />
     <meta property="og:title" content="Blue Team / Defensive Security — Cyber Knowledge | 1200km" />
-    <meta property="og:description" content="Blue Team / Defensive Security. Syllabus in progress: SOC operations, detection engineering, threat hunting, and incident handling…" />
-    <meta property="og:type" content="website" />
+    <meta property="og:description" content="A 14-module Blue Team field guide covering security operations, telemetry, detection engineering, threat hunting, EDR, NDR, ITDR, cloud defense, incident response, AI-assisted analysis, validation, labs, and governance." />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="https://1200km.com/cyber-knowledge/blue-team.html" />
     <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
     <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
@@ -20,7 +20,7 @@
     <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Blue Team / Defensive Security — Cyber Knowledge | 1200km" />
-    <meta name="twitter:description" content="Blue Team / Defensive Security. Syllabus in progress: SOC operations, detection engineering, threat hunting, and incident handling…" />
+    <meta name="twitter:description" content="A 14-module Blue Team field guide covering security operations, telemetry, detection engineering, threat hunting, EDR, NDR, ITDR, cloud defense, incident response, AI-assisted analysis, validation, labs, and governance." />
     <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
     <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <link rel="canonical" href="https://1200km.com/cyber-knowledge/blue-team.html" />
@@ -143,22 +143,277 @@
       }
       .notice strong { font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
       .notice p { margin: 4px 0 0; font-weight: 500; color: var(--muted); }
-      main { padding: 56px 0 72px; }
-      .placeholder-panel {
-        max-width: 720px;
-        padding: 26px 28px;
-        border: 1px dashed var(--line);
-        border-radius: 14px;
+      .ecosystem-paths, .toc, .engagement-map, .featured-term, .reference-article,
+      .case-study, .template-record {
+        border: 1px solid var(--line);
         background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+      .ecosystem-paths {
+        margin-top: 20px;
+        padding: 18px;
+        max-width: 900px;
+        border-radius: 10px;
+      }
+      .ecosystem-paths h2 { margin: 0 0 8px; font-size: 1rem; }
+      .ecosystem-paths p { margin: 0; color: var(--muted); }
+      .ecosystem-paths ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 24px;
+        margin: 14px 0 0;
+        padding-left: 20px;
+      }
+      .module-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+      }
+      .module-nav a {
+        padding: 5px 11px;
+        border-radius: 999px;
+        background: var(--chip);
+        color: var(--accent-dark);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .module-nav a:hover { background: var(--chip-strong); text-decoration: none; }
+      main { padding: 48px 0 64px; display: flex; flex-direction: column; gap: 52px; }
+      .toc { padding: 24px 26px 8px; border-radius: 14px; }
+      .toc-heading, .engagement-map h2, .guide-title, .reference-article h3,
+      .reference-article h4, .case-study h3, .template-record h3, .practice-block h3,
+      .practice-block h4, .reference-table th, .evidence-gate strong {
+        color: var(--panel-ink);
+      }
+      .toc-heading { margin: 0; font-size: 1.05rem; }
+      .toc-intro { max-width: 820px; margin: 8px 0 18px; color: var(--panel-muted); font-size: 0.9rem; }
+      .toc-modules { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 32px; }
+      .toc-module { break-inside: avoid; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+      .toc-module summary {
+        cursor: pointer;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 0;
+        color: var(--panel-ink);
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+      .toc-module summary a { color: inherit; }
+      .toc-count { color: var(--muted); font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+      .toc-terms { list-style: none; display: flex; flex-direction: column; gap: 5px; margin: 0 0 14px; padding-left: 4px; }
+      .toc-terms a { color: var(--panel-muted); font-size: 0.84rem; }
+      .lab-group { scroll-margin-top: 88px; }
+      .group-header {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        margin-bottom: 4px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--line);
+      }
+      .group-title {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .group-count { color: var(--muted); font-size: 0.78rem; font-weight: 600; }
+      .group-note { max-width: 860px; margin: 10px 0 18px; color: var(--muted); font-size: 0.93rem; }
+      .featured-term, .reference-article, .case-study { margin-bottom: 22px; padding: 24px; border-radius: 12px; }
+      .guide-title { display: block; margin-bottom: 10px; font-size: 1.05rem; font-weight: 700; }
+      .guide-desc, .reference-article p, .reference-article li, .case-study > p,
+      .template-record p, .practice-intro, .practice-block p, .practice-block li {
         color: var(--panel-muted);
       }
-      [data-theme="dark"] .placeholder-panel {
+      .guide-desc { margin: 0 0 12px; font-size: 0.95rem; line-height: 1.62; }
+      .further-reading { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.86rem; }
+      .further-reading strong { color: var(--panel-ink); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+      .engagement-map { margin: 0; padding: 24px; border-radius: 14px; }
+      .engagement-map h2 { margin: 0; font-size: 1.25rem; }
+      .engagement-map > p { max-width: 860px; margin: 8px 0 18px; color: var(--panel-muted); }
+      .practice-panel {
+        border-color: rgba(15, 98, 254, 0.34);
+        background: linear-gradient(135deg, rgba(15, 98, 254, 0.055), transparent 48%), var(--panel);
+      }
+      .practice-intro { margin: 0 0 16px; line-height: 1.65; }
+      .practice-grid, .concept-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin: 16px 0;
+      }
+      .practice-block, .concept-block {
+        min-width: 0;
+        padding: 15px 16px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: rgba(127, 127, 127, 0.035);
+      }
+      .practice-block.full, .concept-block.full { grid-column: 1 / -1; }
+      .practice-block h3, .practice-block h4 {
+        margin: 0 0 8px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.055em;
+        text-transform: uppercase;
+      }
+      .practice-block p { margin: 0; font-size: 0.91rem; line-height: 1.58; }
+      .practice-block ul, .practice-block ol { margin: 0; padding-left: 21px; font-size: 0.91rem; }
+      .practice-block li { margin: 6px 0; line-height: 1.55; }
+      .concept-block h4 { margin: 0 0 7px; }
+      .concept-block p { margin: 0; font-size: 0.92rem; }
+      .workflow-steps {
+        counter-reset: workflow;
+        list-style: none;
+        margin: 12px 0 0;
+        padding: 0;
+      }
+      .workflow-steps li {
+        counter-increment: workflow;
+        position: relative;
+        margin: 0;
+        padding: 10px 0 10px 42px;
+        border-bottom: 1px solid var(--line);
+        color: var(--panel-muted);
+        line-height: 1.58;
+      }
+      .workflow-steps li:last-child { border-bottom: 0; }
+      .workflow-steps li::before {
+        content: counter(workflow);
+        position: absolute;
+        top: 9px;
+        left: 0;
+        display: grid;
+        place-items: center;
+        width: 27px;
+        height: 27px;
+        border-radius: 50%;
+        background: var(--chip);
+        color: var(--accent-dark);
+        font-size: 0.75rem;
+        font-weight: 800;
+      }
+      .evidence-gate, .boundary, .acceptance-list {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-left: 3px solid #0f9f6e;
+        background: rgba(15, 159, 110, 0.08);
+        color: var(--panel-muted);
+        font-size: 0.9rem;
+        line-height: 1.58;
+      }
+      .boundary { border-left-color: #d97706; background: rgba(217, 119, 6, 0.09); }
+      .failure-list { margin: 14px 0; padding-left: 24px; color: var(--panel-muted); }
+      .failure-list li { margin: 7px 0; }
+      .reference-article { scroll-margin-top: 88px; }
+      .reference-article h3 { margin: 0 0 10px; font-size: 1.12rem; }
+      .reference-article h4 { margin: 20px 0 8px; font-size: 0.96rem; }
+      .reference-article p { margin: 0 0 12px; }
+      .reference-article ul, .reference-article ol { margin: 8px 0 14px; padding-left: 22px; }
+      .tool-list, .check-list { margin: 10px 0 0; padding-left: 22px; color: var(--panel-muted); }
+      .tool-list li, .check-list li { margin: 6px 0; }
+      .table-wrap {
+        max-width: 100%;
+        margin: 16px 0;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+      .reference-table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        background: var(--panel);
+        color: var(--panel-muted);
+        font-size: 0.87rem;
+      }
+      .reference-table th, .reference-table td {
+        padding: 11px 13px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+        line-height: 1.5;
+      }
+      .reference-table th {
+        background: rgba(127, 127, 127, 0.055);
+        font-size: 0.75rem;
+        letter-spacing: 0.045em;
+        text-transform: uppercase;
+      }
+      .reference-table tr:last-child td { border-bottom: 0; }
+      .case-study { scroll-margin-top: 88px; }
+      .case-study h3 { margin: 0 0 8px; font-size: 1.08rem; }
+      .case-meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 16px; }
+      .case-meta span { padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 0.72rem; font-weight: 700; }
+      .template-record { margin: 14px 0; padding: 17px 18px; border-radius: 10px; box-shadow: none; }
+      .template-record h3 { margin: 0 0 8px; font-size: 1rem; }
+      .template-record p { margin: 0 0 10px; font-size: 0.92rem; }
+      .definition-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 22px;
+      }
+      .definition-grid p {
+        margin: 0;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      code, kbd, samp {
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      pre {
+        max-width: 100%;
+        overflow-x: auto;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #071020;
+        color: #dbeafe;
+        white-space: pre;
+      }
+      [data-theme="dark"] .ecosystem-paths,
+      [data-theme="dark"] .toc,
+      [data-theme="dark"] .engagement-map,
+      [data-theme="dark"] .featured-term,
+      [data-theme="dark"] .reference-article,
+      [data-theme="dark"] .case-study,
+      [data-theme="dark"] .template-record {
         background: rgba(8, 19, 38, 0.84);
         border-color: rgba(147, 197, 253, 0.28);
-        color: #b8c9e3;
       }
-      .placeholder-panel h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--panel-ink); }
-      [data-theme="dark"] .placeholder-panel h2 { color: #f8fbff; }
+      [data-theme="dark"] .toc-heading,
+      [data-theme="dark"] .toc-module summary,
+      [data-theme="dark"] .engagement-map h2,
+      [data-theme="dark"] .guide-title,
+      [data-theme="dark"] .reference-article h3,
+      [data-theme="dark"] .reference-article h4,
+      [data-theme="dark"] .case-study h3,
+      [data-theme="dark"] .template-record h3,
+      [data-theme="dark"] .practice-block h3,
+      [data-theme="dark"] .practice-block h4,
+      [data-theme="dark"] .reference-table th,
+      [data-theme="dark"] .further-reading strong,
+      [data-theme="dark"] .evidence-gate strong { color: #f8fbff; }
+      [data-theme="dark"] .guide-desc,
+      [data-theme="dark"] .reference-article p,
+      [data-theme="dark"] .reference-article li,
+      [data-theme="dark"] .case-study > p,
+      [data-theme="dark"] .template-record p,
+      [data-theme="dark"] .practice-intro,
+      [data-theme="dark"] .practice-block p,
+      [data-theme="dark"] .practice-block li,
+      [data-theme="dark"] .workflow-steps li,
+      [data-theme="dark"] .reference-table { color: #b8c9e3; }
+      [data-theme="dark"] .module-nav a,
+      [data-theme="dark"] .workflow-steps li::before { background: #162d52; color: #93c5fd; }
       footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
       @media (max-width: 720px) {
         .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: min(1080px, calc(100% - 32px)); }
@@ -167,6 +422,13 @@
         .button { flex-shrink: 0; }
         .page-hero-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 10px; max-width: 100%; }
         .page-title, .page-lead, .page-eyebrow { max-width: 100%; overflow-wrap: break-word; }
+        .ecosystem-paths ul, .practice-grid, .concept-grid, .definition-grid { grid-template-columns: 1fr; }
+        .toc { padding: 18px 16px 6px; }
+        .toc-modules { columns: 1; }
+        .featured-term, .reference-article, .case-study, .engagement-map { padding: 18px; }
+        .group-header { display: block; }
+        .group-count { display: inline-block; margin-top: 5px; }
+        .reference-table { min-width: 640px; }
       }
       [data-theme="dark"] footer, [data-theme="dark"] .footer {
         background: rgba(5,12,26,0.96) !important;
@@ -289,7 +551,7 @@
             "@id": "https://1200km.com/cyber-knowledge/blue-team.html#webpage",
             "url": "https://1200km.com/cyber-knowledge/blue-team.html",
             "name": "Blue Team / Defensive Security",
-            "description": "Blue Team / Defensive Security. Syllabus in progress: SOC operations, detection engineering, threat hunting, and incident handling…",
+            "description": "A 14-module Blue Team field guide covering security operations, telemetry, detection engineering, threat hunting, EDR, NDR, ITDR, cloud defense, incident response, AI-assisted analysis, validation, labs, and governance.",
             "isPartOf": {
               "@id": "https://1200km.com/#website"
             },
@@ -300,11 +562,39 @@
               "@id": "https://1200km.com/#person"
             },
             "inLanguage": "en",
-            "dateModified": "2026-07-25",
+            "dateModified": "2026-07-27",
             "primaryImageOfPage": {
               "@type": "ImageObject",
               "url": "https://1200km.com/assets/site-og-v2.png"
             }
+          },
+          {
+            "@type": "Article",
+            "@id": "https://1200km.com/cyber-knowledge/blue-team.html#article",
+            "headline": "Blue Team / Defensive Security",
+            "description": "A practitioner field guide for building and operating defensible security monitoring, detection, hunting, investigation, response, and validation capabilities.",
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/cyber-knowledge/blue-team.html#webpage"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "datePublished": "2026-07-27",
+            "dateModified": "2026-07-27",
+            "inLanguage": "en",
+            "about": [
+              "Security operations",
+              "Detection engineering",
+              "Threat hunting",
+              "Incident response",
+              "Endpoint detection and response",
+              "Network detection and response",
+              "Identity threat detection and response",
+              "Cloud security monitoring"
+            ]
           },
           {
             "@type": "BreadcrumbList",
@@ -381,26 +671,831 @@
     <main data-pagefind-body id="main-content">
       <div class="page-hero">
         <div class="page-hero-inner">
-          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain syllabus</p>
+          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain 03 of 10 · Practitioner field guide</p>
           <h1 class="page-title" id="blue-team">Blue Team / Defensive Security</h1>
-          <p class="page-lead">SOC operations, detection engineering, threat hunting, and incident handling: the discipline of finding and stopping what red team simulates.</p>
+          <p class="page-lead">
+            A complete operating guide for security monitoring, detection engineering, threat hunting,
+            investigation, containment, recovery, and continuous validation. The goal is not to collect the
+            most alerts. It is to produce timely, source-backed decisions that reduce business risk and remain
+            defensible under technical, legal, and executive review.
+          </p>
           <div class="notice" role="note">
             <div>
-              <strong>Under construction</strong>
-              <p>This domain syllabus has not been written yet. Start with the CTI syllabus, which is live, while this page is built out.</p>
+              <strong>Evidence before verdict</strong>
+              <p>Every alert is a lead. Preserve raw telemetry, establish identity and asset context, test alternative explanations, document uncertainty, and require human authorization for disruptive response actions.</p>
             </div>
           </div>
           <div class="page-hero-links">
-            <a class="button primary" href="/cyber-knowledge/cti.html">Read the CTI syllabus →</a>
-            <a class="button" href="/cyber-knowledge/">← Back to Cyber Knowledge</a>
+            <a class="button primary" href="#how-to-use">Start the curriculum →</a>
+            <a class="button" href="/newest-detection-engineering-techniques/">Detection engineering</a>
+            <a class="button" href="/ITDR/">ITDR handbook</a>
+            <a class="button" href="/adversarygraph/">AdversaryGraph</a>
+            <a class="button" href="/labs.html">Hands-on labs</a>
+            <a class="button" href="/cyber-knowledge/">← Cyber Knowledge</a>
           </div>
+          <aside class="ecosystem-paths" aria-labelledby="ecosystem-title">
+            <h2 id="ecosystem-title">1200km defensive-learning paths</h2>
+            <p>This guide explains the operating model. These maintained ecosystem resources supply deeper implementation examples and practical environments.</p>
+            <ul>
+              <li><a href="/articles/read/2025/2025-02-24-soc-tier-1-the-complete-onboarding-guide-to-security-monitoring-and-incident-response-824a1dfe4476">SOC Tier 1 onboarding and triage</a></li>
+              <li><a href="/articles/read/2026/2026-04-14-from-threat-intelligence-to-detection-a-practitioner-s-guide-2d930b168426">Threat intelligence to detection</a></li>
+              <li><a href="/articles/read/2026/2026-04-22-detecting-malicious-insider-activity-a-technical-detection-engineering-guide-3c3b41e95e82">Malicious-insider detection</a></li>
+              <li><a href="/articles/read/2025/2025-12-12-protocol-level-network-threat-hunting-a-wireshark-centric-guide-a6770ffc96c6">Protocol-level network hunting</a></li>
+              <li><a href="/articles/read/2026/2026-02-11-kubernetes-logging-and-monitoring-complete-guide-2ce9d4bdba80">Kubernetes logging and monitoring</a></li>
+              <li><a href="/operation-desert-hydra/">Operation Desert Hydra case material</a></li>
+              <li><a href="/adversarygraph/full-version-feature-guides.html#threat-hunting">AdversaryGraph threat-hunting workflow</a></li>
+              <li><a href="/adversarygraph-docs/attack-simulation/">Attack simulation and rule validation</a></li>
+            </ul>
+          </aside>
+          <nav class="module-nav" aria-label="Jump to module">
+            <a href="#foundations">Foundations</a><a href="#m1">1 SOC model</a><a href="#m2">2 Context</a>
+            <a href="#m3">3 Telemetry</a><a href="#m4">4 Detection</a><a href="#m5">5 Hunting</a>
+            <a href="#m6">6 Triage</a><a href="#m7">7 Endpoint</a><a href="#m8">8 Network</a>
+            <a href="#m9">9 Identity</a><a href="#m10">10 Cloud</a><a href="#m11">11 Human/data</a>
+            <a href="#m12">12 IR/DFIR</a><a href="#m13">13 AI/MCP</a><a href="#m14">14 Validation</a>
+            <a href="#deep-dives">Deep dives</a><a href="#case-studies">Cases</a><a href="#field-kit">Field kit</a>
+          </nav>
         </div>
       </div>
 
-      <div class="placeholder-panel">
-        <h2 id="coming-soon">Coming soon</h2>
-        <p>The full zero-to-hero syllabus for Blue Team / Defensive Security — terminology, frameworks, tools, and a recommended learning order — is being written next. Check back soon, or follow the CTI domain as a model for how each syllabus page will be structured.</p>
-      </div>
+      <nav class="toc" aria-labelledby="toc-title">
+        <h2 class="toc-heading" id="toc-title">Table of contents</h2>
+        <p class="toc-intro">The first three modules establish the operating and data foundations. Modules 4–13 cover specialist practices. Module 14 closes the loop with safe simulation, measurement, and governance. Every module includes concepts, workflow, evidence gates, failure modes, tools, and an applied exercise.</p>
+        <ol class="toc-modules">
+          <li><details class="toc-module"><summary><a href="#foundations">Technical foundations</a><span class="toc-count">5 references</span></summary><ul class="toc-terms"><li><a href="#foundation-event">Events and evidence</a></li><li><a href="#foundation-time">Time and correlation</a></li><li><a href="#foundation-context">Identity, asset, and service context</a></li><li><a href="#foundation-statistics">Detection statistics</a></li><li><a href="#foundation-control">Control and response state</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m1">1 — Defensive mission and SOC model</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#mission">Mission and outcomes</a></li><li><a href="#soc-roles">Roles and decision rights</a></li><li><a href="#case-lifecycle">Case lifecycle</a></li><li><a href="#service-catalog">Service catalogue</a></li><li><a href="#soc-practice">Operating-model exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m2">2 — Assets, services, and exposure</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#asset-model">Asset model</a></li><li><a href="#business-context">Business context</a></li><li><a href="#exposure-context">Exposure and vulnerability</a></li><li><a href="#context-quality">Context quality</a></li><li><a href="#context-practice">Context exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m3">3 — Telemetry and logging architecture</a><span class="toc-count">6 topics</span></summary><ul class="toc-terms"><li><a href="#telemetry-requirements">Requirements</a></li><li><a href="#collection-pipeline">Collection pipeline</a></li><li><a href="#normalization">Normalization</a></li><li><a href="#telemetry-quality">Quality and health</a></li><li><a href="#retention-access">Retention and access</a></li><li><a href="#telemetry-practice">Pipeline exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m4">4 — Detection engineering</a><span class="toc-count">6 topics</span></summary><ul class="toc-terms"><li><a href="#detection-model">Detection model</a></li><li><a href="#rule-lifecycle">Rule lifecycle</a></li><li><a href="#rule-as-code">Detection as code</a></li><li><a href="#behavior-correlation">Behavior and correlation</a></li><li><a href="#tuning-retirement">Tuning and retirement</a></li><li><a href="#detection-practice">Rule exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m5">5 — Threat hunting</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#hunt-hypothesis">Hypotheses</a></li><li><a href="#hunt-plan">Hunt plan</a></li><li><a href="#hunt-analysis">Analysis</a></li><li><a href="#hunt-handoff">Findings and handoff</a></li><li><a href="#hunt-practice">Hunt exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m6">6 — Alert triage and investigations</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#triage-intake">Intake and priority</a></li><li><a href="#triage-enrichment">Enrichment</a></li><li><a href="#investigation-timeline">Timeline</a></li><li><a href="#escalation">Escalation and closure</a></li><li><a href="#triage-practice">Triage exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m7">7 — Endpoint defense and EDR</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#endpoint-telemetry">Endpoint telemetry</a></li><li><a href="#process-reasoning">Process reasoning</a></li><li><a href="#endpoint-response">Response actions</a></li><li><a href="#endpoint-gaps">Coverage gaps</a></li><li><a href="#endpoint-practice">Endpoint exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m8">8 — Network defense and NDR</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#network-visibility">Visibility</a></li><li><a href="#protocol-analysis">Protocol analysis</a></li><li><a href="#encrypted-traffic">Encrypted traffic</a></li><li><a href="#network-response">Network response</a></li><li><a href="#network-practice">Network exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m9">9 — Identity defense and ITDR</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#identity-graph">Identity graph</a></li><li><a href="#ad-detection">AD/Kerberos</a></li><li><a href="#cloud-identity">Cloud identity</a></li><li><a href="#identity-response">Identity response</a></li><li><a href="#identity-practice">Identity exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m10">10 — Cloud, containers, and SaaS</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#cloud-control-plane">Control plane</a></li><li><a href="#kubernetes-defense">Kubernetes</a></li><li><a href="#workload-runtime">Runtime</a></li><li><a href="#saas-defense">SaaS</a></li><li><a href="#cloud-practice">Cloud exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m11">11 — Email, web, data, and insider defense</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#email-defense">Email</a></li><li><a href="#web-defense">Web and API</a></li><li><a href="#data-defense">Data movement</a></li><li><a href="#insider-defense">Insider risk</a></li><li><a href="#human-practice">Cross-domain exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m12">12 — Incident response and DFIR</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#ir-preparation">Preparation</a></li><li><a href="#ir-analysis">Analysis</a></li><li><a href="#contain-eradicate">Containment and eradication</a></li><li><a href="#recover-learn">Recovery and learning</a></li><li><a href="#ir-practice">IR exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m13">13 — AI-assisted defense and MCP</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#ai-roles">Permitted roles</a></li><li><a href="#rag-context">RAG and evidence</a></li><li><a href="#mcp-tools">MCP tools</a></li><li><a href="#ai-controls">Controls</a></li><li><a href="#ai-practice">AI exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m14">14 — Validation, metrics, and maturity</a><span class="toc-count">6 topics</span></summary><ul class="toc-terms"><li><a href="#simulation">Safe simulation</a></li><li><a href="#validation-layers">Validation layers</a></li><li><a href="#blue-metrics">Metrics</a></li><li><a href="#coverage-governance">Coverage governance</a></li><li><a href="#maturity">Maturity</a></li><li><a href="#validation-practice">Validation exercise</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#deep-dives">Operator technical deep dives</a><span class="toc-count">7 references</span></summary><ul class="toc-terms"><li><a href="#deep-pipeline">Telemetry pipeline</a></li><li><a href="#deep-rule">Rule lifecycle</a></li><li><a href="#deep-timeline">Investigation timeline</a></li><li><a href="#deep-hunt">Threat hunt</a></li><li><a href="#deep-identity">Identity incident</a></li><li><a href="#deep-cloud">Cloud/Kubernetes</a></li><li><a href="#deep-ai">AI/MCP safety</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#case-studies">End-to-end case studies</a><span class="toc-count">6 cases</span></summary><ul class="toc-terms"><li><a href="#case-powershell">PowerShell</a></li><li><a href="#case-identity">Identity path</a></li><li><a href="#case-phishing">Phishing/AiTM</a></li><li><a href="#case-kubernetes">Kubernetes</a></li><li><a href="#case-insider">Insider staging</a></li><li><a href="#case-cti">CTI-to-response</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#field-kit">Field references and assessment</a><span class="toc-count">7 references</span></summary><ul class="toc-terms"><li><a href="#tool-matrix">Tool matrix</a></li><li><a href="#lab-curriculum">Lab curriculum</a></li><li><a href="#lab-acceptance">Acceptance criteria</a></li><li><a href="#failure-atlas">Failure atlas</a></li><li><a href="#review-questions">Review questions</a></li><li><a href="#glossary">Glossary</a></li><li><a href="#final-checklist">Final checklist</a></li></ul></details></li>
+        </ol>
+      </nav>
+
+      <section class="engagement-map" id="how-to-use" aria-labelledby="how-title">
+        <h2 id="how-title">How to use this guide</h2>
+        <p>Use the guide as an operating curriculum, not as a list of vendor products. Begin with the event, time, context, and evidence foundations. Build a service catalogue and telemetry requirements before purchasing analytics. Then create, test, deploy, monitor, and retire detections against known decision needs. Specialist teams can enter through endpoint, network, identity, cloud, or incident response, but they should return to the common case and evidence model.</p>
+        <div class="practice-grid">
+          <div class="practice-block"><h3>Analyst track</h3><p>Foundations plus Modules 1, 5, 6, 7, 8, and 9. Practice reconstructing timelines, validating entities, recording competing hypotheses, escalating with an explicit decision request, and closing with a reason code.</p></div>
+          <div class="practice-block"><h3>Detection engineer track</h3><p>Foundations plus Modules 2–5, 10, and 14. Produce versioned analytics with declared telemetry dependencies, test fixtures, attack behavior, expected benign activity, performance limits, ownership, and validation evidence.</p></div>
+          <div class="practice-block"><h3>Incident responder track</h3><p>Modules 1–3, 6–12, and 14. Connect technical containment to business authority, evidence preservation, legal and communications requirements, recovery criteria, and post-incident control improvement.</p></div>
+          <div class="practice-block"><h3>Program leader track</h3><p>Modules 1–3 and 12–14. Govern scope, staffing, service levels, telemetry cost, evidence quality, automation authority, exercise cadence, risk acceptance, metrics, and measurable improvement.</p></div>
+          <div class="practice-block full"><h3>Required case record</h3><p>Every material alert, hunt, or incident should preserve the detection identifier and version; raw event references; normalized fields; entity identifiers; asset and business context; source clock and ingestion time; enrichment sources and collection times; analyst actions; competing explanations; decision owner; containment authority; evidence hashes or immutable references; disposition; limitations; and follow-up work. Dashboards are views. The case record is the durable decision trail.</p></div>
+        </div>
+      </section>
+
+      <section class="lab-group" id="foundations">
+        <div class="group-header"><h2 class="group-title">Technical foundations — reason from evidence before tools</h2><span class="group-count">5 deep references</span></div>
+        <p class="group-note">Security tools summarize observations. A defender must still know what was observed, when, from which vantage point, how it was transformed, what it can prove, and which alternative explanations remain plausible.</p>
+
+        <article class="reference-article" id="foundation-event">
+          <h3>Events, observations, alerts, cases, findings, and incidents are different objects</h3>
+          <p>An event is a structured or unstructured record emitted by a source. An observation is an analyst’s bounded interpretation of one or more records. An alert is a machine- or analyst-generated request for review. A case groups work around a question or decision. A finding is a supported conclusion with scope, evidence, and impact. An incident is an organizational classification that activates response authority and coordination. Treating these words as synonyms destroys auditability: an alert becomes “proof,” a case count becomes an incident count, and an automated severity becomes business impact.</p>
+          <div class="concept-grid">
+            <div class="concept-block"><h4>Source truth</h4><p>Preserve the original record, source system, collector, collection method, parser version, ingestion path, and immutable identifier. Normalized copies accelerate analysis but can omit, rename, truncate, or coerce fields. When a conclusion depends on one field, compare it with the raw source.</p></div>
+            <div class="concept-block"><h4>Assertion truth</h4><p>Separate facts from inferences. “Process 842 created a connection at 10:02:14Z” can be a sourced observation. “The process contacted command-and-control infrastructure” requires destination attribution, time-bounded reputation, process provenance, and exclusion of legitimate software behavior.</p></div>
+            <div class="concept-block"><h4>Decision truth</h4><p>A verdict includes who decided, under which policy, with what confidence, at what time, and what action followed. Confidence is not severity; severity is not priority; and priority is not authorization to isolate a production service.</p></div>
+            <div class="concept-block"><h4>Negative evidence</h4><p>“No event found” proves only that the performed query returned nothing within the searched data, time range, fields, permissions, and retention. Record sensor health, ingest lag, clock assumptions, and coverage before using absence to clear a hypothesis.</p></div>
+          </div>
+          <p class="acceptance-list"><strong>Foundation acceptance:</strong> take one alert and produce a chain from original events to observation, hypothesis, case, decision, and action. Mark every inferred edge, cite every source, and state what missing data could change the conclusion.</p>
+        </article>
+
+        <article class="reference-article" id="foundation-time">
+          <h3>Time is an evidence field, not a display preference</h3>
+          <p>A useful timeline distinguishes event creation time, source-recorded time, collection time, ingestion time, processing time, alert time, analyst access time, and action time. These values can diverge because of clock drift, time-zone conversion, batch forwarding, mobile or offline endpoints, queue backpressure, source buffering, parser failure, retries, or delayed enrichment. Sorting on the wrong field can reverse cause and effect.</p>
+          <ul>
+            <li>Store timestamps in a precise common form while preserving the source representation and time zone.</li>
+            <li>Measure source clock offset and collector lag; do not silently “correct” evidence without retaining the transformation.</li>
+            <li>Use stable event IDs, sequence numbers, process identifiers, trace IDs, session IDs, request IDs, and entity IDs to support correlation when timestamps collide.</li>
+            <li>Record query execution time and the version of mutable enrichment used. A domain’s reputation today may differ from its status at event time.</li>
+            <li>Build timelines with uncertainty ranges when exact order cannot be established.</li>
+          </ul>
+          <p class="boundary"><strong>Common mistake:</strong> a SIEM’s normalized <code>@timestamp</code> may represent source time for one integration and ingest time for another. Never merge cross-source timelines until the semantics are documented and tested.</p>
+        </article>
+
+        <article class="reference-article" id="foundation-context">
+          <h3>Identity, asset, service, vulnerability, and business context</h3>
+          <p>An IP address is not an asset, a username is not a stable identity, a container name is not a workload, and a hostname is not necessarily a service owner. Build entity records with stable identifiers, aliases, lifecycle state, owner, environment, criticality, exposure, trust zone, data classification, dependencies, identities, software, and confidence. Preserve point-in-time context: dynamic infrastructure and identity membership can change between the event and investigation.</p>
+          <div class="concept-grid">
+            <div class="concept-block"><h4>Asset context</h4><p>Map cloud resource IDs, endpoint IDs, hostnames, IP leases, MAC addresses, cluster and namespace, image digest, application, deployment, and owner. Prefer authoritative inventory and orchestration sources over names parsed from logs.</p></div>
+            <div class="concept-block"><h4>Identity context</h4><p>Map immutable user, service principal, workload, device, session, tenant, group, role, and credential IDs. Record effective permissions and recent changes rather than assuming a job title describes access.</p></div>
+            <div class="concept-block"><h4>Service context</h4><p>Connect customer-facing service, technical components, data, dependencies, recovery objectives, change windows, and escalation contacts. Response decisions should consider the service, not only the compromised host.</p></div>
+            <div class="concept-block"><h4>Vulnerability context</h4><p>A CVE match is a candidate until product, version, configuration, reachability, exploit preconditions, compensating controls, and authoritative ownership are confirmed. Scanner output enriches a case; it does not replace validation.</p></div>
+          </div>
+          <p class="further-reading"><strong>1200km path:</strong> <a href="/adversarygraph/full-version-feature-guides.html">AdversaryGraph module guide</a> · <a href="/cyber-knowledge/cti.html">CTI evidence and entity modeling</a></p>
+        </article>
+
+        <article class="reference-article" id="foundation-statistics">
+          <h3>Base rates, precision, recall, thresholds, and analyst capacity</h3>
+          <p>A detector partitions events into matches and non-matches, but operational value depends on the prevalence of the target behavior, telemetry quality, rule logic, suppression, entity context, and cost of errors. Precision describes the fraction of reviewed matches that are relevant under a defined label policy. Recall describes the fraction of relevant behaviors detected in a labeled population. In production, true recall is rarely known because undetected events are not automatically labeled. Use controlled tests, retrospective datasets, sampled negative review, incidents, and simulation to estimate specific aspects without presenting an unmeasured “coverage percentage.”</p>
+          <ul>
+            <li><strong>Base-rate effect:</strong> even a detector with apparently strong test performance can overwhelm analysts when malicious behavior is extremely rare.</li>
+            <li><strong>Threshold effect:</strong> raising a threshold may improve precision while missing low-and-slow activity; lowering it may expose precursors but increase review cost.</li>
+            <li><strong>Label quality:</strong> closed as benign, expected administrative, duplicate, insufficient evidence, test, and malicious should remain distinct.</li>
+            <li><strong>Selection bias:</strong> analyst-reviewed alerts are not a random sample of all events. Measuring only escalated alerts misstates performance.</li>
+            <li><strong>Concept drift:</strong> software, business processes, attacker behavior, schemas, and population baselines change. Monitor detectors after release.</li>
+          </ul>
+          <p class="acceptance-list"><strong>Foundation acceptance:</strong> define the target behavior, evaluation population, labels, test window, decision threshold, expected review volume, miss cost, false-positive cost, and uncertainty. Do not use a single undifferentiated “accuracy” number.</p>
+        </article>
+
+        <article class="reference-article" id="foundation-control">
+          <h3>Controls and response state: prevention, visibility, analysis, decision, and action</h3>
+          <p>A defensive capability is a chain. A preventive control may block behavior without recording enough evidence. A sensor may record behavior without forwarding it. A platform may ingest data without parsing critical fields. A rule may match without opening a case. An analyst may confirm activity without authority to contain it. A response action may execute without verification or rollback. Measure and validate each layer separately.</p>
+          <div class="table-wrap"><table class="reference-table"><thead><tr><th>Layer</th><th>Question</th><th>Evidence</th><th>Failure example</th></tr></thead><tbody>
+            <tr><td>Prevent</td><td>Did the control stop or constrain the behavior?</td><td>Control decision, endpoint or gateway result, target state</td><td>Blocked UI action but allowed API request</td></tr>
+            <tr><td>Observe</td><td>Was a useful record created?</td><td>Raw event with actor, object, action, outcome, time</td><td>Success logged without target identity</td></tr>
+            <tr><td>Transport</td><td>Did the record arrive intact and on time?</td><td>Collector counters, queue lag, checksums, field comparison</td><td>Batch delay caused alert after recovery</td></tr>
+            <tr><td>Analyze</td><td>Did the analytic identify the intended behavior?</td><td>Rule version, query result, test fixture, match explanation</td><td>Field rename silently disabled rule</td></tr>
+            <tr><td>Decide</td><td>Did a qualified reviewer reach a supported disposition?</td><td>Case notes, alternatives, confidence, approval</td><td>Severity label treated as confirmed incident</td></tr>
+            <tr><td>Act</td><td>Was a proportionate action executed and verified?</td><td>Authorization, action log, target confirmation, rollback result</td><td>Shared account disabled during critical operation</td></tr>
+          </tbody></table></div>
+          <p class="further-reading"><strong>Primary:</strong> <a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener noreferrer">NIST Cybersecurity Framework 2.0</a> · <a href="https://d3fend.mitre.org/" target="_blank" rel="noopener noreferrer">MITRE D3FEND</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m1">
+        <div class="group-header"><h2 class="group-title">Module 1 — Defensive mission, operating model, and SOC service</h2><span class="group-count">Mission before queue</span></div>
+        <p class="group-note">A SOC is not a room, dashboard, or product. It is a decision service with defined customers, authority, evidence, handoffs, and measurable outcomes.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="mission">Define the mission in business and technical terms</span>
+          <p class="guide-desc">State which organizations, services, environments, identities, data, and threat scenarios the defensive function covers. Define what it delivers: monitoring, alert triage, threat hunting, incident coordination, detection engineering, intelligence integration, validation, reporting, and advisory support. Record exclusions, hours, escalation channels, response authority, dependencies, and degraded-mode behavior. “Monitor everything” is not a scope.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="soc-roles"><h3>Roles and decision rights</h3><p>Tier 1 validates alert identity, gathers bounded context, follows runbooks, and escalates. Tier 2 reconstructs activity and coordinates deeper investigation. Tier 3, hunting, detection engineering, malware, identity, cloud, and forensics provide specialist analysis. Incident command owns coordination. Service and business owners authorize impact-bearing actions. Legal, privacy, HR, communications, and executive roles join under declared criteria.</p></div>
+            <div class="practice-block" id="case-lifecycle"><h3>Case lifecycle</h3><p>Use explicit states such as new, acknowledged, scoped, investigating, awaiting evidence, awaiting owner, contained, monitoring, recovered, closed, and reopened. Define entry and exit criteria, reason codes, service-level targets, ownership transfer, and clock-pause rules. Preserve state transitions rather than overwriting history.</p></div>
+            <div class="practice-block" id="service-catalog"><h3>Service catalogue</h3><p>For each service, name the customer, intake, supported scope, data requirements, output, response time target, approval boundary, escalation, evidence standard, retention, and quality measure. Separate 24×7 alert response from business-hours engineering and planned hunting.</p></div>
+            <div class="practice-block"><h3>Operating rhythm</h3><p>Use shift handover, queue health, high-risk service review, detection change review, sensor health review, incident review, hunt planning, exercise review, and monthly risk reporting. Meetings exist to make decisions; dashboards should make their inputs traceable.</p></div>
+          </div>
+          <h3 id="soc-practice">Applied exercise — design a three-tier service</h3>
+          <ol class="workflow-steps">
+            <li>Select one customer-facing service and document owner, data classification, availability need, identities, components, and critical threat scenarios.</li>
+            <li>Define Tier 1 validation steps, Tier 2 investigation scope, specialist triggers, incident declaration authority, and business-owner response authority.</li>
+            <li>Create one case state diagram, one escalation matrix, one shift-handover template, and degraded-mode procedure for SIEM or identity-platform failure.</li>
+            <li>Run a tabletop alert through the process. Measure decision time, handoff loss, repeated work, unavailable context, and ambiguous authority.</li>
+            <li>Revise the service catalogue and record the remaining accepted risks.</li>
+          </ol>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> another shift can inherit the case and explain current state, supporting evidence, open questions, next action, owner, deadline, and authority without contacting the original analyst.</p>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2025/2025-02-24-soc-tier-1-the-complete-onboarding-guide-to-security-monitoring-and-incident-response-824a1dfe4476">SOC Tier 1 onboarding guide</a> · <strong>Primary:</strong> <a href="https://csrc.nist.gov/pubs/sp/800/61/r3/final" target="_blank" rel="noopener noreferrer">NIST SP 800-61r3</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m2">
+        <div class="group-header"><h2 class="group-title">Module 2 — Asset, service, identity, and exposure context</h2><span class="group-count">Know what the event concerns</span></div>
+        <p class="group-note">Fast investigation depends on current context. Enrichment should narrow uncertainty, not flood the case with unverified OSINT or stale inventory.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="asset-model">Build a point-in-time defensive entity model</span>
+          <p class="guide-desc">Maintain stable records for applications, services, hosts, cloud resources, containers, devices, networks, identities, credentials, data stores, software, vulnerabilities, vendors, and owners. Record source, verification time, lifecycle state, confidence, aliases, and relationships. Separate authoritative inventory from discovered evidence and analyst inference.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="business-context"><h3>Business context</h3><p>Attach criticality, customer impact, data classification, regulatory boundary, recovery objectives, on-call owner, maintenance window, geography, environment, and dependency path. A development host with a path to a production secret can be higher priority than a nominally “critical” isolated server.</p></div>
+            <div class="practice-block" id="exposure-context"><h3>Exposure and vulnerability</h3><p>Record internet reachability, trust zone, gateway, public name, address ownership, certificate, listening services, software evidence, configuration, vulnerability candidate, exploit prerequisites, compensating control, and validation state. Shared CDN or SaaS infrastructure must not be imported as customer-owned assets merely because it appears in DNS or scan results.</p></div>
+            <div class="practice-block" id="context-quality"><h3>Quality signals</h3><p>Measure freshness, source authority, coverage, orphaned records, duplicate identities, unresolved owners, ephemeral-resource reconciliation, IP reuse, stale vulnerabilities, and conflicting criticality. Display uncertainty to analysts instead of silently choosing one source.</p></div>
+            <div class="practice-block"><h3>Safe enrichment</h3><p>Cache and timestamp reputation, passive DNS, certificate, ASN, geolocation, vulnerability, threat intelligence, and sandbox results. Preserve provider terms, query provenance, rate limits, privacy boundaries, and whether a result concerns the exact artifact or shared infrastructure.</p></div>
+          </div>
+          <h3 id="context-practice">Applied exercise — enrich an internet alert</h3>
+          <ol class="workflow-steps">
+            <li>Start with one outbound network event. Resolve endpoint, user, process, service, owner, environment, and event-time IP allocation from authoritative sources.</li>
+            <li>Resolve destination name, IP, ASN, certificate, passive history, reputation, and known intelligence with collection times and source citations.</li>
+            <li>Separate confirmed entity links, time-bounded observations, heuristics, and unrelated shared-hosting results.</li>
+            <li>Recalculate priority using asset importance, exposure, behavior, confidence, and potential impact—not reputation score alone.</li>
+            <li>Record which enrichment changed the decision and which merely increased noise.</li>
+          </ol>
+          <p class="boundary"><strong>Boundary:</strong> active scanning, sandbox submission, file upload, third-party lookup, or external AI processing may disclose customer data or touch systems outside authority. Use approved providers, sanitized inputs, and explicit assessment authorization.</p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m3">
+        <div class="group-header"><h2 class="group-title">Module 3 — Telemetry and logging architecture</h2><span class="group-count">Observe the decision-relevant behavior</span></div>
+        <p class="group-note">Collecting more data is not equivalent to visibility. Start with decisions and behaviors, define required fields, test the complete path, and continuously monitor data health.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="telemetry-requirements">Translate behavior into telemetry requirements</span>
+          <p class="guide-desc">For each priority behavior, name the actor, action, object, outcome, source and destination, session, process or request lineage, privilege, timestamp semantics, and expected benign context. Identify the source that can observe each element and the control point that can respond. ATT&amp;CK detection strategies and analytics can help organize behavior and mutable environmental elements; note that the older ATT&amp;CK data-source catalogue is retained for reference but deprecated from v18 onward.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="collection-pipeline"><h3>Collection pipeline</h3><p>Document producer → local buffer → agent or API → broker → parser → normalization → enrichment → storage → query → analytic → alert → case. At each hop record authentication, encryption, batching, retry, loss behavior, ordering, backpressure, permissions, and health metrics.</p></div>
+            <div class="practice-block" id="normalization"><h3>Normalization</h3><p>Retain raw events and map to a documented schema. OCSF supplies a vendor-neutral security-event model; OpenTelemetry supplies interoperable telemetry concepts. A mapping must preserve source field, normalized field, type, unit, cardinality, enum, null behavior, transformation, parser version, and examples.</p></div>
+            <div class="practice-block" id="telemetry-quality"><h3>Quality and health</h3><p>Monitor source count, event rate, freshness, lag, parse failures, unknown enum values, null critical fields, duplicate rate, dropped messages, clock skew, schema drift, cardinality explosion, permission failures, and collector resource pressure. Alert on silent data loss separately from adversary behavior.</p></div>
+            <div class="practice-block" id="retention-access"><h3>Retention and access</h3><p>Match hot, warm, archive, and evidence retention to investigation needs, cost, legal holds, privacy, and recovery. Apply least privilege, field-level protection where needed, query auditing, export controls, immutable evidence storage, and tested restoration.</p></div>
+          </div>
+          <h3>Minimum telemetry contract</h3>
+          <div class="table-wrap"><table class="reference-table"><thead><tr><th>Contract field</th><th>Required definition</th><th>Validation</th></tr></thead><tbody>
+            <tr><td>Source identity</td><td>Producer, tenant, environment, integration, schema and parser version</td><td>Known fixture retains identifiers through storage</td></tr>
+            <tr><td>Time</td><td>Source, event, collection and ingestion semantics; zone and precision</td><td>Injected event compared across every hop</td></tr>
+            <tr><td>Entity</td><td>Stable user, device, workload, application, resource and session keys</td><td>Join accuracy tested against authoritative inventory</td></tr>
+            <tr><td>Action</td><td>Verb, object, result, reason, privilege and request lineage</td><td>Success, denial, failure and partial outcomes generated</td></tr>
+            <tr><td>Health</td><td>Heartbeat, volume envelope, lag, loss, parse and authorization metrics</td><td>Collector stop, queue delay and schema change exercised</td></tr>
+          </tbody></table></div>
+          <h3 id="telemetry-practice">Applied exercise — onboard one high-value source</h3>
+          <ol class="workflow-steps">
+            <li>Select one behavior and write the exact fields needed to distinguish malicious, administrative, automated, and ambiguous activity.</li>
+            <li>Generate controlled success, failure, denial, and edge-case events. Preserve source output.</li>
+            <li>Trace each record through collection, parsing, normalization, enrichment, storage, query, rule, alert, and case.</li>
+            <li>Stop the collector, delay the queue, rotate a credential, change one field type, and exceed the normal rate. Verify health detection and recovery.</li>
+            <li>Publish the source contract, coverage limit, retention, owner, support path, cost, and test fixtures.</li>
+          </ol>
+          <p class="further-reading"><strong>Primary:</strong> <a href="https://ocsf.io/" target="_blank" rel="noopener noreferrer">OCSF</a> · <a href="https://opentelemetry.io/docs/concepts/signals/logs/" target="_blank" rel="noopener noreferrer">OpenTelemetry logs</a> · <a href="https://attack.mitre.org/detectionstrategies/" target="_blank" rel="noopener noreferrer">ATT&amp;CK detection strategies</a> · <a href="https://www.cisa.gov/audiences/small-and-medium-businesses/secure-your-business/use-logging-on-business-systems" target="_blank" rel="noopener noreferrer">CISA logging guidance</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m4">
+        <div class="group-header"><h2 class="group-title">Module 4 — Detection engineering and detection as code</h2><span class="group-count">Behavior to tested decision logic</span></div>
+        <p class="group-note">A production detection is a maintained software-and-operations artifact: hypothesis, data contract, logic, tests, deployment, monitoring, runbook, ownership, tuning, and retirement.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="detection-model">Write the analytic contract before the query</span>
+          <p class="guide-desc">Define the adversary or risky behavior, why it matters in this environment, required telemetry, observable sequence, expected legitimate behavior, entity scope, time window, threshold, severity rationale, case fields, analyst decision, response options, owner, and limitations. Map ATT&amp;CK only when the behavior supports the mapping. A technique label does not prove coverage of every implementation of that technique.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="rule-lifecycle"><h3>Lifecycle</h3><p>Backlog → researched → specified → implemented → unit-tested → replay-tested → peer-reviewed → staged → simulated → production → monitored → tuned → superseded or retired. Require evidence for each transition and a rollback path for logic or pipeline changes.</p></div>
+            <div class="practice-block" id="rule-as-code"><h3>Detection as code</h3><p>Store rule source, schema, metadata, tests, fixtures, mappings, runbook, changelog, ownership, deployment target, and conversion pipeline in version control. CI should validate syntax, schema, unique identifiers, references, field availability, mappings, test results, secrets, performance budgets, and generated queries.</p></div>
+            <div class="practice-block" id="behavior-correlation"><h3>Behavior and correlation</h3><p>Single-event analytics are useful for rare, high-signal actions. Correlations connect events by identity, host, process, session, request, resource, destination, or time. Sequences can improve context but create ordering, cardinality, windowing, late-arrival, duplicate, and state-expiry failure modes that must be tested.</p></div>
+            <div class="practice-block" id="tuning-retirement"><h3>Tuning and retirement</h3><p>Prefer scoped contextual filters over broad allowlists. Every suppression needs owner, reason, target, expiry, review, and estimated miss risk. Retire rules when the behavior, telemetry, control, product, or threat premise no longer applies; retain history and a replacement link.</p></div>
+          </div>
+          <h3>Portable rule metadata</h3>
+          <p>Sigma provides a structured, shareable rule format with log source, detection logic, status, references, tags, false-positive notes, severity, and other metadata. Conversion does not make a rule production-ready: field mappings, backend semantics, case sensitivity, wildcard behavior, escaping, aggregation, time windows, null handling, and source availability must be validated in the destination.</p>
+          <pre><code>title: Suspicious Encoded PowerShell With Network Follow-On
+id: 0d5e5d83-17d1-4fc6-bdaf-6c524d1fd086
+status: experimental
+description: Lab example; validate field mappings and benign automation locally.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_image:
+    Image|endswith: '\powershell.exe'
+  selection_flag:
+    CommandLine|contains:
+      - ' -enc '
+      - 'FromBase64String'
+  condition: selection_image and selection_flag
+falsepositives:
+  - Approved administrative automation
+level: medium
+tags:
+  - attack.execution
+  - attack.t1059.001</code></pre>
+          <h3 id="detection-practice">Applied exercise — productionize one analytic</h3>
+          <ol class="workflow-steps">
+            <li>Start with a behavior hypothesis and build positive, near-positive, benign, malformed, duplicate, late, and missing-field fixtures.</li>
+            <li>Implement the smallest logic that separates the labeled fixtures. Document every field and backend assumption.</li>
+            <li>Replay against representative historical data. Review sampled matches and non-matches; record label criteria and uncertainty.</li>
+            <li>Deploy in observation mode, measure volume and latency, simulate the behavior safely, and verify alert and case content.</li>
+            <li>Release with owner, runbook, monitoring, change record, rollback, review date, and explicit coverage boundary.</li>
+          </ol>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> the rule repository, generated backend query, deployed object, test result, observed event, alert, case, analyst decision, and response evidence are linked by stable identifiers and versions.</p>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/newest-detection-engineering-techniques/">Newest Detection Engineering Techniques</a> · <a href="/articles/read/2026/2026-04-14-from-threat-intelligence-to-detection-a-practitioner-s-guide-2d930b168426">From Threat Intelligence to Detection</a> · <strong>Primary:</strong> <a href="https://sigmahq.io/docs/basics/rules.html" target="_blank" rel="noopener noreferrer">Sigma rule documentation</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m5">
+        <div class="group-header"><h2 class="group-title">Module 5 — Threat hunting</h2><span class="group-count">Test a bounded hypothesis</span></div>
+        <p class="group-note">A hunt is a planned investigation of a defined hypothesis in available telemetry. It is not an unbounded search for “anything suspicious,” and it does not claim execution against systems unless the query was actually run.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="hunt-hypothesis">Construct a testable hypothesis</span>
+          <p class="guide-desc">Derive the hypothesis from threat intelligence, an incident, a coverage gap, a new technology, an anomaly, or a control change. State actor or behavior, target population, expected observables, data sources, time window, alternative explanations, and a disconfirmation condition. Example: “On managed Windows endpoints, an adversary may execute encoded PowerShell from an Office child process and make a new outbound connection within five minutes; approved deployment tooling is the main expected benign cause.”</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="hunt-plan"><h3>Plan</h3><p>Record scope, owner, priority, ATT&amp;CK mapping, data contracts, field and time semantics, queries per platform, expected volume, join keys, review sampling, evidence handling, stop conditions, safety, and escalation. Verify source health before interpreting absence.</p></div>
+            <div class="practice-block" id="hunt-analysis"><h3>Analyze</h3><p>Begin broad enough to validate the data, then narrow by behavior and context. Keep query versions and result counts. Pivot across parent/child process, identity, session, device, DNS, network, file, cloud, and service activity. Test competing explanations and inspect raw events when normalized fields drive the conclusion.</p></div>
+            <div class="practice-block" id="hunt-handoff"><h3>Conclude and hand off</h3><p>Close as supported, unsupported in searched data, partially supported, inconclusive, or blocked by visibility. Separate findings, leads, coverage gaps, data-quality issues, new detections, control work, incident escalation, and accepted risk. Record the searchable population and limitations.</p></div>
+            <div class="practice-block"><h3>Build reusable knowledge</h3><p>Promote proven logic into tested detections; store safe query examples by language; link required telemetry and ATT&amp;CK behavior; add false-positive notes; and record when the hunt should run again. A hunt that finds nothing can still improve the data contract or disprove a threat assumption.</p></div>
+          </div>
+          <h3 id="hunt-practice">Applied exercise — encoded PowerShell behavior chain</h3>
+          <ol class="workflow-steps">
+            <li>Confirm process creation, PowerShell script-block or equivalent, network, DNS, and endpoint identity data for the selected population.</li>
+            <li>Query for encoded or decode-related PowerShell usage; measure normal prevalence and identify common management tools.</li>
+            <li>Join suspicious process events to parent process, signer, user, endpoint, destination, and subsequent file or persistence activity.</li>
+            <li>Review high-context matches against approved change and automation records. Preserve exact raw events and query version for candidates.</li>
+            <li>Create a detection proposal for the stable behavior chain and a telemetry backlog item for any unanswerable part.</li>
+          </ol>
+          <p class="boundary"><strong>Boundary:</strong> AI can propose hypotheses, queries, pivots, and summaries, but it cannot assert that a query ran, invent a result, assign a verdict, or replace analyst validation of fields and syntax.</p>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/adversarygraph/full-version-feature-guides.html#threat-hunting">Threat hunting with AdversaryGraph</a> · <a href="/articles/read/2025/2025-12-12-protocol-level-network-threat-hunting-a-wireshark-centric-guide-a6770ffc96c6">Protocol-level network hunting</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m6">
+        <div class="group-header"><h2 class="group-title">Module 6 — Alert triage, investigation, and escalation</h2><span class="group-count">Convert a lead into a decision</span></div>
+        <p class="group-note">Triage establishes whether the alert concerns the expected entity and behavior, whether immediate protection is needed, and who should own the next decision. It should not become shallow box-checking or an endless investigation at Tier 1.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="triage-intake">Validate intake before enrichment</span>
+          <p class="guide-desc">Confirm alert identifier, rule version, source events, time range, entity, environment, current rule health, duplicates, known test activity, and whether the data is complete. Read the logic and runbook. Determine what matched and which part of the description is interpretation. Assign priority using potential impact, asset and identity context, behavior, confidence, exposure, active scope, and response urgency.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="triage-enrichment"><h3>Bounded enrichment</h3><p>Collect only information that can change a decision: process lineage, signer and hash, user/session, asset, service owner, destination, threat intelligence, vulnerability, recent changes, peer behavior, authentication, and adjacent alerts. Timestamp external lookups and distinguish exact matches from associations.</p></div>
+            <div class="practice-block" id="investigation-timeline"><h3>Timeline and competing hypotheses</h3><p>Build an ordered activity graph around the entity and event. List at least one malicious, one benign, and one data-quality explanation. For each, record supporting evidence, contradicting evidence, and the next discriminating query. Do not let the alert title become the hypothesis.</p></div>
+            <div class="practice-block" id="escalation"><h3>Escalation</h3><p>Escalate with a decision request, not a data dump: what happened, affected entities, why it matters, evidence, uncertainty, actions taken, immediate risk, requested authority, recommended next steps, containment options, owner, and deadline. Use an incident trigger matrix for high-impact or multi-system activity.</p></div>
+            <div class="practice-block"><h3>Closure</h3><p>Use specific dispositions and reason codes. Link evidence, record whether the rule worked as intended, capture a tuning or engineering task, remove temporary response changes, notify stakeholders, and set a reopen condition. “False positive” should not hide missing data, expected test, duplicate, or unresolved activity.</p></div>
+          </div>
+          <h3 id="triage-practice">Applied exercise — suspicious administrative login</h3>
+          <ol class="workflow-steps">
+            <li>Validate tenant, immutable identity, source IP, device, authentication method, conditional-access outcome, session, target resource, and event timing.</li>
+            <li>Compare recent password, MFA, group, role, device, consent, and sign-in changes. Check whether source reputation applies to a shared provider or exact endpoint.</li>
+            <li>Look for privilege use, mailbox rules, OAuth grants, secret changes, discovery, data access, and persistence in the same session or identity path.</li>
+            <li>Contact the owner through an independent approved channel when required; never rely solely on the potentially compromised account.</li>
+            <li>Escalate or close with explicit evidence, alternative explanation, rule feedback, and any session or credential cleanup.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2025/2025-02-24-soc-tier-1-the-complete-onboarding-guide-to-security-monitoring-and-incident-response-824a1dfe4476">SOC Tier 1 complete onboarding guide</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m7">
+        <div class="group-header"><h2 class="group-title">Module 7 — Endpoint defense and EDR</h2><span class="group-count">Process, persistence, credential, and response evidence</span></div>
+        <p class="group-note">Endpoint telemetry is powerful because it exposes execution and state change, but sensor visibility, operating-system semantics, identity, and process lineage must be understood before assigning intent.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="endpoint-telemetry">Design endpoint visibility around behaviors</span>
+          <p class="guide-desc">Collect process creation and termination, parent and ancestry, command execution, image and module load, signer, file creation and modification, registry or configuration change, service and scheduled task, logon and token activity, script content where approved, network connection, DNS, driver, security control state, removable media, and sensor health. On Linux and macOS, map equivalent process, audit, launch, persistence, package, shell, authorization, and network sources instead of forcing Windows field assumptions.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="process-reasoning"><h3>Process reasoning</h3><p>Analyze image path, canonical executable, hash, signer, reputation, parent, grandparent, user, integrity or privilege, session, command line, working directory, environment, file origin, loaded code, network activity, and downstream state changes. No single field proves maliciousness.</p></div>
+            <div class="practice-block" id="endpoint-response"><h3>Response actions</h3><p>Isolation, process termination, file quarantine, hash block, credential reset, memory capture, forensic package, scan, script collection, and reimage have different evidence and availability effects. Require target verification, authority, action logging, success check, alternate access, rollback, and service-owner coordination.</p></div>
+            <div class="practice-block" id="endpoint-gaps"><h3>Coverage gaps</h3><p>Account for sensor tampering, kernel and firmware boundaries, unmanaged hosts, offline devices, VDI, containers, ephemeral workloads, encrypted or in-memory content, interpreter and living-off-the-land behavior, exclusion policies, performance sampling, event loss, and privacy limits.</p></div>
+            <div class="practice-block"><h3>Endpoint hardening loop</h3><p>Detection should inform application control, least privilege, script policy, attack-surface reduction, credential protection, patching, logging, administrative tiering, and backup. D3FEND provides useful countermeasure vocabulary, but it does not prescribe or rank effectiveness for a local environment.</p></div>
+          </div>
+          <h3 id="endpoint-practice">Applied exercise — Office-to-script-to-network chain</h3>
+          <ol class="workflow-steps">
+            <li>Generate a safe lab process chain with a document-like parent, script interpreter, benign encoded content, file write, and controlled destination.</li>
+            <li>Trace original events through collection and normalization. Confirm process GUID or equivalent links survive.</li>
+            <li>Write single-event and correlation variants. Test with common administrative scripts, deployment tools, login scripts, and developer workflows.</li>
+            <li>Verify alert fields allow Tier 1 to see parent, command, signer, user, host, destination, and event references without opening multiple consoles.</li>
+            <li>Test isolation and evidence collection on a lab host; verify authorization, action result, user impact, and rollback.</li>
+          </ol>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> report observed process and state behavior. Do not label a binary “malware” solely because it is unsigned, rare, encoded, or launched by a suspicious parent.</p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m8">
+        <div class="group-header"><h2 class="group-title">Module 8 — Network defense, protocol analysis, and NDR</h2><span class="group-count">Connection context beyond an IP</span></div>
+        <p class="group-note">Network evidence describes communication from a particular observation point. Interpret routing, address translation, proxies, shared infrastructure, encryption, and application semantics before attributing the activity.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="network-visibility">Choose the right observation points</span>
+          <p class="guide-desc">Flow records summarize who communicated, when, for how long, and how much. DNS adds requested names and resolution context. Proxy and gateway logs add user, URL, method, policy, and application. Firewall logs add control decisions. Packet capture adds protocol content where collection is lawful and technically available. Endpoint network events add initiating process. Cloud flow and load-balancer logs expose virtual-network paths. No source alone reconstructs every hop.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="protocol-analysis"><h3>Protocol analysis</h3><p>Validate protocol rather than trusting the port. Inspect handshake, direction, state, method or message type, status, negotiated features, timing, payload size, periodicity, errors, and peer behavior. Establish the expected application and compare deviations across the same service and population.</p></div>
+            <div class="practice-block" id="encrypted-traffic"><h3>Encrypted traffic</h3><p>Use SNI where present, certificate, issuer, validity, JA4 or other approved fingerprints, ALPN, DNS, flow shape, destination history, proxy identity, endpoint process, and service context. Fingerprints and reputation are supporting features, not verdicts. TLS inspection has privacy, legal, trust, performance, and application-compatibility consequences.</p></div>
+            <div class="practice-block" id="network-response"><h3>Network response</h3><p>Blocking a domain, address, certificate, URL, application, account, or route has different precision and collateral risk. Shared hosting, CDNs, cloud ranges, resolvers, and SaaS make broad address blocks dangerous. Record scope, expiry, owner, business exception, propagation, verification, and rollback.</p></div>
+            <div class="practice-block"><h3>NDR limits</h3><p>East-west blind spots, remote users, split tunneling, QUIC, encrypted DNS, service meshes, cloud-provider abstractions, NAT, sampling, packet loss, asymmetric routing, short retention, and high-throughput truncation can hide or distort behavior. Monitor the sensor and capture path as a production service.</p></div>
+          </div>
+          <h3 id="network-practice">Applied exercise — protocol-level beacon investigation</h3>
+          <ol class="workflow-steps">
+            <li>Select a controlled endpoint and generate a benign periodic HTTPS request to a lab service with known timing and payload.</li>
+            <li>Collect endpoint process/network, DNS, flow, proxy, TLS, and packet evidence where authorized. Align clock and observation points.</li>
+            <li>Measure periodicity, jitter, bytes, request method, path variation, connection reuse, certificate, SNI, and process ancestry.</li>
+            <li>Compare with software update, monitoring, collaboration, and management traffic. Determine which features are stable and discriminating.</li>
+            <li>Create a hunt or analytic proposal that combines network behavior with endpoint and asset context; document environments where it cannot work.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2025/2025-12-12-protocol-level-network-threat-hunting-a-wireshark-centric-guide-a6770ffc96c6">Protocol-Level Network Threat Hunting</a> · <a href="/labs.html">Attack–defense labs</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m9">
+        <div class="group-header"><h2 class="group-title">Module 9 — Identity defense and ITDR</h2><span class="group-count">Protect the trust graph</span></div>
+        <p class="group-note">Modern incidents often progress through valid identities, sessions, applications, devices, federation, certificates, and delegated trust. Defend the effective identity path, not only password events.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="identity-graph">Model identity as a changing graph</span>
+          <p class="guide-desc">Represent human and service identities, devices, workloads, tenants, directories, groups, roles, permissions, applications, credentials, certificates, sessions, federation, delegation, recovery methods, and resources. Record immutable IDs and point-in-time memberships. High-risk edges include privilege assignment, group control, password or key reset, consent, impersonation, delegation, certificate enrollment, role assumption, session creation, and trust-policy change.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="ad-detection"><h3>AD and Kerberos</h3><p>Correlate logon, ticket request, directory query, group and ACL change, service principal, certificate services, replication, remote service, process, and endpoint evidence. Kerberoasting, DCSync, pass-the-ticket, golden-ticket, delegation, and AD CS abuse require different prerequisites and artifacts; one Windows event ID is rarely sufficient.</p></div>
+            <div class="practice-block" id="cloud-identity"><h3>Cloud identity</h3><p>Monitor sign-in, authentication strength, conditional access, device state, session, token, application consent, OAuth permission, service principal, workload identity, role assignment, mailbox and forwarding rule, secret or certificate, federation, and administrative API use. Connect control-plane actions to the effective identity and session.</p></div>
+            <div class="practice-block" id="identity-response"><h3>Identity response</h3><p>Actions may include session revocation, credential rotation, account disable, role removal, consent revocation, token invalidation, device quarantine, federation key rotation, certificate revocation, and recovery-method reset. Order matters: an attacker-controlled recovery path can restore access after a password change.</p></div>
+            <div class="practice-block"><h3>Identity baselines</h3><p>Compare role, privilege, device, location, authentication method, client, resource, peer group, and working pattern. Do not equate travel, VPN, cloud egress, or new device with compromise. Baselines should explain features and tolerate legitimate changes.</p></div>
+          </div>
+          <h3 id="identity-practice">Applied exercise — Kerberoasting detection and response</h3>
+          <ol class="workflow-steps">
+            <li>Build a lab domain with a controlled SPN account, test user, endpoint telemetry, domain-controller events, and known time synchronization.</li>
+            <li>Generate normal service-ticket traffic and an authorized Kerberoasting simulation. Compare request encryption type, volume, target SPNs, requesting identity, host, process, and subsequent activity.</li>
+            <li>Test a rule against administrative scanners, service discovery, monitoring, and application behavior. Avoid a blanket “any RC4 ticket is malicious” verdict.</li>
+            <li>Investigate the identity path: credential exposure, privilege, reachable systems, delegation, group control, logons, and persistence.</li>
+            <li>Practice containment order, evidence preservation, service-owner coordination, password rotation, ticket/session invalidation, and verification.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km ITDR:</strong> <a href="/ITDR/docs/detection/detection-framework/">Detection framework</a> · <a href="/ITDR/docs/detection/ad-attack-detection/detect-kerberoasting/">Detecting Kerberoasting</a> · <a href="/ITDR/docs/detection/ad-attack-detection/detect-dcsync/">Detecting DCSync</a> · <a href="/ITDR/docs/detection/cloud-attack-detection/detect-mfa-fatigue/">Detecting MFA fatigue</a> · <a href="/ITDR/docs/simulations/simulation-framework/">Simulation framework</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m10">
+        <div class="group-header"><h2 class="group-title">Module 10 — Cloud, containers, Kubernetes, and SaaS defense</h2><span class="group-count">Control-plane and runtime evidence</span></div>
+        <p class="group-note">Cloud defense begins with organization, tenant, account, subscription, project, cluster, namespace, region, identity, and resource IDs. IP addresses and instance names alone are unreliable in elastic environments.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="cloud-control-plane">Treat control-plane APIs as privileged operating-system events</span>
+          <p class="guide-desc">Collect administrative and data-access events for identity, compute, network, storage, database, secrets, keys, logging, security controls, serverless, orchestration, and organization policy. Preserve actor, assumed role or service principal, session, source, user agent, API, resource, region, request parameters with secret filtering, result, error, and request ID. Monitor log disabling, policy changes, snapshot or image creation, public exposure, credential creation, discovery bursts, and cross-account access.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="kubernetes-defense"><h3>Kubernetes audit</h3><p>Kubernetes audit records can answer who did what, when, to which resource, from where, and with what result. Policy controls whether metadata, request, or response bodies are recorded. Collect API audit, authentication, RBAC, admission, controller, kubelet where accessible, workload, runtime, image, registry, network, and cloud control-plane data while protecting secrets in bodies.</p></div>
+            <div class="practice-block" id="workload-runtime"><h3>Workload and runtime</h3><p>Map image digest, signature or provenance, deployment, namespace, service account, node, pod UID, container ID, process, file, network, capability, mount, secret access, exec, port-forward, and admission result. Ephemeral workloads require prompt enrichment and retention of orchestration history.</p></div>
+            <div class="practice-block" id="saas-defense"><h3>SaaS defense</h3><p>Prioritize identity, session, sharing, export, API token, OAuth application, mailbox rule, administrative change, data access, device, and audit-configuration events. Verify the provider’s retention, export delay, API limits, schema changes, administrator access model, and incident-support process.</p></div>
+            <div class="practice-block"><h3>Cloud response</h3><p>Actions include revoking a session, disabling a key, removing a role, isolating a workload, changing a security group, blocking public access, rotating a secret, snapshotting evidence, scaling down, quarantining an image, or restoring policy. Automation must verify account, region, resource ID, current owner, dependencies, and rollback.</p></div>
+          </div>
+          <h3 id="cloud-practice">Applied exercise — suspicious Kubernetes secret access</h3>
+          <ol class="workflow-steps">
+            <li>Enable an approved audit policy in a lab and verify event stages, user, groups, source IP, verb, resource, namespace, name, response, request ID, and omission of sensitive content.</li>
+            <li>Create normal controller and workload access, then perform an authorized unexpected secret list/get with a test service account.</li>
+            <li>Correlate API audit with RBAC, pod, image, process, node, network, and cloud identity. Distinguish a controller, human administrator, compromised workload, and scanner.</li>
+            <li>Test alert volume and late events. Verify ephemeral pod and service-account context remains available after deletion.</li>
+            <li>Practice token revocation or workload isolation, policy correction, secret rotation, redeployment, and service verification.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2026/2026-02-11-kubernetes-logging-and-monitoring-complete-guide-2ce9d4bdba80">Kubernetes Logging and Monitoring</a> · <strong>Primary:</strong> <a href="https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/" target="_blank" rel="noopener noreferrer">Kubernetes auditing</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m11">
+        <div class="group-header"><h2 class="group-title">Module 11 — Email, web, API, data, and insider defense</h2><span class="group-count">Cross-domain behavior and human context</span></div>
+        <p class="group-note">These investigations cross technical and organizational boundaries. Apply privacy, legal, HR, communications, and data-handling rules while maintaining technical rigor and presumption discipline.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="email-defense">Defend the delivery, identity, session, execution, and data paths</span>
+          <p class="guide-desc">For email, preserve message and trace identifiers, sender and envelope, authentication results, routing, URLs, attachments, sandbox evidence, recipient actions, mailbox rules, forwarding, authentication, session, OAuth grants, and post-delivery remediation. Do not infer sender identity from a display name or single header. Coordinate message purge, URL block, session revocation, password reset, consent removal, endpoint review, and recipient communication.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="web-defense"><h3>Web and API</h3><p>Correlate edge, WAF, gateway, application, authentication, authorization, database, cache, service mesh, trace, and deployment events by request or trace ID. Monitor abnormal authentication, enumeration, injection indicators, object access, rate change, error patterns, administrative API use, data export, and control bypass while accounting for bots, scanners, retries, and application releases.</p></div>
+            <div class="practice-block" id="data-defense"><h3>Data movement</h3><p>Model source, actor, object, classification, operation, destination, volume, rate, compression, encryption, sharing, removable media, print, clipboard, repository, cloud storage, email, and network path. Context should include role, project, approved workflow, time, peer baseline, offboarding, and service-account behavior.</p></div>
+            <div class="practice-block" id="insider-defense"><h3>Insider-risk discipline</h3><p>Detection should identify reviewable behavior, not declare motive or guilt. Separate malicious insider, compromised account, negligent action, policy violation, legitimate exception, automation, and data-quality explanations. Limit access to sensitive case information; use independent review and approved HR/legal processes.</p></div>
+            <div class="practice-block"><h3>Human-centered response</h3><p>Protect potentially affected people, avoid unnecessary disclosure, use neutral language, document need-to-know access, and preserve appeal or correction paths. Security evidence can be incomplete, biased by coverage, or misattributed through shared identities.</p></div>
+          </div>
+          <h3 id="human-practice">Applied exercise — unusual repository-to-cloud transfer</h3>
+          <ol class="workflow-steps">
+            <li>Create a synthetic repository and data classification. Generate normal developer clones and an approved large export to a lab destination.</li>
+            <li>Collect identity, device, repository audit, endpoint process, file, archive, DNS, proxy, network, and cloud-storage evidence.</li>
+            <li>Test volume-, rarity-, destination-, archive-, off-hours-, and role-aware analytics independently and as a sequence.</li>
+            <li>Review false assumptions: build agents, backups, migrations, incident responders, remote work, shared accounts, and approved transfer tools.</li>
+            <li>Practice a need-to-know escalation with neutral facts, technical containment options, evidence preservation, and legal/HR decision ownership.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2026/2026-04-22-detecting-malicious-insider-activity-a-technical-detection-engineering-guide-3c3b41e95e82">Detecting Malicious Insider Activity</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m12">
+        <div class="group-header"><h2 class="group-title">Module 12 — Incident response, DFIR, crisis coordination, and recovery</h2><span class="group-count">Technical action under governed authority</span></div>
+        <p class="group-note">Incident response spans preparation, detection, analysis, response, and recovery across the organization. Current NIST SP 800-61r3 aligns incident-response recommendations with the six CSF 2.0 Functions rather than treating response as an isolated late-stage process.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="ir-preparation">Prepare authority, evidence, communications, and alternatives</span>
+          <p class="guide-desc">Maintain incident classification and declaration criteria, severity model, on-call roster, incident command roles, service and business contacts, legal and regulatory path, communications plan, evidence procedures, responder access, clean communications, emergency credentials, provider support, forensic capability, backup and restoration evidence, containment patterns, and exercise schedule. Test these dependencies before an incident.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="ir-analysis"><h3>Analysis and scoping</h3><p>Establish initial facts, affected services and identities, potential impact, entry and persistence hypotheses, time bounds, known and unknown entities, current activity, data exposure question, evidence sources, collection priority, and confidence. Maintain an incident timeline, action log, decision log, evidence index, hypothesis register, and task board.</p></div>
+            <div class="practice-block" id="contain-eradicate"><h3>Containment and eradication</h3><p>Choose actions by risk, scope, reversibility, evidence effect, operational impact, attacker visibility, dependencies, and recovery readiness. Short-term containment may isolate endpoints, revoke sessions, restrict network paths, disable exposed keys, or protect a service. Eradication addresses persistence, credentials, vulnerable paths, malicious artifacts, and control failures after sufficient scope is established.</p></div>
+            <div class="practice-block" id="recover-learn"><h3>Recovery and learning</h3><p>Recover from known-good state, rotate affected trust, verify configuration and identity, restore monitoring, increase observation, test business transactions, communicate residual risk, and define closure criteria. Post-incident review should separate causal factors, detection and response gaps, control improvements, owners, dates, validation, and accepted risk.</p></div>
+            <div class="practice-block"><h3>Evidence handling</h3><p>Record collector, authority, source, acquisition method, time, tool and version, target identifier, hash where appropriate, storage, access, transfer, transformation, and analysis. Preserve originals and work from verified copies. Legal admissibility requirements vary; coordinate with counsel and applicable policy.</p></div>
+          </div>
+          <h3 id="ir-practice">Applied exercise — compromised cloud administrator</h3>
+          <ol class="workflow-steps">
+            <li>Run a tabletop using synthetic sign-in, role, token, secret, audit-policy, storage, and endpoint events. Declare assumptions and unavailable evidence.</li>
+            <li>Assign incident command, investigation, cloud, identity, endpoint, communications, legal/privacy, and service-owner roles.</li>
+            <li>Build a timeline and scope graph. Decide whether and when to revoke sessions, disable identity, protect break-glass accounts, rotate secrets, preserve logs, and isolate workloads.</li>
+            <li>Introduce a business dependency that makes immediate account disable risky. Document the decision, compensating control, approval, monitoring, and deadline.</li>
+            <li>Recover, verify, monitor, close, and create tested detection, logging, identity, and runbook improvements.</li>
+          </ol>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> each material response action has a named approver, exact target, rationale, expected impact, execution record, success verification, evidence consequence, rollback or recovery plan, and owner.</p>
+          <p class="further-reading"><strong>Primary:</strong> <a href="https://csrc.nist.gov/pubs/sp/800/61/r3/final" target="_blank" rel="noopener noreferrer">NIST SP 800-61 Revision 3</a> · <a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener noreferrer">NIST CSF 2.0</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m13">
+        <div class="group-header"><h2 class="group-title">Module 13 — AI-assisted defense, RAG, agents, and MCP</h2><span class="group-count">Assistance with explicit boundaries</span></div>
+        <p class="group-note">AI can accelerate mechanical analysis and expose useful pivots. It also introduces non-determinism, prompt injection, context leakage, unsupported claims, tool misuse, stale retrieval, and automation risk. Keep evidence, policy, and human authority outside the model.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="ai-roles">Define permitted AI roles by stage and data class</span>
+          <p class="guide-desc">Useful roles include summarizing a bounded evidence set; extracting entities with source spans; proposing hypotheses, queries, correlations, and false-positive checks; explaining rule logic; comparing timelines; drafting case notes; mapping reviewed behavior to ATT&amp;CK; translating a validated analytic between query languages; and identifying missing context. Prohibited or gated roles should include unsupervised verdicts, autonomous containment, uncontrolled external enrichment, secret handling, unsupported attribution, and claims that tools or queries ran when they did not.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="rag-context"><h3>RAG and provenance</h3><p>Retrieve from authorized, current, tagged data with stable IDs, source, timestamp, sensitivity, tenant, parser and embedding version, and access controls. Filter before retrieval, not only after generation. Return citations to exact records or passages. Reconcile new and changed IOCs, CVEs, reports, assets, rules, cases, and relationships; measure stale, orphaned, duplicate, and inaccessible chunks.</p></div>
+            <div class="practice-block" id="mcp-tools"><h3>MCP and tool use</h3><p>Expose small typed tools with explicit schemas, read versus write classification, target validation, timeouts, rate limits, result size limits, authentication, audit IDs, safe defaults, and structured errors. Keep scanners and high-risk utilities in isolated services. Require authorization evidence and human confirmation for external scans, uploads, changes, or response actions.</p></div>
+            <div class="practice-block" id="ai-controls"><h3>Control plane</h3><p>Use provider policy, model allowlist, data classification, prompt templates, tool allowlist, network egress control, secret broker, tenant isolation, context budgets, output schema validation, citation checks, human review, full audit, cost limits, kill switch, and fallback. Treat retrieved reports, webpages, emails, and tool output as untrusted content that may contain instructions.</p></div>
+            <div class="practice-block"><h3>Evaluation</h3><p>Test extraction accuracy, citation fidelity, unsupported-claim rate, schema validity, query correctness, secret leakage, tenant isolation, prompt injection, tool-selection precision, denial handling, timeout, partial result, duplicate actions, and human override. Preserve model, prompt, retrieval set, tool calls, output, reviewer changes, and final decision.</p></div>
+          </div>
+          <h3 id="ai-practice">Applied exercise — AI-assisted hunt query</h3>
+          <ol class="workflow-steps">
+            <li>Create a saved hunt hypothesis with data classification, selected provider policy, telemetry schema, and a reviewed context package.</li>
+            <li>Ask the assistant for Sigma, KQL, SPL, EQL, or YARA-L output using a strict response schema: language, query, required fields, assumptions, expected evidence, false positives, and validation steps.</li>
+            <li>Reject invented fields and syntax. Compile or parse where possible, review against the destination schema, and run only through an approved analyst-controlled workflow.</li>
+            <li>Compare returned rows with the hypothesis; preserve queries and raw event references. Ask the model to summarize only the supplied evidence with citations.</li>
+            <li>Record human edits, final disposition, provider/model/prompt version, retrieval references, token or cost metadata where policy requires, and whether the assistance improved time or quality.</li>
+          </ol>
+          <p class="boundary"><strong>Non-negotiable boundary:</strong> model output is a lead, not evidence. Retrieval relevance is not source truth. A tool call is not successful until its authenticated structured result is received, validated, linked to the case, and reviewed.</p>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/adversarygraph/full-version-feature-guides.html">AdversaryGraph AI, RAG, MCP, and module guide</a> · <a href="/adversarygraph/full-version-feature-guides.html#threat-hunting">AI-assisted threat hunting</a> · <strong>Primary:</strong> <a href="https://airc.nist.gov/" target="_blank" rel="noopener noreferrer">NIST AI Resource Center</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="m14">
+        <div class="group-header"><h2 class="group-title">Module 14 — Safe validation, purple teaming, metrics, and maturity</h2><span class="group-count">Prove the defensive chain</span></div>
+        <p class="group-note">Coverage claims require repeatable evidence. Validate the preventive control, event creation, transport, parsing, analytic, alert, case, analyst decision, and response separately.</p>
+        <article class="featured-term practice-panel">
+          <span class="guide-title" id="simulation">Use controlled behavior, not uncontrolled impact</span>
+          <p class="guide-desc">Select behavior from a current threat model or intelligence requirement. Define technique and implementation, target, preconditions, expected telemetry, safety limits, allowed effects, cleanup, stop condition, approvals, observers, and rollback. Use isolated lab systems when possible. In production, favor reversible tests with synthetic data and minimal mutation. Never assume an Atomic Red Team, CALDERA, custom script, or commercial simulation is safe merely because it is packaged as a test.</p>
+          <div class="practice-grid">
+            <div class="practice-block" id="validation-layers"><h3>Validation layers</h3><p>Record execution evidence, control outcome, raw source event, collector arrival, normalized fields, query result, rule match, alert fields, case creation, analyst acknowledgement, escalation, response action, target verification, and cleanup. A green rule test does not prove alert routing or operational response.</p></div>
+            <div class="practice-block" id="blue-metrics"><h3>Metrics that support decisions</h3><p>Measure source freshness and completeness, alert acknowledgement and decision time by priority, escalation quality, reopen rate, queue age, rule deployment lead time, test pass rate, sensor failure detection, incident containment and recovery milestones, exercise findings, overdue owners, and recurrence. Define population, clock, exclusions, owner, verification date, and limitations for every metric.</p></div>
+            <div class="practice-block" id="coverage-governance"><h3>Coverage governance</h3><p>Maintain a matrix of priority behavior → environment → required telemetry → analytic → test → runbook → owner → current state → last validation → limitation. Distinguish planned, data-ready, implemented, tested, operational, degraded, superseded, and retired. Never reduce this to colored ATT&amp;CK cells without evidence.</p></div>
+            <div class="practice-block" id="maturity"><h3>Maturity path</h3><p>Progress from ad hoc observation, to documented services and data contracts, versioned tested analytics, integrated response and exercises, then measured adaptive improvement. Maturity is not tool count or event volume; it is the repeatability and quality of risk-reducing decisions.</p></div>
+          </div>
+          <h3 id="validation-practice">Applied exercise — end-to-end detection validation</h3>
+          <ol class="workflow-steps">
+            <li>Select one priority behavior and retrieve the current rule, data contract, runbook, owner, and last validation evidence.</li>
+            <li>Create a safe execution plan with exact command or action, target, test account, observers, time, expected artifacts, stop conditions, and cleanup.</li>
+            <li>Run the test. Capture every layer from action to case without altering timestamps or substituting screenshots for raw evidence.</li>
+            <li>Have an uninformed analyst triage the resulting alert using the production workflow. Record missing context and ambiguous guidance.</li>
+            <li>Fix the narrowest failing layer, rerun, publish evidence, set the next review, and keep limitations visible.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/adversarygraph-docs/attack-simulation/">AdversaryGraph attack simulation</a> · <a href="/adversarygraph-docs/case-studies-validation/">Validation case studies</a> · <a href="/newest-detection-engineering-techniques/">Validated security telemetry</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="deep-dives">
+        <div class="group-header"><h2 class="group-title">Operator technical deep dives</h2><span class="group-count">7 implementation references</span></div>
+        <p class="group-note">Use these compact references during design and review. They expose the dependencies that graphical consoles often hide.</p>
+
+        <article class="reference-article" id="deep-pipeline">
+          <h3>Deep dive 1 — telemetry pipeline design and failure testing</h3>
+          <p>Begin with a source register: source and owner, environments, authentication, event types, expected rate envelope, critical fields, timestamp semantics, schema/version, privacy class, collection method, buffering, retention, cost, downstream rules, and support path. Store a representative fixture for every critical event class. Parse from the real fixture rather than hand-written examples.</p>
+          <p>Design for at-least-once delivery where practical and make downstream logic tolerant of duplicates. If the source cannot guarantee order, use stable sequence or entity keys and event-time windows. Define maximum acceptable source-to-search latency and monitor percentiles, not only averages. Differentiate zero legitimate volume, missing source, blocked authentication, parser rejection, queue backlog, storage throttle, and query failure.</p>
+          <p>Exercise the pipeline: stop the agent; revoke its token; fill the local buffer; change a field from integer to string; add an enum; omit a critical field; send a large record; send duplicate records; deliver late; deliver out of order; exceed the rate; rotate a certificate; fail DNS; and recover. Verify the health alert identifies the failing layer and does not itself depend exclusively on that layer.</p>
+          <p class="acceptance-list"><strong>Exit criterion:</strong> a maintainer can identify loss, lag, schema drift, authorization failure, and recovery from service telemetry, while an analyst can see whether an apparently empty query is trustworthy.</p>
+        </article>
+
+        <article class="reference-article" id="deep-rule">
+          <h3>Deep dive 2 — rule specification, test pack, and production review</h3>
+          <p>The specification should include purpose, risk statement, behavior, target population, excluded environments, event and field dependencies, query logic, correlation keys and window, severity, triage question, case fields, response options, expected benign patterns, known bypasses, ATT&amp;CK and control mappings, owner, test owner, review date, and deprecation path. Keep the detector’s claim narrower than its name.</p>
+          <p>A useful test pack contains a minimal positive, alternate positive, boundary value, expected benign, near miss, missing field, null field, wrong type, duplicate, late event, reversed order, high-cardinality stress, and historical representative sample. Correlation tests should verify window start/end, identity reuse, host rebuild, session change, late arrival, and event deduplication. Performance tests should include the widest normal population and known peak.</p>
+          <p>Peer review asks whether the behavior is meaningful, data exists and is healthy, logic matches intent, mappings are justified, filters are scoped and expiring, test labels are credible, alert context answers the first analyst questions, runbook actions are authorized, volume is supportable, and rollback works. Production monitoring watches execution errors, latency, result volume, alert volume, entity concentration, disposition mix, suppression changes, source changes, and incidents the rule should have seen.</p>
+        </article>
+
+        <article class="reference-article" id="deep-timeline">
+          <h3>Deep dive 3 — investigation timeline and activity graph</h3>
+          <p>Create two linked views: a chronological event ledger and an entity/activity graph. The ledger stores normalized time, uncertainty, source, event ID, actor, action, object, outcome, observation, and evidence reference. The graph stores entities and sourced relationships such as user authenticated session, session called API, process created process, process opened connection, identity assumed role, workload read secret, or file executed on host.</p>
+          <p>Do not create an edge merely because two events share a display name or IP. Record the join key, time constraint, source authority, confidence, and alternative. For every major hypothesis, list confirming and contradicting evidence and a next discriminating query. Maintain a “known unknowns” section: missing endpoint, unavailable audit body, expired retention, unmanaged device, unresolved NAT, shared identity, unverified clock, or inaccessible SaaS logs.</p>
+          <p>At handoff, provide the high-level narrative separately from the ledger. Narrative should cite event references and state uncertainty. Raw logs should remain accessible under appropriate controls. Screenshots can orient reviewers but should not be the sole evidence when exportable records exist.</p>
+        </article>
+
+        <article class="reference-article" id="deep-hunt">
+          <h3>Deep dive 4 — platform-neutral threat-hunt package</h3>
+          <div class="table-wrap"><table class="reference-table"><thead><tr><th>Record</th><th>Required content</th></tr></thead><tbody>
+            <tr><td>Hypothesis</td><td>Behavior, population, expected observables, alternatives, disconfirmation, risk</td></tr>
+            <tr><td>Data plan</td><td>Sources, fields, health, retention, time semantics, scope, exclusions</td></tr>
+            <tr><td>Query pack</td><td>Language and backend, version, parameters, execution time, result count, link/hash</td></tr>
+            <tr><td>Review plan</td><td>Prioritization, sample, labels, reviewer, evidence threshold, stop condition</td></tr>
+            <tr><td>Result</td><td>Supported, unsupported in searched data, partial, inconclusive, or blocked</td></tr>
+            <tr><td>Handoff</td><td>Incident/case, detection, telemetry, control, intelligence, or accepted risk</td></tr>
+          </tbody></table></div>
+          <p>When translating between Sigma, KQL, SPL, EQL, Lucene, SQL, or YARA-L, maintain a platform-neutral test dataset and expected matches. Translation must account for field names, arrays, case, wildcards, regex, null, time, aggregation, join behavior, and backend limits. Never mark a query “validated” because it parses; validation requires representative events and reviewed results.</p>
+        </article>
+
+        <article class="reference-article" id="deep-identity">
+          <h3>Deep dive 5 — identity incident containment sequence</h3>
+          <p>Inventory the identity and trust path before changing it: immutable identity, account type, directory, tenant, sessions, devices, authentication methods, credentials, tokens, applications, consents, groups, roles, delegated access, recovery methods, federation, certificates, workload identities, automation, service dependencies, owners, and break-glass relationship. Identify attacker-controlled paths and business-critical dependencies.</p>
+          <p>A possible sequence is: preserve identity and audit evidence; establish clean responder access; protect emergency accounts; block or condition the risky session; revoke sessions and refresh tokens; disable or restrict the account when authorized; remove malicious grants and role changes; rotate exposed credentials, keys, certificates, and dependent secrets; correct federation or conditional-access changes; examine endpoints and workloads; restore legitimate access through verified recovery; monitor; and test. The correct order depends on active risk and environment.</p>
+          <p>After containment, query for reuse of the same credential, token, source, device, application, service principal, certificate, mailbox rule, or behavior across the tenant. Verify that revocation propagated. Closing an identity incident after one password reset is rarely sufficient when sessions, applications, devices, or recovery paths were affected.</p>
+        </article>
+
+        <article class="reference-article" id="deep-cloud">
+          <h3>Deep dive 6 — cloud and Kubernetes evidence boundaries</h3>
+          <p>For cloud events, preserve organization and account, region, immutable principal, role or service principal, session, credential or key identifier without secret, source network, user agent, API, resource ARN/ID, request ID, result, error, and relevant request changes. For Kubernetes, preserve cluster, API server, audit ID, stage, source, user and groups, impersonation, verb, API group, resource, namespace, name, response code, admission decision, pod UID, service account, image digest, node, and runtime identifier.</p>
+          <p>Body logging can expose secrets and personal data; metadata-only policies can omit parameters required for investigation. Design policy by resource, verb, environment, sensitivity, and threat need. Validate that high-value mutating actions are visible without collecting unnecessary secret contents. Monitor audit-event drop and error counters, backend delay, webhook failure, policy changes, and storage pressure.</p>
+          <p>When a workload is deleted, names may be reused. Enrich events promptly with UID, deployment, image digest, owner, service account, node, labels, and cloud identity, and retain the point-in-time record. Avoid treating a current inventory lookup as proof of historical state.</p>
+        </article>
+
+        <article class="reference-article" id="deep-ai">
+          <h3>Deep dive 7 — AI, RAG, and MCP assurance checklist</h3>
+          <ul class="check-list">
+            <li>Document use case, prohibited actions, data class, provider, model, region, retention, training policy, and fallback.</li>
+            <li>Enforce tenant and document authorization before retrieval; apply sensitivity and TLP filters; cite stable source IDs and passages.</li>
+            <li>Version chunking, parsing, metadata, embeddings, index, prompt, model, tool definitions, and response schema.</li>
+            <li>Label all retrieved and tool-provided text as untrusted data; prevent it from changing system policy or tool authority.</li>
+            <li>Use typed MCP schemas, bounded parameters, exact target confirmation, read/write classification, rate and time limits, idempotency, structured error, and audit ID.</li>
+            <li>Require human confirmation for external scans, uploads, messages, configuration changes, account actions, containment, and deletion.</li>
+            <li>Evaluate citation accuracy, unsupported claims, secret leakage, cross-tenant access, prompt injection, tool misuse, stale retrieval, denial, timeout, and partial results.</li>
+            <li>Display provider and readiness honestly. A configured key is not proof of live connectivity, model access, or policy permission.</li>
+          </ul>
+          <p class="acceptance-list"><strong>Exit criterion:</strong> a reviewer can reconstruct exactly which authorized sources, prompt, model, tools, parameters, and outputs contributed to a suggestion, and can show that the final decision and any material action were independently approved.</p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="case-studies">
+        <div class="group-header"><h2 class="group-title">End-to-end defensive case studies</h2><span class="group-count">6 evidence-led scenarios</span></div>
+        <p class="group-note">These are training blueprints. Use synthetic or authorized lab data, adapt queries to the local schema, and do not treat a scenario outcome as evidence about a real environment.</p>
+
+        <article class="case-study" id="case-powershell">
+          <h3>Case 1 — suspicious encoded PowerShell with network follow-on</h3>
+          <div class="case-meta"><span>Endpoint</span><span>Network</span><span>T1059.001</span><span>Detection engineering</span></div>
+          <p><strong>Trigger:</strong> process creation matches encoded or decode-related PowerShell syntax. <strong>Question:</strong> is this approved automation, user activity, testing, or unauthorized execution?</p>
+          <ol class="workflow-steps">
+            <li>Validate the raw process event, rule version, source health, endpoint, user, parent, ancestry, command line, signer, session, and time.</li>
+            <li>Decode only in an isolated analysis workflow; preserve original text and hash. Do not execute retrieved content.</li>
+            <li>Pivot to script-block or interpreter evidence, file writes, child processes, persistence, credentials, DNS, connections, proxy, and destination intelligence.</li>
+            <li>Compare deployment, login, security, developer, and support automation. Check change record and script ownership.</li>
+            <li>If supported, scope across the decoded indicators, parent, signer, user, destination, and behavior. Escalate with containment options.</li>
+            <li>Improve the detector by correlating parent, obfuscation, network, signer, and asset context rather than adding one global command-line allowlist.</li>
+          </ol>
+          <p class="evidence-gate"><strong>Decision record:</strong> source events, decoded representation, execution relationship, network relationship, business validation, alternative explanation, confidence, affected scope, and response authority.</p>
+        </article>
+
+        <article class="case-study" id="case-identity">
+          <h3>Case 2 — low-and-slow privilege path through identity changes</h3>
+          <div class="case-meta"><span>ITDR</span><span>Directory</span><span>Cloud</span><span>Correlation</span></div>
+          <p><strong>Trigger:</strong> a low-privilege identity registers a new authentication method, consents to an application, receives an indirect group or role edge, and later accesses a sensitive service. Each event may be individually legitimate.</p>
+          <ol class="workflow-steps">
+            <li>Build the point-in-time identity graph and preserve immutable user, application, group, role, session, device, and resource IDs.</li>
+            <li>Correlate authentication-method, consent, group, role, conditional-access, sign-in, token, and resource-access events over an environment-appropriate window.</li>
+            <li>Validate owner, change request, help-desk or administrator actions, application publisher, permission grant, device, and recovery path.</li>
+            <li>Search for similar grants, same application, same administrator, same source, same device, and access to other resources.</li>
+            <li>Contain the complete trust path, not only the password; verify sessions, tokens, grants, roles, credentials, devices, and recovery.</li>
+          </ol>
+          <p class="further-reading"><strong>Practice:</strong> <a href="/ITDR/docs/detection/detection-framework/">ITDR detection framework</a> · <a href="/ITDR/docs/simulations/simulation-framework/">ITDR simulation framework</a></p>
+        </article>
+
+        <article class="case-study" id="case-phishing">
+          <h3>Case 3 — phishing and adversary-in-the-middle session theft</h3>
+          <div class="case-meta"><span>Email</span><span>Identity</span><span>Endpoint</span><span>Response</span></div>
+          <p><strong>Trigger:</strong> a user reports a realistic sign-in lure; identity telemetry later shows a new session with successful MFA and unusual resource access. <strong>Risk:</strong> password-only reset may leave stolen sessions or consent.</p>
+          <ol class="workflow-steps">
+            <li>Preserve the original message, headers, trace, URL, attachment, delivery and click evidence without broadly redistributing sensitive content.</li>
+            <li>Identify recipients and related messages by message and campaign features; distinguish exact URL, redirector, landing domain, and shared infrastructure.</li>
+            <li>Correlate click time with DNS/proxy, browser or endpoint, sign-in, authentication method, conditional access, device, session, token, and resource activity.</li>
+            <li>Search for mailbox rules, forwarding, OAuth consent, password or method changes, file access, data export, and lateral messaging.</li>
+            <li>Purge or contain the message and destination, revoke sessions, reset affected trust, remove persistence, review endpoints, communicate, and verify.</li>
+          </ol>
+          <p class="boundary"><strong>Do not overclaim:</strong> message receipt is not a click; click is not credential entry; credential entry is not successful authentication; successful authentication is not automatically compromise. Prove each transition.</p>
+        </article>
+
+        <article class="case-study" id="case-kubernetes">
+          <h3>Case 4 — Kubernetes service-account discovery and secret access</h3>
+          <div class="case-meta"><span>Kubernetes</span><span>Cloud</span><span>Runtime</span><span>T1613</span></div>
+          <p><strong>Trigger:</strong> a service account lists pods and secrets outside its normal namespace, followed by a new outbound connection from a short-lived pod.</p>
+          <ol class="workflow-steps">
+            <li>Validate audit stages, user and groups, source, verb, resource, namespace, response, audit ID, and event-time RBAC.</li>
+            <li>Resolve service account to pod UID, deployment, image digest, node, workload identity, owner, admission, and change record.</li>
+            <li>Compare controller and automation patterns. Determine whether list/get succeeded and whether sensitive body content was logged or accessed.</li>
+            <li>Correlate exec, process, image, file, secret mount, DNS, egress, cloud API, and downstream credential use.</li>
+            <li>Isolate or scale the exact workload when authorized, revoke or rotate trust, correct RBAC, preserve image and runtime evidence, redeploy, and verify.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2026/2026-02-11-kubernetes-logging-and-monitoring-complete-guide-2ce9d4bdba80">Kubernetes Logging and Monitoring</a></p>
+        </article>
+
+        <article class="case-study" id="case-insider">
+          <h3>Case 5 — sensitive data staging before departure</h3>
+          <div class="case-meta"><span>Insider risk</span><span>Data</span><span>Endpoint</span><span>Privacy</span></div>
+          <p><strong>Trigger:</strong> unusual repository cloning, archive creation, removable-media activity, and cloud-storage access by an employee nearing a role change. <strong>Boundary:</strong> the same pattern can result from approved handover, backup, travel, or account compromise.</p>
+          <ol class="workflow-steps">
+            <li>Restrict the case to need-to-know personnel and confirm investigation authority, privacy, HR, legal, and evidence rules.</li>
+            <li>Validate identity, device, repository, file classification, access authorization, volume, destination, process, and transfer outcome.</li>
+            <li>Compare assigned projects, peer and personal baseline, manager-approved handover, build and backup automation, and recent support activity.</li>
+            <li>Separate behavior from motive. Document facts, uncertainty, alternative explanations, and technical options without accusatory language.</li>
+            <li>Use the authorized multidisciplinary decision process for containment, interview, preservation, communication, and follow-up.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2026/2026-04-22-detecting-malicious-insider-activity-a-technical-detection-engineering-guide-3c3b41e95e82">Technical detection engineering for malicious-insider activity</a></p>
+        </article>
+
+        <article class="case-study" id="case-cti">
+          <h3>Case 6 — source report to hunt, detection, validation, and response</h3>
+          <div class="case-meta"><span>CTI</span><span>ATT&amp;CK</span><span>Hunting</span><span>Purple team</span></div>
+          <p><strong>Trigger:</strong> a current report describes a relevant actor using PowerShell, scheduled tasks, credential access, and cloud-hosted infrastructure. The task is to convert sourced behavior into local decisions without turning every report IOC into a permanent block.</p>
+          <ol class="workflow-steps">
+            <li>Store report identity, publisher, publication date, canonical URL, TLP, source quality, excerpts, and claim-level citations.</li>
+            <li>Extract entities and behaviors; normalize aliases; map ATT&amp;CK only at the level supported by the text; record confidence and temporal scope.</li>
+            <li>Compare target sectors, geography, technology, identity, and service exposure to local context. Prioritize relevant behaviors over generic actor labels.</li>
+            <li>Build hypotheses and platform-specific queries with required fields, alternatives, and limits. Search current telemetry and preserve results.</li>
+            <li>Create or update detections for stable behavior, then run safe simulation through the complete defensive chain.</li>
+            <li>Publish findings, coverage gaps, control work, incident triggers, and intelligence feedback with evidence and owners.</li>
+          </ol>
+          <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2026/2026-04-14-from-threat-intelligence-to-detection-a-practitioner-s-guide-2d930b168426">From Threat Intelligence to Detection</a> · <a href="/operation-desert-hydra/">Operation Desert Hydra</a> · <a href="/cyber-knowledge/cti.html">CTI field guide</a></p>
+        </article>
+      </section>
+
+      <section class="lab-group" id="field-kit">
+        <div class="group-header"><h2 class="group-title">Field references, lab curriculum, and assessment</h2><span class="group-count">Operational toolkit</span></div>
+        <p class="group-note">Choose tools by evidence requirement and environment. Product names change; data contracts, validation, and decision boundaries remain.</p>
+
+        <article class="reference-article" id="tool-matrix">
+          <h3>Tool and platform decision matrix</h3>
+          <div class="table-wrap"><table class="reference-table"><thead><tr><th>Capability</th><th>Representative tools or formats</th><th>Required validation</th></tr></thead><tbody>
+            <tr><td>SIEM / log analytics</td><td>Elastic, Splunk, Microsoft Sentinel, OpenSearch, Chronicle/SecOps, Loki</td><td>Source contract, schema, time, RBAC, query semantics, alert/case path, retention, export</td></tr>
+            <tr><td>Detection content</td><td>Sigma, YARA-L, KQL, SPL, EQL, Lucene, SQL, Suricata/Snort, YARA</td><td>Backend mapping, fixtures, performance, representative data, versioned deployment</td></tr>
+            <tr><td>Endpoint</td><td>EDR platforms, Sysmon, Windows audit, auditd, osquery, eBPF/runtime sensors</td><td>OS version, event availability, tamper state, sampling, exclusions, action verification</td></tr>
+            <tr><td>Network</td><td>Zeek, Suricata, Wireshark/tshark, flow, DNS, proxy, firewall, cloud flow</td><td>Observation point, loss, direction, NAT, encryption, retention, process/identity correlation</td></tr>
+            <tr><td>Identity</td><td>Directory audit, IdP, PAM, ITDR, cloud identity, AD CS and Kerberos logs</td><td>Immutable IDs, session/token state, effective privileges, tenant, time, response propagation</td></tr>
+            <tr><td>Cloud / containers</td><td>Cloud audit APIs, CSPM/CNAPP, Kubernetes audit, Falco/runtime, registry and admission</td><td>Organization/account/region, resource UID, ephemeral context, policy, secret filtering</td></tr>
+            <tr><td>Case and automation</td><td>SOAR, case management, ticketing, workflow engines, MCP services</td><td>Authority, idempotency, exact target, audit, approval, rollback, failure and partial state</td></tr>
+            <tr><td>Validation</td><td>Atomic Red Team, MITRE CALDERA, custom fixtures, attack-lab systems</td><td>Authorization, exact behavior, safety, cleanup, observable evidence, end-to-end result</td></tr>
+            <tr><td>Knowledge / AI</td><td>AdversaryGraph, OpenCTI, RAG/vector stores, local or approved remote LLMs</td><td>Provenance, access before retrieval, freshness, citation, injection resistance, human review</td></tr>
+          </tbody></table></div>
+          <p class="boundary"><strong>Selection rule:</strong> inclusion in this table is illustrative, not endorsement. Evaluate security, licensing, support, data location, interoperability, operational cost, failure behavior, and fit to documented requirements.</p>
+        </article>
+
+        <article class="reference-article" id="lab-curriculum">
+          <h3>Twelve-lab Blue Team curriculum</h3>
+          <div class="template-record"><h3>Lab 1 — Event and evidence chain</h3><p>Take five raw events from different sources, normalize them, document transformations, create observations and hypotheses, and build a cited case timeline. Inject clock skew and a missing field.</p></div>
+          <div class="template-record"><h3>Lab 2 — Sensor health and pipeline failure</h3><p>Onboard one source, then stop collection, expire authentication, delay events, change schema, duplicate records, and recover. Build health alerts independent from attack analytics.</p></div>
+          <div class="template-record"><h3>Lab 3 — Detection as code</h3><p>Create one Sigma rule and native backend form with metadata, fixtures, CI validation, peer review, staged deployment, simulation, monitoring, and rollback.</p></div>
+          <div class="template-record"><h3>Lab 4 — Threat hunt</h3><p>Write a bounded hypothesis, data plan, multi-language query pack, result labels, competing explanations, conclusion, and detection or telemetry handoff.</p></div>
+          <div class="template-record"><h3>Lab 5 — SOC triage</h3><p>Process a queue containing true test activity, benign administration, duplicate alerts, missing telemetry, and one supported incident. Measure decision quality and handoff completeness.</p></div>
+          <div class="template-record"><h3>Lab 6 — Endpoint process chain</h3><p>Trace safe Office-like parent → PowerShell → file/network behavior, then test analytic variants and a lab isolation/collection workflow.</p></div>
+          <div class="template-record"><h3>Lab 7 — Network protocol hunt</h3><p>Correlate endpoint, DNS, flow, proxy, TLS, and packet evidence for controlled periodic traffic; document observation limits and benign lookalikes.</p></div>
+          <div class="template-record"><h3>Lab 8 — Identity path</h3><p>Simulate Kerberoasting or a cloud consent/session sequence in an isolated directory. Correlate identity, endpoint, and resource evidence and rehearse complete trust cleanup.</p></div>
+          <div class="template-record"><h3>Lab 9 — Kubernetes audit</h3><p>Design audit policy, detect abnormal discovery and secret access, retain ephemeral context, and validate authorized workload isolation and restoration.</p></div>
+          <div class="template-record"><h3>Lab 10 — Email-to-identity response</h3><p>Use a synthetic phishing message and identity events to prove delivery, click, authentication, session use, persistence, and cleanup as separate transitions.</p></div>
+          <div class="template-record"><h3>Lab 11 — AI/RAG/MCP assurance</h3><p>Test citation fidelity, stale retrieval, prompt injection, tenant separation, invalid schema, tool denial, timeout, partial result, secret filtering, and human approval.</p></div>
+          <div class="template-record"><h3>Lab 12 — Full incident and purple-team capstone</h3><p>Run a safe multi-source scenario from authorized behavior through prevention, telemetry, analytic, case, analyst, containment, recovery, review, rule improvement, and retest.</p></div>
+          <p class="further-reading"><strong>1200km labs:</strong> <a href="/labs.html">Security labs and validation environments</a> · <a href="/adversarygraph-docs/case-studies-validation/">AdversaryGraph validation cases</a></p>
+        </article>
+
+        <article class="reference-article" id="lab-acceptance">
+          <h3>Lab acceptance criteria</h3>
+          <ul class="check-list">
+            <li><strong>Authorization:</strong> scope, permitted behavior, data handling, safety limits, stop condition, cleanup, and owner are recorded.</li>
+            <li><strong>Reproducibility:</strong> environment, versions, configuration, inputs, timestamps, commands or actions, and expected outputs are sufficient for another learner.</li>
+            <li><strong>Evidence:</strong> raw events and stable references are preserved; screenshots are supplemental; transformations and enrichments are traceable.</li>
+            <li><strong>Reasoning:</strong> observations, hypotheses, alternatives, limitations, confidence, and decision are separated.</li>
+            <li><strong>Detection:</strong> target behavior, data requirements, logic, tests, mappings, volume, runbook, owner, and limitations are documented.</li>
+            <li><strong>Operations:</strong> alert, case, acknowledgement, escalation, action, verification, rollback, and closure are tested where in scope.</li>
+            <li><strong>Safety:</strong> no unauthorized target, uncontrolled payload, production secret, real customer data, or unsupervised destructive action is used.</li>
+            <li><strong>Learning:</strong> the learner identifies at least one data, analytic, process, control, or documentation improvement and validates the fix.</li>
+          </ul>
+        </article>
+
+        <article class="reference-article" id="failure-atlas">
+          <h3>Blue Team failure-mode atlas</h3>
+          <div class="table-wrap"><table class="reference-table"><thead><tr><th>Failure</th><th>Why it misleads</th><th>Corrective control</th></tr></thead><tbody>
+            <tr><td>Alert equals incident</td><td>Machine severity becomes unsupported verdict</td><td>Explicit case states, evidence threshold, human decision</td></tr>
+            <tr><td>No results equals no activity</td><td>Ignores coverage, health, retention, scope, time and query error</td><td>Data-health proof and bounded conclusion language</td></tr>
+            <tr><td>ATT&amp;CK heatmap equals coverage</td><td>A cell hides platform, behavior, data, test and operational status</td><td>Evidence-linked coverage matrix with state and limitations</td></tr>
+            <tr><td>IOC match equals compromise</td><td>Reputation can be stale, shared, repurposed, or context-free</td><td>Time-bounded behavior and entity validation</td></tr>
+            <tr><td>CVE match equals vulnerability</td><td>Product, version, reachability and configuration may be unproven</td><td>Candidate state and asset-owner validation</td></tr>
+            <tr><td>Rule parses equals rule works</td><td>Backend semantics, mapping and real data remain untested</td><td>Fixtures, replay, staged deployment and simulation</td></tr>
+            <tr><td>Global allowlist</td><td>Suppresses malicious use of legitimate tools or identities</td><td>Scoped contextual filters with expiry and owner</td></tr>
+            <tr><td>Dashboard is evidence</td><td>Views can change and omit source records</td><td>Stable raw-event references and immutable case record</td></tr>
+            <tr><td>Password reset completes identity response</td><td>Sessions, tokens, apps, devices and recovery may persist</td><td>Trust-graph containment and verification</td></tr>
+            <tr><td>AI summary is factual record</td><td>Generation can omit, merge or invent claims</td><td>Citations, structured output, source review and human authorship</td></tr>
+            <tr><td>Automation succeeded because request returned</td><td>Partial, delayed or wrong-target actions can occur</td><td>Exact target, action ID, state verification and rollback</td></tr>
+            <tr><td>Mean time alone proves quality</td><td>Fast closure can reward shallow decisions</td><td>Quality, reopen, evidence, impact and outcome measures</td></tr>
+          </tbody></table></div>
+        </article>
+
+        <article class="reference-article" id="review-questions">
+          <h3>Module review questions</h3>
+          <ol class="check-list">
+            <li>What is the difference between an event, observation, alert, case, finding, and incident?</li>
+            <li>Which timestamp should drive a cross-source timeline, and how do you test that choice?</li>
+            <li>How do stable identities prevent IP, hostname, account, pod, and display-name misattribution?</li>
+            <li>Why can high apparent detector accuracy still create an unusable alert queue?</li>
+            <li>What evidence distinguishes prevention, observation, transport, analysis, decision, and response?</li>
+            <li>What must a SOC service catalogue state about authority and degraded operation?</li>
+            <li>What is the minimum telemetry contract for a high-value behavior?</li>
+            <li>Which tests are needed beyond a positive rule match?</li>
+            <li>How does a hunt conclusion differ between “unsupported” and “inconclusive”?</li>
+            <li>What makes a Tier 1 escalation actionable for Tier 2 or incident command?</li>
+            <li>Which endpoint fields support process-lineage reasoning?</li>
+            <li>How do NAT, proxies, TLS, shared infrastructure, and observation point affect network attribution?</li>
+            <li>Which trust artifacts must be addressed beyond a password in identity response?</li>
+            <li>How do Kubernetes audit policy and ephemeral context affect an investigation?</li>
+            <li>Why must insider-risk cases separate observed behavior from motive?</li>
+            <li>What should an incident action log record for a containment decision?</li>
+            <li>How can prompt injection enter a defensive RAG or MCP workflow?</li>
+            <li>What proves an end-to-end detection worked operationally?</li>
+            <li>Which metric definition fields prevent misleading management reporting?</li>
+            <li>What evidence would make you retire rather than tune a detection?</li>
+          </ol>
+        </article>
+
+        <article class="reference-article" id="glossary">
+          <h3>Technical glossary</h3>
+          <div class="definition-grid">
+            <p><strong>Alert:</strong> a machine- or analyst-generated request for review; not automatically a confirmed threat.</p>
+            <p><strong>Case:</strong> the durable work record that groups evidence, hypotheses, decisions, actions, owners, and state.</p>
+            <p><strong>Detection strategy:</strong> a high-level approach that organizes analytics for a behavior in a given context.</p>
+            <p><strong>Analytic:</strong> logic that transforms or evaluates data to identify a defined condition or behavior.</p>
+            <p><strong>Data contract:</strong> documented source, schema, field, time, quality, ownership, and change expectations.</p>
+            <p><strong>Telemetry health:</strong> evidence that source generation, collection, transport, parsing, storage, and query remain usable.</p>
+            <p><strong>False positive:</strong> a detector match that satisfies rule logic but does not represent the target condition under the label policy.</p>
+            <p><strong>Benign positive:</strong> expected legitimate behavior that genuinely matches the described behavior and may require contextual handling.</p>
+            <p><strong>Precision:</strong> relevant reviewed matches divided by reviewed matches for a defined population and label policy.</p>
+            <p><strong>Recall:</strong> detected relevant instances divided by all relevant instances in a labeled evaluation population.</p>
+            <p><strong>Threat hunt:</strong> a planned, bounded investigation that tests a hypothesis against available evidence.</p>
+            <p><strong>ITDR:</strong> identity threat detection and response across accounts, sessions, credentials, permissions, devices, applications, and trust.</p>
+            <p><strong>NDR:</strong> network detection and response using flow, protocol, packet, DNS, proxy, gateway, and related context.</p>
+            <p><strong>Detection as code:</strong> version-controlled analytic source, tests, metadata, review, deployment, and lifecycle management.</p>
+            <p><strong>RAG:</strong> retrieval-augmented generation, in which authorized source material is retrieved as context for a model.</p>
+            <p><strong>MCP:</strong> Model Context Protocol, used to expose structured resources and tools to compatible AI applications.</p>
+            <p><strong>Containment:</strong> authorized action that limits current or expected harm while preserving a path to recovery and investigation.</p>
+            <p><strong>Eradication:</strong> removal of malicious artifacts, persistence, exposed trust, and exploited root causes after scope is understood.</p>
+            <p><strong>Recovery:</strong> restoration and verification of service and trust, with monitoring and residual-risk communication.</p>
+            <p><strong>Coverage:</strong> an evidence-backed state for a specific behavior, environment, data source, analytic, test, workflow, and limitation.</p>
+          </div>
+        </article>
+
+        <article class="reference-article" id="final-checklist">
+          <h3>Final Blue Team review checklist</h3>
+          <ul class="check-list">
+            <li>The defensive mission, customers, scope, services, hours, authority, and degraded-mode procedures are current.</li>
+            <li>Priority services, assets, identities, dependencies, exposure, owners, and business context have authoritative sources and freshness.</li>
+            <li>Critical telemetry has contracts, raw retention, parser versions, fixtures, health monitoring, change ownership, and recovery tests.</li>
+            <li>Detections have behavior specifications, required fields, tests, peer review, staged validation, runbooks, owners, metrics, and retirement state.</li>
+            <li>Hunts preserve hypothesis, population, data health, query versions, results, alternatives, conclusions, limitations, and handoffs.</li>
+            <li>Cases separate events, observations, inferences, decisions, and actions; source evidence is cited and accessible under proper controls.</li>
+            <li>Endpoint, network, identity, cloud, SaaS, email, web, and data workflows define evidence and authorized response boundaries.</li>
+            <li>Incident preparation covers command, legal/privacy, communications, evidence, clean access, containment, recovery, provider, and exercise needs.</li>
+            <li>AI/RAG/MCP use enforces access before retrieval, provenance, injection resistance, typed tools, human approval, audit, evaluation, and fallback.</li>
+            <li>Validation proves every layer from safe behavior to operational decision and response; failed and degraded states remain visible.</li>
+            <li>Metrics have definitions, populations, time windows, exclusions, owners, sources, verification dates, limitations, and decision purpose.</li>
+            <li>Open gaps have risk, owner, priority, due date, compensating control, validation plan, and explicit acceptance when not remediated.</li>
+          </ul>
+          <p class="acceptance-list"><strong>Curriculum completion:</strong> the learner can design a scoped defensive service; onboard and failure-test telemetry; create and validate a detection; execute a bounded hunt; triage and escalate a case; investigate endpoint, network, identity, and cloud evidence; coordinate authorized response and recovery; safely use AI assistance; run an end-to-end validation; and communicate evidence, uncertainty, limitations, and risk to technical and business reviewers.</p>
+        </article>
+      </section>
     </main>
 
     <!-- site-shell:footer:start -->
