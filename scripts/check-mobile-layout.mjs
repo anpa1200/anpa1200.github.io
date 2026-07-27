@@ -29,6 +29,7 @@ const pages = [
   ['adversarygraph', '/adversarygraph/'],
   ['adversarygraph-full-guide', '/adversarygraph/full-version-feature-guides.html'],
   ['search', '/search.html'],
+  ['cyber-knowledge-vulnerability-research', '/cyber-knowledge/vulnerability-research.html'],
   ['docs-long', '/adversarygraph-docs/full-flow/'],
   ['threat-matrix', '/threat-matrix/'],
 ];
@@ -203,6 +204,19 @@ function layoutExpression(checkFixture) {
       left: round(element.getBoundingClientRect().left),
       right: round(element.getBoundingClientRect().right),
     }));
+    const overflowElements = Array.from(document.querySelectorAll('body *')).filter((element) => {
+      if (!visible(element)) return false;
+      const rect = element.getBoundingClientRect();
+      return rect.left < -1 || rect.right > window.innerWidth + 1;
+    }).slice(0, 8).map((element) => ({
+      tag: element.tagName,
+      id: element.id || '',
+      className: String(element.className).slice(0, 100),
+      left: round(element.getBoundingClientRect().left),
+      right: round(element.getBoundingClientRect().right),
+      width: round(element.getBoundingClientRect().width),
+      overflowX: getComputedStyle(element).overflowX,
+    }));
 
     const productTitleElement = document.querySelector('[data-product-name="AdversaryGraph"]');
     const productTitle = productTitleElement && visible(productTitleElement) ? (() => {
@@ -305,6 +319,7 @@ function layoutExpression(checkFixture) {
       badWrap,
       narrowProse,
       controlOverflow,
+      overflowElements,
       productTitle,
       fixture,
       p2,
