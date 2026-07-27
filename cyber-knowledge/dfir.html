@@ -6,12 +6,12 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <script src="/assets/theme-bootstrap.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Digital Forensics &amp; Incident Response (DFIR) — Cyber Knowledge | 1200km</title>
-    <meta name="description" content="Digital Forensics &amp; Incident Response (DFIR). Digital Forensics &amp; Incident Response. Syllabus in progress: evidence handling, disk/memory/network forensics…" />
+    <title>Digital Forensics &amp; Incident Response — DFIR Field Guide | 1200km</title>
+    <meta name="description" content="A practical 14-module DFIR field guide covering preparation, triage, evidence integrity, endpoint, disk, memory, network, cloud, identity, timeline analysis, containment, recovery, reporting, labs, and controlled AI assistance." />
     <meta name="author" content="Andrey Pautov" />
-    <meta property="og:title" content="Digital Forensics &amp; Incident Response (DFIR) — Cyber Knowledge | 1200km" />
-    <meta property="og:description" content="Digital Forensics &amp; Incident Response (DFIR). Digital Forensics &amp; Incident Response. Syllabus in progress: evidence handling, disk/memory/network forensics…" />
-    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Digital Forensics &amp; Incident Response — DFIR Field Guide | 1200km" />
+    <meta property="og:description" content="A practitioner guide from incident declaration and defensible evidence collection through host, network, cloud, malware, timeline, containment, recovery, and lessons learned." />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="https://1200km.com/cyber-knowledge/dfir.html" />
     <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
     <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
@@ -19,8 +19,8 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Digital Forensics &amp; Incident Response (DFIR) — Cyber Knowledge | 1200km" />
-    <meta name="twitter:description" content="Digital Forensics &amp; Incident Response (DFIR). Digital Forensics &amp; Incident Response. Syllabus in progress: evidence handling, disk/memory/network forensics…" />
+    <meta name="twitter:title" content="Digital Forensics &amp; Incident Response — DFIR Field Guide | 1200km" />
+    <meta name="twitter:description" content="A practical 14-module guide to incident readiness, forensic collection, investigation, containment, recovery, reporting, and evidence-driven improvement." />
     <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
     <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <link rel="canonical" href="https://1200km.com/cyber-knowledge/dfir.html" />
@@ -30,11 +30,6 @@
     <style>
       :root {
         --bg: #050c1a;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.82);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5a6f8f;
         --text: #cdd9ee;
         --muted: #7a96bc;
         --line: #1a3060;
@@ -42,11 +37,10 @@
         --accent-soft: #93c5fd;
         --accent-dark: #054ada;
         --ok: #34d399;
-        --warn: #b45309;
+        --warn: #f59e0b;
         --red: #ef4444;
         --chip: #0d1f3c;
         --chip-strong: #162d52;
-        --shadow: 0 14px 34px rgba(0,0,0,0.45);
       }
       * { box-sizing: border-box; }
       html { scroll-behavior: smooth; }
@@ -55,19 +49,19 @@
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         color: var(--text);
         background: var(--bg);
-        line-height: 1.58;
+        line-height: 1.62;
       }
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { color: var(--accent-dark); text-decoration: underline; }
+      a { color: var(--accent-soft); text-decoration: none; }
+      a:hover { color: var(--accent); text-decoration: underline; }
       .site-header {
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 20;
         border-bottom: 1px solid var(--line);
-        background: rgba(5,12,26,0.92);
+        background: rgba(5,12,26,0.94);
         backdrop-filter: blur(12px);
       }
-      .nav, .page-hero-inner, main, .footer-inner {
+      .nav, .page-hero-inner, .footer-inner {
         width: min(1080px, calc(100% - 32px));
         margin: 0 auto;
       }
@@ -91,115 +85,282 @@
       .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
       .nav-links a.active { color: var(--accent); font-weight: 600; }
       .page-hero {
-        background: linear-gradient(120deg, rgba(15,98,254,0.10), rgba(0,122,90,0.08)), #ffffff;
+        background: linear-gradient(120deg, rgba(15,98,254,0.14), rgba(52,211,153,0.07)), #050c1a;
         border-bottom: 1px solid var(--line);
       }
       .page-hero-inner { padding: 64px 0 52px; }
       .page-eyebrow {
-        color: var(--accent-dark);
+        color: var(--accent-soft);
         font-size: 0.76rem;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: 0.09em;
         text-transform: uppercase;
         margin: 0 0 12px;
       }
-      .page-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
-      .page-lead { max-width: 760px; margin: 16px 0 0; color: var(--muted); font-size: 1.07rem; }
+      .page-title { margin: 0; font-size: clamp(2rem, 5vw, 3.7rem); line-height: 1.05; max-width: 960px; }
+      .page-lead { max-width: 880px; margin: 18px 0 0; color: var(--text); font-size: 1.08rem; }
       .page-hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
       .button {
         display: inline-flex;
         align-items: center;
-        padding: 8px 18px;
+        justify-content: center;
+        padding: 9px 17px;
         border: 1px solid var(--line);
-        border-radius: 6px;
+        border-radius: 7px;
         font-size: 0.88rem;
-        font-weight: 700;
+        font-weight: 750;
         color: var(--text);
-        background: var(--panel);
+        background: var(--chip);
         text-decoration: none;
-        transition: border-color 0.14s, background 0.14s;
       }
-      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
+      .button:hover { border-color: var(--accent); background: var(--chip-strong); text-decoration: none; color: var(--text); }
       .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
       .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
       .notice {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
         margin: 28px 0 0;
-        padding: 14px 18px;
-        border: 1px solid rgba(180, 83, 9, 0.4);
+        padding: 15px 18px;
+        border: 1px solid rgba(245,158,11,0.42);
         border-radius: 10px;
-        background: rgba(180, 83, 9, 0.1);
-        color: #b45309;
-        font-size: 0.92rem;
-        font-weight: 600;
-        max-width: 760px;
+        background: rgba(245,158,11,0.10);
+        max-width: 880px;
       }
-      [data-theme="dark"] .notice {
-        background: rgba(245, 158, 11, 0.12);
-        border-color: rgba(245, 158, 11, 0.35);
-        color: #f59e0b;
+      .notice strong { color: #fbbf24; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
+      .notice p { margin: 4px 0 0; color: var(--text); font-size: 0.92rem; }
+      .guide-nav {
+        position: sticky;
+        top: 64px;
+        z-index: 15;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.96);
+        backdrop-filter: blur(12px);
       }
-      .notice strong { font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
-      .notice p { margin: 4px 0 0; font-weight: 500; color: var(--muted); }
-      main { padding: 56px 0 72px; }
-      .placeholder-panel {
-        max-width: 720px;
-        padding: 26px 28px;
-        border: 1px dashed var(--line);
-        border-radius: 14px;
-        background: var(--panel);
-        color: var(--panel-muted);
+      .guide-nav-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: flex;
+        gap: 8px;
+        padding: 10px 0;
+        overflow-x: auto;
+        scrollbar-width: thin;
       }
-      [data-theme="dark"] .placeholder-panel {
-        background: rgba(8, 19, 38, 0.84);
-        border-color: rgba(147, 197, 253, 0.28);
-        color: #b8c9e3;
+      .guide-nav a {
+        flex: 0 0 auto;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
       }
-      .placeholder-panel h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--panel-ink); }
-      [data-theme="dark"] .placeholder-panel h2 { color: #f8fbff; }
+      .guide-nav a:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+      .guide-layout {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+        gap: 28px;
+        padding: 42px 0 72px;
+      }
+      .toc {
+        position: sticky;
+        top: 122px;
+        align-self: start;
+        max-height: calc(100vh - 142px);
+        overflow-y: auto;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(8,19,38,0.88);
+        scrollbar-width: thin;
+      }
+      .toc h2 { margin: 0 0 12px; font-size: 1rem; }
+      .toc ol, .toc ul { margin: 0; padding-left: 1.25rem; }
+      .toc li { margin: 7px 0; color: var(--muted); font-size: 0.82rem; }
+      .toc a { color: var(--muted); }
+      .toc a:hover { color: var(--accent-soft); }
+      .guide-content { min-width: 0; }
+      .guide-content > section { scroll-margin-top: 128px; margin-bottom: 54px; }
+      .section-kicker {
+        margin: 0 0 5px;
+        color: var(--accent-soft);
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+      }
+      .guide-content h2 { margin: 0 0 12px; font-size: clamp(1.6rem, 3vw, 2.25rem); line-height: 1.16; }
+      .guide-content h3 { margin: 0 0 10px; font-size: 1.18rem; line-height: 1.3; }
+      .guide-content h4 { margin: 15px 0 6px; font-size: 0.98rem; }
+      .section-intro { margin: 0 0 20px; color: var(--muted); font-size: 1rem; max-width: 78ch; }
+      .outcome-grid, .term-grid, .two-col, .case-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .outcome-card, .term-grid > div, .practice-block, .case-study, .reference-article, .template-record {
+        min-width: 0;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(8,19,38,0.72);
+      }
+      .outcome-card h3, .term-grid h3 { margin-bottom: 6px; }
+      .outcome-card p, .term-grid p, .practice-block p, .case-study p, .reference-article p, .template-record p { margin: 7px 0; }
+      .engagement-map, .lab-group {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: linear-gradient(145deg, rgba(15,98,254,0.09), rgba(8,19,38,0.84));
+      }
+      .module {
+        margin-bottom: 18px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(8,19,38,0.74);
+        scroll-margin-top: 128px;
+      }
+      .module-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .module-index {
+        flex: 0 0 auto;
+        padding: 4px 8px;
+        border: 1px solid var(--accent);
+        border-radius: 999px;
+        color: var(--accent-soft);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .module h3 { margin: 0; font-size: 1.26rem; }
+      .module-purpose { color: var(--muted); margin: 12px 0; }
+      .workflow { margin: 12px 0 0; padding-left: 1.25rem; }
+      .workflow li { margin: 7px 0; }
+      .evidence-note, .safety-note, .analysis-note {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-left: 3px solid var(--ok);
+        border-radius: 5px;
+        background: rgba(52,211,153,0.07);
+      }
+      .safety-note { border-left-color: var(--red); background: rgba(239,68,68,0.08); }
+      .analysis-note { border-left-color: var(--accent); background: rgba(15,98,254,0.08); }
+      .further-reading {
+        margin-top: 14px !important;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+      .tag {
+        padding: 3px 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--accent-soft);
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+      .definition-table, .tool-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+        font-size: 0.86rem;
+      }
+      .definition-table th, .definition-table td, .tool-table th, .tool-table td {
+        padding: 10px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+      .definition-table th, .tool-table th { color: var(--text); background: rgba(13,31,60,0.8); }
+      .table-scroll { width: 100%; min-width: 0; overflow-x: auto; max-width: 100%; }
+      pre {
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 12px 0;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #020817;
+        color: #d7e4ff;
+        font: 0.78rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      code, kbd { overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      :not(pre) > code { padding: 0.08em 0.32em; border-radius: 4px; background: rgba(13,31,60,0.82); }
+      .case-study { border-top: 3px solid var(--accent); }
+      .case-study h4 { margin: 16px 0 6px; }
+      .case-study ul, .reference-article ul, .practice-block ul { margin: 8px 0 0; padding-left: 1.25rem; }
+      .case-study li, .reference-article li, .practice-block li { margin: 5px 0; }
+      .checklist { list-style: none; padding: 0 !important; }
+      .checklist li { position: relative; padding-left: 1.6rem; }
+      .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--ok); font-weight: 800; }
+      .reference-list { display: grid; gap: 10px; padding: 0; list-style: none; }
+      .reference-list li { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+      .reference-list li:last-child { border-bottom: 0; }
+      .path-line { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin: 12px 0; }
+      .path-line span { padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.75rem; }
+      .path-line i { color: var(--muted); font-style: normal; }
+      .updated-note { color: var(--muted); font-size: 0.78rem; }
       footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
       @media (max-width: 720px) {
         .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: min(1080px, calc(100% - 32px)); }
-        .nav, .page-hero-inner, main, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
+        .nav, .page-hero-inner, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
         .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 8px 14px; width: 100%; }
         .button { flex-shrink: 0; }
         .page-hero-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 10px; max-width: 100%; }
         .page-title, .page-lead, .page-eyebrow { max-width: 100%; overflow-wrap: break-word; }
+        .guide-nav { top: 0; position: relative; }
+        .guide-nav-inner, .guide-layout { width: calc(100vw - 24px); max-width: calc(100vw - 24px); }
+        .guide-layout { display: block; padding-top: 20px; }
+        .toc { position: relative; top: auto; max-height: 22rem; margin-bottom: 20px; }
+        .outcome-grid, .term-grid, .two-col, .case-grid { grid-template-columns: 1fr; }
+        .engagement-map, .lab-group { padding: 16px; }
+        .module-header { align-items: start; flex-direction: column; gap: 8px; }
+        .definition-table, .tool-table { min-width: 680px; }
+        .practice-block, .case-study, .reference-article, .template-record, .module { padding: 14px; }
       }
-      [data-theme="dark"] footer, [data-theme="dark"] .footer {
-        background: rgba(5,12,26,0.96) !important;
-        border-top-color: #1a3060 !important;
-        color: #7a96bc !important;
+      @media (min-width: 721px) and (max-width: 980px) {
+        .guide-layout { display: block; }
+        .toc { position: relative; top: auto; max-height: 24rem; margin-bottom: 20px; }
+        .outcome-grid, .term-grid, .case-grid { grid-template-columns: 1fr; }
       }
-      [data-theme="dark"] .page-hero {
-        background: linear-gradient(135deg, rgba(15,98,254,0.12), rgba(0,122,90,0.06)), #050c1a !important;
-        border-bottom-color: #1a3060 !important;
-      }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
       [data-theme="light"] {
-        --bg: #f6f8fb;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.97);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5b667a;
+        --bg: #f0f4ff;
         --text: #172033;
-        --muted: #5b667a;
-        --line: #dbe4ef;
+        --muted: #53647e;
+        --line: #cad7eb;
         --accent: #0f62fe;
-        --accent-soft: #3a7dff;
+        --accent-soft: #1459c7;
         --accent-dark: #054ada;
         --ok: #007a5a;
-        --warn: #b45309;
+        --warn: #9a5800;
         --red: #b91c1c;
         --chip: #eef4ff;
         --chip-strong: #dbe9ff;
-        --shadow: 0 14px 34px rgba(24,38,69,0.09);
       }
       [data-theme="light"] body { background: #f0f4ff !important; background-image: none !important; }
-      [data-theme="light"] .site-header { background: rgba(255,255,255,0.96) !important; border-bottom: 1px solid #dbe4ef; }
-      [data-theme="light"] footer, [data-theme="light"] .footer { background: rgba(255,255,255,0.96) !important; border-top: 1px solid #dbe4ef; }
+      [data-theme="light"] .site-header, [data-theme="light"] .guide-nav { background: rgba(255,255,255,0.97) !important; }
+      [data-theme="light"] .page-hero { background: linear-gradient(135deg, rgba(15,98,254,0.10), rgba(0,122,90,0.05)), #f8fbff; }
+      [data-theme="light"] .toc,
+      [data-theme="light"] .outcome-card,
+      [data-theme="light"] .term-grid > div,
+      [data-theme="light"] .practice-block,
+      [data-theme="light"] .case-study,
+      [data-theme="light"] .reference-article,
+      [data-theme="light"] .template-record,
+      [data-theme="light"] .module { background: rgba(255,255,255,0.94); }
+      [data-theme="light"] .definition-table th, [data-theme="light"] .tool-table th { background: #eef4ff; }
+      [data-theme="light"] :not(pre) > code { background: #e5edfa; }
+      [data-theme="light"] footer { background: rgba(255,255,255,0.96); }
       .theme-btn {
         background: none;
         border: 1px solid var(--line);
@@ -213,7 +374,6 @@
         align-items: center;
         justify-content: center;
         padding: 0;
-        transition: border-color 0.15s, color 0.15s;
         flex-shrink: 0;
         font-family: inherit;
       }
@@ -222,9 +382,6 @@
     <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
     <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
     <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
-
-    
-
     <script type="application/ld+json" data-site-graph>
       {
         "@context": "https://schema.org",
@@ -236,38 +393,21 @@
             "url": "https://1200km.com/",
             "image": "https://1200km.com/assets/ap-logo.png",
             "jobTitle": "Threat Intelligence Research Engineer",
-            "worksFor": {
-              "@type": "Organization",
-              "name": "XPLG"
-            },
             "sameAs": [
               "https://github.com/anpa1200",
               "https://medium.com/@1200km",
               "https://www.linkedin.com/in/andrey-pautov/",
               "https://infosecwriteups.com/@1200km"
             ],
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Tel Aviv",
-              "addressCountry": "IL"
-            },
-            "email": "mailto:1200km@gmail.com",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "contactType": "professional inquiries",
-              "email": "mailto:1200km@gmail.com"
-            },
             "knowsAbout": [
-              "Cyber Threat Intelligence",
-              "Detection Engineering",
-              "MITRE ATT&CK",
-              "Threat Hunting",
+              "Digital Forensics",
+              "Incident Response",
+              "Evidence Preservation",
+              "Memory Forensics",
+              "Network Forensics",
+              "Cloud Incident Response",
               "Malware Analysis",
-              "OpenCTI",
-              "SIEM Validation",
-              "Adversary Simulation",
-              "Reverse Engineering",
-              "Cloud Security"
+              "MITRE ATT&CK"
             ]
           },
           {
@@ -275,32 +415,24 @@
             "@id": "https://1200km.com/#website",
             "name": "1200km Security Research",
             "url": "https://1200km.com/",
-            "publisher": {
-              "@id": "https://1200km.com/#person"
-            },
-            "inLanguage": "en",
-            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
-            "author": {
-              "@id": "https://1200km.com/#person"
-            }
+            "publisher": {"@id": "https://1200km.com/#person"},
+            "inLanguage": "en"
           },
           {
-            "@type": "WebPage",
+            "@type": ["WebPage", "TechArticle"],
             "@id": "https://1200km.com/cyber-knowledge/dfir.html#webpage",
             "url": "https://1200km.com/cyber-knowledge/dfir.html",
-            "name": "Digital Forensics & Incident Response (DFIR)",
-            "description": "Digital Forensics & Incident Response (DFIR). Digital Forensics & Incident Response. Syllabus in progress: evidence handling, disk/memory/network forensics…",
-            "isPartOf": {
-              "@id": "https://1200km.com/#website"
-            },
-            "breadcrumb": {
-              "@id": "https://1200km.com/cyber-knowledge/dfir.html#breadcrumb"
-            },
-            "author": {
-              "@id": "https://1200km.com/#person"
-            },
+            "name": "Digital Forensics & Incident Response — DFIR Field Guide",
+            "headline": "Digital Forensics & Incident Response — DFIR Field Guide",
+            "description": "A practical 14-module field guide to incident readiness, forensic evidence, investigation, containment, recovery, reporting, and controlled AI assistance.",
+            "isPartOf": {"@id": "https://1200km.com/#website"},
+            "breadcrumb": {"@id": "https://1200km.com/cyber-knowledge/dfir.html#breadcrumb"},
+            "author": {"@id": "https://1200km.com/#person"},
             "inLanguage": "en",
-            "dateModified": "2026-07-25",
+            "datePublished": "2026-07-27",
+            "dateModified": "2026-07-27",
+            "proficiencyLevel": "Intermediate to advanced",
+            "about": ["Digital forensics", "Incident response", "Evidence preservation", "Cloud forensics"],
             "primaryImageOfPage": {
               "@type": "ImageObject",
               "url": "https://1200km.com/assets/site-og-v2.png"
@@ -310,32 +442,16 @@
             "@type": "BreadcrumbList",
             "@id": "https://1200km.com/cyber-knowledge/dfir.html#breadcrumb",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://1200km.com/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Cyber Knowledge",
-                "item": "https://1200km.com/cyber-knowledge/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "Digital Forensics & Incident Response (DFIR)",
-                "item": "https://1200km.com/cyber-knowledge/dfir.html"
-              }
+              {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://1200km.com/"},
+              {"@type": "ListItem", "position": 2, "name": "Cyber Knowledge", "item": "https://1200km.com/cyber-knowledge/"},
+              {"@type": "ListItem", "position": 3, "name": "Digital Forensics & Incident Response", "item": "https://1200km.com/cyber-knowledge/dfir.html"}
             ]
           }
         ]
       }
     </script>
-</head>
+  </head>
   <body id="top">
-
     <!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -379,27 +495,630 @@
     <!-- site-shell:header:end -->
 
     <main data-pagefind-body id="main-content">
-      <div class="page-hero">
+      <section class="page-hero" aria-labelledby="dfir-title">
         <div class="page-hero-inner">
-          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain syllabus</p>
-          <h1 class="page-title" id="dfir">Digital Forensics &amp; Incident Response (DFIR)</h1>
-          <p class="page-lead">Evidence handling, disk/memory/network forensics, timeline reconstruction, and the incident response lifecycle from detection to lessons learned.</p>
+          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain 07 · Practitioner field guide</p>
+          <h1 class="page-title" id="dfir-title">Digital Forensics &amp; Incident Response</h1>
+          <p class="page-lead">A defensible DFIR practice connects preparation, evidence preservation, technical investigation, business decisions, containment, recovery, and learning. This guide provides a 14-module workflow for endpoint, disk, memory, network, identity, cloud, SaaS, container, malware, and AI-assisted investigations—without confusing a scanner result, an indicator match, or a fluent model answer with proof.</p>
           <div class="notice" role="note">
             <div>
-              <strong>Under construction</strong>
-              <p>This domain syllabus has not been written yet. Start with the CTI syllabus, which is live, while this page is built out.</p>
+              <strong>Authorization, safety, and legal boundary</strong>
+              <p>Collect only data you are authorized to access. Follow organizational policy, privacy and employment requirements, contractual obligations, legal hold instructions, jurisdiction-specific law, and counsel guidance. This technical guide is not legal advice and does not establish admissibility.</p>
             </div>
           </div>
           <div class="page-hero-links">
-            <a class="button primary" href="/cyber-knowledge/cti.html">Read the CTI syllabus →</a>
-            <a class="button" href="/cyber-knowledge/">← Back to Cyber Knowledge</a>
+            <a class="button primary" href="#learning-path">Start the learning path</a>
+            <a class="button" href="#case-studies">Open case studies</a>
+            <a class="button" href="#labs">Build the lab</a>
+            <a class="button" href="/adversarygraph/">Use AdversaryGraph</a>
           </div>
+          <p class="updated-note">Published and source-checked 27 July 2026. Current incident-response baseline: NIST SP 800-61 Rev. 3 (April 2025).</p>
         </div>
-      </div>
+      </section>
 
-      <div class="placeholder-panel">
-        <h2 id="coming-soon">Coming soon</h2>
-        <p>The full zero-to-hero syllabus for Digital Forensics &amp; Incident Response (DFIR) — terminology, frameworks, tools, and a recommended learning order — is being written next. Check back soon, or follow the CTI domain as a model for how each syllabus page will be structured.</p>
+      <nav class="guide-nav" aria-label="DFIR guide sections">
+        <div class="guide-nav-inner">
+          <a href="#orientation">Orientation</a>
+          <a href="#learning-path">14 modules</a>
+          <a href="#tooling">Tools</a>
+          <a href="#evidence-record">Evidence record</a>
+          <a href="#case-studies">Cases</a>
+          <a href="#labs">Labs</a>
+          <a href="#failure-atlas">Failure atlas</a>
+          <a href="#references">References</a>
+        </div>
+      </nav>
+
+      <div class="guide-layout">
+        <aside class="toc" aria-label="Table of contents">
+          <h2>Table of contents</h2>
+          <ol>
+            <li><a href="#orientation">Operating model and outcomes</a></li>
+            <li><a href="#core-language">Core language and evidence states</a></li>
+            <li><a href="#learning-path">Fourteen-module learning path</a></li>
+            <li><a href="#module-1">Readiness and authority</a></li>
+            <li><a href="#module-2">Declaration, triage, and scope</a></li>
+            <li><a href="#module-3">Evidence integrity and custody</a></li>
+            <li><a href="#module-4">Endpoint live response</a></li>
+            <li><a href="#module-5">Disk and file-system forensics</a></li>
+            <li><a href="#module-6">Windows and identity artifacts</a></li>
+            <li><a href="#module-7">Linux and macOS artifacts</a></li>
+            <li><a href="#module-8">Memory forensics</a></li>
+            <li><a href="#module-9">Network, DNS, proxy, and email</a></li>
+            <li><a href="#module-10">Cloud, SaaS, and containers</a></li>
+            <li><a href="#module-11">Malware and behavior extraction</a></li>
+            <li><a href="#module-12">Timelines, ATT&amp;CK, and CTI</a></li>
+            <li><a href="#module-13">Containment through recovery</a></li>
+            <li><a href="#module-14">AI assistance and learning</a></li>
+            <li><a href="#tooling">Tool-selection matrix</a></li>
+            <li><a href="#evidence-record">Evidence-record template</a></li>
+            <li><a href="#case-studies">Six worked cases</a></li>
+            <li><a href="#labs">Twelve-lab sequence</a></li>
+            <li><a href="#failure-atlas">Failure atlas and readiness gate</a></li>
+            <li><a href="#references">Standards and first-party reading</a></li>
+          </ol>
+        </aside>
+
+        <article class="guide-content">
+          <section id="orientation">
+            <p class="section-kicker">Start with decisions, not tools</p>
+            <h2>Operating model and learning outcomes</h2>
+            <p class="section-intro">DFIR is a decision-support discipline. The team must preserve sufficiently trustworthy records, reconstruct what is supportable, communicate uncertainty, and enable proportionate action while normal business and adversary activity may still be changing the environment.</p>
+            <div class="outcome-grid">
+              <div class="outcome-card">
+                <h3>Prepare before the alert</h3>
+                <p>Define authority, roles, communications, evidence sources, retention, secure tooling, clean access, isolation patterns, recovery dependencies, and escalation paths before an incident tests them.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Protect evidence and operations</h3>
+                <p>Choose collection methods according to volatility, value, business impact, privacy, and contamination risk. Record exactly what was acquired, how, by whom, with which tool and clock.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Reason from multiple sources</h3>
+                <p>Correlate endpoint, identity, network, cloud, application, and threat-intelligence evidence. Distinguish direct observations, normalized records, analyst inference, and unsupported possibilities.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Recover with verification</h3>
+                <p>Contain deliberately, eradicate root causes and persistence, restore from trusted state, validate controls and telemetry, and keep monitoring until exit criteria are satisfied.</p>
+              </div>
+            </div>
+            <div class="engagement-map">
+              <h3>A modern lifecycle</h3>
+              <p>NIST SP 800-61 Rev. 3 integrates incident response throughout all six NIST CSF 2.0 functions rather than treating it as a disconnected sequence. A useful operating loop is:</p>
+              <div class="path-line" aria-label="Incident response operating loop">
+                <span>Govern</span><i>→</i><span>Identify</span><i>→</i><span>Protect</span><i>→</i><span>Detect</span><i>→</i><span>Respond</span><i>→</i><span>Recover</span><i>↺</i><span>Improve</span>
+              </div>
+              <p>Preparation and learning span the loop. Collection and analysis support decisions inside it. A team may still use preparation, detection/analysis, containment/eradication/recovery, and post-incident language in playbooks, but should not present that older phase model as the complete current NIST framework.</p>
+            </div>
+          </section>
+
+          <section id="core-language">
+            <p class="section-kicker">Vocabulary controls conclusions</p>
+            <h2>Core language and evidence states</h2>
+            <div class="term-grid">
+              <div><h3>Event, alert, case, incident</h3><p>An event is an observable occurrence. An alert is a rule or analytic output requiring evaluation. A case organizes investigation work. An incident is a declared adverse cybersecurity occurrence under the organization’s criteria. They are not synonyms.</p></div>
+              <div><h3>Artifact and evidence</h3><p>An artifact is a potentially relevant record or object. Evidence is material used to support a proposition after provenance, integrity, context, and limitations are considered. A collected file is not automatically conclusive evidence.</p></div>
+              <div><h3>Indicator and behavior</h3><p>An indicator is a value or pattern that may support detection or investigation. Behavior describes actions or relationships. IOC presence alone does not establish compromise; absence does not establish safety.</p></div>
+              <div><h3>Acquisition and analysis copy</h3><p>The acquisition is the preserved collection from a source. Analysis should normally occur on a controlled working copy while the preserved original remains access-controlled and verifiable.</p></div>
+              <div><h3>Timeline fact and inference</h3><p>A source timestamp is an observation with a clock, format, and semantics. A normalized timeline is derived. An inferred sequence or attribution is an analytical conclusion and must retain its supporting records and confidence.</p></div>
+              <div><h3>Containment and eradication</h3><p>Containment limits ongoing harm. Eradication removes malicious capability and root cause. Isolation can destroy volatile access or disrupt evidence; restoration without eradication can recreate the incident.</p></div>
+            </div>
+            <div class="analysis-note"><strong>Evidence ladder:</strong> label records as <em>raw source</em>, <em>verified acquisition</em>, <em>normalized artifact</em>, <em>correlated observation</em>, <em>analyst inference</em>, or <em>decision</em>. Preserve links backward. Do not allow a summary to erase its provenance.</div>
+          </section>
+
+          <section id="learning-path">
+            <p class="section-kicker">Practitioner curriculum</p>
+            <h2>Fourteen-module DFIR learning path</h2>
+            <p class="section-intro">Complete the modules in order for a new capability. Experienced teams can use each module as a review checklist. Every module produces an operational artifact rather than only reading notes.</p>
+
+            <div class="module" id="module-1">
+              <div class="module-header"><div><h3>Readiness, mandate, governance, and communications</h3><p class="module-purpose">Make authority, responsibility, safe access, evidence sources, and crisis decisions explicit before pressure arrives.</p></div><span class="module-index">Module 01</span></div>
+              <ol class="workflow">
+                <li>Define what constitutes a security incident, who may declare and close one, severity criteria, duty coverage, executive ownership, and conditions for external support.</li>
+                <li>Build a role matrix for incident commander, lead investigator, evidence custodian, system owner, identity/cloud/network responders, legal, privacy, HR, communications, insurance, vendors, and law enforcement liaison.</li>
+                <li>Establish out-of-band communications and clean-room access. Assume normal email, chat, identity, endpoint management, and secrets may be observed or unavailable.</li>
+                <li>Inventory telemetry and retention by source: endpoints, identity, DNS, DHCP, VPN, email, proxy, firewall, cloud control planes, workloads, applications, databases, SaaS, backups, and physical systems. Test retrieval—not only collection.</li>
+                <li>Pre-stage signed or hashed tools, trusted boot media where applicable, secure evidence storage, isolated analysis systems, collection scripts, service-provider contacts, legal-hold procedures, and restoration credentials.</li>
+                <li>Exercise decision-heavy scenarios: ransomware, identity-provider compromise, cloud key theft, business email compromise, destructive insider activity, software supply-chain compromise, and loss of primary communications.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> approved IR policy, service catalogue, RACI/on-call roster, contact tree, evidence-source register, retention map, clean-access plan, playbooks, and exercise findings with owners and deadlines.</div>
+              <p class="further-reading"><strong>Baseline:</strong> use <a href="https://csrc.nist.gov/pubs/sp/800/61/r3/final">NIST SP 800-61 Rev. 3</a> with the <a href="https://www.first.org/standards/frameworks/csirts/csirt_services_framework_v2.1">FIRST CSIRT Services Framework 2.1</a>. No team must provide every FIRST service; define what your constituency can actually expect.</p>
+            </div>
+
+            <div class="module" id="module-2">
+              <div class="module-header"><div><h3>Incident declaration, triage, scope, and hypotheses</h3><p class="module-purpose">Turn a noisy alert into a bounded investigation with explicit questions, risks, and decision points.</p></div><span class="module-index">Module 02</span></div>
+              <ol class="workflow">
+                <li>Record the trigger exactly: source, detection/rule ID and version, raw event references, first-seen time, receiver, affected identity/asset, and what the alert actually asserts.</li>
+                <li>Validate the signal without prematurely modifying the target. Check parser health, duplicate alerts, time zone, clock offset, asset/identity ownership, expected administration, and known maintenance.</li>
+                <li>Declare or reject an incident under documented criteria. Record who decided, when, based on which evidence, and when the decision must be revisited.</li>
+                <li>State testable hypotheses: initial access, affected identities, privilege gained, persistence, lateral movement, collection, exfiltration, impact, and whether the activity is still active. Name evidence that would support or weaken each.</li>
+                <li>Build an initial scope graph around users, hosts, IPs, sessions, processes, applications, cloud resources, tokens, repositories, data stores, and time windows. Treat scope as versioned—not final.</li>
+                <li>Assign severity from business impact, data, safety, privilege, exposure, active adversary control, recoverability, regulatory/contractual context, and confidence. Do not calculate severity from an IOC reputation score alone.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> case identifier, declaration record, initial facts, hypotheses, scope graph, severity rationale, collection plan, owners, next decision time, and preserved original alert.</div>
+              <p class="further-reading"><strong>First-party practice:</strong> the <a href="/articles/read/2025/2025-02-24-soc-tier-1-the-complete-onboarding-guide-to-security-monitoring-and-incident-response-824a1dfe4476">SOC Tier 1 onboarding guide</a> shows the handoff between monitoring, triage, escalation, evidence, and response.</p>
+            </div>
+
+            <div class="module" id="module-3">
+              <div class="module-header"><div><h3>Evidence integrity, order of volatility, and chain of custody</h3><p class="module-purpose">Preserve provenance and integrity while acknowledging that any live collection changes the source.</p></div><span class="module-index">Module 03</span></div>
+              <ol class="workflow">
+                <li>Obtain authority and define the purpose, systems, accounts, locations, data categories, time range, collection limits, minimization, retention, and permitted recipients.</li>
+                <li>Prioritize volatile information by case value and loss risk: active sessions, processes, network state, memory, temporary storage, local logs, disk, remote logs, snapshots, and backups. “Order of volatility” is a decision aid, not an automatic command to collect everything.</li>
+                <li>Before collection, record collector identity, source identity, physical/logical location, source state, system time and reference time, tool name/version/hash, command or API request, output destination, and known changes introduced.</li>
+                <li>Use forensically appropriate acquisition where required. Hash the acquisition and working copies with an approved algorithm, verify after transfer, restrict access, log every custody transfer, and preserve storage/audit records.</li>
+                <li>Keep raw artifacts immutable where feasible. Perform parsing, carving, enrichment, and annotation on controlled copies; record tool versions, configuration, time-zone conversion, parser warnings, and failed/partial collection.</li>
+                <li>Separate technical integrity from legal admissibility. Consult counsel and qualified forensic personnel for litigation, criminal, employment, privacy, cross-border, regulated, or insurance-sensitive matters.</li>
+              </ol>
+              <div class="safety-note"><strong>Reality check:</strong> cryptographic hashes can demonstrate that a byte sequence has not changed since hashing. They do not prove that the source was truthful, the collection complete, the clock correct, or the evidence legally admissible.</div>
+              <div class="evidence-note"><strong>Output:</strong> collection authorization, acquisition manifest, tool/command record, source and reference clocks, hashes, custody ledger, access log, preservation location, and documented limitations.</div>
+              <p class="further-reading"><strong>Primary guidance:</strong> <a href="https://datatracker.ietf.org/doc/rfc3227/">RFC 3227</a> remains useful for collection and archiving principles; <a href="https://csrc.nist.gov/pubs/sp/800/86/final">NIST SP 800-86</a> integrates forensic techniques with incident response but is a 2006 technical publication, not current legal advice.</p>
+            </div>
+
+            <div class="module" id="module-4">
+              <div class="module-header"><div><h3>Endpoint live response and volatile acquisition</h3><p class="module-purpose">Capture high-value runtime state with the smallest justified operational and evidentiary footprint.</p></div><span class="module-index">Module 04</span></div>
+              <ol class="workflow">
+                <li>Decide whether to observe, isolate, snapshot, collect, or power down based on active harm, safety, encryption, volatile evidence, adversary awareness, business criticality, and legal direction. Record the decision.</li>
+                <li>Confirm host identity using more than display name: asset record, hardware/cloud instance ID, operating system, addresses, owner, management agent, boot time, and current/reference clock.</li>
+                <li>Collect logged-on users and sessions, processes and parent/child relationships, executable paths and hashes, command lines where legally permitted, loaded modules, open files, listening/connected sockets, routes, DNS/cache, scheduled execution, services, and security-tool state.</li>
+                <li>Preserve relevant volatile data before disruptive actions. Memory acquisition may reveal injected code, credentials, keys, and sessions, but also highly sensitive data; secure and minimize it accordingly.</li>
+                <li>Record each command, agent action, remote connection, created file, timestamp change, process start, and network request caused by response. Avoid exploratory commands with uncontrolled output or tools that silently alter artifacts.</li>
+                <li>Validate collection completeness and failures. A successful API response does not prove all fields were returned; a disconnected endpoint does not prove it is offline.</li>
+              </ol>
+              <div class="analysis-note"><strong>Collection strategy:</strong> broad fleet triage with <a href="https://docs.velociraptor.app/">Velociraptor</a> or <a href="https://osquery.io/">osquery</a> answers different questions from a full image. Use fast triage to scope and prioritize, then acquire deeper evidence where the decision requires it.</div>
+              <div class="evidence-note"><strong>Output:</strong> endpoint triage bundle, collection transcript, process/network/session snapshot, sensitive-data classification, failures, and next acquisition decision.</div>
+            </div>
+
+            <div class="module" id="module-5">
+              <div class="module-header"><div><h3>Disk, file-system, and persistence forensics</h3><p class="module-purpose">Reconstruct durable activity from file-system metadata, content, configuration, and application artifacts.</p></div><span class="module-index">Module 05</span></div>
+              <ol class="workflow">
+                <li>Choose logical collection, snapshot, volume image, or physical image based on question, platform, encryption, scale, legal need, available time, and operational risk. Document sectors, volumes, snapshots, exclusions, and partial acquisition.</li>
+                <li>Preserve partition, file-system, mount, encryption, time-zone, and system-clock context. Record whether timestamps come from source metadata, application content, archive headers, database records, or parser inference.</li>
+                <li>Analyze file creation/modification/access/change metadata, journals, deleted entries, alternate streams/extended attributes, archives, temporary files, browser/application state, user profiles, recycle/trash, and configuration stores.</li>
+                <li>Enumerate persistence and execution surfaces: services, scheduled jobs, startup folders, shell/profile files, login items, systemd/launchd units, registry autoruns, WMI/event subscriptions, browser extensions, package hooks, and cloud-init/user data.</li>
+                <li>Hash and classify suspicious files, preserve path and metadata, compare trusted baselines, search variants, and determine whether absence reflects deletion, non-collection, unsupported parsing, or true absence.</li>
+                <li>Build a file-level timeline, correlate with execution and identity records, and retain exact source references. Do not infer execution from file presence alone unless the artifact’s semantics support it.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> acquisition map, file-system timeline, suspicious-file manifest, persistence inventory, deleted/partial artifact notes, and conclusions tied to source offsets or record IDs.</div>
+            </div>
+
+            <div class="module" id="module-6">
+              <div class="module-header"><div><h3>Windows endpoint and identity forensics</h3><p class="module-purpose">Correlate Windows execution, persistence, authentication, and user activity without treating a single artifact as a complete history.</p></div><span class="module-index">Module 06</span></div>
+              <ol class="workflow">
+                <li>Preserve relevant EVTX channels and channel configuration: Security, System, Application, PowerShell, Task Scheduler, WMI, Defender, Sysmon where deployed, Terminal Services, and product-specific logs. Record retention and overwrite state.</li>
+                <li>Investigate logons and tokens using account/domain/SID, logon type, source workstation/address, target, authentication package, process, session/logon ID, privilege assignment, and logoff—while accounting for service accounts, NAT, proxies, and missing auditing.</li>
+                <li>Use registry hives and transaction logs to examine services, autoruns, user activity, USB/device history, network configuration, shell state, and application configuration. Preserve hive origin and last-write semantics.</li>
+                <li>Correlate Prefetch, Amcache, Shimcache/AppCompatCache, SRUM, LNK files, Jump Lists, browser history, PowerShell history/logging, scheduled tasks, services, MFT/USN journal, and EDR telemetry according to OS version and artifact availability.</li>
+                <li>For Active Directory or Entra-linked incidents, scope credential exposure, privileged groups, ticket/token issuance, directory changes, applications/service principals, MFA changes, federation, device registration, risky sessions, and synchronization infrastructure.</li>
+                <li>Validate tooling against known fixtures. Artifact meaning and availability vary by Windows version, settings, cleanup, retention, application, and parser; document those limits.</li>
+              </ol>
+              <div class="analysis-note"><strong>Interpretation discipline:</strong> Prefetch can support evidence that an executable ran under particular conditions; it is not a universal program-execution ledger. Similar caveats apply to Amcache, Shimcache, SRUM, and event IDs.</div>
+              <div class="evidence-note"><strong>Output:</strong> Windows/identity timeline, account-session graph, execution and persistence findings, audit gaps, artifact/version notes, and scoped credential-response actions.</div>
+            </div>
+
+            <div class="module" id="module-7">
+              <div class="module-header"><div><h3>Linux and macOS endpoint forensics</h3><p class="module-purpose">Reconstruct host and user activity across distributions and macOS versions while preserving platform-specific context.</p></div><span class="module-index">Module 07</span></div>
+              <ol class="workflow">
+                <li>Identify distribution/build, kernel, boot/session state, file systems, containers/virtualization, time synchronization, audit configuration, log rotation, endpoint tooling, package manager, and mounted remote storage.</li>
+                <li>On Linux, preserve journald and syslog sources, authentication/sudo records, auditd, shell histories with their limitations, cron and systemd timers/units, SSH configuration and keys, package history, web/application logs, persistence paths, and process/network state.</li>
+                <li>On macOS, examine Unified Logs, FSEvents, APFS snapshots, launch agents/daemons, login items, quarantine and download metadata, TCC, shell and application artifacts, persistence extensions, user sessions, and endpoint security telemetry where available.</li>
+                <li>Review accounts, groups, SSH/remote-access state, authorized keys, sudoers, PAM, environment/profile files, credentials/tokens, cloud CLI state, package repositories, kernel/system extensions, and security-control changes.</li>
+                <li>Correlate inode/file metadata, journal records, process accounting/audit, package records, service activation, network flows, and centralized logs. Treat shell history as user-controlled and incomplete.</li>
+                <li>Preserve ownership, permissions, ACLs, extended attributes, capabilities, symbolic links, namespaces, and container volume mappings; a simple archive can lose material metadata.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> platform profile, log and retention map, account/access findings, persistence and package changes, file-system timeline, metadata-preservation record, and audit blind spots.</div>
+            </div>
+
+            <div class="module" id="module-8">
+              <div class="module-header"><div><h3>Memory forensics and runtime reconstruction</h3><p class="module-purpose">Use volatile memory to examine runtime structures that disk and logs may not retain.</p></div><span class="module-index">Module 08</span></div>
+              <ol class="workflow">
+                <li>Acquire memory with an approved, validated tool appropriate to operating system, architecture, virtualization, security controls, and case authority. Record acquisition tool, driver/module, output, duration, host changes, and hash.</li>
+                <li>Establish image metadata and analysis compatibility. Preserve symbols, profiles, kernel/build information, plugin versions, failed translations, and unsupported structures.</li>
+                <li>Enumerate processes and cross-check multiple structures for hidden/terminated activity; inspect parentage, command lines, environment, handles, loaded modules, threads, sockets, and security tokens where supported.</li>
+                <li>Investigate executable and anomalous memory regions, injections, hooks, unsigned/unbacked mappings, decoded configurations, command-and-control state, and credential material only within authorization and data-handling rules.</li>
+                <li>Extract candidate files, strings, keys, connections, and indicators into controlled derivatives. Hash them, link them to memory offsets/process context, and validate with disk, endpoint, network, and threat-intelligence sources.</li>
+                <li>State negative results narrowly: “this plugin found no matching structure in this image” is defensible; “the host had no malware” is not.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> verified memory image, acquisition record, runtime process/network map, suspicious regions and extracted derivatives, plugin logs, sensitive-data controls, and explicit analysis limits.</div>
+              <p class="further-reading"><strong>Tooling:</strong> use the maintained <a href="https://github.com/volatilityfoundation/volatility3">Volatility 3 project</a> and its documentation; preserve framework, symbol, plugin, and command versions in every result.</p>
+            </div>
+
+            <div class="module" id="module-9">
+              <div class="module-header"><div><h3>Network, DNS, proxy, VPN, and email forensics</h3><p class="module-purpose">Reconstruct communications and access paths from packets, flows, application records, and identity context.</p></div><span class="module-index">Module 09</span></div>
+              <ol class="workflow">
+                <li>Map observation points and visibility: endpoint, switch/TAP, firewall, NAT, VPN, resolver, proxy, load balancer, CDN, WAF, cloud flow logs, email gateway, and SaaS audit. State whether records contain packets, metadata, sampled flow, or derived alerts.</li>
+                <li>Preserve packet captures and logs with interface/sensor identity, capture filter, snap length, loss/drop counters, time source, encapsulation, retention, export query, and checksum. Analysis should use a working copy.</li>
+                <li>Normalize addresses through DHCP, NAT, VPN, IPv6 privacy addresses, proxies, cloud elastic addresses, and load balancers before assigning activity to an asset or user.</li>
+                <li>Correlate DNS query/response, passive DNS where authorized, proxy and TLS metadata, HTTP records, network flows, EDR sockets, process identity, and server/application logs. Encryption may limit content while preserving useful metadata.</li>
+                <li>For email, preserve the original message and headers, authentication results, envelope, message trace, mailbox/audit activity, URLs, attachments, sender infrastructure, user actions, and tenant changes. Do not rely on the visible From field.</li>
+                <li>Use baselines and peer comparison for beaconing, data staging/exfiltration, lateral protocols, scanning, tunneling, unusual authentication, and protocol mismatch. Validate that collection and parsing can observe the hypothesized behavior.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> sensor/visibility map, verified PCAP/log exports, address-identity translation, communication timeline, message evidence package, packet/flow references, and visibility limitations.</div>
+              <p class="further-reading"><strong>First-party practice:</strong> <a href="/articles/read/2025/2025-12-12-protocol-level-network-threat-hunting-a-wireshark-centric-guide-a6770ffc96c6">Protocol-Level Network Threat Hunting</a> develops a Wireshark-centered method for translating hypotheses into packet and protocol evidence.</p>
+            </div>
+
+            <div class="module" id="module-10">
+              <div class="module-header"><div><h3>Cloud, SaaS, identity, container, and Kubernetes forensics</h3><p class="module-purpose">Investigate ephemeral, API-driven environments using provider records, snapshots, resource identity, and shared-responsibility boundaries.</p></div><span class="module-index">Module 10</span></div>
+              <ol class="workflow">
+                <li>Prepare a clean forensic/security account or project, cross-account roles, immutable evidence storage, encryption keys, automation, region coverage, organization-level logging, and provider escalation before an incident.</li>
+                <li>Preserve control-plane and data-plane audit logs, identity-provider events, session/token issuance, configuration history, network flow/DNS, workload and application logs, object access, secret/KMS activity, security findings, billing, and support records.</li>
+                <li>Record tenant/account/subscription/project, resource ID, region, API and request ID, principal/session, source address, user agent, time, event version, ingestion delay, export query, retention, and evidence-store object version.</li>
+                <li>Snapshot disks/volumes and collect instance/container state using provider-supported methods. Do not attach an affected disk to an unprotected analyst workstation; isolate analysis and restrict egress.</li>
+                <li>For Kubernetes and containers, preserve cluster audit logs, API events, RBAC, service accounts/tokens, admission and runtime alerts, image digests, manifests, node/runtime logs, network policy/flow, persistent volumes, registry and CI provenance, and ephemeral-container use.</li>
+                <li>For SaaS, export admin, authentication, sharing, mailbox, application consent, API token, file access, and retention records before short windows expire. Confirm provider time semantics and export completeness.</li>
+                <li>Scope credentials and infrastructure as code: keys, temporary sessions, workload identity, roles/policies, federated trust, secrets, pipelines, repositories, state files, and changes replicated across regions or organizations.</li>
+              </ol>
+              <div class="safety-note"><strong>Shared responsibility:</strong> customer evidence and provider evidence differ by service model. A cloud customer usually cannot image provider infrastructure; preserve the available customer-plane records and escalate provider requests early.</div>
+              <div class="evidence-note"><strong>Output:</strong> cloud evidence inventory, immutable exports/snapshots, principal-resource-session graph, container/image provenance, cross-region scope, provider gaps, and credential containment plan.</div>
+              <p class="further-reading"><strong>Primary practice:</strong> AWS describes separating collection from analysis and storing evidence before automated analysis in its <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture-cyber-forensics/forensics-ir.html">forensics-in-IR guidance</a>. Adapt the principle—not service-specific commands—to your environment.</p>
+            </div>
+
+            <div class="module" id="module-11">
+              <div class="module-header"><div><h3>Malware, phishing, ransomware, and behavior extraction</h3><p class="module-purpose">Turn suspicious content into defensible behavioral findings, scoping leads, and detection candidates.</p></div><span class="module-index">Module 11</span></div>
+              <ol class="workflow">
+                <li>Preserve the original message, file, script, archive, document, URL, or memory-derived object; record source, delivery context, filenames, container relationships, passwords, hashes, and handling restrictions.</li>
+                <li>Perform static triage in an isolated environment: type/signature, metadata, strings, imports, configuration, macros/scripts, packer/obfuscation, certificates, embedded content, and known reputation—without opening on a normal workstation.</li>
+                <li>Use controlled dynamic analysis only when authorized: instrumented host, network simulation or tightly controlled egress, snapshots, process/file/registry/API/network capture, time controls, cleanup, and evidence preservation.</li>
+                <li>Extract behaviors first, indicators second. Record how each domain, IP, URL, hash, mutex, path, key, user agent, certificate, or command was observed and its expected lifetime and false-positive risk.</li>
+                <li>Map behaviors to ATT&amp;CK as an analytical index, not attribution. Develop Sigma/YARA/network/EDR candidates with source evidence, scope, required telemetry, test fixtures, and review.</li>
+                <li>For ransomware, prioritize safety, active spread, privileged access, backup integrity, encryption/inhibition behavior, exfiltration evidence, and trusted recovery. Do not run unverified decryptors on the only evidence copy.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> sample/message manifest, triage and sandbox traces, behavioral report, qualified IOC package, ATT&amp;CK candidates, detection tests, and response/scoping leads.</div>
+              <p class="further-reading"><strong>Deep dive:</strong> continue in the <a href="/cyber-knowledge/malware-analysis.html">Malware Analysis &amp; Reverse Engineering field guide</a>, then use <a href="/adversarygraph-docs/use-cases/investigation-malware-family/">AdversaryGraph’s malware-family investigation workflow</a> to organize reviewed evidence.</p>
+            </div>
+
+            <div class="module" id="module-12">
+              <div class="module-header"><div><h3>Timeline reconstruction, ATT&amp;CK mapping, CTI, and confidence</h3><p class="module-purpose">Create a traceable sequence that supports scope and decisions without flattening source semantics or uncertainty.</p></div><span class="module-index">Module 12</span></div>
+              <ol class="workflow">
+                <li>Retain raw timestamps, source time zone, precision, clock offset, event semantics, ingestion time, parser, and record locator. Normalize to one analysis time zone only as a derived field.</li>
+                <li>Merge endpoint, file-system, memory, identity, network, email, application, cloud, physical, and analyst-action records. Deduplicate carefully; repeated records across collectors may corroborate or simply mirror one source.</li>
+                <li>Build anchor events from high-confidence records such as verified authentication, provider API request IDs, process start linked to EDR, or message trace. Expand before and after each anchor and test alternative explanations.</li>
+                <li>Map entities and relationships: user, credential/session/token, device, process, file, address, domain, application, resource, repository, data object, alert, and evidence item. Preserve source-level links for every edge.</li>
+                <li>Use ATT&amp;CK technique mapping to structure observed behavior. Record procedure evidence, platform, data source, mapping rationale, and confidence; a technique match does not establish actor identity.</li>
+                <li>Enrich indicators and techniques with current CTI while keeping external claims separate from local evidence. Check source date, confidence, collection method, sharing restrictions, revocation, and infrastructure reuse.</li>
+                <li>Assign confidence per conclusion and list supporting, contradicting, and missing evidence. Mark unknowns and collection gaps rather than converting them to negative findings.</li>
+              </ol>
+              <div class="analysis-note"><strong>Attribution boundary:</strong> shared malware, infrastructure, language, target sector, and ATT&amp;CK overlap are leads. Responsible attribution requires a multi-source analytical argument and may remain unresolved.</div>
+              <div class="evidence-note"><strong>Output:</strong> normalized and raw-linked timeline, entity/evidence graph, ATT&amp;CK procedure table, CTI enrichment ledger, alternative hypotheses, confidence statement, and collection gaps.</div>
+              <p class="further-reading"><strong>Platform workflow:</strong> <a href="/adversarygraph/">AdversaryGraph</a> can store reports and investigation sessions, correlate reviewed entities, map ATT&amp;CK, and produce analyst-reviewed outputs. Start with <a href="/articles/adversarygraph-from-log-to-report-ioc-investigation.html">From Log to Report</a> and the <a href="/adversarygraph-docs/use-cases/investigation-third-party-report-validation/">third-party report validation guide</a>. It does not convert enrichment into proof.</p>
+            </div>
+
+            <div class="module" id="module-13">
+              <div class="module-header"><div><h3>Containment, eradication, recovery, communications, and closure</h3><p class="module-purpose">Reduce harm and restore trusted operation while preserving the evidence and reasoning behind each action.</p></div><span class="module-index">Module 13</span></div>
+              <ol class="workflow">
+                <li>For each containment option, assess expected harm reduction, evidence impact, adversary reaction, operational/safety cost, reversibility, dependency, owner, approval, and rollback. Preserve volatile evidence first when risk permits.</li>
+                <li>Contain identities and sessions as well as hosts: revoke tokens, rotate exposed credentials and keys, disable or restrict accounts/apps, repair federation/trust, control egress, isolate segments/resources, and protect backups and response tooling.</li>
+                <li>Eradicate root cause, persistence, malicious access, vulnerable paths, unauthorized applications, compromised build/deployment artifacts, and poisoned configuration. Search variants and adjacent trust relationships.</li>
+                <li>Recover from a defined trusted state. Validate image/artifact provenance, patch/configuration, identity, secrets, backups, data integrity, dependencies, logging, detection, access, and business function before staged reconnection.</li>
+                <li>Monitor for recurrence using behaviors, identities, affected resources, newly learned indicators, and control-health signals. Define owner, duration, expected baseline, thresholds, and exit criteria.</li>
+                <li>Maintain technical and executive situation reports with confirmed facts, uncertainty, impact, decisions, actions, owners, next update, and handling classification. Legal/privacy/communications teams decide notification under applicable requirements.</li>
+                <li>Close only when scoped systems and identities are addressed, recovery is accepted, monitoring criteria are met, evidence retained, reports reviewed, and residual risks have accountable owners.</li>
+              </ol>
+              <div class="evidence-note"><strong>Output:</strong> containment decision log, eradication and variant-search evidence, recovery validation, credential-action ledger, stakeholder reports, residual-risk acceptance, closure approval, and monitoring plan.</div>
+              <p class="further-reading"><strong>Worked workflow:</strong> follow <a href="/adversarygraph-docs/use-cases/investigation-ransomware-intrusion/">Investigation: From Log to Report</a> for an evidence-preserving ransomware case structure.</p>
+            </div>
+
+            <div class="module" id="module-14">
+              <div class="module-header"><div><h3>Post-incident learning and controlled AI/RAG/MCP assistance</h3><p class="module-purpose">Turn the incident into durable improvements while keeping models and connected tools inside explicit evidence and authority boundaries.</p></div><span class="module-index">Module 14</span></div>
+              <ol class="workflow">
+                <li>Conduct a blameless but accountable review: intended controls, what occurred, detection and decision timeline, evidence gaps, containment/recovery effectiveness, communication, business impact, contributing conditions, and successful practices.</li>
+                <li>Create owned, time-bounded improvements for prevention, telemetry, detection, response automation, evidence retention, access, architecture, backup/recovery, training, suppliers, and policy. Verify completion rather than closing on ticket creation.</li>
+                <li>Measure capabilities with distributions and context: time to validate, declare, scope, contain, recover, and close; evidence-source availability; collection success; decision latency; recurrence; exercise findings; and overdue improvements. Averages alone can hide severe outliers.</li>
+                <li>Use an approved LLM to summarize sanitized records, propose hypotheses, draft queries or timelines, explain artifacts, map candidate ATT&amp;CK behaviors, and suggest missing evidence—but require a human to review every claim against sources.</li>
+                <li>For RAG, enforce source-level authorization before retrieval and response, preserve citations and immutable evidence IDs, separate original artifacts from chunks/embeddings/summaries, version the index, and reconcile additions, updates, deletions, and access changes.</li>
+                <li>For MCP or other tool connections, allowlist tools and targets, validate strict schemas, use least-privilege identities, isolate execution, cap time/data/cost, log every request/result, and require confirmation before containment, collection, scanning, deletion, or external communication.</li>
+                <li>Test prompt injection in reports, logs, webpages, documents, filenames, and retrieved content. Treat model output and tool output as untrusted until validated; never let the model approve its own evidence or expand its own authority.</li>
+                <li>Record provider/model/version, prompt/template, data classification, retrieved source IDs, tool calls, policy decisions, output, reviewer, corrections, and final disposition. Redact secrets and regulated content according to policy.</li>
+              </ol>
+              <div class="safety-note"><strong>Non-negotiable boundary:</strong> AI may accelerate an investigation; it is not an evidence custodian, legal authority, incident commander, or autonomous containment approver. A confident answer without traceable sources remains unverified.</div>
+              <div class="evidence-note"><strong>Output:</strong> post-incident review, improvement register, capability metrics, AI data-flow and threat model, retrieval ACL tests, MCP/tool policy, prompt-injection evaluations, audit trail, and documented human decisions.</div>
+              <p class="further-reading"><strong>Implementation context:</strong> review the <a href="/adversarygraph-docs/unified-rag-mcp/">AdversaryGraph unified RAG and MCP guide</a> and <a href="/adversarygraph-docs/">platform documentation</a>. These define analysis assistance and auditability; they do not authorize collection or response actions.</p>
+            </div>
+          </section>
+
+          <section id="tooling">
+            <p class="section-kicker">Select by question and evidence</p>
+            <h2>DFIR tool-selection matrix</h2>
+            <p class="section-intro">Tools are examples, not endorsements. Validate each version against known fixtures, preserve command/configuration and logs, and record unsupported formats or failed plugins. No single product establishes completeness.</p>
+            <div class="table-scroll">
+              <table class="tool-table">
+                <thead><tr><th>Capability</th><th>Example tools or sources</th><th>Best question</th><th>Evidence and limit</th></tr></thead>
+                <tbody>
+                  <tr><td>Fleet triage and collection</td><td>Velociraptor, osquery, EDR live response, KAPE</td><td>Which hosts, users, processes, files, and connections need deeper collection?</td><td>Query/artifact, endpoint identity, timestamps, output, errors. Agent scope and retention determine visibility.</td></tr>
+                  <tr><td>Disk and file systems</td><td>The Sleuth Kit/Autopsy, X-Ways or EnCase where licensed, native snapshot tools</td><td>What durable files, metadata, journals, deletions, and persistence exist?</td><td>Verified image/snapshot and offsets. Logical collection may omit unallocated or metadata.</td></tr>
+                  <tr><td>Windows artifacts</td><td>Eric Zimmerman tools, KAPE, Chainsaw, Hayabusa, EvtxECmd</td><td>What execution, authentication, persistence, and user activity do Windows artifacts support?</td><td>Source file, parser/version, record ID/offset. Semantics vary by version and settings.</td></tr>
+                  <tr><td>Memory</td><td>Volatility 3, platform acquisition tools</td><td>What processes, connections, mappings, credentials, or injected/runtime state existed?</td><td>Verified image, OS/symbol context, plugin logs. Acquisition changes state and may be partial.</td></tr>
+                  <tr><td>Timeline</td><td>Plaso/log2timeline, Timesketch, native queries, structured notebooks</td><td>How do events across sources relate in time?</td><td>Raw record locator, parser, source/normalized time. Parser output is derived evidence.</td></tr>
+                  <tr><td>Network</td><td>Wireshark/tshark, Zeek, Suricata, flow/DNS/proxy/firewall records</td><td>Which systems communicated, how, when, and with what observable content or metadata?</td><td>PCAP/log export and sensor context. Encryption, loss, sampling, and placement limit visibility.</td></tr>
+                  <tr><td>Email and SaaS</td><td>Original EML, message trace, tenant audit, eDiscovery/export APIs</td><td>How was a message delivered and what mailbox, consent, sharing, or user action followed?</td><td>Original content plus provider record IDs. Short retention and delegated access complicate scope.</td></tr>
+                  <tr><td>Cloud evidence</td><td>CloudTrail/Config/Flow Logs, Azure activity/Entra/Defender, GCP audit, provider snapshots</td><td>Which principal changed or accessed which resource through which session/API?</td><td>Immutable export, query, resource/principal IDs. Shared responsibility limits infrastructure access.</td></tr>
+                  <tr><td>Containers and Kubernetes</td><td>Kubernetes audit, runtime/registry logs, Falco, image/SBOM/provenance tools</td><td>Which identity, image, workload, API action, node, and persistent resource were involved?</td><td>Digest, manifests, audit IDs, runtime evidence. Ephemeral containers/filesystems disappear quickly.</td></tr>
+                  <tr><td>Malware</td><td>YARA, capa, FLOSS, Ghidra, isolated sandboxes, MalwareGraph</td><td>What does the sample contain and do, and which leads are durable enough to operationalize?</td><td>Sample hash, trace, rule/version, behavioral support. Reputation or unpacking alone is not attribution.</td></tr>
+                  <tr><td>Rules and hunting</td><td>Sigma, YARA/YARA-L, SIEM/EDR queries, AdversaryGraph Query Library</td><td>Can a reviewed behavior be found consistently in available telemetry?</td><td>Rule/query, data contract, fixtures, results, false positives. A syntactically valid rule may never see required data.</td></tr>
+                  <tr><td>AI-assisted correlation</td><td>Approved LLM, access-trimmed RAG, schema-constrained MCP tools</td><td>Can assistance summarize, propose, translate, or identify gaps without taking authority?</td><td>Source citations, prompt/model/tool trace and reviewer. Output is unverified until checked.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="evidence-record">
+            <p class="section-kicker">Reusable artifact</p>
+            <h2>Minimum evidence and investigation record</h2>
+            <p class="section-intro">Use a structured record even during a fast response. Add fields required by your organization, counsel, regulator, insurer, or forensic process; do not remove the links needed to reproduce a conclusion.</p>
+            <div class="template-record">
+              <pre><code>case:
+  id: IR-YYYY-NNNN
+  title:
+  classification: internal | confidential | restricted
+  declared_at_utc:
+  declared_by:
+  severity:
+  business_services:
+  authority_and_scope:
+  legal_hold_or_special_handling:
+
+evidence_item:
+  id: EV-NNNN
+  source_type: endpoint | identity | network | cloud | email | file | memory
+  source_identity:
+  source_location:
+  collector:
+  collection_started_utc:
+  collection_completed_utc:
+  source_clock_and_offset:
+  acquisition_method:
+  tool_name_version_hash:
+  command_or_api_query:
+  output_location:
+  sha256:
+  verification:
+  known_collection_changes:
+  completeness_and_errors:
+  custody_transfers:
+  access_classification:
+  retention_or_hold:
+
+observation:
+  id: OBS-NNNN
+  statement:
+  evidence_ids: [EV-NNNN]
+  raw_record_locators:
+  source_timestamp:
+  normalized_timestamp_utc:
+  parser_and_version:
+  confidence:
+  limitations:
+
+conclusion_or_decision:
+  id: DEC-NNNN
+  statement:
+  supporting_observations: [OBS-NNNN]
+  contradicting_or_missing_evidence:
+  alternatives_considered:
+  confidence:
+  owner_and_approver:
+  action_and_rollback:
+  decided_at_utc:
+  review_at_utc:</code></pre>
+              <p><strong>Do not overwrite:</strong> corrections should append a new version with author, timestamp, reason, and link to the superseded record. Preserve original evidence and prior decisions according to retention policy.</p>
+            </div>
+          </section>
+
+          <section id="case-studies">
+            <p class="section-kicker">Worked analytical patterns</p>
+            <h2>Six end-to-end DFIR case studies</h2>
+            <p class="section-intro">These are controlled training patterns, not claims about a real victim. Each case emphasizes a different decision and evidence boundary.</p>
+            <div class="case-grid">
+              <article class="case-study">
+                <h3>1. Encoded PowerShell and suspected credential access</h3>
+                <p><strong>Trigger:</strong> EDR reports PowerShell launched by an office process with an encoded command and outbound connection.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Preserve the raw alert, process tree, command line, script-block/AMSI events where available, user/session, binary hashes, target address, and endpoint clock.</li>
+                  <li>Isolate based on active-risk criteria after volatile collection. Acquire memory if credential material or injected runtime state is relevant and authorized.</li>
+                  <li>Decode only in an isolated environment; retain original and decoded bytes, method, encoding assumption, hashes, URLs/domains, and script behavior.</li>
+                  <li>Correlate Office/email delivery, downloads, child processes, authentication events, credential access, lateral sessions, DNS/proxy, and other hosts with matching behaviors.</li>
+                  <li>Reset credentials only after scoping session/token and persistence impact; validate logging and deploy reviewed behavioral detections.</li>
+                </ol>
+                <p><strong>Do not claim:</strong> Base64 or PowerShell alone is malicious. The conclusion comes from process lineage, content, execution, network, identity, and surrounding behavior.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>2. Ransomware intrusion from sparse logs</h3>
+                <p><strong>Trigger:</strong> files become unavailable and one endpoint reports bulk renames; central logs are incomplete.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Declare severity from operational impact and spread. Protect backups, identity systems, hypervisors, management plane, and response channels.</li>
+                  <li>Preserve available EDR, authentication, VPN, firewall, DNS, file-server, backup, hypervisor, and cloud records; collect representative endpoints rather than imaging blindly.</li>
+                  <li>Build anchors for initial access, privilege change, lateral administration, defense impairment, staging/exfiltration, encryption, and backup inhibition.</li>
+                  <li>Separate confirmed encryption from possible data theft. Absence of network evidence in missing telemetry is unknown—not “no exfiltration.”</li>
+                  <li>Recover only after identity, persistence, entry point, vulnerable paths, backup integrity, and restored monitoring satisfy written criteria.</li>
+                </ol>
+                <p><strong>Platform practice:</strong> use the <a href="/adversarygraph-docs/use-cases/investigation-ransomware-intrusion/">AdversaryGraph ransomware investigation guide</a> to maintain evidence, mappings, and report handoff.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>3. Cloud service-account key abuse</h3>
+                <p><strong>Trigger:</strong> a cloud audit event shows an unusual principal reading secrets and creating compute in a new region.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Preserve organization/account audit, identity/federation, KMS/secret, configuration, network flow, DNS, workload, billing, repository, and CI records before retention expires.</li>
+                  <li>Trace key or token creation, issuance, session attributes, source, user agent, API request IDs, resources accessed, policy changes, and downstream credentials.</li>
+                  <li>Snapshot affected volumes/resources into a forensic account. Restrict egress and preserve resource IDs, region, image digest, user data, metadata, and tags.</li>
+                  <li>Contain the credential and trust path, not merely one VM. Review workload identity, role trust, CI secrets, repository history, and mirrored deployments.</li>
+                  <li>Restore from verified infrastructure code and images; test organization-level logging, region coverage, secret rotation, and alerting.</li>
+                </ol>
+                <p><strong>Do not claim:</strong> one source IP identifies a person. Cloud proxies, VPNs, compromised systems, and shared infrastructure require identity/session correlation.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>4. Business email and OAuth consent compromise</h3>
+                <p><strong>Trigger:</strong> a user reports a suspicious sent message while the mail gateway shows no malware.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Preserve the original message, message trace, mailbox audit, sign-ins, MFA, inbox/forwarding rules, delegates, application consent, token grants, file access, and admin actions.</li>
+                  <li>Identify phishing, password theft, session theft, malicious application consent, help-desk abuse, or legitimate delegation as competing hypotheses.</li>
+                  <li>Revoke sessions/tokens and malicious consent, reset affected credentials, repair MFA/recovery data, remove rules/delegates, and scope other users receiving the lure.</li>
+                  <li>Correlate user reports, authentication detail, device state, identity risk, application publisher/permissions, mailbox actions, and financial-process impact.</li>
+                  <li>Validate technical recovery and business workflow controls; communications and finance/legal teams handle counterparties and notification.</li>
+                </ol>
+                <p><strong>Do not claim:</strong> a “successful MFA” record proves the legitimate user acted. Session theft, push abuse, token replay, or attacker-registered authentication can change interpretation.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>5. Internet-facing application compromise</h3>
+                <p><strong>Trigger:</strong> WAF and application logs show exploit-like requests followed by a new process and outbound connection.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Preserve CDN/WAF/load-balancer, reverse-proxy, application, authentication, database, container/orchestrator, host, DNS, egress, deployment, and source-control records.</li>
+                  <li>Determine whether the request reached the vulnerable code path, which version/configuration was deployed, execution context, data accessed, secrets available, and whether other instances shared it.</li>
+                  <li>Snapshot or collect affected workloads, image digests, manifests, runtime state, files, memory where justified, service identity, environment, and persistent volumes.</li>
+                  <li>Contain routes/credentials/egress while maintaining evidence; patch root cause, rotate exposed secrets, rebuild from trusted artifacts, and search variants across the fleet.</li>
+                  <li>Reproduce in an isolated environment, add a security regression, validate telemetry, and hand root-cause/remediation evidence to the secure-code program.</li>
+                </ol>
+                <p><strong>Cross-domain path:</strong> use the <a href="/cyber-knowledge/secure-code.html">Secure Code guide</a> and <a href="/cyber-knowledge/vulnerability-research.html">Vulnerability Research guide</a> for remediation and exploitability validation.</p>
+              </article>
+
+              <article class="case-study">
+                <h3>6. Suspected data exfiltration by an insider or compromised account</h3>
+                <p><strong>Trigger:</strong> DLP flags a large archive copied to personal cloud storage by a departing employee.</p>
+                <h4>Workflow</h4>
+                <ol>
+                  <li>Coordinate with legal, privacy, HR, and management before collection. Define authority, monitoring boundaries, data minimization, employment context, and communications.</li>
+                  <li>Preserve DLP, endpoint, identity, file access, cloud sharing, proxy/network, removable-media, email, physical access, and approved business workflow records.</li>
+                  <li>Test alternatives: authorized migration, backup/synchronization, compromised account, malicious insider, automated process, classification error, or duplicated alert.</li>
+                  <li>Build a file/user/device/session timeline and identify exactly which data is supported as accessed or transferred. Avoid reading unrelated personal content without authority.</li>
+                  <li>Use proportionate containment and preserve due process. Technical findings should distinguish account activity from proven human intent.</li>
+                </ol>
+                <p><strong>Do not claim:</strong> an account action alone establishes the actor or motive. Attribution to a person requires corroboration and organizational/legal process.</p>
+              </article>
+            </div>
+          </section>
+
+          <section id="labs">
+            <p class="section-kicker">Practice in isolated environments</p>
+            <h2>Twelve-lab DFIR progression</h2>
+            <p class="section-intro">Use synthetic data and systems you own or are explicitly authorized to investigate. Reset between exercises. Never upload customer, employee, malware, credential, or regulated evidence to an unapproved service.</p>
+            <div class="lab-group">
+              <div class="two-col">
+                <div class="practice-block">
+                  <h3>Labs 1–4: readiness and host evidence</h3>
+                  <ol>
+                    <li><strong>Tabletop and charter:</strong> write declaration criteria, RACI, communication paths, evidence authority, and recovery criteria; run a ransomware decision inject.</li>
+                    <li><strong>Evidence package:</strong> collect a benign file/log set, record clocks and tools, hash acquisition/working copies, transfer custody, verify, and append a correction.</li>
+                    <li><strong>Windows triage:</strong> generate known logon, PowerShell, scheduled task, service, browser, and file events; collect and reconstruct them with artifact caveats.</li>
+                    <li><strong>Linux/macOS triage:</strong> create known SSH/sudo or login/persistence/package events; preserve logs and metadata, then state what retention prevents you from proving.</li>
+                  </ol>
+                </div>
+                <div class="practice-block">
+                  <h3>Labs 5–8: volatile, network, message, cloud</h3>
+                  <ol start="5">
+                    <li><strong>Memory:</strong> acquire an isolated test VM running known processes and sockets; verify the image and compare multiple process/network views in Volatility 3.</li>
+                    <li><strong>Network:</strong> capture a scripted DNS/HTTP/TLS exchange; document sensor limits, correlate PCAP with endpoint process, and write narrow findings.</li>
+                    <li><strong>Email:</strong> analyze a synthetic EML plus tenant-like audit export; trace delivery, URL, user action, consent, and containment without trusting display fields.</li>
+                    <li><strong>Cloud:</strong> create and rotate a temporary lab identity, invoke known APIs, export audit records immutably, build a principal-resource graph, and test a snapshot playbook.</li>
+                  </ol>
+                </div>
+                <div class="practice-block">
+                  <h3>Labs 9–12: integrated response</h3>
+                  <ol start="9">
+                    <li><strong>Container/Kubernetes:</strong> deploy a disposable workload, generate an RBAC/API/image event, preserve audit/manifests/digest/runtime evidence, and restore from code.</li>
+                    <li><strong>Malware-like behavior:</strong> use a harmless simulator in an isolated lab; extract behavior, qualify indicators, map ATT&amp;CK, and write a tested detection.</li>
+                    <li><strong>AdversaryGraph case:</strong> load sanitized logs/report/IOCs, create evidence-linked entities, review ATT&amp;CK candidates, and produce an analyst-approved investigation report.</li>
+                    <li><strong>AI boundary:</strong> give an approved model a sanitized evidence set containing a prompt-injection string; test source citations, access trimming, tool confirmation, hallucination correction, and audit logging.</li>
+                  </ol>
+                </div>
+                <div class="practice-block">
+                  <h3>Scoring every lab</h3>
+                  <ul class="checklist">
+                    <li>Authority and scope are explicit.</li>
+                    <li>Original evidence and working derivatives are distinguishable.</li>
+                    <li>Clocks, tools, commands, versions, hashes, and failures are recorded.</li>
+                    <li>Every conclusion links to evidence and names uncertainty.</li>
+                    <li>Containment has approval, expected effect, and rollback.</li>
+                    <li>Recovery has technical and business acceptance criteria.</li>
+                    <li>New controls are verified with a repeatable test.</li>
+                    <li>Sensitive data is minimized and handled correctly.</li>
+                  </ul>
+                </div>
+              </div>
+              <p class="further-reading"><strong>Environment library:</strong> use the site’s <a href="/labs.html">authorized security labs</a> and <a href="/guides.html">technical guides</a> for supporting Windows, Linux, network, malware, and platform exercises.</p>
+            </div>
+          </section>
+
+          <section id="failure-atlas">
+            <p class="section-kicker">What breaks real investigations</p>
+            <h2>Failure atlas and operational readiness gate</h2>
+            <div class="table-scroll">
+              <table class="definition-table">
+                <thead><tr><th>Failure pattern</th><th>Why it fails</th><th>Corrective control</th></tr></thead>
+                <tbody>
+                  <tr><td>IR plan exists only as a document</td><td>Contacts, access, retention, collection, isolation, provider support, and recovery fail under pressure.</td><td>Exercise scenarios, retrieve real test logs, use clean accounts, and track corrective actions to verification.</td></tr>
+                  <tr><td>Alert text copied as fact</td><td>Detection logic, parser, context, or enrichment may be wrong or incomplete.</td><td>Preserve raw records and rule/version; independently validate signal, entity, clock, and scope.</td></tr>
+                  <tr><td>Immediate reimage or shutdown</td><td>Volatile evidence, active sessions, keys, process state, or scope may be destroyed.</td><td>Use a documented risk decision and prioritized collection before disruption when safety permits.</td></tr>
+                  <tr><td>Collect everything</td><td>Delays response, expands sensitive data, raises cost, and obscures decision-relevant evidence.</td><td>Use hypotheses, volatility, value, minimization, and collection tiers with review points.</td></tr>
+                  <tr><td>Work on the only copy</td><td>Analysis changes or corruption cannot be distinguished from source state.</td><td>Preserve verified acquisition; analyze controlled copies and record derivatives.</td></tr>
+                  <tr><td>One timestamp column</td><td>Source time, ingestion time, normalized time, precision, and clock drift become indistinguishable.</td><td>Preserve raw time/semantics, clock context, normalized time, and parser lineage.</td></tr>
+                  <tr><td>IOC match equals compromise</td><td>Infrastructure is reused, feeds age, hashes collide by family/version context, and benign systems contact shared services.</td><td>Correlate behavior, process/user/resource context, source quality, time, and local evidence.</td></tr>
+                  <tr><td>ATT&amp;CK overlap equals attribution</td><td>Techniques are widely shared and mappings may be generic or inferred.</td><td>Use ATT&amp;CK for behavior organization; keep attribution as a separate multi-source assessment.</td></tr>
+                  <tr><td>Host isolated, identity untouched</td><td>Tokens, cloud roles, mailbox consent, remote sessions, or CI secrets preserve adversary access.</td><td>Contain the full identity/session/trust graph and rotate exposed credentials in dependency order.</td></tr>
+                  <tr><td>Patch then restore</td><td>Persistence, stolen credentials, poisoned artifacts, lateral scope, and root causes may remain.</td><td>Define eradication and trusted-state recovery criteria; search variants and monitor recurrence.</td></tr>
+                  <tr><td>Cloud logs enabled but not retrievable</td><td>Region, tenant, role, retention, provider delay, or compromised admin path blocks evidence.</td><td>Test cross-account export, organization coverage, immutable storage, clean roles, and provider escalation.</td></tr>
+                  <tr><td>AI summary becomes the report</td><td>Source omissions, hallucinations, prompt injection, access leakage, and lost provenance undermine conclusions.</td><td>Require citations, immutable evidence links, schema/audit, access trimming, reviewer correction, and signed disposition.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="practice-block">
+              <h3>Minimum production readiness gate</h3>
+              <ul class="checklist">
+                <li>Incident authority, declaration, severity, roles, and out-of-band communications are approved and exercised.</li>
+                <li>Critical asset, identity, data, service, supplier, logging, retention, backup, and recovery dependencies are inventoried.</li>
+                <li>Clean responder access and emergency credentials work without relying on the affected identity plane.</li>
+                <li>Endpoint, identity, network, cloud, email, application, and SaaS evidence can be retrieved and time-normalized.</li>
+                <li>Collection tools are approved, integrity-checked, versioned, logged, and tested on representative systems.</li>
+                <li>Evidence storage enforces access, encryption, integrity/versioning, audit, retention, and legal-hold procedures.</li>
+                <li>Containment playbooks cover hosts, identities, sessions/tokens, networks, cloud resources, applications, and suppliers.</li>
+                <li>Backups and restoration are tested; trusted-state, business acceptance, monitoring, and rollback criteria exist.</li>
+                <li>External provider, counsel, privacy, HR, communications, insurance, and law-enforcement pathways are known.</li>
+                <li>AI/RAG/MCP use has approved data handling, access trimming, tool authorization, prompt-injection tests, audit, and human review.</li>
+                <li>A tabletop and technical exercise produced evidence packages and tracked corrective actions to verified closure.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section id="references">
+            <p class="section-kicker">Authoritative baselines and ecosystem links</p>
+            <h2>Standards, guidance, and first-party reading</h2>
+            <div class="two-col">
+              <div class="reference-article">
+                <h3>Primary and current guidance</h3>
+                <ul class="reference-list">
+                  <li><a href="https://csrc.nist.gov/pubs/sp/800/61/r3/final">NIST SP 800-61 Rev. 3</a> — current incident-response recommendations integrated with NIST CSF 2.0; final April 2025 and supersedes Rev. 2.</li>
+                  <li><a href="https://www.nist.gov/cyberframework">NIST Cybersecurity Framework 2.0</a> — Govern, Identify, Protect, Detect, Respond, and Recover outcomes.</li>
+                  <li><a href="https://csrc.nist.gov/pubs/sp/800/86/final">NIST SP 800-86</a> — technical integration of forensic techniques into incident response; published 2006, so supplement with current platform and legal guidance.</li>
+                  <li><a href="https://datatracker.ietf.org/doc/rfc3227/">RFC 3227</a> — evidence collection, volatility, integrity, custody, and archiving principles.</li>
+                  <li><a href="https://www.first.org/standards/frameworks/csirts/csirt_services_framework_v2.1">FIRST CSIRT Services Framework 2.1</a> — vocabulary for defining a response team’s service portfolio.</li>
+                  <li><a href="https://www.cisa.gov/topics/cybersecurity-best-practices/executive-order-improving-nations-cybersecurity">CISA Incident and Vulnerability Response Playbooks</a> — repeatable federal procedures that can inform non-federal playbook design when adapted deliberately.</li>
+                  <li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture-cyber-forensics/forensics-ir.html">AWS forensics in incident response</a> — cloud preparation, secure collection, automation, and analysis separation.</li>
+                  <li><a href="https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-v2-incident-response">Microsoft Cloud Security Benchmark: Incident Response</a> — current cloud preparation, investigation, evidence preservation, response, and learning controls.</li>
+                </ul>
+              </div>
+              <div class="reference-article">
+                <h3>1200km and AdversaryGraph practice</h3>
+                <ul class="reference-list">
+                  <li><a href="/adversarygraph/">AdversaryGraph</a> and the <a href="/adversarygraph-docs/">documentation hub</a> — evidence-linked CTI, investigation, ATT&amp;CK, hunting, and validation workflows.</li>
+                  <li><a href="/articles/adversarygraph-from-log-to-report-ioc-investigation.html">From Log to Report: IOC Investigation</a> — local workflow from raw event to reviewed report.</li>
+                  <li><a href="/adversarygraph-docs/use-cases/investigation-cloud-incident/">Cloud incident investigation</a> — cloud evidence, correlation, and analyst handoff.</li>
+                  <li><a href="/adversarygraph-docs/use-cases/investigation-apt-campaign-cluster/">APT campaign cluster investigation</a> — source-backed clustering without automatic attribution.</li>
+                  <li><a href="/adversarygraph-docs/use-cases/defense-ioc-enrichment-pipeline/">IOC enrichment pipeline</a> — qualified enrichment and provenance rather than match-as-verdict.</li>
+                  <li><a href="/cyber-knowledge/cti.html">CTI field guide</a>, <a href="/cyber-knowledge/blue-team.html">Blue Team guide</a>, and <a href="/cyber-knowledge/malware-analysis.html">Malware Analysis guide</a> — adjacent analytical and defensive disciplines.</li>
+                  <li><a href="/cyber-knowledge/secure-code.html">Secure Code</a> and <a href="/cyber-knowledge/vulnerability-research.html">Vulnerability Research</a> — root-cause remediation, exploitability validation, disclosure, and regression testing.</li>
+                  <li><a href="/articles/read/2025/2025-02-24-soc-tier-1-the-complete-onboarding-guide-to-security-monitoring-and-incident-response-824a1dfe4476">SOC Tier 1 onboarding</a> and <a href="/articles/read/2025/2025-12-12-protocol-level-network-threat-hunting-a-wireshark-centric-guide-a6770ffc96c6">protocol-level network hunting</a> — monitoring and packet-analysis practice.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="analysis-note"><strong>Maintenance note:</strong> provider services, operating-system artifacts, ATT&amp;CK mappings, tool behavior, retention, and legal requirements change. Pin procedures to tested versions, review after material platform changes, and re-run collection and recovery exercises.</div>
+          </section>
+        </article>
       </div>
     </main>
 
@@ -429,6 +1148,5 @@
       </div>
     </footer>
     <!-- site-shell:footer:end -->
-
   </body>
 </html>

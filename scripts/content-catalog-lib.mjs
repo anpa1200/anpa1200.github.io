@@ -30,6 +30,7 @@ export const VOCABULARIES = Object.freeze({
     'threat-intelligence',
     'detection-engineering',
     'threat-hunting',
+    'incident-response',
     'malware-analysis',
     'identity-security',
     'offensive-research',
