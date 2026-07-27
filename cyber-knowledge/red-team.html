@@ -240,6 +240,110 @@
       .tool-list, .check-list { margin: 10px 0 0; padding-left: 22px; color: var(--panel-muted); }
       [data-theme="dark"] .tool-list, [data-theme="dark"] .check-list { color: #b8c9e3; }
       .tool-list li, .check-list li { margin: 6px 0; }
+      .practice-panel {
+        border-color: rgba(15, 98, 254, 0.34);
+        background:
+          linear-gradient(135deg, rgba(15, 98, 254, 0.055), transparent 48%),
+          var(--panel);
+      }
+      [data-theme="dark"] .practice-panel {
+        border-color: rgba(96, 165, 250, 0.32);
+        background:
+          linear-gradient(135deg, rgba(30, 64, 175, 0.13), transparent 48%),
+          rgba(8, 19, 38, 0.84);
+      }
+      .practice-intro { margin: 0 0 16px; color: var(--panel-muted); line-height: 1.65; }
+      [data-theme="dark"] .practice-intro { color: #b8c9e3; }
+      .practice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin: 16px 0;
+      }
+      .practice-block {
+        min-width: 0;
+        padding: 15px 16px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: rgba(127, 127, 127, 0.035);
+      }
+      .practice-block.full { grid-column: 1 / -1; }
+      .practice-block h3, .practice-block h4 {
+        margin: 0 0 8px;
+        color: var(--panel-ink);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.055em;
+        text-transform: uppercase;
+      }
+      [data-theme="dark"] .practice-block h3, [data-theme="dark"] .practice-block h4 { color: #f8fbff; }
+      .practice-block p { margin: 0; color: var(--panel-muted); font-size: 0.91rem; line-height: 1.58; }
+      [data-theme="dark"] .practice-block p { color: #b8c9e3; }
+      .practice-block ul, .practice-block ol {
+        margin: 0;
+        padding-left: 21px;
+        color: var(--panel-muted);
+        font-size: 0.91rem;
+      }
+      [data-theme="dark"] .practice-block ul, [data-theme="dark"] .practice-block ol { color: #b8c9e3; }
+      .practice-block li { margin: 6px 0; line-height: 1.55; }
+      .workflow-steps {
+        counter-reset: workflow;
+        list-style: none;
+        margin: 12px 0 0;
+        padding: 0;
+      }
+      .workflow-steps li {
+        counter-increment: workflow;
+        position: relative;
+        margin: 0;
+        padding: 10px 0 10px 42px;
+        border-bottom: 1px solid var(--line);
+        color: var(--panel-muted);
+        line-height: 1.58;
+      }
+      [data-theme="dark"] .workflow-steps li { color: #b8c9e3; }
+      .workflow-steps li:last-child { border-bottom: 0; }
+      .workflow-steps li::before {
+        content: counter(workflow);
+        position: absolute;
+        top: 9px;
+        left: 0;
+        display: grid;
+        place-items: center;
+        width: 27px;
+        height: 27px;
+        border-radius: 50%;
+        background: var(--chip);
+        color: var(--accent-dark);
+        font-size: 0.75rem;
+        font-weight: 800;
+      }
+      [data-theme="dark"] .workflow-steps li::before { background: #162d52; color: #93c5fd; }
+      .evidence-gate {
+        margin: 16px 0 0;
+        padding: 14px 16px;
+        border-left: 3px solid #0f9f6e;
+        background: rgba(15, 159, 110, 0.08);
+        color: var(--panel-muted);
+        font-size: 0.9rem;
+        line-height: 1.58;
+      }
+      .evidence-gate strong { color: var(--panel-ink); }
+      [data-theme="dark"] .evidence-gate { color: #b8c9e3; }
+      [data-theme="dark"] .evidence-gate strong { color: #f8fbff; }
+      .engagement-map {
+        margin: 0;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+      .engagement-map h2 { margin: 0; color: var(--panel-ink); font-size: 1.25rem; }
+      .engagement-map > p { margin: 8px 0 18px; color: var(--panel-muted); max-width: 820px; }
+      [data-theme="dark"] .engagement-map h2 { color: #f8fbff; }
+      [data-theme="dark"] .engagement-map > p { color: #b8c9e3; }
       .boundary {
         margin: 14px 0 0;
         padding: 12px 14px;
@@ -252,6 +356,8 @@
       @media (max-width: 720px) {
         .toc-modules { columns: 1; }
         .ecosystem-paths ul { grid-template-columns: 1fr; }
+        .practice-grid { grid-template-columns: 1fr; }
+        .practice-block.full { grid-column: auto; }
         .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: min(1080px, calc(100% - 32px)); }
         .nav, .page-hero-inner, main, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
         .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 8px 14px; width: 100%; }
@@ -557,21 +663,58 @@
         <h2 class="toc-heading" id="toc-heading">Table of contents</h2>
         <p class="toc-intro">Ten modules arranged in engagement order. Each concept includes an operational purpose, a review boundary, and links to relevant 1200km guides or labs.</p>
         <ol class="toc-modules">
-          <li><details class="toc-module" open><summary><a href="#m1">1 — Mission, authorization, and methodology</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#red-team-vs-pentest">Red team vs. penetration test</a></li><li><a href="#scope-roe">Scope and rules of engagement</a></li><li><a href="#objectives">Objectives and success criteria</a></li><li><a href="#opsec-deconfliction">OPSEC and deconfliction</a></li><li><a href="#evidence-plan">Evidence plan</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m2">2 — Reconnaissance and attack surface</a><span class="toc-count">4 topics</span></summary><ul class="toc-terms"><li><a href="#passive-active-recon">Passive and active recon</a></li><li><a href="#asset-model">Asset and identity model</a></li><li><a href="#network-enumeration">Network enumeration</a></li><li><a href="#recon-analysis">Recon analysis</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m3">3 — Vulnerability discovery and validation</a><span class="toc-count">4 topics</span></summary><ul class="toc-terms"><li><a href="#scanner-vs-finding">Scanner output vs. finding</a></li><li><a href="#manual-validation">Manual validation</a></li><li><a href="#exploit-research">Exploit research</a></li><li><a href="#risk-prioritization">Risk prioritization</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m4">4 — Web applications and APIs</a><span class="toc-count">4 topics</span></summary><ul class="toc-terms"><li><a href="#web-methodology">Web testing methodology</a></li><li><a href="#auth-session-access">Identity and access testing</a></li><li><a href="#input-business-logic">Input and business logic</a></li><li><a href="#web-toolchain">Web testing toolchain</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m5">5 — Cloud, containers, and Kubernetes</a><span class="toc-count">4 topics</span></summary><ul class="toc-terms"><li><a href="#cloud-scope">Cloud scope and shared responsibility</a></li><li><a href="#cloud-identity">Cloud identity paths</a></li><li><a href="#kubernetes">Kubernetes assessment</a></li><li><a href="#cloud-evidence">Cloud evidence and cleanup</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m6">6 — Active Directory and identity</a><span class="toc-count">4 topics</span></summary><ul class="toc-terms"><li><a href="#identity-enumeration">Identity enumeration</a></li><li><a href="#kerberos">Kerberos attack paths</a></li><li><a href="#adcs-delegation">ADCS and delegation</a></li><li><a href="#identity-labs">Identity labs</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m7">7 — Privilege, movement, and impact</a><span class="toc-count">4 topics</span></summary><ul class="toc-terms"><li><a href="#privilege-escalation">Privilege escalation</a></li><li><a href="#credential-access">Credential access</a></li><li><a href="#pivoting-movement">Pivoting and lateral movement</a></li><li><a href="#impact-boundary">Impact simulation and cleanup</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m8">8 — Threat-informed emulation</a><span class="toc-count">4 topics</span></summary><ul class="toc-terms"><li><a href="#attack-planning">ATT&amp;CK-based planning</a></li><li><a href="#atomic-caldera">Atomic tests and CALDERA</a></li><li><a href="#purple-team">Purple-team validation</a></li><li><a href="#coverage-evidence">Coverage evidence</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m9">9 — AI-assisted offensive security</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#ai-roles">Appropriate AI roles</a></li><li><a href="#mcp-hexstrike">MCP and HexStrike</a></li><li><a href="#ai-guardrails">Agent guardrails</a></li><li><a href="#ai-system-testing">Testing AI systems</a></li><li><a href="#ai-evidence">AI output validation</a></li></ul></details></li>
-          <li><details class="toc-module"><summary><a href="#m10">10 — Labs, tools, and reporting</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#lab-architecture">Safe lab architecture</a></li><li><a href="#tool-selection">Tool selection</a></li><li><a href="#reporting">Professional reporting</a></li><li><a href="#retest">Remediation and retest</a></li><li><a href="#learning-order">Recommended learning order</a></li></ul></details></li>
+          <li><details class="toc-module" open><summary><a href="#m1">1 — Mission, authorization, and methodology</a><span class="toc-count">6 topics</span></summary><ul class="toc-terms"><li><a href="#red-team-vs-pentest">Red team vs. penetration test</a></li><li><a href="#scope-roe">Scope and rules of engagement</a></li><li><a href="#objectives">Objectives and success criteria</a></li><li><a href="#opsec-deconfliction">OPSEC and deconfliction</a></li><li><a href="#evidence-plan">Evidence plan</a></li><li><a href="#engagement-design-practice">Applied engagement design</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m2">2 — Reconnaissance and attack surface</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#passive-active-recon">Passive and active recon</a></li><li><a href="#asset-model">Asset and identity model</a></li><li><a href="#network-enumeration">Network enumeration</a></li><li><a href="#recon-analysis">Recon analysis</a></li><li><a href="#recon-practice">Applied attack-surface workflow</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m3">3 — Vulnerability discovery and validation</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#scanner-vs-finding">Scanner output vs. finding</a></li><li><a href="#manual-validation">Manual validation</a></li><li><a href="#exploit-research">Exploit research</a></li><li><a href="#risk-prioritization">Risk prioritization</a></li><li><a href="#validation-practice">Applied finding validation</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m4">4 — Web applications and APIs</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#web-methodology">Web testing methodology</a></li><li><a href="#auth-session-access">Identity and access testing</a></li><li><a href="#input-business-logic">Input and business logic</a></li><li><a href="#web-toolchain">Web testing toolchain</a></li><li><a href="#web-api-practice">Applied transaction testing</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m5">5 — Cloud, containers, and Kubernetes</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#cloud-scope">Cloud scope and shared responsibility</a></li><li><a href="#cloud-identity">Cloud identity paths</a></li><li><a href="#kubernetes">Kubernetes assessment</a></li><li><a href="#cloud-evidence">Cloud evidence and cleanup</a></li><li><a href="#cloud-practice">Applied cloud privilege analysis</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m6">6 — Active Directory and identity</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#identity-enumeration">Identity enumeration</a></li><li><a href="#kerberos">Kerberos attack paths</a></li><li><a href="#adcs-delegation">ADCS and delegation</a></li><li><a href="#identity-labs">Identity labs</a></li><li><a href="#identity-practice">Applied identity path validation</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m7">7 — Privilege, movement, and impact</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#privilege-escalation">Privilege escalation</a></li><li><a href="#credential-access">Credential access</a></li><li><a href="#pivoting-movement">Pivoting and lateral movement</a></li><li><a href="#impact-boundary">Impact simulation and cleanup</a></li><li><a href="#post-exploitation-practice">Applied controlled path</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m8">8 — Threat-informed emulation</a><span class="toc-count">5 topics</span></summary><ul class="toc-terms"><li><a href="#attack-planning">ATT&amp;CK-based planning</a></li><li><a href="#atomic-caldera">Atomic tests and CALDERA</a></li><li><a href="#purple-team">Purple-team validation</a></li><li><a href="#coverage-evidence">Coverage evidence</a></li><li><a href="#emulation-practice">Applied purple-team workflow</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m9">9 — AI-assisted offensive security</a><span class="toc-count">6 topics</span></summary><ul class="toc-terms"><li><a href="#ai-roles">Appropriate AI roles</a></li><li><a href="#mcp-hexstrike">MCP and HexStrike</a></li><li><a href="#ai-guardrails">Agent guardrails</a></li><li><a href="#ai-system-testing">Testing AI systems</a></li><li><a href="#ai-evidence">AI output validation</a></li><li><a href="#ai-mcp-practice">Applied AI + MCP workflow</a></li></ul></details></li>
+          <li><details class="toc-module"><summary><a href="#m10">10 — Labs, tools, and reporting</a><span class="toc-count">6 topics</span></summary><ul class="toc-terms"><li><a href="#lab-architecture">Safe lab architecture</a></li><li><a href="#tool-selection">Tool selection</a></li><li><a href="#reporting">Professional reporting</a></li><li><a href="#retest">Remediation and retest</a></li><li><a href="#learning-order">Recommended learning order</a></li><li><a href="#capstone-practice">Capstone assessment</a></li></ul></details></li>
         </ol>
       </nav>
 
+      <section class="engagement-map" aria-labelledby="how-to-use-title">
+        <h2 id="how-to-use-title">How to use this guide</h2>
+        <p>
+          This is an engagement-oriented curriculum, not a catalogue of commands. Read Modules 1–3 before
+          selecting a specialist path, then return to Modules 8–10 to connect the technical result to detection,
+          reporting, and retesting. Every practical exercise should produce evidence that another authorized
+          reviewer can reproduce without relying on the operator’s memory or an AI-generated narrative.
+        </p>
+        <div class="practice-grid">
+          <div class="practice-block">
+            <h3>Foundation track</h3>
+            <p>Modules 1–3 establish authority, objectives, reconnaissance, validation discipline, and evidence. They are mandatory even when a specialist performs only web, cloud, or identity testing.</p>
+          </div>
+          <div class="practice-block">
+            <h3>Specialist tracks</h3>
+            <p>Modules 4–7 cover application, infrastructure, cloud, identity, privilege, and movement. Select only the paths authorized by the engagement and supported by the laboratory or target environment.</p>
+          </div>
+          <div class="practice-block">
+            <h3>Validation track</h3>
+            <p>Module 8 converts relevant adversary behavior into observable, reversible tests. It separates prevention, telemetry, analytic coverage, alert handling, and response outcomes.</p>
+          </div>
+          <div class="practice-block">
+            <h3>Assistance and delivery</h3>
+            <p>Modules 9–10 define when AI and MCP can assist, how tools are constrained, how labs are designed, and how evidence becomes a report, defensive handoff, and retest decision.</p>
+          </div>
+          <div class="practice-block full">
+            <h3>Required engagement record</h3>
+            <p>
+              Maintain one record containing authorization and ROE, target inventory, objective-to-test mapping,
+              operator timeline, tool versions and configuration, raw outputs, evidence references, changes made,
+              cleanup confirmation, findings, detection observations, reviewer decisions, limitations, and retest
+              state. A result that cannot be traced to this record remains a lead, not a defensible conclusion.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section class="lab-group" id="m1">
-        <div class="group-header"><h2 class="group-title">Module 1 — Mission, authorization, and methodology</h2><span class="group-count">5 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 1 — Mission, authorization, and methodology</h2><span class="group-count">6 topics</span></div>
         <p class="group-note">The engagement contract is a security control. A technically successful test can still be a failed engagement if it exceeds authority, disrupts production, mishandles data, or cannot explain business impact.</p>
 
         <article class="featured-term" id="red-team-vs-pentest">
@@ -607,10 +750,48 @@
           <p class="guide-desc">Decide before testing what evidence is required to prove each objective: timestamps, tool versions, commands or requests, target identifiers, screenshots, relevant logs, observed controls, and cleanup confirmation. Store evidence in the approved location with access control and retention limits.</p>
           <p class="guide-desc">Every finding should distinguish observation, reproduction, inference, and impact. A scanner alert is an observation; a controlled reproduction is validation; a claim that the flaw enables business-process compromise is an inference until the authorized path is demonstrated or otherwise supported.</p>
         </article>
+
+        <article class="featured-term practice-panel" id="engagement-design-practice">
+          <h3 class="guide-title">Applied workflow — design an engagement that can be defended</h3>
+          <p class="practice-intro">
+            The first deliverable is not a scan: it is a signed, testable agreement between the sponsor, system
+            owner, white team, operators, and evidence consumers. The following workflow turns a broad request
+            such as “red team our environment” into bounded decisions and observable outcomes.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Translate the request into a business decision.</strong> Identify what the sponsor needs to decide after the engagement: accept a risk, fund a control, validate a response process, compare detection capability, or approve a release.</li>
+            <li><strong>Name the protected operation.</strong> Describe the business process, sensitive action, data class, critical identities, trust boundaries, and unacceptable outcomes. This prevents the assessment from becoming an infrastructure-only exercise.</li>
+            <li><strong>Define the assumed starting point.</strong> External unauthenticated, standard workforce user, compromised endpoint, contractor identity, or cloud workload are different tests. State which access, knowledge, and credentials the operator receives.</li>
+            <li><strong>Build the authority matrix.</strong> Map each target class to discovery, authentication testing, exploitation, social engineering, persistence, data access, movement, impact simulation, and cleanup permissions. Mark prohibited actions explicitly.</li>
+            <li><strong>Write objective-level success and stop criteria.</strong> Define the minimum evidence that answers each objective and the event that stops further action. Reaching a synthetic marker may be sufficient; accessing real customer records rarely is.</li>
+            <li><strong>Perform a technical and safety dry run.</strong> Verify source infrastructure, time synchronization, logging, emergency communication, test identities, target allowlists, backups, snapshots, rate limits, and cleanup procedures in a lab or staging environment.</li>
+            <li><strong>Open the evidence ledger before execution.</strong> Assign identifiers to objectives, actions, artifacts, findings, and changes so every screenshot, scan, request, and defensive observation can be traced to a reviewed decision.</li>
+            <li><strong>Close formally.</strong> Confirm cleanup, revoke test access, inventory residual artifacts, transfer evidence, document limitations, and obtain owner acknowledgement before treating the engagement as complete.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Minimum artifacts</h4>
+              <ul><li>Authorization letter and signed ROE</li><li>Objective and success-criteria matrix</li><li>Asset, identity, provider, and exclusion list</li><li>Contact, escalation, pause, and resume plan</li><li>Evidence, retention, and data-destruction plan</li><li>Change and cleanup ledger</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Create two fictional engagement briefs for the same vulnerable lab: one vulnerability assessment and one threat-informed red-team exercise. Compare authority, success criteria, evidence, test depth, defensive participation, and reporting. The technical target stays unchanged; the mission changes the work.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Example scenario</h4>
+              <p>A SaaS provider wants to know whether a compromised standard account can reach restricted billing exports without prevention or a triaged alert. The authorized proof is access to a synthetic record and a correlated defensive timeline—not downloading the production dataset.</p>
+            </div>
+            <div class="practice-block">
+              <h4>AI assistance boundary</h4>
+              <p>An assistant may compare the ROE with a proposed test plan, identify ambiguity, draft checklists, and normalize notes. It must not expand scope, infer permission, select a real target, or approve an intrusive action. Only the named authority can change the engagement.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> do not begin active collection until each target can be tied to written authority, a named owner, a permitted action class, an evidence requirement, a stop condition, and a cleanup owner.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m2">
-        <div class="group-header"><h2 class="group-title">Module 2 — Reconnaissance and attack-surface mapping</h2><span class="group-count">4 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 2 — Reconnaissance and attack-surface mapping</h2><span class="group-count">5 topics</span></div>
         <p class="group-note">Reconnaissance should produce a scoped, attributed asset model—not an unreviewed pile of domains, ports, and screenshots.</p>
 
         <article class="featured-term" id="passive-active-recon">
@@ -638,10 +819,48 @@
           <p class="guide-desc">Prioritize paths using business criticality, exposure, authentication, likely attack preconditions, observed defensive controls, and the objective—not merely the number of open ports. A mature recon output is a reviewed attack-surface map plus questions to validate, such as whether an exposed management service is truly internet reachable or belongs to a shared provider.</p>
           <p class="guide-desc">AI can summarize large scan results or correlate naming patterns, but it must not invent asset ownership, product versions, or exploitability. Keep the original scan artifacts and require each AI-produced claim to cite the underlying host, port, request, or source record.</p>
         </article>
+
+        <article class="featured-term practice-panel" id="recon-practice">
+          <h3 class="guide-title">Applied workflow — build an attributed attack-surface map</h3>
+          <p class="practice-intro">
+            Effective reconnaissance is an evidence-reconciliation process. It joins supplied inventory with
+            public observations and carefully controlled active validation, while preventing shared infrastructure,
+            stale DNS, acquired companies, and third-party services from silently entering scope.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Normalize the seed set.</strong> Import approved domains, CIDRs, cloud accounts, applications, APIs, mobile backends, identity providers, repositories, subsidiaries, and third parties. Preserve the system of record and owner for every seed.</li>
+            <li><strong>Collect passive observations by source.</strong> Record DNS and certificate names, registration data, public documents, code references, storage endpoints, exposure-engine observations, and historical records with collection time and source URL.</li>
+            <li><strong>Resolve attribution before expansion.</strong> Use DNS chains, certificates, organization data, application content, cloud identifiers, supplied inventory, and owner confirmation. Assign confidence and status: confirmed, likely, ambiguous, shared-provider, third-party, or excluded.</li>
+            <li><strong>Plan active validation.</strong> Group targets by risk and protocol; define source address, scan rate, timing, TCP/UDP coverage, retry policy, safe probes, and expected monitoring. Start narrow and increase breadth only when results and system health justify it.</li>
+            <li><strong>Fingerprint at multiple layers.</strong> Separate network reachability, protocol behavior, TLS and HTTP characteristics, product evidence, authentication boundary, and application identity. Do not let one banner populate all fields.</li>
+            <li><strong>Correlate identities and trust.</strong> Record federation endpoints, exposed administrative interfaces, service principals, API documentation, password-reset flows, support channels, and machine identities without collecting real credentials unnecessarily.</li>
+            <li><strong>Convert observations into hypotheses.</strong> Examples include an orphaned DNS record, an internet-reachable management plane, a legacy authentication path, an exposed artifact repository, or a version that requires confirmation.</li>
+            <li><strong>Review deltas with owners.</strong> Distinguish new assets from newly observed assets, document uncertainty, and route confirmed inventory gaps to the accountable team before vulnerability testing.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Asset record fields</h4>
+              <ul><li>Canonical identifier and aliases</li><li>Owner, business service, environment, and criticality</li><li>DNS, address, cloud, CDN, and provider relationships</li><li>Exposure, ports, protocols, and authentication</li><li>Technology evidence and confidence</li><li>Source, first/last seen, scope, and review state</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Tool roles</h4>
+              <p>Use DNS and certificate tools for naming evidence, Shodan/Censys-style indexes for historical exposure leads, Nmap for controlled network validation, HTTP and TLS clients for application-layer evidence, and Wireshark for protocol confirmation. Each tool answers a narrower question than “is this vulnerable?”</p>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Build a three-host private lab with a reverse proxy, one intentionally stale DNS entry, and one shared service. Start with only the parent domain and supplied inventory. Produce an attributed map that correctly separates confirmed, ambiguous, and out-of-scope observations.</p>
+            </div>
+            <div class="practice-block">
+              <h4>1200km worked path</h4>
+              <p>Follow the <a href="/articles/read/2025/2025-11-24-reinventing-recon-nmap-meets-chatgpt-e2acb6130be5">Nmap-assisted analysis guide</a>, the <a href="/articles/read/2025/2025-12-23-integrating-shodan-with-hexstrike-ai-using-gemini-cli-b6f9fcbe8e6e">Shodan + HexStrike workflow</a>, and the <a href="/articles/read/2026/2026-01-11-hexstrike-cursor-for-osint-from-one-email-to-a-full-exposure-map-ffdfc7ba1b30">OSINT exposure-map case study</a>. Treat every enrichment result as a reviewable lead.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> an asset may enter active testing only when its attribution, scope state, owner or responsible provider, resolution path, collection time, and permitted probe class are recorded.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m3">
-        <div class="group-header"><h2 class="group-title">Module 3 — Vulnerability discovery and validation</h2><span class="group-count">4 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 3 — Vulnerability discovery and validation</h2><span class="group-count">5 topics</span></div>
         <p class="group-note">A finding becomes defensible when the affected component, version, preconditions, reproducibility, control context, and impact are supported by evidence.</p>
 
         <article class="featured-term" id="scanner-vs-finding">
@@ -667,10 +886,48 @@
           <p class="guide-desc">Prioritize using evidence: affected version, reachable path, authentication requirements, privilege gained, exploit maturity, known exploitation, compensating controls, asset importance, and blast radius. CVSS communicates severity characteristics; it is not proof that an organization is exposed or compromised.</p>
           <p class="further-reading"><strong>1200km guide:</strong> <a href="/articles/read/2026/2026-03-24-cvss-v4-0-the-practical-field-guide-for-vulnerability-management-5b5a59728456/">CVSS v4.0 Practical Field Guide</a> · <a href="/adversarygraph-docs/cve-cvss-intelligence/">CVE/CVSS intelligence workflow</a></p>
         </article>
+
+        <article class="featured-term practice-panel" id="validation-practice">
+          <h3 class="guide-title">Applied workflow — turn a scanner lead into a validated finding</h3>
+          <p class="practice-intro">
+            Validation connects a technical observation to the exact affected component, reachable condition,
+            authorized proof, and business consequence. The objective is not to maximize exploit execution; it is
+            to reduce uncertainty with the minimum necessary change to the target.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Preserve the original lead.</strong> Save the scanner engine and version, policy, template or plugin ID, target, timestamp, request and response evidence, confidence, severity, and any authentication state.</li>
+            <li><strong>Confirm asset identity.</strong> Verify that the responding service is the scoped asset rather than a CDN, WAF, proxy, shared address, honeypot, or redirected third party. Record the exact hostname, address, virtual host, route, and tenant context.</li>
+            <li><strong>Identify the deployed component.</strong> Correlate vendor metadata, package or image inventory, authenticated configuration, software bill of materials, protocol behavior, headers, and owner knowledge. Treat banners as evidence with limited confidence.</li>
+            <li><strong>Evaluate the affected condition.</strong> Read the vendor advisory and primary vulnerability record. Check fixed and affected versions, configuration prerequisites, platform, authentication, privileges, attack vector, mitigations, and whether the vulnerable code path is enabled and reachable.</li>
+            <li><strong>Design minimum proof.</strong> Define a reversible request or state change that distinguishes vulnerable from non-vulnerable behavior without accessing unrelated data, executing destructive code, creating persistence, or increasing blast radius.</li>
+            <li><strong>Validate controls and telemetry.</strong> Record WAF, EDR, identity, segmentation, runtime, and logging behavior. A compensating control may reduce exploitability without removing the underlying vulnerable condition; report both.</li>
+            <li><strong>Determine consequence and confidence.</strong> Trace the validated primitive to realistic privilege, data, service, or attack-path impact. Separate demonstrated impact from plausible impact and assign confidence to each conclusion.</li>
+            <li><strong>Stop, clean up, and retest safely.</strong> Remove test data or accounts, restore state, notify the owner, provide a remediation test, and retain the original evidence so closure can be compared with the same condition.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Finding evidence packet</h4>
+              <ul><li>Affected asset, component, version, and configuration</li><li>Primary advisory and vulnerability references</li><li>Preconditions and authorized reproduction</li><li>Sanitized request/response or state evidence</li><li>Observed controls, impact, confidence, and limitations</li><li>Cleanup and remediation-validation procedure</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Decision sources</h4>
+              <p>Vendor advisories establish the affected condition; NVD and CVSS describe standardized characteristics; CISA KEV records known exploitation for listed vulnerabilities; EPSS estimates exploitation probability; local inventory, reachability, controls, and asset context determine organizational exposure and priority.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Scan an intentionally vulnerable Ubuntu or Metasploitable host, select three alerts, and build evidence packets. Confirm one, reject one false positive, and leave one unresolved because version or configuration evidence is missing. Explain why uncertainty is an acceptable result.</p>
+            </div>
+            <div class="practice-block">
+              <h4>AI assistance boundary</h4>
+              <p>AI may compare version ranges, summarize advisories, cluster duplicate alerts, and draft validation questions. It may not declare exploitability from a CVE match, choose or execute proof-of-concept code, or convert probability scores into factual compromise claims.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> promote a lead to a finding only when the scoped asset, affected component and condition, reproduction evidence, impact statement, confidence, control context, and cleanup state are independently reviewable.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m4">
-        <div class="group-header"><h2 class="group-title">Module 4 — Web applications and APIs</h2><span class="group-count">4 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 4 — Web applications and APIs</h2><span class="group-count">5 topics</span></div>
         <p class="group-note">Use a repeatable testing model that covers architecture, identity, authorization, sessions, input handling, business logic, APIs, clients, and deployment—not just an automated crawl.</p>
 
         <article class="featured-term" id="web-methodology">
@@ -697,10 +954,48 @@
           <p class="guide-desc">An intercepting proxy supports request capture, replay, comparison, and controlled mutation; browser developer tools reveal client behavior; scanners add breadth; command-line tools support repeatability. The <a href="/articles/read/2024/2024-11-11-mastering-burp-suite-vulnerability-scanner-019ed82c8bac">Burp Scanner guide</a> and <a href="/articles/read/2024/2024-10-24-cracking-web-interfaces-with-burp-suite-a-comprehensive-tutorial-33087bb286b0">Burp interface-testing tutorial</a> show how to turn proxy observations into structured evidence.</p>
           <p class="guide-desc">For an AI-assisted lab workflow, see <a href="/articles/read/2026/2026-01-31-ai-assisted-web-and-cloud-penetration-testing-with-cursor-mcp-hexstrike-and-burp-suite-mcp-01c02eed5258">Cursor + HexStrike + Burp MCP</a>. Treat the model as a planning and interpretation layer; the proxy history remains the authoritative record.</p>
         </article>
+
+        <article class="featured-term practice-panel" id="web-api-practice">
+          <h3 class="guide-title">Applied workflow — test one business transaction end to end</h3>
+          <p class="practice-intro">
+            The strongest web assessment follows data and authority through a complete transaction. It tests the
+            browser or client, edge controls, application, API, identity provider, asynchronous workers, storage,
+            and audit trail as one system instead of producing disconnected endpoint findings.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Model architecture and trust.</strong> Identify public and internal origins, reverse proxies, CDNs, WAFs, identity providers, APIs, queues, storage, administrative planes, mobile clients, webhooks, and third-party integrations.</li>
+            <li><strong>Create controlled identities and data.</strong> Use at least two standard users from separate tenants or organizations plus an approved privileged role. Seed synthetic records with unique markers so cross-user and cross-tenant access can be proven safely.</li>
+            <li><strong>Capture a valid baseline.</strong> Record the complete transaction, including redirects, tokens, cookies, headers, object identifiers, API calls, state changes, background jobs, notifications, and resulting audit entries.</li>
+            <li><strong>Build the authorization matrix.</strong> For every action, compare unauthenticated, own-object, other-user, other-tenant, lower-role, expired-session, and administrative contexts. Validate on the server side; client-side restrictions are not authorization evidence.</li>
+            <li><strong>Test session and token lifecycle.</strong> Evaluate issuance, storage, rotation, expiry, logout, revocation, device changes, MFA and recovery, step-up authentication, refresh behavior, and replay within the allowed accounts.</li>
+            <li><strong>Test input and state transitions.</strong> Exercise type, size, encoding, sequence, concurrency, file, URL, and object-reference boundaries. Define rate and cost limits before automation, and stop when a test could affect availability or external systems.</li>
+            <li><strong>Trace server-side effects.</strong> Verify where data is stored, whether jobs or webhooks execute, what permissions they use, how errors are handled, and whether security-relevant events reach an audit or detection pipeline.</li>
+            <li><strong>Reproduce and minimize.</strong> Reduce each candidate to the smallest request sequence that proves the violated security property, sanitize secrets, preserve both allowed and denied comparisons, clean synthetic data, and retest the fix.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Coverage inventory</h4>
+              <ul><li>Roles, tenants, objects, actions, and expected decisions</li><li>Authentication, recovery, MFA, and session states</li><li>Web, REST, GraphQL, WebSocket, and webhook surfaces</li><li>Uploads, downloads, exports, and asynchronous jobs</li><li>Administrative and support workflows</li><li>Security logging, notifications, and response behavior</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Evidence pattern</h4>
+              <p>Preserve a sanitized baseline request, one controlled mutation, the response and resulting state, identity and tenant context, timestamps, proxy history reference, server or audit event where available, expected behavior, observed behavior, and cleanup confirmation.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Use an intentionally vulnerable web lab with two tenants. Select one export or object-update transaction, build the role–action–object matrix, validate an authorization weakness using synthetic records, then add a server-side check and demonstrate the denied retest.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Tools and interpretation</h4>
+              <p>Use Burp Suite or ZAP for history and controlled replay, browser tools for client state, API clients for reproducible collections, and application logs for server confirmation. AI may compare flows and suggest untested states; it cannot prove a server-side effect absent evidence.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> report a web or API finding only when the tested identity, tenant, object, action, expected security property, observed result, downstream effect, and reproducible sanitized evidence are explicit.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m5">
-        <div class="group-header"><h2 class="group-title">Module 5 — Cloud, containers, and Kubernetes</h2><span class="group-count">4 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 5 — Cloud, containers, and Kubernetes</h2><span class="group-count">5 topics</span></div>
         <p class="group-note">Cloud testing combines provider authorization, identity, control-plane APIs, workload exposure, data paths, and audit evidence. A hostname scan alone is not a cloud assessment.</p>
 
         <article class="featured-term" id="cloud-scope">
@@ -725,10 +1020,49 @@
           <h3 class="guide-title">Cloud evidence, cost, and cleanup</h3>
           <p class="guide-desc">Capture provider audit events, resource diffs, identity decisions, and relevant requests. Tag test resources, set budgets and expiry, rotate temporary credentials, delete created objects, restore policy changes, and verify cleanup through the control plane. Report residual risk if a created token, snapshot, role, or public object cannot be conclusively removed.</p>
         </article>
+
+        <article class="featured-term practice-panel" id="cloud-practice">
+          <h3 class="guide-title">Applied workflow — analyze a cloud privilege path without losing tenant context</h3>
+          <p class="practice-intro">
+            Cloud assessments should be resource- and identity-aware from the first API call. The same public IP
+            can represent provider infrastructure for many customers, while a low-visibility permission on one
+            role can control a sensitive workload. Resource IDs, effective permissions, trust, and audit events
+            are stronger evidence than network appearance alone.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Establish the authorized control plane.</strong> Record organization, tenant, account, subscription, project, region, cluster, provider policy, test identity, allowed services, cost limits, and prohibited provider-layer actions.</li>
+            <li><strong>Build a resource and ownership graph.</strong> Inventory public endpoints, workloads, storage, databases, functions, registries, secrets, networks, clusters, CI/CD identities, SaaS integrations, and accountable teams using immutable provider identifiers.</li>
+            <li><strong>Calculate effective identity.</strong> Trace direct and inherited roles, groups, resource policies, federation, workload identity, service-account impersonation, permission boundaries, conditions, delegated administration, OAuth consent, and cross-account trust.</li>
+            <li><strong>Map reachable data and execution paths.</strong> Ask which identity can read secrets, alter code or images, attach a role, modify a policy, create a key, invoke a workload, access metadata, change logging, expose storage, or move into another account.</li>
+            <li><strong>Review workload boundaries.</strong> For containers and Kubernetes, connect RBAC, service accounts, admission, security context, host access, network policy, secret mounts, image provenance, node permissions, and cloud workload identity.</li>
+            <li><strong>Validate with reversible actions.</strong> Prefer policy simulation, read-only inventory, denied requests, synthetic objects, short-lived tagged resources, and test identities. Any permission change or resource creation requires a documented rollback and owner.</li>
+            <li><strong>Observe the defensive path.</strong> Correlate cloud audit, identity, network, workload, Kubernetes audit, runtime, and SIEM events. Verify event latency, actor attribution, source context, rule behavior, and analyst routing.</li>
+            <li><strong>Reconcile and clean up.</strong> Delete tagged resources, revoke sessions and temporary keys, restore policies, confirm logging, check costs, compare inventory with the pre-test baseline, and retain provider event IDs as evidence.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Cloud evidence packet</h4>
+              <ul><li>Tenant/account/project and immutable resource ID</li><li>Test principal and effective permission chain</li><li>Policy, trust, condition, and workload context</li><li>Sanitized API request and provider event ID</li><li>Before/after state and defensive observations</li><li>Cost, expiry, credential, and cleanup confirmation</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Identity references</h4>
+              <p>Use the <a href="/ITDR/docs/protocols/aws-iam/aws-iam-overview/">AWS IAM overview</a>, <a href="/ITDR/docs/protocols/entra-id/entra-overview/">Entra ID overview</a>, <a href="/ITDR/docs/protocols/google-workspace/gcp-iam/">Google Cloud IAM guide</a>, and <a href="/ITDR/docs/protocols/kubernetes/k8s-rbac/">Kubernetes RBAC guide</a> to interpret provider-specific objects without collapsing them into one generic “cloud role.”</p>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Create a disposable cloud project with a public test service, private storage, one intentionally over-permissioned workload identity, audit logging, budget alerts, and an expiry tag. Demonstrate the privilege relationship with a synthetic object, confirm the audit trail, remediate the policy, and prove cleanup.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Worked material</h4>
+              <p>Use the <a href="/articles/read/2026/2026-02-09-gcp-penetration-testing-a-step-by-step-attack-guide-9e39bc3eb96d">GCP testing guide</a>, <a href="/articles/read/2026/2026-02-03-black-box-kubernetes-penetration-testing-playbook-56350b178af4">Kubernetes playbook</a>, and <a href="/adversarygraph-docs/use-cases/investigation-cloud-incident/">AdversaryGraph cloud investigation case study</a> as complementary offensive, platform, and evidence perspectives.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> a cloud finding must identify the exact tenant, resource, principal, effective-permission chain, reachable action, provider evidence, business consequence, defensive signal, and cleanup state.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m6">
-        <div class="group-header"><h2 class="group-title">Module 6 — Active Directory and identity attack paths</h2><span class="group-count">4 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 6 — Active Directory and identity attack paths</h2><span class="group-count">5 topics</span></div>
         <p class="group-note">Identity testing is relationship analysis: users, machines, services, certificates, policies, trusts, and delegated rights combine into paths that single-object reviews miss.</p>
 
         <article class="featured-term" id="identity-enumeration">
@@ -754,10 +1088,48 @@
           <p class="guide-desc">Start with an isolated AD domain, then add certificate services, Linux identity, Entra ID, and a logging stack. Snapshot each stage, use synthetic identities, document normal traffic, and validate one attack path plus its detection before chaining scenarios.</p>
           <p class="further-reading"><strong>Labs:</strong> <a href="/ITDR/docs/labs/lab-architecture/">Lab architecture</a> · <a href="/ITDR/docs/labs/lab-entra-setup/">Entra ID</a> · <a href="/ITDR/docs/labs/lab-linux-setup/">Linux identity</a> · <a href="/ITDR/docs/simulations/scenarios/domain-compromise-chain/">Domain compromise scenario</a></p>
         </article>
+
+        <article class="featured-term practice-panel" id="identity-practice">
+          <h3 class="guide-title">Applied workflow — prove one identity control path and its detection</h3>
+          <p class="practice-intro">
+            Identity environments are graphs of authority. A standard user may influence a service account, group,
+            certificate template, application, device, or synchronized cloud identity that ultimately controls a
+            protected resource. The assessment should explain the complete path and the conditions that break it.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Define identity tiers and protected actions.</strong> Identify workforce, service, device, application, privileged, emergency, and external identities; authentication systems; trust boundaries; and the business operations that require stronger protection.</li>
+            <li><strong>Collect the directory model with minimum privilege.</strong> Record domains, forests, tenants, trusts, OUs, groups, roles, sessions, SPNs, delegation, certificate services, synchronization, local administration, policies, and object-control rights.</li>
+            <li><strong>Normalize control relationships.</strong> Distinguish membership, ownership, write rights, delegation, impersonation, certificate enrollment, password or key reset, consent, session control, local execution, and policy modification. “Can reach” is not the same as “can control.”</li>
+            <li><strong>Select a path tied to an objective.</strong> Prioritize paths from the assumed starting identity toward a protected action using preconditions, current sessions, control reliability, operational impact, and expected telemetry—not graph length alone.</li>
+            <li><strong>Validate each edge independently.</strong> Confirm the exact principal, target, permission, protocol, service state, authentication condition, and resulting authorization decision. Use test objects and reversible changes where possible.</li>
+            <li><strong>Observe protocol and control evidence.</strong> Correlate directory changes, Kerberos, LDAP, certificate, endpoint, cloud identity, and SIEM events. Note which edge was prevented, merely logged, detected, or investigated.</li>
+            <li><strong>Remediate the relationship.</strong> Remove unnecessary rights, redesign delegation, harden templates, isolate tiers, rotate affected credentials, reduce standing privilege, and validate that required administration still works.</li>
+            <li><strong>Retest path closure.</strong> Re-run the same edge with the same test identity, confirm the denial and logs, then recalculate whether an alternate path remains.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Path record</h4>
+              <ul><li>Starting identity and authentication assurance</li><li>Each principal, object, permission, and protocol edge</li><li>Required service, session, template, or policy state</li><li>Authorized proof and before/after evidence</li><li>Expected and observed telemetry per edge</li><li>Remediation owner and alternate-path review</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Protocol study path</h4>
+              <p>Start with <a href="/ITDR/docs/protocols/active-directory/kerberos/">Kerberos</a>, <a href="/ITDR/docs/protocols/active-directory/ldap/">LDAP</a>, <a href="/ITDR/docs/protocols/active-directory/ad-trusts/">AD trusts</a>, and <a href="/ITDR/docs/protocols/active-directory/adcs/">ADCS</a>. Then study attack and detection pairs such as <a href="/ITDR/docs/attacks/active-directory/kerberoasting/">Kerberoasting</a> and its <a href="/ITDR/docs/detection/ad-attack-detection/detect-kerberoasting/">detection guide</a>.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Deploy the <a href="/ITDR/docs/labs/lab-ad-setup/">AD lab</a> with synthetic users, one service account, a deliberately risky delegation or certificate relationship, endpoint logging, directory auditing, and a SIEM. Validate one edge, observe the events, remediate it, and prove the path is closed.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Hybrid extension</h4>
+              <p>Add an <a href="/ITDR/docs/labs/lab-entra-setup/">Entra ID lab</a> and trace one synchronized or federated identity path. Keep on-premises object rights, cloud roles, OAuth grants, conditional access, device state, and token lifecycle as distinct evidence layers.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> an identity path is validated only when every edge has a named principal, controlled object, effective right, protocol or service condition, resulting action, telemetry record, and remediation decision.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m7">
-        <div class="group-header"><h2 class="group-title">Module 7 — Privilege, lateral movement, and controlled impact</h2><span class="group-count">4 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 7 — Privilege, lateral movement, and controlled impact</h2><span class="group-count">5 topics</span></div>
         <p class="group-note">Post-exploitation proves paths and defensive visibility with the minimum necessary action. It is not permission to collect everything reachable.</p>
 
         <article class="featured-term" id="privilege-escalation">
@@ -783,10 +1155,48 @@
           <p class="guide-desc">Use reversible proof: a benign marker, test record, synthetic file, controlled account, or pre-agreed simulation. Denial of service, destructive actions, ransomware-like encryption, production persistence, bulk data access, and safety-system interaction require exceptional explicit authority and often should be represented rather than executed.</p>
           <p class="guide-desc">Maintain a change ledger and remove payloads, users, keys, tasks, services, files, rules, tunnels, cloud resources, and test data. Verify cleanup independently and disclose anything that cannot be confirmed.</p>
         </article>
+
+        <article class="featured-term practice-panel" id="post-exploitation-practice">
+          <h3 class="guide-title">Applied workflow — validate a post-exploitation path with minimum impact</h3>
+          <p class="practice-intro">
+            Post-exploitation answers a bounded question about privilege, reachability, trust, or defensive
+            response. It should not become open-ended collection. Every transition needs a reason, a permitted
+            proof, a telemetry expectation, and a cleanup action before execution.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Reconfirm the current state.</strong> Record the controlled identity, host or workload, integrity or privilege level, network vantage point, acquired capability, evidence source, and the objective that requires another step.</li>
+            <li><strong>Enumerate locally before acting.</strong> Review platform, patch and configuration evidence, execution boundaries, services, permissions, scheduled activity, secrets locations, network routes, and defensive controls. Avoid broad collection unrelated to the objective.</li>
+            <li><strong>Rank privilege transitions.</strong> Prefer configuration and delegated-right paths that can be proven reversibly. Evaluate required version, access, interaction, stability, likely side effects, and telemetry before considering exploit-based transitions.</li>
+            <li><strong>Control credential handling.</strong> Use synthetic or engagement-specific credentials when possible. If collection of real material is authorized, minimize fields, encrypt evidence, restrict access, prohibit reuse, rotate promptly, and document destruction.</li>
+            <li><strong>Plan each pivot.</strong> Identify source, destination, protocol, port, credential or token, expected segmentation decision, defensive signal, transfer requirement, and rollback. Do not use a newly reachable subnet as automatic permission to scan it.</li>
+            <li><strong>Demonstrate controlled impact.</strong> Use a unique marker, synthetic record, harmless test file, approved account, or pre-staged canary. Record the proof and stop at the objective instead of collecting additional data.</li>
+            <li><strong>Pair execution with observation.</strong> Capture endpoint, identity, network, application, cloud, and SIEM evidence. Note prevention, logging, alert creation, enrichment, analyst triage, containment, and communication separately.</li>
+            <li><strong>Perform independent cleanup verification.</strong> Remove accounts, keys, tokens, tasks, services, files, routes, listeners, tunnels, firewall rules, payloads, cloud objects, and test records; then have a second reviewer compare the change ledger with actual state.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Transition record</h4>
+              <ul><li>Objective and reason for continuing</li><li>Source identity, asset, privilege, and capability</li><li>Destination and approved protocol or action</li><li>Preconditions, expected result, and stop point</li><li>Operator and defensive timestamps</li><li>Changes, artifacts, secrets, and cleanup owner</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>When to simulate</h4>
+              <p>Represent rather than execute actions that could interrupt service, encrypt or delete data, affect safety, trigger financial transactions, send external messages, expose regulated records, create durable persistence, or make recovery uncertain. The report must state that impact was simulated.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Use the <a href="/articles/read/2026/2026-01-08-hexstrike-cursor-mcp-from-single-target-full-subnet-compromise-lab-pt-walkthrough-f2e1fd793ad7">isolated subnet-compromise lab</a> to document one privilege transition and one approved pivot. Replace unrestricted compromise goals with a synthetic marker, a route allowlist, a change ledger, and a second-person cleanup review.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Defensive handoff</h4>
+              <p>For each transition, provide the exact behavior, ATT&amp;CK mapping, affected control, available data source, observed event, analytic result, false-positive considerations, containment opportunity, and retest procedure. Tool names alone are not detection requirements.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> continue beyond the current foothold only when the next transition is explicitly in scope, necessary for an objective, reversible, observable, assigned a cleanup action, and supported by a defined stop point.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m8">
-        <div class="group-header"><h2 class="group-title">Module 8 — Threat-informed adversary emulation and purple teaming</h2><span class="group-count">4 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 8 — Threat-informed adversary emulation and purple teaming</h2><span class="group-count">5 topics</span></div>
         <p class="group-note">Threat-informed testing asks whether relevant behaviors are prevented, observed, detected, investigated, and contained—not merely whether an operator can run a tool.</p>
 
         <article class="featured-term" id="attack-planning">
@@ -813,10 +1223,48 @@
           <p class="guide-desc">Separate “rule exists,” “telemetry exists,” “test executed,” “alert fired,” and “analyst responded.” Each is a different maturity state. Record the test artifact, data source, time window, rule version, result, false-positive considerations, owner, and retest date.</p>
           <p class="guide-desc">A failed detection is useful evidence when the execution was valid and reproducible. Route it into a telemetry, analytic, workflow, or control backlog rather than hiding it behind an aggregate coverage percentage.</p>
         </article>
+
+        <article class="featured-term practice-panel" id="emulation-practice">
+          <h3 class="guide-title">Applied workflow — run a threat-informed purple-team validation</h3>
+          <p class="practice-intro">
+            A defensible emulation links source-backed adversary behavior to a relevant organizational hypothesis,
+            a safe procedure, expected telemetry, analytic logic, analyst action, and a retest. It does not copy an
+            actor name onto a generic tool sequence or claim “coverage” because a technique appears in a matrix.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Define the decision and protected process.</strong> State which prevention, telemetry, detection, triage, or response capability the exercise will validate and why the behavior matters to this environment.</li>
+            <li><strong>Build a source-backed behavior set.</strong> Use current threat reporting, ATT&amp;CK procedure examples, incident evidence, and local context. Record source date, confidence, platform, identity, software, and procedure—not only technique IDs.</li>
+            <li><strong>Translate behavior into a safe test.</strong> Preserve the observable properties required by the hypothesis while replacing destructive payloads, real targets, sensitive data, and uncontrolled infrastructure with benign equivalents.</li>
+            <li><strong>Write the telemetry contract.</strong> For each action, name the endpoint, identity, network, application, cloud, or audit events expected; required fields; time synchronization; collection path; retention; and query used to confirm ingestion.</li>
+            <li><strong>Validate atomically first.</strong> Execute one bounded procedure, confirm target state, evidence, telemetry, and cleanup, and only then combine tested procedures into a scenario chain.</li>
+            <li><strong>Observe the complete defensive lifecycle.</strong> Record control prevention, raw telemetry, enrichment, analytic evaluation, alert creation, routing, analyst interpretation, escalation, containment, and recovery as separate outcomes.</li>
+            <li><strong>Classify the gap accurately.</strong> Distinguish missing telemetry, malformed fields, delayed ingestion, logic failure, excessive noise, disabled rule, routing failure, playbook weakness, analyst-context gap, or containment limitation.</li>
+            <li><strong>Improve and retest the same procedure.</strong> Version the data source, analytic, test artifact, environment, expected result, and acceptance criteria. Re-execute under comparable conditions and retain both failed and successful evidence.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Validation record</h4>
+              <ul><li>Source behavior, procedure, and ATT&amp;CK mapping</li><li>Environment relevance and hypothesis</li><li>Test artifact, inputs, target, and cleanup</li><li>Expected data sources, fields, and timing</li><li>Prevention, telemetry, analytic, alert, and response results</li><li>Gap owner, change, acceptance criteria, and retest</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Tool selection</h4>
+              <p>Use Atomic Red Team for narrow repeatable procedures, CALDERA or a controlled framework for sequenced emulation, custom scripts when exact behavior or safety needs it, and AdversaryGraph for mapping scenarios to ATT&amp;CK, detections, evidence, and validation results. The procedure—not the platform name—is the unit of evidence.</p>
+            </div>
+            <div class="practice-block">
+              <h4>1200km case-study path</h4>
+              <p>Study <a href="/operation-desert-hydra/">Operation Desert Hydra</a>, then use the <a href="/ITDR/docs/simulations/simulation-framework/">Attack–Defense Simulation Framework</a> and <a href="/adversarygraph-docs/attack-simulation/">AdversaryGraph Attack Simulation</a> guide to build a source-to-test-to-detection evidence chain.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Select one behavior relevant to the lab platform, create an ATT&amp;CK Navigator layer, implement a benign atomic test, define expected logs, execute it, query raw events, validate or improve one analytic, record analyst actions, clean up, and rerun the identical versioned test.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> never mark a technique “covered” without a versioned procedure, successful controlled execution, confirmed required telemetry, an evaluated analytic or control, documented analyst/response outcome, and an environment-specific limitation statement.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m9">
-        <div class="group-header"><h2 class="group-title">Module 9 — AI-assisted offensive security and MCP</h2><span class="group-count">5 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 9 — AI-assisted offensive security and MCP</h2><span class="group-count">6 topics</span></div>
         <p class="group-note">AI can accelerate interpretation and orchestration, but it also adds a non-deterministic planner, new data flows, tool permissions, prompt-injection risk, and supply-chain trust to the engagement.</p>
 
         <article class="featured-term" id="ai-roles">
@@ -852,10 +1300,54 @@
           <p class="guide-desc">Keep raw tool output separate from model summaries. Every claim should point to a request, response, scan record, log, screenshot, source document, or reproduced observation. Record uncertainty and discarded suggestions; do not silently convert model confidence into finding severity.</p>
           <p class="guide-desc">The <a href="/articles/read/2025/2025-11-24-reinventing-recon-nmap-meets-chatgpt-e2acb6130be5">Nmap meets ChatGPT</a> and <a href="/articles/read/2025/2025-11-25-getting-more-from-burp-suite-with-llms-fdd03cec343d">Burp Suite with LLMs</a> guides are best used as assisted-analysis patterns: the authoritative evidence remains the scan or proxy record.</p>
         </article>
+
+        <article class="featured-term practice-panel" id="ai-mcp-practice">
+          <h3 class="guide-title">Applied workflow — operate an AI + MCP assessment stack safely</h3>
+          <p class="practice-intro">
+            An AI-connected offensive toolchain is a privileged automation system. Its risk is determined by the
+            combined model, client, prompts, retrieved content, MCP servers, tool schemas, credentials, execution
+            host, network reach, approval design, and logs. A persuasive chat response is never a substitute for
+            deterministic tool evidence.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Draw the trust and data-flow diagram.</strong> Identify the user, client, local and remote models, MCP servers, tool processes, secrets, retrieved sources, target network, storage, logs, and every boundary where assessment data leaves the controlled environment.</li>
+            <li><strong>Classify tools by effect.</strong> Separate read-only interpretation, passive retrieval, active discovery, authentication, file write, code execution, exploitation, credential use, privilege change, persistence, movement, data transfer, and external communication. Assign a default-deny policy to higher-impact classes.</li>
+            <li><strong>Constrain at the execution layer.</strong> Enforce target allowlists, network egress, filesystem mounts, process limits, command or argument validation, timeouts, rate limits, credential scope, sandboxing, and disposable runtime state outside the prompt.</li>
+            <li><strong>Design explicit approvals.</strong> Show the operator the selected target, tool, normalized arguments, expected effect, data being sent, rollback, and evidence location. Require fresh confirmation for state-changing or credential-bearing actions; do not approve an opaque multi-step plan.</li>
+            <li><strong>Validate schemas and responses.</strong> Tool inputs should use narrow types and enumerations, reject unknown fields, normalize identifiers, and return structured status, observations, artifact references, errors, and side effects. Free-form model prose must not become an executable argument without validation.</li>
+            <li><strong>Assume tool output is untrusted.</strong> Web content, repository text, scan banners, documents, and MCP resources may contain indirect instructions. Keep data distinct from system policy and prevent retrieved content from authorizing a tool call.</li>
+            <li><strong>Record provenance end to end.</strong> Log the request ID, user, model and version, system/policy version, prompt context reference, provider, tool server/version, approved call, normalized arguments, raw result hash, parsed result, reviewer decision, and resulting finding or discarded lead.</li>
+            <li><strong>Test failure and abuse cases.</strong> Exercise unavailable servers, malformed schemas, timeouts, duplicate calls, prompt injection, over-broad targets, path traversal, secret leakage, approval bypass, stale context, tool-result spoofing, and partial cleanup before using the stack in an engagement.</li>
+            <li><strong>Keep the human analytical gate.</strong> Independently verify asset attribution, scope, product and version, command safety, CVE relevance, ATT&amp;CK mapping, finding severity, evidence quality, and remediation before acceptance.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>HexStrike learning path</h4>
+              <ul><li><a href="/articles/read/2025/2025-12-18-hexstrike-ai-install-configure-and-run-mcp-with-gemini-openai-cursor-llama-85a0e5752949">Install and configure MCP clients</a></li><li><a href="/articles/read/2025/2025-12-31-hexstrike-mcp-orchestration-with-ollama-ubuntu-host-kali-vm-ssh-bridging-and-performance-f049ab140596">Isolate orchestration and execution</a></li><li><a href="/articles/read/2026/2026-01-03-hexstrike-openai-codex-ai-driven-exploitation-of-metasploitable-b892c07be39f">Run the Metasploitable lab</a></li><li><a href="/articles/read/2026/2026-01-31-ai-assisted-web-and-cloud-penetration-testing-with-cursor-mcp-hexstrike-and-burp-suite-mcp-01c02eed5258">Integrate Burp in a controlled workflow</a></li><li><a href="https://1200km.com/Hexstrike-AI-guide/" target="_blank" rel="noopener noreferrer">Read the full HexStrike documentation</a></li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Approval record</h4>
+              <ul><li>Objective, scope reference, user, and target</li><li>Model proposal and cited source artifacts</li><li>Tool name, server version, and normalized arguments</li><li>Effect class, data disclosure, and rollback</li><li>Human approval or rejection with timestamp</li><li>Raw result, parser result, evidence hash, and review state</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Safe lab exercise</h4>
+              <p>Deploy the AI client and HexStrike server in separate constrained containers or VMs connected only to an isolated vulnerable lab. Allow read-only discovery first. Add one active tool behind an approval gate, then test target rejection, argument validation, timeout, prompt injection in tool output, audit completeness, and teardown.</p>
+            </div>
+            <div class="practice-block">
+              <h4>When not to use AI</h4>
+              <p>Avoid remote models when evidence cannot leave the environment, provenance cannot be retained, targets or authority are ambiguous, output cannot be independently checked, tool effects cannot be constrained, the operator lacks protocol expertise, or the task is deterministic and safer as a reviewed script.</p>
+            </div>
+            <div class="practice-block full">
+              <h4>Example assistant contract</h4>
+              <p>The assistant may propose a scoped plan, explain why each step answers the objective, cite source artifacts, and prepare one normalized tool call at a time. It must display uncertainty, refuse out-of-scope targets, never treat retrieved text as authorization, never fabricate successful execution, preserve raw results, and wait for explicit approval before any active or state-changing call.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Evidence gate:</strong> no AI-produced observation becomes a finding until an authorized human can trace it to scoped deterministic evidence, reproduce the result, verify the interpretation, and account for every tool effect and disclosed data element.</p>
+        </article>
       </section>
 
       <section class="lab-group" id="m10">
-        <div class="group-header"><h2 class="group-title">Module 10 — Laboratories, tool discipline, and reporting</h2><span class="group-count">5 topics</span></div>
+        <div class="group-header"><h2 class="group-title">Module 10 — Laboratories, tool discipline, and reporting</h2><span class="group-count">6 topics</span></div>
         <p class="group-note">Practice should be isolated, observable, reproducible, and tied to defensive learning. Reporting is part of the technical work, not an administrative afterthought.</p>
 
         <article class="featured-term" id="lab-architecture">
@@ -888,6 +1380,45 @@
           <h3 class="guide-title">Recommended learning order</h3>
           <ol class="check-list"><li>Networking, operating systems, HTTP, identity, scripting, version control, and evidence handling.</li><li>Authorization, ROE, lab isolation, reconnaissance, and manual validation.</li><li>Web and API testing with an intercepting proxy and OWASP methodology.</li><li>Windows/Linux privilege concepts, Active Directory, cloud identity, containers, and Kubernetes.</li><li>ATT&amp;CK-based adversary emulation paired with logging and detection validation.</li><li>AI assistance and MCP only after you can independently verify the underlying tool, protocol, command, and result.</li></ol>
           <p class="guide-desc">A strong portfolio shows reproducible lab design, bounded testing, clear evidence, defensive relevance, and honest limitations. Start with the <a href="/articles/read/2024/2024-11-16-the-basic-toolkit-for-penetration-testing-303da9234d82">Basic Toolkit for Penetration Testing</a>, then use the <a href="/labs.html">lab index</a> and <a href="/articles/">local article archive</a> to deepen one domain at a time.</p>
+        </article>
+
+        <article class="featured-term practice-panel" id="capstone-practice">
+          <h3 class="guide-title">Capstone workflow — deliver a reviewable attack–defense assessment</h3>
+          <p class="practice-intro">
+            The capstone joins the entire guide into one controlled engagement. The quality measure is not the
+            number of tools or exploits used; it is whether authority, evidence, technical reasoning, defensive
+            value, cleanup, and communication remain intact from the first hypothesis through the retest.
+          </p>
+          <ol class="workflow-steps">
+            <li><strong>Build the laboratory.</strong> Use isolated networks or accounts, synthetic identities and data, snapshots or infrastructure as code, time synchronization, endpoint and identity logging, network visibility, a SIEM, resource limits, and verified teardown.</li>
+            <li><strong>Write the engagement pack.</strong> Define sponsor decision, objective, assumed access, scope, exclusions, permitted techniques, test window, data policy, contacts, stop conditions, expected telemetry, success criteria, and cleanup plan.</li>
+            <li><strong>Establish a normal baseline.</strong> Record expected services, identities, application workflows, cloud resources, logs, alerts, and performance before testing. A lab without known normal state cannot explain what changed.</li>
+            <li><strong>Map and validate the attack surface.</strong> Reconcile inventory, perform controlled discovery, attribute observations, select one reachable hypothesis, and validate only the conditions needed for the objective.</li>
+            <li><strong>Execute a short scenario.</strong> Chain two or three previously validated reversible procedures, maintaining action IDs, evidence references, defensive timestamps, approval gates, and cleanup tasks.</li>
+            <li><strong>Measure defense at every layer.</strong> Record prevention, raw telemetry, analytic behavior, alert enrichment, routing, analyst understanding, containment, and recovery. Do not compress these states into one pass/fail label.</li>
+            <li><strong>Report for multiple consumers.</strong> Produce an executive decision summary, objective result, attack-path narrative, prioritized findings, technical evidence appendix, detection gaps, remediation backlog, limitations, and residual risk.</li>
+            <li><strong>Remediate and retest.</strong> Change the vulnerable condition or control, rerun the same versioned proof under comparable conditions, verify business functionality and telemetry, and retain before/after evidence.</li>
+            <li><strong>Close and archive responsibly.</strong> Verify teardown, revoke credentials, destroy or retain evidence according to policy, disclose unresolved artifacts, capture lessons, and preserve only the sanitized portfolio material approved for publication.</li>
+          </ol>
+          <div class="practice-grid">
+            <div class="practice-block">
+              <h4>Recommended capstone variants</h4>
+              <ul><li>External service → validated web authorization gap</li><li>Standard identity → risky directory-control path</li><li>Cloud workload → excessive identity privilege</li><li>Threat report → ATT&amp;CK scenario → detection retest</li><li>AI + MCP → constrained lab tool orchestration</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Quality rubric</h4>
+              <ul><li>Authority and scope are unambiguous</li><li>Every claim points to preserved evidence</li><li>Impact and uncertainty are stated honestly</li><li>Actions are reversible and cleanup is verified</li><li>Defensive observations are reproducible</li><li>Retest proves the changed security property</li></ul>
+            </div>
+            <div class="practice-block">
+              <h4>Report architecture</h4>
+              <p>Use a decision summary; engagement authority and limitations; objective results; attack-path timeline; finding records; control and telemetry observations; ATT&amp;CK mappings with procedures; remediation plan; retest criteria; cleanup attestation; and a technical appendix containing sanitized evidence references.</p>
+            </div>
+            <div class="practice-block">
+              <h4>Portfolio publication</h4>
+              <p>Publish only synthetic lab targets and explicitly approved evidence. Remove customer names, real addresses, credentials, internal architecture, unpublished vulnerabilities, and operational details that create avoidable risk. Link the write-up to the relevant <a href="/labs.html">1200km lab</a>, <a href="/pt-tools.html">tool guide</a>, and defensive outcome.</p>
+            </div>
+          </div>
+          <p class="evidence-gate"><strong>Completion gate:</strong> the assessment is complete only after every objective has a supported result or stated limitation, every change has a verified cleanup state, findings have owners and retest criteria, and the sponsor receives a decision-ready summary.</p>
         </article>
       </section>
     </main>
