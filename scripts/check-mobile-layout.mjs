@@ -30,6 +30,7 @@ const pages = [
   ['adversarygraph-full-guide', '/adversarygraph/full-version-feature-guides.html'],
   ['search', '/search.html'],
   ['cyber-knowledge-vulnerability-research', '/cyber-knowledge/vulnerability-research.html'],
+  ['cyber-knowledge-malware-analysis', '/cyber-knowledge/malware-analysis.html'],
   ['docs-long', '/adversarygraph-docs/full-flow/'],
   ['threat-matrix', '/threat-matrix/'],
 ];
