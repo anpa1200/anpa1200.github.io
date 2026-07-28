@@ -10,7 +10,7 @@ const site = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
 const check = args.includes('--check');
 const model = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge.json'), 'utf8'));
 const crosslinkModel = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge-crosslinks.json'), 'utf8'));
-const { domains, collection } = model;
+const { domains, collection, entry_paths: entryPaths } = model;
 let moduleIndex = new Map();
 
 function escapeHtml(value) {
@@ -137,6 +137,19 @@ function assertCrosslinkModel(source) {
     const unknown = [...mappingIds].filter((id) => !partIds.has(id));
     if (missing.length || unknown.length) {
       throw new Error(`${domain.path}: crosslink coverage mismatch; missing=${missing.join(',') || 'none'} unknown=${unknown.join(',') || 'none'}`);
+    }
+  }
+}
+
+function assertEntryPaths() {
+  const ids = new Set();
+  for (const path of entryPaths) {
+    if (ids.has(path.id)) throw new Error(`Duplicate Cyber Knowledge entry path: ${path.id}`);
+    ids.add(path.id);
+    for (const step of path.steps) {
+      if (!moduleIndex.has(`${step.domain}:${step.module}`)) {
+        throw new Error(`Entry path ${path.id}: invalid step ${step.domain}#${step.module}`);
+      }
     }
   }
 }
@@ -407,6 +420,13 @@ function transformDomain(html, domain) {
   );
   html = replaceRequired(
     html,
+    /<p class="content-freshness">[\s\S]*?<\/p>/i,
+    `<p class="content-freshness"><span>Version ${escapeHtml(domain.guide_version)}</span><span>Published <time datetime="${domain.published_at}">${escapeHtml(humanDate(domain.published_at))}</time></span><span>Reviewed <time datetime="${collection.reviewed_at}">${escapeHtml(humanDate(collection.reviewed_at))}</time></span><span>Status: maintained practitioner guide</span><span>Maintained by <a href="/about.html">Andrey Pautov</a></span><span><a href="/cyber-knowledge/editorial-policy/">Editorial policy and corrections</a></span></p>`,
+    'visible guide version and review metadata',
+    domain.path,
+  );
+  html = replaceRequired(
+    html,
     /    <nav class="knowledge-pathway"[\s\S]*?<\/nav>/i,
     renderPathway(domain),
     'learning-path navigation',
@@ -442,8 +462,11 @@ ${domains.map((domain) => {
             <p class="domain-facts">
               <span>${stat.modules} modules</span>
               <span>~${stat.minutes} min</span>
+              <span>${escapeHtml(domain.difficulty)}</span>
+              <span>Version ${escapeHtml(domain.guide_version)}</span>
               <span>Reviewed ${escapeHtml(humanDate(collection.reviewed_at))}</span>${baseline}
             </p>
+            <p class="domain-audience"><strong>For:</strong> ${escapeHtml(domain.audience)}</p>
             <ul class="domain-topics" aria-label="${escapeHtml(domain.name)} topics">
 ${domain.topics.map((topic) => `              <li>${escapeHtml(topic)}</li>`).join('\n')}
             </ul>
@@ -453,6 +476,28 @@ ${domain.topics.map((topic) => `              <li>${escapeHtml(topic)}</li>`).jo
   }).join('\n\n')}
         </div>
         <!-- cyber-knowledge:cards:end -->`;
+}
+
+function renderEntryPaths() {
+  return `      <!-- cyber-knowledge:entry-paths:start -->
+      <section id="entry-paths" aria-labelledby="entry-paths-title">
+        <h2 id="entry-paths-title">Start with the work you need to do</h2>
+        <p class="section-intro">These routes connect selected chapters across multiple guides. They are practical starting points, not mandatory curricula.</p>
+        <div class="entry-path-grid">
+${entryPaths.map((path) => `          <article class="entry-path-card" id="path-${escapeHtml(path.id)}">
+            <h3>${escapeHtml(path.label)}</h3>
+            <p>${escapeHtml(path.description)}</p>
+            <ol>
+${path.steps.map((step) => {
+    const domain = domains.find((candidate) => candidate.id === step.domain);
+    const part = moduleIndex.get(`${step.domain}:${step.module}`);
+    return `              <li><a href="/${domain.path}#${step.module}"><strong>${escapeHtml(domain.short)}:</strong> ${escapeHtml(part.name)}</a></li>`;
+  }).join('\n')}
+            </ol>
+          </article>`).join('\n')}
+        </div>
+      </section>
+      <!-- cyber-knowledge:entry-paths:end -->`;
 }
 
 function crossDomainEdges(source) {
@@ -537,17 +582,42 @@ function renderEcosystem() {
           <article class="domain-card"><span class="domain-index">Practice</span><h3 class="domain-title"><a href="/labs.html">Security labs</a></h3><p class="domain-desc">Controlled lab environments, validation walkthroughs, and reproducible evidence.</p></article>
           <article class="domain-card"><span class="domain-index">Writing</span><h3 class="domain-title"><a href="/articles/">Article archive</a></h3><p class="domain-desc">Local, searchable versions of published long-form research and technical articles.</p></article>
           <article class="domain-card"><span class="domain-index">Evidence</span><h3 class="domain-title"><a href="/external-validation.html">External validation</a></h3><p class="domain-desc">Source-backed external contributions, references, and acceptance evidence.</p></article>
+          <article class="domain-card"><span class="domain-index">Reference</span><h3 class="domain-title"><a href="/cyber-knowledge/glossary/">Glossary</a></h3><p class="domain-desc">Source-linked terminology with direct routes back to the guide context.</p></article>
+          <article class="domain-card"><span class="domain-index">Provenance</span><h3 class="domain-title"><a href="/cyber-knowledge/sources/">Source index</a></h3><p class="domain-desc">External sources grouped by class and the guides where each is used.</p></article>
+          <article class="domain-card"><span class="domain-index">Governance</span><h3 class="domain-title"><a href="/cyber-knowledge/editorial-policy/">Editorial policy</a></h3><p class="domain-desc">Source selection, review, correction, versioning, and AI-assistance boundaries.</p></article>
         </div>
       </section>
       <!-- cyber-knowledge:ecosystem:end -->`;
 }
 
 function transformHub(html, stats, edges) {
+  const hubTitle = 'Cybersecurity Knowledge Base and Practitioner Field Guides | 1200km';
+  const hubDescription = 'Ten connected cybersecurity field guides covering terminology, workflows, evidence, authoritative sources, labs, and operational handoffs.';
+  html = setTitle(html, hubTitle, 'cyber-knowledge/index.html');
+  html = setMeta(html, 'name', 'description', hubDescription, 'cyber-knowledge/index.html');
+  html = setMeta(html, 'property', 'og:title', hubTitle, 'cyber-knowledge/index.html');
+  html = setMeta(html, 'property', 'og:description', hubDescription, 'cyber-knowledge/index.html');
+  html = setMeta(html, 'name', 'twitter:title', hubTitle, 'cyber-knowledge/index.html');
+  html = setMeta(html, 'name', 'twitter:description', hubDescription, 'cyber-knowledge/index.html');
   html = ensureArticleDates(html, collection.published_at, collection.reviewed_at);
   html = setMeta(html, 'property', 'og:image', 'https://1200km.com/assets/cyber-knowledge-og/hub.png', 'cyber-knowledge/index.html');
   html = setMeta(html, 'property', 'og:image:alt', 'Cyber Knowledge — ten practitioner domains at 1200km', 'cyber-knowledge/index.html');
   html = setMeta(html, 'name', 'twitter:image', 'https://1200km.com/assets/cyber-knowledge-og/hub.png', 'cyber-knowledge/index.html');
   html = setMeta(html, 'name', 'twitter:image:alt', 'Cyber Knowledge — ten practitioner domains at 1200km', 'cyber-knowledge/index.html');
+  html = replaceRequired(
+    html,
+    /<h1\b([^>]*)class="page-title"([^>]*)>[\s\S]*?<\/h1>/i,
+    '<h1$1class="page-title"$2>Cybersecurity Knowledge Base and Practitioner Field Guides</h1>',
+    'hub H1',
+    'cyber-knowledge/index.html',
+  );
+  html = replaceRequired(
+    html,
+    /<p class="page-lead">[\s\S]*?<\/p>/i,
+    `<p class="page-lead">A practitioner-oriented cybersecurity knowledge system connecting concepts, evidence, workflows, laboratories, and operational handoffs. Ten connected disciplines take you from cybersecurity concepts to reviewable operational work.</p>`,
+    'hub positioning statement',
+    'cyber-knowledge/index.html',
+  );
   html = replaceRequired(
     html,
     /<div class="notice" role="note">[\s\S]*?<\/div>\s*<\/div>/i,
@@ -563,12 +633,10 @@ function transformHub(html, stats, edges) {
   html = replaceRequired(
     html,
     /<(?:div|nav)\b[^>]*class="[^"]*page-hero-links[^"]*"[^>]*>[\s\S]*?<\/(?:div|nav)>/i,
-    `<nav class="page-hero-links role-chooser" aria-label="Choose a Cyber Knowledge starting point">
-            <a class="button primary" href="/cyber-knowledge/blue-team.html">SOC analyst → Blue Team</a>
-            <a class="button" href="/cyber-knowledge/red-team.html">Offensive tester → Red Team</a>
-            <a class="button" href="/cyber-knowledge/cti.html">Vocabulary first → CTI</a>
-            <a class="button" href="/cyber-knowledge/dfir.html">Responding now → DFIR</a>
-            <a class="button" href="/cyber-knowledge/grc.html">Building the program → GRC</a>
+    `<nav class="page-hero-links role-chooser" aria-label="Explore Cyber Knowledge">
+            <a class="button primary" href="#domains">Explore the guides</a>
+            <a class="button" href="#entry-paths">Browse by workflow</a>
+            <a class="button" href="/search.html?q=cybersecurity">Search the knowledge base</a>
           </nav>`,
     'role-based starting points',
     'cyber-knowledge/index.html',
@@ -585,6 +653,7 @@ function transformHub(html, stats, edges) {
       'cyber-knowledge/index.html',
     );
   }
+  html = generatedRegion(html, 'entry-paths', renderEntryPaths(), /[ \t]*<!-- cyber-knowledge:relationship-map:start -->/i);
   html = generatedRegion(html, 'relationship-map', renderRelationshipMap(edges), /[ \t]*<\/main>/i);
   html = generatedRegion(html, 'ecosystem', renderEcosystem(), /[ \t]*<\/main>/i);
   html = ensureGeneratedJsonLd(html, 'cyber-knowledge-structured-data', hubStructuredData(stats));
@@ -607,6 +676,7 @@ for (const domain of domains) {
   stats.set(domain.id, { modules, minutes: readingMinutes(html) });
 }
 assertCrosslinkModel(source);
+assertEntryPaths();
 
 for (const domain of domains) {
   const path = join(site, domain.path);

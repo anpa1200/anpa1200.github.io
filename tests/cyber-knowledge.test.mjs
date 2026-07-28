@@ -77,9 +77,32 @@ test('Cyber Knowledge hub is the canonical collection for ten maintained guides'
   assert.equal(collection.hasPart?.length, modules.length);
   assert.ok(collection.hasPart.every((item) => item['@type'] === 'TechArticle'));
   assert.match(html, /Cross-domain learning and operational pathways/);
+  assert.match(html, /Cybersecurity Knowledge Base and Practitioner Field Guides/);
+  assert.match(html, /id="entry-paths"/);
+  assert.equal((html.match(/class="entry-path-card"/g) || []).length, 8);
   assert.doesNotMatch(html, temporaryPublicationLanguage);
   for (const module of modules) {
     assert.match(html, new RegExp(`/cyber-knowledge/${module}\\.html`), module);
+  }
+});
+
+test('Cyber Knowledge reference indexes are canonical, static, and source-linked', () => {
+  const cases = [
+    ['glossary/index.html', 'https://1200km.com/cyber-knowledge/glossary/', 'DefinedTermSet'],
+    ['sources/index.html', 'https://1200km.com/cyber-knowledge/sources/', 'ItemList'],
+    ['editorial-policy/index.html', 'https://1200km.com/cyber-knowledge/editorial-policy/', 'CreativeWork'],
+  ];
+  for (const [path, canonical, expectedType] of cases) {
+    const html = source(path);
+    assert.equal(linkHref(html, 'canonical'), canonical, path);
+    assert.equal((html.match(/<h1\b/gi) || []).length, 1, path);
+    assert.match(tagContent(html, 'name="robots"'), /index,\s*follow/i, path);
+    assert.ok(jsonLdEntries(html).some((entry) => {
+      const types = Array.isArray(entry['@type']) ? entry['@type'] : [entry['@type']];
+      return types.includes(expectedType);
+    }), `${path}: ${expectedType}`);
+    assert.match(html, /data-pagefind-body/, path);
+    assert.match(html, /href="\/cyber-knowledge\/"/, path);
   }
 });
 
@@ -123,7 +146,10 @@ test('each module has consistent SEO, AI-readable structure, and source-review s
     assert.equal(tagContent(html, 'property="article:modified_time"'), '2026-07-27', module);
     assert.ok(article.breadcrumb, module);
     assert.match(html, /data-pagefind-body/, module);
-    assert.match(html, /Source review: 27 July 2026/, module);
+    assert.match(html, /Version 1\.0/, module);
+    assert.match(html, /Reviewed <time datetime="2026-07-27">27 Jul 2026<\/time>/, module);
+    assert.match(html, /Maintained by <a href="\/about\.html">Andrey Pautov<\/a>/, module);
+    assert.match(html, /href="\/cyber-knowledge\/editorial-policy\/">Editorial policy and corrections<\/a>/, module);
     assert.match(html, /Status: maintained practitioner guide/, module);
     assert.match(html, /class="knowledge-pathway"/, module);
     assert.match(html, /src="\/assets\/cyber-knowledge\.js"/, module);
