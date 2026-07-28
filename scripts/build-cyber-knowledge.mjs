@@ -68,8 +68,46 @@ function moduleParts(html) {
     .filter((part) => part.name);
 }
 
+function slugify(value) {
+  return stripHtml(value)
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function glossaryRegion(html) {
+  return html.match(
+    /(<(?:article|section)\b[^>]*\bid=["']glossary["'][^>]*>)([\s\S]*?)(?=<(?:article|section)\b[^>]*\bid=["'][^"']+["'])/i,
+  );
+}
+
+function ensureGlossaryTermAnchors(html, domain) {
+  if (!['blue-team', 'vulnerability-research', 'malware-analysis'].includes(domain.id)) return html;
+  const region = glossaryRegion(html);
+  if (!region) throw new Error(`${domain.path}: glossary region not found`);
+  const anchored = region[0].replace(
+    /<p><strong(?![^>]*\bid=)([^>]*)>([^<:]+):<\/strong>/gi,
+    (full, attributes, name) => `<p><strong${attributes} id="term-${slugify(name)}">${name}:</strong>`,
+  );
+  return html.replace(region[0], anchored);
+}
+
 function definedTerms(html, domain) {
-  if (domain.id !== 'cti') return [];
+  if (domain.id !== 'cti') {
+    if (!['blue-team', 'vulnerability-research', 'malware-analysis'].includes(domain.id)) return [];
+    const region = glossaryRegion(html);
+    if (!region) throw new Error(`${domain.path}: glossary region not found`);
+    return [...region[0].matchAll(/<p><strong[^>]*\bid=["']([^"']+)["'][^>]*>([^<:]+):<\/strong>\s*([\s\S]*?)<\/p>/gi)]
+      .map((match) => ({
+        '@type': 'DefinedTerm',
+        name: stripHtml(match[2]),
+        description: stripHtml(match[3]),
+        url: `https://1200km.com/${domain.path}#${match[1]}`,
+        inDefinedTermSet: `https://1200km.com/${domain.path}#defined-terms`,
+      }))
+      .filter((term) => term.name && term.description);
+  }
   const terms = [];
   for (const match of html.matchAll(/<div class="featured-term">([\s\S]*?)<\/div>/gi)) {
     const block = match[1];
@@ -157,7 +195,7 @@ function domainStructuredData(html, domain) {
       '@type': 'DefinedTermSet',
       '@id': `${url}#defined-terms`,
       name: `${domain.name} defined terms`,
-      url,
+      url: `${url}#glossary`,
       hasDefinedTerm: terms,
     });
   }
@@ -263,7 +301,7 @@ function transformDomain(html, domain) {
     /href=(["'])(\/articles\/read\/\d{4}\/[^"'#?\/]+)([?#][^"']*)?\1/gi,
     (full, quote, path, suffix = '') => `href=${quote}${path}/${suffix}${quote}`,
   );
-  const title = `${domain.title_name} Field Guide — Cyber Knowledge | 1200km`;
+  const title = `${domain.short} Field Guide — Cyber Knowledge | 1200km`;
   html = setTitle(html, title, domain.path);
   html = setMeta(html, 'name', 'description', domain.description, domain.path);
   html = setMeta(html, 'property', 'og:title', title, domain.path);
@@ -290,7 +328,7 @@ function transformDomain(html, domain) {
   html = replaceRequired(
     html,
     /<h1\b([^>]*)class="page-title"([^>]*)>[\s\S]*?<\/h1>/i,
-    `<h1$1class="page-title"$2>${escapeHtml(domain.h1)}</h1>`,
+    `<h1$1class="page-title"$2>${escapeHtml(domain.name)}</h1>`,
     'page title heading',
     domain.path,
   );
@@ -308,6 +346,7 @@ function transformDomain(html, domain) {
       'https://1200km.com/cyber-knowledge/cti.html#defined-terms',
     );
   }
+  html = ensureGlossaryTermAnchors(html, domain);
   html = ensureGeneratedJsonLd(html, 'cyber-knowledge-structured-data', domainStructuredData(html, domain));
   html = ensureEnhancementScript(html);
   return html;

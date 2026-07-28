@@ -163,6 +163,28 @@ test('CTI terms have one generated DefinedTermSet', () => {
   }
 });
 
+test('domain glossaries have generated, independently addressable DefinedTerm records', () => {
+  const expectedMinimum = new Map([
+    ['blue-team', 20],
+    ['vulnerability-research', 16],
+    ['malware-analysis', 16],
+  ]);
+  for (const [module, minimum] of expectedMinimum) {
+    const html = source(`${module}.html`);
+    const sets = jsonLdEntries(html).filter((entry) => entry['@type'] === 'DefinedTermSet');
+    assert.equal(sets.length, 1, module);
+    assert.ok(sets[0].hasDefinedTerm.length >= minimum, module);
+    for (const term of sets[0].hasDefinedTerm) {
+      assert.equal(term['@type'], 'DefinedTerm', module);
+      const fragment = new URL(term.url).hash.slice(1);
+      assert.ok(fragment, `${module}: term fragment`);
+      assert.match(html, new RegExp(`\\bid="${fragment}"`), `${module}: ${fragment}`);
+      assert.ok(term.name, module);
+      assert.ok(term.description, module);
+    }
+  }
+});
+
 test('shared knowledge styles preserve focus and light-theme contrast', () => {
   const css = readFileSync(join(ROOT, 'assets', 'site-theme.css'), 'utf8');
   assert.match(css, /\.table-wrap:focus-visible[\s\S]*outline:/);

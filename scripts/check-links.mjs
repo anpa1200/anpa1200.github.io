@@ -86,6 +86,33 @@ function resolveLocalRef(fromFile, url) {
   return normalize(join(dirname(fromFile), clean));
 }
 
+function localHtmlFile(pathname) {
+  const clean = pathname.split('#')[0].split('?')[0];
+  const relativePath = clean.replace(/^\//, '');
+  let candidate = join(ROOT, relativePath);
+  if (!candidate.startsWith(ROOT) || !existsSync(candidate)) return '';
+  if (statSync(candidate).isDirectory()) candidate = join(candidate, 'index.html');
+  if (!candidate.endsWith('.html') || !existsSync(candidate)) return '';
+  return relative(ROOT, candidate).replace(/\\/g, '/');
+}
+
+function validateLocalFragment(fromFile, pathname, fragment, sourceUrl) {
+  if (!fragment) return true;
+  // Hash-router state is application navigation, not an HTML element fragment.
+  if (/^#\//.test(fragment)) return true;
+  let decoded;
+  try {
+    decoded = decodeURIComponent(fragment.replace(/^#/, ''));
+  } catch {
+    decoded = fragment.replace(/^#/, '');
+  }
+  if (!decoded) return true;
+  const targetFile = localHtmlFile(pathname) || fromFile;
+  if (idsByFile[targetFile]?.has(decoded)) return true;
+  results.missingAnchor.push(`${fromFile}: ${sourceUrl} (missing #${decoded} in ${targetFile})`);
+  return false;
+}
+
 function isLive1200kmSiblingPath(pathname) {
   return LIVE_1200KM_ROOTS.some((root) => pathname === root || pathname.startsWith(root));
 }
@@ -120,8 +147,7 @@ for (const f of htmlFiles) {
 
     if (url.startsWith('#')) {
       const id = url.slice(1);
-      if (id && !idsByFile[f].has(id)) results.missingAnchor.push(`${f}: ${url}`);
-      else results.ok++;
+      if (validateLocalFragment(f, f, id, url)) results.ok++;
       continue;
     }
 
@@ -130,7 +156,9 @@ for (const f of htmlFiles) {
       try { u = new URL(url); } catch { continue; }
       if (u.hostname === '1200km.com') {
         if (isLive1200kmSiblingPath(u.pathname)) externalToProbe.add(url);
-        else if (localPathExists(u.pathname)) results.ok++;
+        else if (localPathExists(u.pathname)) {
+          if (validateLocalFragment(f, u.pathname, u.hash, url)) results.ok++;
+        }
         else externalToProbe.add(url);
       } else {
         externalToProbe.add(url);
@@ -146,7 +174,7 @@ for (const f of htmlFiles) {
 
     const resolved = resolveLocalRef(f, url);
     if (!localPathExists(resolved)) results.broken.push(`${f}: ${url}`);
-    else results.ok++;
+    else if (validateLocalFragment(f, resolved, url.includes('#') ? `#${url.split('#')[1]}` : '', url)) results.ok++;
   }
 }
 
