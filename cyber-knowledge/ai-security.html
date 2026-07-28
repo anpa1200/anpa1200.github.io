@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Security Field Guide — Cyber Knowledge | 1200km</title>
+    <meta name="description" content="AI-security guide covering system modeling, data and model threats, prompt injection, agents, MCP, testing, monitoring, incident response, and governance." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta property="og:title" content="AI Security Field Guide — Cyber Knowledge | 1200km" />
+    <meta property="og:description" content="AI-security guide covering system modeling, data and model threats, prompt injection, agents, MCP, testing, monitoring, incident response, and governance." />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="article:published_time" content="2026-07-28" />
+    <meta property="article:modified_time" content="2026-07-27" />
+    <meta property="og:url" content="https://1200km.com/cyber-knowledge/ai-security.html" />
+    <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
+    <meta property="og:image" content="https://1200km.com/assets/cyber-knowledge-og/ai-security.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AI Security — 1200km Cyber Knowledge" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AI Security Field Guide — Cyber Knowledge | 1200km" />
+    <meta name="twitter:description" content="AI-security guide covering system modeling, data and model threats, prompt injection, agents, MCP, testing, monitoring, incident response, and governance." />
+    <meta name="twitter:image" content="https://1200km.com/assets/cyber-knowledge-og/ai-security.png" />
+    <meta name="twitter:image:alt" content="AI Security — 1200km Cyber Knowledge" />
+    <link rel="canonical" href="https://1200km.com/cyber-knowledge/ai-security.html" />
+    <link rel="up" href="/cyber-knowledge/" />
+    <link rel="prev" href="/cyber-knowledge/osint.html" />
+    <link rel="next" href="/cyber-knowledge/cti.html" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="icon" href="/assets/ap-logo.png" type="image/png" />
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
+    <style>
+      :root{--bg:#050c1a;--surface:#081326;--surface2:#0d1f3c;--text:#cdd9ee;--muted:#88a0c2;--line:#1a3060;--accent:#0f62fe;--soft:#93c5fd;--ok:#34d399;--warn:#fbbf24;--danger:#fb7185}
+      *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--soft)}a:hover{color:#fff}.site-header{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--line);background:rgba(5,12,26,.96)}.nav,.page-hero-inner,.footer-inner{width:min(1120px,calc(100% - 32px));margin:auto}.nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:800;text-decoration:none}.brand img{width:36px;height:36px;border-radius:10px}.nav-links{display:flex;gap:14px;flex-wrap:wrap}.page-hero{border-bottom:1px solid var(--line);background:linear-gradient(125deg,rgba(15,98,254,.18),rgba(52,211,153,.07))}.page-hero-inner{padding:64px 0 52px}.page-eyebrow,.module-number,.toc-group{color:var(--soft);font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.page-title{font-size:clamp(2.3rem,6vw,4.4rem);line-height:1.04;margin:10px 0}.page-lead{font-size:1.12rem;max-width:900px}.notice,.boundary,.evidence-note,.decision-gate{border:1px solid var(--line);border-left:4px solid var(--warn);padding:14px 16px;border-radius:8px;background:rgba(13,31,60,.64)}.evidence-note,.decision-gate{border-left-color:var(--ok)}.page-hero-links,.content-freshness{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.button{display:inline-flex;padding:9px 15px;border:1px solid var(--line);border-radius:7px;background:var(--surface2);color:var(--text);font-weight:750;text-decoration:none}.button.primary{background:var(--accent);border-color:var(--accent);color:#fff}.content-freshness{font-size:.82rem;color:var(--muted)}.content-freshness span+span:before{content:"·";margin-right:10px}.guide-nav{position:sticky;top:64px;z-index:20;border-bottom:1px solid var(--line);background:rgba(5,12,26,.97)}.guide-nav-inner{width:min(1180px,calc(100% - 32px));margin:auto;display:flex;gap:8px;padding:10px 0;overflow-x:auto}.guide-nav a{white-space:nowrap;padding:5px 10px;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:.8rem}.guide-layout{width:min(1180px,calc(100% - 32px));margin:auto;display:grid;grid-template-columns:minmax(230px,280px) minmax(0,1fr);gap:28px;padding:42px 0 72px}.toc{position:sticky;top:122px;align-self:start;max-height:calc(100vh - 142px);overflow:auto;border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--surface)}.toc h2{font-size:1rem}.toc ol,.toc ul{padding-left:22px}.toc li{margin:6px 0}.toc-group{display:block;margin-top:17px}.guide-content{min-width:0}.guide-content>section,.module{scroll-margin-top:128px}.guide-content h2{font-size:clamp(1.65rem,4vw,2.4rem);line-height:1.15}.module{margin:0 0 24px;padding:24px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.module h2{margin:.35rem 0 1rem}.module h3{margin-top:1.4rem}.two-col,.outcome-grid,.case-grid,.lab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.outcome-card,.case-study,.practice-block,.reference-article{padding:16px;border:1px solid var(--line);border-radius:9px;background:rgba(13,31,60,.55)}.workflow{border-left:3px solid var(--accent);padding-left:16px}.workflow li{margin:8px 0}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;min-width:680px}th,td{text-align:left;vertical-align:top;padding:11px;border-bottom:1px solid var(--line)}th{background:var(--surface2)}code{padding:2px 5px;border-radius:4px;background:var(--surface2);color:#bfdbfe}.knowledge-pathway{margin-top:36px;padding:18px;border:1px solid var(--line);border-radius:10px}.knowledge-pathway__links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.knowledge-pathway__links a{padding:12px;border:1px solid var(--line);border-radius:8px;text-decoration:none}.knowledge-pathway small,.knowledge-pathway strong{display:block}.site-footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted)}
+      @media(max-width:900px){.guide-layout{grid-template-columns:1fr}.toc{position:static;max-height:none}.two-col,.outcome-grid,.case-grid,.lab-grid{grid-template-columns:1fr}}@media(max-width:720px){.nav{min-height:58px}.guide-nav{top:58px}.page-hero-inner{padding:42px 0}.guide-layout{width:calc(100% - 24px)}.module{padding:17px}.knowledge-pathway__links{grid-template-columns:1fr}.page-lead,.module p,.module li{max-width:none;overflow-wrap:normal;word-break:normal}a,code,td{overflow-wrap:anywhere}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}[data-theme="light"]{--bg:#f0f4ff;--surface:#fff;--surface2:#e7eefb;--text:#172033;--muted:#53627a;--line:#ccd9eb;--soft:#1559cf}
+    </style>
+    <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
+    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+
+
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ],
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "inLanguage": "en",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/cyber-knowledge/ai-security.html#webpage",
+            "url": "https://1200km.com/cyber-knowledge/ai-security.html",
+            "name": "AI Security",
+            "headline": "AI Security Field Guide",
+            "description": "AI-security guide covering system modeling, data and model threats, prompt injection, agents, MCP, testing, monitoring, incident response, and governance.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "datePublished": "2026-07-28",
+            "dateModified": "2026-07-27",
+            "educationalLevel": "Intermediate to advanced",
+            "learningResourceType": "Cybersecurity practitioner field guide",
+            "breadcrumb": {
+              "@id": "https://1200km.com/cyber-knowledge/ai-security.html#breadcrumb"
+            },
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/cyber-knowledge-og/ai-security.png"
+            },
+            "mainEntity": {
+              "@id": "https://1200km.com/cyber-knowledge/ai-security.html#course"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/cyber-knowledge/ai-security.html#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Cybersecurity Knowledge Base and Practitioner Field Guides",
+                "item": "https://1200km.com/cyber-knowledge/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "AI Security",
+                "item": "https://1200km.com/cyber-knowledge/ai-security.html"
+              }
+            ]
+          },
+          {
+            "@type": [
+              "Course",
+              "LearningResource"
+            ],
+            "@id": "https://1200km.com/cyber-knowledge/ai-security.html#course",
+            "name": "AI Security",
+            "description": "AI-security guide covering system modeling, data and model threats, prompt injection, agents, MCP, testing, monitoring, incident response, and governance.",
+            "url": "https://1200km.com/cyber-knowledge/ai-security.html",
+            "provider": {
+              "@id": "https://1200km.com/#person"
+            },
+            "teaches": [
+              "AI threat modeling",
+              "prompt injection",
+              "agent security",
+              "AI assurance"
+            ],
+            "educationalLevel": "Intermediate to advanced",
+            "timeRequired": "PT19M",
+            "coursePrerequisites": "Use the prerequisites and authorization boundaries stated in the field guide.",
+            "hasPart": [
+              {
+                "@type": "LearningResource",
+                "position": 1,
+                "name": "AI security foundations and threat landscape",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-1"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 2,
+                "name": "Architecture, assets, trust boundaries, and AI threat modeling",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-2"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 3,
+                "name": "Training data, ingestion, retrieval, RAG, and knowledge integrity",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-3"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 4,
+                "name": "Model and dependency supply-chain security",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-4"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 5,
+                "name": "Prompt injection, instruction hierarchy, and secure output handling",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-5"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 6,
+                "name": "Privacy, secrets, confidential data, and model leakage",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-6"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 7,
+                "name": "Agents, tools, plugins, browsers, and MCP security",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-7"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 8,
+                "name": "Identity, authorization, tenancy, and human approval",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-8"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 9,
+                "name": "Infrastructure, network, resource, and availability security",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-9"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 10,
+                "name": "AI red teaming, evaluation, and reproducible security testing",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-10"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 11,
+                "name": "Logging, monitoring, detection, and security analytics",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-11"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 12,
+                "name": "AI incident response and forensic readiness",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-12"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 13,
+                "name": "Governance, risk, assurance, transparency, and human factors",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-13"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 14,
+                "name": "Secure AI development lifecycle and production release gate",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-14"
+              }
+            ],
+            "datePublished": "2026-07-28",
+            "dateModified": "2026-07-27",
+            "inLanguage": "en"
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json" id="cyber-knowledge-structured-data">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": [
+              "WebPage",
+              "TechArticle"
+            ],
+            "@id": "https://1200km.com/cyber-knowledge/ai-security.html#webpage",
+            "url": "https://1200km.com/cyber-knowledge/ai-security.html",
+            "name": "AI Security Field Guide — Cyber Knowledge | 1200km",
+            "headline": "AI Security",
+            "description": "AI-security guide covering system modeling, data and model threats, prompt injection, agents, MCP, testing, monitoring, incident response, and governance.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/cyber-knowledge/ai-security.html#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "datePublished": "2026-07-28",
+            "dateModified": "2026-07-27",
+            "proficiencyLevel": "Intermediate to advanced",
+            "educationalLevel": "Intermediate to advanced",
+            "learningResourceType": "Cybersecurity practitioner field guide",
+            "about": [
+              "AI threat modeling",
+              "prompt injection",
+              "agent security",
+              "AI assurance"
+            ],
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/cyber-knowledge-og/ai-security.png"
+            }
+          },
+          {
+            "@type": [
+              "Course",
+              "LearningResource"
+            ],
+            "@id": "https://1200km.com/cyber-knowledge/ai-security.html#course",
+            "name": "AI Security",
+            "description": "AI-security guide covering system modeling, data and model threats, prompt injection, agents, MCP, testing, monitoring, incident response, and governance.",
+            "url": "https://1200km.com/cyber-knowledge/ai-security.html",
+            "provider": {
+              "@id": "https://1200km.com/#person"
+            },
+            "teaches": [
+              "AI threat modeling",
+              "prompt injection",
+              "agent security",
+              "AI assurance"
+            ],
+            "educationalLevel": "Intermediate to advanced",
+            "timeRequired": "PT19M",
+            "coursePrerequisites": "Use the prerequisites and authorization boundaries stated in the field guide.",
+            "hasPart": [
+              {
+                "@type": "LearningResource",
+                "position": 1,
+                "name": "AI security foundations and threat landscape",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-1"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 2,
+                "name": "Architecture, assets, trust boundaries, and AI threat modeling",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-2"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 3,
+                "name": "Training data, ingestion, retrieval, RAG, and knowledge integrity",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-3"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 4,
+                "name": "Model and dependency supply-chain security",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-4"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 5,
+                "name": "Prompt injection, instruction hierarchy, and secure output handling",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-5"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 6,
+                "name": "Privacy, secrets, confidential data, and model leakage",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-6"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 7,
+                "name": "Agents, tools, plugins, browsers, and MCP security",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-7"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 8,
+                "name": "Identity, authorization, tenancy, and human approval",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-8"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 9,
+                "name": "Infrastructure, network, resource, and availability security",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-9"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 10,
+                "name": "AI red teaming, evaluation, and reproducible security testing",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-10"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 11,
+                "name": "Logging, monitoring, detection, and security analytics",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-11"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 12,
+                "name": "AI incident response and forensic readiness",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-12"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 13,
+                "name": "Governance, risk, assurance, transparency, and human factors",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-13"
+              },
+              {
+                "@type": "LearningResource",
+                "position": 14,
+                "name": "Secure AI development lifecycle and production release gate",
+                "url": "https://1200km.com/cyber-knowledge/ai-security.html#module-14"
+              }
+            ],
+            "datePublished": "2026-07-28",
+            "dateModified": "2026-07-27",
+            "inLanguage": "en"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body id="top">
+    <!-- site-shell:header:start -->
+    <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
+          <span class="brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <details class="nav-links" data-mobile-navigation>
+          <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
+            <span class="nav-menu-text">Menu</span>
+          </summary>
+          <div class="nav-list" id="primary-nav-list">
+            <!-- site-shell:primary-navigation:start -->
+            <a href="/cti.html">Research</a>
+            <a href="/guides.html">Library</a>
+            <a href="/projects.html">Products &amp; Labs</a>
+            <a class="nav-flagship" href="/adversarygraph/">AdversaryGraph</a>
+            <details class="nav-more" data-active="true">
+              <summary>More</summary>
+              <div class="nav-more-list">
+                <a class="active" aria-current="location" href="/cyber-knowledge/">Cyber Knowledge</a>
+                <a href="/about.html">About</a>
+                <a href="/cv.html">CV</a>
+                <a href="/external-validation.html">External validation</a>
+              </div>
+            </details>
+            <!-- site-shell:primary-navigation:end -->
+          </div>
+        </details>
+        <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">
+            <span aria-hidden="true" class="site-search-fallback-icon"></span>
+            <span class="site-search-fallback-text">Search research</span>
+          </a>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+    <!-- site-shell:header:end -->
+    <main data-pagefind-body id="main-content">
+      <div class="page-hero"><div class="page-hero-inner">
+        <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain 11 of 11 · Practitioner field guide</p>
+        <h1 class="page-title" id="ai-security">AI Security</h1>
+        <p class="page-lead">AI security protects the complete socio-technical system around models: data pipelines, model artifacts, prompts, retrieval, application code, identities, plugins, agents, MCP servers, infrastructure, people, and decisions. This guide connects engineering, adversarial testing, monitoring, response, and governance so teams can move from a demo that “uses AI” to a system with explicit boundaries and reviewable evidence.</p>
+        <div class="notice" role="note"><strong>Scope and safety boundary</strong><p>Use adversarial techniques only against systems you own or are explicitly authorized to assess. Model output is untrusted data, not authority. Never give an AI system broader tool, data, or network access than the task requires, and never treat an automated score as proof of security, privacy, compliance, or model correctness.</p></div>
+        <div class="page-hero-links"><a class="button primary" href="#learning-path">Start the 14-module path</a><a class="button" href="#cases">Open case studies</a><a class="button" href="#labs">Build the labs</a><a class="button" href="/cyber-knowledge/">All domains</a></div>
+        <p class="content-freshness"><span>Version 1.0</span><span>Published <time datetime="2026-07-28">28 Jul 2026</time></span><span>Reviewed <time datetime="2026-07-27">27 Jul 2026</time></span><span>Status: maintained practitioner guide</span><span>Maintained by <a href="/about.html">Andrey Pautov</a></span><span><a href="/cyber-knowledge/editorial-policy/">Editorial policy and corrections</a></span></p>
+      </div></div>
+      <nav class="guide-nav" aria-label="Guide sections"><div class="guide-nav-inner"><a href="#orientation">Orientation</a><a href="#learning-path">14 modules</a><a href="#control-map">Control map</a><a href="#cases">Cases</a><a href="#labs">Labs</a><a href="#readiness">Readiness gate</a><a href="#references">Sources</a></div></nav>
+      <div class="guide-layout">
+        <aside class="toc" aria-label="Table of contents"><h2 id="table-of-contents">Table of contents</h2><span class="toc-group">Start here</span><ol><li><a href="#orientation">Purpose and operating model</a></li><li><a href="#system-map">AI system map</a></li></ol><span class="toc-group">Fourteen modules</span><ol><li><a href="#module-1">Foundations and threat landscape</a></li><li><a href="#module-2">Architecture and threat modeling</a></li><li><a href="#module-3">Data and retrieval security</a></li><li><a href="#module-4">Model supply chain</a></li><li><a href="#module-5">Prompt injection and output handling</a></li><li><a href="#module-6">Privacy and sensitive data</a></li><li><a href="#module-7">Agents, tools, and MCP</a></li><li><a href="#module-8">Identity, authorization, and tenancy</a></li><li><a href="#module-9">Infrastructure and availability</a></li><li><a href="#module-10">Adversarial testing</a></li><li><a href="#module-11">Monitoring and detection</a></li><li><a href="#module-12">Incident response</a></li><li><a href="#module-13">Governance and assurance</a></li><li><a href="#module-14">Secure delivery lifecycle</a></li></ol><span class="toc-group">Practice</span><ul><li><a href="#control-map">Threat-to-control map</a></li><li><a href="#cases">End-to-end cases</a></li><li><a href="#labs">Hands-on labs</a></li><li><a href="#readiness">Production gate</a></li><li><a href="#references">Authoritative sources</a></li></ul></aside>
+        <div class="guide-content">
+          <section id="orientation"><h2 id="purpose-mental-model-and-learning-outcomes">Purpose, mental model, and learning outcomes</h2><p>AI security is not a synonym for prompt filtering. A production system may combine a hosted or local model, system prompts, retrieval indexes, user content, memory, APIs, tools, agents, browsers, files, queues, databases, and human approvals. Each component has a different owner and trust level. The security objective is therefore to preserve confidentiality, integrity, availability, accountability, and safe human decision-making across the whole chain.</p><div class="outcome-grid"><div class="outcome-card"><h3 id="you-will-be-able-to">You will be able to</h3><ul><li>Draw a data-flow and trust-boundary model for an AI application.</li><li>Separate model behavior risks from ordinary application and infrastructure vulnerabilities.</li><li>Design least-privilege retrieval, agent, and MCP tool access.</li><li>Build abuse cases, tests, telemetry, response playbooks, and release evidence.</li></ul></div><div class="outcome-card"><h3 id="evidence-you-should-produce">Evidence you should produce</h3><ul><li>System inventory, model/data provenance, and owner register.</li><li>Threat model with assumptions, abuse cases, and control owners.</li><li>Adversarial test corpus, results, residual-risk decisions, and regression gates.</li><li>Runtime audit trail, incident playbooks, and governed change history.</li></ul></div></div></section>
+          <section id="system-map"><h2 id="map-the-ai-system-before-testing-it">Map the AI system before testing it</h2><figure><img src="/assets/ai-security-architecture.png" alt="AI security architecture connecting data provenance, model integrity, retrieval and RAG, agent tools and MCP, and monitoring and governance around a protected model" width="1731" height="909" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px"><figcaption>Security is a property of the connected system—not the model in isolation.</figcaption></figure><div class="table-wrap" tabindex="0" role="region" aria-label="AI system component map"><table><thead><tr><th>Layer</th><th>Assets</th><th>Typical trust failure</th><th>Required evidence</th></tr></thead><tbody><tr><td>Experience</td><td>UI, API, conversation, files</td><td>Untrusted content becomes an instruction</td><td>Input origin, tenant, policy decision, output destination</td></tr><tr><td>Orchestration</td><td>System prompt, routing, memory, agent loop</td><td>Instruction hierarchy or state is confused</td><td>Prompt version, route, tool plan, approval event</td></tr><tr><td>Knowledge</td><td>Documents, embeddings, vector index, graph</td><td>Poisoned or unauthorized context is retrieved</td><td>Source identity, ACL, chunk lineage, retrieval score</td></tr><tr><td>Model</td><td>Weights, tokenizer, adapters, endpoint</td><td>Untrusted artifact or unsuitable model is deployed</td><td>Digest, origin, evaluation, deployment approval</td></tr><tr><td>Action</td><td>Functions, plugins, MCP servers, credentials</td><td>Model output invokes excessive capability</td><td>Actor, arguments, authorization, result, rollback</td></tr><tr><td>Platform</td><td>Compute, network, secrets, logs, CI/CD</td><td>Conventional compromise reaches AI assets</td><td>Configuration baseline, identity, telemetry, build provenance</td></tr></tbody></table></div></section>
+
+          <section id="learning-path" aria-labelledby="learning-path-title"><h2 id="learning-path-title">Fourteen-module learning path</h2></section>
+          <article class="module" id="module-1"><span class="module-number">Module 01</span><h2 id="ai-security-foundations-and-threat-landscape">AI security foundations and threat landscape</h2><p>Begin with three distinct questions: can an attacker compromise the application around the model, can untrusted content manipulate model-mediated behavior, and can the system cause unacceptable harm even without a conventional exploit? These overlap but require different tests and owners. An authorization flaw is still an authorization flaw; a retrieved document that changes an agent’s goal is an indirect prompt-injection problem; a plausible but false answer is a reliability and decision-control problem.</p><p>Use the <a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI Risk Management Framework</a> to organize governance and risk work, the <a href="https://genai.owasp.org/">OWASP GenAI Security Project</a> for application abuse classes, and <a href="https://atlas.mitre.org/">MITRE ATLAS</a> for adversary behaviors. Treat these as complementary lenses rather than interchangeable checklists.</p><h3 id="working-method">Working method</h3><ol class="workflow"><li>Define business purpose, affected people, unacceptable outcomes, and accountable owner.</li><li>Classify system type: predictive model, generative assistant, RAG service, autonomous workflow, or security copilot.</li><li>Inventory external dependencies and conventional attack surface.</li><li>Record which decisions are advisory, human-approved, or automatically executed.</li><li>Translate risks into observable security properties and testable acceptance criteria.</li></ol><div class="boundary"><strong>Boundary:</strong> “The model refused my prompt” is not a security control assessment. Test the application, identities, data paths, and downstream effects.</div>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/grc.html#module-14">Governance, Risk &amp; Compliance (GRC) — AI governance, machine-readable controls, and safe GRC automation</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-2"><span class="module-number">Module 02</span><h2 id="architecture-assets-trust-boundaries-and-ai-threat-modeling">Architecture, assets, trust boundaries, and AI threat modeling</h2><p>Create both a component diagram and a data-flow diagram. Mark every transition where content, identity, authority, or provenance changes. Model user input, uploaded documents, web retrieval, system instructions, conversation memory, vector search, model calls, tool calls, human approval, and output publication as separate flows. Shared infrastructure does not imply shared authorization.</p><p>Extend ordinary STRIDE-style analysis with AI-specific abuse cases: instruction override, retrieval poisoning, model extraction, membership inference, unsafe tool planning, resource exhaustion, insecure output consumption, and cross-tenant context leakage. For each case, document preconditions, attacker-controlled inputs, affected asset, observable signal, preventive control, recovery control, and residual uncertainty.</p><h3 id="threat-model-record">Threat-model record</h3><ul><li><strong>System claim:</strong> what the feature is allowed to do—and explicitly cannot do.</li><li><strong>Authority:</strong> whose identity is used for retrieval and action.</li><li><strong>Untrusted channels:</strong> prompts, files, pages, connectors, model output, and tool output.</li><li><strong>Decision gates:</strong> deterministic policy checks and human approvals outside the model.</li><li><strong>Failure containment:</strong> rate limits, timeouts, transaction scope, rollback, and kill switch.</li></ul><p>Connect the model to <a href="/cyber-knowledge/secure-code.html#module-2">application threat modeling</a>, <a href="/cyber-knowledge/cloud-security.html#module-2">cloud architecture boundaries</a>, and the <a href="/cyber-knowledge/grc.html#module-3">scenario-based risk process</a>.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/secure-code.html#module-2">Secure Code &amp; Application Security — Threat modeling and secure architecture</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-3"><span class="module-number">Module 03</span><h2 id="training-data-ingestion-retrieval-rag-and-knowledge-integrity">Training data, ingestion, retrieval, RAG, and knowledge integrity</h2><p>Data security spans collection, licensing, classification, preprocessing, training, embedding, indexing, retrieval, caching, retention, and deletion. A RAG system creates a new authorization surface: a document may be legitimate to store but illegitimate to retrieve for a particular user, tenant, task, or model. Embeddings are not an access-control boundary, and vector similarity is not evidence quality.</p><p>Preserve source URL or object identity, author/publisher, collection time, tenant, handling marking, checksum, parser version, chunk offsets, ACL, and supersession state. Apply authorization before retrieval results reach the prompt. Quarantine unknown formats, scan uploads, constrain parsers, and prevent fetched content from being interpreted as system authority. Detect duplicate, stale, contradictory, and poisoned material.</p><h3 id="rag-integrity-workflow">RAG integrity workflow</h3><ol class="workflow"><li>Accept only permitted sources and record provenance.</li><li>Normalize without destroying the original evidence.</li><li>Classify sensitivity and bind source ACLs to every chunk.</li><li>Validate parser output and reject active or malformed content.</li><li>Measure retrieval relevance, authorization correctness, citation accuracy, and poisoning resistance.</li><li>Reconcile additions, updates, deletions, and embedding-model changes.</li></ol><div class="evidence-note"><strong>1200km implementation context:</strong> compare these controls with the <a href="/adversarygraph-docs/unified-rag-mcp/">AdversaryGraph unified RAG and MCP guide</a>, where source-linked CTI, IOC, CVE, and ATT&amp;CK context must remain attributable and analyst-reviewable.</div>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/cti.html#m5">Cyber Threat Intelligence (CTI) — Module 5 — Analysis Techniques Tradecraft</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-4"><span class="module-number">Module 04</span><h2 id="model-and-dependency-supply-chain-security">Model and dependency supply-chain security</h2><p>Models are executable dependencies with large transitive trust. Record provider, repository, model card, license, intended use, training disclosures, digest, serialization format, tokenizer, adapters, quantization, runtime, evaluation set, and deployment approval. Pin immutable revisions. Never load an untrusted pickle-like artifact into a privileged environment merely because it is called a model.</p><p>Apply ordinary software supply-chain controls to Python packages, containers, inference runtimes, GPU drivers, prompt templates, evaluation code, browser automation, MCP servers, and model gateways. Generate an SBOM where supported, scan artifacts, verify signatures or attestations, isolate conversion jobs, and retain a reproducible build path. Provider model aliases can change behavior without changing your code; production systems should detect and review that drift.</p><h3 id="release-evidence">Release evidence</h3><ul><li>Approved model and dependency inventory with owners and end-of-life dates.</li><li>Artifact hashes, signature/attestation status, malware scan, and isolated load test.</li><li>Task-specific quality and abuse evaluations against the exact deployed configuration.</li><li>Rollback candidate and compatibility evidence for prompts, embeddings, and tools.</li></ul><p>See <a href="/cyber-knowledge/secure-code.html#module-10">software supply-chain assurance</a> and <a href="/cyber-knowledge/malware-analysis.html#module-10">model/artifact triage principles</a>.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/secure-code.html#module-10">Secure Code &amp; Application Security — Dependencies, source control, builds, artifacts, and supply-chain assurance</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-5"><span class="module-number">Module 05</span><h2 id="prompt-injection-instruction-hierarchy-and-secure-output-handling">Prompt injection, instruction hierarchy, and secure output handling</h2><p>Prompt injection is the attempt to make untrusted content influence instructions or decisions. Direct injection arrives from the user; indirect injection arrives through retrieved documents, email, web pages, images, tool responses, or memory. Delimiters, hidden prompts, and “ignore previous instructions” filters may improve robustness, but they do not create a security boundary.</p><p>Keep policy enforcement outside the model. Separate instructions from content in the application data model, label provenance, minimize context, and let deterministic code authorize tools and output destinations. Treat every generated value as untrusted: validate JSON against a strict schema, constrain enumerations and lengths, encode for the destination, parameterize database operations, and never execute generated shell, SQL, HTML, or URLs without independent controls.</p><h3 id="test-corpus">Test corpus</h3><ul><li>Direct and multilingual override attempts.</li><li>Instructions embedded in HTML, PDFs, images, metadata, and tool output.</li><li>Requests to reveal system prompts, secrets, memory, or other tenants’ data.</li><li>Malformed structured output, dangerous URLs, command substitution, and stored payloads.</li><li>Multi-turn attacks that progressively alter state or exploit approval fatigue.</li></ul><div class="decision-gate"><strong>Accept only when:</strong> high-impact actions remain blocked by authorization and approval controls even when the model follows the attacker’s instruction.</div>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/secure-code.html#module-14">Secure Code &amp; Application Security — AI-generated code, RAG, models, agents, and MCP-connected tools</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-6"><span class="module-number">Module 06</span><h2 id="privacy-secrets-confidential-data-and-model-leakage">Privacy, secrets, confidential data, and model leakage</h2><p>Map personal data, credentials, source code, customer content, security evidence, and regulated records across prompts, files, logs, traces, caches, vector stores, fine-tuning datasets, provider retention, and support channels. “Do not train on my data” addresses only one part of the lifecycle. Define purpose, minimization, locality, retention, deletion, access, export, and incident obligations for every copy.</p><p>Use secret detection before model submission, but do not rely on redaction alone: transformed or encoded values can remain sensitive. Prefer short-lived scoped credentials delivered only at the tool boundary. Prevent the model from reading raw secret stores. Evaluate memorization and extraction risk for custom models; test cross-session and cross-tenant leakage; and ensure logs preserve security evidence without silently becoming a second sensitive-data lake.</p><h3 id="review-questions">Review questions</h3><ul><li>Which provider and region receive each class of content?</li><li>Can users delete conversations, uploaded sources, embeddings, and derived memory?</li><li>Who can access prompts and traces for support or monitoring?</li><li>What happens when content is quoted in an evaluation dataset or incident ticket?</li></ul><p>Pair this module with <a href="/cyber-knowledge/grc.html#module-10">privacy engineering and data governance</a> and <a href="/cyber-knowledge/cloud-security.html#module-5">cloud data protection</a>.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/grc.html#module-10">Governance, Risk &amp; Compliance (GRC) — Privacy engineering and data governance</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-7"><span class="module-number">Module 07</span><h2 id="agents-tools-plugins-browsers-and-mcp-security">Agents, tools, plugins, browsers, and MCP security</h2><p>An agent turns model output into state change. Its risk is determined by reachable capability, credential scope, data visibility, autonomy, iteration count, and reversibility—not by the model’s marketing name. MCP standardizes discovery and invocation of tools and resources, but it does not automatically make a server, tool description, returned content, or authorization policy trustworthy.</p><p>Maintain an allowlist of server identities and pinned versions. Authenticate both sides where applicable. Validate tool schemas, constrain arguments, and authorize each invocation using the requesting user and task—not a universal agent credential. Separate read from write tools; isolate high-risk tools in containers or sandboxes; block arbitrary command execution and unrestricted egress; cap recursion, time, tokens, cost, and result size; and require explicit approval for destructive, external, or privilege-changing actions.</p><h3 id="agent-transaction-pattern">Agent transaction pattern</h3><ol class="workflow"><li>Planner proposes a bounded action with reason and expected effect.</li><li>Deterministic policy evaluates user, tenant, tool, arguments, data class, and risk.</li><li>Human approval is requested for material external effects.</li><li>Executor uses a scoped, short-lived credential in an isolated environment.</li><li>Result is treated as untrusted content and validated before reuse.</li><li>Audit record links request, policy, approval, execution, result, and rollback.</li></ol><p>Explore the local ecosystem through the <a href="/hexstrike.html">HexStrike AI security testing guide</a>, <a href="/ai-offensive.html">AI-assisted offensive-security analysis</a>, and <a href="/adversarygraph-docs/unified-rag-mcp/">AdversaryGraph MCP architecture</a>.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/red-team.html#m9">Red Team &amp; Offensive Security — Module 9 — AI-assisted offensive security and MCP</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-8"><span class="module-number">Module 08</span><h2 id="identity-authorization-tenancy-and-human-approval">Identity, authorization, tenancy, and human approval</h2><p>Authenticate the human or workload at the application boundary, propagate identity deliberately, and re-authorize at retrieval and action boundaries. Do not let the model infer permissions from natural-language claims. A user who may ask about a record does not necessarily have permission to retrieve its raw source, export it, or invoke an action against it.</p><p>Use tenant-aware object identifiers, row/document-level controls, explicit workspace membership, and service identities per environment. Protect system prompts and administrative configuration as privileged objects. Approval dialogs must state the exact action, target, data leaving the boundary, credential context, and rollback—not merely ask “Allow AI?”. Prevent replay and bind approval to immutable arguments and expiry.</p><h3 id="abuse-cases">Abuse cases</h3><ul><li>Cross-tenant retrieval through ambiguous entity names or cached context.</li><li>Confused-deputy action using a more privileged service account.</li><li>Privilege escalation by editing a tool description, prompt template, or routing rule.</li><li>Approval substitution where displayed arguments differ from executed arguments.</li></ul><p>Continue with <a href="/cyber-knowledge/blue-team.html#m9">identity threat detection and response</a> and <a href="/cyber-knowledge/secure-code.html#module-3">application identity and session security</a>.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/blue-team.html#m9">Blue Team &amp; Defensive Security — Module 9 — Identity defense and ITDR</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-9"><span class="module-number">Module 09</span><h2 id="infrastructure-network-resource-and-availability-security">Infrastructure, network, resource, and availability security</h2><p>Protect inference endpoints, gateways, notebooks, training jobs, vector stores, queues, object stores, GPU nodes, and management planes with ordinary hardening and segmentation. Private deployment does not remove supply-chain, insider, or tenant risks. Restrict network egress so model-mediated fetches cannot become SSRF, metadata-service access, internal discovery, or data exfiltration.</p><p>Availability threats include expensive prompts, unbounded context, decompression bombs, high-cardinality retrieval, recursive agents, adversarial inputs that trigger slow paths, provider quota exhaustion, and cascading retries. Enforce input and output limits, concurrency budgets, per-tenant quotas, circuit breakers, queue backpressure, timeouts, and cost alerts. Design a degraded mode that disables risky automation while preserving essential operations.</p><h3 id="baseline-evidence">Baseline evidence</h3><ul><li>Network and identity policy for every AI service and data store.</li><li>Secret delivery, rotation, and emergency revocation test.</li><li>Capacity, quota, timeout, and cost-abuse test results.</li><li>Backup, restore, regional/provider failure, and kill-switch exercises.</li></ul><p>Use the <a href="/cyber-knowledge/cloud-security.html#module-14">cloud AI workload controls</a> and <a href="/cyber-knowledge/dfir.html#module-10">cloud response evidence</a> as companion material.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/cloud-security.html#module-14">Cloud Security — Cloud AI/ML, agents, RAG, MCP, and autonomous operations</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-10"><span class="module-number">Module 10</span><h2 id="ai-red-teaming-evaluation-and-reproducible-security-testing">AI red teaming, evaluation, and reproducible security testing</h2><p>Security evaluation must be task-, architecture-, language-, and impact-specific. Separate model robustness tests from end-to-end security controls. Build a versioned corpus from threat models, production incidents, public techniques, internal policy, and expected user behavior. Include benign controls so the team measures over-blocking as well as bypass.</p><p>Record exact model/provider, temperature and relevant parameters, system prompt revision, retrieval snapshot, tool set, policy version, tester, time, attempts, and result. Because model behavior is probabilistic, repeat tests and report rates with sample size instead of presenting a single transcript as proof. Sanitize external test data and avoid sending protected content to unapproved services.</p><h3 id="assessment-sequence">Assessment sequence</h3><ol class="workflow"><li>Confirm authorization, targets, data handling, stop conditions, and communications.</li><li>Map exposed functions and ordinary web/API vulnerabilities.</li><li>Test prompt, retrieval, output, tool, tenancy, privacy, and availability abuse cases.</li><li>Validate impact through safe canaries and reversible actions.</li><li>Retest controls, add regression cases, and document residual risk.</li></ol><p>See <a href="/cyber-knowledge/red-team.html#m9">AI and MCP offensive testing</a>, <a href="/cyber-knowledge/vulnerability-research.html#m13">AI-assisted vulnerability research</a>, and the hands-on <a href="/labs.html#ai-labs">AI penetration-testing lab</a>.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/red-team.html#m9">Red Team &amp; Offensive Security — Module 9 — AI-assisted offensive security and MCP</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-11"><span class="module-number">Module 11</span><h2 id="logging-monitoring-detection-and-security-analytics">Logging, monitoring, detection, and security analytics</h2><p>Log enough to reconstruct decisions without indiscriminately copying sensitive content. Useful events include authenticated actor and tenant, session/request ID, model and prompt-policy version, retrieval source IDs, policy decisions, tool proposals and calls, approval events, output validation, safety-control outcomes, latency, tokens, cost, errors, and data destination. Protect logs against tampering and apply strict access and retention.</p><p>Detect unusual tool sequences, new servers, denied-action spikes, cross-tenant lookup attempts, repeated extraction patterns, sudden output-volume or cost changes, sensitive-data indicators, retrieval of quarantined sources, prompt-template changes, and policy bypass. Correlate AI events with IAM, endpoint, cloud, proxy, and application telemetry. Behavioral alerts are investigation leads, not automatic proof of malicious intent.</p><h3 id="detection-engineering-loop">Detection engineering loop</h3><ol class="workflow"><li>Define the abuse hypothesis and required telemetry.</li><li>Generate a safe positive case and ordinary negative cases.</li><li>Write, test, and version the analytic.</li><li>Measure visibility, precision, latency, and investigation cost.</li><li>Attach response actions and rerun after model or workflow changes.</li></ol><p>Operationalize this with <a href="/cyber-knowledge/blue-team.html#m4">detection engineering</a>, <a href="/cyber-knowledge/cti.html#m8">CTI-to-detection handoff</a>, and <a href="/adversarygraph/">AdversaryGraph</a> for analyst-reviewed relationships and validation context.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/blue-team.html#m13">Blue Team &amp; Defensive Security — Module 13 — AI-assisted defense, RAG, agents, and MCP</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-12"><span class="module-number">Module 12</span><h2 id="ai-incident-response-and-forensic-readiness">AI incident response and forensic readiness</h2><p>Define AI-specific incident categories before an event: unauthorized disclosure, poisoned knowledge, compromised model or dependency, abusive automation, unauthorized tool action, cross-tenant leakage, integrity failure, availability/cost attack, and unsafe published output. Establish ownership across security, ML/AI engineering, application, privacy, legal, provider management, and business operations.</p><p>Preserve the exact prompt and policy versions, conversation and request IDs, retrieved source identities, model endpoint/version, tool arguments and results, approval record, relevant configuration, and surrounding cloud/application events. Avoid assuming a transcript alone explains the decision: orchestration, retries, hidden context, caches, and policy layers matter. Revoke credentials and disable tools independently from shutting down the entire service.</p><h3 id="response-sequence">Response sequence</h3><ol class="workflow"><li>Declare severity from observed impact and reachable capability.</li><li>Contain identities, tools, connectors, sources, routes, or model versions.</li><li>Preserve evidence with handling and access controls.</li><li>Determine whether the failure was compromise, abuse, misconfiguration, drift, or expected model uncertainty.</li><li>Recover with fixed policy and regression evidence.</li><li>Notify affected owners and meet contractual or legal duties.</li></ol><p>Use the broader <a href="/cyber-knowledge/dfir.html#module-2">incident triage</a> and <a href="/cyber-knowledge/grc.html#module-11">incident governance</a> workflows.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/dfir.html#module-14">Digital Forensics &amp; Incident Response (DFIR) — Post-incident learning and controlled AI/RAG/MCP assistance</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-13"><span class="module-number">Module 13</span><h2 id="governance-risk-assurance-transparency-and-human-factors">Governance, risk, assurance, transparency, and human factors</h2><p>Maintain an inventory of AI use cases, owners, models, providers, data classes, affected users, decision authority, connected tools, deployment status, and review date. Classify risk from context and impact rather than model size alone. Shadow AI and embedded vendor features belong in the inventory when they process organizational data or influence decisions.</p><p>Document intended use, prohibited use, limitations, human oversight, user notice, appeal/escalation path, evaluation evidence, change triggers, incident history, and residual-risk acceptance. Claims such as “secure,” “private,” “compliant,” or “bias-free” require scoped evidence. Track provider and regulatory change, but consult qualified counsel for applicability; a field guide cannot determine legal obligations.</p><h3 id="assurance-questions">Assurance questions</h3><ul><li>Can an independent reviewer trace each material claim to evidence?</li><li>Are human reviewers trained, given time, and able to reject automation?</li><li>Do metrics include harmful misses, false blocks, near misses, and downstream impact?</li><li>Does a material model, data, prompt, tool, or purpose change trigger reassessment?</li></ul><p>Integrate with <a href="/cyber-knowledge/grc.html#module-14">AI governance and safe GRC automation</a> and the section’s <a href="/cyber-knowledge/editorial-policy/">source and AI-assistance policy</a>.</p>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/grc.html#module-14">Governance, Risk &amp; Compliance (GRC) — AI governance, machine-readable controls, and safe GRC automation</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <article class="module" id="module-14"><span class="module-number">Module 14</span><h2 id="secure-ai-development-lifecycle-and-production-release-gate">Secure AI development lifecycle and production release gate</h2><p>Embed AI security into product discovery, architecture, data onboarding, implementation, evaluation, release, monitoring, and retirement. Maintain controls as code where appropriate, but keep accountable decisions visible. Every material change to model, provider, embedding, knowledge source, system prompt, tool, permission, or output destination can invalidate earlier evidence.</p><p>A production gate should combine ordinary application security with AI-specific checks. Require model and dependency provenance, data and privacy approval, threat model closure, retrieval authorization tests, prompt-injection and output-validation tests, tool-policy tests, tenancy tests, monitoring coverage, incident playbook, rollback, and explicit residual-risk acceptance. A successful benchmark or frontend build alone is not a release decision.</p><h3 id="minimum-release-gate">Minimum release gate</h3><ul><li>Named owner, approved use case, system map, and risk classification.</li><li>Pinned deployable configuration and rollback candidate.</li><li>No unresolved critical conventional or AI-specific abuse path.</li><li>High-impact actions protected by deterministic authorization and approval.</li><li>Evaluation report includes configuration, samples, rates, limitations, and negative controls.</li><li>Telemetry, alert routing, response playbook, and kill switch tested.</li><li>Change and periodic review dates recorded.</li></ul><div class="decision-gate"><strong>Release decision:</strong> approve only the tested configuration and scope. Record exceptions with owner, expiry, compensating control, and retest date.</div>
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="/cyber-knowledge/secure-code.html#module-14">Secure Code &amp; Application Security — AI-generated code, RAG, models, agents, and MCP-connected tools</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+</article>
+
+          <section id="control-map"><h2 id="threat-to-control-decision-map">Threat-to-control decision map</h2><div class="table-wrap" tabindex="0" role="region" aria-label="AI security threat and control map"><table><thead><tr><th>Threat</th><th>Prevent</th><th>Detect</th><th>Recover</th></tr></thead><tbody><tr><td>Indirect prompt injection</td><td>Constrain sources and capabilities; external authorization</td><td>Source lineage, denied tool calls, canary instructions</td><td>Quarantine source; revoke session/tool; regression test</td></tr><tr><td>RAG poisoning</td><td>Approved ingestion, provenance, ACLs, review</td><td>Drift, contradiction, duplicate, and anomalous-source checks</td><td>Remove chunks, rebuild index, invalidate cache</td></tr><tr><td>Unsafe agent action</td><td>Least privilege, schema validation, approval, sandbox</td><td>Action sequence and argument policy alerts</td><td>Stop agent, revoke token, roll back transaction</td></tr><tr><td>Cross-tenant leakage</td><td>Tenant-scoped storage and pre-retrieval authorization</td><td>Cross-tenant access and canary monitoring</td><td>Contain, preserve, notify, rotate, repair isolation</td></tr><tr><td>Model supply-chain compromise</td><td>Trusted source, hash/signature, isolated validation</td><td>Artifact/config drift and runtime behavior monitoring</td><td>Rollback, rebuild, revoke, hunt affected systems</td></tr><tr><td>Cost/availability abuse</td><td>Quotas, limits, timeouts, recursion caps</td><td>Token, cost, queue, latency, and retry anomalies</td><td>Circuit breaker, degraded mode, provider failover</td></tr></tbody></table></div></section>
+
+          <section id="cases"><h2 id="end-to-end-case-studies">End-to-end case studies</h2><div class="case-grid"><article class="case-study"><h3 id="case-1-rag-security-analyst">Case 1: RAG security analyst</h3><p><strong>Scenario:</strong> Internal reports, IOC records, CVEs, and ATT&amp;CK data support analyst questions.</p><ol><li>Classify sources and preserve record/chunk provenance.</li><li>Enforce workspace and TLP policy before retrieval.</li><li>Test poisoned reports, conflicting facts, and source deletion.</li><li>Require citations and analyst approval before downstream use.</li><li>Monitor source, retrieval, provider, and response lineage.</li></ol><p><strong>Evidence:</strong> authorization matrix, poisoning tests, citation accuracy, reconciliation report, audit trail.</p></article><article class="case-study"><h3 id="case-2-mcp-vulnerability-assessment-agent">Case 2: MCP vulnerability-assessment agent</h3><p><strong>Scenario:</strong> An assistant proposes authorized scanner actions against inventory assets.</p><ol><li>Bind target ownership and assessment authorization.</li><li>Allowlist tools and constrain target, ports, rate, and network route.</li><li>Require approval for active scanning and prohibit arbitrary command execution.</li><li>Validate scanner output before model reuse.</li><li>Store tool evidence separately from AI interpretation.</li></ol><p><strong>Evidence:</strong> target authorization, policy decision, tool arguments, raw result, interpretation, rollback/stop test.</p></article><article class="case-study"><h3 id="case-3-customer-support-assistant">Case 3: Customer-support assistant</h3><p><strong>Scenario:</strong> A multi-tenant assistant reads account records and drafts actions.</p><ol><li>Authorize every lookup by customer and agent identity.</li><li>Prevent conversation memory crossing account boundaries.</li><li>Block untrusted attachments from changing tool authority.</li><li>Require confirmation for refunds or account changes.</li><li>Test deletion, export, and support-log access.</li></ol><p><strong>Evidence:</strong> tenant isolation tests, approval binding, privacy flow, audit reconstruction.</p></article><article class="case-study"><h3 id="case-4-ai-assisted-security-research">Case 4: AI-assisted security research</h3><p><strong>Scenario:</strong> A researcher uses a local model to classify code and evidence.</p><ol><li>Keep samples and secrets in an isolated lab.</li><li>Record model/prompt versions and label generated claims.</li><li>Validate findings with disassembly, execution evidence, or source documentation.</li><li>Prevent generated commands from running automatically.</li><li>Publish limitations and reproducible evidence.</li></ol><p><strong>Evidence:</strong> lab boundary, prompt/output record, analyst corrections, independent validation.</p></article></div></section>
+
+          <section id="labs"><h2 id="hands-on-lab-programme">Hands-on lab programme</h2><div class="lab-grid"><article class="practice-block"><h3 id="lab-1-prompt-and-output-boundary">Lab 1 — Prompt and output boundary</h3><p>Build a small document summarizer. Seed one document with an indirect instruction, enforce source labeling, validate structured output, and demonstrate that no model response can authorize a filesystem or network action.</p></article><article class="practice-block"><h3 id="lab-2-tenant-safe-rag">Lab 2 — Tenant-safe RAG</h3><p>Create two tenant corpora with canary records. Implement authorization before retrieval, run cross-tenant query variations, test deletion/reindexing, and prove canaries never enter unauthorized context.</p></article><article class="practice-block"><h3 id="lab-3-least-privilege-mcp">Lab 3 — Least-privilege MCP</h3><p>Expose one read-only and one state-changing tool. Pin server identity, validate arguments, require approval for the write, cap execution, record an audit chain, and test a malicious tool response.</p></article><article class="practice-block"><h3 id="lab-4-ai-detection-and-response">Lab 4 — AI detection and response</h3><p>Generate safe prompt-injection, enumeration, denied-tool, and cost-spike events. Correlate them with identity and application logs, investigate, disable a connector, preserve evidence, and rerun a regression test.</p></article></div><p>Use only isolated, authorized targets. Relevant ecosystem practice includes <a href="/labs.html">1200km security labs</a>, <a href="/labs.html#ai-labs">AI-PT-Lab</a>, <a href="/hexstrike.html">HexStrike AI</a>, and the browser-based <a href="/threat-matrix/">Threat Matrix</a> for ATT&amp;CK exploration.</p></section>
+
+          <section id="readiness"><h2 id="production-readiness-checklist">Production readiness checklist</h2><ul><li>Every model, data source, connector, tool, and owner is inventoried.</li><li>Trust boundaries and high-impact abuse cases are documented.</li><li>Retrieval and actions use caller-aware authorization.</li><li>Model output is validated and encoded for its destination.</li><li>Secrets and sensitive content are minimized and governed across providers and logs.</li><li>Agent and MCP capabilities are allowlisted, scoped, bounded, and auditable.</li><li>Adversarial tests cover direct/indirect injection, tenancy, leakage, tools, and availability.</li><li>Monitoring can reconstruct a decision without exposing unnecessary content.</li><li>Containment, credential revocation, source quarantine, rollback, and kill switch are tested.</li><li>Residual risk is accepted by a named owner for the exact deployed configuration.</li></ul></section>
+
+          <section id="references"><h2 id="authoritative-frameworks-and-ecosystem-reading">Authoritative frameworks and ecosystem reading</h2><div class="two-col"><article class="reference-article"><h3 id="external-primary-references">External primary references</h3><ul><li><a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI Risk Management Framework</a></li><li><a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final">NIST AI 100-2e2025: Adversarial Machine Learning taxonomy</a></li><li><a href="https://genai.owasp.org/">OWASP GenAI Security Project</a></li><li><a href="https://atlas.mitre.org/">MITRE ATLAS</a></li><li><a href="https://www.iso.org/standard/81230.html">ISO/IEC 42001 AI management systems</a></li><li><a href="https://airc.nist.gov/">NIST AI Resource Center</a></li></ul></article><article class="reference-article"><h3 id="1200km-connected-material">1200km connected material</h3><ul><li><a href="/ai-offensive.html">AI in offensive security</a></li><li><a href="/hexstrike.html">HexStrike AI guide and lab context</a></li><li><a href="/adversarygraph/">AdversaryGraph platform</a></li><li><a href="/adversarygraph-docs/unified-rag-mcp/">Unified RAG and MCP architecture</a></li><li><a href="/cyber-knowledge/secure-code.html#module-14">Secure AI-enabled application delivery</a></li><li><a href="/cyber-knowledge/grc.html#module-14">AI governance and GRC automation</a></li><li><a href="/cyber-knowledge/red-team.html#m9">AI/MCP adversarial testing</a></li><li><a href="/cyber-knowledge/blue-team.html#m13">Controlled AI assistance in defense</a></li></ul></article></div></section>
+
+          <nav class="knowledge-pathway" aria-label="Cyber Knowledge learning path">
+      <p class="knowledge-pathway__label">Continue through the knowledge base</p>
+      <div class="knowledge-pathway__links">
+        <a href="/cyber-knowledge/osint.html"><small>Previous domain</small><strong>← OSINT &amp; Reconnaissance</strong></a>
+        <a href="/cyber-knowledge/"><small>All guides</small><strong>Cyber Knowledge hub</strong></a>
+        <a href="/cyber-knowledge/cti.html"><small>Next domain</small><strong>Cyber Threat Intelligence (CTI) →</strong></a>
+      </div>
+    </nav>
+        </div>
+      </div>
+    </main>
+    <!-- site-shell:footer:start -->
+    <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
+      <div class="shared-footer-inner">
+        <a class="shared-footer-brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="32" height="32" />
+          <span><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <nav class="shared-footer-links" aria-label="Footer navigation">
+          <a href="/cti.html">Research</a>
+          <a href="/guides.html">Library</a>
+          <a href="/projects.html">Products &amp; Labs</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/about.html">About</a>
+        </nav>
+        <nav class="shared-footer-meta" aria-label="Site information">
+          <a href="/privacy.html">Privacy / Data Handling</a>
+          <a href="/about.html#contact">Contact</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></a>
+        </nav>
+      </div>
+      <div class="shared-footer-bottom">
+        <span>© 2026 Andrey Pautov · Original research and tooling</span>
+        <a href="#top" data-back-to-top>Back to top ↑</a>
+      </div>
+    </footer>
+    <!-- site-shell:footer:end -->
+    <script src="/assets/cyber-knowledge.js" defer></script>
+  </body>
+</html>

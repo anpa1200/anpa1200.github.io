@@ -66,6 +66,7 @@ administration requires `manage_intel`, and index administration requires
 - `/cyber-knowledge/cloud-security.html` - Cloud Security field guide
 - `/cyber-knowledge/grc.html` - Cybersecurity Governance, Risk, and Compliance field guide
 - `/cyber-knowledge/osint.html` - OSINT and Reconnaissance field guide
+- `/cyber-knowledge/ai-security.html` - AI Security field guide
 - `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
 - `/guides.html#detection` - Detection and SOC guide cluster
 - `/articles/` - Local article archive

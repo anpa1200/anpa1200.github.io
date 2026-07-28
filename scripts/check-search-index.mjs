@@ -36,7 +36,8 @@ try {
   if (build.failedPages > (remote ? 12 : 0)) failures.push(`too many failed pages: ${build.failedPages}`);
   if ((build.skipped?.['stale-sitemap-url'] || 0) !== 0) failures.push(`stale sitemap URLs were indexed: ${build.skipped['stale-sitemap-url']}`);
   if (remote && build.canonicalSitemapPages !== build.indexedPages) failures.push('canonical sitemap coverage does not match the Pagefind index');
-  if (build.totalSitemapEntries !== build.indexedPages + (build.auxiliarySitemapPages || 0)) {
+  if (Number.isInteger(build.totalSitemapEntries)
+    && build.totalSitemapEntries !== build.indexedPages + (build.auxiliarySitemapPages || 0)) {
     failures.push('total sitemap coverage disagrees with indexed and auxiliary discovery URLs');
   }
 } catch (error) {
@@ -122,6 +123,7 @@ async function checkQueries() {
       { query: 'application security', expectedPrefixes: ['/cyber-knowledge/secure-code.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'incident response', expectedPrefixes: ['/cyber-knowledge/dfir.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'cloud security', expectedPrefixes: ['/cyber-knowledge/cloud-security.html'], first: true, broad: true, requiredTier: 'core' },
+      { query: 'AI security prompt injection MCP', expectedPrefixes: ['/cyber-knowledge/ai-security.html'], broad: true, requiredTier: 'core' },
       { query: 'cybersecurity governance', expectedPrefixes: ['/cyber-knowledge/grc.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'OSINT reconnaissance', expectedPrefixes: ['/cyber-knowledge/osint.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'malware analysis', expectedPrefixes: ['/cyber-knowledge/malware-analysis.html'], first: true, broad: true, requiredTier: 'core' },

@@ -22,7 +22,7 @@ function escapeHtml(value) {
 }
 
 function assertModel() {
-  if (!Array.isArray(domains) || domains.length !== 10) throw new Error('Cyber Knowledge model must contain ten domains');
+  if (!Array.isArray(domains) || domains.length !== 11) throw new Error('Cyber Knowledge model must contain eleven domains');
   const ids = new Set();
   const paths = new Set();
   const positions = new Set();
@@ -34,8 +34,8 @@ function assertModel() {
     paths.add(domain.path);
     positions.add(domain.position);
   }
-  if ([...positions].sort((a, b) => a - b).join(',') !== '1,2,3,4,5,6,7,8,9,10') {
-    throw new Error('Cyber Knowledge positions must be exactly 1 through 10');
+  if ([...positions].sort((a, b) => a - b).join(',') !== '1,2,3,4,5,6,7,8,9,10,11') {
+    throw new Error('Cyber Knowledge positions must be exactly 1 through 11');
   }
 }
 
@@ -254,6 +254,28 @@ function domainStructuredData(html, domain) {
   const parts = moduleParts(html);
   const graph = [
     {
+      '@type': ['WebPage', 'TechArticle'],
+      '@id': `${url}#webpage`,
+      url,
+      name: `${domain.short} Field Guide — Cyber Knowledge | 1200km`,
+      headline: domain.name,
+      description: domain.description,
+      isPartOf: { '@id': 'https://1200km.com/#website' },
+      breadcrumb: { '@id': `${url}#breadcrumb` },
+      author: { '@id': 'https://1200km.com/#person' },
+      inLanguage: 'en',
+      datePublished: domain.published_at,
+      dateModified: collection.reviewed_at,
+      proficiencyLevel: 'Intermediate to advanced',
+      educationalLevel: 'Intermediate to advanced',
+      learningResourceType: 'Cybersecurity practitioner field guide',
+      about: domain.topics,
+      primaryImageOfPage: {
+        '@type': 'ImageObject',
+        url: `https://1200km.com/assets/cyber-knowledge-og/${domain.id}.png`,
+      },
+    },
+    {
       '@type': ['Course', 'LearningResource'],
       '@id': `${url}#course`,
       name: domain.name,
@@ -291,20 +313,37 @@ function domainStructuredData(html, domain) {
 function hubStructuredData(stats) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    '@id': `${collection.canonical_url}#domain-list`,
-    name: `${collection.name} domains`,
-    numberOfItems: domains.length,
-    itemListElement: domains.map((domain) => ({
-      '@type': 'ListItem',
-      position: domain.position,
-      name: domain.name,
-      url: `https://1200km.com/${domain.path}`,
-      additionalProperty: [
-        { '@type': 'PropertyValue', name: 'module count', value: stats.get(domain.id).modules },
-        { '@type': 'PropertyValue', name: 'estimated reading time', value: `${stats.get(domain.id).minutes} minutes` },
-      ],
-    })),
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${collection.canonical_url}#webpage`,
+        name: 'Cybersecurity Knowledge Base and Practitioner Field Guides',
+        url: collection.canonical_url,
+        description: 'Eleven connected cybersecurity field guides covering terminology, workflows, evidence, authoritative sources, labs, and operational handoffs.',
+        author: { '@id': 'https://1200km.com/#person' },
+        hasPart: domains.map((domain) => ({
+          '@type': 'TechArticle',
+          name: domain.name,
+          url: `https://1200km.com/${domain.path}`,
+        })),
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${collection.canonical_url}#domain-list`,
+        name: `${collection.name} domains`,
+        numberOfItems: domains.length,
+        itemListElement: domains.map((domain) => ({
+          '@type': 'ListItem',
+          position: domain.position,
+          name: domain.name,
+          url: `https://1200km.com/${domain.path}`,
+          additionalProperty: [
+            { '@type': 'PropertyValue', name: 'module count', value: stats.get(domain.id).modules },
+            { '@type': 'PropertyValue', name: 'estimated reading time', value: `${stats.get(domain.id).minutes} minutes` },
+          ],
+        })),
+      },
+    ],
   };
 }
 
@@ -440,6 +479,7 @@ function transformDomain(html, domain) {
     );
   }
   html = ensureGlossaryTermAnchors(html, domain);
+  if (definedTerms(html, domain).length) html = removeLegacyJsonLdType(html, 'DefinedTermSet');
   html = ensureModuleCrosslinks(html, domain);
   html = ensureGeneratedJsonLd(html, 'cyber-knowledge-structured-data', domainStructuredData(html, domain));
   html = ensureEnhancementScript(html);
@@ -533,12 +573,12 @@ function renderRelationshipMap(edges) {
   }));
   return `      <!-- cyber-knowledge:relationship-map:start -->
       <section id="domain-map" aria-labelledby="domain-map-title">
-        <h2 id="domain-map-title">How the ten domains connect</h2>
+        <h2 id="domain-map-title">How the eleven domains connect</h2>
         <p class="section-intro">This map is generated from cross-domain links in the field guides. Each connection reflects an existing route to another guide.</p>
         <div class="knowledge-map">
           <svg viewBox="0 0 1000 520" role="group" aria-labelledby="knowledge-map-svg-title knowledge-map-svg-desc">
             <title id="knowledge-map-svg-title">Cyber Knowledge cross-domain relationship map</title>
-            <desc id="knowledge-map-svg-desc">Ten domain nodes connected by links already present in the field guides. A complete text equivalent follows the diagram.</desc>
+            <desc id="knowledge-map-svg-desc">Eleven domain nodes connected by links already present in the field guides. A complete text equivalent follows the diagram.</desc>
             <g class="knowledge-map__edges">
 ${edges.map((edge) => {
     const from = points.get(edge.source.id);
@@ -592,7 +632,7 @@ function renderEcosystem() {
 
 function transformHub(html, stats, edges) {
   const hubTitle = 'Cybersecurity Knowledge Base and Practitioner Field Guides | 1200km';
-  const hubDescription = 'Ten connected cybersecurity field guides covering terminology, workflows, evidence, authoritative sources, labs, and operational handoffs.';
+  const hubDescription = 'Eleven connected cybersecurity field guides covering terminology, workflows, evidence, authoritative sources, labs, and operational handoffs.';
   html = setTitle(html, hubTitle, 'cyber-knowledge/index.html');
   html = setMeta(html, 'name', 'description', hubDescription, 'cyber-knowledge/index.html');
   html = setMeta(html, 'property', 'og:title', hubTitle, 'cyber-knowledge/index.html');
@@ -601,9 +641,9 @@ function transformHub(html, stats, edges) {
   html = setMeta(html, 'name', 'twitter:description', hubDescription, 'cyber-knowledge/index.html');
   html = ensureArticleDates(html, collection.published_at, collection.reviewed_at);
   html = setMeta(html, 'property', 'og:image', 'https://1200km.com/assets/cyber-knowledge-og/hub.png', 'cyber-knowledge/index.html');
-  html = setMeta(html, 'property', 'og:image:alt', 'Cyber Knowledge — ten practitioner domains at 1200km', 'cyber-knowledge/index.html');
+  html = setMeta(html, 'property', 'og:image:alt', 'Cyber Knowledge — eleven practitioner domains at 1200km', 'cyber-knowledge/index.html');
   html = setMeta(html, 'name', 'twitter:image', 'https://1200km.com/assets/cyber-knowledge-og/hub.png', 'cyber-knowledge/index.html');
-  html = setMeta(html, 'name', 'twitter:image:alt', 'Cyber Knowledge — ten practitioner domains at 1200km', 'cyber-knowledge/index.html');
+  html = setMeta(html, 'name', 'twitter:image:alt', 'Cyber Knowledge — eleven practitioner domains at 1200km', 'cyber-knowledge/index.html');
   html = replaceRequired(
     html,
     /<h1\b([^>]*)class="page-title"([^>]*)>[\s\S]*?<\/h1>/i,
@@ -614,7 +654,7 @@ function transformHub(html, stats, edges) {
   html = replaceRequired(
     html,
     /<p class="page-lead">[\s\S]*?<\/p>/i,
-    `<p class="page-lead">A practitioner-oriented cybersecurity knowledge system connecting concepts, evidence, workflows, laboratories, and operational handoffs. Ten connected disciplines take you from cybersecurity concepts to reviewable operational work.</p>`,
+    `<p class="page-lead">A practitioner-oriented cybersecurity knowledge system connecting concepts, evidence, workflows, laboratories, and operational handoffs. Eleven connected disciplines take you from cybersecurity concepts to reviewable operational work.</p>`,
     'hub positioning statement',
     'cyber-knowledge/index.html',
   );
@@ -623,7 +663,7 @@ function transformHub(html, stats, edges) {
     /<div class="notice" role="note">[\s\S]*?<\/div>\s*<\/div>/i,
     `<div class="notice" role="note">
             <div>
-              <strong>Ten domains · maintained practitioner guides</strong>
+              <strong>Eleven domains · maintained practitioner guides</strong>
               <p>Last reviewed <time datetime="${collection.reviewed_at}">${escapeHtml(fullHumanDate(collection.reviewed_at))}</time></p>
             </div>
           </div>`,
@@ -656,6 +696,7 @@ function transformHub(html, stats, edges) {
   html = generatedRegion(html, 'entry-paths', renderEntryPaths(), /[ \t]*<!-- cyber-knowledge:relationship-map:start -->/i);
   html = generatedRegion(html, 'relationship-map', renderRelationshipMap(edges), /[ \t]*<\/main>/i);
   html = generatedRegion(html, 'ecosystem', renderEcosystem(), /[ \t]*<\/main>/i);
+  html = removeLegacyJsonLdType(html, 'CollectionPage');
   html = ensureGeneratedJsonLd(html, 'cyber-knowledge-structured-data', hubStructuredData(stats));
   html = ensureEnhancementScript(html);
   return html;

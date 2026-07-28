@@ -38,6 +38,7 @@ const pages = [
   ['cyber-knowledge-secure-code', '/cyber-knowledge/secure-code.html'],
   ['cyber-knowledge-dfir', '/cyber-knowledge/dfir.html'],
   ['cyber-knowledge-cloud-security', '/cyber-knowledge/cloud-security.html'],
+  ['cyber-knowledge-ai-security', '/cyber-knowledge/ai-security.html'],
   ['cyber-knowledge-grc', '/cyber-knowledge/grc.html'],
   ['cyber-knowledge-osint', '/cyber-knowledge/osint.html'],
   ['docs-long', '/adversarygraph-docs/full-flow/'],

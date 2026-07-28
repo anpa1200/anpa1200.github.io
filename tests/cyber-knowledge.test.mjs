@@ -17,6 +17,7 @@ const modules = [
   'cloud-security',
   'grc',
   'osint',
+  'ai-security',
 ];
 const temporaryPublicationLanguage =
   /\b(?:under construction|coming soon|work in progress|syllabus draft live|placeholder page|content forthcoming|open syllabus)\b/i;
@@ -62,7 +63,7 @@ function jsonLdEntries(html) {
     });
 }
 
-test('Cyber Knowledge hub is the canonical collection for ten maintained guides', () => {
+test('Cyber Knowledge hub is the canonical collection for eleven maintained guides', () => {
   const html = source('index.html');
   const entries = jsonLdEntries(html);
   const collection = entries.find((entry) => entry['@type'] === 'CollectionPage');
@@ -79,7 +80,7 @@ test('Cyber Knowledge hub is the canonical collection for ten maintained guides'
   assert.match(html, /Cross-domain learning and operational pathways/);
   assert.match(html, /Cybersecurity Knowledge Base and Practitioner Field Guides/);
   assert.match(html, /id="entry-paths"/);
-  assert.equal((html.match(/class="entry-path-card"/g) || []).length, 8);
+  assert.equal((html.match(/class="entry-path-card"/g) || []).length, 9);
   assert.doesNotMatch(html, temporaryPublicationLanguage);
   for (const module of modules) {
     assert.match(html, new RegExp(`/cyber-knowledge/${module}\\.html`), module);
