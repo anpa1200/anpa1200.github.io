@@ -143,6 +143,15 @@ test('metadata description normalization is idempotent on an already-normalized 
   assert.doesNotMatch(twicePassed, /ecosystem\.\. Public evidence/);
 });
 
+test('archive series descriptions remain page-specific without truncation ellipses', () => {
+  const shared = 'A practical walkthrough covering configuration, execution, evidence review, and operational safeguards for security practitioners.';
+  const first = normalizeMetaDescriptions(`<html><head><title>Series Part 1 | 1200km</title><link rel="canonical" href="https://1200km.com/articles/read/2026/series-part-1/"><meta name="description" content="${shared}"></head></html>`);
+  const second = normalizeMetaDescriptions(`<html><head><title>Series Part 2 | 1200km</title><link rel="canonical" href="https://1200km.com/articles/read/2026/series-part-2/"><meta name="description" content="${shared}"></head></html>`);
+  assert.notEqual(first.match(/name="description" content="([^"]+)"/)?.[1], second.match(/name="description" content="([^"]+)"/)?.[1]);
+  assert.doesNotMatch(first, /name="description" content="[^"]*…"/);
+  assert.doesNotMatch(second, /name="description" content="[^"]*…"/);
+});
+
 test('pages without a bespoke share image receive the governed social fallback', () => {
   const input = '<html><head><title>Research Note | 1200km</title></head><body><main><h1>Research Note</h1></main></body></html>';
   const output = normalizeSocialImages(input);
