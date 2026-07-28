@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1200km.com/data/cyber-knowledge.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "collection", "domains"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "collection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "canonical_url", "published_at", "reviewed_at", "status"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "canonical_url": {"type": "string", "format": "uri"},
+        "published_at": {"type": "string", "format": "date"},
+        "reviewed_at": {"type": "string", "format": "date"},
+        "status": {"type": "string", "minLength": 1}
+      }
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "position", "published_at", "path", "name", "h1", "title_name", "description", "card_description", "topics"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "position": {"type": "integer", "minimum": 1, "maximum": 10},
+          "published_at": {"type": "string", "format": "date"},
+          "path": {"type": "string", "pattern": "^cyber-knowledge/[a-z0-9-]+\\.html$"},
+          "name": {"type": "string", "minLength": 2},
+          "h1": {"type": "string", "minLength": 2},
+          "title_name": {"type": "string", "minLength": 2},
+          "description": {"type": "string", "minLength": 70, "maxLength": 155},
+          "card_description": {"type": "string", "minLength": 70},
+          "topics": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 4,
+            "items": {"type": "string", "minLength": 2},
+            "uniqueItems": true
+          },
+          "baseline": {"type": "string", "minLength": 2}
+        }
+      }
+    }
+  }
+}

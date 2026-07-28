@@ -38,3 +38,8 @@ await validate(
   join(ROOT, 'data', 'content-taxonomy-audit.schema.json'),
   join(siteRoot, 'reports', 'content-taxonomy-audit.json'),
 );
+await validate(
+  'cyber-knowledge.json',
+  join(ROOT, 'data', 'cyber-knowledge.schema.json'),
+  join(siteRoot, 'data', 'cyber-knowledge.json'),
+);

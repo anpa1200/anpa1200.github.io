@@ -69,6 +69,7 @@ test('Cyber Knowledge hub is the canonical collection for ten maintained guides'
   assert.equal(tagContent(html, 'name="twitter:description"'), tagContent(html, 'name="description"'));
   assert.equal(linkHref(html, 'canonical'), BASE);
   assert.ok(collection, 'CollectionPage JSON-LD is required');
+  assert.ok(entries.find((entry) => entry['@type'] === 'ItemList'), 'generated domain ItemList is required');
   assert.equal(collection.hasPart?.length, modules.length);
   assert.ok(collection.hasPart.every((item) => item['@type'] === 'TechArticle'));
   assert.match(html, /Cross-domain learning and operational pathways/);
@@ -88,6 +89,10 @@ test('each module has consistent SEO, AI-readable structure, and source-review s
       const types = Array.isArray(entry['@type']) ? entry['@type'] : [entry['@type']];
       return types.includes('TechArticle');
     });
+    const course = entries.find((entry) => {
+      const types = Array.isArray(entry['@type']) ? entry['@type'] : [entry['@type']];
+      return types.includes('Course') && types.includes('LearningResource');
+    });
 
     assert.equal(linkHref(html, 'canonical'), `${BASE}${module}.html`, module);
     assert.equal(tagContent(html, 'property="og:title"'), title, module);
@@ -103,9 +108,12 @@ test('each module has consistent SEO, AI-readable structure, and source-review s
       `${module}: description length ${description.length}`,
     );
     assert.ok(article, `${module}: TechArticle JSON-LD is required`);
+    assert.ok(course, `${module}: Course/LearningResource JSON-LD is required`);
+    assert.equal(course.educationalLevel, 'Intermediate to advanced', module);
+    assert.ok(course.hasPart.length >= 10, `${module}: module learning resources`);
     assert.equal(article.isPartOf?.['@id'], 'https://1200km.com/#website', module);
     assert.equal(article.learningResourceType, 'Cybersecurity practitioner field guide', module);
-    assert.equal(article.educationalLevel, 'Beginner to advanced', module);
+    assert.equal(article.educationalLevel, 'Intermediate to advanced', module);
     assert.equal(article.datePublished, tagContent(html, 'property="article:published_time"'), module);
     assert.equal(article.dateModified, '2026-07-27', module);
     assert.equal(tagContent(html, 'property="article:modified_time"'), '2026-07-27', module);
@@ -114,6 +122,8 @@ test('each module has consistent SEO, AI-readable structure, and source-review s
     assert.match(html, /Source review: 27 July 2026/, module);
     assert.match(html, /Status: maintained practitioner guide/, module);
     assert.match(html, /class="knowledge-pathway"/, module);
+    assert.match(html, /src="\/assets\/cyber-knowledge\.js"/, module);
+    assert.match(tagContent(html, 'property="og:image"'), /\/assets\/cyber-knowledge-og\/.+\.png$/, module);
     assert.match(html, /href="\/cyber-knowledge\/"/, module);
     assert.ok((html.match(/href="\//g) || []).length >= 10, `${module}: internal link density`);
     assert.ok((html.match(/href="https?:\/\//g) || []).length >= 6, `${module}: source link density`);
@@ -125,6 +135,7 @@ test('each module has consistent SEO, AI-readable structure, and source-review s
       assert.match(match[0], /\btabindex="0"/i, `${module}: scrollable code block must be focusable`);
     }
     assert.doesNotMatch(html, temporaryPublicationLanguage, module);
+    assert.doesNotMatch(html, /href="\/articles\/read\/\d{4}\/[^"#?\/]+"/, `${module}: article archive trailing slash`);
   }
 });
 
@@ -133,12 +144,22 @@ test('module discovery sequence is explicit in source HTML', () => {
     const module = modules[index];
     const html = source(`${module}.html`);
     assert.equal(linkHref(html, 'up'), '/cyber-knowledge/', `${module}: up`);
-    if (index > 0) {
-      assert.equal(linkHref(html, 'prev'), `/cyber-knowledge/${modules[index - 1]}.html`, `${module}: prev`);
-    }
-    if (index < modules.length - 1) {
-      assert.equal(linkHref(html, 'next'), `/cyber-knowledge/${modules[index + 1]}.html`, `${module}: next`);
-    }
+    const previous = modules[(index - 1 + modules.length) % modules.length];
+    const next = modules[(index + 1) % modules.length];
+    assert.equal(linkHref(html, 'prev'), `/cyber-knowledge/${previous}.html`, `${module}: prev`);
+    assert.equal(linkHref(html, 'next'), `/cyber-knowledge/${next}.html`, `${module}: next`);
+  }
+});
+
+test('CTI terms have one generated DefinedTermSet', () => {
+  const sets = jsonLdEntries(source('cti.html')).filter((entry) => entry['@type'] === 'DefinedTermSet');
+  assert.equal(sets.length, 1);
+  assert.equal(sets[0].hasDefinedTerm.length, 69);
+  for (const term of sets[0].hasDefinedTerm) {
+    assert.equal(term['@type'], 'DefinedTerm');
+    assert.match(term.url, /^https:\/\/1200km\.com\/cyber-knowledge\/cti\.html#[a-z0-9-]+$/);
+    assert.ok(term.name);
+    assert.ok(term.description);
   }
 });
 

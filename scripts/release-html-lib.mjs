@@ -136,17 +136,16 @@ export function normalizeMetaDescriptions(html) {
   const current = metaContent(html, 'description');
   if (!current) return html;
   const decodedCurrent = decodeEntities(current);
-  // Idempotency: a prior pass already prepends "<title>. " below. Without
-  // detecting that prefix, reprocessing an already-normalized page (routine
-  // on every content rebuild) re-prepends the title on every run, so the
-  // description grows and truncates a little more each time.
+  // Preserve complete, authored descriptions. Older release passes prepended
+  // the title and then truncated the result, which repeated the H1, wasted the
+  // search-snippet budget, and left literal ellipses in deployable output.
   const alreadyPrefixed = decodedCurrent === title || decodedCurrent.startsWith(`${title}. `);
   const generic = !alreadyPrefixed && /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodedCurrent);
   const base = alreadyPrefixed
-    ? decodedCurrent
+    ? decodedCurrent.slice(title.length).replace(/^\.\s*/, '') || decodedCurrent
     : generic
       ? `${title}. Practical security guidance with scope, evidence, and validation boundaries.`
-      : `${title}. ${decodedCurrent}`;
+      : decodedCurrent;
   const description = conciseDescription(base);
   let transformed = html;
   for (const [attribute, key] of [
