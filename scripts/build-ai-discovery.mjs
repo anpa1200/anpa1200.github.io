@@ -63,6 +63,7 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 - [Cloud Security field guide](https://1200km.com/cyber-knowledge/cloud-security.html)
 - [Cybersecurity GRC field guide](https://1200km.com/cyber-knowledge/grc.html)
 - [OSINT and Reconnaissance field guide](https://1200km.com/cyber-knowledge/osint.html)
+- [AI Security field guide](https://1200km.com/cyber-knowledge/ai-security.html)
 - [CTI Analyst Field Manual](https://1200km.com/cti-analyst-field-manual/)
 - [CTI as Code](https://1200km.com/CTI_as_a_Code/)
 - [Operation Desert Hydra](https://1200km.com/operation-desert-hydra/)

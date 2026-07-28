@@ -151,7 +151,7 @@ for (const page of pages) {
 
 const summary = {
   generated_at: model.collection.reviewed_at,
-  scope: '1200km Cyber Knowledge hub, ten maintained field guides, and three reference/governance pages',
+  scope: '1200km Cyber Knowledge hub, eleven maintained field guides, and three reference/governance pages',
   page_count: inventory.length,
   total_words: inventory.reduce((sum, page) => sum + page.word_count, 0),
   total_internal_links: inventory.reduce((sum, page) => sum + page.internal_link_count, 0),

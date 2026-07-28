@@ -61,7 +61,7 @@ function svgFor({ label, name, modules }) {
 }
 
 const cards = [
-  { id: 'hub', label: '10 PRACTITIONER DOMAINS', name: 'Cyber Knowledge', modules: 'Connected field-guide collection' },
+  { id: 'hub', label: '11 PRACTITIONER DOMAINS', name: 'Cyber Knowledge', modules: 'Connected field-guide collection' },
   ...model.domains.map((domain) => ({
     id: domain.id,
     label: `DOMAIN ${String(domain.position).padStart(2, '0')}`,
