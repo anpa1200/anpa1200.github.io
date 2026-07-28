@@ -3,7 +3,7 @@
   "$id": "https://1200km.com/data/cyber-knowledge.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "collection", "domains"],
+  "required": ["version", "collection", "entry_paths", "domains"],
   "properties": {
     "$schema": {"type": "string"},
     "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
@@ -19,6 +19,35 @@
         "status": {"type": "string", "minLength": 1}
       }
     },
+    "entry_paths": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "description", "steps"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "label": {"type": "string", "minLength": 5},
+          "description": {"type": "string", "minLength": 30},
+          "steps": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["domain", "module"],
+              "properties": {
+                "domain": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+                "module": {"type": "string", "pattern": "^(?:m|module-)\\d+$"}
+              }
+            }
+          }
+        }
+      }
+    },
     "domains": {
       "type": "array",
       "minItems": 10,
@@ -26,7 +55,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "position", "published_at", "path", "name", "short", "description", "card_description", "topics"],
+        "required": ["id", "position", "published_at", "path", "name", "short", "description", "card_description", "audience", "difficulty", "guide_version", "topics"],
         "properties": {
           "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
           "position": {"type": "integer", "minimum": 1, "maximum": 10},
@@ -36,6 +65,9 @@
           "short": {"type": "string", "minLength": 2},
           "description": {"type": "string", "minLength": 70, "maxLength": 155},
           "card_description": {"type": "string", "minLength": 70},
+          "audience": {"type": "string", "minLength": 10},
+          "difficulty": {"enum": ["Foundation to practitioner", "Practitioner", "Practitioner to advanced"]},
+          "guide_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
           "topics": {
             "type": "array",
             "minItems": 3,
