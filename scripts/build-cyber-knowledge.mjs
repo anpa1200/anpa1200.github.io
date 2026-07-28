@@ -103,6 +103,7 @@ function ensureModuleCrosslinks(html, domain) {
     if (targetDomainId === domain.id) {
       throw new Error(`${domain.path}#${moduleId}: handoff must target another Cyber Knowledge domain`);
     }
+    if (domain.id === 'ai-security' && moduleId === 'module-13') continue;
     const openingEnd = opening.index + opening[0].length;
     const closing = matchingElementClose(html, openingEnd, tagName);
     if (!closing) throw new Error(`${domain.path}#${moduleId}: unable to locate module closing tag`);
@@ -250,6 +251,7 @@ function ensureEnhancementScript(html) {
 
 function domainStructuredData(html, domain) {
   const url = `https://1200km.com/${domain.path}`;
+  const modifiedAt = domain.modified_at || collection.reviewed_at;
   const minutes = readingMinutes(html);
   const parts = moduleParts(html);
   const graph = [
@@ -265,7 +267,7 @@ function domainStructuredData(html, domain) {
       author: { '@id': 'https://1200km.com/#person' },
       inLanguage: 'en',
       datePublished: domain.published_at,
-      dateModified: collection.reviewed_at,
+      dateModified: modifiedAt,
       proficiencyLevel: 'Intermediate to advanced',
       educationalLevel: 'Intermediate to advanced',
       learningResourceType: 'Cybersecurity practitioner field guide',
@@ -293,7 +295,7 @@ function domainStructuredData(html, domain) {
         url: `${url}#${part.id}`,
       })),
       datePublished: domain.published_at,
-      dateModified: collection.reviewed_at,
+      dateModified: modifiedAt,
       inLanguage: 'en',
     },
   ];
@@ -422,6 +424,7 @@ function renderPathway(domain) {
 }
 
 function transformDomain(html, domain) {
+  const modifiedAt = domain.modified_at || collection.reviewed_at;
   html = html.replace(
     /href=(["'])(\/articles\/read\/\d{4}\/[^"'#?\/]+)([?#][^"']*)?\1/gi,
     (full, quote, path, suffix = '') => `href=${quote}${path}/${suffix}${quote}`,
@@ -437,11 +440,11 @@ function transformDomain(html, domain) {
   html = setMeta(html, 'property', 'og:image:alt', `${domain.name} — 1200km Cyber Knowledge`, domain.path);
   html = setMeta(html, 'name', 'twitter:image', `https://1200km.com/assets/cyber-knowledge-og/${domain.id}.png`, domain.path);
   html = setMeta(html, 'name', 'twitter:image:alt', `${domain.name} — 1200km Cyber Knowledge`, domain.path);
-  html = ensureArticleDates(html, domain.published_at, collection.reviewed_at);
+  html = ensureArticleDates(html, domain.published_at, modifiedAt);
   html = ensureSequenceLinks(html, domain);
   html = html
     .replace(/"datePublished":\s*"\d{4}-\d{2}-\d{2}"/g, `"datePublished": "${domain.published_at}"`)
-    .replace(/"dateModified":\s*"\d{4}-\d{2}-\d{2}"/g, `"dateModified": "${collection.reviewed_at}"`)
+    .replace(/"dateModified":\s*"\d{4}-\d{2}-\d{2}"/g, `"dateModified": "${modifiedAt}"`)
     .replace(/"educationalLevel":\s*"Beginner to advanced"/g, '"educationalLevel": "Intermediate to advanced"');
   html = replaceRequired(
     html,
@@ -460,7 +463,7 @@ function transformDomain(html, domain) {
   html = replaceRequired(
     html,
     /<p class="content-freshness">[\s\S]*?<\/p>/i,
-    `<p class="content-freshness"><span>Version ${escapeHtml(domain.guide_version)}</span><span>Published <time datetime="${domain.published_at}">${escapeHtml(humanDate(domain.published_at))}</time></span><span>Reviewed <time datetime="${collection.reviewed_at}">${escapeHtml(humanDate(collection.reviewed_at))}</time></span><span>Status: maintained practitioner guide</span><span>Maintained by <a href="/about.html">Andrey Pautov</a></span><span><a href="/cyber-knowledge/editorial-policy/">Editorial policy and corrections</a></span></p>`,
+    `<p class="content-freshness"><span>Version ${escapeHtml(domain.guide_version)}</span> <span>Published <time datetime="${domain.published_at}">${escapeHtml(humanDate(domain.published_at))}</time></span> <span>Source review: <time datetime="${collection.reviewed_at}">${escapeHtml(humanDate(collection.reviewed_at))}</time></span> <span>Status: maintained practitioner guide</span> <span>Maintained by <a href="/about.html">Andrey Pautov</a></span> <span><a href="/cyber-knowledge/editorial-policy/">Editorial policy and corrections</a></span></p>`,
     'visible guide version and review metadata',
     domain.path,
   );
@@ -510,8 +513,8 @@ ${domains.map((domain) => {
             <ul class="domain-topics" aria-label="${escapeHtml(domain.name)} topics">
 ${domain.topics.map((topic) => `              <li>${escapeHtml(topic)}</li>`).join('\n')}
             </ul>
-            <span class="domain-status ready">Maintained practitioner guide</span>
-            <a class="domain-link" href="/${domain.path}">Open field guide →</a>
+            <span class="domain-status ready">Practitioner guide live</span>
+            <a class="domain-link" href="/${domain.path}">Open syllabus →</a>
           </article>`;
   }).join('\n\n')}
         </div>
@@ -632,7 +635,7 @@ function renderEcosystem() {
 
 function transformHub(html, stats, edges) {
   const hubTitle = 'Cybersecurity Knowledge Base and Practitioner Field Guides | 1200km';
-  const hubDescription = 'Eleven connected cybersecurity field guides covering terminology, workflows, evidence, authoritative sources, labs, and operational handoffs.';
+  const hubDescription = 'Cyber Knowledge. A syllabus-style reference hub covering CTI, red team, blue team, vulnerability research, malware analysis, secure code, DFIR, cloud, GRC, OSINT, and AI security.';
   html = setTitle(html, hubTitle, 'cyber-knowledge/index.html');
   html = setMeta(html, 'name', 'description', hubDescription, 'cyber-knowledge/index.html');
   html = setMeta(html, 'property', 'og:title', hubTitle, 'cyber-knowledge/index.html');

@@ -79,7 +79,7 @@ function sourceClass(url) {
   return 'First-party or practitioner reference';
 }
 
-function metadataPage({ slug, title, description, h1, lead, body, graph }) {
+function metadataPage({ slug, title, description, h1, lead, body, graph, modifiedAt = model.collection.reviewed_at }) {
   const canonical = `https://1200km.com/cyber-knowledge/${slug}/`;
   const pageGraph = {
     '@context': 'https://schema.org',
@@ -93,7 +93,7 @@ function metadataPage({ slug, title, description, h1, lead, body, graph }) {
         inLanguage: 'en',
         isPartOf: { '@id': 'https://1200km.com/#website' },
         breadcrumb: { '@id': `${canonical}#breadcrumb` },
-        dateModified: model.collection.reviewed_at,
+        dateModified: modifiedAt,
         author: { '@id': 'https://1200km.com/#person' },
       },
       {
@@ -114,6 +114,7 @@ function metadataPage({ slug, title, description, h1, lead, body, graph }) {
     .replace(/<meta property="og:title" content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${escapeHtml(title)}" />`)
     .replace(/<meta property="og:description" content="[^"]*"\s*\/?>/i, `<meta property="og:description" content="${escapeHtml(description)}" />`)
     .replace(/<meta property="og:url" content="[^"]*"\s*\/?>/i, `<meta property="og:url" content="${canonical}" />`)
+    .replace(/<meta property="article:modified_time" content="[^"]*"\s*\/?>/i, `<meta property="article:modified_time" content="${modifiedAt}" />`)
     .replace(/<meta name="twitter:title" content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
     .replace(/<meta name="twitter:description" content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
     .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${canonical}" />`)
@@ -217,7 +218,7 @@ const policyGraph = {
   '@id': 'https://1200km.com/cyber-knowledge/editorial-policy/#page',
   name: 'Cyber Knowledge editorial and source policy',
   url: 'https://1200km.com/cyber-knowledge/editorial-policy/',
-  dateModified: model.collection.reviewed_at,
+  dateModified: '2026-07-28',
   author: { '@id': 'https://1200km.com/#person' },
 };
 
@@ -248,6 +249,7 @@ const outputs = [
     lead: 'The evidence, review, correction, versioning, and AI-assistance rules used to maintain Cyber Knowledge.',
     body: policyBody,
     graph: policyGraph,
+    modifiedAt: '2026-07-28',
   })],
 ];
 
