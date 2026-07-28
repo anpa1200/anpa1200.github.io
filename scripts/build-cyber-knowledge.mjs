@@ -9,7 +9,9 @@ const siteIndex = args.indexOf('--site');
 const site = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
 const check = args.includes('--check');
 const model = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge.json'), 'utf8'));
+const crosslinkModel = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge-crosslinks.json'), 'utf8'));
 const { domains, collection } = model;
+let moduleIndex = new Map();
 
 function escapeHtml(value) {
   return String(value)
@@ -66,6 +68,77 @@ function moduleParts(html) {
       name: stripHtml(match[2]),
     }))
     .filter((part) => part.name);
+}
+
+function matchingElementClose(html, openingEnd, tagName) {
+  const tags = new RegExp(`<\\/?${tagName}\\b[^>]*>`, 'gi');
+  tags.lastIndex = openingEnd;
+  let depth = 1;
+  for (let match = tags.exec(html); match; match = tags.exec(html)) {
+    if (/^<\//.test(match[0])) depth -= 1;
+    else if (!/\/\s*>$/.test(match[0])) depth += 1;
+    if (depth === 0) return { start: match.index, end: tags.lastIndex };
+  }
+  return null;
+}
+
+function ensureModuleCrosslinks(html, domain) {
+  html = html.replace(
+    /\r?\n[ \t]*<!-- cyber-knowledge:module-crosslink:start -->[\s\S]*?<!-- cyber-knowledge:module-crosslink:end -->\r?\n/gi,
+    '',
+  );
+  const mappings = crosslinkModel.links[domain.id];
+  const openings = [...html.matchAll(/<(article|section|div)\b[^>]*\bid=["']((?:m|module-)\d+)["'][^>]*>/gi)];
+  const insertions = [];
+  for (const opening of openings) {
+    const [, tagName, moduleId] = opening;
+    const target = mappings[moduleId];
+    if (!target) throw new Error(`${domain.path}#${moduleId}: cross-domain handoff is missing`);
+    const [targetDomainId, targetModuleId] = target;
+    const targetDomain = domains.find((candidate) => candidate.id === targetDomainId);
+    const targetPart = moduleIndex.get(`${targetDomainId}:${targetModuleId}`);
+    if (!targetDomain || !targetPart) {
+      throw new Error(`${domain.path}#${moduleId}: invalid handoff ${targetDomainId}#${targetModuleId}`);
+    }
+    if (targetDomainId === domain.id) {
+      throw new Error(`${domain.path}#${moduleId}: handoff must target another Cyber Knowledge domain`);
+    }
+    const openingEnd = opening.index + opening[0].length;
+    const closing = matchingElementClose(html, openingEnd, tagName);
+    if (!closing) throw new Error(`${domain.path}#${moduleId}: unable to locate module closing tag`);
+    const href = `/${targetDomain.path}#${targetModuleId}`;
+    const block = `
+          <!-- cyber-knowledge:module-crosslink:start -->
+          <p class="further-reading module-crosslink"><strong>Related Cyber Knowledge:</strong> <a href="${escapeHtml(href)}">${escapeHtml(targetDomain.name)} — ${escapeHtml(targetPart.name)}</a></p>
+          <!-- cyber-knowledge:module-crosslink:end -->
+`;
+    insertions.push({ at: closing.start, block });
+  }
+  for (const insertion of insertions.sort((left, right) => right.at - left.at)) {
+    html = `${html.slice(0, insertion.at)}${insertion.block}${html.slice(insertion.at)}`;
+  }
+  return html;
+}
+
+function assertCrosslinkModel(source) {
+  const domainIds = new Set(domains.map((domain) => domain.id));
+  for (const key of Object.keys(crosslinkModel.links)) {
+    if (!domainIds.has(key)) throw new Error(`Unknown Cyber Knowledge crosslink domain: ${key}`);
+  }
+  moduleIndex = new Map();
+  for (const domain of domains) {
+    const parts = moduleParts(source.get(domain.id));
+    const mappings = crosslinkModel.links[domain.id];
+    if (!mappings) throw new Error(`${domain.path}: no crosslink mapping`);
+    for (const part of parts) moduleIndex.set(`${domain.id}:${part.id}`, part);
+    const partIds = new Set(parts.map((part) => part.id));
+    const mappingIds = new Set(Object.keys(mappings));
+    const missing = [...partIds].filter((id) => !mappingIds.has(id));
+    const unknown = [...mappingIds].filter((id) => !partIds.has(id));
+    if (missing.length || unknown.length) {
+      throw new Error(`${domain.path}: crosslink coverage mismatch; missing=${missing.join(',') || 'none'} unknown=${unknown.join(',') || 'none'}`);
+    }
+  }
 }
 
 function slugify(value) {
@@ -347,8 +420,10 @@ function transformDomain(html, domain) {
     );
   }
   html = ensureGlossaryTermAnchors(html, domain);
+  html = ensureModuleCrosslinks(html, domain);
   html = ensureGeneratedJsonLd(html, 'cyber-knowledge-structured-data', domainStructuredData(html, domain));
   html = ensureEnhancementScript(html);
+  html = html.replace(/^[ \t]+$/gm, '');
   return html;
 }
 
@@ -531,11 +606,17 @@ for (const domain of domains) {
   if (!modules) throw new Error(`${domain.path}: no numbered modules detected`);
   stats.set(domain.id, { modules, minutes: readingMinutes(html) });
 }
+assertCrosslinkModel(source);
 
 for (const domain of domains) {
   const path = join(site, domain.path);
   const current = source.get(domain.id);
   const generated = transformDomain(current, domain);
+  source.set(domain.id, generated);
+  stats.set(domain.id, {
+    modules: moduleCount(generated),
+    minutes: readingMinutes(generated),
+  });
   if (current === generated) continue;
   if (check) stale.push(domain.path);
   else writeFileSync(path, generated);

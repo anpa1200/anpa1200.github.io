@@ -20,6 +20,10 @@ const modules = [
 ];
 const temporaryPublicationLanguage =
   /\b(?:under construction|coming soon|work in progress|syllabus draft live|placeholder page|content forthcoming|open syllabus)\b/i;
+const knowledgeModel = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge.json'), 'utf8'));
+const crosslinkModel = JSON.parse(
+  readFileSync(join(ROOT, 'data', 'cyber-knowledge-crosslinks.json'), 'utf8'),
+);
 
 function source(name) {
   return readFileSync(join(ROOT, 'cyber-knowledge', name), 'utf8');
@@ -148,6 +152,47 @@ test('module discovery sequence is explicit in source HTML', () => {
     const next = modules[(index + 1) % modules.length];
     assert.equal(linkHref(html, 'prev'), `/cyber-knowledge/${previous}.html`, `${module}: prev`);
     assert.equal(linkHref(html, 'next'), `/cyber-knowledge/${next}.html`, `${module}: next`);
+  }
+});
+
+test('every numbered module has one valid cross-domain Cyber Knowledge handoff', () => {
+  const domainById = new Map(knowledgeModel.domains.map((domain) => [domain.id, domain]));
+
+  for (const domain of knowledgeModel.domains) {
+    const html = source(domain.path.split('/').at(-1));
+    const moduleIds = [...html.matchAll(
+      /<(?:article|section|div)\b[^>]*\bid=["']((?:m|module-)\d+)["'][^>]*>/gi,
+    )].map((match) => match[1]);
+    const mappings = crosslinkModel.links[domain.id];
+    assert.ok(mappings, `${domain.id}: crosslink mapping is required`);
+    assert.deepEqual(
+      Object.keys(mappings).sort(),
+      [...new Set(moduleIds)].sort(),
+      `${domain.id}: every numbered module must be mapped exactly once`,
+    );
+    assert.equal(
+      (html.match(/cyber-knowledge:module-crosslink:start/g) || []).length,
+      moduleIds.length,
+      `${domain.id}: generated handoff count`,
+    );
+
+    for (const [moduleId, [targetDomainId, targetModuleId]] of Object.entries(mappings)) {
+      assert.notEqual(targetDomainId, domain.id, `${domain.id}#${moduleId}: cross-domain target`);
+      const targetDomain = domainById.get(targetDomainId);
+      assert.ok(targetDomain, `${domain.id}#${moduleId}: known target domain`);
+      const targetHtml = source(targetDomain.path.split('/').at(-1));
+      assert.match(
+        targetHtml,
+        new RegExp(`\\bid=["']${targetModuleId}["']`),
+        `${domain.id}#${moduleId}: target anchor exists`,
+      );
+      const href = `/${targetDomain.path}#${targetModuleId}`.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      assert.match(
+        html,
+        new RegExp(`class="further-reading module-crosslink"[\\s\\S]*?href="${href}"`),
+        `${domain.id}#${moduleId}: generated target link`,
+      );
+    }
   }
 });
 
