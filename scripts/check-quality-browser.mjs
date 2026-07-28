@@ -44,6 +44,17 @@ let pages = [
   ['adversarygraph-full-guide', '/adversarygraph/full-version-feature-guides.html', 'default'],
   ['threat-matrix', '/threat-matrix/', 'interactive'],
   ['docs', '/adversarygraph-docs/full-flow/', 'documentation'],
+  ['cyber-knowledge-index', '/cyber-knowledge/', 'documentation'],
+  ['cyber-knowledge-cti', '/cyber-knowledge/cti.html', 'documentation'],
+  ['cyber-knowledge-red-team', '/cyber-knowledge/red-team.html', 'documentation'],
+  ['cyber-knowledge-blue-team', '/cyber-knowledge/blue-team.html', 'documentation'],
+  ['cyber-knowledge-vulnerability-research', '/cyber-knowledge/vulnerability-research.html', 'documentation'],
+  ['cyber-knowledge-malware-analysis', '/cyber-knowledge/malware-analysis.html', 'documentation'],
+  ['cyber-knowledge-secure-code', '/cyber-knowledge/secure-code.html', 'documentation'],
+  ['cyber-knowledge-dfir', '/cyber-knowledge/dfir.html', 'documentation'],
+  ['cyber-knowledge-cloud-security', '/cyber-knowledge/cloud-security.html', 'documentation'],
+  ['cyber-knowledge-grc', '/cyber-knowledge/grc.html', 'documentation'],
+  ['cyber-knowledge-osint', '/cyber-knowledge/osint.html', 'documentation'],
 ];
 
 const articleCatalogPath = join(site, 'data', 'article-catalog.json');
