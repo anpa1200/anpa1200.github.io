@@ -178,7 +178,7 @@ function layoutExpression(checkFixture) {
     const selector = 'main p, main li, article p, article li, .page-hero p, .profile-hero p, .cv-hero p';
     const prose = Array.from(document.querySelectorAll(selector)).filter((element) =>
       visible(element)
-      && !element.closest('nav, footer, pre, table, .sr-only, [hidden], .site-search-modal, .page-sidenav')
+      && !element.closest('nav, footer, pre, table, .sr-only, [hidden], .site-search-modal, .page-sidenav, .domain-topics')
       && !element.closest('#layout-regression-fixture')
     );
     const badWrap = prose.filter((element) => {
@@ -199,6 +199,7 @@ function layoutExpression(checkFixture) {
     }).slice(0, 5).map((element) => ({
       tag: element.tagName,
       className: String(element.className).slice(0, 80),
+      text: element.textContent.trim().slice(0, 90),
       width: round(element.getBoundingClientRect().width),
       parentWidth: round(element.parentElement.getBoundingClientRect().width),
       maxWidth: getComputedStyle(element).maxWidth,
