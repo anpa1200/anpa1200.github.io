@@ -151,6 +151,17 @@ test('module discovery sequence is explicit in source HTML', () => {
   }
 });
 
+test('OSINT attack-surface handoffs target the intended modules', () => {
+  const osint = source('osint.html');
+  const redTeam = source('red-team.html');
+  const cloud = source('cloud-security.html');
+  assert.match(redTeam, /\bid="m2"/);
+  assert.match(cloud, /\bid="module-11"/);
+  assert.match(osint, /href="\/cyber-knowledge\/red-team\.html#m2"/);
+  assert.match(osint, /href="\/cyber-knowledge\/cloud-security\.html#module-11">Cloud posture and exposure/);
+  assert.doesNotMatch(osint, /cloud-security\.html#module-10">Cloud posture and exposure/);
+});
+
 test('CTI terms have one generated DefinedTermSet', () => {
   const sets = jsonLdEntries(source('cti.html')).filter((entry) => entry['@type'] === 'DefinedTermSet');
   assert.equal(sets.length, 1);
