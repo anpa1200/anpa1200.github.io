@@ -263,7 +263,7 @@ function transformDomain(html, domain) {
     /href=(["'])(\/articles\/read\/\d{4}\/[^"'#?\/]+)([?#][^"']*)?\1/gi,
     (full, quote, path, suffix = '') => `href=${quote}${path}/${suffix}${quote}`,
   );
-  const title = `${domain.title_name} Field Guide — Cyber Knowledge | 1200km`;
+  const title = `${domain.short} Field Guide — Cyber Knowledge | 1200km`;
   html = setTitle(html, title, domain.path);
   html = setMeta(html, 'name', 'description', domain.description, domain.path);
   html = setMeta(html, 'property', 'og:title', title, domain.path);
@@ -290,7 +290,7 @@ function transformDomain(html, domain) {
   html = replaceRequired(
     html,
     /<h1\b([^>]*)class="page-title"([^>]*)>[\s\S]*?<\/h1>/i,
-    `<h1$1class="page-title"$2>${escapeHtml(domain.h1)}</h1>`,
+    `<h1$1class="page-title"$2>${escapeHtml(domain.name)}</h1>`,
     'page title heading',
     domain.path,
   );
