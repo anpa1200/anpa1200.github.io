@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,6 +18,7 @@ const origins = [
   { id: 'custom-domain', url: valueAfter('--custom-origin', 'https://1200km.com') },
   { id: 'github-pages', url: valueAfter('--pages-origin', 'https://anpa1200.github.io') },
 ];
+const knowledgeModel = JSON.parse(await readFile(resolve(ROOT, 'data/cyber-knowledge.json'), 'utf8'));
 
 if (!/^[0-9a-f]{40}$/i.test(expectedCommit)) throw new Error(`Expected full site commit, received ${expectedCommit || '(missing)'}`);
 if (!/^[0-9a-f]{40}$/i.test(expectedArchiveCommit)) throw new Error(`Expected full archive commit, received ${expectedArchiveCommit || '(missing)'}`);
@@ -49,6 +50,42 @@ async function fetchRecord(origin, path, attempt) {
 function buildMetaPresent(body) {
   return new RegExp(`<meta\\b[^>]*name=["']1200km-build["'][^>]*content=["']${expectedCommit}["']`, 'i').test(body)
     || new RegExp(`<meta\\b[^>]*content=["']${expectedCommit}["'][^>]*name=["']1200km-build["']`, 'i').test(body);
+}
+
+function decodeHtml(value = '') {
+  return value
+    .replaceAll('&amp;', '&')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>');
+}
+
+function titleContent(body) {
+  return decodeHtml(body.match(/<title>([\s\S]*?)<\/title>/i)?.[1].trim() || '');
+}
+
+function metaContent(body, attribute, value) {
+  const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const tag = body.match(new RegExp(`<meta\\b[^>]*${attribute}=["']${escaped}["'][^>]*>`, 'i'))?.[0] || '';
+  return decodeHtml(tag.match(/\bcontent=["']([^"']*)["']/i)?.[1] || '');
+}
+
+function headingContent(body) {
+  return decodeHtml((body.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || '').replace(/<[^>]+>/g, '').trim());
+}
+
+function knowledgeChecks(domain, body) {
+  const expectedTitle = `${domain.short} Field Guide — Cyber Knowledge | 1200km`;
+  const expectedImage = `https://1200km.com/assets/cyber-knowledge-og/${domain.id}.png`;
+  return [
+    { label: 'current build ID', pass: buildMetaPresent(body) },
+    { label: `canonical title ${expectedTitle}`, pass: titleContent(body) === expectedTitle },
+    { label: `canonical H1 ${domain.name}`, pass: headingContent(body) === domain.name },
+    { label: `canonical OG image ${domain.id}.png`, pass: metaContent(body, 'property', 'og:image') === expectedImage },
+    { label: `canonical Twitter image ${domain.id}.png`, pass: metaContent(body, 'name', 'twitter:image') === expectedImage },
+    { label: `OG image alt names ${domain.name}`, pass: metaContent(body, 'property', 'og:image:alt') === `${domain.name} — 1200km Cyber Knowledge` },
+  ];
 }
 
 function pageChecks(path, body, articleCount) {
@@ -104,6 +141,12 @@ async function verifyOrigin(origin, attempt) {
   for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/threat-matrix/', '/privacy.html']) {
     const record = await fetchRecord(origin.url, path, attempt);
     record.fingerprints = pageChecks(path, record.body, articleCount);
+    records.push(record);
+  }
+  for (const domain of knowledgeModel.domains) {
+    const path = `/${domain.path}`;
+    const record = await fetchRecord(origin.url, path, attempt);
+    record.fingerprints = knowledgeChecks(domain, record.body);
     records.push(record);
   }
   for (const record of records) delete record.body;
@@ -163,5 +206,5 @@ if (!report.pass) {
   for (const result of finalResults) result.failures?.forEach((failure) => console.error(`- ${result.id}: ${failure}`));
   process.exit(1);
 }
-console.log(`Production verification passed for ${expectedCommit} on both origins.`);
+console.log(`Production verification passed for ${expectedCommit} on both configured entry points.`);
 console.log(`Report: ${reportPath}`);
