@@ -6,12 +6,16 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <script src="/assets/theme-bootstrap.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OSINT &amp; Reconnaissance — Cyber Knowledge | 1200km</title>
-    <meta name="description" content="OSINT &amp; Reconnaissance. Syllabus in progress: search operators, infrastructure enumeration, social/corporate footprinting, and OPSEC…" />
+    <title>OSINT &amp; Reconnaissance Field Guide | 1200km</title>
+    <meta name="description" content="A 14-module OSINT field guide to ethical collection, infrastructure discovery, media verification, threat research, AI assistance, evidence, and reporting." />
     <meta name="author" content="Andrey Pautov" />
-    <meta property="og:title" content="OSINT &amp; Reconnaissance — Cyber Knowledge | 1200km" />
-    <meta property="og:description" content="OSINT &amp; Reconnaissance. Syllabus in progress: search operators, infrastructure enumeration, social/corporate footprinting, and OPSEC…" />
-    <meta property="og:type" content="website" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta property="og:title" content="OSINT &amp; Reconnaissance Field Guide | 1200km" />
+    <meta property="og:description" content="A 14-module OSINT field guide to ethical collection, infrastructure discovery, media verification, threat research, AI assistance, evidence, and reporting." />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="article:published_time" content="2026-07-27" />
+    <meta property="article:modified_time" content="2026-07-27" />
     <meta property="og:url" content="https://1200km.com/cyber-knowledge/osint.html" />
     <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
     <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
@@ -19,55 +23,60 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="OSINT &amp; Reconnaissance — Cyber Knowledge | 1200km" />
-    <meta name="twitter:description" content="OSINT &amp; Reconnaissance. Syllabus in progress: search operators, infrastructure enumeration, social/corporate footprinting, and OPSEC…" />
+    <meta name="twitter:title" content="OSINT &amp; Reconnaissance Field Guide | 1200km" />
+    <meta name="twitter:description" content="A 14-module OSINT field guide to ethical collection, infrastructure discovery, media verification, threat research, AI assistance, evidence, and reporting." />
     <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
     <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
     <link rel="canonical" href="https://1200km.com/cyber-knowledge/osint.html" />
+    <link rel="up" href="/cyber-knowledge/" />
+    <link rel="prev" href="/cyber-knowledge/grc.html" />
     <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
     <meta name="theme-color" content="#0f62fe" />
     <link rel="icon" href="/assets/ap-logo.png" type="image/png" />
     <style>
       :root {
         --bg: #050c1a;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.82);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5a6f8f;
-        --text: #cdd9ee;
-        --muted: #7a96bc;
+        --surface: #081326;
+        --surface-2: #0d1f3c;
+        --text: #d8e2f3;
+        --muted: #94a9c7;
         --line: #1a3060;
-        --accent: #0f62fe;
+        --accent: #4f8fff;
         --accent-soft: #93c5fd;
-        --accent-dark: #054ada;
+        --accent-dark: #0f62fe;
         --ok: #34d399;
-        --warn: #b45309;
-        --red: #ef4444;
-        --chip: #0d1f3c;
-        --chip-strong: #162d52;
-        --shadow: 0 14px 34px rgba(0,0,0,0.45);
+        --warn: #f59e0b;
+        --danger: #fb7185;
+        --purple: #c4b5fd;
       }
       * { box-sizing: border-box; }
       html { scroll-behavior: smooth; }
       body {
         margin: 0;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        overflow-x: clip;
         color: var(--text);
         background: var(--bg);
-        line-height: 1.58;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.62;
       }
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { color: var(--accent-dark); text-decoration: underline; }
+      a { color: var(--accent-soft); text-decoration: none; }
+      a:hover { color: var(--accent); text-decoration: underline; }
+      code {
+        padding: 0.08em 0.3em;
+        border-radius: 4px;
+        color: #bfdbfe;
+        background: #102443;
+        overflow-wrap: anywhere;
+      }
       .site-header {
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 30;
         border-bottom: 1px solid var(--line);
-        background: rgba(5,12,26,0.92);
+        background: rgba(5,12,26,0.95);
         backdrop-filter: blur(12px);
       }
-      .nav, .page-hero-inner, main, .footer-inner {
+      .nav, .page-hero-inner, .footer-inner {
         width: min(1080px, calc(100% - 32px));
         margin: 0 auto;
       }
@@ -82,149 +91,375 @@
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        font-weight: 700;
         color: var(--text);
-        text-decoration: none;
+        font-weight: 750;
       }
-      .brand:hover { text-decoration: none; color: var(--text); }
+      .brand:hover { color: var(--text); text-decoration: none; }
       .brand img { width: 36px; height: 36px; border-radius: 10px; }
       .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.92rem; }
-      .nav-links a.active { color: var(--accent); font-weight: 600; }
+      .nav-links a.active { color: var(--accent); font-weight: 700; }
       .page-hero {
-        background: linear-gradient(120deg, rgba(15,98,254,0.10), rgba(0,122,90,0.08)), #ffffff;
         border-bottom: 1px solid var(--line);
+        background:
+          radial-gradient(circle at 82% 18%, rgba(52,211,153,0.12), transparent 27%),
+          linear-gradient(135deg, rgba(15,98,254,0.12), rgba(196,181,253,0.055)),
+          #050c1a;
       }
-      .page-hero-inner { padding: 64px 0 52px; }
+      .page-hero-inner { padding: 66px 0 54px; }
       .page-eyebrow {
-        color: var(--accent-dark);
+        margin: 0 0 12px;
+        color: var(--accent-soft);
         font-size: 0.76rem;
-        font-weight: 600;
+        font-weight: 800;
         letter-spacing: 0.09em;
         text-transform: uppercase;
-        margin: 0 0 12px;
       }
-      .page-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
-      .page-lead { max-width: 760px; margin: 16px 0 0; color: var(--muted); font-size: 1.07rem; }
+      .page-title {
+        max-width: 960px;
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3.7rem);
+        line-height: 1.05;
+      }
+      .page-lead {
+        max-width: 900px;
+        margin: 18px 0 0;
+        color: var(--text);
+        font-size: 1.08rem;
+      }
+      .notice {
+        max-width: 920px;
+        margin-top: 28px;
+        padding: 16px 18px;
+        border: 1px solid rgba(245,158,11,0.42);
+        border-radius: 10px;
+        background: rgba(245,158,11,0.09);
+      }
+      .notice strong {
+        color: #fbbf24;
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .notice p { margin: 5px 0 0; color: var(--text); font-size: 0.93rem; }
       .page-hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
       .button {
         display: inline-flex;
+        min-height: 42px;
         align-items: center;
-        padding: 8px 18px;
+        justify-content: center;
+        padding: 9px 17px;
         border: 1px solid var(--line);
-        border-radius: 6px;
-        font-size: 0.88rem;
-        font-weight: 700;
+        border-radius: 7px;
         color: var(--text);
-        background: var(--panel);
-        text-decoration: none;
-        transition: border-color 0.14s, background 0.14s;
+        background: var(--surface-2);
+        font-size: 0.88rem;
+        font-weight: 750;
       }
-      .button:hover { border-color: var(--accent); background: var(--chip); text-decoration: none; color: var(--text); }
-      .button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-      .button.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
-      .notice {
+      .button:hover { border-color: var(--accent); color: var(--text); background: #162d52; text-decoration: none; }
+      .button.primary { border-color: var(--accent-dark); color: #fff; background: var(--accent-dark); }
+      .guide-nav {
+        position: sticky;
+        top: 64px;
+        z-index: 20;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5,12,26,0.96);
+        backdrop-filter: blur(12px);
+      }
+      .guide-nav-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: flex;
+        gap: 8px;
+        padding: 10px 0;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+      .guide-nav a {
+        flex: 0 0 auto;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .guide-nav a:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+      .guide-layout {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+        gap: 28px;
+        padding: 42px 0 72px;
+      }
+      .toc {
+        position: sticky;
+        top: 122px;
+        align-self: start;
+        max-height: calc(100vh - 142px);
+        overflow-y: auto;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(8,19,38,0.88);
+        scrollbar-width: thin;
+      }
+      .toc h2 { margin: 0 0 12px; font-size: 1rem; }
+      .toc ol, .toc ul { margin: 0; padding-left: 1.25rem; }
+      .toc li { margin: 7px 0; color: var(--muted); font-size: 0.82rem; }
+      .toc a { color: var(--muted); }
+      .toc a:hover { color: var(--accent-soft); }
+      .toc-group {
+        display: block;
+        margin: 15px 0 3px;
+        color: var(--accent-soft);
+        font-size: 0.69rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .guide-content { min-width: 0; }
+      .guide-content > section { scroll-margin-top: 128px; margin-bottom: 54px; }
+      .section-kicker {
+        margin: 0 0 5px;
+        color: var(--accent-soft);
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+      }
+      .guide-content h2 {
+        margin: 0 0 12px;
+        font-size: clamp(1.6rem, 3vw, 2.25rem);
+        line-height: 1.16;
+      }
+      .guide-content h3 { margin: 0 0 10px; font-size: 1.18rem; line-height: 1.3; }
+      .guide-content h4 { margin: 15px 0 6px; font-size: 0.98rem; }
+      .section-intro { max-width: 78ch; margin: 0 0 20px; color: var(--muted); font-size: 1rem; }
+      .outcome-grid, .term-grid, .two-col, .case-grid, .lab-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .outcome-card, .term-grid > div, .practice-block, .case-study, .reference-article, .template-record {
+        min-width: 0;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(8,19,38,0.82);
+      }
+      .outcome-card h3, .term-grid h3, .template-record h3 { margin-bottom: 7px; }
+      .outcome-card p, .term-grid p, .practice-block p, .reference-article p, .template-record p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .module {
+        scroll-margin-top: 128px;
+        margin: 0 0 18px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(8,19,38,0.94), rgba(13,31,60,0.62));
+      }
+      .module-header {
         display: flex;
         align-items: flex-start;
-        gap: 12px;
-        margin: 28px 0 0;
-        padding: 14px 18px;
-        border: 1px solid rgba(180, 83, 9, 0.4);
-        border-radius: 10px;
-        background: rgba(180, 83, 9, 0.1);
-        color: #b45309;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 10px;
+      }
+      .module-number {
+        flex: 0 0 auto;
+        padding: 4px 8px;
+        border: 1px solid rgba(79,143,255,0.5);
+        border-radius: 999px;
+        color: var(--accent-soft);
+        font-size: 0.7rem;
+        font-weight: 850;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .module > p { color: var(--muted); }
+      .module ul, .module ol, .case-study ul, .case-study ol { padding-left: 1.25rem; }
+      .module li, .case-study li { margin: 7px 0; }
+      .workflow {
+        margin: 14px 0 0;
+        padding: 14px 16px;
+        border-left: 3px solid var(--accent);
+        border-radius: 0 8px 8px 0;
+        background: rgba(15,98,254,0.08);
+      }
+      .workflow strong { color: #bfdbfe; }
+      .evidence-note, .boundary, .acceptance {
+        margin: 14px 0 0;
+        padding: 13px 15px;
+        border-radius: 8px;
         font-size: 0.92rem;
-        font-weight: 600;
-        max-width: 760px;
       }
-      [data-theme="dark"] .notice {
-        background: rgba(245, 158, 11, 0.12);
-        border-color: rgba(245, 158, 11, 0.35);
-        color: #f59e0b;
+      .evidence-note { border: 1px solid rgba(52,211,153,0.34); background: rgba(52,211,153,0.07); }
+      .evidence-note strong { color: #6ee7b7; }
+      .boundary { border: 1px solid rgba(245,158,11,0.34); background: rgba(245,158,11,0.07); }
+      .boundary strong { color: #fbbf24; }
+      .acceptance { border: 1px solid rgba(196,181,253,0.35); background: rgba(139,92,246,0.07); }
+      .acceptance strong { color: var(--purple); }
+      .further-reading { margin: 13px 0 0; color: var(--muted); font-size: 0.9rem; }
+      .table-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
       }
-      .notice strong { font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.78rem; }
-      .notice p { margin: 4px 0 0; font-weight: 500; color: var(--muted); }
-      main { padding: 56px 0 72px; }
-      .placeholder-panel {
-        max-width: 720px;
-        padding: 26px 28px;
-        border: 1px dashed var(--line);
-        border-radius: 14px;
-        background: var(--panel);
-        color: var(--panel-muted);
+      table { width: 100%; min-width: 760px; border-collapse: collapse; background: rgba(8,19,38,0.75); }
+      th, td { padding: 12px 13px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+      th {
+        color: var(--accent-soft);
+        background: #09162b;
+        font-size: 0.73rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
       }
-      [data-theme="dark"] .placeholder-panel {
-        background: rgba(8, 19, 38, 0.84);
-        border-color: rgba(147, 197, 253, 0.28);
-        color: #b8c9e3;
+      td { color: var(--muted); font-size: 0.9rem; }
+      tr:last-child td { border-bottom: 0; }
+      .case-study { border-left: 3px solid var(--danger); }
+      .case-study h3 { color: #fecdd3; }
+      .case-meta { margin: 0 0 10px; color: var(--muted); font-size: 0.82rem; }
+      .decision-gate {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid rgba(52,211,153,0.35);
+        border-radius: 8px;
+        background: rgba(52,211,153,0.07);
       }
-      .placeholder-panel h2 { margin: 0 0 10px; font-size: 1.1rem; color: var(--panel-ink); }
-      [data-theme="dark"] .placeholder-panel h2 { color: #f8fbff; }
-      footer { border-top: 1px solid var(--line); padding: 22px 0; font-size: 0.84rem; color: var(--muted); }
+      .decision-gate strong { color: #6ee7b7; }
+      .failure-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 0;
+        list-style: none;
+      }
+      .failure-list li {
+        margin: 0;
+        padding: 14px;
+        border: 1px solid rgba(251,113,133,0.27);
+        border-radius: 8px;
+        background: rgba(251,113,133,0.05);
+      }
+      .failure-list strong { display: block; margin-bottom: 4px; color: #fecdd3; }
+      .checklist {
+        display: grid;
+        gap: 8px;
+        padding: 0;
+        list-style: none;
+      }
+      .checklist li {
+        position: relative;
+        margin: 0;
+        padding: 11px 13px 11px 39px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(8,19,38,0.7);
+      }
+      .checklist li::before {
+        content: "✓";
+        position: absolute;
+        left: 14px;
+        color: var(--ok);
+        font-weight: 900;
+      }
+      .reference-list { display: grid; gap: 12px; }
+      .reference-article h3 { font-size: 1rem; }
+      .site-footer { border-top: 1px solid var(--line); color: var(--muted); }
+      @media (max-width: 900px) {
+        .guide-layout { grid-template-columns: 1fr; }
+        .toc { position: static; max-height: none; }
+        .outcome-grid, .term-grid, .two-col, .case-grid, .lab-grid { grid-template-columns: 1fr; }
+      }
       @media (max-width: 720px) {
-        .nav { align-items: flex-start; flex-direction: column; gap: 10px; padding: 10px 0; width: min(1080px, calc(100% - 32px)); }
-        .nav, .page-hero-inner, main, .footer-inner { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
-        .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 8px 14px; width: 100%; }
-        .button { flex-shrink: 0; }
-        .page-hero-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 10px; max-width: 100%; }
-        .page-title, .page-lead, .page-eyebrow { max-width: 100%; overflow-wrap: break-word; }
+        .nav { min-height: 58px; }
+        .guide-nav { top: 58px; }
+        .page-hero-inner { padding: 46px 0 40px; }
+        .page-title {
+          font-size: clamp(2rem, 10vw, 2.4rem);
+          overflow-wrap: normal;
+          word-break: normal;
+        }
+        .page-hero-links { display: grid; grid-template-columns: 1fr; }
+        .button { width: 100%; }
+        .guide-layout { width: calc(100% - 24px); padding-top: 28px; }
+        .guide-nav-inner { width: calc(100% - 24px); }
+        .module { padding: 17px; }
+        .module-header { display: block; }
+        .module-number { display: inline-block; margin-bottom: 8px; }
+        .failure-list { grid-template-columns: 1fr; }
+        .page-lead, .section-intro, .module p, .module li, .case-study p, .case-study li {
+          max-width: none;
+          overflow-wrap: normal;
+          word-break: normal;
+        }
+        a, code, td { overflow-wrap: anywhere; }
       }
-      [data-theme="dark"] footer, [data-theme="dark"] .footer {
-        background: rgba(5,12,26,0.96) !important;
-        border-top-color: #1a3060 !important;
-        color: #7a96bc !important;
-      }
-      [data-theme="dark"] .page-hero {
-        background: linear-gradient(135deg, rgba(15,98,254,0.12), rgba(0,122,90,0.06)), #050c1a !important;
-        border-bottom-color: #1a3060 !important;
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      @media print {
+        .site-header, .guide-nav, .toc, .page-hero-links, .site-footer { display: none !important; }
+        body { color: #111; background: #fff; font-size: 10pt; }
+        .page-hero { border: 0; background: #fff; }
+        .page-hero-inner, .guide-layout { width: 100%; padding: 0; }
+        .guide-layout { display: block; }
+        .module, .case-study, .practice-block, .template-record { break-inside: avoid; color: #111; background: #fff; }
+        a { color: #111; text-decoration: underline; }
       }
       [data-theme="light"] {
-        --bg: #f6f8fb;
-        --panel: #ffffff;
-        --panel-translucent: rgba(255,255,255,0.97);
-        --panel-ink: #172033;
-        --panel-ink-soft: #2d3a4f;
-        --panel-muted: #5b667a;
+        --bg: #f0f4ff;
+        --surface: #ffffff;
+        --surface-2: #eef4ff;
         --text: #172033;
-        --muted: #5b667a;
-        --line: #dbe4ef;
+        --muted: #53627a;
+        --line: #ccd9eb;
         --accent: #0f62fe;
-        --accent-soft: #3a7dff;
+        --accent-soft: #1559cf;
         --accent-dark: #054ada;
         --ok: #007a5a;
-        --warn: #b45309;
-        --red: #b91c1c;
-        --chip: #eef4ff;
-        --chip-strong: #dbe9ff;
-        --shadow: 0 14px 34px rgba(24,38,69,0.09);
+        --warn: #9a5b00;
+        --danger: #b4233b;
+        --purple: #5b36a6;
       }
-      [data-theme="light"] body { background: #f0f4ff !important; background-image: none !important; }
-      [data-theme="light"] .site-header { background: rgba(255,255,255,0.96) !important; border-bottom: 1px solid #dbe4ef; }
-      [data-theme="light"] footer, [data-theme="light"] .footer { background: rgba(255,255,255,0.96) !important; border-top: 1px solid #dbe4ef; }
+      [data-theme="light"] body { background: var(--bg); }
+      [data-theme="light"] .site-header,
+      [data-theme="light"] .guide-nav { background: rgba(255,255,255,0.96); }
+      [data-theme="light"] .page-hero { background: linear-gradient(135deg, #eef4ff, #f4fbf8); }
+      [data-theme="light"] .toc,
+      [data-theme="light"] .module,
+      [data-theme="light"] .outcome-card,
+      [data-theme="light"] .term-grid > div,
+      [data-theme="light"] .practice-block,
+      [data-theme="light"] .case-study,
+      [data-theme="light"] .reference-article,
+      [data-theme="light"] .template-record,
+      [data-theme="light"] table,
+      [data-theme="light"] .checklist li { background: #fff; }
+      [data-theme="light"] th { background: #eef4ff; }
+      [data-theme="light"] code { color: #163f80; background: #e5eefc; }
       .theme-btn {
-        background: none;
-        border: 1px solid var(--line);
-        border-radius: 6px;
         width: 32px;
         height: 32px;
-        cursor: pointer;
-        color: var(--muted);
-        font-size: 1rem;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
-        transition: border-color 0.15s, color 0.15s;
-        flex-shrink: 0;
-        font-family: inherit;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        background: none;
+        cursor: pointer;
+        font: inherit;
       }
-      .theme-btn:hover { border-color: var(--accent); color: var(--accent-soft); }
+      .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
     </style>
     <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
     <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
     <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
-
-    
-
     <script type="application/ld+json" data-site-graph>
       {
         "@context": "https://schema.org",
@@ -236,38 +471,21 @@
             "url": "https://1200km.com/",
             "image": "https://1200km.com/assets/ap-logo.png",
             "jobTitle": "Threat Intelligence Research Engineer",
-            "worksFor": {
-              "@type": "Organization",
-              "name": "XPLG"
-            },
             "sameAs": [
               "https://github.com/anpa1200",
               "https://medium.com/@1200km",
               "https://www.linkedin.com/in/andrey-pautov/",
               "https://infosecwriteups.com/@1200km"
             ],
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Tel Aviv",
-              "addressCountry": "IL"
-            },
-            "email": "mailto:1200km@gmail.com",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "contactType": "professional inquiries",
-              "email": "mailto:1200km@gmail.com"
-            },
             "knowsAbout": [
-              "Cyber Threat Intelligence",
-              "Detection Engineering",
+              "Open-source intelligence",
+              "Reconnaissance",
+              "External attack surface management",
+              "Internet infrastructure research",
+              "Digital evidence",
+              "Threat intelligence",
               "MITRE ATT&CK",
-              "Threat Hunting",
-              "Malware Analysis",
-              "OpenCTI",
-              "SIEM Validation",
-              "Adversary Simulation",
-              "Reverse Engineering",
-              "Cloud Security"
+              "AI-assisted security research"
             ]
           },
           {
@@ -275,32 +493,26 @@
             "@id": "https://1200km.com/#website",
             "name": "1200km Security Research",
             "url": "https://1200km.com/",
-            "publisher": {
-              "@id": "https://1200km.com/#person"
-            },
-            "inLanguage": "en",
-            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
-            "author": {
-              "@id": "https://1200km.com/#person"
-            }
+            "publisher": {"@id": "https://1200km.com/#person"},
+            "inLanguage": "en"
           },
           {
-            "@type": "WebPage",
+            "@type": ["WebPage", "TechArticle"],
             "@id": "https://1200km.com/cyber-knowledge/osint.html#webpage",
             "url": "https://1200km.com/cyber-knowledge/osint.html",
-            "name": "OSINT & Reconnaissance",
-            "description": "OSINT & Reconnaissance. Syllabus in progress: search operators, infrastructure enumeration, social/corporate footprinting, and OPSEC…",
-            "isPartOf": {
-              "@id": "https://1200km.com/#website"
-            },
-            "breadcrumb": {
-              "@id": "https://1200km.com/cyber-knowledge/osint.html#breadcrumb"
-            },
-            "author": {
-              "@id": "https://1200km.com/#person"
-            },
+            "name": "OSINT & Reconnaissance — Practitioner Field Guide",
+            "headline": "OSINT & Reconnaissance — Practitioner Field Guide",
+            "description": "A practical 14-module guide to authorized and ethical open-source collection, infrastructure discovery, media verification, threat research, automation, AI assistance, evidence preservation, and reporting.",
+            "isPartOf": {"@id": "https://1200km.com/#website"},
+            "breadcrumb": {"@id": "https://1200km.com/cyber-knowledge/osint.html#breadcrumb"},
+            "author": {"@id": "https://1200km.com/#person"},
             "inLanguage": "en",
-            "dateModified": "2026-07-25",
+            "datePublished": "2026-07-27",
+            "dateModified": "2026-07-27",
+            "proficiencyLevel": "Intermediate to advanced",
+            "educationalLevel": "Beginner to advanced",
+            "learningResourceType": "Cybersecurity practitioner field guide",
+            "about": ["Open-source intelligence", "Reconnaissance", "External attack surface management", "Digital evidence"],
             "primaryImageOfPage": {
               "@type": "ImageObject",
               "url": "https://1200km.com/assets/site-og-v2.png"
@@ -310,32 +522,16 @@
             "@type": "BreadcrumbList",
             "@id": "https://1200km.com/cyber-knowledge/osint.html#breadcrumb",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://1200km.com/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Cyber Knowledge",
-                "item": "https://1200km.com/cyber-knowledge/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "OSINT & Reconnaissance",
-                "item": "https://1200km.com/cyber-knowledge/osint.html"
-              }
+              {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://1200km.com/"},
+              {"@type": "ListItem", "position": 2, "name": "Cyber Knowledge", "item": "https://1200km.com/cyber-knowledge/"},
+              {"@type": "ListItem", "position": 3, "name": "OSINT & Reconnaissance", "item": "https://1200km.com/cyber-knowledge/osint.html"}
             ]
           }
         ]
       }
     </script>
-</head>
+  </head>
   <body id="top">
-
     <!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -381,27 +577,636 @@
     <main data-pagefind-body id="main-content">
       <div class="page-hero">
         <div class="page-hero-inner">
-          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain syllabus</p>
+          <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Domain 10 · Practitioner field guide</p>
           <h1 class="page-title" id="osint">OSINT &amp; Reconnaissance</h1>
-          <p class="page-lead">Open-source intelligence gathering: search operators, infrastructure enumeration, social/corporate footprinting, and OPSEC while collecting.</p>
+          <p class="page-lead">OSINT is disciplined inquiry using lawfully accessible information. Reconnaissance is the structured discovery of entities, infrastructure, relationships, exposure, and change. This guide moves from questions and authority to reproducible collection, careful attribution, protected evidence, explicit confidence, and operational handoff—not from a name to an invasive search.</p>
           <div class="notice" role="note">
-            <div>
-              <strong>Under construction</strong>
-              <p>This domain syllabus has not been written yet. Start with the CTI syllabus, which is live, while this page is built out.</p>
-            </div>
+            <strong>Authorization, privacy, and safety boundary</strong>
+            <p>Publicly visible does not mean ethically unrestricted, risk-free, accurate, or authorized for active testing. Follow applicable law, platform terms, organizational policy, data-protection requirements, contractual scope, and a documented collection plan. Do not harass, impersonate, pretext, bypass access controls, purchase illicit data, expose vulnerable people, or actively probe systems without explicit authority. Use qualified legal and privacy review where the purpose, jurisdiction, or handling is uncertain.</p>
           </div>
           <div class="page-hero-links">
-            <a class="button primary" href="/cyber-knowledge/cti.html">Read the CTI syllabus →</a>
-            <a class="button" href="/cyber-knowledge/">← Back to Cyber Knowledge</a>
+            <a class="button primary" href="#learning-path">Start the learning path</a>
+            <a class="button" href="#cases">Open case studies</a>
+            <a class="button" href="#labs">Build the labs</a>
+            <a class="button" href="/cyber-knowledge/">Cyber Knowledge index</a>
           </div>
+          <p class="content-freshness"><span>Source review: 27 July 2026</span><span>Status: maintained practitioner guide</span><span>Collection must follow current law, policy, terms, and scope</span></p>
         </div>
       </div>
 
-      <div class="placeholder-panel">
-        <h2 id="coming-soon">Coming soon</h2>
-        <p>The full zero-to-hero syllabus for OSINT &amp; Reconnaissance — terminology, frameworks, tools, and a recommended learning order — is being written next. Check back soon, or follow the CTI domain as a model for how each syllabus page will be structured.</p>
+      <nav class="guide-nav" aria-label="Guide sections">
+        <div class="guide-nav-inner">
+          <a href="#orientation">Orientation</a>
+          <a href="#learning-path">14 modules</a>
+          <a href="#source-matrix">Source matrix</a>
+          <a href="#cases">Cases</a>
+          <a href="#labs">Labs</a>
+          <a href="#failures">Failure atlas</a>
+          <a href="#readiness">Readiness gate</a>
+          <a href="#references">References</a>
+        </div>
+      </nav>
+
+      <div class="guide-layout">
+        <aside class="toc" aria-label="Table of contents">
+          <h2>Table of contents</h2>
+          <span class="toc-group">Start here</span>
+          <ol>
+            <li><a href="#orientation">Purpose, boundaries, and outcomes</a></li>
+            <li><a href="#operating-model">Investigation operating model</a></li>
+          </ol>
+          <span class="toc-group">Fourteen modules</span>
+          <ol>
+            <li><a href="#module-1">Authority, ethics, privacy, and OPSEC</a></li>
+            <li><a href="#module-2">Questions and collection planning</a></li>
+            <li><a href="#module-3">Search, archives, and public documents</a></li>
+            <li><a href="#module-4">DNS, RDAP, certificates, and routing</a></li>
+            <li><a href="#module-5">Internet exposure and service indexes</a></li>
+            <li><a href="#module-6">Web, API, and application reconnaissance</a></li>
+            <li><a href="#module-7">People and organization research</a></li>
+            <li><a href="#module-8">Code, packages, cloud, and leaked artifacts</a></li>
+            <li><a href="#module-9">Images, video, geolocation, and time</a></li>
+            <li><a href="#module-10">Threat infrastructure and IOC pivoting</a></li>
+            <li><a href="#module-11">Automation, graphs, and data engineering</a></li>
+            <li><a href="#module-12">AI-assisted OSINT</a></li>
+            <li><a href="#module-13">Defensive exposure monitoring</a></li>
+            <li><a href="#module-14">Analysis, preservation, and reporting</a></li>
+          </ol>
+          <span class="toc-group">Practice</span>
+          <ul>
+            <li><a href="#source-matrix">Source decision matrix</a></li>
+            <li><a href="#artifacts">Core artifact templates</a></li>
+            <li><a href="#cases">Six end-to-end cases</a></li>
+            <li><a href="#labs">Twelve-lab sequence</a></li>
+            <li><a href="#failures">Failure atlas</a></li>
+            <li><a href="#readiness">Investigation readiness gate</a></li>
+            <li><a href="#references">Primary references</a></li>
+          </ul>
+        </aside>
+
+        <article class="guide-content">
+          <section id="orientation">
+            <p class="section-kicker">Orientation</p>
+            <h2>Find less, understand more, and preserve the path between source and conclusion</h2>
+            <p class="section-intro">OSINT quality is not measured by tabs opened, records collected, tools installed, or nodes drawn. It is measured by whether the collection answered a defined question, stayed inside authority and minimization boundaries, preserved provenance, separated observation from inference, survived challenge, and produced a proportionate decision.</p>
+            <div class="outcome-grid">
+              <div class="outcome-card">
+                <h3>Discovery</h3>
+                <p>Identify candidate entities, infrastructure, aliases, services, publications, relationships, and changes from sources suited to the question. Record what each source actually observes and what it cannot establish.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Verification</h3>
+                <p>Corroborate important claims through independent evidence, temporal consistency, source proximity, content analysis, and explicit alternatives. A repeated claim is not independent confirmation when every copy derives from one origin.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Protection</h3>
+                <p>Protect investigators, subjects, sources, credentials, queries, workstations, case data, and downstream users. Minimize personal and sensitive data, control access, and avoid actions that create harm or tip off a monitored actor.</p>
+              </div>
+              <div class="outcome-card">
+                <h3>Communication</h3>
+                <p>Deliver a claim-evidence matrix, timeline, entity model, confidence assessment, limitations, alternative hypotheses, and recommended collection or response. Make uncertainty visible instead of hiding it behind a polished graph.</p>
+              </div>
+            </div>
+            <div class="term-grid" style="margin-top:14px">
+              <div><h3>Open-source information</h3><p>Lawfully accessible material that may be observed, requested, purchased through legitimate channels, or obtained under an applicable public-access process. Accessibility, legality, terms, and ethical use remain context-dependent.</p></div>
+              <div><h3>OSINT</h3><p>An analyzed product derived from open-source information to address a defined requirement. Search output becomes intelligence only after evaluation, corroboration, interpretation, and communication.</p></div>
+              <div><h3>Passive reconnaissance</h3><p>Collection from existing third-party or supplied observations without intentionally sending assessment traffic to the target. “Passive” does not remove privacy, terms, attribution, or operational-security risks.</p></div>
+              <div><h3>Active reconnaissance</h3><p>Direct interaction with target-controlled systems or people to discover information. It requires explicit scope, rate and safety controls, source attribution, stop conditions, and coordination.</p></div>
+            </div>
+          </section>
+
+          <section id="operating-model">
+            <p class="section-kicker">Operating model</p>
+            <h2>One traceable chain from requirement to supported claim</h2>
+            <p class="section-intro">Use a durable investigation chain: requirement → authority and risk assessment → hypotheses → collection plan → source capture → normalization → entity resolution → corroboration → analysis → confidence → review → dissemination → retention or deletion. Every transition should be inspectable.</p>
+            <div class="table-scroll" role="region" aria-label="OSINT investigation operating model" tabindex="0">
+              <table>
+                <thead><tr><th>Layer</th><th>Question</th><th>Minimum record</th><th>Failure to avoid</th></tr></thead>
+                <tbody>
+                  <tr><td>Requirement</td><td>Which decision must this investigation support?</td><td>Requestor, decision, precise questions, priority, deadline, audience, acceptable uncertainty</td><td>Collecting everything about a person or organization “just in case”</td></tr>
+                  <tr><td>Authority</td><td>What may be collected, from where, by which method, and for how long?</td><td>Purpose, legal/policy basis, scope, prohibited actions, privacy and safety constraints, approver</td><td>Assuming public visibility authorizes interaction, republication, or indefinite retention</td></tr>
+                  <tr><td>Collection</td><td>Which source can observe the required fact?</td><td>Source, query, account/tool, timestamp, result, coverage, cost, terms, errors, capture hash</td><td>Treating an aggregator as the original source or a missing result as proof of absence</td></tr>
+                  <tr><td>Identity</td><td>Do records refer to the same entity?</td><td>Stable identifiers, temporal overlap, shared attributes, conflicts, confidence, alternatives</td><td>Merging by name, email pattern, IP, logo, or shared hosting alone</td></tr>
+                  <tr><td>Analysis</td><td>What is observed, inferred, assessed, and still unknown?</td><td>Claim-evidence matrix, hypotheses, confidence, source quality, contradictions, gaps</td><td>Graph proximity, AI prose, or repeated reporting presented as proof</td></tr>
+                  <tr><td>Handoff</td><td>What action is proportionate and reviewable?</td><td>Finding, scope, owner, evidence links, caveats, sensitivity, next step, retention</td><td>Doxxing, over-attribution, automated enforcement, or publication without harm review</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="learning-path">
+            <p class="section-kicker">Learning path</p>
+            <h2>Fourteen-module OSINT and reconnaissance practitioner sequence</h2>
+            <p class="section-intro">Complete the modules in order when building a new capability. Experienced researchers can use them as a review map, but the dependencies remain: collection without authority creates risk, data without provenance cannot be defended, and attribution without alternatives is storytelling.</p>
+
+            <div class="module" id="module-1">
+              <div class="module-header"><div><h3>Authority, ethics, privacy, safety, and operational security</h3></div><span class="module-number">Module 01</span></div>
+              <p>Before searching, establish purpose, authority, scope, collection classes, prohibited methods, dissemination, retention, and stop conditions. Distinguish research about organization-controlled infrastructure from research about individuals. The latter can expose vulnerable people, families, employees, sources, investigators, or unrelated tenants, even when fragments are publicly visible.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Collection risk assessment</h4><p>Assess legal and policy basis, platform terms, expected personal/special-category data, minors or vulnerable persons, source sensitivity, jurisdiction, necessity, proportionality, retention, reidentification risk, potential notification, and harm if the case file leaks. Record why each data class is needed.</p></div>
+                <div class="practice-block"><h4>Investigator OPSEC</h4><p>Use organization-managed research identities where permitted, isolated browser profiles or workstations, separate credentials, strong MFA, controlled downloads, DNS and browser telemetry awareness, approved VPN/proxy design, malware-safe handling, logging, and a documented rule for when not to authenticate, click, download, contact, or join a community.</p></div>
+              </div>
+              <ul>
+                <li><strong>Passive is not invisible:</strong> search providers, websites, social platforms, archives, and APIs can log queries, source addresses, cookies, browser characteristics, and account identity.</li>
+                <li><strong>Public is not ownerless:</strong> copyright, database rights, contractual terms, confidentiality, privacy, safeguarding, and contextual integrity may still apply.</li>
+                <li><strong>Contact changes the operation:</strong> messaging a subject, requesting access, creating a pretext, or joining a restricted group can create legal, ethical, evidentiary, and safety consequences.</li>
+                <li><strong>Data brokers are not neutral:</strong> provenance, consent, accuracy, access legitimacy, and downstream risk must be reviewed before acquisition or use.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> define purpose → classify target and affected people → determine authority → select minimally intrusive methods → approve research identity and environment → set prohibited actions and stop conditions → record dissemination and retention → brief the investigator → review when scope changes.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> collection authority, privacy/safety assessment, scope and exclusions, approved identities and tooling, data classes, contact prohibition, escalation path, retention schedule, and reviewer.</div>
+              <div class="boundary"><strong>Boundary:</strong> this guide does not authorize investigation, access, surveillance, impersonation, social engineering, active scanning, or publication. Obtain context-specific approval. Do not use OSINT to facilitate stalking, harassment, credential abuse, physical targeting, or discrimination.</div>
+              <div class="acceptance"><strong>Accept when:</strong> an independent reviewer can tell what may be collected, why it is necessary, what must not be done, which harms are controlled, and when work must stop.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://searchlibrary.ohchr.org/record/30334?ln=en" target="_blank" rel="noopener noreferrer">OHCHR and UC Berkeley — Berkeley Protocol on Digital Open Source Investigations</a> · <a href="https://csrc.nist.gov/pubs/sp/800/115/final" target="_blank" rel="noopener noreferrer">NIST SP 800-115</a></p>
+            </div>
+
+            <div class="module" id="module-2">
+              <div class="module-header"><div><h3>Intelligence requirements, hypotheses, and collection planning</h3></div><span class="module-number">Module 02</span></div>
+              <p>Translate a broad request into answerable questions. “Research this company,” “find everything about this person,” and “map the attack surface” have no natural stopping point. A defensible requirement names the decision, target entity, time window, relevant relationship, acceptable evidence, priority, constraints, and the uncertainty the decision-maker can tolerate.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Question decomposition</h4><p>Break the requirement into claims: legal identity; owned domains and netblocks; externally operated services; brands and products; historical changes; supplier dependencies; public code; known malicious relationships; or whether one observable is connected to a campaign. State what would support, weaken, or falsify each hypothesis.</p></div>
+                <div class="practice-block"><h4>Collection matrix</h4><p>For every question, list preferred original sources, secondary sources, query variants, identifiers, time coverage, expected result type, access and rate limits, privacy class, collection owner, validation route, fallback, and stop rule. Assign source priority before results bias the method.</p></div>
+              </div>
+              <h4>Build the seed set without contaminating the conclusion</h4>
+              <p>Start from known-good identifiers: official legal name, verified domain, registry identifier, supplied IP or hash, published account, or certificate fingerprint. Preserve where each seed came from. Expand one relationship at a time and label every edge by relationship type, observation time, and source. Never let a candidate discovered during collection silently become a confirmed seed.</p>
+              <div class="workflow"><strong>Workflow:</strong> record the decision → write priority intelligence requirements → define scope and target identifiers → create competing hypotheses → choose observable indicators for each → map sources and query order → set collection limits → peer-review the plan → execute and update gaps without rewriting the original question.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> requirement record, target dictionary, hypothesis register, collection matrix, source register, query log, coverage and gap log, changes to scope, and completion criteria.</div>
+              <div class="boundary"><strong>Boundary:</strong> a tool’s available fields should not define the investigation. Start with the question; use tools only where their observation model can contribute evidence.</div>
+              <div class="acceptance"><strong>Accept when:</strong> every planned query supports a named question, has a justified source and collection boundary, and can be stopped when sufficient evidence or a defined limit is reached.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/cyber-knowledge/cti.html">Cyber Threat Intelligence field guide</a> · <a href="/articles/adversarygraph-from-log-to-report-ioc-investigation.html">AdversaryGraph IOC investigation workflow</a></p>
+            </div>
+
+            <div class="module" id="module-3">
+              <div class="module-header"><div><h3>Search engines, web archives, public records, and documents</h3></div><span class="module-number">Module 03</span></div>
+              <p>General search is a discovery layer, not a source of truth. Query multiple indexes because coverage, ranking, geography, language, personalization, removals, caching, and date interpretation differ. Capture the result page, query, locale, time, and destination. Open the underlying document and locate its publisher, edition, date, context, and revision history.</p>
+              <ul>
+                <li><strong>Query design:</strong> combine exact phrases, aliases, identifiers, site or domain restrictions, file types, date ranges, language variants, transliterations, known document titles, and exclusions. Keep a query notebook so another researcher can reproduce the path.</li>
+                <li><strong>Archives:</strong> compare captures over time, but distinguish capture time from publication time. Missing snapshots do not prove a page never existed. Archived scripts, redirects, images, robots exclusions, and dynamic content may be incomplete.</li>
+                <li><strong>Documents:</strong> inspect title, author, publisher, revision, embedded links, signatures, metadata, page references, and visual consistency. Sanitize downloads and avoid opening untrusted active content on normal workstations.</li>
+                <li><strong>Public records:</strong> use the authoritative registry, court, procurement, corporate, regulatory, standards, or government portal where available. Record jurisdiction, identifier, effective date, status, and whether the database is complete or delayed.</li>
+                <li><strong>Languages:</strong> preserve the original text and source. Treat machine translation as an aid, not a substitute for qualified review when nuance changes the conclusion.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> build alias and identifier variants → search multiple indexes → capture result and destination → pivot to original publisher or authoritative registry → retrieve safely → hash and store → extract entities and dates → compare archived versions → corroborate material claims → document absence limits.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> exact query, engine/source, timestamp, locale, result URL, final URL, HTTP/archival context where available, document hash, publisher, publication/revision date, relevant excerpt location, and capture method.</div>
+              <div class="boundary"><strong>Boundary:</strong> cached snippets, AI summaries, search-result counts, autogenerated profile pages, and scraped mirrors are discovery aids. Do not cite them as original evidence when the authoritative item exists.</div>
+              <div class="acceptance"><strong>Accept when:</strong> each material claim links to the closest available original source, the exact supporting passage or record is preserved, and archive/search limitations are explicit.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/articles/read/2024/2024-11-09-mastering-the-basics-essential-cli-tools-for-reconnaissance-in-penetration-testing-ee7fd9e36394">Essential CLI tools for reconnaissance</a> · <a href="/guides.html#network-reconnaissance">Network reconnaissance guides</a></p>
+            </div>
+
+            <div class="module" id="module-4">
+              <div class="module-header"><div><h3>Domain, DNS, RDAP, certificate transparency, and routing research</h3></div><span class="module-number">Module 04</span></div>
+              <p>Infrastructure research works best as a time-aware evidence graph. A domain can resolve to shared CDN addresses; a certificate can cover customer-selected names; an ASN can announce provider and tenant space; and registration records can be privacy-protected or redacted. Every relationship needs a type, observation time, source, ownership interpretation, and confidence.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Names and registration</h4><p>Use DNS for current records and authorized passive-DNS providers for historical observations. Use RDAP for structured domain, IP network, and autonomous-system registration data where supported. Preserve registrar/registry status, events, nameservers, entities returned, notices, redaction, and query time. Registration, administration, hosting, and operational control are different relationships.</p></div>
+                <div class="practice-block"><h4>Certificates and routing</h4><p>Certificate Transparency logs can reveal names submitted in certificates and support monitoring for unexpected issuance. Inspect subject alternative names, issuer, validity, fingerprint, key and signature properties, source log, and first/last observation. Use RIR/RDAP and BGP sources for prefixes, origin AS, route history, and organization records while distinguishing allocation, announcement, hosting, and service ownership.</p></div>
+              </div>
+              <h4>Resolution workflow</h4>
+              <p>Start with the verified domain. Enumerate current authoritative DNS records and nameserver delegation. Search certificate records for exact and wildcard names, then validate candidates against current and historical DNS. Resolve IPs to registration and routing context. Identify CDN, cloud, shared-hosting, WAF, reverse proxy, email, SaaS, and third-party boundaries. A candidate becomes organization-attributed only when two or more suitable signals support that relationship or an authoritative source confirms it.</p>
+              <div class="workflow"><strong>Workflow:</strong> canonicalize the name → query DNS and DNSSEC context → retrieve RDAP → inspect CT and live TLS → resolve and classify addresses → map RIR/ASN/BGP context → compare historical observations → identify shared-service boundaries → record candidates separately from confirmed assets.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> normalized FQDN, record type/value/TTL, first and last observation, resolver/provider, RDAP object and notices, certificate fingerprint and names, IP prefix, ASN, route observation, provider classification, and ownership rationale.</div>
+              <div class="boundary"><strong>Boundary:</strong> a shared IP, wildcard certificate, reverse-DNS suffix, analytics identifier, or common nameserver does not by itself prove common ownership. CDN and SaaS observations often describe delivery infrastructure rather than the customer’s origin.</div>
+              <div class="acceptance"><strong>Accept when:</strong> confirmed assets are separated from candidates and third-party services, historical observations include time bounds, and every ownership statement identifies the evidence and alternative explanation.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://www.icann.org/rdap/" target="_blank" rel="noopener noreferrer">ICANN RDAP</a> · <a href="https://www.rfc-editor.org/rfc/rfc9162.html" target="_blank" rel="noopener noreferrer">RFC 9162 — Certificate Transparency Version 2.0</a> · <strong>1200km:</strong> <a href="/articles/read/2024/2024-11-07-theharvester-your-essential-tool-for-osint-and-reconnaissance-in-cybersecurity-10aa6d76f5b3">theHarvester guide</a></p>
+            </div>
+
+            <div class="module" id="module-5">
+              <div class="module-header"><div><h3>Internet exposure, service indexes, and infrastructure search</h3></div><span class="module-number">Module 05</span></div>
+              <p>Internet-wide search platforms expose observations collected at particular times through particular scan methods. Shodan’s fundamental record is a service banner; Censys models hosts, web properties, certificates, and related assets; urlscan stores website-scan observations and resources. Their outputs are valuable evidence leads, but they are not live ground truth, vulnerability proof, ownership proof, or permission to test.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Query discipline</h4><p>Begin with confirmed organization identifiers: netblocks, exact domains, certificate names or fingerprints, approved organization fields, or known products. Use structured filters, narrow time windows, and exported raw records. Record account tier and coverage because history, fields, results, quotas, and API features vary.</p></div>
+                <div class="practice-block"><h4>Observation interpretation</h4><p>Separate IP host, virtual host, web property, service, certificate, and screenshot observations. Note observed-at time, scanner vantage, protocol, port, transport, banner, HTTP/TLS metadata, labels, inferred software, CPE/CVE claims, and provider. Validate critical exposure against an authorized current source before escalation.</p></div>
+              </div>
+              <ul>
+                <li><strong>Shodan:</strong> search banners and structured properties. Preserve the full banner and observation date; product or vulnerability fields remain scanner-derived claims.</li>
+                <li><strong>Censys:</strong> choose hosts for IP and non-HTTP service questions, web properties for hostname/HTTP behavior, and certificates for issuance and presentation relationships.</li>
+                <li><strong>urlscan:</strong> search historical scans before submitting a URL. Submission visibility matters; a public scan can disclose an investigation target or sensitive URL.</li>
+                <li><strong>Reputation platforms:</strong> distinguish crowdsourced labels, vendor verdicts, passive associations, detections, and analyst comments. Count sources, not repeated feeds that inherit one label.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> validate seed → query exact records → export raw observations → normalize assets/services/timestamps → classify provider and shared tenancy → compare independent platforms → verify material exposure through authorized current inventory or scanning → open remediation with evidence and expiry.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> platform, dataset, query, account tier, timestamp, returned observation time, raw record, asset type, IP/hostname/port, service metadata, certificate, screenshot provenance, coverage caveat, and verification status.</div>
+              <div class="boundary"><strong>Boundary:</strong> never equate an internet-index result with current exploitable exposure. A banner may be stale, deceptive, proxied, shared, incorrectly parsed, or changed since observation. Do not trigger an on-demand scan without authority.</div>
+              <div class="acceptance"><strong>Accept when:</strong> every exposure is tied to a time and dataset, shared infrastructure is handled correctly, and high-impact findings are revalidated through an authorized current source.</div>
+              <p class="further-reading"><strong>Official:</strong> <a href="https://help.shodan.io/the-basics/search-query-fundamentals" target="_blank" rel="noopener noreferrer">Shodan query fundamentals</a> · <a href="https://docs.censys.com/docs/platform-quickstart-guide" target="_blank" rel="noopener noreferrer">Censys Platform quick start</a> · <a href="https://docs.urlscan.io/apis/urlscan-openapi/search" target="_blank" rel="noopener noreferrer">urlscan Search API</a> · <strong>1200km:</strong> <a href="/articles/read/2024/2024-10-24-shodan-guide-how-you-can-find-everything-640f47f41bbe">Shodan guide</a> · <a href="/articles/read/2024/2024-11-10-censys-for-enhanced-cybersecurity-insight-533df14794bd">Censys guide</a></p>
+            </div>
+
+            <div class="module" id="module-6">
+              <div class="module-header"><div><h3>Web, API, mobile, and application reconnaissance</h3></div><span class="module-number">Module 06</span></div>
+              <p>Application reconnaissance models entry points, trust boundaries, identities, data flows, technologies, deployments, and third parties. Passive discovery can include indexed pages, archived content, public documentation, application stores, package registries, public API specifications, DNS, certificates, client-side code already delivered to a normal user, and exposure-index observations. Direct crawling, directory enumeration, fingerprinting, parameter discovery, or protocol interaction is active testing and must stay inside explicit scope.</p>
+              <ul>
+                <li><strong>Application inventory:</strong> hostname, scheme, ports, environment, product, owner, authentication, user roles, API base URLs, mobile package identifiers, status pages, documentation, repositories, data classes, and third-party integrations.</li>
+                <li><strong>Client-visible surface:</strong> links, scripts, source maps, API endpoints, feature flags, telemetry endpoints, storage names, CSP/connect destinations, public configuration, and framework metadata. Do not treat an endpoint name as proof that it is reachable or vulnerable.</li>
+                <li><strong>API context:</strong> published OpenAPI/GraphQL documentation, versioning, base paths, authentication scheme, rate-limit statements, SDKs, examples, deprecation, status, and public change logs.</li>
+                <li><strong>Historical surface:</strong> archived routes, old documentation, retired subdomains, mobile versions, abandoned marketing applications, and previous hosting. Validate current ownership and availability before classifying.</li>
+                <li><strong>Active phase:</strong> use an approved user agent, source address, rate, time window, request method set, wordlist, exclusion list, authentication account, data-handling rule, and emergency contact.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> establish owned application seeds → enumerate passive sources → build endpoint and trust-boundary model → reconcile inventory and owners → mark candidates → approve active phase if needed → collect low-impact confirmations → stop on instability or out-of-scope redirection → report exposure separately from vulnerability.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> source URL, capture time, application/environment, endpoint, method if known, authentication context, observed client reference or response, archive status, scope state, owner, and validation status.</div>
+              <div class="boundary"><strong>Boundary:</strong> do not fuzz, brute-force, enumerate accounts, bypass controls, upload payloads, or probe third-party integrations under the label “OSINT.” Those are active security tests and require their own authority and safeguards.</div>
+              <div class="acceptance"><strong>Accept when:</strong> the application surface distinguishes observed, inferred, historical, third-party, and actively verified components, with owners and scope status attached.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://owasp.org/www-project-web-security-testing-guide/" target="_blank" rel="noopener noreferrer">OWASP Web Security Testing Guide</a> · <strong>1200km:</strong> <a href="/articles/read/2024/2024-11-10-web-applications-penetretion-testing-stage-1-reconnaissance-6b6b7aae0399">Web application reconnaissance</a> · <a href="/cyber-knowledge/secure-code.html">Secure Code / Application Security</a></p>
+            </div>
+
+            <div class="module" id="module-7">
+              <div class="module-header"><div><h3>People, organizations, brands, suppliers, and relationship research</h3></div><span class="module-number">Module 07</span></div>
+              <p>People and organization research carries the highest risk of unnecessary collection and harm. Define the organizational question first: confirm an executive role from authoritative publications, identify the owner of a business service, validate a supplier relationship, detect brand impersonation, or understand public hiring signals relevant to a threat model. Avoid building personal dossiers where an organization-level answer is sufficient.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Authoritative organization sources</h4><p>Prefer official corporate sites, filings, registries, regulator notices, procurement records, verified press releases, conference programs, patent or standards records, repositories, and the subject’s own professional publication. Record effective dates; titles, subsidiaries, brands, and supplier relationships change.</p></div>
+                <div class="practice-block"><h4>Identity resolution</h4><p>Use multiple stable attributes: legal entity or employer, verified account, organization domain, location at the relevant time, publication history, unique identifier, or explicit cross-link. Names, profile photos, usernames, writing style, and contact patterns are weak alone. Preserve conflicts and avoid inferring sensitive attributes.</p></div>
+              </div>
+              <ul>
+                <li>Collect the minimum professional information necessary for the requirement and mask personal contact details in routine reporting.</li>
+                <li>Distinguish current employee, former employee, contractor, speaker, contributor, customer, partner, reseller, and unverified self-claim.</li>
+                <li>For brand monitoring, preserve the legitimate brand baseline—domains, certificates, visual marks, support channels, and campaigns—before labeling a lookalike.</li>
+                <li>Do not contact colleagues, relatives, or unrelated third parties; do not attempt password recovery, account discovery, or identity challenge flows.</li>
+                <li>Escalate safeguarding concerns and credible threats through approved channels rather than publishing personal information.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> state organization-level question → minimize attributes → collect official records → add self-published professional sources → resolve identity with independent signals → record temporal validity → review privacy and harm → redact outputs → retain only what supports the decision.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> entity type, exact name, stable identifier, role/relationship, source publisher, direct URL, publication/effective date, capture time, corroboration, conflicts, sensitivity, redaction, and confidence.</div>
+              <div class="boundary"><strong>Boundary:</strong> never infer ethnicity, religion, health, sexuality, political belief, home location, family relationship, or other sensitive characteristics unless a lawful and necessary investigation explicitly requires qualified handling. Public availability does not make inference accurate or proportionate.</div>
+              <div class="acceptance"><strong>Accept when:</strong> the answer uses the least personal data possible, material identities and relationships are time-bounded and corroborated, and reporting cannot reasonably expose unrelated people.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://searchlibrary.ohchr.org/record/30334?ln=en" target="_blank" rel="noopener noreferrer">Berkeley Protocol</a> · <strong>1200km:</strong> <a href="/privacy.html">Privacy / Data Handling</a> · <a href="/cyber-knowledge/grc.html#module-10">Privacy and data governance</a></p>
+            </div>
+
+            <div class="module" id="module-8">
+              <div class="module-header"><div><h3>Public code, packages, cloud artifacts, documents, and exposed secrets</h3></div><span class="module-number">Module 08</span></div>
+              <p>Public repositories and package ecosystems can explain technologies, ownership, deployment patterns, identifiers, domains, storage names, API schemas, historical changes, and third-party dependencies. They can also expose credentials or sensitive configuration. Treat suspected secrets as hazardous evidence: do not test them, do not place them in tickets or chat, and do not broaden access.</p>
+              <ul>
+                <li><strong>Repository discovery:</strong> search verified organizations, repository topics, package metadata, commit authorship where appropriate, documentation links, dependency files, CI workflows, infrastructure templates, container references, public issue trackers, and release artifacts.</li>
+                <li><strong>Attribution:</strong> a repository name, copied code, contributor email, package namespace, or cloud identifier may be stale, forked, mirrored, typosquatted, or unrelated. Confirm through organization ownership, signed releases, official links, registry publisher data, and temporal consistency.</li>
+                <li><strong>Secret handling:</strong> preserve only the minimum needed to report; mask values; record repository, path, commit, discovery time, type, exposure status, and responsible contact. Do not clone unnecessary history if a safer permalink or platform report is sufficient.</li>
+                <li><strong>Cloud artifacts:</strong> bucket names, tenant IDs, account IDs, regions, image names, workload identity, and endpoints are identifiers, not proof of public access. Validate ownership and exposure through the owner or an explicitly authorized assessment.</li>
+                <li><strong>Dependencies:</strong> package name and version may support technology inventory, but lockfiles, built artifacts, runtime inventory, and deployment evidence provide different confidence levels.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> identify verified organization and packages → query narrow identifiers → capture permalink/commit metadata → classify source and temporal validity → route suspected secrets privately without use → reconcile software/cloud clues with authoritative inventory → document candidate relationships → delete unnecessary sensitive copies.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> platform, organization/repository/package, immutable commit or release identifier, path, timestamp, publisher, signature/verification state, relevant masked excerpt, secret-handling record, ownership status, and remediation handoff.</div>
+              <div class="boundary"><strong>Boundary:</strong> discovering a credential does not authorize authentication. Do not verify by logging in, querying an API, listing a bucket, or attempting a transaction. Follow the platform’s reporting mechanism and the organization’s incident process.</div>
+              <div class="acceptance"><strong>Accept when:</strong> repository and package attribution is supported, sensitive values are masked and access-controlled, no credential was used, and every inferred asset remains a candidate until owner evidence confirms it.</div>
+              <p class="further-reading"><strong>Official:</strong> <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories" target="_blank" rel="noopener noreferrer">GitHub repository visibility and security considerations</a> · <strong>1200km:</strong> <a href="/cyber-knowledge/cloud-security.html">Cloud Security</a> · <a href="/cyber-knowledge/secure-code.html">Secure Code / Application Security</a></p>
+            </div>
+
+            <div class="module" id="module-9">
+              <div class="module-header"><div><h3>Images, video, audio, geolocation, chronolocation, and media verification</h3></div><span class="module-number">Module 09</span></div>
+              <p>Media verification asks whether an item is original or derivative, what it depicts, where and when it may have been captured, how it was published, and whether manipulation or context changes the claim. No single metadata field, reverse-image result, shadow estimate, AI detector, compression artifact, or visual resemblance should carry the conclusion.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Preserve before analysis</h4><p>Capture the original URL, publisher/account, post and retrieval times, surrounding text, engagement context, available original file, hashes, file metadata, dimensions, codec/container, thumbnails, and archive reference. Work from copies and record transformations such as transcoding, frame extraction, cropping, enhancement, or translation.</p></div>
+                <div class="practice-block"><h4>Corroborate location and time</h4><p>Compare landmarks, terrain, road geometry, signs, scripts, utilities, transit, vegetation, weather, sun direction, shadows, construction state, event schedules, satellite or map imagery, and independent media. Document which features are distinctive, which are common, and which alternatives remain possible.</p></div>
+              </div>
+              <ul>
+                <li>Use reverse-image and keyframe searches across multiple indexes to locate earlier publication and variants.</li>
+                <li>Separate file creation metadata from upload, edit, transcoding, screenshot, and publication times.</li>
+                <li>Do not expose precise locations of vulnerable people, shelters, medical facilities, witnesses, or ongoing operations.</li>
+                <li>Track source lineage: original uploader, reposts, crops, translations, overlays, compilations, and news embeds can create false independence.</li>
+                <li>Treat automated deepfake or manipulation scores as one signal with documented model/version/limitations, not a verdict.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> preserve item and context → hash originals → map publication lineage → extract frames/metadata safely → search earlier variants → form location/time hypotheses → test distinctive features against independent sources → document contradictions → peer review → publish only the precision necessary.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> original and capture URLs, account/publisher, timestamps, hashes, tool/version, transformations, keyframes, feature table, map/weather/archive references, alternative locations/times, confidence, and safeguarding decision.</div>
+              <div class="boundary"><strong>Boundary:</strong> avoid claiming exact location or time when only country, region, season, or broad period is supported. Never sharpen uncertainty into false precision because a map pin or timestamp field is convenient.</div>
+              <div class="acceptance"><strong>Accept when:</strong> the conclusion can be reconstructed from preserved media and independent features, source lineage is understood, alternatives were tested, and publication precision passes a harm review.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://searchlibrary.ohchr.org/record/30334?ln=en" target="_blank" rel="noopener noreferrer">Berkeley Protocol on Digital Open Source Investigations</a></p>
+            </div>
+
+            <div class="module" id="module-10">
+              <div class="module-header"><div><h3>Threat infrastructure, IOC enrichment, campaign pivots, and attribution restraint</h3></div><span class="module-number">Module 10</span></div>
+              <p>Threat-infrastructure research begins with a supplied observable or behavior and asks which relationships are supported: resolution, hosting, certificate presentation, content similarity, registration, malware communication, file download, redirect, tracker reuse, or co-observation in a report. Shared infrastructure and commodity services make careless clustering especially dangerous.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Observable discipline</h4><p>Canonicalize IP, domain, URL, email, file hash, certificate fingerprint, mutex, registry path, user agent, or other artifact. Record source, first/last seen, role, confidence, TLP/handling, maliciousness basis, and expiration. Preserve exact URLs safely without browsing a live malicious destination from a normal workstation.</p></div>
+                <div class="practice-block"><h4>Relationship discipline</h4><p>Use explicit predicates: domain resolved-to IP at time; certificate presented-by host; file contacted domain in sandbox run; URL redirected-to URL; report asserted actor-used infrastructure; registration shared email; content hash matched. “Related to” is too vague for analytic review.</p></div>
+              </div>
+              <h4>Attribution ladder</h4>
+              <p>Move from observation to cluster only when multiple independent or high-quality relationships align across time, infrastructure, behavior, malware, operations, and victimology. Keep infrastructure clustering, activity-cluster naming, malware-family assessment, campaign assessment, and sponsor attribution as separate conclusions. A TTP overlap, shared hosting provider, common registrar, commodity tool, or AI-generated similarity score is a lead—not attribution.</p>
+              <div class="workflow"><strong>Workflow:</strong> validate and normalize seed → query local and approved external sources → capture direct relationships and time bounds → distinguish malicious, suspicious, benign, sinkhole, scanner, shared, and unknown roles → cluster with explicit rules → compare behavior and reporting → document alternatives → expire unsupported IOCs → hand off supported TTP and detection leads.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> observable type/value, source, handling, first/last seen, direct relationships, source independence, provider and shared-tenancy context, malware/report evidence, ATT&amp;CK mapping rationale, confidence, expiry, and contradictions.</div>
+              <div class="boundary"><strong>Boundary:</strong> reputation is context, not identity. An IP can be reassigned; a domain can be sinkholed; a certificate can be shared; and a public scanner can appear in victim telemetry. Confirm time and role before blocking or attribution.</div>
+              <div class="acceptance"><strong>Accept when:</strong> each graph edge has a typed, dated source; cluster rules are reproducible; generic signals are discounted; and attribution strength does not exceed the evidence.</div>
+              <p class="further-reading"><strong>Official:</strong> <a href="https://docs.virustotal.com/reference/relationships" target="_blank" rel="noopener noreferrer">VirusTotal relationship model</a> · <a href="https://attack.mitre.org/tactics/TA0043/" target="_blank" rel="noopener noreferrer">MITRE ATT&amp;CK Reconnaissance tactic</a> · <strong>1200km:</strong> <a href="/articles/adversarygraph-from-log-to-report-ioc-investigation.html">From log to report with AdversaryGraph</a> · <a href="/adversarygraph-docs/capabilities/">AdversaryGraph IOC investigation capabilities</a></p>
+            </div>
+
+            <div class="module" id="module-11">
+              <div class="module-header"><div><h3>Automation, APIs, entity graphs, normalization, and data engineering</h3></div><span class="module-number">Module 11</span></div>
+              <p>Automation should make collection reproducible and reviewable, not turn every weak association into a permanent fact. Design pipelines around immutable raw capture, normalized records, typed relationships, provenance, temporal validity, confidence, access control, review state, and deletion. Preserve the ability to rebuild derived graphs when parsing or resolution logic changes.</p>
+              <ul>
+                <li><strong>Raw layer:</strong> source response, request metadata, collection timestamp, tool and version, account tier, status/error, response headers where relevant, content hash, encryption, and retention class.</li>
+                <li><strong>Normalized layer:</strong> canonical entity type and value, stable internal ID, source ID, observation time, valid-from/to, labels, sensitivity, and parser version. Keep raw values for audit.</li>
+                <li><strong>Relationship layer:</strong> subject, predicate, object, source, observation time, confidence, inference rule, reviewer, status, and expiry. Avoid generic edges.</li>
+                <li><strong>Analytic layer:</strong> hypotheses, claim-evidence links, source independence, scoring explanation, contradictions, gaps, and review history.</li>
+                <li><strong>Operational layer:</strong> case, owner, dissemination, alert/detection/remediation links, suppression, retention, and deletion proof.</li>
+              </ul>
+              <h4>Reliability engineering</h4>
+              <p>Honor rate limits, quotas, acceptable-use terms, pagination, time zones, retries, backoff, schema changes, partial responses, and API deprecation. Cache according to source terms and freshness needs. Deduplicate by source-native ID plus canonical observation—not by value alone—so multiple independent sources and historical changes remain visible. Quarantine malformed or ambiguous records instead of silently coercing them.</p>
+              <div class="workflow"><strong>Workflow:</strong> register source and terms → define schema and mappings → collect into immutable raw storage → validate and normalize → resolve candidates without destructive merge → create typed edges → run confidence and expiry rules → queue analyst review → publish approved facts → monitor data quality and rebuild when logic changes.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> source registry, API/version, schema, raw hash, parser version, validation result, normalization rule, dedup key, entity-resolution decision, relationship rule, analyst approval, quality metrics, and retention action.</div>
+              <div class="boundary"><strong>Boundary:</strong> never hide source errors, missing pages, quota truncation, or parser failures behind a successful job status. A partial dataset cannot support an unqualified negative finding.</div>
+              <div class="acceptance"><strong>Accept when:</strong> a derived entity and every relationship can be traced to raw observations, uncertain merges remain reversible, failed records are visible, and deletion propagates through derived products.</div>
+              <p class="further-reading"><strong>Official tooling:</strong> <a href="https://owasp.org/www-project-amass/" target="_blank" rel="noopener noreferrer">OWASP Amass</a> · <a href="https://docs.urlscan.io/pages/search-general" target="_blank" rel="noopener noreferrer">urlscan search semantics</a> · <strong>1200km:</strong> <a href="/adversarygraph-docs/platform-guide/">AdversaryGraph platform guide</a></p>
+            </div>
+
+            <div class="module" id="module-12">
+              <div class="module-header"><div><h3>AI-assisted OSINT with bounded tools, citations, and human review</h3></div><span class="module-number">Module 12</span></div>
+              <p>AI can accelerate query generation, translation, document triage, entity extraction, schema normalization, relationship suggestions, timeline drafting, hypothesis generation, and report formatting. It can also fabricate sources, merge identities, expose sensitive case data, follow malicious content instructions, overstate confidence, and initiate actions outside scope when connected to tools.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Safe task design</h4><p>Provide a structured requirement, approved source set, data classification, target schema, prohibited inferences, citation requirement, confidence vocabulary, and instruction to return unknown when evidence is absent. Use retrieval over approved case material and require source spans for every proposed claim.</p></div>
+                <div class="practice-block"><h4>Tool and MCP controls</h4><p>Expose read-only, allowlisted tools by default. Separate search from active scanning, authentication, messaging, purchase, upload, and publication. Require explicit human authorization for any state-changing or target-interacting action. Log tool name, arguments, source, response hash, model, prompt version, and reviewer decision.</p></div>
+              </div>
+              <ul>
+                <li>Redact unnecessary personal data, secrets, private sources, and customer information before remote processing; follow provider data-handling policy.</li>
+                <li>Treat webpages, documents, repository content, images, and search results as untrusted data that may contain prompt-injection instructions.</li>
+                <li>Resolve entities deterministically where possible. AI may suggest a merge, but a reviewer must inspect supporting and conflicting identifiers.</li>
+                <li>Recalculate dates, IP ranges, hashes, DNS names, geographic coordinates, and query syntax with deterministic validation.</li>
+                <li>Preserve citations to the original item, not to the model response or a generated summary.</li>
+                <li>Evaluate on known cases for source fidelity, identity precision/recall, abstention, privacy leakage, unsafe tool selection, and confidence calibration.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> classify case data → choose permitted provider/local model → retrieve only approved evidence → run a versioned task-specific prompt → validate schema → resolve citations → verify entities and calculations → challenge with alternatives → review every proposed claim/action → save model and reviewer audit trail.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> provider/model, prompt and policy version, retrieval set, tool calls, output schema validation, citations, redactions, reviewer edits/rejections, confidence, latency/cost where relevant, and evaluation result.</div>
+              <div class="boundary"><strong>Boundary:</strong> never let an agent independently expand a person-focused target, contact a subject, authenticate, submit a URL for public scanning, buy data, trigger active reconnaissance, or publish an assessment. AI output is a lead until the underlying evidence is reviewed.</div>
+              <div class="acceptance"><strong>Accept when:</strong> the system abstains appropriately, every accepted claim resolves to reviewed evidence, tool authority is enforceable, sensitive data follows policy, and a human owns the final assessment.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/ai-offensive.html">AI &amp; Offensive Security research</a> · <a href="/hexstrike.html">HexStrike laboratory index</a> · <a href="/articles/read/2025/2025-12-23-integrating-shodan-with-hexstrike-ai-using-gemini-cli-b6f9fcbe8e6e">Shodan with HexStrike AI</a> · <a href="/articles/read/2026/2026-01-11-hexstrike-cursor-for-osint-from-one-email-to-a-full-exposure-map-ffdfc7ba1b30">AI-assisted OSINT exposure-map case study</a></p>
+            </div>
+
+            <div class="module" id="module-13">
+              <div class="module-header"><div><h3>Defensive external attack-surface discovery and continuous monitoring</h3></div><span class="module-number">Module 13</span></div>
+              <p>A defensive exposure program reconciles what the organization believes it owns with what external observers can see. Its goal is not a one-time internet scan. It maintains an attributed inventory of domains, certificates, IPs, netblocks, cloud and SaaS properties, applications, APIs, repositories, mobile apps, brands, and suppliers; detects meaningful change; verifies ownership; routes remediation; and measures closure.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Discovery-to-inventory loop</h4><p>Seed from legal entities, brands, known domains, cloud accounts, certificates, netblocks, repositories, and service owners. Discover candidates through approved sources. Score ownership evidence separately from exposure risk. Ask the responsible owner to confirm or reject. Add confirmed assets with lifecycle, criticality, environment, dependency, and monitoring coverage.</p></div>
+                <div class="practice-block"><h4>Change-to-action loop</h4><p>Track first/last seen, new certificate, DNS change, new port/service, login or administration page, exposed development environment, new repository/package, storage reference, security-header change, or brand lookalike. Deduplicate, suppress expected provider churn, verify current state, and route by owner and severity.</p></div>
+              </div>
+              <h4>Metrics that support decisions</h4>
+              <p>Measure candidate-to-confirmed precision, unknown-owner backlog, time to ownership decision, time to verification, exposure age, stale assets, orphaned domains, unexpected certificates, high-risk changes, remediation age, false-positive causes, source freshness, and coverage by critical service. Avoid using the raw number of discovered assets or scanner “risk score” as a maturity grade.</p>
+              <div class="workflow"><strong>Workflow:</strong> synchronize authoritative inventory → collect external observations → normalize and cluster → classify shared/third-party infrastructure → score ownership evidence → obtain owner confirmation → validate exposure safely → create finding and response → rescan/requery for closure → update inventory and detection logic.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> authoritative asset ID, candidate identifiers, ownership signals, provider boundary, first/last seen, current verification, service/technology, finding, owner, remediation, closure proof, source coverage, and monitoring rule.</div>
+              <div class="boundary"><strong>Boundary:</strong> third-party SaaS, CDN, cloud-provider, shared-hosting, and acquired-company assets require explicit relationship modeling. Do not import every hostname on a shared IP or certificate into company inventory.</div>
+              <div class="acceptance"><strong>Accept when:</strong> new external observations reliably reach an accountable owner, candidates are not silently promoted, current verification is proportionate, and closure updates both inventory and monitoring.</div>
+              <p class="further-reading"><strong>Primary:</strong> <a href="https://www.cisa.gov/news-events/directives/bod-23-01-improving-asset-visibility-and-vulnerability-detection-federal-networks" target="_blank" rel="noopener noreferrer">CISA BOD 23-01</a> (mandatory only for its stated FCEB scope; useful visibility concepts elsewhere) · <strong>1200km:</strong> <a href="/adversarygraph/full-version-feature-guides.html#asset-surface">AdversaryGraph Asset Surface guide</a> · <a href="/cyber-knowledge/cloud-security.html#module-10">Cloud posture and exposure</a></p>
+            </div>
+
+            <div class="module" id="module-14">
+              <div class="module-header"><div><h3>Analysis, confidence, evidence preservation, reporting, and operational handoff</h3></div><span class="module-number">Module 14</span></div>
+              <p>The final product should make the reasoning inspectable. Separate facts observed directly, source assertions, analytic inferences, and unknowns. Use consistent confidence language tied to evidence quality, source independence, identity resolution, temporal relevance, contradictions, and alternative explanations. Confidence is not the same as impact, priority, or probability.</p>
+              <div class="two-col">
+                <div class="practice-block"><h4>Claim-evidence matrix</h4><p>For each claim, record supporting observations, contradicting observations, source proximity, independence, timestamps, identity rationale, assumptions, alternative hypotheses, confidence, and reviewer. Link graphs, timelines, and screenshots back to the matrix rather than letting visuals become unsupported conclusions.</p></div>
+                <div class="practice-block"><h4>Preservation package</h4><p>Maintain original capture, normalized record, query and collection log, hashes, timestamps, tool/version, transformations, access and handling, analyst notes, source restrictions, review history, and export. For legal or disciplinary use, obtain qualified evidence-handling guidance and preserve chain-of-custody requirements.</p></div>
+              </div>
+              <ul>
+                <li><strong>Executive output:</strong> question, supported answer, confidence, material implications, limitations, decision options, and next review.</li>
+                <li><strong>Operational output:</strong> confirmed entities/observables, scope, owner, timeline, typed relationships, source links, detection/remediation actions, expiry, and handling.</li>
+                <li><strong>Analytic annex:</strong> methodology, sources, queries, identity resolution, alternatives, gaps, contradictions, AI/tool use, and quality controls.</li>
+                <li><strong>Redaction:</strong> remove personal contact data, credentials, irrelevant private details, precise safeguarding-sensitive locations, and provider secrets.</li>
+                <li><strong>Correction:</strong> provide a route to challenge or correct a record; preserve what changed, why, by whom, and which downstream products were updated.</li>
+              </ul>
+              <div class="workflow"><strong>Workflow:</strong> freeze collection set → normalize final entities → build timeline and typed graph → complete claim-evidence matrix → test alternatives → assign confidence → peer review identity/privacy/method → produce audience-specific report → record dissemination → track action/correction/expiry → delete data when retention ends.</div>
+              <div class="evidence-note"><strong>Evidence:</strong> complete case manifest, original and derived hashes, query log, source register, claim-evidence matrix, entity-resolution decisions, confidence rubric, alternative hypotheses, redaction log, reviewer approval, dissemination, and retention event.</div>
+              <div class="boundary"><strong>Boundary:</strong> write “not observed in the searched sources and time window,” not “does not exist.” Write “assessed with moderate confidence,” not “confirmed,” when the relationship depends on inference.</div>
+              <div class="acceptance"><strong>Accept when:</strong> another analyst can reproduce the collection path, distinguish evidence from inference, evaluate alternatives, understand limitations, and execute the handoff without receiving unnecessary sensitive data.</div>
+              <p class="further-reading"><strong>1200km:</strong> <a href="/external-validation.html">External validation and evidence</a> · <a href="/cyber-knowledge/dfir.html">DFIR evidence and timeline practice</a> · <a href="/adversarygraph-docs/use-cases/investigation-apt-campaign-cluster/">AdversaryGraph campaign-cluster investigation</a></p>
+            </div>
+          </section>
+
+          <section id="source-matrix">
+            <p class="section-kicker">Source strategy</p>
+            <h2>Choose sources by observation model, not brand familiarity</h2>
+            <p class="section-intro">No platform “has all the data.” Select a source because it can observe the entity or relationship needed, then document coverage, timing, terms, and validation. The matrix below is a decision aid, not an endorsement or claim of completeness.</p>
+            <div class="table-scroll" role="region" aria-label="OSINT source decision matrix" tabindex="0">
+              <table>
+                <thead><tr><th>Question</th><th>Preferred source class</th><th>What it can support</th><th>Essential caveat</th></tr></thead>
+                <tbody>
+                  <tr><td>Who is the registered domain/IP/ASN entity?</td><td>Registry/RIR RDAP and authoritative registration services</td><td>Structured registration object, status, events, entities returned, notices</td><td>Redaction and privacy proxies are common; registration is not operational ownership</td></tr>
+                  <tr><td>What does a name resolve to now or historically?</td><td>Authoritative/current DNS and approved passive-DNS providers</td><td>Dated record observation and resolution history</td><td>Resolver cache, split horizon, sinkholes, wildcarding, and provider coverage affect results</td></tr>
+                  <tr><td>Which names appeared on certificates?</td><td>CT logs, certificate datasets, live TLS where authorized</td><td>Certificate issuance/logging and presentation observations</td><td>A certificate name or wildcard does not prove live service or organization ownership</td></tr>
+                  <tr><td>Which public services were observed?</td><td>Internet-wide host/web-property search platforms</td><td>Dated banner, service, protocol, web, TLS, or screenshot observations</td><td>Records may be stale, shared, parsed incorrectly, or different from current state</td></tr>
+                  <tr><td>What pages/resources were loaded?</td><td>Website-scan archives and owner-authorized browsing/capture</td><td>Dated page, request, response, resource, redirect, and visual context</td><td>Submitting a new scan may interact with or publicly disclose the target</td></tr>
+                  <tr><td>What did the organization publish?</td><td>Official site, filings, registry, release, documentation, repository</td><td>First-party assertion at a time and version</td><td>Self-published claims still require interpretation and may later change</td></tr>
+                  <tr><td>How is an observable related to malware?</td><td>Sandbox/report evidence and typed threat-intelligence relationships</td><td>Observed communication, download, execution, or asserted report relationship</td><td>Reputation aggregation and shared infrastructure can produce misleading associations</td></tr>
+                  <tr><td>What existed in the past?</td><td>Web archives, historical DNS/cert/service records, version control</td><td>Point-in-time capture or change history</td><td>Archive coverage is incomplete; absence of capture is not absence of existence</td></tr>
+                  <tr><td>Does an asset currently belong to us?</td><td>Authoritative inventory, account/provider data, owner confirmation</td><td>Current accountable ownership and lifecycle</td><td>External observation alone rarely establishes full ownership</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="artifacts">
+            <p class="section-kicker">Reusable artifacts</p>
+            <h2>Templates that preserve method, evidence, and restraint</h2>
+            <p class="section-intro">A tool output is not an investigation record. These artifacts connect collection to decision and make the work reviewable, correctable, and repeatable.</p>
+            <div class="two-col">
+              <div class="template-record">
+                <h3>Investigation charter</h3>
+                <p>Case ID; requestor; decision; priority questions; target entity and known-good seeds; purpose and authority; jurisdictions; approved source/method classes; prohibited actions; personal/sensitive data; safeguarding; research identity; active-contact rule; dissemination; retention; owner; approver; start/stop conditions.</p>
+              </div>
+              <div class="template-record">
+                <h3>Collection record</h3>
+                <p>Collection ID; question; source and dataset; exact query/request; account/tool/version; collection and observation time; locale/time zone; result and pagination; raw hash; source terms/classification; errors/coverage; extracted entities; analyst; review status.</p>
+              </div>
+              <div class="template-record">
+                <h3>Entity record</h3>
+                <p>Internal ID; entity type; canonical value/name; aliases; stable external identifiers; source observations; valid-from/to; ownership/role; sensitivity; candidate/confirmed/rejected state; merge and split rationale; conflicts; confidence; reviewer; expiry.</p>
+              </div>
+              <div class="template-record">
+                <h3>Typed relationship record</h3>
+                <p>Subject; predicate; object; direct observation or inference; source; observed-at; valid time; first/last seen; supporting and contradicting evidence; shared-service context; inference rule; confidence; analyst/reviewer; expiry; downstream use.</p>
+              </div>
+              <div class="template-record">
+                <h3>Claim-evidence matrix</h3>
+                <p>Claim; decision relevance; supporting evidence; contradictions; source proximity and independence; temporal fit; identity fit; alternative hypotheses; assumptions; gaps; confidence; wording; reviewer; correction status.</p>
+              </div>
+              <div class="template-record">
+                <h3>Exposure candidate</h3>
+                <p>Candidate asset; discovery source; ownership signals; provider/tenant boundary; environment; service; current verification; risk lead; owner; confirmation status; first/last seen; remediation; closure evidence; inventory and monitoring update.</p>
+              </div>
+              <div class="template-record">
+                <h3>AI-assistance audit</h3>
+                <p>Task; provider/model; prompt/policy; retrieval set; redaction; tool calls; output schema; citations; validation; unsafe or rejected suggestions; reviewer changes; accepted claims; cost/latency where material; evaluation version.</p>
+              </div>
+              <div class="template-record">
+                <h3>Case preservation manifest</h3>
+                <p>Original files/URLs; capture method; hashes; timestamps; transformations; storage; access history; handling; source restrictions; derived files; reports; dissemination; legal hold where authorized; correction; retention trigger; deletion proof.</p>
+              </div>
+            </div>
+          </section>
+
+          <section id="cases">
+            <p class="section-kicker">End-to-end practice</p>
+            <h2>Six OSINT and reconnaissance case studies</h2>
+            <p class="section-intro">These cases are designed for owned infrastructure, supplied datasets, documentation, or approved lab material. They demonstrate method and evidence handling without encouraging unscoped targeting of real people or third-party systems.</p>
+            <div class="case-grid">
+              <div class="case-study">
+                <h3>Case 1 — Reconcile a company’s external web estate</h3>
+                <p class="case-meta">Purpose: defensive asset inventory · Inputs: legal entities, verified domains, CMDB export, approved external datasets</p>
+                <ol>
+                  <li>Create known-good seeds from legal and inventory records; do not begin from an internet-wide fuzzy organization search.</li>
+                  <li>Collect DNS, RDAP, CT, approved passive DNS, host/web-property, repository, status-page, and application-store observations.</li>
+                  <li>Normalize FQDN, certificate, IP, ASN, repository, application, and provider entities; retain observation times.</li>
+                  <li>Classify direct ownership, acquired entity, SaaS, CDN/WAF, supplier, shared hosting, historical, candidate, or rejected.</li>
+                  <li>Ask owners to confirm candidates and environment; compare with cloud/account inventory and service maps.</li>
+                  <li>Verify material exposure through approved current sources; create owner-bound remediation and monitoring records.</li>
+                </ol>
+                <div class="decision-gate"><strong>Done when:</strong> every confirmed asset has an accountable owner and lifecycle, every candidate has an evidence-based disposition, and shared infrastructure has not been imported as company property.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 2 — Investigate a suspected phishing domain</h3>
+                <p class="case-meta">Purpose: brand and threat triage · Inputs: supplied domain or URL, approved isolated collection environment</p>
+                <ol>
+                  <li>Canonicalize the indicator and preserve the reporting source without opening it from a normal browser.</li>
+                  <li>Search existing URL-scan, DNS, RDAP, CT, reputation, certificate, redirect, screenshot, and historical observations before any new submission.</li>
+                  <li>Compare string, visual, certificate, infrastructure, content, and timing with the legitimate brand baseline.</li>
+                  <li>Identify shared hosting/CDN, registrar, nameserver, campaign-related infrastructure, and malware/report evidence without equating provider reuse with actor identity.</li>
+                  <li>Assign role and confidence; route domain/URL and supporting evidence to blocking, takedown, fraud, legal, or monitoring owners.</li>
+                  <li>Set expiry and recheck; record sinkhole, takedown, content, DNS, and certificate changes.</li>
+                </ol>
+                <div class="decision-gate"><strong>Done when:</strong> the maliciousness assessment is based on observed content/behavior or trusted reporting, brand similarity is explained, and the report does not over-attribute a provider or actor.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 3 — Validate an unexpected certificate alert</h3>
+                <p class="case-meta">Purpose: certificate and domain monitoring · Inputs: CT alert, certificate record, organization domain inventory</p>
+                <ol>
+                  <li>Preserve certificate fingerprint, SANs, issuer, validity, CT log/source, and alert time.</li>
+                  <li>Classify exact, wildcard, lookalike, internal-looking, customer-controlled, provider, or unrelated names.</li>
+                  <li>Query DNS and authorized historical sources; compare known certificate-management providers and account records.</li>
+                  <li>Contact the named certificate/domain owner through internal channels; do not interact with an unknown endpoint solely because it appeared in CT.</li>
+                  <li>Determine authorized issuance, abandoned DNS, provider validation artifact, brand abuse, or false candidate.</li>
+                  <li>Update inventory, issuance monitoring, CAA/control review, response, and closure evidence.</li>
+                </ol>
+                <div class="decision-gate"><strong>Done when:</strong> ownership and issuance status are confirmed by authoritative records or the accountable owner, and the CT observation remains distinct from live-service exposure.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 4 — Triage a public-repository secret report</h3>
+                <p class="case-meta">Purpose: exposure response · Inputs: repository permalink or platform alert · Constraint: never use the credential</p>
+                <ol>
+                  <li>Restrict access to the report; preserve repository, commit, path, time, secret type, and a masked excerpt.</li>
+                  <li>Confirm repository and organization relationship through authoritative links; identify fork, mirror, archived, or unrelated status.</li>
+                  <li>Notify the security/secret owner through approved private channels and revoke/rotate before broader investigation.</li>
+                  <li>Use platform history and internal provider logs—not authentication attempts—to determine validity and use.</li>
+                  <li>Remove or rewrite history where appropriate, enable detection and push protection, and inspect related exposure under incident authority.</li>
+                  <li>Delete unnecessary copies; document revocation, remediation, monitoring, and disclosure handling.</li>
+                </ol>
+                <div class="decision-gate"><strong>Done when:</strong> the value is revoked or proven non-sensitive through owner evidence, no investigator used it, exposure history is understood, and preventative controls are updated.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 5 — Build a threat-infrastructure cluster from one IOC</h3>
+                <p class="case-meta">Purpose: CTI and detection support · Inputs: sourced IOC with time and handling · Output: typed graph, not actor attribution</p>
+                <ol>
+                  <li>Validate type, source, role, first/last seen, handling, and why the seed is malicious or suspicious.</li>
+                  <li>Collect direct DNS, certificate, hosting, URL, redirect, sandbox, file, report, and registration relationships.</li>
+                  <li>Normalize time and separate shared, benign, scanner, sinkhole, CDN, and unknown infrastructure.</li>
+                  <li>Build candidate clusters using documented rules; require multiple high-quality signals for promotion.</li>
+                  <li>Compare behaviors and report evidence; map ATT&amp;CK only from described behavior, not infrastructure type.</li>
+                  <li>Create detection/blocking/hunting leads with confidence and expiry; retain alternatives and contradictions.</li>
+                </ol>
+                <div class="decision-gate"><strong>Done when:</strong> every edge is typed and dated, cluster membership is reproducible, generic infrastructure is discounted, and no actor claim exceeds the reporting evidence.</div>
+              </div>
+              <div class="case-study">
+                <h3>Case 6 — AI-assisted review of a supplied research package</h3>
+                <p class="case-meta">Purpose: analyst acceleration · Inputs: approved documents and captures · No autonomous collection or target interaction</p>
+                <ol>
+                  <li>Classify and redact the package; create immutable originals and a retrieval corpus limited to approved evidence.</li>
+                  <li>Define schemas for entities, observations, typed relationships, claims, citations, contradictions, and unknowns.</li>
+                  <li>Ask the model to extract and propose—not decide—while treating source content as untrusted data.</li>
+                  <li>Validate identifiers, dates, citations, translations, calculations, and entity merges deterministically.</li>
+                  <li>Have an analyst review every claim and compare alternative hypotheses; reject uncited or overconfident output.</li>
+                  <li>Save provider/model/prompt/retrieval/tool/reviewer audit and generate the report from accepted structured records.</li>
+                </ol>
+                <div class="decision-gate"><strong>Done when:</strong> all accepted claims resolve to source spans, no tool exceeded authority, sensitive data followed policy, and the final assessment is owned by a named analyst.</div>
+              </div>
+            </div>
+          </section>
+
+          <section id="labs">
+            <p class="section-kicker">Hands-on curriculum</p>
+            <h2>Twelve-lab OSINT and reconnaissance sequence</h2>
+            <p class="section-intro">Use your own domain, an intentionally published lab domain, reserved examples such as <code>example.com</code>, supplied offline datasets, and platform documentation. Do not redirect these exercises at an arbitrary real person or organization.</p>
+            <div class="lab-grid">
+              <div class="practice-block"><h3>Lab 01 — Investigation charter</h3><p>Turn “map our exposure” into three precise questions. Write scope, authority, source classes, prohibited methods, privacy risks, research identity, active-contact rule, retention, completion criteria, and escalation. Peer-review the charter before collecting.</p></div>
+              <div class="practice-block"><h3>Lab 02 — Query and provenance notebook</h3><p>Use a harmless subject to run exact-phrase, site, file-type, date, language, alias, and identifier queries across two search engines. Preserve query, locale, time, result, original source, archive state, and what each missing result cannot prove.</p></div>
+              <div class="practice-block"><h3>Lab 03 — DNS/RDAP/CT evidence graph</h3><p>For a domain you control, collect current DNS, ICANN/RIR RDAP, CT records, live certificate metadata, and provider context. Build typed dated edges and mark authoritative ownership, service provider, candidate, and historical relationships separately.</p></div>
+              <div class="practice-block"><h3>Lab 04 — Internet-index comparison</h3><p>Compare approved Shodan, Censys, and urlscan observations for your own asset. Record dataset, query, observation time, host versus web-property semantics, stale/shared results, and current verification. Explain every disagreement.</p></div>
+              <div class="practice-block"><h3>Lab 05 — Passive application map</h3><p>Map your own public website from normal browser-delivered HTML, scripts, CSP destinations, documentation, status pages, archives, DNS, and certificates. Separate observed endpoints from inferred or historical candidates; perform no fuzzing.</p></div>
+              <div class="practice-block"><h3>Lab 06 — Repository and package inventory</h3><p>Use a repository you own. Trace organization, packages, releases, dependency files, container images, CI workflows, domains, and cloud identifiers. Create a private synthetic secret example and practice masked reporting without using the value.</p></div>
+              <div class="practice-block"><h3>Lab 07 — Media verification worksheet</h3><p>Use an instructor-supplied non-sensitive image and known answer. Preserve file/context, extract metadata and frames, identify distinctive features, search variants, test two location/time hypotheses, and document confidence and transformation history.</p></div>
+              <div class="practice-block"><h3>Lab 08 — IOC relationship graph</h3><p>Use a historical, defanged IOC package supplied with source records. Normalize entities; type DNS, certificate, URL, file, and report edges; identify shared infrastructure; create candidate clusters; add expiry; and write why the graph does not prove attribution.</p></div>
+              <div class="practice-block"><h3>Lab 09 — Source/API ingestion</h3><p>Ingest a small saved JSON response. Keep raw hash and request metadata, validate schema, normalize observations, preserve source IDs, quarantine malformed rows, deduplicate without losing independent sources, and rebuild the graph from raw data.</p></div>
+              <div class="practice-block"><h3>Lab 10 — AI extraction evaluation</h3><p>Provide an approved offline report with known entities and citations. Evaluate extraction precision/recall, identity merges, citation resolution, abstention, prompt-injection resistance, sensitive-data handling, and analyst correction. No external tools are enabled.</p></div>
+              <div class="practice-block"><h3>Lab 11 — External asset reconciliation</h3><p>Combine a synthetic CMDB with DNS, certificate, and service observations containing shared-provider traps. Score ownership evidence, request simulated owner dispositions, confirm inventory changes, route exposures, and measure candidate precision and unknown-owner backlog.</p></div>
+              <div class="practice-block"><h3>Lab 12 — Defensible final product</h3><p>Produce a charter, source/query register, entity dictionary, typed graph, timeline, claim-evidence matrix, confidence assessment, alternatives, redacted executive summary, operational handoff, correction route, and retention action. A second analyst must reproduce one claim.</p></div>
+            </div>
+          </section>
+
+          <section id="failures">
+            <p class="section-kicker">Failure atlas</p>
+            <h2>Common ways OSINT becomes unsafe or analytically weak</h2>
+            <ul class="failure-list">
+              <li><strong>Collection without a decision</strong>“Find everything” creates uncontrolled scope, privacy risk, and a pile of facts no one can use. Rewrite the requirement and define stopping conditions.</li>
+              <li><strong>Public-equals-permitted thinking</strong>Visibility does not authorize active probing, contact, republication, or indefinite retention. Recheck authority, terms, necessity, and harm.</li>
+              <li><strong>Name-only identity merge</strong>Common names and reused usernames create false people and organizations. Require stable corroborating identifiers and preserve alternatives.</li>
+              <li><strong>Shared-infrastructure ownership</strong>A CDN IP, wildcard certificate, cloud ASN, nameserver, or analytics ID pulls unrelated tenants into the graph. Model provider relationships explicitly.</li>
+              <li><strong>Timestamp collapse</strong>Collection, publication, observation, registration, certificate validity, archive capture, and event time become one “date.” Preserve each semantic time separately.</li>
+              <li><strong>Aggregator circularity</strong>Several platforms repeat one original report, creating apparent corroboration. Trace lineage and count independent origins.</li>
+              <li><strong>Absence as proof</strong>No search result becomes “does not exist.” State source set, window, coverage, errors, and “not observed.”</li>
+              <li><strong>Stale exposure escalation</strong>An old banner or screenshot becomes an urgent current vulnerability. Verify ownership and current state through an authorized source.</li>
+              <li><strong>Credential verification</strong>An investigator tests a discovered secret. Revoke and investigate through authorized logs; never authenticate to “confirm.”</li>
+              <li><strong>Public URL submission</strong>A sensitive target is submitted to a public scanner, exposing the investigation. Search existing records first and select visibility deliberately.</li>
+              <li><strong>Graph-as-proof</strong>Layout, color, centrality, or node proximity replaces typed evidence. Make every edge reviewable and keep candidate status visible.</li>
+              <li><strong>AI citation laundering</strong>Generated prose cites a search snippet or nonexistent source. Resolve every citation to original captured evidence before acceptance.</li>
+              <li><strong>Unbounded agent tools</strong>An AI system expands scope, scans, contacts, or publishes. Enforce allowlists, read-only defaults, approval gates, logging, and stop controls.</li>
+              <li><strong>Investigator exposure</strong>Normal accounts, browser profiles, or workstations reveal identity or ingest malicious content. Use approved research identities and isolated handling.</li>
+              <li><strong>Overcollection of people</strong>Personal details enter a company-security case without necessity. Minimize, redact, restrict, and delete; escalate safeguarding issues.</li>
+              <li><strong>No correction path</strong>A false association persists across graphs, reports, alerts, and blocklists. Version claims and propagate correction or deletion downstream.</li>
+            </ul>
+          </section>
+
+          <section id="readiness">
+            <p class="section-kicker">Readiness gate</p>
+            <h2>Accept an OSINT product only when the method and limits are visible</h2>
+            <ul class="checklist">
+              <li>The product names the decision, requestor, questions, scope, time window, and completion criteria.</li>
+              <li>Authority, privacy, platform terms, investigator safety, source handling, contact rules, and retention were reviewed.</li>
+              <li>Known-good seeds and candidate discoveries remain distinguishable throughout the case.</li>
+              <li>Every material observation records source, query or retrieval route, collection time, observation/publication time where available, and coverage caveat.</li>
+              <li>Original captures are hashed or otherwise integrity-protected; transformations and tools are documented.</li>
+              <li>Entities were resolved using appropriate stable identifiers; weak name, IP, certificate, or hosting matches were not silently merged.</li>
+              <li>Relationships use explicit predicates, evidence, temporal bounds, confidence, and expiry rather than generic “related” edges.</li>
+              <li>Original, secondary, and aggregate sources are distinguished; apparent corroboration was checked for common lineage.</li>
+              <li>Facts, source assertions, inferences, assumptions, and unknowns are visibly separated.</li>
+              <li>Alternative hypotheses and contradicting evidence were recorded and reviewed.</li>
+              <li>External exposure was not treated as current, owned, or vulnerable without proportionate authorized validation.</li>
+              <li>People-focused data is necessary, minimized, redacted, access-controlled, and safe to disseminate.</li>
+              <li>AI and automation outputs retain prompts/policy, tool calls, citations, validation, and reviewer decisions; no agent exceeded authority.</li>
+              <li>Confidence wording matches evidence quality, identity certainty, temporal relevance, source independence, and unresolved conflicts.</li>
+              <li>The handoff includes owners, actions, caveats, handling, monitoring or expiry, correction route, and retention/deletion.</li>
+              <li>A second analyst can reproduce at least one high-impact claim from the preserved record.</li>
+            </ul>
+          </section>
+
+          <section id="references">
+            <p class="section-kicker">Current primary and practitioner references</p>
+            <h2>Source set used to ground this guide</h2>
+            <p class="section-intro">Use current official documentation and source-specific terms before operational collection. Product fields, quotas, visibility, APIs, and coverage change. The links below identify the maintained source rather than freezing every feature claim in this page.</p>
+            <div class="reference-list">
+              <div class="reference-article"><h3><a href="https://searchlibrary.ohchr.org/record/30334?ln=en" target="_blank" rel="noopener noreferrer">OHCHR and UC Berkeley — Berkeley Protocol on Digital Open Source Investigations</a></h3><p>Professional, legal, ethical, security, collection, preservation, verification, and reporting methodology for digital open-source investigations. Its formal human-rights context does not make every rule universal, but its evidence and safety discipline is broadly instructive.</p></div>
+              <div class="reference-article"><h3><a href="https://attack.mitre.org/tactics/TA0043/" target="_blank" rel="noopener noreferrer">MITRE ATT&amp;CK — Reconnaissance tactic</a></h3><p>Adversary reconnaissance behaviors including active scanning, victim organization/infrastructure/host/identity information, search of open websites and technical databases, phishing for information, and gathering victim network information.</p></div>
+              <div class="reference-article"><h3><a href="https://csrc.nist.gov/pubs/sp/800/115/final" target="_blank" rel="noopener noreferrer">NIST SP 800-115 — Technical Guide to Information Security Testing and Assessment</a></h3><p>Planning, rules of engagement, test execution, analysis, reporting, and mitigation guidance. Apply it to active assessment under explicit authority, not as a blanket authorization.</p></div>
+              <div class="reference-article"><h3><a href="https://owasp.org/www-project-web-security-testing-guide/" target="_blank" rel="noopener noreferrer">OWASP Web Security Testing Guide</a></h3><p>Maintained web-testing methodology with versioned information-gathering scenarios and reporting guidance. Distinguish stable/versioned material from current development.</p></div>
+              <div class="reference-article"><h3><a href="https://www.icann.org/rdap/" target="_blank" rel="noopener noreferrer">ICANN — Registration Data Access Protocol</a></h3><p>Current overview and resources for structured domain registration data access and RDAP’s relationship to legacy WHOIS.</p></div>
+              <div class="reference-article"><h3><a href="https://www.rfc-editor.org/rfc/rfc9162.html" target="_blank" rel="noopener noreferrer">RFC 9162 — Certificate Transparency Version 2.0</a></h3><p>IETF Experimental RFC describing CT v2 public logging and auditing of TLS certificate issuance; it obsoletes RFC 6962 while CT ecosystem implementations may have version-specific realities.</p></div>
+              <div class="reference-article"><h3><a href="https://owasp.org/www-project-amass/" target="_blank" rel="noopener noreferrer">OWASP Amass</a></h3><p>Open-source attack-surface mapping and external asset discovery framework with collection, storage, and an Open Asset Model.</p></div>
+              <div class="reference-article"><h3><a href="https://help.shodan.io/" target="_blank" rel="noopener noreferrer">Shodan Help Center</a></h3><p>Official source for banner semantics, query filters, CLI/API use, data timeframes, credits, monitoring, and scanning behavior.</p></div>
+              <div class="reference-article"><h3><a href="https://docs.censys.com/docs/platform-quickstart-guide" target="_blank" rel="noopener noreferrer">Censys Platform documentation</a></h3><p>Official current model for host, web-property, and certificate datasets, CenQL search, related assets, plan-dependent access, and direct lookups.</p></div>
+              <div class="reference-article"><h3><a href="https://docs.urlscan.io/" target="_blank" rel="noopener noreferrer">urlscan Documentation Hub</a></h3><p>Official source for existing-scan search, API fields, visibility, submission, result retrieval, quotas, and data-source behavior.</p></div>
+              <div class="reference-article"><h3><a href="https://docs.virustotal.com/reference/key-concepts" target="_blank" rel="noopener noreferrer">VirusTotal API v3 concepts and relationships</a></h3><p>Object, collection, relationship, pagination, and access semantics for files, URLs, domains, IPs, and related threat context.</p></div>
+              <div class="reference-article"><h3><a href="https://www.cisa.gov/news-events/directives/bod-23-01-improving-asset-visibility-and-vulnerability-detection-federal-networks" target="_blank" rel="noopener noreferrer">CISA BOD 23-01 — Asset Visibility and Vulnerability Detection</a></h3><p>FCEB-specific binding requirements and useful definitions distinguishing asset discovery from vulnerability enumeration. Do not present its cadence as a universal mandate.</p></div>
+              <div class="reference-article"><h3><a href="/pt-tools.html#network-reconnaissance">1200km Network Reconnaissance library</a></h3><p>First-party Nmap, CLI, Shodan, Censys, theHarvester, network discovery, and web-recon guides, with practitioner context and local article mirrors.</p></div>
+              <div class="reference-article"><h3><a href="/cyber-knowledge/red-team.html#module-2">1200km Red Team reconnaissance and attack-surface module</a></h3><p>Authorized active-testing context, asset modeling, safe validation, evidence, and reporting boundaries that complement this OSINT-focused guide.</p></div>
+              <div class="reference-article"><h3><a href="/adversarygraph/">AdversaryGraph</a> · <a href="/adversarygraph-docs/capabilities/">capabilities</a> · <a href="/articles/adversarygraph-from-log-to-report-ioc-investigation.html">IOC case study</a></h3><p>1200km’s self-hosted analyst workbench and published workflow for source-backed IOC enrichment, typed pivots, ATT&amp;CK leads, evidence review, and report handoff.</p></div>
+            </div>
+          </section>
+        </article>
       </div>
     </main>
+
+    <nav class="knowledge-pathway" aria-label="Cyber Knowledge learning path">
+      <p class="knowledge-pathway__label">Continue through the knowledge base</p>
+      <div class="knowledge-pathway__links">
+        <a href="/cyber-knowledge/grc.html"><small>Previous domain</small><strong>← Governance, Risk &amp; Compliance</strong></a>
+        <a href="/cyber-knowledge/"><small>All guides</small><strong>Cyber Knowledge hub</strong></a>
+        <a href="/cyber-knowledge/cti.html"><small>Apply OSINT evidence</small><strong>Cyber Threat Intelligence →</strong></a>
+      </div>
+    </nav>
 
     <!-- site-shell:footer:start -->
     <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-07-24.1">
@@ -429,6 +1234,5 @@
       </div>
     </footer>
     <!-- site-shell:footer:end -->
-
   </body>
 </html>

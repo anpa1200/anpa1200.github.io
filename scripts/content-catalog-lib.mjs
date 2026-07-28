@@ -36,6 +36,8 @@ export const VOCABULARIES = Object.freeze({
     'offensive-research',
     'cloud-security',
     'security-governance',
+    'open-source-intelligence',
+    'vulnerability-research',
     'ai-security',
     'application-security',
     'network-security',
@@ -302,6 +304,8 @@ function inferDomain(url, title, html, collection) {
   if (/malware|reverse engineering|debugger|unpack/i.test(text)) return 'malware-analysis';
   if (/threat hunt|hunting hypoth|hunt quer/i.test(text)) return 'threat-hunting';
   if (/\bgrc\b|governance,? risk|risk (management|assessment)|compliance|security assurance/i.test(text)) return 'security-governance';
+  if (/\bosint\b|open.source intelligence|certificate transparency|\brdap\b|internet exposure|attack.surface discovery/i.test(text)) return 'open-source-intelligence';
+  if (/vulnerability research|exploitability|fuzz(ing|er)|coordinated (vulnerability )?disclosure/i.test(text)) return 'vulnerability-research';
   if (/detection|sigma|telemetry|siem|anomaly/i.test(text)) return 'detection-engineering';
   if (/cloud|kubernetes|aws|azure|gcp/i.test(text)) return 'cloud-security';
   if (/pentest|penetration|offensive|hexstrike|exploit|password crack|aircrack|hydra|sqlmap|metasploit|nmap|burp/i.test(text)) return 'offensive-research';
@@ -323,6 +327,8 @@ function defaultsForType(primaryType, primaryDomain) {
     'offensive-research': ['security-engineer'],
     'cloud-security': ['security-engineer', 'detection-engineer'],
     'security-governance': ['security-leader', 'security-engineer'],
+    'open-source-intelligence': ['cti-analyst', 'security-engineer'],
+    'vulnerability-research': ['security-engineer', 'developer'],
     'ai-security': ['security-engineer', 'developer'],
     'application-security': ['security-engineer', 'developer'],
     'network-security': ['security-engineer'],

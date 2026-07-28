@@ -55,8 +55,17 @@ administration requires `manage_intel`, and index administration requires
 - `/adversarygraph-docs/capabilities/` - Capability overview
 - `https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/unified-rag-and-mcp.md` - v6.5 RAG/MCP source guide
 - `/threat-matrix/` - Threat Matrix, the public read-only ATT&CK workspace associated with AdversaryGraph
-- `/cyber-knowledge/` - Cyber Knowledge syllabus hub, one page per security domain
-- `/cyber-knowledge/cti.html` - Zero-to-hero CTI syllabus: 10 modules, 69 defined terms, each with an anchor id and Schema.org DefinedTerm markup
+- `/cyber-knowledge/` - Cybersecurity Knowledge Base: ten source-reviewed, maintained practitioner field guides with explicit scope and learning pathways
+- `/cyber-knowledge/cti.html` - Cyber Threat Intelligence field guide: requirements, collection, analysis, ATT&CK, actor research, sharing, hunting, and detection
+- `/cyber-knowledge/red-team.html` - Red Team and Offensive Security field guide
+- `/cyber-knowledge/blue-team.html` - Blue Team and Defensive Security field guide
+- `/cyber-knowledge/vulnerability-research.html` - Vulnerability Research field guide
+- `/cyber-knowledge/malware-analysis.html` - Malware Analysis and Reverse Engineering field guide
+- `/cyber-knowledge/secure-code.html` - Application Security and Secure Code guide
+- `/cyber-knowledge/dfir.html` - Digital Forensics and Incident Response guide
+- `/cyber-knowledge/cloud-security.html` - Cloud Security field guide
+- `/cyber-knowledge/grc.html` - Cybersecurity Governance, Risk, and Compliance field guide
+- `/cyber-knowledge/osint.html` - OSINT and Reconnaissance field guide
 - `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
 - `/guides.html#detection` - Detection and SOC guide cluster
 - `/articles/` - Local article archive

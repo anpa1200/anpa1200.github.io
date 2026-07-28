@@ -1,0 +1,155 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import test from 'node:test';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const BASE = 'https://1200km.com/cyber-knowledge/';
+const modules = [
+  'cti',
+  'red-team',
+  'blue-team',
+  'vulnerability-research',
+  'malware-analysis',
+  'secure-code',
+  'dfir',
+  'cloud-security',
+  'grc',
+  'osint',
+];
+const temporaryPublicationLanguage =
+  /\b(?:under construction|coming soon|work in progress|syllabus draft live|placeholder page|content forthcoming|open syllabus)\b/i;
+
+function source(name) {
+  return readFileSync(join(ROOT, 'cyber-knowledge', name), 'utf8');
+}
+
+function decode(value = '') {
+  return value
+    .replaceAll('&amp;', '&')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>');
+}
+
+function tagContent(html, selector) {
+  if (selector === 'title') {
+    return decode(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1].trim());
+  }
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return decode(
+    html.match(new RegExp(`<meta\\s+${escaped}\\s+content="([^"]*)"`, 'i'))?.[1]
+      || html.match(new RegExp(`<meta\\s+content="([^"]*)"\\s+${escaped}`, 'i'))?.[1],
+  );
+}
+
+function linkHref(html, relation) {
+  const tag = html.match(new RegExp(`<link[^>]+rel="${relation}"[^>]*>`, 'i'))?.[0] || '';
+  return tag.match(/href="([^"]+)"/i)?.[1];
+}
+
+function jsonLdEntries(html) {
+  return [...html.matchAll(/<script\s+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)]
+    .flatMap((match) => {
+      const parsed = JSON.parse(match[1]);
+      return parsed['@graph'] || [parsed];
+    });
+}
+
+test('Cyber Knowledge hub is the canonical collection for ten maintained guides', () => {
+  const html = source('index.html');
+  const entries = jsonLdEntries(html);
+  const collection = entries.find((entry) => entry['@type'] === 'CollectionPage');
+
+  assert.equal(tagContent(html, 'property="og:title"'), tagContent(html, 'title'));
+  assert.equal(tagContent(html, 'name="twitter:title"'), tagContent(html, 'title'));
+  assert.equal(tagContent(html, 'property="og:description"'), tagContent(html, 'name="description"'));
+  assert.equal(tagContent(html, 'name="twitter:description"'), tagContent(html, 'name="description"'));
+  assert.equal(linkHref(html, 'canonical'), BASE);
+  assert.ok(collection, 'CollectionPage JSON-LD is required');
+  assert.equal(collection.hasPart?.length, modules.length);
+  assert.ok(collection.hasPart.every((item) => item['@type'] === 'TechArticle'));
+  assert.match(html, /Cross-domain learning and operational pathways/);
+  assert.doesNotMatch(html, temporaryPublicationLanguage);
+  for (const module of modules) {
+    assert.match(html, new RegExp(`/cyber-knowledge/${module}\\.html`), module);
+  }
+});
+
+test('each module has consistent SEO, AI-readable structure, and source-review status', () => {
+  for (const module of modules) {
+    const html = source(`${module}.html`);
+    const title = tagContent(html, 'title');
+    const description = tagContent(html, 'name="description"');
+    const entries = jsonLdEntries(html);
+    const article = entries.find((entry) => {
+      const types = Array.isArray(entry['@type']) ? entry['@type'] : [entry['@type']];
+      return types.includes('TechArticle');
+    });
+
+    assert.equal(linkHref(html, 'canonical'), `${BASE}${module}.html`, module);
+    assert.equal(tagContent(html, 'property="og:title"'), title, module);
+    assert.equal(tagContent(html, 'name="twitter:title"'), title, module);
+    assert.equal(tagContent(html, 'property="og:description"'), description, module);
+    assert.equal(tagContent(html, 'name="twitter:description"'), description, module);
+    assert.equal(tagContent(html, 'property="og:type"'), 'article', module);
+    assert.equal(tagContent(html, 'property="og:locale"'), 'en_US', module);
+    assert.match(tagContent(html, 'name="robots"'), /index,\s*follow/i, module);
+    assert.ok(title.length >= 30 && title.length <= 60, `${module}: title length ${title.length}`);
+    assert.ok(
+      description.length >= 70 && description.length <= 160,
+      `${module}: description length ${description.length}`,
+    );
+    assert.ok(article, `${module}: TechArticle JSON-LD is required`);
+    assert.equal(article.isPartOf?.['@id'], 'https://1200km.com/#website', module);
+    assert.equal(article.learningResourceType, 'Cybersecurity practitioner field guide', module);
+    assert.equal(article.educationalLevel, 'Beginner to advanced', module);
+    assert.equal(article.datePublished, tagContent(html, 'property="article:published_time"'), module);
+    assert.equal(article.dateModified, '2026-07-27', module);
+    assert.equal(tagContent(html, 'property="article:modified_time"'), '2026-07-27', module);
+    assert.ok(article.breadcrumb, module);
+    assert.match(html, /data-pagefind-body/, module);
+    assert.match(html, /Source review: 27 July 2026/, module);
+    assert.match(html, /Status: maintained practitioner guide/, module);
+    assert.match(html, /class="knowledge-pathway"/, module);
+    assert.match(html, /href="\/cyber-knowledge\/"/, module);
+    assert.ok((html.match(/href="\//g) || []).length >= 10, `${module}: internal link density`);
+    assert.ok((html.match(/href="https?:\/\//g) || []).length >= 6, `${module}: source link density`);
+    assert.doesNotMatch(html, /<summary>\s*<a\b/i, `${module}: nested interactive summary link`);
+    for (const match of html.matchAll(/<(?:div)\b[^>]*class="[^"]*table-(?:wrap|scroll)[^"]*"[^>]*>/gi)) {
+      assert.match(match[0], /\btabindex="0"/i, `${module}: scrollable table wrapper must be focusable`);
+    }
+    for (const match of html.matchAll(/<pre\b[^>]*>/gi)) {
+      assert.match(match[0], /\btabindex="0"/i, `${module}: scrollable code block must be focusable`);
+    }
+    assert.doesNotMatch(html, temporaryPublicationLanguage, module);
+  }
+});
+
+test('module discovery sequence is explicit in source HTML', () => {
+  for (let index = 0; index < modules.length; index += 1) {
+    const module = modules[index];
+    const html = source(`${module}.html`);
+    assert.equal(linkHref(html, 'up'), '/cyber-knowledge/', `${module}: up`);
+    if (index > 0) {
+      assert.equal(linkHref(html, 'prev'), `/cyber-knowledge/${modules[index - 1]}.html`, `${module}: prev`);
+    }
+    if (index < modules.length - 1) {
+      assert.equal(linkHref(html, 'next'), `/cyber-knowledge/${modules[index + 1]}.html`, `${module}: next`);
+    }
+  }
+});
+
+test('shared knowledge styles preserve focus and light-theme contrast', () => {
+  const css = readFileSync(join(ROOT, 'assets', 'site-theme.css'), 'utf8');
+  assert.match(css, /\.table-wrap:focus-visible[\s\S]*outline:/);
+  assert.match(css, /\.table-wrap table:not\(\.compare-table\)[\s\S]*display:\s*table/);
+  assert.match(css, /\.analysis-note a[\s\S]*text-decoration:\s*underline/);
+  assert.match(css, /\[data-theme="light"\] \.workflow strong[\s\S]*color:\s*#163f80/);
+  assert.match(css, /\[data-theme="light"\] \.evidence-note strong[\s\S]*color:\s*#00684f/);
+  assert.match(css, /\[data-theme="light"\] \.boundary strong[\s\S]*color:\s*#7a4800/);
+  assert.match(css, /\[data-theme="light"\] \.case-study h3[\s\S]*color:\s*#7f1d2d/);
+  assert.match(css, /\[data-theme="light"\] \.decision-gate strong[\s\S]*color:\s*#00684f/);
+});

@@ -41,6 +41,11 @@ test('every item carries governed provenance independent of build origin', () =>
 
 test('core, reference, and archive are distinct governed discovery tiers', () => {
   assert.equal(catalog.items.find((item) => item.canonical_url === 'https://1200km.com/adversarygraph/')?.collection_tier, 'core');
+  for (const item of catalog.items.filter((entry) =>
+    /^https:\/\/1200km\.com\/cyber-knowledge\/(?:|[^/]+\.html)$/.test(entry.canonical_url)
+  )) {
+    assert.equal(item.collection_tier, 'core', item.canonical_url);
+  }
   assert.equal(catalog.items.find((item) => item.canonical_url === 'https://1200km.com/threat-matrix/techniques/T1059.003/')?.collection_tier, 'reference');
   for (const item of catalog.items.filter((entry) => ['archived', 'superseded'].includes(entry.status))) {
     assert.equal(item.collection_tier, 'archive', item.id);
