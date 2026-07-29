@@ -15,7 +15,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="article:modified_time" content="2026-06-27" />
 
-    
+
 
     <script type="application/ld+json" data-site-graph>
       {
@@ -146,6 +146,7 @@
         ]
       }
     </script>
+  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 </head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
@@ -165,6 +166,22 @@
   <section><h2 id="detection-logic">Detection logic</h2><p>Command-line interface monitoring may be useful to detect instances of net.exe or other command-line utilities being used to gather system time or time zone. Methods of detecting API use for gathering this information are likely less useful due to how often they may be used by legitimate software. For network infrastructure devices, collect AAA logging to monitor `show` commands being run by non-standard users from non-standard locations.</p></section>
   <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G1017/"><strong>Volt Typhoon</strong><br><span class="muted">G1017</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G1012/"><strong>CURIUM</strong><br><span class="muted">G1012</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0121/"><strong>Sidewinder</strong><br><span class="muted">G0121</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0128/"><strong>ZIRCONIUM</strong><br><span class="muted">G0128</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0126/"><strong>Higaisa</strong><br><span class="muted">G0126</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0089/"><strong>The White Company</strong><br><span class="muted">G0089</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0114/"><strong>Chimera</strong><br><span class="muted">G0114</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0060/"><strong>BRONZE BUTLER</strong><br><span class="muted">G0060</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0012/"><strong>Darkhotel</strong><br><span class="muted">G0012</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a></div></section>
   <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+
+<!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/blue-team.html#m6"><strong>Module 6 — Alert triage, investigation, and escalation</strong><br><span class="muted">Blue Team &amp; Defensive Security · topic-match · 54/100</span></a><a class="card" href="/cyber-knowledge/osint.html#module-5"><strong>Internet exposure, service indexes, and infrastructure search</strong><br><span class="muted">OSINT &amp; Reconnaissance · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/red-team.html#m5"><strong>Module 5 — Cloud, containers, and Kubernetes</strong><br><span class="muted">Red Team &amp; Offensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/cloud-security.html#module-5"><strong>Data classification, storage, cryptography, keys, backup, and deletion</strong><br><span class="muted">Cloud Security · tactic-route · 24/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><p>No ATT&amp;CK mitigation relationship is published for this technique. Apply risk-based controls and verify scope.</p></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0151 · Behavior-chain, platform-aware detection strategy for T1124 System Time Discovery</strong><ul><li><strong>AN0430 · Analytic 0430</strong> — Untrusted or unusual process/script (cmd.exe, powershell.exe, w32tm.exe, net.exe, custom binaries) queries system time/timezone (e.g., w32tm /tz, net time \\host, Get-TimeZone, GetTickCount API) and (optionally) is followed within a short window by time-based scheduling or conditional execution (e.g., schtasks /create, at.exe, PowerShell Start-Sleep with large values).</li><li><strong>AN0431 · Analytic 0431</strong> — A process (often spawned by a shell, interpreter, or malware implant) executes time discovery via commands (date, timedatectl, hwclock, cat /etc/timezone, /proc/uptime) or direct syscalls (time(), clock_gettime) and is (optionally) followed by scheduled task creation/modification (crontab, at) or conditional sleep logic.</li><li><strong>AN0432 · Analytic 0432</strong> — Process/script execution of systemsetup -gettimezone, date, ioreg, or API usage (timeIntervalSinceNow, gettimeofday) followed by time-based scheduling (launchd plist modification) or sleep-based execution.</li><li><strong>AN0433 · Analytic 0433</strong> — Interactive or remote shell/API invocation of esxcli system clock get or querying time parameters via hostd/vpxa shortly followed by time/ntp configuration checks or scheduled task creation, executed by non-standard accounts or outside maintenance windows.</li><li><strong>AN0434 · Analytic 0434</strong> — Non-standard or rare users/locations issue CLI commands like &quot;show clock detail&quot; or &quot;show timezone&quot;; optionally followed by configuration of time/timezone or NTP sources. AAA/TACACS+ accounting and syslog correlate execution to identity, source IP, and privilege level.</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0151">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END -->
   <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>

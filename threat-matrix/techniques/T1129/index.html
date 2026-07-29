@@ -15,7 +15,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="article:modified_time" content="2026-06-27" />
 
-    
+
 
     <script type="application/ld+json" data-site-graph>
       {
@@ -146,6 +146,7 @@
         ]
       }
     </script>
+  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 </head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
@@ -165,6 +166,22 @@
   <section><h2 id="detection-logic">Detection logic</h2><p>Monitoring DLL module loads may generate a significant amount of data and may not be directly useful for defense unless collected under specific circumstances, since benign use of Windows modules load functions are common and may be difficult to distinguish from malicious behavior. Legitimate software will likely only need to load routine, bundled DLL modules or Windows system DLLs such that deviation from known module loads may be suspicious. Limiting DLL module loads to `%SystemRoot%` and `%ProgramFiles%` directories will protect against module loads from unsafe paths.  Correlation of other events with behavior surrounding module loads using API monitoring and suspicious DLLs written to disk will provide additional context to an event that may assist in determining if it is due to malicious behavior.</p></section>
   <section><h2 id="observed-actors">Observed actors</h2><div class="grid"></div></section>
   <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+
+<!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/red-team.html#m5"><strong>Module 5 — Cloud, containers, and Kubernetes</strong><br><span class="muted">Red Team &amp; Offensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/malware-analysis.html#module-3"><strong>Static triage: strings, imports, resources, and capabilities</strong><br><span class="muted">Malware Analysis &amp; Reverse Engineering · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/blue-team.html#m4"><strong>Module 4 — Detection engineering and detection as code</strong><br><span class="muted">Blue Team &amp; Defensive Security · tactic-route · 24/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><article class="card"><strong>M1038 · Execution Prevention</strong><p>Prevent the execution of unauthorized or malicious code on systems by implementing application control, script blocking, and other execution prevention mechanisms. This ensures that only trusted and authorized code is executed, reducing the risk of malware and unauthorized actions. This mitigation can be implemented through the following measures: Application Control: - Use Case: Use tools like AppLocker or Windows Defender Application Control (WDAC) to create whitelists of authorized applications and block unauthorized ones. On Linux, use tools like SELinux or AppArmor to define mandatory access control policies for application execution. - Implementation: Allow only digitally signed or pre-approved applications to execute on servers and endpoints. (e.g., `New-AppLockerPolicy -PolicyType Enforced -FilePath &quot;C:\Policies\AppLocker.xml&quot;`) Script Blocking: - Use Case: Use script control me…</p><a href="https://attack.mitre.org/mitigations/M1038">MITRE mitigation source</a></article></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0018 · Behavior-chain, platform-aware detection strategy for T1129 Shared Modules</strong><ul><li><strong>AN0052 · Analytic 0052</strong> — A process (often LOLBin or user-launched program) loads a DLL from a user-writable/UNC/Temp path or unsigned/invalid signer. Within a short window the DLL is (a) newly written to disk, (b) spawned as follow-on execution (rundll32/regsvr32), or (c) establishes outbound C2.</li><li><strong>AN0053 · Analytic 0053</strong> — A process loads a shared object (.so) via dlopen/LD_PRELOAD/open from non-standard or temporary locations (e.g., /tmp, /dev/shm), especially shortly after that .so is written or fetched, or linked via manipulated environment variables (LD_PRELOAD/LD_LIBRARY_PATH).</li><li><strong>AN0054 · Analytic 0054</strong> — A process loads a non-system .dylib/.so via dyld (dlopen/dlsym) from user-writable locations (~/Library, /tmp) or after the library was recently created/downloaded, often followed by network egress or persistence.</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0018">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END -->
   <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>

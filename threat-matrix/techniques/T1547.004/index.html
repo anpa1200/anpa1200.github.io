@@ -15,7 +15,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="article:modified_time" content="2026-06-27" />
 
-    
+
 
     <script type="application/ld+json" data-site-graph>
       {
@@ -146,6 +146,7 @@
         ]
       }
     </script>
+  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 </head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
@@ -165,6 +166,22 @@
   <section><h2 id="detection-logic">Detection logic</h2><p>Monitor for changes to Registry entries associated with Winlogon that do not correlate with known software, patch cycles, etc. Tools such as Sysinternals Autoruns may also be used to detect system changes that could be attempts at persistence, including listing current Winlogon helper values.   New DLLs written to System32 that do not correlate with known good software or patching may also be suspicious. Look for abnormal process behavior that may be due to a process loading a malicious DLL. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as network connections made for Command and Control, learning details about the environment through Discovery, and Lateral Movement.</p></section>
   <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0081/"><strong>Tropic Trooper</strong><br><span class="muted">G0081</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0010/"><strong>Turla</strong><br><span class="muted">G0010</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0102/"><strong>Wizard Spider</strong><br><span class="muted">G0102</span></a></div></section>
   <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+
+<!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/red-team.html#m5"><strong>Module 5 — Cloud, containers, and Kubernetes</strong><br><span class="muted">Red Team &amp; Offensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/blue-team.html#m4"><strong>Module 4 — Detection engineering and detection as code</strong><br><span class="muted">Blue Team &amp; Defensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/dfir.html#module-5"><strong>Disk, file-system, and persistence forensics</strong><br><span class="muted">Digital Forensics &amp; Incident Response (DFIR) · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/vulnerability-research.html#m7"><strong>Binary formats, ABI, loaders, and mitigations</strong><br><span class="muted">Vulnerability Research &amp; Exploit Development · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/cloud-security.html#module-4"><strong>Network, edge, service communication, hybrid access, and zero trust</strong><br><span class="muted">Cloud Security · tactic-route · 24/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><article class="card"><strong>M1038 · Execution Prevention</strong><p>Prevent the execution of unauthorized or malicious code on systems by implementing application control, script blocking, and other execution prevention mechanisms. This ensures that only trusted and authorized code is executed, reducing the risk of malware and unauthorized actions. This mitigation can be implemented through the following measures: Application Control: - Use Case: Use tools like AppLocker or Windows Defender Application Control (WDAC) to create whitelists of authorized applications and block unauthorized ones. On Linux, use tools like SELinux or AppArmor to define mandatory access control policies for application execution. - Implementation: Allow only digitally signed or pre-approved applications to execute on servers and endpoints. (e.g., `New-AppLockerPolicy -PolicyType Enforced -FilePath &quot;C:\Policies\AppLocker.xml&quot;`) Script Blocking: - Use Case: Use script control me…</p><a href="https://attack.mitre.org/mitigations/M1038">MITRE mitigation source</a></article><article class="card"><strong>M1018 · User Account Management</strong><p>User Account Management involves implementing and enforcing policies for the lifecycle of user accounts, including creation, modification, and deactivation. Proper account management reduces the attack surface by limiting unauthorized access, managing account privileges, and ensuring accounts are used according to organizational policies. This mitigation can be implemented through the following measures: Enforcing the Principle of Least Privilege - Implementation: Assign users only the minimum permissions required to perform their job functions. Regularly audit accounts to ensure no excess permissions are granted. - Use Case: Reduces the risk of privilege escalation by ensuring accounts cannot perform unauthorized actions. Implementing Strong Password Policies - Implementation: Enforce password complexity requirements (e.g., length, character types). Require password expiration every 90…</p><a href="https://attack.mitre.org/mitigations/M1018">MITRE mitigation source</a></article></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0404 · Detect Winlogon Helper DLL Abuse via Registry and Process Artifacts on Windows</strong><ul><li><strong>AN1133 · Analytic 1133</strong> — Monitor Windows Registry modifications to Winlogon keys (Shell, Userinit, Notify) that introduce new executable or DLL paths. Correlate these changes with subsequent DLL loading, image loads, or process creation originating from winlogon.exe or userinit.exe. Abnormal child process lineage or unauthorized binaries in C:\Windows\System32 may indicate abuse.</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0404">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END -->
   <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>

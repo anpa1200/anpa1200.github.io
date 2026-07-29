@@ -85,8 +85,16 @@ test('current, superseded, archived, and externally sourced entities remain dist
 
 test('taxonomy audit separates generated references from authored distribution', () => {
   assert.equal(taxonomyAudit.item_count, catalog.items.length);
-  assert.equal(taxonomyAudit.distributions.by_primary_type['generated-reference'], 656);
-  assert.equal(taxonomyAudit.distributions.by_primary_type['reference-entity'], 160);
+  assert.equal(
+    taxonomyAudit.distributions.by_primary_type['generated-reference'],
+    catalog.items.filter((item) => item.primary_type === 'generated-reference').length,
+  );
+  assert.ok(taxonomyAudit.distributions.by_primary_type['generated-reference'] >= 697);
+  assert.equal(
+    taxonomyAudit.distributions.by_primary_type['reference-entity'],
+    catalog.items.filter((item) => item.primary_type === 'reference-entity').length,
+  );
+  assert.ok(taxonomyAudit.distributions.by_primary_type['reference-entity'] >= 174);
   assert.equal(taxonomyAudit.authored_only.by_primary_type['generated-reference'], undefined);
   assert.ok(taxonomyAudit.warnings.some((warning) => warning.code === 'GENERATED_REFERENCE_DISTRIBUTION'));
   assert.ok(taxonomyAudit.warnings.every((warning) => warning.severity !== 'error'));

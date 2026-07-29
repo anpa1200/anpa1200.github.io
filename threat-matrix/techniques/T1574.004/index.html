@@ -15,7 +15,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="article:modified_time" content="2026-06-27" />
 
-    
+
 
     <script type="application/ld+json" data-site-graph>
       {
@@ -146,6 +146,7 @@
         ]
       }
     </script>
+  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 </head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
@@ -165,6 +166,22 @@
   <section><h2 id="detection-logic">Detection logic</h2><p>Monitor file systems for moving, renaming, replacing, or modifying dylibs. Changes in the set of dylibs that are loaded by a process (compared to past behavior) that do not correlate with known software, patches, etc., are suspicious. Check the system for multiple dylibs with the same name and monitor which versions have historically been loaded into a process.  Run path dependent libraries can include LC_LOAD_DYLIB, LC_LOAD_WEAK_DYLIB, and LC_RPATH. Other special keywords are recognized by the macOS loader are @rpath, @loader_path, and @executable_path. These loader instructions can be examined for individual binaries or frameworks using the otool -l command. Objective-See&#39;s Dylib Hijacking Scanner can be used to identify applications vulnerable to dylib hijacking.</p></section>
   <section><h2 id="observed-actors">Observed actors</h2><div class="grid"></div></section>
   <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+
+<!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/malware-analysis.html#module-6"><strong>Controlled dynamic behavior and differential observation</strong><br><span class="muted">Malware Analysis &amp; Reverse Engineering · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/blue-team.html#m4"><strong>Module 4 — Detection engineering and detection as code</strong><br><span class="muted">Blue Team &amp; Defensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/dfir.html#module-5"><strong>Disk, file-system, and persistence forensics</strong><br><span class="muted">Digital Forensics &amp; Incident Response (DFIR) · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/red-team.html#m5"><strong>Module 5 — Cloud, containers, and Kubernetes</strong><br><span class="muted">Red Team &amp; Offensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/malware-analysis.html#module-3"><strong>Static triage: strings, imports, resources, and capabilities</strong><br><span class="muted">Malware Analysis &amp; Reverse Engineering · tactic-route · 24/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><article class="card"><strong>M1022 · Restrict File and Directory Permissions</strong><p>Restricting file and directory permissions involves setting access controls at the file system level to limit which users, groups, or processes can read, write, or execute files. By configuring permissions appropriately, organizations can reduce the attack surface for adversaries seeking to access sensitive data, plant malicious code, or tamper with system files. Enforce Least Privilege Permissions: - Remove unnecessary write permissions on sensitive files and directories. - Use file ownership and groups to control access for specific roles. Example (Windows): Right-click the shared folder → Properties → Security tab → Adjust permissions for NTFS ACLs. Harden File Shares: - Disable anonymous access to shared folders. - Enforce NTFS permissions for shared folders on Windows. Example: Set permissions to restrict write access to critical files, such as system executables (e.g., `/bin` or `…</p><a href="https://attack.mitre.org/mitigations/M1022">MITRE mitigation source</a></article></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0152 · Detection Strategy for Hijack Execution Flow: Dylib Hijacking</strong><ul><li><strong>AN0435 · Analytic 0435</strong> — Detection focuses on adversaries placing or modifying malicious dylibs in locations searched by legitimate applications. From the defender’s perspective, observable patterns include unexpected creation or modification of dylib files in application bundle paths, unusual module loads by processes compared to historical baselines, and execution of applications loading dylibs from suspicious directories (e.g., /tmp, user-controlled paths). Correlation across file system changes, process execution, and module loads provides high-fidelity detection.</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0152">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END -->
   <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>

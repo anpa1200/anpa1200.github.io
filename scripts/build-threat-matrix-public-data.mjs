@@ -9,6 +9,9 @@ const ATTACK_INDEX_URL = 'https://raw.githubusercontent.com/mitre-attack/attack-
 const URLHAUS_RECENT_URL = 'https://urlhaus.abuse.ch/downloads/json_recent/';
 const CISA_KEV_URL = 'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json';
 const args = process.argv.slice(2);
+const attackOnly = args.includes('--attack-only');
+const domainArgIndex = args.indexOf('--domain');
+const selectedDomain = domainArgIndex >= 0 ? args[domainArgIndex + 1] : '';
 const offlineCacheIndex = args.indexOf('--offline-cache');
 const offlineCache = offlineCacheIndex >= 0 ? args[offlineCacheIndex + 1] : '';
 
@@ -25,6 +28,7 @@ async function main() {
   for (const collection of attackIndex.collections || []) {
     const target = DOMAIN_OUTPUTS[collection.name];
     if (!target) continue;
+    if (selectedDomain && target.domain !== selectedDomain) continue;
     const latest = collection.versions?.[0];
     if (!latest?.url) throw new Error(`Missing latest URL for ${collection.name}`);
     const bundle = await readJsonSource(latest.url, basenameFromUrl(latest.url));
@@ -34,9 +38,19 @@ async function main() {
       source_url: latest.url,
       source_modified: latest.modified,
     });
-    await writeJson(join(THREAT_MATRIX_ROOT, target.output), generated);
+    if (target.domain === 'enterprise') {
+      const { core, defense } = splitEnterpriseDefenseData(generated);
+      await Promise.all([
+        writeJson(join(THREAT_MATRIX_ROOT, target.output), core),
+        writeJson(join(THREAT_MATRIX_ROOT, 'mitre-defense-data.json'), defense),
+      ]);
+    } else {
+      await writeJson(join(THREAT_MATRIX_ROOT, target.output), generated);
+    }
     console.log(`Wrote ${target.output}: ${generated.techniques.length} techniques, ${generated.groups.length} groups, ATT&CK ${generated.version}`);
   }
+
+  if (attackOnly) return;
 
   const iocs = buildIocDemoLibrary(await readJsonSource(URLHAUS_RECENT_URL, 'urlhaus_recent.json'));
   await writeJson(join(DEMO_DATA_ROOT, 'iocs.json'), iocs);
@@ -70,6 +84,8 @@ function transformAttackBundle(bundle, metadata) {
   const objects = (bundle.objects || []).filter((object) => !object.revoked && !object.x_mitre_deprecated);
   const byStixId = new Map(objects.map((object) => [object.id, object]));
   const externalIdByStixId = new Map(objects.map((object) => [object.id, externalId(object)]).filter(([, id]) => id));
+  const mitigationsByTechnique = relationshipObjectsByTarget(objects, byStixId, 'mitigates', 'course-of-action');
+  const detectionsByTechnique = relationshipObjectsByTarget(objects, byStixId, 'detects', 'x-mitre-detection-strategy');
 
   const subtechniqueParents = new Map();
   for (const relationship of objects.filter((object) => object.type === 'relationship' && object.relationship_type === 'subtechnique-of')) {
@@ -114,6 +130,34 @@ function transformAttackBundle(bundle, metadata) {
         tactic_ids: tacticIds,
         is_sub: Boolean(object.x_mitre_is_subtechnique || subtechniqueParents.has(id)),
         parent_id: subtechniqueParents.get(id) || null,
+        mitigations: (mitigationsByTechnique.get(object.id) || [])
+          .map((mitigation) => ({
+            id: externalId(mitigation),
+            name: mitigation.name || externalId(mitigation),
+            description: compactText(mitigation.description, 900),
+            references: primaryReferenceFor(mitigation),
+          }))
+          .filter((mitigation) => mitigation.id?.startsWith('M')),
+        detection_strategies: (detectionsByTechnique.get(object.id) || [])
+          .map((strategy) => ({
+            id: externalId(strategy),
+            name: strategy.name || externalId(strategy),
+            analytics: (strategy.x_mitre_analytic_refs || [])
+              .map((ref) => byStixId.get(ref))
+              .filter(Boolean)
+              .map((analytic) => ({
+                id: externalId(analytic),
+                name: analytic.name || externalId(analytic),
+                description: compactText(analytic.description, 1000),
+                log_sources: (analytic.x_mitre_log_source_references || []).map((source) => ({
+                  name: source.name || '',
+                  channel: source.channel || '',
+                })),
+                references: primaryReferenceFor(analytic),
+              })),
+            references: primaryReferenceFor(strategy),
+          }))
+          .filter((strategy) => strategy.id?.startsWith('DET')),
         references: primaryReferenceFor(object),
       };
     })
@@ -148,6 +192,42 @@ function transformAttackBundle(bundle, metadata) {
     tactics,
     techniques,
     groups,
+  };
+}
+
+function relationshipObjectsByTarget(objects, byStixId, relationshipType, sourceType) {
+  const mapped = new Map();
+  for (const relationship of objects.filter((object) =>
+    object.type === 'relationship' && object.relationship_type === relationshipType)) {
+    const source = byStixId.get(relationship.source_ref);
+    if (source?.type !== sourceType || !byStixId.has(relationship.target_ref)) continue;
+    if (!mapped.has(relationship.target_ref)) mapped.set(relationship.target_ref, []);
+    mapped.get(relationship.target_ref).push(source);
+  }
+  return mapped;
+}
+
+function splitEnterpriseDefenseData(generated) {
+  const techniques = [];
+  const defensiveTechniques = [];
+  for (const technique of generated.techniques) {
+    const { mitigations, detection_strategies: detectionStrategies, ...core } = technique;
+    techniques.push(core);
+    defensiveTechniques.push({
+      id: technique.id,
+      mitigations: mitigations || [],
+      detection_strategies: detectionStrategies || [],
+    });
+  }
+  return {
+    core: { ...generated, techniques },
+    defense: {
+      domain: generated.domain,
+      version: generated.version,
+      generated: generated.generated,
+      source: generated.source,
+      techniques: defensiveTechniques,
+    },
   };
 }
 

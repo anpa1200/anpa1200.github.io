@@ -15,7 +15,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="article:modified_time" content="2026-06-27" />
 
-    
+
 
     <script type="application/ld+json" data-site-graph>
       {
@@ -146,6 +146,7 @@
         ]
       }
     </script>
+  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 </head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
@@ -165,6 +166,22 @@
   <section><h2 id="detection-logic">Detection logic</h2><p>Monitor for changes to environment variables and files associated with loading shared libraries such as LD_PRELOAD and DYLD_INSERT_LIBRARIES, as well as the commands to implement these changes. Monitor processes for unusual activity (e.g., a process that does not use the network begins to do so). Track library metadata, such as a hash, and compare libraries that are loaded at process execution time against previous executions to detect differences that do not correlate with patching or updates.</p></section>
   <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0096/"><strong>APT41</strong><br><span class="muted">G0096</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0106/"><strong>Rocke</strong><br><span class="muted">G0106</span></a><a class="card" href="https://1200km.com/threat-matrix/actors/G0143/"><strong>Aquatic Panda</strong><br><span class="muted">G0143</span></a></div></section>
   <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+
+<!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/malware-analysis.html#module-6"><strong>Controlled dynamic behavior and differential observation</strong><br><span class="muted">Malware Analysis &amp; Reverse Engineering · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/blue-team.html#m4"><strong>Module 4 — Detection engineering and detection as code</strong><br><span class="muted">Blue Team &amp; Defensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/dfir.html#module-5"><strong>Disk, file-system, and persistence forensics</strong><br><span class="muted">Digital Forensics &amp; Incident Response (DFIR) · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/red-team.html#m5"><strong>Module 5 — Cloud, containers, and Kubernetes</strong><br><span class="muted">Red Team &amp; Offensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/malware-analysis.html#module-3"><strong>Static triage: strings, imports, resources, and capabilities</strong><br><span class="muted">Malware Analysis &amp; Reverse Engineering · tactic-route · 24/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><article class="card"><strong>M1028 · Operating System Configuration</strong><p>Operating System Configuration involves adjusting system settings and hardening the default configurations of an operating system (OS) to mitigate adversary exploitation and prevent abuse of system functionality. Proper OS configurations address security vulnerabilities, limit attack surfaces, and ensure robust defense against a wide range of techniques. This mitigation can be implemented through the following measures: Disable Unused Features: - Turn off SMBv1, LLMNR, and NetBIOS where not needed. - Disable remote registry and unnecessary services. Enforce OS-level Protections: - Enable Data Execution Prevention (DEP), Address Space Layout Randomization (ASLR), and Control Flow Guard (CFG) on Windows. - Use AppArmor or SELinux on Linux for mandatory access controls. Secure Access Settings: - Enable User Account Control (UAC) for Windows. - Restrict root/sudo access on Linux/macOS and e…</p><a href="https://attack.mitre.org/mitigations/M1028">MITRE mitigation source</a></article><article class="card"><strong>M1038 · Execution Prevention</strong><p>Prevent the execution of unauthorized or malicious code on systems by implementing application control, script blocking, and other execution prevention mechanisms. This ensures that only trusted and authorized code is executed, reducing the risk of malware and unauthorized actions. This mitigation can be implemented through the following measures: Application Control: - Use Case: Use tools like AppLocker or Windows Defender Application Control (WDAC) to create whitelists of authorized applications and block unauthorized ones. On Linux, use tools like SELinux or AppArmor to define mandatory access control policies for application execution. - Implementation: Allow only digitally signed or pre-approved applications to execute on servers and endpoints. (e.g., `New-AppLockerPolicy -PolicyType Enforced -FilePath &quot;C:\Policies\AppLocker.xml&quot;`) Script Blocking: - Use Case: Use script control me…</p><a href="https://attack.mitre.org/mitigations/M1038">MITRE mitigation source</a></article></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0435 · Detection Strategy for Hijack Execution Flow: Dynamic Linker Hijacking</strong><ul><li><strong>AN1209 · Analytic 1209</strong> — Detection focuses on identifying abuse of LD_PRELOAD and related linker variables. Defender perspective: monitor unexpected setting or modification of LD_PRELOAD in shell initialization scripts or environment exports, file creation of suspicious shared libraries, and correlation of these modifications with anomalous process execution. Key signals include execve events with LD_PRELOAD defined, newly created .so files in user directories, and processes hooking libc functions exhibiting abnormal behavior.</li><li><strong>AN1210 · Analytic 1210</strong> — Detection centers on DYLD_INSERT_LIBRARIES and DYLD_LIBRARY_PATH abuse. Defender perspective: monitor for modification of these environment variables in shell or plist files, file creation of dylibs in user-controlled paths, and correlation of environment variable usage with unexpected module loads by user applications. Suspicious indicators include processes with DYLD_INSERT_LIBRARIES set, execution of applications loading untrusted dylibs, and anomalies in module load history.</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0435">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END -->
   <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T1564.013 Bind Mounts | AdversaryGraph</title>
+<meta name="description" content="T1564.013 Bind Mounts: ATT&amp;CK behavior, detection strategies, mitigations, groups, and Cyber Knowledge context.">
+<link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1564.013/"><link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
+<style>body{margin:0;background:#07101f;color:#dce7f7;font:16px/1.6 system-ui,sans-serif}main{width:min(1120px,calc(100% - 2rem));margin:2rem auto}a{color:#8bd8ff}.meta,.muted{color:#93a4bd}.cta{display:inline-block;background:#e11d48;color:#fff;padding:.65rem .85rem;border-radius:.4rem;text-decoration:none;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem}.card{display:block;border:1px solid #334155;border-radius:.5rem;padding:.8rem;background:#0d1728;color:#dce7f7;text-decoration:none}.card p{color:#c6d4e8}</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1564.013 Bind Mounts","url":"https://1200km.com/threat-matrix/techniques/T1564.013/","about":["MITRE ATT&CK","T1564.013","stealth"]}</script>
+  <meta property="article:published_time" content="2026-07-29"><meta property="article:modified_time" content="2026-07-29">
+</head><body><main><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / T1564.013</nav>
+<p class="meta">T1564.013 · stealth · ATT&amp;CK 19.1</p>
+<h1>Bind Mounts</h1><p>Adversaries may abuse bind mounts on file structures to hide their activity and artifacts from native utilities. A bind mount maps a directory or file from one location on the filesystem to another, similar to a shortcut on Windows. It’s commonly used to provide access to specific files or directories across different environments, such as inside containers or chroot environments, and requires sudo access. Adversaries may use bind mounts to map either an empty directory or a benign `/proc` directory to a malicious process’s `/proc` directory. Using the commands `mount –o bind /proc/benign-process /proc/malicious-process` (or `mount –B`), the malicious process&#39;s `/proc` directory is overlayed with the contents of a benign process&#39;s `/proc` directory. When system utilities query process activity, such as `ps` and `top`, the kernel follows the bind mount and presents the benign directory’s contents instead of the malicious process&#39;s actual `/proc` directory. As a result, these utilities display information that appears to come from the benign process, effectively hiding the malicious process&#39;s metadata, executable, or other artifacts from detection.(Citation: Cado Security Commando Cat 2024)(Citation: Ahn Lab CoinMiner 2023)</p>
+<p><a class="cta" href="/cyber-knowledge/attack-matrix.html?technique=T1564.013">Open in the interactive knowledge mesh</a></p>
+<section><h2>Detection overview</h2><p>Use the published detection strategies below and validate required telemetry in the target environment.</p></section>
+<section><h2>Observed groups</h2><div class="grid"><p>No current Enterprise group relationship is published in this bundle.</p></div></section>
+
+<!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/malware-analysis.html#module-6"><strong>Controlled dynamic behavior and differential observation</strong><br><span class="muted">Malware Analysis &amp; Reverse Engineering · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/blue-team.html#m4"><strong>Module 4 — Detection engineering and detection as code</strong><br><span class="muted">Blue Team &amp; Defensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/dfir.html#module-5"><strong>Disk, file-system, and persistence forensics</strong><br><span class="muted">Digital Forensics &amp; Incident Response (DFIR) · tactic-route · 24/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><p>No ATT&amp;CK mitigation relationship is published for this technique. Apply risk-based controls and verify scope.</p></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0428 · Detection Strategy for Bind Mounts on Linux</strong><ul><li><strong>AN1196 · Analytic 1196</strong> — Abuse of bind mounts to obscure process directories. Defender perspective: detecting anomalous mount operations where a process’s /proc entry is remapped to another directory, often hiding malicious activity from native utilities (ps, top). Behavior chain includes: (1) execution of `mount` with `-o bind` or `-B` flags, (2) modification of /proc entries inconsistent with expected process lineage, and (3) subsequent anomalous activity from processes whose metadata no longer matches execution context.</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0428">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END -->
+</main></body></html>

@@ -678,6 +678,7 @@ function transformHub(html, stats, edges) {
     /<(?:div|nav)\b[^>]*class="[^"]*page-hero-links[^"]*"[^>]*>[\s\S]*?<\/(?:div|nav)>/i,
     `<nav class="page-hero-links role-chooser" aria-label="Explore Cyber Knowledge">
             <a class="button primary" href="#domains">Explore the guides</a>
+            <a class="button" href="/cyber-knowledge/attack-matrix.html">Open ATT&amp;CK knowledge mesh</a>
             <a class="button" href="#entry-paths">Browse by workflow</a>
             <a class="button" href="/search.html?q=cybersecurity">Search the knowledge base</a>
           </nav>`,
@@ -706,6 +707,16 @@ function transformHub(html, stats, edges) {
 }
 
 assertModel();
+const withoutAttackKnowledgeMesh = (html) => html
+  .replace(/<!-- ATTACK_KNOWLEDGE_MESH_START -->[\s\S]*?<!-- ATTACK_KNOWLEDGE_MESH_END -->/g, '');
+const equivalentGeneratedHtml = (left, right) => {
+  const normalize = (html) => withoutAttackKnowledgeMesh(html)
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/>\s+</g, '><')
+    .trim();
+  return normalize(left) === normalize(right);
+};
 const stale = [];
 const stats = new Map();
 const source = new Map();
@@ -715,9 +726,9 @@ for (const domain of domains) {
   if (!existsSync(path)) throw new Error(`Missing Cyber Knowledge page: ${domain.path}`);
   const html = readFileSync(path, 'utf8');
   source.set(domain.id, html);
-  const modules = moduleCount(html);
+  const modules = moduleCount(withoutAttackKnowledgeMesh(html));
   if (!modules) throw new Error(`${domain.path}: no numbered modules detected`);
-  stats.set(domain.id, { modules, minutes: readingMinutes(html) });
+  stats.set(domain.id, { modules, minutes: readingMinutes(withoutAttackKnowledgeMesh(html)) });
 }
 assertCrosslinkModel(source);
 assertEntryPaths();
@@ -728,10 +739,10 @@ for (const domain of domains) {
   const generated = transformDomain(current, domain);
   source.set(domain.id, generated);
   stats.set(domain.id, {
-    modules: moduleCount(generated),
-    minutes: readingMinutes(generated),
+    modules: moduleCount(withoutAttackKnowledgeMesh(generated)),
+    minutes: readingMinutes(withoutAttackKnowledgeMesh(generated)),
   });
-  if (current === generated) continue;
+  if (equivalentGeneratedHtml(current, generated)) continue;
   if (check) stale.push(domain.path);
   else writeFileSync(path, generated);
 }
@@ -739,7 +750,7 @@ for (const domain of domains) {
 const hubPath = join(site, 'cyber-knowledge/index.html');
 const hubCurrent = readFileSync(hubPath, 'utf8');
 const hubGenerated = transformHub(hubCurrent, stats, crossDomainEdges(source));
-if (hubCurrent !== hubGenerated) {
+if (!equivalentGeneratedHtml(hubCurrent, hubGenerated)) {
   if (check) stale.push('cyber-knowledge/index.html');
   else writeFileSync(hubPath, hubGenerated);
 }
