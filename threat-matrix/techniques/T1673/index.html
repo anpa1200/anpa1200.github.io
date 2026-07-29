@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T1673 Virtual Machine Discovery | AdversaryGraph</title>
+<meta name="description" content="T1673 Virtual Machine Discovery: ATT&amp;CK behavior, detection strategies, mitigations, groups, and Cyber Knowledge context.">
+<link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1673/"><link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
+<style>body{margin:0;background:#07101f;color:#dce7f7;font:16px/1.6 system-ui,sans-serif}main{width:min(1120px,calc(100% - 2rem));margin:2rem auto}a{color:#8bd8ff}.meta,.muted{color:#93a4bd}.cta{display:inline-block;background:#e11d48;color:#fff;padding:.65rem .85rem;border-radius:.4rem;text-decoration:none;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem}.card{display:block;border:1px solid #334155;border-radius:.5rem;padding:.8rem;background:#0d1728;color:#dce7f7;text-decoration:none}.card p{color:#c6d4e8}</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1673 Virtual Machine Discovery","url":"https://1200km.com/threat-matrix/techniques/T1673/","about":["MITRE ATT&CK","T1673","discovery"]}</script>
+  <meta property="article:published_time" content="2026-07-29"><meta property="article:modified_time" content="2026-07-29">
+</head><body><main><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / T1673</nav>
+<p class="meta">T1673 · discovery · ATT&amp;CK 19.1</p>
+<h1>Virtual Machine Discovery</h1><p>An adversary may attempt to enumerate running virtual machines (VMs) after gaining access to a host or hypervisor. For example, adversaries may enumerate a list of VMs on an ESXi hypervisor using a [Hypervisor CLI](https://attack.mitre.org/techniques/T1059/012) such as `esxcli` or `vim-cmd` (e.g. `esxcli vm process list or vim-cmd vmsvc/getallvms`).(Citation: Crowdstrike Hypervisor Jackpotting Pt 2 2021)(Citation: TrendMicro Play) Adversaries may also directly leverage a graphical user interface, such as VMware vCenter, in order to view virtual machines on a host. Adversaries may use the information from [Virtual Machine Discovery](https://attack.mitre.org/techniques/T1673) during discovery to shape follow-on behaviors. Subsequently discovered VMs may be leveraged for follow-on activities such as [Service Stop](https://attack.mitre.org/techniques/T1489) or [Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486).(Citation: Crowdstrike Hypervisor Jackpotting Pt 2 2021)</p>
+<p><a class="cta" href="/cyber-knowledge/attack-matrix.html?technique=T1673">Open in the interactive knowledge mesh</a></p>
+<section><h2>Detection overview</h2><p>Use the published detection strategies below and validate required telemetry in the target environment.</p></section>
+<section><h2>Observed groups</h2><div class="grid"><a class="card" href="/threat-matrix/actors/G1048/"><strong>UNC3886</strong><br><span class="muted">G1048</span></a></div></section>
+
+<!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/osint.html#module-5"><strong>Internet exposure, service indexes, and infrastructure search</strong><br><span class="muted">OSINT &amp; Reconnaissance · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/red-team.html#m5"><strong>Module 5 — Cloud, containers, and Kubernetes</strong><br><span class="muted">Red Team &amp; Offensive Security · tactic-route · 24/100</span></a><a class="card" href="/cyber-knowledge/cloud-security.html#module-5"><strong>Data classification, storage, cryptography, keys, backup, and deletion</strong><br><span class="muted">Cloud Security · tactic-route · 24/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><p>No ATT&amp;CK mitigation relationship is published for this technique. Apply risk-based controls and verify scope.</p></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0199 · Detection Strategy for Virtual Machine Discovery</strong><ul><li><strong>AN0572 · Analytic 0572</strong> — Monitor for execution of hypervisor management commands such as `esxcli vm process list` or `vim-cmd vmsvc/getallvms` that enumerate virtual machines. Defenders observe unexpected users issuing VM listing commands outside normal administrative workflows.</li><li><strong>AN0573 · Analytic 0573</strong> — Detects attempts to enumerate VMs via hypervisor tools like `virsh`, `VBoxManage`, or `qemu-img`. Defender correlates suspicious command invocations with parent process lineage and unexpected users.</li><li><strong>AN0574 · Analytic 0574</strong> — Detects enumeration of VMs using PowerShell (`Get-VM`), VMware Workstation (`vmrun.exe`), or Hyper-V (`VBoxManage.exe`). Defender observes suspicious command lines executed by unexpected users or outside normal administrative sessions.</li><li><strong>AN0575 · Analytic 0575</strong> — Detects VM enumeration attempts using virtualization utilities such as VirtualBox (`VBoxManage`) or Parallels CLI. Defender observes abnormal invocation of VM listing commands correlated with non-admin users or unusual parent processes.</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0199">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END --></main></body></html>

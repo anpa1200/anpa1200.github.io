@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1200km.com/data/attack-knowledge-mesh.schema.json",
+  "title": "1200km ATT&CK knowledge mesh",
+  "type": "object",
+  "required": ["version", "generated_at", "attack", "modules", "techniques"],
+  "properties": {
+    "version": { "const": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "attack": {
+      "type": "object",
+      "required": ["version", "source"],
+      "properties": {
+        "version": { "type": "string" },
+        "source": { "type": "string", "format": "uri" }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "domain_id", "title", "url", "tactics", "techniques"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+:m[0-9]+$" },
+          "domain_id": { "type": "string" },
+          "title": { "type": "string" },
+          "url": { "type": "string" },
+          "tactics": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "techniques": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "score", "basis"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^T[0-9]{4}(\\.[0-9]{3})?$" },
+                "score": { "type": "integer", "minimum": 1, "maximum": 100 },
+                "basis": { "enum": ["explicit-id", "explicit-name", "topic-match"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "techniques": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["knowledge_routes"],
+        "properties": {
+          "knowledge_routes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["module_id", "url", "title", "basis", "score"],
+              "properties": {
+                "module_id": { "type": "string" },
+                "url": { "type": "string" },
+                "title": { "type": "string" },
+                "basis": { "enum": ["explicit-id", "explicit-name", "topic-match", "tactic-route"] },
+                "score": { "type": "integer", "minimum": 1, "maximum": 100 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

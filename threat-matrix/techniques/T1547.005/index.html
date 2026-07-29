@@ -15,7 +15,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="article:modified_time" content="2026-06-27" />
 
-    
+
 
     <script type="application/ld+json" data-site-graph>
       {
@@ -146,6 +146,7 @@
         ]
       }
     </script>
+  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 </head><body><main data-pagefind-body>
   <!-- AG_PROJECT_NOTICE -->
 <section class="ag-project-notice" style="border:1px solid #1f3b57;background:linear-gradient(135deg,#08111f,#111827 58%,#23080d);border-radius:8px;margin:0 0 28px;padding:16px 18px;color:#dbeafe">
@@ -165,6 +166,28 @@
   <section><h2 id="detection-logic">Detection logic</h2><p>Monitor the Registry for changes to the SSP Registry keys. Monitor the LSA process for DLL loads. Windows 8.1 and Windows Server 2012 R2 may generate events when unsigned SSP DLLs try to load into the LSA by setting the Registry key HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\LSASS.exe with AuditLevel = 8.</p></section>
   <section><h2 id="observed-actors">Observed actors</h2><div class="grid"><a class="card" href="https://1200km.com/threat-matrix/actors/G0032/"><strong>Lazarus Group</strong><br><span class="muted">G0032</span></a></div></section>
   <section><h2 id="correlated-cti-and-ir-reports">Correlated CTI and IR reports</h2><div class="grid"></div></section>
+
+
+
+
+
+
+
+  <!-- ATTACK_KNOWLEDGE_MESH_START -->
+<section class="attack-knowledge-detail">
+  <h2 id="cyber-knowledge-context">Cyber Knowledge context</h2>
+  <p>Use these routes to move from the ATT&amp;CK behavior into explanation, implementation, evidence handling, validation, and defensive operations. Relevance is generated from explicit identifiers/names and governed topic mappings; it is not attribution evidence.</p>
+  <div class="grid"><a class="card" href="/cyber-knowledge/secure-code.html#module-3"><strong>Authentication, sessions, and identity lifecycle</strong><br><span class="muted">Secure Code &amp; Application Security · topic-match · 63/100</span></a><a class="card" href="/cyber-knowledge/ai-security.html#module-6"><strong>Privacy, secrets, confidential data, and model leakage</strong><br><span class="muted">AI Security · topic-match · 63/100</span></a><a class="card" href="/cyber-knowledge/red-team.html#m4"><strong>Module 4 — Web applications and APIs</strong><br><span class="muted">Red Team &amp; Offensive Security · topic-match · 54/100</span></a><a class="card" href="/cyber-knowledge/dfir.html#module-10"><strong>Cloud, SaaS, identity, container, and Kubernetes forensics</strong><br><span class="muted">Digital Forensics &amp; Incident Response (DFIR) · topic-match · 54/100</span></a><a class="card" href="/cyber-knowledge/malware-analysis.html#module-14"><strong>AI-assisted analysis, RAG/MCP controls, and defensive handoff</strong><br><span class="muted">Malware Analysis &amp; Reverse Engineering · topic-match · 51/100</span></a><a class="card" href="/cyber-knowledge/secure-code.html#module-1"><strong>Requirements, ownership, inventory, and data flow</strong><br><span class="muted">Secure Code &amp; Application Security · topic-match · 51/100</span></a><a class="card" href="/cyber-knowledge/secure-code.html#module-4"><strong>Authorization, object access, and tenant isolation</strong><br><span class="muted">Secure Code &amp; Application Security · topic-match · 51/100</span></a><a class="card" href="/cyber-knowledge/grc.html#module-1"><strong>Governance, organizational context, and accountable authority</strong><br><span class="muted">Governance, Risk &amp; Compliance (GRC) · topic-match · 51/100</span></a><a class="card" href="/cyber-knowledge/grc.html#module-2"><strong>Scope, business services, assets, dependencies, and data</strong><br><span class="muted">Governance, Risk &amp; Compliance (GRC) · topic-match · 51/100</span></a><a class="card" href="/cyber-knowledge/grc.html#module-4"><strong>Frameworks, profiles, baselines, and crosswalk discipline</strong><br><span class="muted">Governance, Risk &amp; Compliance (GRC) · topic-match · 51/100</span></a><a class="card" href="/cyber-knowledge/grc.html#module-6"><strong>Control design, ownership, inheritance, and lifecycle</strong><br><span class="muted">Governance, Risk &amp; Compliance (GRC) · topic-match · 51/100</span></a><a class="card" href="/cyber-knowledge/grc.html#module-9"><strong>Third-party, service-provider, and software supply-chain risk</strong><br><span class="muted">Governance, Risk &amp; Compliance (GRC) · topic-match · 51/100</span></a></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="mitigations">MITRE mitigations</h2>
+  <div class="grid"><article class="card"><strong>M1025 · Privileged Process Integrity</strong><p>Privileged Process Integrity focuses on defending highly privileged processes (e.g., system services, antivirus, or authentication processes) from tampering, injection, or compromise by adversaries. These processes often interact with critical components, making them prime targets for techniques like code injection, privilege escalation, and process manipulation. This mitigation can be implemented through the following measures: Protected Process Mechanisms: - Enable RunAsPPL on Windows systems to protect LSASS and other critical processes. - Use registry modifications to enforce protected process settings: `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\RunAsPPL` Anti-Injection and Memory Protection: - Enable Control Flow Guard (CFG), DEP, and ASLR to protect against process memory tampering. - Deploy endpoint protection tools that actively block process injection attempts. Co…</p><a href="https://attack.mitre.org/mitigations/M1025">MITRE mitigation source</a></article></div>
+</section>
+<section class="attack-knowledge-detail">
+  <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
+  <div class="grid"><article class="card"><strong>DET0542 · Registry and LSASS Monitoring for Security Support Provider Abuse</strong><ul><li><strong>AN1495 · Analytic 1495</strong> — Monitor registry modifications to `HKLM\SYSTEM\CurrentControlSet\Control\Lsa\Security Packages` or `...\OSConfig\Security Packages`, especially insertions of new DLL entries. Correlate this with subsequent DLL module loads into `lsass.exe`. Track unsigned or anomalous DLLs loading into LSASS using image load auditing. LSASS loads unsigned DLL due to AuditLevel=8 registry configuration or System reboot followed by DLL load into lsass.exe</li></ul><a href="https://attack.mitre.org/detectionstrategies/DET0542">MITRE detection source</a></article></div>
+</section>
+<!-- ATTACK_KNOWLEDGE_MESH_END -->
   <section><h2 id="continue-the-investigation">Continue the investigation</h2><div class="links">
     <a href="https://1200km.com/threat-matrix/">Interactive AdversaryGraph</a>
     <a href="https://1200km.com/adversarygraph-docs/">AdversaryGraph documentation</a>
