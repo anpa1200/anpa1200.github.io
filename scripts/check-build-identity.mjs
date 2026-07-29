@@ -51,6 +51,9 @@ for (const path of pages) {
   const matches = [...html.matchAll(/<meta\b[^>]*name=["']1200km-build["'][^>]*>/gi)];
   if (matches.length !== 1) failures.push(`${relative(site, path)} has ${matches.length} build identity tags`);
   else if (!matches[0][0].includes(identity.site_commit)) failures.push(`${relative(site, path)} does not expose the current build commit`);
+  for (const match of html.matchAll(/<code\b[^>]*\bdata-site-build-id(?:=["'][^"']*["'])?[^>]*>([^<]*)<\/code>/gi)) {
+    if (match[1].trim() !== identity.site_commit) failures.push(`${relative(site, path)} has a stale visible build identity`);
+  }
 }
 
 if (failures.length) {
