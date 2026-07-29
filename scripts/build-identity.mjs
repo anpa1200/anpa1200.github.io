@@ -46,11 +46,15 @@ async function walk(directory = site) {
 
 function addBuildMeta(html) {
   const meta = `    <meta name="1200km-build" content="${siteCommit}" />\n`;
+  const replaceVisibleBuild = (value) => value.replace(
+    /(<code\b[^>]*\bdata-site-build-id(?:=["'][^"']*["'])?[^>]*>)[^<]*(<\/code>)/gi,
+    `$1${siteCommit}$2`,
+  );
   if (/<meta\b[^>]*name=["']1200km-build["'][^>]*>/i.test(html)) {
-    return html.replace(/\s*<meta\b[^>]*name=["']1200km-build["'][^>]*>\s*/i, `\n${meta}`);
+    return replaceVisibleBuild(html.replace(/\s*<meta\b[^>]*name=["']1200km-build["'][^>]*>\s*/i, `\n${meta}`));
   }
   if (!/<\/head>/i.test(html)) throw new Error('HTML document has no closing head element');
-  return html.replace(/<\/head>/i, `${meta}  </head>`);
+  return replaceVisibleBuild(html.replace(/<\/head>/i, `${meta}  </head>`));
 }
 
 const htmlFiles = (await walk()).filter((path) => path.endsWith('.html')).sort();

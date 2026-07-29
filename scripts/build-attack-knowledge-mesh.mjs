@@ -11,7 +11,22 @@ const CHECK = process.argv.includes('--check');
 const START = '<!-- ATTACK_KNOWLEDGE_MESH_START -->';
 const END = '<!-- ATTACK_KNOWLEDGE_MESH_END -->';
 const GENERATED_BLOCK_PATTERN = new RegExp(`${START}[\\s\\S]*?${END}`, 'g');
+const PAGE_SUMMARY_START = '<!-- ATTACK_PAGE_SUMMARY_START -->';
+const PAGE_SUMMARY_END = '<!-- ATTACK_PAGE_SUMMARY_END -->';
+const STATIC_MATRIX_START = '<!-- ATTACK_STATIC_MATRIX_START -->';
+const STATIC_MATRIX_END = '<!-- ATTACK_STATIC_MATRIX_END -->';
+const PROVENANCE_START = '<!-- ATTACK_PROVENANCE_START -->';
+const PROVENANCE_END = '<!-- ATTACK_PROVENANCE_END -->';
+const STATS_START = '<!-- ATTACK_STATS_START -->';
+const STATS_END = '<!-- ATTACK_STATS_END -->';
 let attackGroups = [];
+let attackVersion = '';
+const ROUTE_LABELS = {
+  'explicit-id': 'Explicit ATT&CK ID',
+  'explicit-name': 'Exact technique name',
+  'topic-match': 'Governed topic match',
+  'tactic-route': 'Tactic learning route',
+};
 
 const DOMAIN_PROFILES = {
   cti: {
@@ -186,14 +201,60 @@ function insertModuleBlocks(html, modules, techniquesById, tacticsByShortname) {
   return output;
 }
 
+function replaceRegion(html, start, end, content) {
+  const pattern = new RegExp(`${start}[\\s\\S]*?${end}`);
+  if (!pattern.test(html)) throw new Error(`Missing generated page region: ${start}`);
+  return html.replace(pattern, `${start}\n${content}\n      ${end}`);
+}
+
+function formatBuildDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) throw new Error(`Invalid ATT&CK bundle build date: ${value || '(missing)'}`);
+  return date.toISOString().slice(0, 10);
+}
+
+function buildStaticMatrix(attack) {
+  return attack.tactics.map((tactic) => {
+    const techniques = attack.techniques.filter((technique) => (technique.tactic_ids || []).includes(tactic.shortname));
+    const parents = techniques.filter((technique) => !technique.is_sub);
+    const links = parents.map((parent) => {
+      const parentLink = `<a class="mesh-technique" href="/threat-matrix/techniques/${encodeURIComponent(parent.id)}/"><strong>${escapeHtml(parent.id)}</strong>${escapeHtml(parent.name)}</a>`;
+      const subLinks = techniques.filter((technique) => technique.parent_id === parent.id)
+        .map((sub) => `<a class="mesh-technique mesh-sub" href="/threat-matrix/techniques/${encodeURIComponent(sub.id)}/"><strong>${escapeHtml(sub.id)}</strong>${escapeHtml(sub.name)}</a>`)
+        .join('');
+      return `${parentLink}${subLinks}`;
+    }).join('');
+    return `<section class="mesh-tactic" aria-labelledby="static-tactic-${escapeHtml(tactic.id)}"><h3 id="static-tactic-${escapeHtml(tactic.id)}">${escapeHtml(tactic.name)} · ${techniques.length}</h3>${links}</section>`;
+  }).join('');
+}
+
+async function buildAttackMatrixPage(attack, mesh) {
+  if (!attack.version) throw new Error('ATT&CK bundle version cannot be determined');
+  const path = join(ROOT, 'cyber-knowledge/attack-matrix.html');
+  const current = await readFile(path, 'utf8');
+  const buildDate = formatBuildDate(attack.retrieved_at || attack.generated);
+  let rendered = replaceRegion(current, PAGE_SUMMARY_START, PAGE_SUMMARY_END,
+    `      <p class="lede">Move from adversary behavior to explanation, evidence, detection, mitigation, and practice. Every technique is backed by official ATT&amp;CK ${escapeHtml(attack.version)} data and resolves to at least a tactic-level Cyber Knowledge learning route; most carry stronger explicit-ID, name, or topic mappings.</p>`);
+  rendered = replaceRegion(rendered, STATIC_MATRIX_START, STATIC_MATRIX_END, buildStaticMatrix(attack));
+  rendered = replaceRegion(rendered, PROVENANCE_START, PROVENANCE_END,
+    `      <p class="mesh-provenance" id="mesh-provenance" data-bundle-date="${buildDate}"><strong>Data provenance:</strong> ATT&amp;CK content ${escapeHtml(attack.version)} · STIX 2.1 bundle build ${buildDate} · site build <code data-site-build-id>source build</code>. Revoked and deprecated objects are excluded from live matrix entries; old IDs resolve through STIX <code>revoked-by</code> relationships when MITRE publishes a successor.</p>`);
+  rendered = replaceRegion(rendered, STATS_START, STATS_END,
+    `<span>ATT&amp;CK ${escapeHtml(attack.version)}</span><span>${attack.tactics.length} tactics</span><span>${attack.techniques.length} techniques</span><span>${attack.groups.length} groups</span><span>${mesh.modules.length} knowledge modules</span>`);
+  if (CHECK) {
+    if (rendered !== current) throw new Error('ATT&CK matrix page fallback/provenance is stale; run npm run build-attack-mesh');
+    return;
+  }
+  await writeFile(path, rendered);
+}
+
 function techniqueKnowledgeSection(technique, routes) {
   const routeCards = routes.slice(0, 12).map((route) =>
-    `<a class="card" href="${escapeHtml(route.url)}"><strong>${escapeHtml(route.title)}</strong><br><span class="muted">${escapeHtml(route.domain_name)} · ${escapeHtml(route.basis)} · ${route.score}/100</span></a>`).join('');
+    `<a class="card" href="${escapeHtml(route.url)}"><strong>${escapeHtml(route.title)}</strong><br><span class="muted">${escapeHtml(route.domain_name)} · ${escapeHtml(ROUTE_LABELS[route.basis] || route.basis)} · ${route.score}/100</span></a>`).join('');
   const mitigationCards = (technique.mitigations || []).map((item) =>
     `<article class="card"><strong>${escapeHtml(item.id)} · ${escapeHtml(item.name)}</strong><p>${escapeHtml(item.description)}</p>${item.references?.[0]?.url ? `<a href="${escapeHtml(item.references[0].url)}">MITRE mitigation source</a>` : ''}</article>`).join('');
   const detectionCards = (technique.detection_strategies || []).map((strategy) => {
     const analytics = (strategy.analytics || []).map((analytic) =>
-      `<li><strong>${escapeHtml(analytic.id)} · ${escapeHtml(analytic.name)}</strong> — ${escapeHtml(analytic.description)}</li>`).join('');
+      `<li><strong>${analytic.references?.[0]?.url ? `<a href="${escapeHtml(analytic.references[0].url)}">${escapeHtml(analytic.id)} · ${escapeHtml(analytic.name)}</a>` : `${escapeHtml(analytic.id)} · ${escapeHtml(analytic.name)}`}</strong> — ${escapeHtml(analytic.description)}</li>`).join('');
     return `<article class="card"><strong>${escapeHtml(strategy.id)} · ${escapeHtml(strategy.name)}</strong>${analytics ? `<ul>${analytics}</ul>` : ''}${strategy.references?.[0]?.url ? `<a href="${escapeHtml(strategy.references[0].url)}">MITRE detection source</a>` : ''}</article>`;
   }).join('');
   return `${START}
@@ -245,7 +306,7 @@ async function enrichTechniquePage(technique, routes) {
 <style>body{margin:0;background:#07101f;color:#dce7f7;font:16px/1.6 system-ui,sans-serif}main{width:min(1120px,calc(100% - 2rem));margin:2rem auto}a{color:#8bd8ff}.meta,.muted{color:#93a4bd}.cta{display:inline-block;background:#e11d48;color:#fff;padding:.65rem .85rem;border-radius:.4rem;text-decoration:none;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem}.card{display:block;border:1px solid #334155;border-radius:.5rem;padding:.8rem;background:#0d1728;color:#dce7f7;text-decoration:none}.card p{color:#c6d4e8}</style>
 <script type="application/ld+json">${JSON.stringify({ '@context':'https://schema.org','@type':'TechArticle',headline:`${technique.id} ${technique.name}`,url:canonical,about:['MITRE ATT&CK',technique.id,...technique.tactic_ids] })}</script>
 </head><body><main><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / ${escapeHtml(technique.id)}</nav>
-<p class="meta">${escapeHtml(technique.id)} · ${escapeHtml((technique.tactic_ids || []).join(' · '))} · ATT&amp;CK 19.1</p>
+<p class="meta">${escapeHtml(technique.id)} · ${escapeHtml((technique.tactic_ids || []).join(' · '))} · ATT&amp;CK ${escapeHtml(attackVersion)}</p>
 <h1>${escapeHtml(technique.name)}</h1><p>${escapeHtml(technique.description)}</p>
 <p><a class="cta" href="/cyber-knowledge/attack-matrix.html?technique=${encodeURIComponent(technique.id)}">Open in the interactive knowledge mesh</a></p>
 <section><h2>Detection overview</h2><p>${escapeHtml(technique.detection || 'Use the published detection strategies below and validate required telemetry in the target environment.')}</p></section>
@@ -282,7 +343,7 @@ ${END}`;
 <title>${escapeHtml(group.name)} ${escapeHtml(group.id)} | AdversaryGraph</title><meta name="description" content="${escapeHtml(`${group.name} (${group.id}): aliases, ATT&CK techniques, and Cyber Knowledge routes.`)}">
 <meta property="article:published_time" content="2026-07-29"><meta property="article:modified_time" content="2026-07-29"><link rel="canonical" href="${canonical}"><link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 <style>body{margin:0;background:#07101f;color:#dce7f7;font:16px/1.6 system-ui,sans-serif}main{width:min(1120px,calc(100% - 2rem));margin:2rem auto}a{color:#8bd8ff}.muted{color:#93a4bd}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.7rem}.card{display:block;border:1px solid #334155;border-radius:.5rem;padding:.8rem;background:#0d1728;color:#dce7f7;text-decoration:none}</style></head>
-<body><main><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / ${escapeHtml(group.id)}</nav><p class="muted">${escapeHtml(group.id)} · ATT&amp;CK 19.1 group</p>
+<body><main><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / ${escapeHtml(group.id)}</nav><p class="muted">${escapeHtml(group.id)} · ATT&amp;CK ${escapeHtml(attackVersion)} group</p>
 <h1>${escapeHtml(group.name)}</h1><p>${escapeHtml(group.description)}</p><p><strong>Aliases:</strong> ${escapeHtml((group.aliases || []).join(', ') || 'None published')}</p>
 <section><h2>Mapped techniques (${group.technique_ids.length})</h2><div class="grid">${techniques}</div></section>${section}</main></body></html>`;
     await mkdir(join(ROOT, `threat-matrix/actors/${group.id}`), { recursive: true });
@@ -301,6 +362,7 @@ async function main() {
     ...technique,
     ...(defenseByTechnique.get(technique.id) || {}),
   }));
+  attackVersion = attack.version;
   const techniquesById = new Map(attack.techniques.map((item) => [item.id, item]));
   attackGroups = attack.groups;
   const tacticsByShortname = new Map(attack.tactics.map((item) => [item.shortname, item]));
@@ -374,12 +436,14 @@ async function main() {
     const current = await readFile(OUTPUT_PATH, 'utf8');
     const normalizeGenerated = (text) => text.replace(/"generated_at": "[^"]+"/, '"generated_at": "<generated>"');
     if (normalizeGenerated(current) !== normalizeGenerated(serialized)) throw new Error('ATT&CK knowledge mesh is stale; run npm run build-attack-mesh');
+    await buildAttackMatrixPage(attack, mesh);
     console.log(`ATT&CK knowledge mesh current: ${modules.length} modules, ${attack.techniques.length} techniques`);
     return;
   }
 
   await mkdir(join(ROOT, 'cyber-knowledge'), { recursive: true });
   await Promise.all([writeFile(OUTPUT_PATH, serialized), writeFile(PUBLIC_OUTPUT_PATH, serialized)]);
+  await buildAttackMatrixPage(attack, mesh);
   for (const { html, path, domain } of sourcePages.values()) {
     await writeFile(path, insertModuleBlocks(html, modules.filter((module) => module.domain_id === domain.id), techniquesById, tacticsByShortname));
   }

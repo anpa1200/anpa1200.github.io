@@ -5,7 +5,7 @@ const SITE_ROOT = new URL('..', import.meta.url).pathname;
 const THREAT_MATRIX_ROOT = join(SITE_ROOT, 'threat-matrix');
 const DEMO_DATA_ROOT = join(THREAT_MATRIX_ROOT, 'demo-data');
 
-const ATTACK_INDEX_URL = 'https://raw.githubusercontent.com/mitre-attack/attack-stix-data/v19.1/index.json';
+const ATTACK_INDEX_URL = 'https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/index.json';
 const URLHAUS_RECENT_URL = 'https://urlhaus.abuse.ch/downloads/json_recent/';
 const CISA_KEV_URL = 'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json';
 const args = process.argv.slice(2);
@@ -37,6 +37,7 @@ async function main() {
       version: latest.version,
       source_url: latest.url,
       source_modified: latest.modified,
+      retrieved_at: new Date().toISOString(),
     });
     if (target.domain === 'enterprise') {
       const { core, defense } = splitEnterpriseDefenseData(generated);
@@ -81,8 +82,11 @@ function basenameFromUrl(url) {
 }
 
 function transformAttackBundle(bundle, metadata) {
-  const objects = (bundle.objects || []).filter((object) => !object.revoked && !object.x_mitre_deprecated);
+  if (!metadata.version) throw new Error('ATT&CK bundle version cannot be determined');
+  const allObjects = bundle.objects || [];
+  const objects = allObjects.filter((object) => !object.revoked && !object.x_mitre_deprecated);
   const byStixId = new Map(objects.map((object) => [object.id, object]));
+  const allByStixId = new Map(allObjects.map((object) => [object.id, object]));
   const externalIdByStixId = new Map(objects.map((object) => [object.id, externalId(object)]).filter(([, id]) => id));
   const mitigationsByTechnique = relationshipObjectsByTarget(objects, byStixId, 'mitigates', 'course-of-action');
   const detectionsByTechnique = relationshipObjectsByTarget(objects, byStixId, 'detects', 'x-mitre-detection-strategy');
@@ -178,10 +182,41 @@ function transformAttackBundle(bundle, metadata) {
     })
     .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
 
+  const revokedBy = new Map(allObjects
+    .filter((object) => object.type === 'relationship' && object.relationship_type === 'revoked-by')
+    .map((relationship) => [relationship.source_ref, relationship.target_ref]));
+  const resolveSuccessor = (object) => {
+    const visited = new Set([object.id]);
+    let successorRef = revokedBy.get(object.id);
+    while (successorRef && !visited.has(successorRef)) {
+      visited.add(successorRef);
+      const successor = allByStixId.get(successorRef);
+      if (!successor) return null;
+      if (!successor.revoked && !successor.x_mitre_deprecated) return successor;
+      successorRef = revokedBy.get(successor.id);
+    }
+    return null;
+  };
+  const revokedTechniques = allObjects
+    .filter((object) => object.type === 'attack-pattern'
+      && (object.revoked || object.x_mitre_deprecated)
+      && externalId(object)?.startsWith('T'))
+    .map((object) => {
+      const successor = resolveSuccessor(object);
+      return {
+        id: externalId(object),
+        name: object.name || externalId(object),
+        status: object.revoked ? 'revoked' : 'deprecated',
+        successor: successor ? { id: externalId(successor), name: successor.name || externalId(successor) } : null,
+      };
+    })
+    .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+
   return {
     domain: metadata.domain,
     version: metadata.version,
     generated: new Date().toISOString(),
+    retrieved_at: metadata.retrieved_at,
     source: {
       name: 'MITRE ATT&CK STIX data',
       url: metadata.source_url,
@@ -192,6 +227,7 @@ function transformAttackBundle(bundle, metadata) {
     tactics,
     techniques,
     groups,
+    revoked_techniques: revokedTechniques,
   };
 }
 
