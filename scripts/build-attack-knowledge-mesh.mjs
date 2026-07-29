@@ -79,7 +79,27 @@ const TACTIC_ROUTES = {
 const escapeHtml = (value) => String(value ?? '')
   .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
-const stripHtml = (value) => String(value).replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ')
+function stripElementBlocks(value, tagName) {
+  let output = String(value);
+  let normalized = output.toLowerCase();
+  const opening = `<${tagName}`;
+  const closing = `</${tagName}`;
+  let start = normalized.indexOf(opening);
+  while (start !== -1) {
+    const closingStart = normalized.indexOf(closing, start + opening.length);
+    if (closingStart === -1) {
+      output = output.slice(0, start);
+      break;
+    }
+    const closingEnd = normalized.indexOf('>', closingStart + closing.length);
+    const end = closingEnd === -1 ? output.length : closingEnd + 1;
+    output = `${output.slice(0, start)} ${output.slice(end)}`;
+    normalized = output.toLowerCase();
+    start = normalized.indexOf(opening, start + 1);
+  }
+  return output;
+}
+const stripHtml = (value) => stripElementBlocks(stripElementBlocks(value, 'script'), 'style')
   .replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/\s+/g, ' ').trim();
 const normalize = (value) => stripHtml(value).toLowerCase().replace(/[^a-z0-9.]+/g, ' ');
 
