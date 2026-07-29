@@ -3,12 +3,14 @@ import { join } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const DATA_PATH = join(ROOT, 'threat-matrix/mitre-data.json');
+const DEFENSE_DATA_PATH = join(ROOT, 'threat-matrix/mitre-defense-data.json');
 const CATALOG_PATH = join(ROOT, 'data/cyber-knowledge.json');
 const OUTPUT_PATH = join(ROOT, 'data/attack-knowledge-mesh.json');
 const PUBLIC_OUTPUT_PATH = join(ROOT, 'cyber-knowledge/attack-knowledge-mesh.json');
 const CHECK = process.argv.includes('--check');
 const START = '<!-- ATTACK_KNOWLEDGE_MESH_START -->';
 const END = '<!-- ATTACK_KNOWLEDGE_MESH_END -->';
+const GENERATED_BLOCK_PATTERN = new RegExp(`${START}[\\s\\S]*?${END}`, 'g');
 let attackGroups = [];
 
 const DOMAIN_PROFILES = {
@@ -152,7 +154,7 @@ function buildModuleTagBlock(module, techniquesById, tacticsByShortname) {
   }).join('');
   return `${START}
 <aside class="attack-module-map" aria-labelledby="${module.anchor}-attack-map-title">
-  <h3 id="${module.anchor}-attack-map-title">ATT&amp;CK knowledge mesh</h3>
+  <h3 id="${module.anchor}-attack-map-title">ATT&amp;CK knowledge mesh for ${escapeHtml(module.title)}</h3>
   <p>This module is contextually mapped to ATT&amp;CK Enterprise ${escapeHtml(module.attack_version)}. Tags are discovery routes, not claims that every technique is implemented or observed.</p>
   <div class="attack-tag-list" aria-label="Relevant tactics">${tacticLinks}</div>
   <div class="attack-tag-list" aria-label="Relevant techniques">${techniqueLinks}</div>
@@ -162,7 +164,7 @@ ${END}`;
 }
 
 function insertModuleBlocks(html, modules, techniquesById, tacticsByShortname) {
-  let output = html.replace(new RegExp(`${START}[\\s\\S]*?${END}`, 'g'), '');
+  let output = html.replace(GENERATED_BLOCK_PATTERN, '');
   for (const module of [...modules].reverse()) {
     const sectionStart = output.search(new RegExp(`<${module.element_tag}\\b[^>]*id="${module.source_anchor}"`, 'i'));
     if (sectionStart < 0) continue;
@@ -215,10 +217,12 @@ async function enrichTechniquePage(technique, routes) {
   const path = join(ROOT, `threat-matrix/techniques/${technique.id}/index.html`);
   try {
     let html = await readFile(path, 'utf8');
-    html = html.replace(new RegExp(`${START}[\\s\\S]*?${END}`, 'g'), '');
+    html = html.replace(GENERATED_BLOCK_PATTERN, '');
     const marker = '<section><h2 id="continue-the-investigation">';
     const section = techniqueKnowledgeSection(technique, routes);
-    html = html.includes(marker) ? html.replace(marker, `${section}\n  ${marker}`) : html.replace('</main>', `${section}</main>`);
+    html = html.includes(marker)
+      ? html.replace(new RegExp(`\\s*${marker}`), `\n\n${section}\n  ${marker}`)
+      : html.replace(/\s*<\/main>/, `\n\n${section}\n</main>`);
     if (!html.includes('/assets/attack-knowledge-mesh.css')) {
       html = html.replace('</head>', '  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">\n</head>');
     }
@@ -266,8 +270,8 @@ async function enrichGroupPage(group, reverse) {
 ${END}`;
   try {
     let html = await readFile(path, 'utf8');
-    html = html.replace(new RegExp(`${START}[\\s\\S]*?${END}`, 'g'), '');
-    html = html.replace('</main>', `${section}</main>`);
+    html = html.replace(GENERATED_BLOCK_PATTERN, '');
+    html = html.replace(/\s*<\/main>/, `\n${section}\n</main>`);
     if (!html.includes('/assets/attack-knowledge-mesh.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/attack-knowledge-mesh.css"></head>');
     await writeFile(path, html.replace(/[ \t]+$/gm, ''));
   } catch (error) {
@@ -287,10 +291,16 @@ ${END}`;
 }
 
 async function main() {
-  const [attack, catalog] = await Promise.all([
+  const [attack, defense, catalog] = await Promise.all([
     readFile(DATA_PATH, 'utf8').then(JSON.parse),
+    readFile(DEFENSE_DATA_PATH, 'utf8').then(JSON.parse),
     readFile(CATALOG_PATH, 'utf8').then(JSON.parse),
   ]);
+  const defenseByTechnique = new Map(defense.techniques.map((technique) => [technique.id, technique]));
+  attack.techniques = attack.techniques.map((technique) => ({
+    ...technique,
+    ...(defenseByTechnique.get(technique.id) || {}),
+  }));
   const techniquesById = new Map(attack.techniques.map((item) => [item.id, item]));
   attackGroups = attack.groups;
   const tacticsByShortname = new Map(attack.tactics.map((item) => [item.shortname, item]));
@@ -299,7 +309,7 @@ async function main() {
 
   for (const domain of catalog.domains) {
     const path = join(ROOT, domain.path);
-    const html = (await readFile(path, 'utf8')).replace(new RegExp(`${START}[\\s\\S]*?${END}`, 'g'), '');
+    const html = (await readFile(path, 'utf8')).replace(GENERATED_BLOCK_PATTERN, '');
     sourcePages.set(domain.id, { path, html, domain });
     const profile = DOMAIN_PROFILES[domain.id];
     if (!profile) throw new Error(`Missing ATT&CK profile for ${domain.id}`);

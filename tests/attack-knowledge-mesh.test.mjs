@@ -37,9 +37,12 @@ test('every ATT&CK technique has a governed Cyber Knowledge route', async () => 
 
 test('official defensive relationships survive the public ATT&CK transform', async () => {
   const attack = await readJson('threat-matrix/mitre-data.json');
-  const mitigationCount = attack.techniques.flatMap((technique) => technique.mitigations || []).length;
-  const strategyCount = attack.techniques.flatMap((technique) => technique.detection_strategies || []).length;
-  const analyticCount = attack.techniques.flatMap((technique) =>
+  const defense = await readJson('threat-matrix/mitre-defense-data.json');
+  assert.ok(Buffer.byteLength(JSON.stringify(attack)) < 2 * 1024 * 1024, 'interactive ATT&CK bundle exceeds 2 MiB');
+  assert.equal(defense.version, attack.version);
+  const mitigationCount = defense.techniques.flatMap((technique) => technique.mitigations || []).length;
+  const strategyCount = defense.techniques.flatMap((technique) => technique.detection_strategies || []).length;
+  const analyticCount = defense.techniques.flatMap((technique) =>
     (technique.detection_strategies || []).flatMap((strategy) => strategy.analytics || [])).length;
   assert.equal(mitigationCount, 1448);
   assert.equal(strategyCount, 697);

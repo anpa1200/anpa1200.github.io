@@ -38,7 +38,15 @@ async function main() {
       source_url: latest.url,
       source_modified: latest.modified,
     });
-    await writeJson(join(THREAT_MATRIX_ROOT, target.output), generated);
+    if (target.domain === 'enterprise') {
+      const { core, defense } = splitEnterpriseDefenseData(generated);
+      await Promise.all([
+        writeJson(join(THREAT_MATRIX_ROOT, target.output), core),
+        writeJson(join(THREAT_MATRIX_ROOT, 'mitre-defense-data.json'), defense),
+      ]);
+    } else {
+      await writeJson(join(THREAT_MATRIX_ROOT, target.output), generated);
+    }
     console.log(`Wrote ${target.output}: ${generated.techniques.length} techniques, ${generated.groups.length} groups, ATT&CK ${generated.version}`);
   }
 
@@ -197,6 +205,30 @@ function relationshipObjectsByTarget(objects, byStixId, relationshipType, source
     mapped.get(relationship.target_ref).push(source);
   }
   return mapped;
+}
+
+function splitEnterpriseDefenseData(generated) {
+  const techniques = [];
+  const defensiveTechniques = [];
+  for (const technique of generated.techniques) {
+    const { mitigations, detection_strategies: detectionStrategies, ...core } = technique;
+    techniques.push(core);
+    defensiveTechniques.push({
+      id: technique.id,
+      mitigations: mitigations || [],
+      detection_strategies: detectionStrategies || [],
+    });
+  }
+  return {
+    core: { ...generated, techniques },
+    defense: {
+      domain: generated.domain,
+      version: generated.version,
+      generated: generated.generated,
+      source: generated.source,
+      techniques: defensiveTechniques,
+    },
+  };
 }
 
 function compactText(value, limit) {
