@@ -137,13 +137,14 @@
     </div>
 
     <main class="wrap">
-      <section aria-labelledby="source-title">
-        <h2 id="source-title">Published source</h2>
-        <div class="callout source">
-          <p><strong>This course chapter follows the published article:</strong> <a href="https://medium.com/@1200km/ai-security-course-module-00-part-1-introduction-ai-ml-taxonomy-and-data-foundations-2e26c0740a17" target="_blank" rel="noopener noreferrer">AI Security Course, Module 00 — Part 1: Introduction, AI/ML Taxonomy, and Data Foundations</a>.</p>
-          <p>The sequence, explanations, real cases, terminology, references, and data-lifecycle sections below mirror the publication. The preserved infographics and video links are kept in a media companion section so they remain available without breaking the article’s learning flow.</p>
-          <p>This is Part 1 of the chapter-by-chapter version of Module 00: <strong>AI, Machine Learning, and LLM Foundations</strong>. It covers the introduction, Chapter 1, and Chapter 2. Later articles will cover neural networks, Transformers, the LLM lifecycle, RAG, agents, and serving.</p>
-        </div>
+      <section id="introduction" aria-labelledby="introduction-title" class="prose">
+        <h2 id="introduction-title">Before you secure an AI system, learn what the system is</h2>
+        <p>AI security conversations often begin with prompt injection, jailbreaks, or a new red-team tool. That is understandable, but it creates a dangerous starting point.</p>
+        <p>An AI system is not just a model.</p>
+        <p>It is a chain of data pipelines, model artifacts, prompts, retrieval systems, applications, identities, tools, memory, infrastructure, operators, and downstream actions. The model may generate text or choose an action, but it does not automatically provide authorization, tenant isolation, provenance, auditability, or safe execution.</p>
+        <p>That is why the first module of the AI Security Engineering course is not an attack lab. It is a technical foundation module for security practitioners who need to reason accurately about the complete system.</p>
+        <p>This article is Part 1 of the chapter-by-chapter version of Module 00: <strong>AI, Machine Learning, and LLM Foundations</strong>. It covers the introduction, Chapter 1, and Chapter 2. Later articles will cover neural networks, Transformers, the LLM lifecycle, RAG, agents, and serving.</p>
+        <blockquote><strong>Course status:</strong> Under construction. The syllabus may change during creation. The scope, examples, references, labs, and assessment criteria may change before pilot delivery.</blockquote>
       </section>
 
       <section aria-labelledby="contents-title">
@@ -152,8 +153,6 @@
           <li><a href="#purpose">The purpose of Module 00</a></li>
           <li><a href="#audience">Audience, prerequisites, and skip paths</a></li>
           <li><a href="#taxonomy">1. AI, machine learning, deep learning, and generative AI</a></li>
-          <li><a href="#media">Publication media companion</a></li>
-          <li><a href="#cases">Security cases and terminology test</a></li>
           <li><a href="#data-foundations">2. How learning systems use data</a></li>
           <li><a href="#key-takeaways">Key takeaways</a></li>
         </ol>
@@ -192,26 +191,19 @@
         <h2 id="taxonomy-title">1. AI, machine learning, deep learning, and generative AI are not synonyms</h2>
         <p>The first source of confusion is vocabulary. These terms describe overlapping scopes, not interchangeable products. The hierarchy below is useful as a map, but it is not a strict pipeline: some AI systems use no machine learning, some foundation models are not language models, and some generative systems are specialized rather than broadly reusable.</p>
         <div class="callout"><pre>Artificial intelligence
-├── symbolic rules, search, planning, knowledge, optimization, robotics
+├── symbolic AI: rules, search, planning, knowledge, optimization, robotics
 └── Machine learning
+    ├── supervised, unsupervised, self-supervised, and reinforcement learning
     ├── classical statistical and algorithmic ML
     └── Deep learning
-        ├── discriminative and representation models
+        ├── discriminative models
+        ├── encoder and representation models
         ├── embedding models
         ├── generative models
         └── foundation models
             ├── language models and LLMs
             ├── vision models
             └── multimodal models</pre></div>
-        <table class="case-table"><thead><tr><th>Term</th><th>What it means</th><th>Security question</th></tr></thead><tbody>
-          <tr><td>AI</td><td>The broad field of systems producing predictions, recommendations, decisions, or content.</td><td>Which component has authority and what state can it change?</td></tr>
-          <tr><td>Symbolic rules</td><td>Explicit human-authored conditions, facts, policies, and actions.</td><td>Can inputs bypass, confuse, or reorder the policy path?</td></tr>
-          <tr><td>Machine learning</td><td>Behavior learned from data or interaction rather than only hand-written rules.</td><td>Who can influence training data, labels, features, feedback, or thresholds?</td></tr>
-          <tr><td>Deep learning</td><td>Multilayer neural networks that learn representations and functions.</td><td>What was learned, under which distribution, and what happens under shift or evasion?</td></tr>
-          <tr><td>Generative AI</td><td>Systems that produce text, code, images, audio, video, or structured content.</td><td>Where are output validation, encoding, identity, and egress enforced?</td></tr>
-          <tr><td>Foundation model</td><td>A broadly trained reusable starting point for downstream applications.</td><td>Is provenance known, is loading safe, and are adapters and revisions controlled?</td></tr>
-          <tr><td>LLM</td><td>A language model that predicts and generates sequences of tokens.</td><td>Which application controls provide truth checks, authorization, and safe tool execution?</td></tr>
-        </tbody></table>
 
         <p>The branches overlap. A foundation model may be generative, encoder-based, multimodal, or a combination. An embedding model may be a deep-learning model without being generative. Reinforcement learning is a learning paradigm that can use deep networks; it is not a sibling product category to “foundation model.” An LLM is a language model, and many current LLMs are language foundation models, but the terms are not interchangeable.</p>
 
@@ -295,7 +287,10 @@ and account_age &lt; policy_threshold:
         </ul>
         <p>Those properties come from the application and operating environment.</p>
 
-        <h3 id="real-life-examples">Real-life examples: the label changes the security question</h3>
+      </section>
+
+      <section id="real-life-examples" aria-labelledby="real-life-examples-title" class="prose">
+        <h2 id="real-life-examples-title">Real-life examples: the label changes the security question</h2>
         <table class="case-table"><thead><tr><th>System or case</th><th>Technical category</th><th>What the system does</th><th>Security question</th></tr></thead><tbody>
           <tr><td>Rules-based transaction screening</td><td>AI without ML</td><td>Applies explicit conditions to a transaction</td><td>Can an attacker manipulate inputs or bypass the decision workflow?</td></tr>
           <tr><td>Spam or fraud classifier</td><td>Classical ML</td><td>Produces a class or probability from features</td><td>Are training data, thresholds, feedback, and analyst actions protected?</td></tr>
@@ -305,46 +300,6 @@ and account_age &lt; policy_threshold:
           <tr><td>RAG assistant</td><td>AI system pattern</td><td>Retrieves external content and supplies it to a model</td><td>Is authorization checked before content enters context, and is lineage logged?</td></tr>
           <tr><td>Tool-using agent</td><td>AI system with delegated authority</td><td>Chooses and invokes operations in a loop</td><td>Which identity can act, what can change, and who approves the exact action?</td></tr>
         </tbody></table>
-      </section>
-
-      <section id="media" aria-labelledby="media-title">
-        <h2 id="media-title">Publication media companion</h2>
-        <p class="section-intro">These are the nine visual assets and five video references preserved with the published chapter. They support the same explanations above; the primary article sequence remains text-first for reviewability.</p>
-        <div class="gallery">
-          <figure><img src="/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" alt="Illustration of the complete AI security system and its surrounding components" loading="eager" /><figcaption>01 — The complete AI security system: data, model, application, identity, tools, infrastructure, and action.<br /><a href="/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/02-ai-ml-taxonomy.png" alt="Taxonomy showing artificial intelligence, machine learning, deep learning, generative models, foundation models, and language models" loading="lazy" /><figcaption>02 — AI, ML, deep learning, generative AI, foundation models, and LLMs.<br /><a href="/ai-security-course/assets/chapter-01/02-ai-ml-taxonomy.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/03-machine-learning-security-boundary.png" alt="Machine learning examples and the security boundary around data, model, and decision workflow" loading="lazy" /><figcaption>03 — Machine-learning examples and the security boundary around the decision workflow.<br /><a href="/ai-security-course/assets/chapter-01/03-machine-learning-security-boundary.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/04-deep-learning.png" alt="Deep-learning representation and multilayer neural-network concept" loading="lazy" /><figcaption>04 — Deep learning as multilayer representation learning.<br /><a href="/ai-security-course/assets/chapter-01/04-deep-learning.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/05-real-life-examples.png" alt="Table connecting AI system categories to real-life security questions" loading="lazy" /><figcaption>05 — Real-life system categories and the security question each creates.<br /><a href="/ai-security-course/assets/chapter-01/05-real-life-examples.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/06-shadowray.png" alt="ShadowRay AI infrastructure security case illustration" loading="lazy" /><figcaption>06 — ShadowRay: platform compromise can expose AI workloads, models, data, credentials, and compute.<br /><a href="/ai-security-course/assets/chapter-01/06-shadowray.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/07-malicious-model-artifacts.png" alt="Malicious machine-learning model artifact supply-chain security case illustration" loading="lazy" /><figcaption>07 — Malicious model artifacts: a model file can be a supply-chain input, not inert data.<br /><a href="/ai-security-course/assets/chapter-01/07-malicious-model-artifacts.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/08-echoleak.png" alt="EchoLeak enterprise AI assistant vulnerability case illustration" loading="lazy" /><figcaption>08 — EchoLeak: retrieved content, instructions, rendering, and outbound paths can combine into impact.<br /><a href="/ai-security-course/assets/chapter-01/08-echoleak.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-          <figure><img src="/ai-security-course/assets/chapter-01/09-mcp-tool-poisoning.png" alt="MCP tool-poisoning attack and delegated-authority security case illustration" loading="lazy" /><figcaption>09 — MCP tool poisoning: tool definitions and delegated identity are security boundaries.<br /><a href="/ai-security-course/assets/chapter-01/09-mcp-tool-poisoning.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
-        </div>
-      </section>
-
-      <section id="videos" aria-labelledby="videos-title">
-        <h2 id="videos-title">Video references from the publication</h2>
-        <p class="section-intro">The original article included five YouTube references. They are linked directly here so the course page remains usable without embedding third-party players.</p>
-        <ol class="video-list">
-          <li><span><strong>01.</strong> Machine-learning overview and the transition from AI concepts to learned behavior</span><a href="https://www.youtube.com/watch?v=AhCcMOlPxJY" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
-          <li><span><strong>02.</strong> Deep learning and multilayer representations</span><a href="https://www.youtube.com/watch?v=CMdWxIo-Qv8&amp;t=74s" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
-          <li><span><strong>03.</strong> Generative AI and produced content</span><a href="https://www.youtube.com/watch?v=ZK28lp4qsqI" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
-          <li><span><strong>04.</strong> Foundation models and reusable model capabilities</span><a href="https://www.youtube.com/watch?v=OgzkydUdF9I" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
-          <li><span><strong>05.</strong> Large language models and language generation</span><a href="https://www.youtube.com/watch?v=Zas3ufXo9wg" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
-        </ol>
-      </section>
-
-      <section id="cases" aria-labelledby="cases-title">
-        <h2 id="cases-title">Real security cases</h2>
-        <p class="section-intro">The chapter uses cases to show why taxonomy matters. Each case has different evidence, target assets, and controls.</p>
-        <table class="case-table"><thead><tr><th>Case</th><th>Evidence and lesson</th></tr></thead><tbody>
-          <tr><td><a href="https://www.oligo.security/blog/shadowray-attack-ai-workloads-actively-exploited-in-the-wild" target="_blank" rel="noopener noreferrer">ShadowRay</a></td><td>Reported exploitation of exposed Ray infrastructure. The platform around AI workloads can expose models, datasets, credentials, and expensive compute.</td></tr>
-          <tr><td><a href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/" target="_blank" rel="noopener noreferrer">Malicious model artifacts</a></td><td>Public ML artifacts can carry unsafe loading behavior or backdoors. Model provenance, format, loader, and admission controls are supply-chain controls.</td></tr>
-          <tr><td><a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32711" target="_blank" rel="noopener noreferrer">CVE-2025-32711 / EchoLeak</a></td><td>A disclosed enterprise-AI vulnerability illustrates how retrieved content, instructions, rendering, and outbound paths can combine into impact.</td></tr>
-          <tr><td><a href="https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks" target="_blank" rel="noopener noreferrer">MCP tool poisoning</a></td><td>Tool metadata can influence an agent’s planning context. Pin definitions, scope delegated identity, require authorization outside the model, and log approvals.</td></tr>
-        </tbody></table>
-        <div class="callout"><p><strong>Evidence rule:</strong> a demonstrated vulnerability, a provider observation, a confirmed incident, and a constructed scenario must not be reported as if they were the same thing.</p></div>
         <h3 id="case-evidence">Security cases that make the distinction concrete</h3>
         <p>The course uses real reports to connect terminology to operational risk:</p>
         <ol>
@@ -364,7 +319,10 @@ and account_age &lt; policy_threshold:
           <li>Which deterministic control could have prevented, constrained, detected, or preserved the action?</li>
         </ol>
         <p>If the report cannot answer these questions, it may still be useful as a lead, but it is not yet a complete threat model.</p>
-        <h3 id="chapter-1-references">References for Chapter 1</h3>
+      </section>
+
+      <section id="chapter-1-references" aria-labelledby="chapter-1-references-title" class="prose">
+        <h2 id="chapter-1-references-title">References for Chapter 1</h2>
         <ul>
           <li><a href="https://doi.org/10.6028/NIST.AI.100-3" target="_blank" rel="noopener noreferrer">NIST AI 100-3: The Language of Trustworthy AI</a></li>
           <li><a href="https://developers.google.com/machine-learning/crash-course/classification/" target="_blank" rel="noopener noreferrer">Google Machine Learning Crash Course: Classification</a></li>
@@ -495,9 +453,36 @@ and account_age &lt; policy_threshold:
           <li>A model score or generated output is evidence for a policy decision, not the policy itself.</li>
           <li>During incident response, identify the exact artifact, configuration, input, context, identity, and downstream action before claiming that “the AI” caused an outcome.</li>
         </ul>
-        <h3 id="what-comes-next">What comes next</h3>
+      </section>
+
+      <section id="what-comes-next" aria-labelledby="what-comes-next-title" class="prose">
+        <h2 id="what-comes-next-title">What comes next</h2>
         <p>The next article covers neural networks, optimization, and adversarial machine learning. Later parts will trace tokens and Transformer context assembly, the LLM lifecycle, RAG authorization, agent and tool authority, and serving observability.</p>
       </section>
+
+      <aside id="media" aria-labelledby="media-title">
+        <h2 id="media-title">Publication media companion</h2>
+        <p class="section-intro">The primary article above follows the published Medium sequence. These nine infographics and five video references are preserved as supplemental study media.</p>
+        <div class="gallery">
+          <figure><img src="/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" alt="Illustration of the complete AI security system and its surrounding components" loading="eager" /><figcaption>01 — The complete AI security system: data, model, application, identity, tools, infrastructure, and action.<br /><a href="/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/02-ai-ml-taxonomy.png" alt="Taxonomy showing artificial intelligence, machine learning, deep learning, generative models, foundation models, and language models" loading="lazy" /><figcaption>02 — AI, ML, deep learning, generative AI, foundation models, and LLMs.<br /><a href="/ai-security-course/assets/chapter-01/02-ai-ml-taxonomy.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/03-machine-learning-security-boundary.png" alt="Machine learning examples and the security boundary around data, model, and decision workflow" loading="lazy" /><figcaption>03 — Machine-learning examples and the security boundary around the decision workflow.<br /><a href="/ai-security-course/assets/chapter-01/03-machine-learning-security-boundary.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/04-deep-learning.png" alt="Deep-learning representation and multilayer neural-network concept" loading="lazy" /><figcaption>04 — Deep learning as multilayer representation learning.<br /><a href="/ai-security-course/assets/chapter-01/04-deep-learning.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/05-real-life-examples.png" alt="Table connecting AI system categories to real-life security questions" loading="lazy" /><figcaption>05 — Real-life system categories and the security question each creates.<br /><a href="/ai-security-course/assets/chapter-01/05-real-life-examples.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/06-shadowray.png" alt="ShadowRay AI infrastructure security case illustration" loading="lazy" /><figcaption>06 — ShadowRay: platform compromise can expose AI workloads, models, data, credentials, and compute.<br /><a href="/ai-security-course/assets/chapter-01/06-shadowray.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/07-malicious-model-artifacts.png" alt="Malicious machine-learning model artifact supply-chain security case illustration" loading="lazy" /><figcaption>07 — Malicious model artifacts: a model file can be a supply-chain input, not inert data.<br /><a href="/ai-security-course/assets/chapter-01/07-malicious-model-artifacts.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/08-echoleak.png" alt="EchoLeak enterprise AI assistant vulnerability case illustration" loading="lazy" /><figcaption>08 — EchoLeak: retrieved content, instructions, rendering, and outbound paths can combine into impact.<br /><a href="/ai-security-course/assets/chapter-01/08-echoleak.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/09-mcp-tool-poisoning.png" alt="MCP tool-poisoning attack and delegated-authority security case illustration" loading="lazy" /><figcaption>09 — MCP tool poisoning: tool definitions and delegated identity are security boundaries.<br /><a href="/ai-security-course/assets/chapter-01/09-mcp-tool-poisoning.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+        </div>
+        <h3 id="videos-title">Video references from the publication</h3>
+        <ol class="video-list">
+          <li><span><strong>01.</strong> Machine-learning overview and the transition from AI concepts to learned behavior</span><a href="https://www.youtube.com/watch?v=AhCcMOlPxJY" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>02.</strong> Deep learning and multilayer representations</span><a href="https://www.youtube.com/watch?v=CMdWxIo-Qv8&amp;t=74s" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>03.</strong> Generative AI and produced content</span><a href="https://www.youtube.com/watch?v=ZK28lp4qsqI" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>04.</strong> Foundation models and reusable model capabilities</span><a href="https://www.youtube.com/watch?v=OgzkydUdF9I" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>05.</strong> Large language models and language generation</span><a href="https://www.youtube.com/watch?v=Zas3ufXo9wg" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+        </ol>
+      </aside>
     </main>
 
     <footer><div class="wrap"><p><strong>AI Security Engineering Course — under construction.</strong> <a href="https://1200km.com">1200km.com</a> · <a href="https://medium.com/@1200km/im-building-an-ai-security-engineering-course-55e29e6c035e" target="_blank" rel="noopener noreferrer">Main course article on Medium ↗</a> · <a href="#top">Back to top ↑</a></p></div></footer>
