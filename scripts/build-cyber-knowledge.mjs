@@ -681,6 +681,7 @@ function transformHub(html, stats, edges) {
             <a class="button" href="/cyber-knowledge/attack-matrix.html">Open ATT&amp;CK knowledge mesh</a>
             <a class="button" href="#entry-paths">Browse by workflow</a>
             <a class="button" href="/search.html?q=cybersecurity">Search the knowledge base</a>
+            <a class="button" href="/ai-security-course.html">AI Security Engineering course</a>
           </nav>`,
     'role-based starting points',
     'cyber-knowledge/index.html',
