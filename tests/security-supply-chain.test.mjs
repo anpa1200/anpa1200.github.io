@@ -5,6 +5,7 @@ import test from 'node:test';
 import {
   decodeEntities,
   deferThirdPartyBoot,
+  hardenStandaloneHead,
   replaceStructuredData,
   transformReleaseHtml,
 } from '../scripts/release-html-lib.mjs';
@@ -49,6 +50,13 @@ test('release transformer is idempotent on an already-hardened page', () => {
   assert.equal(themeBootstrapMatches.length, 1, 'reprocessing must not accumulate duplicate theme-bootstrap script tags');
   const cspMatches = twicePassed.match(/http-equiv="Content-Security-Policy"/g) || [];
   assert.equal(cspMatches.length, 1, 'reprocessing must not accumulate duplicate CSP meta tags');
+});
+
+test('standalone CSP allows only explicitly embedded YouTube course media', () => {
+  const withVideo = hardenStandaloneHead('<!doctype html><html><head><meta charset="utf-8"></head><body><iframe src="https://www.youtube-nocookie.com/embed/test"></iframe></body></html>');
+  const withoutVideo = hardenStandaloneHead('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>');
+  assert.match(withVideo, /frame-src https:\/\/www\.youtube-nocookie\.com https:\/\/www\.youtube\.com/);
+  assert.match(withoutVideo, /frame-src 'none'/);
 });
 
 test('HTML element removal handles quoted delimiters and spaced closing tags', () => {
