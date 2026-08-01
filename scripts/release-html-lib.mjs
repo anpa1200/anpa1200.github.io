@@ -827,8 +827,14 @@ export function hardenStandaloneHead(html) {
     /\s*<script\b[^>]*\bsrc=["']\/assets\/theme-bootstrap\.js["'][^>]*>\s*<\/script>/gi,
     '',
   );
+  // Keep frames disabled by default, but allow the explicitly supported
+  // YouTube embeds used by course articles. This preserves the restrictive
+  // policy for every page that does not embed external media.
+  const standaloneCsp = /<iframe\b[^>]*\bsrc=["']https:\/\/(?:www\.)?youtube-nocookie\.com\//i.test(transformed)
+    ? STANDALONE_CSP.replace("frame-src 'none'", 'frame-src https://www.youtube-nocookie.com https://www.youtube.com')
+    : STANDALONE_CSP;
   const securityMeta = [
-    `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(STANDALONE_CSP)}">`,
+    `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(standaloneCsp)}">`,
     '<meta name="referrer" content="strict-origin-when-cross-origin">',
     '<script src="/assets/theme-bootstrap.js"></script>',
   ].join('\n    ');
