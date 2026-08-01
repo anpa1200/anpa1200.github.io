@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Module 00, Chapter 1 — AI/ML Taxonomy and Data Foundations | 1200km</title>
+    <meta name="description" content="Published Chapter 1 of the AI Security Engineering course: AI and ML taxonomy, symbolic rules, deep learning, generative AI, foundation models, LLMs, security cases, infographics, and video references." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="Module 00, Chapter 1 — AI/ML Taxonomy and Data Foundations" />
+    <meta property="og:description" content="A media-rich course chapter with the published infographics, video references, real security cases, and terminology foundations." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://1200km.com/ai-security-course/module-00/chapter-01.html" />
+    <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
+    <meta property="og:image" content="https://1200km.com/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Module 00, Chapter 1 — AI/ML Taxonomy and Data Foundations" />
+    <meta name="twitter:description" content="Published Chapter 1 of the AI Security Engineering course." />
+    <meta name="twitter:image" content="https://1200km.com/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="canonical" href="https://1200km.com/ai-security-course/module-00/chapter-01.html" />
+    <link rel="icon" href="/assets/ap-logo-72.png" type="image/png" sizes="72x72" />
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
+    <script src="/assets/theme-bootstrap.js"></script>
+    <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
+    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <style>
+      :root { --bg:#050c1a; --surface:rgba(8,19,38,.9); --text:#cdd9ee; --muted:#9db4d5; --heading:#f8fbff; --line:#1a3060; --accent:#60a5fa; --green:#34d399; --warning:#fbbf24; --shadow:0 14px 34px rgba(0,0,0,.4); }
+      * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      body { margin:0; color:var(--text); background:#050c1a url("/assets/bg-cyber.png") center/cover fixed; font:16px/1.65 Inter,system-ui,sans-serif; }
+      a { color:var(--accent); text-decoration:none; }
+      a:hover { color:#bfdbfe; text-decoration:underline; }
+      .wrap { width:min(1100px,calc(100% - 32px)); margin:0 auto; }
+      .site-header { position:sticky; top:0; z-index:8; border-bottom:1px solid var(--line); background:rgba(5,12,26,.96); backdrop-filter:blur(14px); }
+      .nav { display:flex; align-items:center; justify-content:space-between; min-height:64px; gap:18px; }
+      .brand { display:flex; align-items:center; gap:10px; color:var(--heading); font-weight:800; white-space:nowrap; }
+      .brand img { border-radius:10px; }
+      .navlinks { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; font-size:.92rem; }
+      .navlinks a { color:var(--text); }
+      .theme-btn { border:1px solid #38537a; border-radius:8px; background:transparent; color:var(--text); width:34px; height:34px; cursor:pointer; }
+      .hero { border-bottom:1px solid var(--line); background:radial-gradient(circle at 82% 8%,rgba(15,98,254,.2),transparent 38%),rgba(5,12,26,.9); }
+      .hero-inner { padding:68px 0 48px; }
+      .eyebrow { margin:0 0 12px; color:#7dd3fc; font-size:.78rem; font-weight:850; letter-spacing:.11em; text-transform:uppercase; }
+      h1,h2,h3 { color:var(--heading); line-height:1.2; }
+      h1 { max-width:900px; margin:0; font-size:clamp(2.3rem,5.2vw,4.5rem); letter-spacing:-.045em; }
+      h2 { margin:48px 0 16px; font-size:clamp(1.45rem,2.5vw,2rem); }
+      h3 { margin:0 0 8px; font-size:1.1rem; }
+      .lead { max-width:850px; margin:20px 0 0; color:#b8c9e3; font-size:1.15rem; }
+      .notice { display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start; max-width:900px; margin-top:26px; padding:20px; border:1px solid rgba(251,191,36,.58); border-radius:13px; background:rgba(251,191,36,.1); }
+      .notice-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:var(--warning); color:#1c1300; font-weight:900; }
+      .notice strong { display:block; color:#fde68a; font-size:1.15rem; text-transform:uppercase; letter-spacing:.04em; }
+      .notice p { margin:5px 0 0; color:#e5d6ad; }
+      .meta,.actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:22px; }
+      .pill { padding:6px 10px; border:1px solid rgba(147,197,253,.3); border-radius:999px; background:rgba(96,165,250,.1); color:#dbeafe; font-size:.82rem; }
+      .button { display:inline-flex; align-items:center; min-height:42px; padding:0 15px; border:1px solid #37527a; border-radius:8px; color:#eef5ff; font-weight:750; }
+      .button.primary { border-color:transparent; background:var(--accent); color:#031026; }
+      main { padding:42px 0 72px; }
+      .toc { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:0; padding:0; list-style:none; }
+      .toc a { display:block; padding:11px 13px; border:1px solid rgba(147,197,253,.2); border-radius:8px; background:var(--surface); }
+      .section-intro { max-width:850px; color:var(--muted); }
+      .callout,.card { padding:19px; border:1px solid rgba(147,197,253,.22); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+      .callout { border-left:4px solid var(--green); }
+      .callout p,.card p { margin:0; color:var(--muted); }
+      .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+      .case-table,.data-table { width:100%; border-collapse:collapse; margin:16px 0; }
+      th,td { padding:10px 9px; border-bottom:1px solid rgba(147,197,253,.18); text-align:left; vertical-align:top; }
+      th { color:var(--heading); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
+      td { color:var(--muted); }
+      .gallery { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-top:20px; }
+      figure { margin:0; padding:12px; border:1px solid rgba(147,197,253,.22); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+      figure:first-child { grid-column:1/-1; }
+      figure img { display:block; width:100%; height:auto; border-radius:7px; background:#030814; }
+      figcaption { padding:10px 2px 0; color:var(--muted); font-size:.9rem; }
+      figcaption a { display:inline-block; margin-top:5px; font-size:.82rem; }
+      .video-list { display:grid; gap:11px; margin:0; padding:0; list-style:none; }
+      .video-list li { display:flex; align-items:baseline; justify-content:space-between; gap:18px; padding:15px 17px; border:1px solid rgba(147,197,253,.22); border-radius:10px; background:var(--surface); }
+      .video-list span { color:var(--muted); }
+      .video-list a { white-space:nowrap; font-weight:750; }
+      .source { border-left-color:#7dd3fc; }
+      .source p + p { margin-top:10px; }
+      code { color:#bfdbfe; }
+      footer { padding:28px 0; border-top:1px solid var(--line); color:var(--muted); }
+      footer p { margin:0; }
+      [data-theme="light"] { --bg:#f0f4ff; --surface:rgba(255,255,255,.96); --text:#172033; --muted:#52627a; --heading:#101827; --line:#d5dfed; --accent:#0f62fe; --shadow:0 14px 34px rgba(24,38,69,.09); }
+      [data-theme="light"] body { background:#f0f4ff; }
+      [data-theme="light"] .site-header { background:rgba(255,255,255,.96); }
+      [data-theme="light"] .hero { background:linear-gradient(135deg,#eef4ff,#f8fbff); }
+      [data-theme="light"] .lead { color:#40516a; }
+      [data-theme="light"] .notice strong { color:#7a4a00; }
+      [data-theme="light"] .notice p { color:#654b1a; }
+      [data-theme="light"] .pill { color:#174ea6; }
+      [data-theme="light"] .button:not(.primary) { color:#172033; }
+      @media (max-width:760px) { .navlinks { display:none; } .grid,.gallery,.toc { grid-template-columns:1fr; } figure:first-child { grid-column:auto; } .video-list li { display:block; } .video-list a { display:inline-block; margin-top:8px; } }
+      @media print { .site-header,.actions,.notice { display:none; } body { background:#fff; color:#111; } .hero { padding:20px 0; background:#fff; } .card,figure,.callout { break-inside:avoid; background:#fff; box-shadow:none; } h1,h2,h3,.lead,.card p,.callout p,td { color:#111; } }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Module 00, Chapter 1 — AI/ML Taxonomy and Data Foundations",
+        "description": "Published Chapter 1 of the AI Security Engineering course.",
+        "url": "https://1200km.com/ai-security-course/module-00/chapter-01.html",
+        "author": { "@type": "Person", "name": "Andrey Pautov", "url": "https://1200km.com/" },
+        "isPartOf": { "@type": "Course", "name": "AI Security Engineering: From Models to Agentic Systems", "url": "https://1200km.com/ai-security-course.html" },
+        "inLanguage": "en"
+      }
+    </script>
+  </head>
+  <body id="top">
+    <header class="site-header">
+      <nav class="nav wrap" aria-label="Primary navigation">
+        <a class="brand" href="/"><img src="/assets/ap-logo.png" alt="" width="36" height="36" />1200km</a>
+        <div class="navlinks"><a href="/ai-security-course.html">Course overview</a><a href="/ai-security-course/module-00.html">Module 00</a><a href="/ai-security-course/glossary.html">Glossary</a><a href="/projects.html">Projects</a></div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <div class="hero-inner wrap">
+        <p class="eyebrow"><a href="/ai-security-course.html">AI Security Engineering</a> / Module 00 / Chapter 1</p>
+        <h1>AI, ML, Deep Learning, and Generative AI</h1>
+        <p class="lead">Introduction, taxonomy, real security cases, and data foundations for the AI Security Engineering course. This chapter brings the published Medium article’s infographics and video references into the course workspace.</p>
+        <aside class="notice" role="status" aria-label="Chapter development status"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Under construction</strong><p>This course chapter is a working draft. Content, media, terminology, references, and exercises may change during creation. The original publication remains the source version for this chapter.</p></div></aside>
+        <div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 1</span><span class="pill">Published companion</span><span class="pill">CTI evidence base</span></div>
+        <div class="actions"><a class="button primary" href="/ai-security-course/module-00.html">← Module 00</a><a class="button" href="https://medium.com/@1200km/ai-security-course-module-00-part-1-introduction-ai-ml-taxonomy-and-data-foundations-2e26c0740a17" target="_blank" rel="noopener noreferrer">Read on Medium ↗</a><a class="button" href="/ai-security-course.html">Course syllabus</a></div>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <section aria-labelledby="source-title">
+        <h2 id="source-title">Published source</h2>
+        <div class="callout source">
+          <p><strong>This course chapter is based on the published article:</strong> <a href="https://medium.com/@1200km/ai-security-course-module-00-part-1-introduction-ai-ml-taxonomy-and-data-foundations-2e26c0740a17" target="_blank" rel="noopener noreferrer">AI Security Course, Module 00 — Part 1: Introduction, AI/ML Taxonomy, and Data Foundations</a>.</p>
+          <p>The local page preserves the chapter’s media references and connects them to the course’s terminology, architecture, and security evidence workflow. Infographics are reproduced from the author’s publication for course use; video links open the original YouTube destinations.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="contents-title">
+        <h2 id="contents-title">Chapter contents</h2>
+        <ol class="toc">
+          <li><a href="#foundation">Why the foundation matters</a></li>
+          <li><a href="#taxonomy">AI, ML, deep learning, and generative AI</a></li>
+          <li><a href="#media">Infographics from the publication</a></li>
+          <li><a href="#videos">Video references</a></li>
+          <li><a href="#cases">Real security cases</a></li>
+          <li><a href="#data-foundations">Data foundations</a></li>
+          <li><a href="#checkpoint">Chapter checkpoint</a></li>
+        </ol>
+      </section>
+
+      <section id="foundation" aria-labelledby="foundation-title">
+        <h2 id="foundation-title">Why the foundation matters</h2>
+        <p class="section-intro">An AI system is not just a model. It is a chain of data pipelines, artifacts, prompts, retrieval systems, applications, identities, tools, memory, infrastructure, operators, and downstream actions. A generated answer or model score does not automatically provide authorization, tenant isolation, provenance, auditability, or safe execution.</p>
+        <div class="grid">
+          <article class="card"><h3>Model versus system</h3><p>Classify the model, wrapper, data path, identity, tool, and downstream side effect separately. The same model can have a different risk profile when connected to different authority.</p></article>
+          <article class="card"><h3>Symbolic rules still matter</h3><p>Explicit rules, policies, allowlists, and search procedures are security-critical artifacts even when no parameters are learned. Preserve their versions, evaluation order, inputs, and decision path.</p></article>
+          <article class="card"><h3>Evidence before labels</h3><p>Distinguish a confirmed incident, provider observation, disclosed vulnerability, malicious artifact, demonstrated research result, forecast, and constructed scenario.</p></article>
+          <article class="card"><h3>Security outside the model</h3><p>Authorization, identity, tenant isolation, output validation, egress, logging, and rollback remain application and platform responsibilities.</p></article>
+        </div>
+      </section>
+
+      <section id="taxonomy" aria-labelledby="taxonomy-title">
+        <h2 id="taxonomy-title">The taxonomy in one view</h2>
+        <p class="section-intro">These terms overlap, but they are not synonyms. The label changes the security question.</p>
+        <div class="callout"><pre>Artificial intelligence
+├── symbolic rules, search, planning, knowledge, optimization, robotics
+└── Machine learning
+    ├── classical statistical and algorithmic ML
+    └── Deep learning
+        ├── discriminative and representation models
+        ├── embedding models
+        ├── generative models
+        └── foundation models
+            ├── language models and LLMs
+            ├── vision models
+            └── multimodal models</pre></div>
+        <table class="case-table"><thead><tr><th>Term</th><th>What it means</th><th>Security question</th></tr></thead><tbody>
+          <tr><td>AI</td><td>The broad field of systems producing predictions, recommendations, decisions, or content.</td><td>Which component has authority and what state can it change?</td></tr>
+          <tr><td>Symbolic rules</td><td>Explicit human-authored conditions, facts, policies, and actions.</td><td>Can inputs bypass, confuse, or reorder the policy path?</td></tr>
+          <tr><td>Machine learning</td><td>Behavior learned from data or interaction rather than only hand-written rules.</td><td>Who can influence training data, labels, features, feedback, or thresholds?</td></tr>
+          <tr><td>Deep learning</td><td>Multilayer neural networks that learn representations and functions.</td><td>What was learned, under which distribution, and what happens under shift or evasion?</td></tr>
+          <tr><td>Generative AI</td><td>Systems that produce text, code, images, audio, video, or structured content.</td><td>Where are output validation, encoding, identity, and egress enforced?</td></tr>
+          <tr><td>Foundation model</td><td>A broadly trained reusable starting point for downstream applications.</td><td>Is provenance known, is loading safe, and are adapters and revisions controlled?</td></tr>
+          <tr><td>LLM</td><td>A language model that predicts and generates sequences of tokens.</td><td>Which application controls provide truth checks, authorization, and safe tool execution?</td></tr>
+        </tbody></table>
+      </section>
+
+      <section id="media" aria-labelledby="media-title">
+        <h2 id="media-title">Infographics from the publication</h2>
+        <p class="section-intro">These are the nine visual assets included with the published chapter. Open any image in a new tab for the locally preserved full-size course copy.</p>
+        <div class="gallery">
+          <figure><img src="/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" alt="Illustration of the complete AI security system and its surrounding components" loading="eager" /><figcaption>01 — The complete AI security system: data, model, application, identity, tools, infrastructure, and action.<br /><a href="/ai-security-course/assets/chapter-01/01-ai-security-system.jpeg" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/02-ai-ml-taxonomy.png" alt="Taxonomy showing artificial intelligence, machine learning, deep learning, generative models, foundation models, and language models" loading="lazy" /><figcaption>02 — AI, ML, deep learning, generative AI, foundation models, and LLMs.<br /><a href="/ai-security-course/assets/chapter-01/02-ai-ml-taxonomy.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/03-machine-learning-security-boundary.png" alt="Machine learning examples and the security boundary around data, model, and decision workflow" loading="lazy" /><figcaption>03 — Machine-learning examples and the security boundary around the decision workflow.<br /><a href="/ai-security-course/assets/chapter-01/03-machine-learning-security-boundary.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/04-deep-learning.png" alt="Deep-learning representation and multilayer neural-network concept" loading="lazy" /><figcaption>04 — Deep learning as multilayer representation learning.<br /><a href="/ai-security-course/assets/chapter-01/04-deep-learning.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/05-real-life-examples.png" alt="Table connecting AI system categories to real-life security questions" loading="lazy" /><figcaption>05 — Real-life system categories and the security question each creates.<br /><a href="/ai-security-course/assets/chapter-01/05-real-life-examples.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/06-shadowray.png" alt="ShadowRay AI infrastructure security case illustration" loading="lazy" /><figcaption>06 — ShadowRay: platform compromise can expose AI workloads, models, data, credentials, and compute.<br /><a href="/ai-security-course/assets/chapter-01/06-shadowray.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/07-malicious-model-artifacts.png" alt="Malicious machine-learning model artifact supply-chain security case illustration" loading="lazy" /><figcaption>07 — Malicious model artifacts: a model file can be a supply-chain input, not inert data.<br /><a href="/ai-security-course/assets/chapter-01/07-malicious-model-artifacts.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/08-echoleak.png" alt="EchoLeak enterprise AI assistant vulnerability case illustration" loading="lazy" /><figcaption>08 — EchoLeak: retrieved content, instructions, rendering, and outbound paths can combine into impact.<br /><a href="/ai-security-course/assets/chapter-01/08-echoleak.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+          <figure><img src="/ai-security-course/assets/chapter-01/09-mcp-tool-poisoning.png" alt="MCP tool-poisoning attack and delegated-authority security case illustration" loading="lazy" /><figcaption>09 — MCP tool poisoning: tool definitions and delegated identity are security boundaries.<br /><a href="/ai-security-course/assets/chapter-01/09-mcp-tool-poisoning.png" target="_blank" rel="noopener">Open image ↗</a></figcaption></figure>
+        </div>
+      </section>
+
+      <section id="videos" aria-labelledby="videos-title">
+        <h2 id="videos-title">Video references from the publication</h2>
+        <p class="section-intro">The original article included five YouTube references. They are linked directly here so the course page remains usable without embedding third-party players.</p>
+        <ol class="video-list">
+          <li><span><strong>01.</strong> Machine-learning overview and the transition from AI concepts to learned behavior</span><a href="https://www.youtube.com/watch?v=AhCcMOlPxJY" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>02.</strong> Deep learning and multilayer representations</span><a href="https://www.youtube.com/watch?v=CMdWxIo-Qv8&amp;t=74s" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>03.</strong> Generative AI and produced content</span><a href="https://www.youtube.com/watch?v=ZK28lp4qsqI" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>04.</strong> Foundation models and reusable model capabilities</span><a href="https://www.youtube.com/watch?v=OgzkydUdF9I" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+          <li><span><strong>05.</strong> Large language models and language generation</span><a href="https://www.youtube.com/watch?v=Zas3ufXo9wg" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></li>
+        </ol>
+      </section>
+
+      <section id="cases" aria-labelledby="cases-title">
+        <h2 id="cases-title">Real security cases</h2>
+        <p class="section-intro">The chapter uses cases to show why taxonomy matters. Each case has different evidence, target assets, and controls.</p>
+        <table class="case-table"><thead><tr><th>Case</th><th>Evidence and lesson</th></tr></thead><tbody>
+          <tr><td><a href="https://www.oligo.security/blog/shadowray-attack-ai-workloads-actively-exploited-in-the-wild" target="_blank" rel="noopener noreferrer">ShadowRay</a></td><td>Reported exploitation of exposed Ray infrastructure. The platform around AI workloads can expose models, datasets, credentials, and expensive compute.</td></tr>
+          <tr><td><a href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/" target="_blank" rel="noopener noreferrer">Malicious model artifacts</a></td><td>Public ML artifacts can carry unsafe loading behavior or backdoors. Model provenance, format, loader, and admission controls are supply-chain controls.</td></tr>
+          <tr><td><a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32711" target="_blank" rel="noopener noreferrer">CVE-2025-32711 / EchoLeak</a></td><td>A disclosed enterprise-AI vulnerability illustrates how retrieved content, instructions, rendering, and outbound paths can combine into impact.</td></tr>
+          <tr><td><a href="https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks" target="_blank" rel="noopener noreferrer">MCP tool poisoning</a></td><td>Tool metadata can influence an agent’s planning context. Pin definitions, scope delegated identity, require authorization outside the model, and log approvals.</td></tr>
+        </tbody></table>
+        <div class="callout"><p><strong>Evidence rule:</strong> a demonstrated vulnerability, a provider observation, a confirmed incident, and a constructed scenario must not be reported as if they were the same thing.</p></div>
+      </section>
+
+      <section id="data-foundations" aria-labelledby="data-title">
+        <h2 id="data-title">Data foundations: the security objects</h2>
+        <p class="section-intro">The published Part 1 also introduces the objects security teams must separate during development and incident response.</p>
+        <table class="data-table"><thead><tr><th>Object</th><th>Example</th><th>What to preserve</th></tr></thead><tbody>
+          <tr><td><strong>Data</strong></td><td>Phishing messages, RAG documents, prompts, retrieved passages, and feedback.</td><td>Source, owner, access policy, provenance, content hash, split, retention.</td></tr>
+          <tr><td><strong>Features</strong></td><td>URL features, pixel tensors, token IDs, or embedding vectors.</td><td>Extraction code, tokenizer/embedding version, normalization, validation.</td></tr>
+          <tr><td><strong>Labels</strong></td><td><code>phishing</code>/<code>benign</code>, severity, entity spans, or preference choices.</td><td>Label policy, source, annotator, confidence, disagreement, policy version.</td></tr>
+          <tr><td><strong>Parameters</strong></td><td>Weights, biases, embedding tables, or adapter weights.</td><td>Digest, signature, parent checkpoint, adapter list, format, loader.</td></tr>
+          <tr><td><strong>Hyperparameters</strong></td><td>Learning rate, threshold, retrieval <code>top-k</code>, temperature, or max output.</td><td>Versioned configuration beside the model artifact and release decision.</td></tr>
+          <tr><td><strong>Training / validation / testing</strong></td><td>Optimization, development choices, and held-out evaluation.</td><td>Code, manifests, split rules, seeds, environment, metrics, exceptions.</td></tr>
+          <tr><td><strong>Inference</strong></td><td>A classification, generated answer, embedding, or proposed tool call.</td><td>Caller, tenant, model route, context, retrieval, policy, output, side effect.</td></tr>
+        </tbody></table>
+      </section>
+
+      <section id="checkpoint" aria-labelledby="checkpoint-title">
+        <h2 id="checkpoint-title">Chapter checkpoint</h2>
+        <div class="grid">
+          <article class="card"><h3>Explain</h3><p>Distinguish AI, symbolic rules, ML, deep learning, generative AI, foundation models, and LLMs without using the labels as synonyms.</p></article>
+          <article class="card"><h3>Trace</h3><p>Identify the data, features, labels, parameters, hyperparameters, and inference boundary in a phishing classifier or RAG assistant.</p></article>
+          <article class="card"><h3>Classify evidence</h3><p>State whether a case is a confirmed incident, disclosed vulnerability, demonstrated research result, malicious artifact, or constructed scenario.</p></article>
+          <article class="card"><h3>Preserve</h3><p>Name the artifact, configuration, identity, context, tool definition, output, and downstream action needed to reconstruct a security event.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer><div class="wrap"><p><strong>AI Security Engineering Course — under construction.</strong> <a href="https://1200km.com">1200km.com</a> · <a href="https://medium.com/@1200km/im-building-an-ai-security-engineering-course-55e29e6c035e" target="_blank" rel="noopener noreferrer">Main course article on Medium ↗</a> · <a href="#top">Back to top ↑</a></p></div></footer>
+  </body>
+</html>
