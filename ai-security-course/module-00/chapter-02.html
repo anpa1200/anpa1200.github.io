@@ -9,7 +9,7 @@
     <meta name="description" content="AI Security Course Module 00 Chapter 2: data, features, labels, parameters, hyperparameters, training, validation, testing, inference, and CTI evidence." />
     <meta name="author" content="Andrey Pautov" />
     <meta property="og:title" content="AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data" />
-    <meta property="og:description" content="A security practitioner’s guide to the data and model lifecycle, with real adversarial-ML research and evidence-preservation practices." />
+    <meta property="og:description" content="The published Chapter 2 foundation for AI security: data and model lifecycle objects, CTI evidence, and evidence-preservation practices." />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://1200km.com/ai-security-course/module-00/chapter-02.html" />
     <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
@@ -72,6 +72,10 @@
       th,td { padding:10px 9px; border-bottom:1px solid rgba(147,197,253,.18); text-align:left; vertical-align:top; }
       th { color:var(--heading); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
       td { color:var(--muted); }
+      .inline-media { max-width:900px; margin:26px 0; }
+      .inline-media img { display:block; width:100%; height:auto; border-radius:7px; background:#030814; }
+      .inline-media figcaption { padding:10px 2px 0; border-top:1px solid rgba(147,197,253,.14); color:var(--muted); font-size:.9rem; }
+      .inline-media figcaption a { display:inline-block; margin-top:5px; font-size:.82rem; }
       code { color:#bfdbfe; }
       footer { padding:28px 0; border-top:1px solid var(--line); color:var(--muted); }
       footer p { margin:0; }
@@ -92,9 +96,9 @@
         "@context": "https://schema.org",
         "@type": "TechArticle",
         "headline": "AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data",
-        "description": "A security practitioner’s guide to data, model artifacts, lifecycle evidence, and adversarial machine-learning research.",
+        "description": "The published Chapter 2 foundation for AI security: data, model artifacts, lifecycle evidence, and adversarial machine-learning research.",
         "url": "https://1200km.com/ai-security-course/module-00/chapter-02.html",
-        "dateModified": "2026-08-01",
+        "dateModified": "2026-08-02",
         "author": { "@type": "Person", "name": "Andrey Pautov", "url": "https://1200km.com/" },
         "isPartOf": { "@type": "Course", "name": "AI Security Engineering: From Models to Agentic Systems", "url": "https://1200km.com/ai-security-course.html" },
         "inLanguage": "en"
@@ -114,16 +118,17 @@
       <div class="hero-inner wrap">
         <p class="eyebrow"><a href="/ai-security-course.html">AI Security Engineering</a> / Module 00 / Chapter 2</p>
         <h1>How Learning Systems Use Data</h1>
-        <p class="lead">Data, features, labels, parameters, hyperparameters, training, validation, testing, and inference are different security objects. This chapter turns that vocabulary into an evidence-preserving workflow for AI security engineering.</p>
-        <aside class="notice" role="status" aria-label="Chapter development status"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Under construction</strong><p>This article is a working course draft. The syllabus, examples, references, exercises, and terminology may change during creation and pilot delivery.</p></div></aside>
-        <div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 2</span><span class="pill">Draft companion article</span><span class="pill">CTI evidence base</span></div>
-        <div class="actions"><a class="button primary" href="/ai-security-course/module-00.html">← Module 00</a><a class="button" href="/ai-security-course/module-00/chapter-01.html">Chapter 1</a><a class="button" href="/ai-security-course.html">Course syllabus</a><a class="button" href="/ai-security-course/glossary.html">Terminology dictionary</a></div>
+        <p class="lead">Data, features, labels, parameters, hyperparameters, training, validation, testing, and inference are different security objects. This published chapter turns that vocabulary into an evidence-preserving workflow for AI security engineering.</p>
+        <aside class="notice" role="status" aria-label="Chapter development status"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Under construction</strong><p>This course chapter is published as a companion to the Medium article, but remains part of a course under construction. The syllabus, examples, references, exercises, and terminology may change during creation and pilot delivery. The original publication remains the source version for this chapter.</p></div></aside>
+        <div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 2</span><span class="pill">Published companion</span><span class="pill">CTI evidence base</span></div>
+        <div class="actions"><a class="button primary" href="/ai-security-course/module-00.html">← Module 00</a><a class="button" href="https://medium.com/@1200km/ai-security-course-module-00-chapter-2-69381c74a59c?postPublishedType=repub" target="_blank" rel="noopener noreferrer">Read on Medium ↗</a><a class="button" href="/ai-security-course/module-00/chapter-01.html">Chapter 1</a><a class="button" href="/ai-security-course.html">Course syllabus</a><a class="button" href="/ai-security-course/glossary.html">Terminology dictionary</a></div>
       </div>
     </div>
 
     <main class="wrap">
       <section id="introduction" class="prose">
         <h2>Security starts before the model sees a request</h2>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/00-overview.png" alt="Overview of the data, model, configuration, inference, and evidence lifecycle for AI security" width="1400" height="933" loading="eager" /><figcaption>Figure 1 — The Chapter 2 lifecycle: data and feedback become representations, learned artifacts, configuration, inference, policy, and evidence. <a href="/ai-security-course/assets/chapter-02/00-overview.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>A model does not appear at the end of a clean, neutral pipeline. Someone selected the data sources, wrote collection code, filtered records, assigned labels, chose a split, trained an artifact, tuned configuration, approved a release, and connected the result to an application. Every one of those decisions can change behavior.</p>
         <p>That is why “the model classified it” is not a sufficient incident explanation. A result can change because a data source changed, a feature parser was upgraded, a label policy drifted, a checkpoint was replaced, an adapter was loaded, a threshold moved, a prompt template changed, or a retrieval index supplied different context.</p>
         <pre>source data and feedback
@@ -160,7 +165,9 @@
       <section id="data" class="prose">
         <h2>1. Data is a lifecycle object</h2>
         <p><strong>Data</strong> is any input used to learn, evaluate, retrieve, or generate. In a phishing classifier, the message body, headers, URLs, sender reputation, analyst disposition, and later feedback are all data. In a retrieval-augmented generation (RAG) application, source documents, parsed text, chunks, metadata, access-control lists, embeddings, user questions, retrieved passages, and conversation history are separate data objects.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/01-data-lifecycle.png" alt="Data lifecycle from raw sources through curation, retrieval, prompts, feedback, and synthetic data" width="1400" height="788" loading="lazy" /><figcaption>Figure 2 — Data appears in multiple roles across learning, retrieval, generation, and feedback. <a href="/ai-security-course/assets/chapter-02/01-data-lifecycle.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>“Internal” is not a security classification by itself. A public threat report can become sensitive when it is combined with an internal incident timeline. A user prompt can contain credentials even when the model provider is trusted. A log can create a second, longer-lived copy of a prompt that the application was supposed to delete.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/02-data-classification.png" alt="Data classification and security questions for source, curated, retrieval, prompt, feedback, and synthetic data" width="976" height="254" loading="lazy" /><figcaption>Figure 3 — Data classification must preserve provenance, access, integrity, and retention decisions as data changes role. <a href="/ai-security-course/assets/chapter-02/02-data-classification.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <table class="data-table"><thead><tr><th>Data role</th><th>Example</th><th>Security questions</th></tr></thead><tbody>
           <tr><td>Raw source</td><td>Mail, URLs, documents, code, images, telemetry</td><td>Who supplied it? Can an adversary alter or replay it?</td></tr>
           <tr><td>Curated dataset</td><td>Deduplicated and normalized records selected for learning</td><td>Which filters, hashes, licenses, and exclusions produced it?</td></tr>
@@ -176,6 +183,7 @@
       <section id="features" class="prose">
         <h2>2. Features are representations and attack surfaces</h2>
         <p><strong>Features</strong> are the representations consumed by a task or model. A phishing detector might use URL length, sender-domain age, authentication results, character n-grams, and attachment metadata. An image model consumes normalized pixel tensors. An LLM consumes token IDs and attention masks. A RAG system may use dense vectors, sparse terms, metadata filters, and a reranker score.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/03-features.png" alt="Feature representations and attack surfaces across phishing detection, images, language models, and retrieval" width="1400" height="788" loading="lazy" /><figcaption>Figure 4 — Features turn business objects into model inputs, creating representation and extraction boundaries. <a href="/ai-security-course/assets/chapter-02/03-features.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>Features can be designed by an engineer, extracted by a parser, or learned by earlier neural-network layers. The representation is therefore a security boundary: an attacker can keep the apparent business object unchanged while manipulating the bytes or structure that the model actually sees.</p>
         <ul>
           <li><strong>Input manipulation:</strong> alter URL encoding, Unicode, image pixels, document structure, or headers to change representation.</li>
@@ -191,7 +199,9 @@
       <section id="labels" class="prose">
         <h2>3. Labels are judgments, not automatic truth</h2>
         <p><strong>Labels</strong> identify the target a supervised system is expected to predict: <code>phishing</code> or <code>benign</code>, malware family, severity, entity span, or preferred response. A label is a judgment made under a policy. It is not automatically ground truth.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/04-labels.png" alt="Labels as policy judgments from analysts, vendors, heuristics, feedback, and other models" width="1400" height="788" loading="lazy" /><figcaption>Figure 5 — A label is a policy-bound judgment with a source, confidence, and error profile. <a href="/ai-security-course/assets/chapter-02/04-labels.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>Labels may come from analysts, vendors, heuristics, weak-labeling rules, user feedback, or another model. Each source has a different error profile. “Malicious” might mean a confirmed payload, a suspicious campaign, a policy violation, or a message later linked to an incident. Those are different targets and should not be merged without an explicit policy.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/05-labels-governance.png" alt="Label governance workflow showing original labels, review, corrections, confidence, and policy versions" width="1084" height="230" loading="lazy" /><figcaption>Figure 6 — Preserve the original label, later correction, reviewer, confidence, and policy version instead of overwriting history. <a href="/ai-security-course/assets/chapter-02/05-labels-governance.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <table class="data-table"><thead><tr><th>Label risk</th><th>What happens</th><th>Evidence to keep</th></tr></thead><tbody>
           <tr><td>Poisoned feedback</td><td>An attacker submits outcomes that teach the system the wrong class.</td><td>Caller identity, original event, reviewer, adjudication, policy version.</td></tr>
           <tr><td>Label drift</td><td>The definition changes but old and new records retain the same name.</td><td>Versioned label ontology and migration notes.</td></tr>
@@ -204,6 +214,7 @@
       <section id="parameters" class="prose">
         <h2>4. Parameters and model artifacts</h2>
         <p><strong>Parameters</strong> are values learned during optimization: weights, biases, embedding tables, normalization statistics, and adapter or low-rank update weights. They encode behavior, but they remain artifacts that must be identified and protected like compiled software.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/06-parameters.png" alt="Model parameters and artifact supply chain including checkpoints, adapters, loaders, and registries" width="1400" height="788" loading="lazy" /><figcaption>Figure 7 — Learned parameters travel through model files, checkpoints, adapters, loaders, and registries that require provenance controls. <a href="/ai-security-course/assets/chapter-02/06-parameters.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>The security boundary includes the model file, serialization format, loader, registry, parent checkpoint, derived checkpoints, quantized copies, and adapters. A surprising output can come from an unapproved adapter or a different quantized artifact even when the base-model name is unchanged.</p>
         <p>JFrog’s research, <a href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/" target="_blank" rel="noopener noreferrer">Data Scientists Targeted by Malicious Hugging Face ML Models</a>, documented a public model whose loading could execute embedded code through an unsafe serialization path. This was security research, not proof that every public model is malicious. Its evidence-based lesson is precise: a model download is a software-supply-chain event, not merely the transfer of inert data.</p>
         <p>MITRE ATLAS also records <a href="https://atlas.mitre.org/techniques/AML.T0020" target="_blank" rel="noopener noreferrer">Poison Training Data (AML.T0020)</a> and related model-supply-chain techniques. Use the technique as a vocabulary and mapping aid; use the underlying report, artifact, or telemetry to establish what actually happened.</p>
@@ -213,6 +224,7 @@
       <section id="hyperparameters" class="prose">
         <h2>5. Hyperparameters and configuration</h2>
         <p><strong>Hyperparameters</strong> are selected configuration values rather than values learned from training examples. They include learning rate, batch size, optimizer, number of epochs, architecture depth, regularization, chunk size, retrieval <code>top-k</code>, and early-stopping policy.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/07-hyperparameters.png" alt="Hyperparameters and deployment configuration that change model behavior without changing learned weights" width="1400" height="788" loading="lazy" /><figcaption>Figure 8 — Configuration such as thresholds, prompts, routing, retrieval, and decoding can change the security outcome. <a href="/ai-security-course/assets/chapter-02/07-hyperparameters.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>In a deployed generative application, temperature, <code>top-p</code>, repetition penalty, maximum output length, stop sequences, system prompt, tool schema, and model route also change behavior. A decision threshold is usually policy configuration rather than a model hyperparameter, but it belongs in the same release record because it changes the security outcome.</p>
         <p>For example, changing a phishing threshold from 0.5 to 0.9 can reduce false positives while increasing false negatives, without changing one learned weight. Changing retrieval <code>top-k</code> can introduce an untrusted document into context. Changing a prompt template can make an injection reachable. Configuration drift is a behavior change even when the checkpoint digest is identical.</p>
         <p>Store configuration beside the artifact digest, not in an undocumented environment variable. Require review for threshold, prompt, routing, retrieval, and tool-permission changes. During response, compare the complete configuration—not only the model name—with the last known-good release.</p>
@@ -229,8 +241,10 @@
   → validation decisions and selected artifact
   → security/capability evaluation
   → signed registry entry and release approval</pre>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/08-training.png" alt="Security-sensitive training build from data manifest and code through checkpoints, evaluation, and signed release" width="1400" height="788" loading="lazy" /><figcaption>Figure 9 — Training is a build pipeline with provenance, isolated runners, checkpoints, evaluation, and release approval. <a href="/ai-security-course/assets/chapter-02/08-training.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>Training threats include poisoned data, compromised dependencies, unauthorized experiment code, secret leakage in logs, stolen checkpoints, tampered callbacks, and an attacker using the training runner for another workload. The controls look familiar to a CTI or software-supply-chain analyst: least privilege, isolated runners, pinned dependencies, provenance, signatures, reviewable changes, and immutable logs.</p>
         <h3>Learning paradigms and their security questions</h3>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/09-learning-paradigms.png" alt="Learning paradigms and the security questions raised by supervised, unsupervised, self-supervised, semi-supervised, reinforcement, and transfer learning" width="978" height="248" loading="lazy" /><figcaption>Figure 10 — Each learning paradigm exposes a different source of influence: labels, corpora, feedback, environments, or parent artifacts. <a href="/ai-security-course/assets/chapter-02/09-learning-paradigms.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <table class="data-table"><thead><tr><th>Paradigm</th><th>How it learns</th><th>Security question</th></tr></thead><tbody>
           <tr><td>Supervised</td><td>Input–target pairs</td><td>Who can alter labels, and do the labels match the policy?</td></tr>
           <tr><td>Unsupervised</td><td>Structure without explicit labels</td><td>Can an attacker create a cluster or hide in a dominant group?</td></tr>
@@ -244,12 +258,14 @@
       <section id="evaluation" class="prose">
         <h2>7. Validation, testing, and generalization</h2>
         <p><strong>Validation</strong> supports development choices: threshold, prompt template, architecture, early-stopping checkpoint, retriever, or hyperparameters. <strong>Testing</strong> estimates behavior on held-out conditions that were not used to fit parameters or make routine decisions. The distinction is about how evidence was used, not the filename of a dataset.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/10-validation.png" alt="Validation stage used to choose thresholds, prompts, architectures, checkpoints, retrievers, and hyperparameters" width="903" height="187" loading="lazy" /><figcaption>Figure 11 — Validation supports development choices and must be separated from the held-out evidence used for testing. <a href="/ai-security-course/assets/chapter-02/10-validation.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <table class="data-table"><thead><tr><th>Stage</th><th>Purpose</th><th>Security failure if confused</th></tr></thead><tbody>
           <tr><td>Training</td><td>Fit parameters to examples and objective</td><td>Poisoning or leakage changes what the model learns.</td></tr>
           <tr><td>Validation</td><td>Choose configuration and compare candidates</td><td>Repeated tuning overfits the development set.</td></tr>
           <tr><td>Testing</td><td>Estimate held-out behavior for a release decision</td><td>Contamination creates an unjustified safety claim.</td></tr>
           <tr><td>Operational monitoring</td><td>Observe production inputs, outcomes, and drift</td><td>A passing benchmark hides changed real-world conditions.</td></tr>
         </tbody></table>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/11-testing.png" alt="Testing and operational monitoring for generalization, drift, precision, recall, calibration, and cost" width="1400" height="788" loading="lazy" /><figcaption>Figure 12 — Testing estimates held-out behavior; production monitoring checks whether the world still resembles the evaluated conditions. <a href="/ai-security-course/assets/chapter-02/11-testing.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>For a phishing model, a random split can be misleading if near-duplicate messages from one campaign appear in both training and testing. A time-based split or a campaign-held-out split asks a more operational question: does the detector generalize to a later or unfamiliar campaign? For a RAG assistant, a security test should ask whether tenant A can retrieve tenant B’s document, not only whether the generated answer sounds fluent.</p>
         <p>Track precision, recall, false-positive and false-negative counts, calibration, coverage, abstention, latency, and cost. “99% accurate” is not a quarantine policy. The business cost of a false negative may be a delivered payload; the cost of a false positive may be an unavailable executive mailbox. The threshold is part of the security decision.</p>
         <p><a href="https://developers.google.com/machine-learning/crash-course/overfitting/" target="_blank" rel="noopener noreferrer">Google’s explanation of overfitting</a> is a useful foundation. <a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final" target="_blank" rel="noopener noreferrer">NIST AI 100-2</a> extends the vocabulary to adversarial machine learning, including poisoning, evasion, privacy, and misuse attacks across the lifecycle.</p>
@@ -267,6 +283,7 @@
   → deterministic policy and output validation
   → human review or bounded side effect
   → audit event and privacy-aware telemetry</pre>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/12-inference.png" alt="Inference request path from caller identity and tenant through model routing, retrieval, policy, side effect, and audit" width="1400" height="788" loading="lazy" /><figcaption>Figure 13 — Inference is where untrusted input meets a released artifact, authorization, deterministic policy, and possible side effects. <a href="/ai-security-course/assets/chapter-02/12-inference.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>Record caller and tenant, model and adapter digests, tokenizer, prompt or feature template, retrieved document IDs and authorization result, tool definitions, guardrail decisions, output, latency, and side effect. Minimize sensitive payloads, but retain enough keyed evidence to reconstruct a security-relevant decision.</p>
         <p>A prompt injection can change context; a retrieval bug can supply another tenant’s data; a route change can select a different model; an output parser can turn text into an unauthorized API call. Deterministic authorization, schema validation, transaction limits, and human approval must surround inference. A probability score or confident sentence is not an authorization mechanism.</p>
       </section>
@@ -283,6 +300,7 @@
           <li>Scored by an analyst, it may produce a <strong>label</strong>.</li>
         </ol>
         <p>The bytes may be identical, but the owner, access rule, retention period, audit trail, and threat model are not. During incident response, identify the role of each copy before deciding whether it should be deleted, quarantined, reindexed, retrained on, or disclosed.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/13-same-bytes.png" alt="One document taking different security roles as training data, retrieval features, inference context, test input, telemetry, and labels" width="1400" height="788" loading="lazy" /><figcaption>Figure 14 — The same bytes can have different owners, controls, retention rules, and threat models as they move through the lifecycle. <a href="/ai-security-course/assets/chapter-02/13-same-bytes.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <div class="callout"><h3>Evidence graph</h3><p>Use stable identifiers for the source record, transformed record, feature vector, label event, model artifact, configuration, inference request, and downstream action. Link them with hashes, timestamps, tenant, caller, and pipeline version. This creates a causal graph instead of a folder of unconnected screenshots.</p></div>
       </section>
 
@@ -296,7 +314,9 @@
   → quarantine, delivery, or analyst review
   → feedback queue
   → next training dataset</pre>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/14-phishing-flow.png" alt="Phishing classifier flow from message and headers through features, score, threshold, quarantine, review, feedback, and retraining" width="1400" height="788" loading="lazy" /><figcaption>Figure 15 — A phishing classifier is a system of data, parsing, model score, policy, side effect, feedback, and retraining. <a href="/ai-security-course/assets/chapter-02/14-phishing-flow.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>An attacker does not need to “hack the neural network” to influence the outcome. They may craft message features for evasion, submit malicious analyst feedback, exploit a parser discrepancy, manipulate a threshold configuration, or cause the team to train on contaminated data.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/15-phishing-threats.png" alt="Threat paths against a phishing classifier including evasion, feedback manipulation, parser mismatch, threshold changes, and poisoned training data" width="918" height="280" loading="lazy" /><figcaption>Figure 16 — Attack paths can target inputs, feedback, parsing, configuration, or future training rather than the neural network directly. <a href="/ai-security-course/assets/chapter-02/15-phishing-threats.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <table class="data-table"><thead><tr><th>Object</th><th>Example</th><th>Investigation question</th></tr></thead><tbody>
           <tr><td>Data</td><td>Message, headers, URLs, attachment metadata, feedback</td><td>Which source and tenant supplied it, and who could write it?</td></tr>
           <tr><td>Features</td><td>Domain age, URL tokens, authentication results</td><td>Did parsing and normalization match the evaluated pipeline?</td></tr>
@@ -312,6 +332,7 @@
 
       <section id="controls" class="prose">
         <h2>11. From terminology to controls and evidence</h2>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/16-controls.png" alt="Security objects mapped to control focus and evidence to preserve" width="1400" height="788" loading="lazy" /><figcaption>Figure 17 — Terminology becomes operational when every security object has an owner, control focus, and evidence record. <a href="/ai-security-course/assets/chapter-02/16-controls.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>The terms become useful when they assign ownership and a control point.</p>
         <table class="data-table"><thead><tr><th>Security object</th><th>Control focus</th><th>Evidence to preserve</th></tr></thead><tbody>
           <tr><td>Data</td><td>Provenance, access, integrity, minimization, retention</td><td>Source, owner, hash, ACL, collection time, manifest</td></tr>
@@ -323,12 +344,14 @@
           <tr><td>Validation/testing</td><td>Immutable manifests, leakage checks, adversarial cases</td><td>Split rule, test hash, metrics, evaluator, exceptions</td></tr>
           <tr><td>Inference</td><td>Authentication, authorization, output validation, bounded effects</td><td>Caller, tenant, context IDs, policy result, side effect</td></tr>
         </tbody></table>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/17-evidence-graph.png" alt="Evidence graph linking source records, transformations, features, labels, artifacts, configuration, inference, and actions" width="944" height="319" loading="lazy" /><figcaption>Figure 18 — CTI becomes detection engineering when claims connect to identifiable inputs, identities, artifacts, configuration changes, and actions. <a href="/ai-security-course/assets/chapter-02/17-evidence-graph.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <p>This is also the bridge from CTI to detection engineering. A report can become a useful detection only after the team can identify the relevant input, identity, artifact, configuration change, or downstream action and can observe it reliably.</p>
       </section>
 
       <section id="exercise" class="prose">
         <h2>12. Analyst exercise and completion criteria</h2>
         <p>Choose one AI system you can inspect safely: a local classifier, a RAG demo, or a course-owned LLM application. Do not upload confidential data or test a system without authorization.</p>
+        <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/18-exercise.png" alt="Analyst exercise workflow for tracing an AI system, inventorying artifacts, assigning controls, and writing an evidence-based hypothesis" width="1400" height="788" loading="lazy" /><figcaption>Figure 19 — The exercise turns the chapter vocabulary into a traceable analyst workflow. <a href="/ai-security-course/assets/chapter-02/18-exercise.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
         <ol>
           <li>Draw the request and learning lifecycle from source data to downstream action.</li>
           <li>Inventory one example of data, feature, label, parameter, hyperparameter, training run, validation decision, test result, and inference event.</li>
