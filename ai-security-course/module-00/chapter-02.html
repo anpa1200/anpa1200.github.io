@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data | 1200km</title>
+    <meta name="description" content="AI Security Course Module 00 Chapter 2: data, features, labels, parameters, hyperparameters, training, validation, testing, inference, and CTI evidence." />
+    <meta name="author" content="Andrey Pautov" />
+    <meta property="og:title" content="AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data" />
+    <meta property="og:description" content="A security practitioner’s guide to the data and model lifecycle, with real adversarial-ML research and evidence-preservation practices." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://1200km.com/ai-security-course/module-00/chapter-02.html" />
+    <meta property="og:site_name" content="1200km — Andrey Pautov Security Research" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data" />
+    <meta name="twitter:description" content="Data, model artifacts, lifecycle evidence, and CTI-grounded security questions for AI systems." />
+    <meta name="theme-color" content="#0f62fe" />
+    <link rel="canonical" href="https://1200km.com/ai-security-course/module-00/chapter-02.html" />
+    <link rel="icon" href="/assets/ap-logo-72.png" type="image/png" sizes="72x72" />
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
+    <script src="/assets/theme-bootstrap.js"></script>
+    <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
+    <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+    <style>
+      :root { --bg:#050c1a; --surface:rgba(8,19,38,.9); --text:#cdd9ee; --muted:#9db4d5; --heading:#f8fbff; --line:#1a3060; --accent:#60a5fa; --green:#34d399; --warning:#fbbf24; --shadow:0 14px 34px rgba(0,0,0,.4); }
+      * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      body { margin:0; color:var(--text); background:#050c1a url("/assets/bg-cyber.png") center/cover fixed; font:16px/1.65 Inter,system-ui,sans-serif; }
+      a { color:var(--accent); text-decoration:none; }
+      a:hover { color:#bfdbfe; text-decoration:underline; }
+      .wrap { width:min(1100px,calc(100% - 32px)); margin:0 auto; }
+      .site-header { position:sticky; top:0; z-index:8; border-bottom:1px solid var(--line); background:rgba(5,12,26,.96); backdrop-filter:blur(14px); }
+      .nav { display:flex; align-items:center; justify-content:space-between; min-height:64px; gap:18px; }
+      .brand { display:flex; align-items:center; gap:10px; color:var(--heading); font-weight:800; white-space:nowrap; }
+      .brand img { border-radius:10px; }
+      .navlinks { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; font-size:.92rem; }
+      .navlinks a { color:var(--text); }
+      .theme-btn { border:1px solid #38537a; border-radius:8px; background:transparent; color:var(--text); width:34px; height:34px; cursor:pointer; }
+      .hero { border-bottom:1px solid var(--line); background:radial-gradient(circle at 82% 8%,rgba(15,98,254,.2),transparent 38%),rgba(5,12,26,.9); }
+      .hero-inner { padding:68px 0 48px; }
+      .eyebrow { margin:0 0 12px; color:#7dd3fc; font-size:.78rem; font-weight:850; letter-spacing:.11em; text-transform:uppercase; }
+      h1,h2,h3 { color:var(--heading); line-height:1.2; }
+      h1 { max-width:900px; margin:0; font-size:clamp(2.3rem,5.2vw,4.5rem); letter-spacing:-.045em; }
+      h2 { margin:48px 0 16px; font-size:clamp(1.45rem,2.5vw,2rem); }
+      h3 { margin:30px 0 8px; font-size:1.1rem; }
+      .lead { max-width:850px; margin:20px 0 0; color:#b8c9e3; font-size:1.15rem; }
+      .notice { display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start; max-width:900px; margin-top:26px; padding:20px; border:1px solid rgba(251,191,36,.58); border-radius:13px; background:rgba(251,191,36,.1); }
+      .notice-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:var(--warning); color:#1c1300; font-weight:900; }
+      .notice strong { display:block; color:#fde68a; font-size:1.15rem; text-transform:uppercase; letter-spacing:.04em; }
+      .notice p { margin:5px 0 0; color:#e5d6ad; }
+      .meta,.actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:22px; }
+      .pill { padding:6px 10px; border:1px solid rgba(147,197,253,.3); border-radius:999px; background:rgba(96,165,250,.1); color:#dbeafe; font-size:.82rem; }
+      .button { display:inline-flex; align-items:center; min-height:42px; padding:0 15px; border:1px solid #37527a; border-radius:8px; color:#eef5ff; font-weight:750; }
+      .button.primary { border-color:transparent; background:var(--accent); color:#031026; }
+      main { padding:42px 0 72px; }
+      .toc { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:0; padding:0; list-style:none; }
+      .toc a { display:block; padding:11px 13px; border:1px solid rgba(147,197,253,.2); border-radius:8px; background:var(--surface); }
+      .prose { max-width:930px; }
+      .prose p { margin:12px 0; }
+      .prose ul,.prose ol { padding-left:24px; color:var(--muted); }
+      .prose li { margin:7px 0; }
+      .prose pre { overflow:auto; margin:16px 0; padding:17px; border:1px solid rgba(147,197,253,.22); border-radius:10px; background:#030814; color:#dbeafe; font:0.88rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; }
+      .prose blockquote { margin:18px 0; padding:14px 18px; border-left:4px solid var(--green); background:var(--surface); color:var(--muted); }
+      .prose blockquote strong { color:var(--heading); }
+      .callout,.card { padding:19px; border:1px solid rgba(147,197,253,.22); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+      .callout { border-left:4px solid var(--green); }
+      .callout p,.card p { margin:0; color:var(--muted); }
+      .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+      .data-table { width:100%; border-collapse:collapse; margin:16px 0; }
+      th,td { padding:10px 9px; border-bottom:1px solid rgba(147,197,253,.18); text-align:left; vertical-align:top; }
+      th { color:var(--heading); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
+      td { color:var(--muted); }
+      code { color:#bfdbfe; }
+      footer { padding:28px 0; border-top:1px solid var(--line); color:var(--muted); }
+      footer p { margin:0; }
+      [data-theme="light"] { --bg:#f0f4ff; --surface:rgba(255,255,255,.96); --text:#172033; --muted:#52627a; --heading:#101827; --line:#d5dfed; --accent:#0f62fe; --shadow:0 14px 34px rgba(24,38,69,.09); }
+      [data-theme="light"] body { background:#f0f4ff; }
+      [data-theme="light"] .site-header { background:rgba(255,255,255,.96); }
+      [data-theme="light"] .hero { background:linear-gradient(135deg,#eef4ff,#f8fbff); }
+      [data-theme="light"] .lead { color:#40516a; }
+      [data-theme="light"] .notice strong { color:#7a4a00; }
+      [data-theme="light"] .notice p { color:#654b1a; }
+      [data-theme="light"] .pill { color:#174ea6; }
+      [data-theme="light"] .button:not(.primary) { color:#172033; }
+      @media (max-width:760px) { .navlinks { display:none; } .grid,.toc { grid-template-columns:1fr; } }
+      @media print { .site-header,.actions,.notice { display:none; } body { background:#fff; color:#111; } .hero { padding:20px 0; background:#fff; } .card,.callout { break-inside:avoid; background:#fff; box-shadow:none; } h1,h2,h3,.lead,.card p,.callout p,td { color:#111; } }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data",
+        "description": "A security practitioner’s guide to data, model artifacts, lifecycle evidence, and adversarial machine-learning research.",
+        "url": "https://1200km.com/ai-security-course/module-00/chapter-02.html",
+        "dateModified": "2026-08-01",
+        "author": { "@type": "Person", "name": "Andrey Pautov", "url": "https://1200km.com/" },
+        "isPartOf": { "@type": "Course", "name": "AI Security Engineering: From Models to Agentic Systems", "url": "https://1200km.com/ai-security-course.html" },
+        "inLanguage": "en"
+      }
+    </script>
+  </head>
+  <body id="top">
+    <header class="site-header">
+      <nav class="nav wrap" aria-label="Primary navigation">
+        <a class="brand" href="/"><img src="/assets/ap-logo.png" alt="" width="36" height="36" />1200km</a>
+        <div class="navlinks"><a href="/ai-security-course.html">Course overview</a><a href="/ai-security-course/module-00.html">Module 00</a><a href="/ai-security-course/glossary.html">Glossary</a><a href="/projects.html">Projects</a></div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <div class="hero-inner wrap">
+        <p class="eyebrow"><a href="/ai-security-course.html">AI Security Engineering</a> / Module 00 / Chapter 2</p>
+        <h1>How Learning Systems Use Data</h1>
+        <p class="lead">Data, features, labels, parameters, hyperparameters, training, validation, testing, and inference are different security objects. This chapter turns that vocabulary into an evidence-preserving workflow for AI security engineering.</p>
+        <aside class="notice" role="status" aria-label="Chapter development status"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Under construction</strong><p>This article is a working course draft. The syllabus, examples, references, exercises, and terminology may change during creation and pilot delivery.</p></div></aside>
+        <div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 2</span><span class="pill">Draft companion article</span><span class="pill">CTI evidence base</span></div>
+        <div class="actions"><a class="button primary" href="/ai-security-course/module-00.html">← Module 00</a><a class="button" href="/ai-security-course/module-00/chapter-01.html">Chapter 1</a><a class="button" href="/ai-security-course.html">Course syllabus</a><a class="button" href="/ai-security-course/glossary.html">Terminology dictionary</a></div>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <section id="introduction" class="prose">
+        <h2>Security starts before the model sees a request</h2>
+        <p>A model does not appear at the end of a clean, neutral pipeline. Someone selected the data sources, wrote collection code, filtered records, assigned labels, chose a split, trained an artifact, tuned configuration, approved a release, and connected the result to an application. Every one of those decisions can change behavior.</p>
+        <p>That is why “the model classified it” is not a sufficient incident explanation. A result can change because a data source changed, a feature parser was upgraded, a label policy drifted, a checkpoint was replaced, an adapter was loaded, a threshold moved, a prompt template changed, or a retrieval index supplied different context.</p>
+        <pre>source data and feedback
+  → collection and provenance
+  → cleaning, parsing, and representation
+  → labels and dataset splits
+  → objective, training, and learned parameters
+  → validation, testing, and release decision
+  → inference input, context, and configuration
+  → prediction, generation, policy, and downstream action
+  → telemetry, feedback, drift, and the next data version</pre>
+        <blockquote><strong>Course rule:</strong> treat every data copy, model artifact, configuration value, and decision as an identifiable security object. If it cannot be named and versioned, it cannot be reliably investigated.</blockquote>
+      </section>
+
+      <section aria-labelledby="contents-title">
+        <h2 id="contents-title">Table of contents</h2>
+        <ol class="toc">
+          <li><a href="#data">1. Data is a lifecycle object</a></li>
+          <li><a href="#features">2. Features are representations and attack surfaces</a></li>
+          <li><a href="#labels">3. Labels are judgments, not automatic truth</a></li>
+          <li><a href="#parameters">4. Parameters and model artifacts</a></li>
+          <li><a href="#hyperparameters">5. Hyperparameters and configuration</a></li>
+          <li><a href="#training">6. Training as a security-sensitive build</a></li>
+          <li><a href="#evaluation">7. Validation, testing, and generalization</a></li>
+          <li><a href="#inference">8. Inference is where authority meets input</a></li>
+          <li><a href="#same-bytes">9. The same bytes can have different roles</a></li>
+          <li><a href="#cti-case">10. CTI case study: a phishing classifier</a></li>
+          <li><a href="#controls">11. From terminology to controls and evidence</a></li>
+          <li><a href="#exercise">12. Analyst exercise and completion criteria</a></li>
+          <li><a href="#references">References</a></li>
+        </ol>
+      </section>
+
+      <section id="data" class="prose">
+        <h2>1. Data is a lifecycle object</h2>
+        <p><strong>Data</strong> is any input used to learn, evaluate, retrieve, or generate. In a phishing classifier, the message body, headers, URLs, sender reputation, analyst disposition, and later feedback are all data. In a retrieval-augmented generation (RAG) application, source documents, parsed text, chunks, metadata, access-control lists, embeddings, user questions, retrieved passages, and conversation history are separate data objects.</p>
+        <p>“Internal” is not a security classification by itself. A public threat report can become sensitive when it is combined with an internal incident timeline. A user prompt can contain credentials even when the model provider is trusted. A log can create a second, longer-lived copy of a prompt that the application was supposed to delete.</p>
+        <table class="data-table"><thead><tr><th>Data role</th><th>Example</th><th>Security questions</th></tr></thead><tbody>
+          <tr><td>Raw source</td><td>Mail, URLs, documents, code, images, telemetry</td><td>Who supplied it? Can an adversary alter or replay it?</td></tr>
+          <tr><td>Curated dataset</td><td>Deduplicated and normalized records selected for learning</td><td>Which filters, hashes, licenses, and exclusions produced it?</td></tr>
+          <tr><td>Retrieval corpus</td><td>Documents and chunks available to a RAG query</td><td>Are tenant ACLs preserved before and after indexing?</td></tr>
+          <tr><td>Prompt and context</td><td>User input, system instructions, retrieved passages, memory</td><td>What secrets or untrusted instructions cross into context?</td></tr>
+          <tr><td>Feedback and telemetry</td><td>Clicks, analyst decisions, ratings, outcomes, traces</td><td>Can a malicious result become tomorrow’s training label?</td></tr>
+          <tr><td>Synthetic data</td><td>Generated examples, augmentations, or red-team prompts</td><td>What generator and acceptance policy created it?</td></tr>
+        </tbody></table>
+        <p>Preserve a data manifest with the source, owner, collection time, content hash, schema, transformation version, license or consent basis, split membership, access policy, and retention decision. A manifest is not bureaucracy; it is the first line of causal reconstruction.</p>
+        <div class="callout"><h3>CTI connection</h3><p>A threat-intelligence report is evidence, not a magic “ground truth” label. Record the publisher, publication date, collection method, confidence, corroborating sources, and the exact claim being used. Do not silently turn an unconfirmed report into a supervised target.</p></div>
+      </section>
+
+      <section id="features" class="prose">
+        <h2>2. Features are representations and attack surfaces</h2>
+        <p><strong>Features</strong> are the representations consumed by a task or model. A phishing detector might use URL length, sender-domain age, authentication results, character n-grams, and attachment metadata. An image model consumes normalized pixel tensors. An LLM consumes token IDs and attention masks. A RAG system may use dense vectors, sparse terms, metadata filters, and a reranker score.</p>
+        <p>Features can be designed by an engineer, extracted by a parser, or learned by earlier neural-network layers. The representation is therefore a security boundary: an attacker can keep the apparent business object unchanged while manipulating the bytes or structure that the model actually sees.</p>
+        <ul>
+          <li><strong>Input manipulation:</strong> alter URL encoding, Unicode, image pixels, document structure, or headers to change representation.</li>
+          <li><strong>Extraction mismatch:</strong> use different parsing, normalization, tokenization, or missing-value behavior in training and serving.</li>
+          <li><strong>Index manipulation:</strong> insert, delete, or duplicate vector records so retrieval returns an attacker-controlled passage.</li>
+          <li><strong>Feature leakage:</strong> allow a feature to contain information that would only be known after the decision.</li>
+          <li><strong>Drift:</strong> let the real-world distribution move beyond the conditions represented during evaluation.</li>
+        </ul>
+        <p>Google’s documentation on <a href="https://cloud.google.com/blog/topics/developers-practitioners/monitor-models-training-serving-skew-vertex-ai" target="_blank" rel="noopener noreferrer">training-serving skew</a> and its <a href="https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-validate-data-skew" target="_blank" rel="noopener noreferrer"><code>ML.VALIDATE_DATA_SKEW</code> function</a> show the operational version of this problem: compare serving statistics with the training baseline instead of assuming the feature pipeline stayed equivalent.</p>
+        <p>For security evidence, retain the feature-extraction code and version, schema, tokenizer or embedding model, normalization rules, dimensionality, missing-value handling, and a sample of the pre- and post-transformation input. A score without the representation that produced it is weak evidence.</p>
+      </section>
+
+      <section id="labels" class="prose">
+        <h2>3. Labels are judgments, not automatic truth</h2>
+        <p><strong>Labels</strong> identify the target a supervised system is expected to predict: <code>phishing</code> or <code>benign</code>, malware family, severity, entity span, or preferred response. A label is a judgment made under a policy. It is not automatically ground truth.</p>
+        <p>Labels may come from analysts, vendors, heuristics, weak-labeling rules, user feedback, or another model. Each source has a different error profile. “Malicious” might mean a confirmed payload, a suspicious campaign, a policy violation, or a message later linked to an incident. Those are different targets and should not be merged without an explicit policy.</p>
+        <table class="data-table"><thead><tr><th>Label risk</th><th>What happens</th><th>Evidence to keep</th></tr></thead><tbody>
+          <tr><td>Poisoned feedback</td><td>An attacker submits outcomes that teach the system the wrong class.</td><td>Caller identity, original event, reviewer, adjudication, policy version.</td></tr>
+          <tr><td>Label drift</td><td>The definition changes but old and new records retain the same name.</td><td>Versioned label ontology and migration notes.</td></tr>
+          <tr><td>Weak labels</td><td>A heuristic or vendor verdict is treated as confirmed fact.</td><td>Source type, confidence, rule, and corroboration.</td></tr>
+          <tr><td>Feedback loop</td><td>Model output becomes the label used to retrain the next model.</td><td>Human override rate, sampling policy, and independent review.</td></tr>
+        </tbody></table>
+        <p>During triage, preserve annotator or source, timestamp, confidence, disagreement, adjudication notes, and the policy version. An immutable original label plus a later corrected label is more useful than silently overwriting history.</p>
+      </section>
+
+      <section id="parameters" class="prose">
+        <h2>4. Parameters and model artifacts</h2>
+        <p><strong>Parameters</strong> are values learned during optimization: weights, biases, embedding tables, normalization statistics, and adapter or low-rank update weights. They encode behavior, but they remain artifacts that must be identified and protected like compiled software.</p>
+        <p>The security boundary includes the model file, serialization format, loader, registry, parent checkpoint, derived checkpoints, quantized copies, and adapters. A surprising output can come from an unapproved adapter or a different quantized artifact even when the base-model name is unchanged.</p>
+        <p>JFrog’s research, <a href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/" target="_blank" rel="noopener noreferrer">Data Scientists Targeted by Malicious Hugging Face ML Models</a>, documented a public model whose loading could execute embedded code through an unsafe serialization path. This was security research, not proof that every public model is malicious. Its evidence-based lesson is precise: a model download is a software-supply-chain event, not merely the transfer of inert data.</p>
+        <p>MITRE ATLAS also records <a href="https://atlas.mitre.org/techniques/AML.T0020" target="_blank" rel="noopener noreferrer">Poison Training Data (AML.T0020)</a> and related model-supply-chain techniques. Use the technique as a vocabulary and mapping aid; use the underlying report, artifact, or telemetry to establish what actually happened.</p>
+        <div class="callout"><h3>Minimum model-artifact record</h3><p>Keep the cryptographic digest, signature or attestation, source revision, parent checkpoint, adapter list, serialization format, approved loader and runtime, dependency lockfile, evaluation evidence, promotion approver, and rollback location.</p></div>
+      </section>
+
+      <section id="hyperparameters" class="prose">
+        <h2>5. Hyperparameters and configuration</h2>
+        <p><strong>Hyperparameters</strong> are selected configuration values rather than values learned from training examples. They include learning rate, batch size, optimizer, number of epochs, architecture depth, regularization, chunk size, retrieval <code>top-k</code>, and early-stopping policy.</p>
+        <p>In a deployed generative application, temperature, <code>top-p</code>, repetition penalty, maximum output length, stop sequences, system prompt, tool schema, and model route also change behavior. A decision threshold is usually policy configuration rather than a model hyperparameter, but it belongs in the same release record because it changes the security outcome.</p>
+        <p>For example, changing a phishing threshold from 0.5 to 0.9 can reduce false positives while increasing false negatives, without changing one learned weight. Changing retrieval <code>top-k</code> can introduce an untrusted document into context. Changing a prompt template can make an injection reachable. Configuration drift is a behavior change even when the checkpoint digest is identical.</p>
+        <p>Store configuration beside the artifact digest, not in an undocumented environment variable. Require review for threshold, prompt, routing, retrieval, and tool-permission changes. During response, compare the complete configuration—not only the model name—with the last known-good release.</p>
+      </section>
+
+      <section id="training" class="prose">
+        <h2>6. Training as a security-sensitive build</h2>
+        <p><strong>Training</strong> updates parameters using data, an objective, and an optimization procedure. Pre-training may use next-token prediction; supervised fine-tuning may use instruction examples; preference optimization may update behavior using ranked outcomes. The runner may have access to incident reports, source code, credentials, package registries, checkpoints, and expensive compute.</p>
+        <pre>data manifest + code revision + dependency lockfile
+  → parser, filter, and label policy
+  → split and leakage checks
+  → objective, seed, and initialization
+  → training jobs and checkpoints
+  → validation decisions and selected artifact
+  → security/capability evaluation
+  → signed registry entry and release approval</pre>
+        <p>Training threats include poisoned data, compromised dependencies, unauthorized experiment code, secret leakage in logs, stolen checkpoints, tampered callbacks, and an attacker using the training runner for another workload. The controls look familiar to a CTI or software-supply-chain analyst: least privilege, isolated runners, pinned dependencies, provenance, signatures, reviewable changes, and immutable logs.</p>
+        <h3>Learning paradigms and their security questions</h3>
+        <table class="data-table"><thead><tr><th>Paradigm</th><th>How it learns</th><th>Security question</th></tr></thead><tbody>
+          <tr><td>Supervised</td><td>Input–target pairs</td><td>Who can alter labels, and do the labels match the policy?</td></tr>
+          <tr><td>Unsupervised</td><td>Structure without explicit labels</td><td>Can an attacker create a cluster or hide in a dominant group?</td></tr>
+          <tr><td>Self-supervised</td><td>Targets derived from the data itself</td><td>What untrusted corpus is being absorbed at scale?</td></tr>
+          <tr><td>Semi-supervised</td><td>Labeled and unlabeled data combined</td><td>Can a small trusted set be overwhelmed by unreviewed examples?</td></tr>
+          <tr><td>Reinforcement learning</td><td>States, actions, rewards, and returns</td><td>Can the reward, environment, or feedback channel be manipulated?</td></tr>
+          <tr><td>Transfer learning</td><td>Existing representations adapted to a new task</td><td>What behavior and hidden assumptions arrive with the parent artifact?</td></tr>
+        </tbody></table>
+      </section>
+
+      <section id="evaluation" class="prose">
+        <h2>7. Validation, testing, and generalization</h2>
+        <p><strong>Validation</strong> supports development choices: threshold, prompt template, architecture, early-stopping checkpoint, retriever, or hyperparameters. <strong>Testing</strong> estimates behavior on held-out conditions that were not used to fit parameters or make routine decisions. The distinction is about how evidence was used, not the filename of a dataset.</p>
+        <table class="data-table"><thead><tr><th>Stage</th><th>Purpose</th><th>Security failure if confused</th></tr></thead><tbody>
+          <tr><td>Training</td><td>Fit parameters to examples and objective</td><td>Poisoning or leakage changes what the model learns.</td></tr>
+          <tr><td>Validation</td><td>Choose configuration and compare candidates</td><td>Repeated tuning overfits the development set.</td></tr>
+          <tr><td>Testing</td><td>Estimate held-out behavior for a release decision</td><td>Contamination creates an unjustified safety claim.</td></tr>
+          <tr><td>Operational monitoring</td><td>Observe production inputs, outcomes, and drift</td><td>A passing benchmark hides changed real-world conditions.</td></tr>
+        </tbody></table>
+        <p>For a phishing model, a random split can be misleading if near-duplicate messages from one campaign appear in both training and testing. A time-based split or a campaign-held-out split asks a more operational question: does the detector generalize to a later or unfamiliar campaign? For a RAG assistant, a security test should ask whether tenant A can retrieve tenant B’s document, not only whether the generated answer sounds fluent.</p>
+        <p>Track precision, recall, false-positive and false-negative counts, calibration, coverage, abstention, latency, and cost. “99% accurate” is not a quarantine policy. The business cost of a false negative may be a delivered payload; the cost of a false positive may be an unavailable executive mailbox. The threshold is part of the security decision.</p>
+        <p><a href="https://developers.google.com/machine-learning/crash-course/overfitting/" target="_blank" rel="noopener noreferrer">Google’s explanation of overfitting</a> is a useful foundation. <a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final" target="_blank" rel="noopener noreferrer">NIST AI 100-2</a> extends the vocabulary to adversarial machine learning, including poisoning, evasion, privacy, and misuse attacks across the lifecycle.</p>
+      </section>
+
+      <section id="inference" class="prose">
+        <h2>8. Inference is where authority meets input</h2>
+        <p><strong>Inference</strong> is execution of a released artifact to produce a prediction, score, embedding, classification, or generation. It is where untrusted input meets model behavior and where output can cross into a consequential system.</p>
+        <pre>caller identity and tenant
+  → request validation and rate limits
+  → feature extraction / tokenization
+  → model, adapter, tokenizer, and configuration route
+  → retrieval and authorization filters
+  → model output and confidence / citations
+  → deterministic policy and output validation
+  → human review or bounded side effect
+  → audit event and privacy-aware telemetry</pre>
+        <p>Record caller and tenant, model and adapter digests, tokenizer, prompt or feature template, retrieved document IDs and authorization result, tool definitions, guardrail decisions, output, latency, and side effect. Minimize sensitive payloads, but retain enough keyed evidence to reconstruct a security-relevant decision.</p>
+        <p>A prompt injection can change context; a retrieval bug can supply another tenant’s data; a route change can select a different model; an output parser can turn text into an unauthorized API call. Deterministic authorization, schema validation, transaction limits, and human approval must surround inference. A probability score or confident sentence is not an authorization mechanism.</p>
+      </section>
+
+      <section id="same-bytes" class="prose">
+        <h2>9. The same bytes can have different roles</h2>
+        <p>One document can change security meaning as it travels through the lifecycle:</p>
+        <ol>
+          <li>Included in a fine-tuning corpus, it is <strong>training data</strong>.</li>
+          <li>Indexed for search, its vector and metadata are <strong>retrieval features</strong>.</li>
+          <li>Inserted into a prompt, it is <strong>inference context</strong>.</li>
+          <li>Used by an evaluator, it is a <strong>test input</strong>.</li>
+          <li>Copied into telemetry, it is <strong>operational log data</strong>.</li>
+          <li>Scored by an analyst, it may produce a <strong>label</strong>.</li>
+        </ol>
+        <p>The bytes may be identical, but the owner, access rule, retention period, audit trail, and threat model are not. During incident response, identify the role of each copy before deciding whether it should be deleted, quarantined, reindexed, retrained on, or disclosed.</p>
+        <div class="callout"><h3>Evidence graph</h3><p>Use stable identifiers for the source record, transformed record, feature vector, label event, model artifact, configuration, inference request, and downstream action. Link them with hashes, timestamps, tenant, caller, and pipeline version. This creates a causal graph instead of a folder of unconnected screenshots.</p></div>
+      </section>
+
+      <section id="cti-case" class="prose">
+        <h2>10. CTI case study: a phishing classifier</h2>
+        <p>Consider a security team that labels incoming messages as <code>benign</code> or <code>phishing</code>, then quarantines messages above a threshold. The model is only one node in the system:</p>
+        <pre>message and headers
+  → parser and feature extraction
+  → classifier score
+  → threshold and policy
+  → quarantine, delivery, or analyst review
+  → feedback queue
+  → next training dataset</pre>
+        <p>An attacker does not need to “hack the neural network” to influence the outcome. They may craft message features for evasion, submit malicious analyst feedback, exploit a parser discrepancy, manipulate a threshold configuration, or cause the team to train on contaminated data.</p>
+        <table class="data-table"><thead><tr><th>Object</th><th>Example</th><th>Investigation question</th></tr></thead><tbody>
+          <tr><td>Data</td><td>Message, headers, URLs, attachment metadata, feedback</td><td>Which source and tenant supplied it, and who could write it?</td></tr>
+          <tr><td>Features</td><td>Domain age, URL tokens, authentication results</td><td>Did parsing and normalization match the evaluated pipeline?</td></tr>
+          <tr><td>Labels</td><td><code>phishing</code>, <code>benign</code>, analyst confidence</td><td>Was the disposition independently reviewed?</td></tr>
+          <tr><td>Parameters</td><td>Classifier weights and normalization statistics</td><td>Does the digest match the approved checkpoint?</td></tr>
+          <tr><td>Hyperparameters</td><td>Threshold, feature window, regularization</td><td>Which configuration turned the score into action?</td></tr>
+          <tr><td>Evaluation</td><td>Later campaigns and held-out senders</td><td>Was the test set independent and representative?</td></tr>
+          <tr><td>Inference</td><td>Score, decision, quarantine event</td><td>Which identity and policy produced the side effect?</td></tr>
+        </tbody></table>
+        <p>NIST describes poisoning attacks as interference during training, including malicious data or changes to the training process. MITRE ATLAS maps the behavior to techniques such as <a href="https://atlas.mitre.org/techniques/AML.T0020" target="_blank" rel="noopener noreferrer">Poison Training Data</a>. These references help an analyst name the behavior, but a defensible case still needs the local data manifest, label history, model digest, configuration, and event timeline.</p>
+        <p><strong>Evidence standard:</strong> report what is observed, what is reproduced, what is inferred, and what remains unknown. A research demonstration of poisoning is not automatically a confirmed intrusion. A provider report of abuse is not automatically evidence that your tenant was affected.</p>
+      </section>
+
+      <section id="controls" class="prose">
+        <h2>11. From terminology to controls and evidence</h2>
+        <p>The terms become useful when they assign ownership and a control point.</p>
+        <table class="data-table"><thead><tr><th>Security object</th><th>Control focus</th><th>Evidence to preserve</th></tr></thead><tbody>
+          <tr><td>Data</td><td>Provenance, access, integrity, minimization, retention</td><td>Source, owner, hash, ACL, collection time, manifest</td></tr>
+          <tr><td>Features</td><td>Schema, canonicalization, parser parity, drift monitoring</td><td>Extraction version, statistics, pre/post samples, alerts</td></tr>
+          <tr><td>Labels</td><td>Policy, reviewer separation, confidence, correction workflow</td><td>Label event, annotator, disagreement, adjudication</td></tr>
+          <tr><td>Parameters</td><td>Signing, registry controls, loader isolation, rollback</td><td>Digest, signature, parent, adapter, loader, approval</td></tr>
+          <tr><td>Hyperparameters</td><td>Versioned configuration, review, change detection</td><td>Threshold, prompt, route, retrieval, decoding settings</td></tr>
+          <tr><td>Training</td><td>Isolated builds, pinned dependencies, least privilege</td><td>Code, lockfile, runner identity, seed, logs, checkpoints</td></tr>
+          <tr><td>Validation/testing</td><td>Immutable manifests, leakage checks, adversarial cases</td><td>Split rule, test hash, metrics, evaluator, exceptions</td></tr>
+          <tr><td>Inference</td><td>Authentication, authorization, output validation, bounded effects</td><td>Caller, tenant, context IDs, policy result, side effect</td></tr>
+        </tbody></table>
+        <p>This is also the bridge from CTI to detection engineering. A report can become a useful detection only after the team can identify the relevant input, identity, artifact, configuration change, or downstream action and can observe it reliably.</p>
+      </section>
+
+      <section id="exercise" class="prose">
+        <h2>12. Analyst exercise and completion criteria</h2>
+        <p>Choose one AI system you can inspect safely: a local classifier, a RAG demo, or a course-owned LLM application. Do not upload confidential data or test a system without authorization.</p>
+        <ol>
+          <li>Draw the request and learning lifecycle from source data to downstream action.</li>
+          <li>Inventory one example of data, feature, label, parameter, hyperparameter, training run, validation decision, test result, and inference event.</li>
+          <li>Assign an owner, access rule, integrity control, retention decision, and evidence source to each object.</li>
+          <li>Describe one poisoning, evasion, leakage, or configuration-drift path and the deterministic control that limits it.</li>
+          <li>Write a one-paragraph incident hypothesis with separate observed facts, reproductions, inferences, and unknowns.</li>
+        </ol>
+        <p>You have completed this chapter when you can explain why a changed prediction does not automatically imply a changed model, and when you can identify the artifact and evidence needed to test each alternative explanation.</p>
+      </section>
+
+      <section id="key-takeaways" class="prose">
+        <h2>Key takeaways</h2>
+        <ul>
+          <li>Data, features, labels, parameters, hyperparameters, training, validation, testing, and inference are distinct security objects.</li>
+          <li>Data provenance and access control must survive transformation, indexing, prompting, logging, and feedback.</li>
+          <li>A model file can be a software-supply-chain input; a vector index and a prompt can also carry attacker-controlled influence.</li>
+          <li>Validation supports development choices; testing estimates held-out behavior; neither replaces production monitoring.</li>
+          <li>A score or generated output is evidence for a policy decision, not the policy or authorization itself.</li>
+          <li>Use CTI frameworks to name and map behavior, but match every claim to the evidence level of the underlying report or reproduction.</li>
+        </ul>
+      </section>
+
+      <section id="references" class="prose">
+        <h2>References</h2>
+        <ul>
+          <li><a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final" target="_blank" rel="noopener noreferrer">NIST AI 100-2 E2025 — Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations</a></li>
+          <li><a href="https://doi.org/10.6028/NIST.AI.100-3" target="_blank" rel="noopener noreferrer">NIST AI 100-3 — The Language of Trustworthy AI</a></li>
+          <li><a href="https://atlas.mitre.org/" target="_blank" rel="noopener noreferrer">MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems</a></li>
+          <li><a href="https://atlas.mitre.org/techniques/AML.T0020" target="_blank" rel="noopener noreferrer">MITRE ATLAS AML.T0020 — Poison Training Data</a></li>
+          <li><a href="https://cloud.google.com/blog/topics/developers-practitioners/monitor-models-training-serving-skew-vertex-ai" target="_blank" rel="noopener noreferrer">Google Cloud — Monitor models for training-serving skew</a></li>
+          <li><a href="https://developers.google.com/machine-learning/crash-course/overfitting/" target="_blank" rel="noopener noreferrer">Google Machine Learning Crash Course — Overfitting and generalization</a></li>
+          <li><a href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/" target="_blank" rel="noopener noreferrer">JFrog Security Research — Malicious Hugging Face ML Models</a></li>
+          <li><a href="https://www.mithrilsecurity.io/blog/poisongpt-how-we-hid-a-lobotomized-llm-on-hugging-face-to-spread-fake-news" target="_blank" rel="noopener noreferrer">Mithril Security — PoisonGPT demonstration (research case, not a confirmed campaign)</a></li>
+          <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener noreferrer">Lewis et al. — Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a></li>
+        </ul>
+      </section>
+
+      <section id="next" class="prose">
+        <h2>What comes next</h2>
+        <p>The next chapter explains neural networks and optimization: forward passes, loss, gradients, backpropagation, generalization, adversarial examples, and the evidence needed to distinguish model behavior from data or configuration changes.</p>
+      </section>
+    </main>
+
+    <footer><div class="wrap"><p><strong>AI Security Engineering Course — under construction.</strong> The syllabus, examples, references, labs, and assessment criteria may change during creation. <a href="https://1200km.com">1200km.com</a> · <a href="https://medium.com/@1200km/im-building-an-ai-security-engineering-course-55e29e6c035e" target="_blank" rel="noopener noreferrer">Main course article on Medium ↗</a> · <a href="/ai-security-course/module-00.html">Module 00</a> · <a href="#top">Back to top ↑</a></p></div></footer>
+  </body>
+</html>
