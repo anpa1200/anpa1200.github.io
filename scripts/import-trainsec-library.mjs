@@ -361,6 +361,29 @@ for (const article of payload.articles) {
     }
   }
 }
+// Make catalogue metadata actionable: every author, domain, mode, and tag
+// chip can be clicked to apply the corresponding filter.
+for (const authorName of [...new Set(payload.articles.map((article) => article.author))]) {
+  const value = escapeHtml(authorName);
+  catalogue = catalogue.replaceAll(
+    `<p class="article-meta"><strong>Author:</strong> ${value} ·`,
+    `<p class="article-meta"><strong>Author:</strong> <button class="filter-chip" type="button" data-filter="author" data-filter-value="${value}">${value}</button> ·`,
+  );
+}
+for (const article of payload.articles) {
+  const domain = escapeHtml(article.domain || article.category || '');
+  const mode = escapeHtml(article.mode || 'Article');
+  const kicker = `<p class="article-kicker">${domain} · ${mode}</p>`;
+  const clickableKicker = `<p class="article-kicker"><button class="filter-chip" type="button" data-filter="domain" data-filter-value="${domain}">${domain}</button> · <button class="filter-chip" type="button" data-filter="mode" data-filter-value="${mode}">${mode}</button></p>`;
+  catalogue = catalogue.replaceAll(kicker, clickableKicker);
+  for (const tag of article.tags || []) {
+    const value = escapeHtml(tag);
+    catalogue = catalogue.replaceAll(
+      `<span class="tag">${value}</span>`,
+      `<button class="tag filter-chip" type="button" data-filter="search" data-filter-value="${value}">${value}</button>`,
+    );
+  }
+}
 catalogue = catalogue.replace('A source-linked catalogue of TrainSec’s public knowledge-library articles integrated into the 1200km article ecosystem. Browse by author, domain, mode, and topic, then follow the attribution link to the original publication.', 'A permitted integration of TrainSec’s Knowledge Library. Read the complete original text with screenshots, infographics, and embedded videos in the original order, then follow the attribution link to TrainSec.net.');
 if (!catalogue.includes('<meta name="author"')) {
   catalogue = catalogue.replace('<meta name="description"', `${authorMeta}<meta name="description"`);
@@ -377,8 +400,14 @@ if (!catalogue.includes('.article-card-cover')) {
 if (!catalogue.includes('.toolbar button')) {
   catalogue = catalogue.replace('</style>', '.toolbar button{min-height:42px;padding:0 14px;border:1px solid #294574;border-radius:7px;background:#102449;color:#e5efff;cursor:pointer}.toolbar button:hover{border-color:#72aaff;background:#16315e}</style>');
 }
+if (!catalogue.includes('.filter-chip')) {
+  catalogue = catalogue.replace('</style>', '.filter-chip{font:inherit;color:#72aaff;background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.filter-chip:hover,.filter-chip:focus-visible{color:#b7d2ff;text-decoration-color:currentColor;outline:0}.tag.filter-chip{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;text-decoration:none;font-size:.75rem}.tag.filter-chip:hover,.tag.filter-chip:focus-visible{background:#1b3c71;color:#fff}.article-meta .filter-chip{font-size:inherit}.article-kicker{display:flex;flex-wrap:wrap;align-items:center;gap:.35em}.article-card{overflow-wrap:anywhere}@media(max-width:700px){.article-grid{grid-template-columns:minmax(0,1fr);align-items:start}.article-card{height:auto !important;min-height:0;overflow:hidden}.article-card-cover{height:auto;aspect-ratio:16/9}.article-card .rights-disclaimer{margin-top:0}}</style>');
+}
 if (!catalogue.includes('id="filter-reset"')) {
-  catalogue = catalogue.replace('<span id="result-count"', '<button id="filter-reset" type="button">Clear filters</button><span id="result-count"');
+  catalogue = catalogue.replace('<span id="result-count"', '<button id="filter-search" type="button">Search</button><button id="filter-reset" type="button">Clear filters</button><span id="result-count"');
+}
+if (!catalogue.includes('id="filter-search"')) {
+  catalogue = catalogue.replace('<span id="result-count"', '<button id="filter-search" type="button">Search</button><span id="result-count"');
 }
 if (!catalogue.includes('id="category-filter"')) {
   catalogue = catalogue.replace('<input id="article-search"', '<input id="article-search" autocomplete="off"');
@@ -393,7 +422,7 @@ catalogue = catalogue.replace('const matchesAuthor=!author.value||card.dataset.a
 catalogue = catalogue.replace('&&matchesAuthor&&matchesDomain&&matchesMode;', '&&matchesCategory&&matchesAuthor&&matchesDomain&&matchesMode;');
 catalogue = catalogue.replace('[search,author,domain,mode].forEach(control=>control.addEventListener("input",apply));', '[search,category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("input",apply));');
 catalogue = catalogue.replace('[author,domain,mode].forEach(control=>control.addEventListener("change",apply))', '[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("change",apply));apply()');
-const filterScript = `<script>(()=>{const cards=[...document.querySelectorAll(".article-card")],category=document.querySelector("#category-filter"),search=document.querySelector("#article-search"),author=document.querySelector("#author-filter"),domain=document.querySelector("#domain-filter"),mode=document.querySelector("#mode-filter"),reset=document.querySelector("#filter-reset"),count=document.querySelector("#result-count"),controls=[search,category,author,domain,mode].filter(Boolean),params=new URLSearchParams(location.search);const setControl=(control,key)=>{if(!control)return;if(control.tagName==='SELECT'){const value=params.get(key);control.value=value&&[...control.options].some(option=>option.value===value)?value:''}else{control.value=params.get(key)||''}};setControl(search,'q');setControl(category,'category');setControl(author,'author');setControl(domain,'domain');setControl(mode,'mode');const apply=()=>{const q=search.value.trim().toLowerCase();let shown=0;cards.forEach(card=>{const haystack=[card.dataset.title,card.dataset.author,card.dataset.domain,card.dataset.mode,card.dataset.tags].filter(Boolean).join(' ').toLowerCase();const ok=(!q||haystack.includes(q))&&(!category||!category.value||card.dataset.category===category.value)&&(!author||!author.value||card.dataset.author===author.value)&&(!domain||!domain.value||card.dataset.domain===domain.value)&&(!mode||!mode.value||card.dataset.mode===mode.value);card.hidden=!ok;if(ok)shown+=1});count.textContent=shown+' shown'};controls.forEach(control=>control.addEventListener('input',apply));[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener('change',apply));reset?.addEventListener('click',()=>{controls.forEach(control=>{control.value=''});history.replaceState(null,'',location.pathname);apply();search.focus()});apply()})();</script>`;
+const filterScript = `<script>(()=>{const cards=[...document.querySelectorAll(".article-card")],category=document.querySelector("#category-filter"),search=document.querySelector("#article-search"),author=document.querySelector("#author-filter"),domain=document.querySelector("#domain-filter"),mode=document.querySelector("#mode-filter"),filterSearch=document.querySelector("#filter-search"),reset=document.querySelector("#filter-reset"),count=document.querySelector("#result-count"),controls=[search,category,author,domain,mode].filter(Boolean),chips=[...document.querySelectorAll("[data-filter-value]")],params=new URLSearchParams(location.search);const setControl=(control,key)=>{if(!control)return;if(control.tagName==='SELECT'){const value=params.get(key);control.value=value&&[...control.options].some(option=>option.value===value)?value:''}else{control.value=params.get(key)||''}};setControl(search,'q');setControl(category,'category');setControl(author,'author');setControl(domain,'domain');setControl(mode,'mode');const apply=()=>{const q=search.value.trim().toLowerCase();let shown=0;cards.forEach(card=>{const haystack=[card.dataset.title,card.dataset.author,card.dataset.domain,card.dataset.mode,card.dataset.tags].filter(Boolean).join(' ').toLowerCase();const ok=(!q||haystack.includes(q))&&(!category||!category.value||card.dataset.category===category.value)&&(!author||!author.value||card.dataset.author===author.value)&&(!domain||!domain.value||card.dataset.domain===domain.value)&&(!mode||!mode.value||card.dataset.mode===mode.value);card.hidden=!ok;if(ok)shown+=1});count.textContent=shown+' shown'};const applyChip=(chip)=>{const target=chip.dataset.filter,value=chip.dataset.filterValue;if(target==='search')search.value=value;else{const control={category,author,domain,mode}[target];if(control)control.value=value}apply();history.replaceState(null,'',location.pathname+'?'+new URLSearchParams({[target==='search'?'q':target]:value}).toString())};controls.forEach(control=>control.addEventListener('input',apply));[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener('change',apply));chips.forEach(chip=>chip.addEventListener('click',()=>applyChip(chip)));filterSearch?.addEventListener('click',()=>{apply();document.querySelector('#article-grid')?.scrollIntoView({behavior:'smooth',block:'start'})});reset?.addEventListener('click',()=>{controls.forEach(control=>{control.value=''});history.replaceState(null,'',location.pathname);apply();search.focus()});apply()})();</script>`;
 catalogue = catalogue.replace(/<script>\(\(\)=>\{const cards=.*?<\/script>/, filterScript);
 await fs.writeFile(cataloguePath, catalogue);
 
