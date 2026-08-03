@@ -10,12 +10,13 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html#article","url":"https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html","headline":"The Hitchhiker's Guide to Breaking Secure Boot","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html#webpage"},"datePublished":"2026-04-18","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/hardware-hacking/the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves/"}</script>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
-</style></head><body>
+ .article-cover{max-width:420px;margin:24px 0;padding:8px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style></head><body>
 <header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
 <main class="wrap" data-pagefind-body><article class="article">
 <p class="eyebrow">TrainSec source integration · Hardware hacking · Hardware security research</p><h1>The Hitchhiker&#39;s Guide to Breaking Secure Boot</h1>
 <p class="meta"><strong>Author:</strong> Amichai Yifrach · <strong>Published:</strong> April 19, 2026</p>
-<div class="tag-row"><span class="tag">hardware security</span><span class="tag">embedded</span></div>
+<div class="tag-row"><span class="tag">TrainSec</span><span class="tag">hardware security</span><span class="tag">embedded</span></div>
+<figure class="article-cover"><img src="/assets/trainsec/covers/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.jpg" alt="Cover image for The Hitchhiker&#39;s Guide to Breaking Secure Boot" loading="eager"><figcaption>Cover image from the original TrainSec publication.</figcaption></figure>
 <aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Amichai Yifrach. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/hardware-hacking/the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
 <div class="trainsec-content">
 
@@ -23,7 +24,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img fetchpriority="high" fetchpriority="high" decoding="async" width="1365" height="1092" alt="Title banner" class="wp-image-11232"  src="https://trainsec.net/wp-content/uploads/2026/04/image1.jpeg" srcset="https://trainsec.net/wp-content/uploads/2026/04/image1.jpeg 1365w, https://trainsec.net/wp-content/uploads/2026/04/image1-300x240.jpeg 300w, https://trainsec.net/wp-content/uploads/2026/04/image1-1024x819.jpeg 1024w, https://trainsec.net/wp-content/uploads/2026/04/image1-768x614.jpeg 768w, https://trainsec.net/wp-content/uploads/2026/04/image1-600x480.jpeg 600w" sizes="(max-width: 1365px) 100vw, 1365px"/></figure>
+<figure class="wp-block-image size-large"><img fetchpriority="high" fetchpriority="high" decoding="async" width="1365" height="1092" alt="Title banner" class="wp-image-11232"  src="/assets/trainsec/media/c1651f083b0dc3d9.jpg"/></figure>
 
 
 
@@ -99,7 +100,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1379" height="920" alt="Jetson Orin module" class="wp-image-11233"  src="https://trainsec.net/wp-content/uploads/2026/04/image2.jpeg" srcset="https://trainsec.net/wp-content/uploads/2026/04/image2.jpeg 1379w, https://trainsec.net/wp-content/uploads/2026/04/image2-300x200.jpeg 300w, https://trainsec.net/wp-content/uploads/2026/04/image2-1024x683.jpeg 1024w, https://trainsec.net/wp-content/uploads/2026/04/image2-768x512.jpeg 768w, https://trainsec.net/wp-content/uploads/2026/04/image2-600x400.jpeg 600w" sizes="(max-width: 1379px) 100vw, 1379px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1379" height="920" alt="Jetson Orin module" class="wp-image-11233"  src="/assets/trainsec/media/f44bb3fb1fedbef7.jpg"/></figure>
 
 
 
@@ -119,7 +120,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Chain of trust diagram" class="wp-image-11234"  src="https://trainsec.net/wp-content/uploads/2026/04/image3.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image3.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image3-300x201.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image3-1024x686.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image3-768x514.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image3-600x402.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Chain of trust diagram" class="wp-image-11234"  src="/assets/trainsec/media/3b5bc3e3d5fec0d8.png"/></figure>
 
 
 
@@ -239,7 +240,7 @@
 
 
 
-<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" srcset="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-300x169.png 300w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-768x432.png 768w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1536x864.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-600x338.png 600w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner.png 1600w" sizes="(max-width: 1024px) 100vw, 1024px" /></a></figure>
+<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="/assets/trainsec/media/e8171384dc507a2b.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" /></a></figure>
 
 
 
@@ -271,7 +272,7 @@
 
 
 
-<figure class="wp-block-image size-large is-resized"><img decoding="async" width="643" height="403" alt="PoC injection" class="wp-image-11235" style="width:800px;height:auto"  src="https://trainsec.net/wp-content/uploads/2026/04/image4.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image4.png 643w, https://trainsec.net/wp-content/uploads/2026/04/image4-300x188.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image4-600x376.png 600w" sizes="(max-width: 643px) 100vw, 643px"/></figure>
+<figure class="wp-block-image size-large is-resized"><img decoding="async" width="643" height="403" alt="PoC injection" class="wp-image-11235" style="width:800px;height:auto"  src="/assets/trainsec/media/74c7ee367055a7e1.png"/></figure>
 
 
 
@@ -283,7 +284,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="449" alt="Root shell reached" class="wp-image-11236"  src="https://trainsec.net/wp-content/uploads/2026/04/image5.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image5.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image5-300x73.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image5-1024x249.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image5-768x187.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image5-1536x374.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image5-600x146.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="449" alt="Root shell reached" class="wp-image-11236"  src="/assets/trainsec/media/4e79109f15146ea5.png"/></figure>
 
 
 
@@ -315,7 +316,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="916" alt="Polite panic note" class="wp-image-11237"  src="https://trainsec.net/wp-content/uploads/2026/04/image6.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image6.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image6-300x200.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image6-1024x683.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image6-768x512.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image6-600x400.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="916" alt="Polite panic note" class="wp-image-11237"  src="/assets/trainsec/media/a7d784af7823dd35.png"/></figure>
 
 
 
@@ -363,7 +364,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1280" height="865" alt="Init script inspection" class="wp-image-11238"  src="https://trainsec.net/wp-content/uploads/2026/04/image7.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image7.png 1280w, https://trainsec.net/wp-content/uploads/2026/04/image7-300x203.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image7-1024x692.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image7-768x519.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image7-600x405.png 600w" sizes="(max-width: 1280px) 100vw, 1280px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1280" height="865" alt="Init script inspection" class="wp-image-11238"  src="/assets/trainsec/media/790a5951a1d7a26c.png"/></figure>
 
 
 
@@ -371,7 +372,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="951" alt="Helper script execution" class="wp-image-11239"  src="https://trainsec.net/wp-content/uploads/2026/04/image8.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image8.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image8-300x155.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image8-1024x528.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image8-768x396.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image8-1536x792.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image8-600x309.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="951" alt="Helper script execution" class="wp-image-11239"  src="/assets/trainsec/media/9bedcb4560e6fa5a.png"/></figure>
 
 
 
@@ -379,7 +380,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="2146" height="576" alt="Decrypted rootfs mounted" class="wp-image-11240"  src="https://trainsec.net/wp-content/uploads/2026/04/image9.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image9.png 2146w, https://trainsec.net/wp-content/uploads/2026/04/image9-300x81.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image9-1024x275.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image9-768x206.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image9-1536x412.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image9-2048x550.png 2048w, https://trainsec.net/wp-content/uploads/2026/04/image9-600x161.png 600w" sizes="(max-width: 2146px) 100vw, 2146px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="2146" height="576" alt="Decrypted rootfs mounted" class="wp-image-11240"  src="/assets/trainsec/media/e48d8a9d473f37d1.png"/></figure>
 
 
 
@@ -387,7 +388,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Sensitive directories accessible" class="wp-image-11241"  src="https://trainsec.net/wp-content/uploads/2026/04/image11.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image11.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image11-300x201.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image11-1024x686.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image11-768x514.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image11-600x402.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Sensitive directories accessible" class="wp-image-11241"  src="/assets/trainsec/media/56476e00dcdb0280.png"/></figure>
 
 
 
@@ -403,7 +404,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1899" height="168" alt="Logic reconstruction" class="wp-image-11242"  src="https://trainsec.net/wp-content/uploads/2026/04/image12.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image12.png 1899w, https://trainsec.net/wp-content/uploads/2026/04/image12-300x27.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image12-1024x91.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image12-768x68.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image12-1536x136.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image12-600x53.png 600w" sizes="(max-width: 1899px) 100vw, 1899px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1899" height="168" alt="Logic reconstruction" class="wp-image-11242"  src="/assets/trainsec/media/4f76a9027d4bfb6f.png"/></figure>
 
 
 
@@ -439,7 +440,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="421" alt="systemd emergency target" class="wp-image-11243"  src="https://trainsec.net/wp-content/uploads/2026/04/image13.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image13.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image13-300x68.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image13-1024x234.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image13-768x175.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image13-1536x351.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image13-600x137.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="421" alt="systemd emergency target" class="wp-image-11243"  src="/assets/trainsec/media/46d7b8eddddf05b9.png"/></figure>
 
 
 
@@ -447,7 +448,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="2018" height="412" alt="Root shell on real rootfs" class="wp-image-11244"  src="https://trainsec.net/wp-content/uploads/2026/04/image14.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image14.png 2018w, https://trainsec.net/wp-content/uploads/2026/04/image14-300x61.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image14-1024x209.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image14-768x157.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image14-1536x314.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image14-600x122.png 600w" sizes="(max-width: 2018px) 100vw, 2018px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="2018" height="412" alt="Root shell on real rootfs" class="wp-image-11244"  src="/assets/trainsec/media/b6190d0ee3775516.png"/></figure>
 
 
 
@@ -455,7 +456,7 @@
 
 
 
-<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" srcset="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-300x169.png 300w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-768x432.png 768w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1536x864.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-600x338.png 600w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner.png 1600w" sizes="(max-width: 1024px) 100vw, 1024px" /></a></figure>
+<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="/assets/trainsec/media/e8171384dc507a2b.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" /></a></figure>
 
 
 
@@ -463,7 +464,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="2018" height="412" alt="UEFI certificates over UART" class="wp-image-11244"  src="https://trainsec.net/wp-content/uploads/2026/04/image14.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image14.png 2018w, https://trainsec.net/wp-content/uploads/2026/04/image14-300x61.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image14-1024x209.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image14-768x157.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image14-1536x314.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image14-600x122.png 600w" sizes="(max-width: 2018px) 100vw, 2018px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="2018" height="412" alt="UEFI certificates over UART" class="wp-image-11244"  src="/assets/trainsec/media/b6190d0ee3775516.png"/></figure>
 
 
 
@@ -471,7 +472,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1941" height="543" alt="Root filesystem UUID" class="wp-image-11245"  src="https://trainsec.net/wp-content/uploads/2026/04/image16.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image16.png 1941w, https://trainsec.net/wp-content/uploads/2026/04/image16-300x84.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image16-1024x286.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image16-768x215.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image16-1536x430.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image16-600x168.png 600w" sizes="(max-width: 1941px) 100vw, 1941px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1941" height="543" alt="Root filesystem UUID" class="wp-image-11245"  src="/assets/trainsec/media/289a83f41d4c2f66.png"/></figure>
 
 
 
@@ -479,7 +480,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="983" height="129" alt="dm-0 dm-1" class="wp-image-11246"  src="https://trainsec.net/wp-content/uploads/2026/04/image17.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image17.png 983w, https://trainsec.net/wp-content/uploads/2026/04/image17-300x39.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image17-768x101.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image17-600x79.png 600w" sizes="(max-width: 983px) 100vw, 983px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="983" height="129" alt="dm-0 dm-1" class="wp-image-11246"  src="/assets/trainsec/media/acd1dffda723acac.png"/></figure>
 
 
 
@@ -487,7 +488,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1380" height="886" alt="UEFI Setup unauthenticated" class="wp-image-11247"  src="https://trainsec.net/wp-content/uploads/2026/04/image18.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image18.png 1380w, https://trainsec.net/wp-content/uploads/2026/04/image18-300x193.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image18-1024x657.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image18-768x493.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image18-600x385.png 600w" sizes="(max-width: 1380px) 100vw, 1380px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1380" height="886" alt="UEFI Setup unauthenticated" class="wp-image-11247"  src="/assets/trainsec/media/36b40d5dcec8e700.png"/></figure>
 
 
 
@@ -499,7 +500,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="931" alt="UEFI shell device mapping" class="wp-image-11248"  src="https://trainsec.net/wp-content/uploads/2026/04/image19.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image19.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image19-300x151.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image19-1024x517.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image19-768x388.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image19-1536x775.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image19-600x303.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="931" alt="UEFI shell device mapping" class="wp-image-11248"  src="/assets/trainsec/media/0511a3b002ca9809.png"/></figure>
 
 
 
@@ -507,7 +508,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="931" alt="UEFI shell filesystem access" class="wp-image-11249"  src="https://trainsec.net/wp-content/uploads/2026/04/image20.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image20.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image20-300x151.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image20-1024x517.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image20-768x388.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image20-1536x775.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image20-600x303.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="931" alt="UEFI shell filesystem access" class="wp-image-11249"  src="/assets/trainsec/media/e2cba12d266ccd49.png"/></figure>
 
 
 
@@ -515,7 +516,7 @@
 
 
 
-<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Systemic framing" class="wp-image-11250"  src="https://trainsec.net/wp-content/uploads/2026/04/image21.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image21.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image21-300x201.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image21-1024x686.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image21-768x514.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image21-600x402.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Systemic framing" class="wp-image-11250"  src="/assets/trainsec/media/c7a6039c35c2eec1.png"/></figure>
 
 
 
@@ -719,7 +720,7 @@
 
 
 
-<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" srcset="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-300x169.png 300w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-768x432.png 768w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1536x864.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-600x338.png 600w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner.png 1600w" sizes="(max-width: 1024px) 100vw, 1024px" /></a></figure>
+<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="/assets/trainsec/media/e8171384dc507a2b.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" /></a></figure>
 
 
 

@@ -1,9 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 const root = process.cwd();
 const dataPath = path.join(root, 'data', 'trainsec-library.json');
 const outputRoot = path.join(root, 'articles', 'trainsec');
+const coverRoot = path.join(root, 'assets', 'trainsec', 'covers');
+const mediaRoot = path.join(root, 'assets', 'trainsec', 'media');
 const siteOrigin = 'https://1200km.com';
 const retrievedAt = new Date().toISOString().slice(0, 10);
 
@@ -44,7 +47,15 @@ function findElementorContent(html) {
   return html.slice(openEnd + 1);
 }
 
-function normalizeMedia(body) {
+function attributeValue(attrs, name) {
+  return attrs.match(new RegExp(`\\s${name}=("|')([^"']*)\\1`, 'i'))?.[2] || '';
+}
+
+function youtubeIdFrom(src) {
+  return src.match(/(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{6,})/i)?.[1] || '';
+}
+
+function normalizeMedia(body, article) {
   let out = body
     .replace(/<script\b[\s\S]*?<\/script>/gi, '')
     .replace(/<style\b[\s\S]*?<\/style>/gi, '')
@@ -77,6 +88,20 @@ function normalizeMedia(body) {
   // Elementor layout. Keep the original heading text while making the local
   // article hierarchy valid beneath the page H1.
   out = out.replace(/<h[1-6](\b[^>]*)>/gi, '<h2$1>').replace(/<\/h[1-6]>/gi, '</h2>');
+  // Use the privacy-preserving YouTube host and provide a visible source link
+  // when a browser, extension, or network policy cannot render an iframe.
+  out = out.replace(/<iframe\b([\s\S]*?)><\/iframe>/gi, (full, attrs) => {
+    const videoId = youtubeIdFrom(attributeValue(attrs, 'src'));
+    if (!videoId) return full;
+    const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+    let clean = attrs
+      .replace(/\ssrc=(?:"[^"]*"|'[^']*')/i, '')
+      .replace(/\sloading=(?:"[^"]*"|'[^']*')/i, '')
+      .replace(/\stitle=(?:"[^"]*"|'[^']*')/i, '');
+    clean += ` src="${embedUrl}" loading="eager" title="${escapeHtml(article.title)}"`;
+    return `<div class="video-embed"><iframe${clean}></iframe><p class="video-fallback"><a href="${watchUrl}" target="_blank" rel="noopener noreferrer">If the player does not load, watch this video on YouTube ↗</a></p></div>`;
+  });
   return out;
 }
 
@@ -86,6 +111,64 @@ function rewriteSourceLinks(body) {
 
 function localPathFor(article) {
   return `/articles/trainsec/${slugFor(article)}.html`;
+}
+
+function imageExtension(url, contentType = '') {
+  const fromType = contentType.toLowerCase().match(/image\/(jpeg|jpg|png|gif|webp|svg\+xml|avif)/)?.[1];
+  if (fromType) return fromType === 'svg+xml' ? 'svg' : fromType === 'jpeg' ? 'jpg' : fromType;
+  const fromUrl = new URL(url).pathname.match(/\.([a-z0-9]{2,5})$/i)?.[1]?.toLowerCase();
+  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'].includes(fromUrl) ? (fromUrl === 'jpeg' ? 'jpg' : fromUrl) : 'jpg';
+}
+
+async function downloadCover(url, article) {
+  if (!url) return '';
+  try {
+    const response = await fetch(url, { headers: { 'user-agent': '1200km-TrainSec-permitted-import/1.0' } });
+    if (!response.ok) return '';
+    const extension = imageExtension(url, response.headers.get('content-type') || 'image/jpeg');
+    const filename = `${slugFor(article)}.${extension}`;
+    await fs.writeFile(path.join(coverRoot, filename), Buffer.from(await response.arrayBuffer()));
+    return `/assets/trainsec/covers/${filename}`;
+  } catch {
+    return '';
+  }
+}
+
+const mediaCache = new Map();
+async function localMediaPath(url) {
+  const cleanUrl = url.replaceAll('&amp;', '&');
+  if (!/^https?:\/\//i.test(cleanUrl)) return '';
+  if (!mediaCache.has(cleanUrl)) {
+    mediaCache.set(cleanUrl, (async () => {
+      try {
+        const response = await fetch(cleanUrl, { headers: { 'user-agent': '1200km-TrainSec-permitted-import/1.0' } });
+        if (!response.ok) return '';
+        const extension = imageExtension(cleanUrl, response.headers.get('content-type') || 'image/jpeg');
+        const hash = crypto.createHash('sha1').update(cleanUrl).digest('hex').slice(0, 16);
+        const filename = `${hash}.${extension}`;
+        await fs.writeFile(path.join(mediaRoot, filename), Buffer.from(await response.arrayBuffer()));
+        return `/assets/trainsec/media/${filename}`;
+      } catch {
+        return '';
+      }
+    })());
+  }
+  return mediaCache.get(cleanUrl);
+}
+
+async function localizeBodyImages(html) {
+  const images = [...html.matchAll(/<img\b[^>]*>/gi)];
+  const replacements = await Promise.all(images.map(async ([tag]) => {
+    const src = attributeValue(tag, 'src');
+    const local = await localMediaPath(src);
+    if (!local) return [tag, tag];
+    const next = tag
+      .replace(/\ssrc=(?:"[^"]*"|'[^']*')/i, ` src="${local}"`)
+      .replace(/\ssrcset=(?:"[^"]*"|'[^']*')/i, '')
+      .replace(/\ssizes=(?:"[^"]*"|'[^']*')/i, '');
+    return [tag, next];
+  }));
+  return replacements.reduce((output, [before, after]) => output.replace(before, after), html);
 }
 
 function siteArticleJsonLd(canonical, headline, datePublished = retrievedAt, source = '') {
@@ -140,14 +223,15 @@ ${publishedIso ? `<meta property="article:published_time" content="${publishedIs
 <script type="application/ld+json">${siteArticleJsonLd(`${siteOrigin}/${localPath}`, article.title, publishedIso || retrievedAt, source)}</script>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
-</style></head><body>
+ .article-cover{max-width:420px;margin:24px 0;padding:8px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style></head><body>
 <header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
 <main class="wrap" data-pagefind-body><article class="article">
 <p class="eyebrow">TrainSec source integration · ${category} · ${mode}</p><h1>${title}</h1>
 <p class="meta"><strong>Author:</strong> ${author} · <strong>Published:</strong> ${date}</p>
-<div class="tag-row">${tags}</div>
+<div class="tag-row"><span class="tag">TrainSec</span>${tags}</div>
+${article.cover_path ? `<figure class="article-cover"><img src="${article.cover_path}" alt="Cover image for ${title}" loading="eager"><figcaption>Cover image from the original TrainSec publication.</figcaption></figure>` : ''}
 <aside class="rights-disclaimer"><strong>Rights and attribution.</strong> ${rights} <a href="${source}" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
-<div class="trainsec-content">${rewriteSourceLinks(normalizeMedia(body))}</div>
+<div class="trainsec-content">${body}</div>
 ${relatedMarkup(article, allArticles)}
 <p class="source-attribution"><strong>Original publication:</strong> <a href="${source}" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
 </article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
@@ -170,11 +254,16 @@ async function fetchArticle(article) {
   const html = await response.text();
   const body = findElementorContent(html);
   if (!body || body.length < 100) throw new Error('article content container not found');
-  return body;
+  const imageMeta = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)/i)
+    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']/i);
+  const coverUrl = imageMeta?.[1] ? new URL(imageMeta[1], article.url).href : article.image || '';
+  return { body, coverUrl };
 }
 
 const payload = JSON.parse(await fs.readFile(dataPath, 'utf8'));
 await fs.mkdir(outputRoot, { recursive: true });
+await fs.mkdir(coverRoot, { recursive: true });
+await fs.mkdir(mediaRoot, { recursive: true });
 const failures = [];
 let completed = 0;
 const concurrency = 5;
@@ -187,9 +276,12 @@ async function worker() {
     const slug = slugFor(article);
     const localPath = `articles/trainsec/${slug}.html`;
     try {
-      const body = await fetchArticle(article);
+      const { body, coverUrl } = await fetchArticle(article);
       article.local_path = `/${localPath}`;
-      await fs.writeFile(path.join(outputRoot, `${slug}.html`), pageFor(article, body, localPath, payload.articles));
+      article.image = coverUrl || article.image || '';
+      article.cover_path = await downloadCover(article.image, article);
+      const mediaReadyBody = await localizeBodyImages(rewriteSourceLinks(normalizeMedia(body, article)));
+      await fs.writeFile(path.join(outputRoot, `${slug}.html`), pageFor(article, mediaReadyBody, localPath, payload.articles));
       completed += 1;
       process.stdout.write(`Imported ${completed}/${payload.articles.length}: ${article.title}\n`);
     } catch (error) {

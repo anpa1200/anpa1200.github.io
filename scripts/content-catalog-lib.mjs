@@ -476,6 +476,7 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
       ...topics,
       ...(identifier ? [identifier] : []),
       ...(author ? [`author:${author}`] : []),
+      ...(collection?.id === 'collection:trainsec-library' ? ['trainsec'] : []),
       primaryDomain,
       primaryType,
     ])].sort(),
