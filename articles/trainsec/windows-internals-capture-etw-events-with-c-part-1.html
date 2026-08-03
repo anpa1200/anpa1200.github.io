@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capture ETW events with C++ (Part 1) — TrainSec article | 1200km</title>
+<meta name="description" content="Capture ETW events with C++ (Part 1) by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-1/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-04-12">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Capture ETW events with C++ (Part 1)"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html","headline":"Capture ETW events with C++ (Part 1)","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html#webpage"},"datePublished":"2026-04-12","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-1/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Capture ETW events with C++ (Part 1)</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> April 13, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-1/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<h2 class="wp-block-heading">Introduction</h2>
+
+
+
+<p class="wp-block-paragraph">ETW (Event Tracing for Windows) is the telemetry backbone of the entire Windows ecosystem. Drivers use it. System components use it. Every serious security tool reads from it at some point. And yet, most developers who work on Windows have never touched the ETW APIs directly.</p>
+
+
+
+<p class="wp-block-paragraph">This post walks through the mechanics of consuming ETW events in real-time using plain Win32 C++. No wrappers, no abstractions. Just the actual API calls, what they require, and what can go wrong. I&#8217;m assuming you&#8217;re already familiar with the basics of ETW: what a provider is, what a session is, and generally how events flow. If not, take a look at the introductory ETW video first, then come back here.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Capture ETW events with C++ (Part 1)" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/su8Bd5d6YFQ?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">Getting the Provider GUID</h2>
+
+
+
+<p class="wp-block-paragraph">Every registered ETW provider has a GUID. That&#8217;s the identifier you pass to the APIs, not a human-friendly name but an actual 16-byte structure. Technically, you could enumerate all providers using <code>TdhEnumerateProviders</code> and resolve a name to a GUID programmatically. For our purposes here, we&#8217;ll take the GUID directly from the command line and let the caller figure out which provider they want.</p>
+
+
+
+<p class="wp-block-paragraph">There are a couple of tools that make finding a GUID straightforward. One is ETW Explorer, which lets you browse all registered providers on the machine, see their events, and inspect the properties of each one. Another option is <code>logman query providers</code> from an elevated command prompt. Pipe that through <code>grep</code> and you&#8217;ll find what you need quickly enough.</p>
+
+
+
+<p class="wp-block-paragraph">Once you have the GUID as a string (the <code>{xxxxxxxx-xxxx-...}</code> format), you convert it using <code>CLSIDFromString</code>. The name is a bit misleading. This is a COM function, but a CLSID is just a GUID, so it does exactly what we need. It takes a Unicode string and fills a <code>GUID</code> structure.</p>
+
+
+
+<p class="wp-block-paragraph">The function requires a Unicode string, which is why we use <code>wmain</code> instead of <code>main</code>.</p>
+
+
+
+<h2 class="wp-block-heading">Creating a Trace Session</h2>
+
+
+
+<p class="wp-block-paragraph">The first real piece of work is starting a trace session. The function is <code>StartTrace</code>, and it needs three things: a handle that will receive the session identifier, a session name, and a pointer to an <code>EVENT_TRACE_PROPERTIES</code> structure.</p>
+
+
+
+<p class="wp-block-paragraph">The session name just has to be unique across the system. If a session with that name already exists, <code>StartTrace</code> will fail with <code>ERROR_ALREADY_EXISTS</code>. We&#8217;ll deal with that in a moment.</p>
+
+
+
+<p class="wp-block-paragraph">The <code>EVENT_TRACE_PROPERTIES</code> structure is where things get slightly unfortunate. You can&#8217;t just allocate one and fill it in. The structure needs extra space appended after it for the session name string, because Windows will copy the name into that offset. So the actual allocation looks like this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>const auto sessionName = L"YouTubeSession";
+const auto size = sizeof(EVENT_TRACE_PROPERTIES) + sizeof(WCHAR) * (wcslen(sessionName) + 1);
+auto buffer = std::make_unique&lt;BYTE[]>(size);
+auto props = reinterpret_cast&lt;EVENT_TRACE_PROPERTIES*>(buffer.get());
+memset(props, 0, size);
+props->Wnode.BufferSize = static_cast&lt;ULONG>(size);
+props->LogFileMode = EVENT_TRACE_REAL_TIME_MODE;
+props->LoggerNameOffset = sizeof(EVENT_TRACE_PROPERTIES);
+</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #569CD6">const</span><span style="color: #D4D4D4"> </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> sessionName = </span><span style="color: #CE9178">L&quot;YouTubeSession&quot;</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #569CD6">const</span><span style="color: #D4D4D4"> </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> size = </span><span style="color: #569CD6">sizeof</span><span style="color: #D4D4D4">(EVENT_TRACE_PROPERTIES) + </span><span style="color: #569CD6">sizeof</span><span style="color: #D4D4D4">(WCHAR) * (</span><span style="color: #DCDCAA">wcslen</span><span style="color: #D4D4D4">(sessionName) + </span><span style="color: #B5CEA8">1</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> buffer = </span><span style="color: #4EC9B0">std</span><span style="color: #D4D4D4">::</span><span style="color: #DCDCAA">make_unique</span><span style="color: #D4D4D4">&lt;</span><span style="color: #4EC9B0">BYTE</span><span style="color: #D4D4D4">[]&gt;(size);</span></span>
+<span class="line"><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> props = </span><span style="color: #569CD6">reinterpret_cast</span><span style="color: #D4D4D4">&lt;EVENT_TRACE_PROPERTIES*&gt;(</span><span style="color: #9CDCFE">buffer</span><span style="color: #D4D4D4">.</span><span style="color: #DCDCAA">get</span><span style="color: #D4D4D4">());</span></span>
+<span class="line"><span style="color: #DCDCAA">memset</span><span style="color: #D4D4D4">(props, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, size);</span></span>
+<span class="line"><span style="color: #9CDCFE">props</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">Wnode</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">BufferSize</span><span style="color: #D4D4D4"> = </span><span style="color: #569CD6">static_cast</span><span style="color: #D4D4D4">&lt;ULONG&gt;(size);</span></span>
+<span class="line"><span style="color: #9CDCFE">props</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">LogFileMode</span><span style="color: #D4D4D4"> = EVENT_TRACE_REAL_TIME_MODE;</span></span>
+<span class="line"><span style="color: #9CDCFE">props</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">LoggerNameOffset</span><span style="color: #D4D4D4"> = </span><span style="color: #569CD6">sizeof</span><span style="color: #D4D4D4">(EVENT_TRACE_PROPERTIES);</span></span>
+<span class="line"></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The <code>BufferSize</code> field in <code>Wnode</code> needs to reflect the entire allocation, including the extra space. <code>LogFileMode</code> is set to real-time, meaning events go directly to any active consumer rather than being written to a file. And <code>LoggerNameOffset</code> tells Windows where to write the session name inside the buffer, right after the structure itself.</p>
+
+
+
+<p class="wp-block-paragraph">That&#8217;s really the minimum you need to call <code>StartTrace</code>. Plenty of other fields exist for tuning buffer sizes, flush intervals, and so on. We&#8217;re ignoring all of that here.</p>
+
+
+
+<h2 class="wp-block-heading">Handling &#8220;Session Already Exists&#8221;</h2>
+
+
+
+<p class="wp-block-paragraph">StartTrace returns ERROR_ALREADY_EXISTS when a session with that name is already running. This happens more often than you&#8217;d think during development. You break out of a debugging session and the ETW session keeps running on its own. It has a life of its own, so to speak.</p>
+
+
+
+<p class="wp-block-paragraph">The simplest fix is to stop the existing session and start fresh. ControlTrace does that:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>TRACEHANDLE hTrace{};
+auto status = StartTrace(&amp;hTrace, sessionName, props);
+if (status == ERROR_ALREADY_EXISTS) {
+    ControlTrace(0, sessionName, props, EVENT_TRACE_CONTROL_STOP);
+
+    // Re-initialize props before calling StartTrace again
+    memset(props, 0, size);
+    props->Wnode.BufferSize = static_cast&lt;ULONG>(size);
+    props->LogFileMode = EVENT_TRACE_REAL_TIME_MODE;
+    props->LoggerNameOffset = sizeof(EVENT_TRACE_PROPERTIES);
+
+    status = StartTrace(&amp;hTrace, sessionName, props);
+}
+</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">TRACEHANDLE hTrace{};</span></span>
+<span class="line"><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> status = </span><span style="color: #DCDCAA">StartTrace</span><span style="color: #D4D4D4">(&amp;hTrace, sessionName, props);</span></span>
+<span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (status == ERROR_ALREADY_EXISTS) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">ControlTrace</span><span style="color: #D4D4D4">(</span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, sessionName, props, EVENT_TRACE_CONTROL_STOP);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #6A9955">    // Re-initialize props before calling StartTrace again</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">memset</span><span style="color: #D4D4D4">(props, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, size);</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #9CDCFE">props</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">Wnode</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">BufferSize</span><span style="color: #D4D4D4"> = </span><span style="color: #569CD6">static_cast</span><span style="color: #D4D4D4">&lt;ULONG&gt;(size);</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #9CDCFE">props</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">LogFileMode</span><span style="color: #D4D4D4"> = EVENT_TRACE_REAL_TIME_MODE;</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #9CDCFE">props</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">LoggerNameOffset</span><span style="color: #D4D4D4"> = </span><span style="color: #569CD6">sizeof</span><span style="color: #D4D4D4">(EVENT_TRACE_PROPERTIES);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">    status = </span><span style="color: #DCDCAA">StartTrace</span><span style="color: #D4D4D4">(&amp;hTrace, sessionName, props);</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span>
+<span class="line"></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">After calling <code>ControlTrace</code> to stop the session, reinitialize <code>props</code> before passing it to <code>StartTrace</code> again. The stop operation can modify the structure&#8217;s contents, and you don&#8217;t want to start a new session with whatever state was left behind.</p>
+
+
+
+<h2 class="wp-block-heading">Enabling a Provider</h2>
+
+
+
+<p class="wp-block-paragraph">Once the session exists, it has no providers, which means it collects nothing. You add a provider using <code>EnableTraceEx2</code>, which is the most flexible variant. There&#8217;s also <code>EnableTrace</code> and EnableTraceEx, each slightly less capable. Use <code>EnableTraceEx2</code>.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>EnableTraceEx2(
+    hTrace,
+    &amp;providerGuid,
+    EVENT_CONTROL_CODE_ENABLE_PROVIDER,
+    TRACE_LEVEL_VERBOSE,
+    0,   // MatchAnyKeyword - 0 means all keywords
+    0,   // MatchAllKeyword
+    0,   // Timeout
+    nullptr  // EnableParameters
+);
+</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #DCDCAA">EnableTraceEx2</span><span style="color: #D4D4D4">(</span></span>
+<span class="line"><span style="color: #D4D4D4">    hTrace,</span></span>
+<span class="line"><span style="color: #D4D4D4">    &amp;providerGuid,</span></span>
+<span class="line"><span style="color: #D4D4D4">    EVENT_CONTROL_CODE_ENABLE_PROVIDER,</span></span>
+<span class="line"><span style="color: #D4D4D4">    TRACE_LEVEL_VERBOSE,</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">,</span><span style="color: #6A9955">   // MatchAnyKeyword - 0 means all keywords</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">,</span><span style="color: #6A9955">   // MatchAllKeyword</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">,</span><span style="color: #6A9955">   // Timeout</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">nullptr</span><span style="color: #6A9955">  // EnableParameters</span></span>
+<span class="line"><span style="color: #D4D4D4">);</span></span>
+<span class="line"></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph"><code>TRACE_LEVEL_VERBOSE</code> means you want everything at verbose level or below, which in practice means all events. You can filter by level if you only care about warnings and above, for example. The keyword parameters let you filter by event category, which is useful when a provider is noisy. Setting both to zero means no filtering.</p>
+
+
+
+<p class="wp-block-paragraph">The <code>EnableParameters</code> argument is where you could ask for stack traces per event, among other things. Passing <code>nullptr</code> means no extras.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Opening a Consumer</h2>
+
+
+
+<p class="wp-block-paragraph">The session is running and the provider is enabled. Events are flowing into ETW&#8217;s internal buffers. But we&#8217;re not receiving anything yet. We haven&#8217;t set up a consumer.</p>
+
+
+
+<p class="wp-block-paragraph">That&#8217;s done through <code>OpenTrace</code>, which takes an <code>EVENT_TRACE_LOGFILE</code> structure:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>EVENT_TRACE_LOGFILE etl{};
+etl.LoggerName = const_cast&lt;PWSTR>(sessionName);
+etl.ProcessTraceMode = PROCESS_TRACE_MODE_REAL_TIME | PROCESS_TRACE_MODE_EVENT_RECORD;
+etl.EventRecordCallback = OnEvent;
+TRACEHANDLE hParse = OpenTrace(&amp;etl);
+</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">EVENT_TRACE_LOGFILE etl{};</span></span>
+<span class="line"><span style="color: #9CDCFE">etl</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">LoggerName</span><span style="color: #D4D4D4"> = </span><span style="color: #569CD6">const_cast</span><span style="color: #D4D4D4">&lt;PWSTR&gt;(sessionName);</span></span>
+<span class="line"><span style="color: #9CDCFE">etl</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">ProcessTraceMode</span><span style="color: #D4D4D4"> = PROCESS_TRACE_MODE_REAL_TIME | PROCESS_TRACE_MODE_EVENT_RECORD;</span></span>
+<span class="line"><span style="color: #9CDCFE">etl</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">EventRecordCallback</span><span style="color: #D4D4D4"> = OnEvent;</span></span>
+<span class="line"><span style="color: #D4D4D4">TRACEHANDLE hParse = </span><span style="color: #DCDCAA">OpenTrace</span><span style="color: #D4D4D4">(&amp;etl);</span></span>
+<span class="line"></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The <code>LoggerName</code> field tells <code>OpenTrace</code> which session to connect to. <code>ProcessTraceMode</code> has two flags: <code>REAL_TIME</code> means we&#8217;re not reading from a file, and <code>EVENT_RECORD</code> switches to the modern callback style. That means <code>EventRecordCallback</code> instead of the older EventCallback. Always use the event record style. The older callback exists for backwards compatibility and isn&#8217;t worth the trouble.</p>
+
+
+
+<h2 class="wp-block-heading">Processing Events</h2>
+
+
+
+<p class="wp-block-paragraph">With the consumer open, you start receiving events by calling <code>ProcessTrace</code>:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>ProcessTrace(&amp;hParse, 1, nullptr, nullptr);</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #DCDCAA">ProcessTrace</span><span style="color: #D4D4D4">(&amp;hParse, </span><span style="color: #B5CEA8">1</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">);</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">This call never returns. It enters a loop and dispatches your callback for every event that arrives. In a real application, you&#8217;d run this on a dedicated thread so the rest of your application stays responsive. To stop it, you call <code>CloseTrace</code> from another thread, which causes <code>ProcessTrace</code> to return.</p>
+
+
+
+<p class="wp-block-paragraph">For our purposes here, the application just blocks until you kill it with Ctrl+C.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">The Event Callback</h2>
+
+
+
+<p class="wp-block-paragraph">The callback receives a pointer to an <code>EVENT_RECORD</code> for every event. <code>EventHeader</code> inside it gives you the basics: process ID, thread ID, provider GUID, and a timestamp.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>void WINAPI OnEvent(PEVENT_RECORD rec) {
+    const auto&amp; header = rec->EventHeader;
+    // Convert timestamp to local time
+    FILETIME ft{};
+    FileTimeToLocalFileTime(
+        reinterpret_cast&lt;const FILETIME*>(&amp;header.TimeStamp), &amp;ft);
+    SYSTEMTIME st{};
+    FileTimeToSystemTime(&amp;ft, &amp;st);
+    printf("[%02d:%02d:%02d.%03d] PID: %lu  TID: %lu\n",
+        st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+        header.ProcessId, header.ThreadId);
+}</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #569CD6">void</span><span style="color: #D4D4D4"> WINAPI </span><span style="color: #DCDCAA">OnEvent</span><span style="color: #D4D4D4">(PEVENT_RECORD rec) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">const</span><span style="color: #D4D4D4"> </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">&amp; header = </span><span style="color: #9CDCFE">rec</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">EventHeader</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #6A9955">    // Convert timestamp to local time</span></span>
+<span class="line"><span style="color: #D4D4D4">    FILETIME ft{};</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">FileTimeToLocalFileTime</span><span style="color: #D4D4D4">(</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #569CD6">reinterpret_cast</span><span style="color: #D4D4D4">&lt;</span><span style="color: #569CD6">const</span><span style="color: #D4D4D4"> FILETIME*&gt;(&amp;</span><span style="color: #9CDCFE">header</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">TimeStamp</span><span style="color: #D4D4D4">), &amp;ft);</span></span>
+<span class="line"><span style="color: #D4D4D4">    SYSTEMTIME st{};</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">FileTimeToSystemTime</span><span style="color: #D4D4D4">(&amp;ft, &amp;st);</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;[</span><span style="color: #9CDCFE">%02d</span><span style="color: #CE9178">:</span><span style="color: #9CDCFE">%02d</span><span style="color: #CE9178">:</span><span style="color: #9CDCFE">%02d</span><span style="color: #CE9178">.</span><span style="color: #9CDCFE">%03d</span><span style="color: #CE9178">] PID: </span><span style="color: #9CDCFE">%lu</span><span style="color: #CE9178">  TID: </span><span style="color: #9CDCFE">%lu</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">,</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #9CDCFE">st</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">wHour</span><span style="color: #D4D4D4">, </span><span style="color: #9CDCFE">st</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">wMinute</span><span style="color: #D4D4D4">, </span><span style="color: #9CDCFE">st</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">wSecond</span><span style="color: #D4D4D4">, </span><span style="color: #9CDCFE">st</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">wMilliseconds</span><span style="color: #D4D4D4">,</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #9CDCFE">header</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">ProcessId</span><span style="color: #D4D4D4">, </span><span style="color: #9CDCFE">header</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">ThreadId</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The timestamp is a 64-bit value in 100-nanosecond units from January 1st, 1601, in UTC. Yes, 1601. This is the same format as <code>FILETIME</code>, which is not a coincidence. The cast is safe since the memory layout is identical, just different struct names for historical reasons.</p>
+
+
+
+<p class="wp-block-paragraph"><code>FileTimeToLocalFileTime</code> converts from UTC to local time, then <code>FileTimeToSystemTime</code> breaks it down into hours, minutes, seconds, and milliseconds, something you can actually read.</p>
+
+
+
+<p class="wp-block-paragraph">Getting the actual event properties — the task name, the field values, the process name for a process creation event — requires the Trace Data Helper (TDH) API. That&#8217;s where things get considerably more involved, and we&#8217;ll cover that in Part 2.</p>
+
+
+
+<h2 class="wp-block-heading">Key Takeaways</h2>
+
+
+
+<ul class="wp-block-list">
+<li><code>EVENT_TRACE_PROPERTIES</code> requires an oversized allocation. The session name is stored after the structure itself. Get the size calculation wrong and things will fail in non-obvious ways.</li>
+
+
+
+<li><code>StartTrace</code> fails with <code>ERROR_ALREADY_EXISTS</code> if the session name is already in use. Reinitialize props before retrying.</li>
+
+
+
+<li>Use <code>EnableTraceEx2</code>. It&#8217;s the most capable variant and supports stack trace capture and other extensions via <code>EnableParameters</code>.</li>
+
+
+
+<li><code>ProcessTrace</code> blocks the calling thread indefinitely. Use a dedicated thread in any real application.</li>
+
+
+
+<li>Timestamp conversion requires two steps: <code>FileTimeToLocalFileTime</code> then <code>FileTimeToSystemTime</code>. The raw <code>TimeStamp</code> field in <code>EventHeader</code> is UTC and not human-readable.</li>
+
+
+
+<li>Most ETW operations require admin privileges. You&#8217;ll get <code>ERROR_ACCESS_DENIED</code> (error code 5) if you forget to run elevated.</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Keep Learning</h2>
+
+
+
+<p class="wp-block-paragraph">If you want to go deeper into Windows system programming and the APIs that underlie ETW, take a look at the <a href="https://trainsec.net/courses/windows-system-programming-1/">Windows System Programming 1</a> and <a href="https://trainsec.net/courses/windows-system-programming-2/">Windows System Programming 2</a> courses at TrainSec. They cover the Win32 layer in detail, including handles, memory management, threading, and synchronization.</p>
+
+
+
+<p class="wp-block-paragraph">For the kernel-side picture, the Windows Internals series walks through how ETW is implemented beneath the API. You can start with <a href="https://trainsec.net/courses/windows-internals-day-1/">Windows Internals: Day 1</a>.</p>
+
+
+
+<p class="wp-block-paragraph">Part 2 of this series will cover extracting event properties using TDH, getting the actual field values out of an <code>EVENT_RECORD</code>.</p>
+
+
+
+<p class="wp-block-paragraph">Go to PART 2: <a href="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-2">https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-2</a></p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph"></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-2.html">Capture ETW events with C++ (Part 2)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-1/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

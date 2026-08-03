@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Windows App Execution Aliases Work (and How to Read Them in C++) — TrainSec article | 1200km</title>
+<meta name="description" content="How Windows App Execution Aliases Work (and How to Read Them in C++) by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/how-windows-app-execution-aliases-work-and-how-to-read-them-in-c/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-07-11">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-how-windows-app-execution-aliases-work-and-how-to-read-them-in-c.html">
+<meta property="og:type" content="article"><meta property="og:title" content="How Windows App Execution Aliases Work (and How to Read Them in C++)"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-how-windows-app-execution-aliases-work-and-how-to-read-them-in-c.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-how-windows-app-execution-aliases-work-and-how-to-read-them-in-c.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-how-windows-app-execution-aliases-work-and-how-to-read-them-in-c.html","headline":"How Windows App Execution Aliases Work (and How to Read Them in C++)","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-how-windows-app-execution-aliases-work-and-how-to-read-them-in-c.html#webpage"},"datePublished":"2026-07-11","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/how-windows-app-execution-aliases-work-and-how-to-read-them-in-c/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>How Windows App Execution Aliases Work (and How to Read Them in C++)</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> July 12, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/how-windows-app-execution-aliases-work-and-how-to-read-them-in-c/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Pavel Yosifovich, co-author of the Microsoft Press Windows Internals books, walks through a small Windows feature that most people run into without ever noticing: App Execution Aliases. </p>
+
+
+
+<p class="wp-block-paragraph">If you have ever typed <code>notepad</code> and gotten the new Store version instead of the classic one in System32, you have already met this feature. In this post I want to show what these aliases actually are, where Windows stores them, how they work at the file system level, and how you can read them yourself from code. This is aimed at Windows developers, security researchers, and anyone who likes to understand what the system is really doing instead of taking it at face value.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="App Execution Aliases" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/62v3BsdFt3Q?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">Why Does the Wrong Notepad Launch?</h2>
+
+
+
+<p class="wp-block-paragraph">Let me start with something simple. I type <code>notepad</code> in the Run dialog, and I get the new Notepad. I go to the <strong>System32</strong> directory, where Notepad has lived forever, double click it, and I still get the new Notepad. That is a little strange. The executable I clicked on is clearly a different file. If you open <strong>Task Manager</strong>, find the running Notepad, and choose Open file location, you land in a long path under <code>Program Files\WindowsApps\Microsoft...</code>, not System32. The sizes do not match either: the Store Notepad is around 3 MB, the System32 one is a few hundred kilobytes. So obviously these are not the same binary.</p>
+
+
+
+<p class="wp-block-paragraph">So how does typing a plain name like <code>notepad</code> end up running something from a completely different directory? This is where App Execution Aliases come in.</p>
+
+
+
+<h2 class="wp-block-heading">What Is an App Execution Alias?</h2>
+
+
+
+<p class="wp-block-paragraph">If you open Settings and search for &#8220;app execution aliases&#8221;, you get a page titled <strong>Manage app execution aliases</strong>. It is a per user list, and depending on what you have installed it can be quite long. The basic idea is that an executable name, for example <code>notepad.exe</code>, can point to some real application wherever it happens to live, and that name is resolvable from anywhere: a command window, the Run dialog, an API call, (almost) anything really.</p>
+
+
+
+<p class="wp-block-paragraph">The Settings page is a bit limited. It shows you the aliases and lets you toggle them on and off, but it does not tell you what a given alias actually points to. It is still useful for one thing though: if I disable the <code>notepad.exe</code> alias and try again, I finally get the classic <strong>Notepad </strong>from System32, along with a gentle suggestion that a newer Notepad exists. So the alias was intercepting the name the whole time. You can see the same behavior with <code>mspaint</code>. Paint also has a second alias called <code>pbrush</code>, which is a nice bit of history. And on a modern Windows box the classic Paint is gone from System32 entirely, so once you disable the alias, <code>mspaint</code> simply fails, because there is nothing left for the name to resolve to.</p>
+
+
+
+<h2 class="wp-block-heading">Where Does Windows Store These Aliases?</h2>
+
+
+
+<p class="wp-block-paragraph">The aliases live in a per user directory: <code>%LOCALAPPDATA%\Microsoft\WindowsApps</code>. Open that folder and you will find a file for each alias, including <code>notepad.exe</code>. Now here is the part that looks wrong at first. Every one of these files is zero bytes. Not small, zero. The size on disk is zero as well. A zero byte file should be completely useless, and yet if I double click <code>notepad.exe</code> in that folder, Notepad launches normally. Every one of these empty files runs whatever it is supposed to point to, behind the scenes.</p>
+
+
+
+<p class="wp-block-paragraph">So how can an empty file launch a real program? The answer is reparse points.</p>
+
+
+
+<h2 class="wp-block-heading">How Do Reparse Points Make an Empty File Run a Program?</h2>
+
+
+
+<p class="wp-block-paragraph">A reparse point is an NTFS feature. You can attach a block of data to a file or directory, stored in the NTFS metadata rather than in the file contents. Each reparse point carries a tag, and when the file is accessed, a file system mini filter that recognizes that tag gets a chance to step in and do something interesting instead of the normal open. Reparse points are used for all kinds of things (symbolic links and mount points are the classic examples), and App Execution Aliases are just another consumer of the same mechanism. Windows ships a mini filter that understands the alias tag, and that is what turns a zero byte file into a launch of the real executable.</p>
+
+
+
+<p class="wp-block-paragraph">If you want to understand reparse points in a broader context, they are the same family of NTFS machinery behind more advanced tricks. I covered a related file system feature in <a href="https://trainsec.net/library/windows-kernel/ntfs-transactions-in-windows-kernel-transaction-manager-createfiletransacted-and-process-doppelganging/">NTFS transactions in Windows</a>, which is worth a read if you like going below the API surface of the file system.</p>
+
+
+
+<h2 class="wp-block-heading">How Do You Inspect an Alias with fsutil?</h2>
+
+
+
+<p class="wp-block-paragraph">You do not need to write any code to see this. The <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-reparsepoint" rel="nofollow noopener" target="_blank"><code>fsutil</code></a> tool has been around for years, and it knows how to query reparse data. Copy the path to one of the alias files and run:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>fsutil reparsepoint query "%LOCALAPPDATA%\Microsoft\WindowsApps\notepad.exe"</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">fsutil reparsepoint query &quot;%LOCALAPPDATA%\Microsoft\WindowsApps\notepad.exe&quot;</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">If there is no reparse point on the file you get an error, which is fine. For an alias, you get real output: the reparse tag value, an indication that Microsoft is the provider of the tag, and a hex dump of the data. The tag for App Execution Aliases is always the same value, <code>0x8000001B</code>, and it has a define in the Windows Driver Kit (<a href="https://learn.microsoft.com/en-us/windows/win32/fileio/reparse-point-tags" rel="nofollow noopener" target="_blank">reparse point tags</a> are partitioned into ranges so different providers do not collide). In the hex dump you can squint and make out a few UTF-16 strings separated by null terminators: something like <code>Microsoft.WindowsNotepad...</code>, a package identity, and the actual executable path. The first few bytes are less obvious, probably a version or a reserved field. We will pin that down in code.</p>
+
+
+
+<h2 class="wp-block-heading">How Do You Enumerate App Execution Aliases in C++?</h2>
+
+
+
+<p class="wp-block-paragraph">Reading this with a tool is fine, but I always like to do it programmatically as well. It is not just about using existing tools, it is about understanding them well enough to reproduce what they do. So let me build a small console application that enumerates every alias and prints where each one points.</p>
+
+
+
+<h2 class="wp-block-heading">Finding the alias files</h2>
+
+
+
+<p class="wp-block-paragraph">First I need the directory. I could hardcode my own user path, but that is fragile. A better way is to ask for the <code>LOCALAPPDATA</code> location at runtime with <a href="https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-getenvironmentvariablew" rel="nofollow noopener" target="_blank"><code>GetEnvironmentVariable</code></a>, then append the rest of the path. There are other ways to get the local app data folder (asking the shell for the known folder, for example), but the environment variable is good enough here.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>WCHAR path[MAX_PATH];
+GetEnvironmentVariable(L"LOCALAPPDATA", path, MAX_PATH);
+
+std::wstring dir(path);
+dir += L"\\Microsoft\\WindowsApps\\";</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">WCHAR </span><span style="color: #9CDCFE">path</span><span style="color: #D4D4D4">[MAX_PATH];</span></span>
+<span class="line"><span style="color: #DCDCAA">GetEnvironmentVariable</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">L&quot;LOCALAPPDATA&quot;</span><span style="color: #D4D4D4">, path, MAX_PATH);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #4EC9B0">std</span><span style="color: #D4D4D4">::</span><span style="color: #4EC9B0">wstring</span><span style="color: #D4D4D4"> </span><span style="color: #DCDCAA">dir</span><span style="color: #D4D4D4">(</span><span style="color: #4EC9B0">path</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #D4D4D4">dir += </span><span style="color: #CE9178">L&quot;</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">Microsoft</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">WindowsApps</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">;</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">Now I search that directory for <code>*.exe</code> using <a href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew" rel="nofollow noopener" target="_blank"><code>FindFirstFile</code></a> and <a href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findnextfilew" rel="nofollow noopener" target="_blank"><code>FindNextFile</code></a>. Each call fills a <a href="https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-win32_find_dataw" rel="nofollow noopener" target="_blank"><code>WIN32_FIND_DATA</code></a> with the next entry.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>WIN32_FIND_DATA fd;
+HANDLE hFind = FindFirstFile((dir + L"*.exe").c_str(), &amp;fd);
+if (hFind == INVALID_HANDLE_VALUE)
+    return 1;   // directory missing, no permission, whatever it may be
+
+do {
+    // fd.cFileName is one alias, for example notepad.exe
+    ProcessAlias(dir, fd.cFileName);
+} while (FindNextFile(hFind, &amp;fd));
+
+FindClose(hFind);</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">WIN32_FIND_DATA fd;</span></span>
+<span class="line"><span style="color: #D4D4D4">HANDLE hFind = </span><span style="color: #DCDCAA">FindFirstFile</span><span style="color: #D4D4D4">((dir + </span><span style="color: #CE9178">L&quot;*.exe&quot;</span><span style="color: #D4D4D4">).</span><span style="color: #DCDCAA">c_str</span><span style="color: #D4D4D4">(), &amp;fd);</span></span>
+<span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (hFind == INVALID_HANDLE_VALUE)</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">return</span><span style="color: #D4D4D4"> </span><span style="color: #B5CEA8">1</span><span style="color: #D4D4D4">;</span><span style="color: #6A9955">   // directory missing, no permission, whatever it may be</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C586C0">do</span><span style="color: #D4D4D4"> {</span></span>
+<span class="line"><span style="color: #6A9955">    // fd.cFileName is one alias, for example notepad.exe</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">ProcessAlias</span><span style="color: #D4D4D4">(dir, </span><span style="color: #9CDCFE">fd</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">cFileName</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #D4D4D4">} </span><span style="color: #C586C0">while</span><span style="color: #D4D4D4"> (</span><span style="color: #DCDCAA">FindNextFile</span><span style="color: #D4D4D4">(hFind, &amp;fd));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #DCDCAA">FindClose</span><span style="color: #D4D4D4">(hFind);</span></span></code></pre></div>
+
+
+
+<h2 class="wp-block-heading">Opening the reparse point</h2>
+
+
+
+<p class="wp-block-paragraph">For each alias I have to get at the reparse data, and that takes a bit of care. I open the file with <a href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew" rel="nofollow noopener" target="_blank"><code>CreateFile</code></a>, but with one important flag: <code>FILE_FLAG_OPEN_REPARSE_POINT</code>. Without it, the open follows the reparse point in the normal way and you never see the underlying data. <code>GENERIC_READ</code> and <code>FILE_SHARE_READ</code> are fine, since we are just reading something that already exists.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>std::wstring full = dir + fileName;
+HANDLE hFile = CreateFile(full.c_str(), GENERIC_READ, FILE_SHARE_READ,
+    nullptr, OPEN_EXISTING,
+    FILE_FLAG_OPEN_REPARSE_POINT, nullptr);
+if (hFile == INVALID_HANDLE_VALUE)
+    return;   // no reparse point here</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #4EC9B0">std</span><span style="color: #D4D4D4">::wstring full = dir + fileName;</span></span>
+<span class="line"><span style="color: #D4D4D4">HANDLE hFile = </span><span style="color: #DCDCAA">CreateFile</span><span style="color: #D4D4D4">(</span><span style="color: #9CDCFE">full</span><span style="color: #D4D4D4">.</span><span style="color: #DCDCAA">c_str</span><span style="color: #D4D4D4">(), GENERIC_READ, FILE_SHARE_READ,</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, OPEN_EXISTING,</span></span>
+<span class="line"><span style="color: #D4D4D4">    FILE_FLAG_OPEN_REPARSE_POINT, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (hFile == INVALID_HANDLE_VALUE)</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">return</span><span style="color: #D4D4D4">;</span><span style="color: #6A9955">   // no reparse point here</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">Now, how do I actually pull the data out? If you reach for <a href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile" rel="nofollow noopener" target="_blank"><code>ReadFile</code></a>, it will not work, because that reads the file contents, and the contents are empty. The reparse data lives in the metadata, so I have to ask the file system for it directly with <a href="https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol" rel="nofollow noopener" target="_blank"><code>DeviceIoControl</code></a> and the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ni-winioctl-fsctl_get_reparse_point" rel="nofollow noopener" target="_blank"><code>FSCTL_GET_REPARSE_POINT</code></a> control code. There is no input buffer to give (we are getting, not setting), so I pass null and zero for the input, and a plain byte buffer for the output.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>BYTE buffer[2048] = {};   // zero it, or you get leftovers from the previous run
+DWORD returned;
+if (!DeviceIoControl(hFile, FSCTL_GET_REPARSE_POINT,
+        nullptr, 0, buffer, sizeof(buffer), &amp;returned, nullptr)) {
+    CloseHandle(hFile);
+    return;
+}</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">BYTE </span><span style="color: #9CDCFE">buffer</span><span style="color: #D4D4D4">[</span><span style="color: #B5CEA8">2048</span><span style="color: #D4D4D4">] = {};</span><span style="color: #6A9955">   // zero it, or you get leftovers from the previous run</span></span>
+<span class="line"><span style="color: #D4D4D4">DWORD returned;</span></span>
+<span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (!</span><span style="color: #DCDCAA">DeviceIoControl</span><span style="color: #D4D4D4">(hFile, FSCTL_GET_REPARSE_POINT,</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, buffer, </span><span style="color: #569CD6">sizeof</span><span style="color: #D4D4D4">(buffer), &amp;returned, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">)) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">CloseHandle</span><span style="color: #D4D4D4">(hFile);</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">return</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">One small but real detail: zero the buffer. When I first ran this without doing that, I got residual characters left over from the previous alias, which made the output look messier than it was.</p>
+
+
+
+<h2 class="wp-block-heading">Interpreting the data</h2>
+
+
+
+<p class="wp-block-paragraph">Instead of poking at raw bytes, it is nicer to lay a structure over the buffer. The fundamental shape of a reparse buffer is defined in the Windows Driver Kit headers. For our purposes the layout is: the tag, a length, a reserved or version field, and then the data itself, which in this case is a run of null terminated UTF-16 strings.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>struct ReparseData {
+    ULONG  Tag;         // 0x8000001B for app execution aliases
+    USHORT Length;      // size of the data that follows
+    USHORT Reserved;
+    ULONG  Version;     // undocumented: version or reserved, not sure
+    WCHAR  Text[1];     // null separated strings start here
+};
+
+auto data = reinterpret_cast&lt;ReparseData*>(buffer);
+printf("\tTag:   0x%08X\n", data->Tag);
+printf("\tBytes: %u\n", data->Length);
+
+// Walk the null separated strings
+const WCHAR* p = data->Text;
+while (*p) {
+    printf("\t%ws\n", p);
+    p += wcslen(p) + 1;   // skip the string and its null terminator
+}
+
+CloseHandle(hFile);</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #569CD6">struct</span><span style="color: #D4D4D4"> </span><span style="color: #4EC9B0">ReparseData</span><span style="color: #D4D4D4"> {</span></span>
+<span class="line"><span style="color: #D4D4D4">    ULONG  Tag;</span><span style="color: #6A9955">         // 0x8000001B for app execution aliases</span></span>
+<span class="line"><span style="color: #D4D4D4">    USHORT Length;</span><span style="color: #6A9955">      // size of the data that follows</span></span>
+<span class="line"><span style="color: #D4D4D4">    USHORT Reserved;</span></span>
+<span class="line"><span style="color: #D4D4D4">    ULONG  Version;</span><span style="color: #6A9955">     // undocumented: version or reserved, not sure</span></span>
+<span class="line"><span style="color: #D4D4D4">    WCHAR  </span><span style="color: #9CDCFE">Text</span><span style="color: #D4D4D4">[</span><span style="color: #B5CEA8">1</span><span style="color: #D4D4D4">];</span><span style="color: #6A9955">     // null separated strings start here</span></span>
+<span class="line"><span style="color: #D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> data = </span><span style="color: #569CD6">reinterpret_cast</span><span style="color: #D4D4D4">&lt;ReparseData*&gt;(buffer);</span></span>
+<span class="line"><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;</span><span style="color: #D7BA7D">\t</span><span style="color: #CE9178">Tag:   0x</span><span style="color: #9CDCFE">%08X</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">, </span><span style="color: #9CDCFE">data</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">Tag</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;</span><span style="color: #D7BA7D">\t</span><span style="color: #CE9178">Bytes: </span><span style="color: #9CDCFE">%u</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">, </span><span style="color: #9CDCFE">data</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">Length</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #6A9955">// Walk the null separated strings</span></span>
+<span class="line"><span style="color: #569CD6">const</span><span style="color: #D4D4D4"> WCHAR* p = </span><span style="color: #9CDCFE">data</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">Text</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #C586C0">while</span><span style="color: #D4D4D4"> (*p) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;</span><span style="color: #D7BA7D">\t</span><span style="color: #CE9178">%ws</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">, p);</span></span>
+<span class="line"><span style="color: #D4D4D4">    p += </span><span style="color: #DCDCAA">wcslen</span><span style="color: #D4D4D4">(p) + </span><span style="color: #B5CEA8">1</span><span style="color: #D4D4D4">;</span><span style="color: #6A9955">   // skip the string and its null terminator</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #DCDCAA">CloseHandle</span><span style="color: #D4D4D4">(hFile);</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">When you run this, each alias prints its executable name, the same tag for every entry (it has to be the same tag), the byte count (which varies with the length of the strings), and then the strings it points to. Typically you get several strings: the package name, an Application User Model ID that uniquely identifies the app entry (see <a href="https://learn.microsoft.com/en-us/windows/win32/shell/appids" rel="nofollow noopener" target="_blank">Application User Model IDs</a>), and the actual executable path, which is the one you were really after. There is also a trailing zero string on the last entry whose exact meaning I have not fully chased down. It is clearly there on purpose, but the documentation does not say much. That is one of those things to investigate on your own, and honestly one of the more fun parts of this kind of work.</p>
+
+
+
+<h2 class="wp-block-heading">What This Means Practically</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Toggle an alias off in Settings, or delete the corresponding zero byte file in <code>%LOCALAPPDATA%\Microsoft\WindowsApps</code>, when a plain name like <code>notepad</code> or <code>mspaint</code> keeps resolving to a Store app you did not want.</li>
+
+
+
+<li>Run <code>fsutil reparsepoint query</code> on any alias file to see its tag and the executable it points to, with no code required.</li>
+
+
+
+<li>Open a reparse point without following it by passing <code>FILE_FLAG_OPEN_REPARSE_POINT</code> to <code>CreateFile</code>, then read the data with <code>DeviceIoControl</code> and <code>FSCTL_GET_REPARSE_POINT</code>. <code>ReadFile</code> will not do it.</li>
+
+
+
+<li>Enumerate every alias on a machine to audit exactly what those short names resolve to, which is useful when you care about what actually runs on a system.</li>
+
+
+
+<li>Treat the reparse tag as the extension point: if you ever write a file system mini filter, the same tag mechanism lets you attach and interpret your own metadata on files and directories.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Keep Learning</h2>
+
+
+
+<p class="wp-block-paragraph">If you want to understand the file system internals and the Win32 APIs behind features like this, these TrainSec courses go deeper:</p>
+
+
+
+<ul class="wp-block-list">
+<li><a href="https://trainsec.net/courses/windows-internals-bundle/">Windows Internals Bundle</a>: covers the file system, the I/O system, and reparse points as part of the full internals picture</li>
+
+
+
+<li><a href="https://trainsec.net/courses/windows-system-programming/">Windows System Programming</a>: covers the Win32 file APIs, <code>DeviceIoControl</code>, and working with the file system from user mode</li>
+
+
+
+<li><a href="https://trainsec.net/windows-security-researcher/">Windows Internals Bundle for security researchers</a>: the learning path if you are approaching Windows internals from a security angle</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Related reading in the knowledge library: <a href="https://trainsec.net/library/windows-internals/dll-injection-with-windows-application-verifier/">DLL Injection with Windows Application Verifier</a>, another look at how Windows decides what actually gets loaded and run.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/how-windows-app-execution-aliases-work-and-how-to-read-them-in-c/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Windows PE Files Use Custom Resources to Embed Anything — TrainSec article | 1200km</title>
+<meta name="description" content="How Windows PE Files Use Custom Resources to Embed Anything by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/how-windows-pe-files-use-custom-resources-to-embed-anything/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-05-24">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-how-windows-pe-files-use-custom-resources-to-embed-anything.html">
+<meta property="og:type" content="article"><meta property="og:title" content="How Windows PE Files Use Custom Resources to Embed Anything"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-how-windows-pe-files-use-custom-resources-to-embed-anything.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-how-windows-pe-files-use-custom-resources-to-embed-anything.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-how-windows-pe-files-use-custom-resources-to-embed-anything.html","headline":"How Windows PE Files Use Custom Resources to Embed Anything","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-how-windows-pe-files-use-custom-resources-to-embed-anything.html#webpage"},"datePublished":"2026-05-24","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/how-windows-pe-files-use-custom-resources-to-embed-anything/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>How Windows PE Files Use Custom Resources to Embed Anything</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> May 25, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/how-windows-pe-files-use-custom-resources-to-embed-anything/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Pavel Yosifovich, Windows internals expert and author of the TrainSec Windows Internals course series, walks through one of the PE format&#8217;s most overlooked features: custom resources. Everyone knows PE files contain code. Most people know they contain data. Fewer people think carefully about the resource section — and even fewer realize it can hold absolutely anything. In this post we&#8217;ll look at what PE resources actually are, how Windows handles the standard ones, and what you can do with custom resource types that Windows knows nothing about. Along the way, we&#8217;ll crack open Process Explorer and find something interesting hiding inside.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="How Process Explorer Hides a Driver Inside Itself, Custom Resources in Windows PE Files" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/_k7LssiUxkA?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">What Exactly Lives Inside a Windows PE File?</h2>
+
+
+
+<p class="wp-block-paragraph">A Windows <a href="https://learn.microsoft.com/en-us/windows/win32/debug/pe-format" rel="nofollow noopener" target="_blank">PE file</a> — whether it&#8217;s an executable or a DLL — can contain three distinct kinds of things. </p>
+
+
+
+<p class="wp-block-paragraph">First, there&#8217;s <em>code</em>. This is what the processor executes. Most executables have it; DLLs typically do too, though technically neither is required to.</p>
+
+
+
+<p class="wp-block-paragraph">Second, there&#8217;s <em>global data</em>. Global variables end up here. Some of it is read-only — mapped into a protected memory region, so writing to it gives you an access violation. Some is read-write, meaning it can change at runtime. Either way, it&#8217;s typed, named, and accessed directly through normal programming constructs. </p>
+
+
+
+<p class="wp-block-paragraph">Third — and this is what we&#8217;re interested in — there are <em>resources</em>. Resources are read-only data, but they&#8217;re a different kind of read-only than global variables. They don&#8217;t have names in the programming sense. They&#8217;re more free-form. And technically, they can be anything.</p>
+
+
+
+<p class="wp-block-paragraph">The distinction matters: global data has direct, typed access through the linker. Resources have indirect access through a set of APIs that retrieve raw bytes by type name and ID. That indirection is what makes them flexible.</p>
+
+
+
+<h2 class="wp-block-heading">What Are the Standard Resource Types and How Do You Access Them?</h2>
+
+
+
+<p class="wp-block-paragraph">Windows recognizes a set of <a href="https://learn.microsoft.com/en-us/windows/win32/menurc/resource-types" rel="nofollow noopener" target="_blank">well-known resource types</a> that are documented and have corresponding APIs. Icons, cursors, bitmaps, menus, dialogs, string tables, manifests — these are all resources. The format of each is documented by Microsoft, and APIs like <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadmenua" rel="nofollow noopener" target="_blank"><code>LoadMenu</code></a>, <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadicona" rel="nofollow noopener" target="_blank"><code>LoadIcon</code></a>, <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadbitmapa" rel="nofollow noopener" target="_blank"><code>LoadBitmap</code></a>, and <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadstringa" rel="nofollow noopener" target="_blank"><code>LoadString</code></a> know how to take a resource and convert it into its runtime representation.</p>
+
+
+
+<p class="wp-block-paragraph">So if you call <code>LoadMenu</code>, Windows reads the menu resource from the PE, interprets the binary format, and hands you back a menu handle you can attach to a window. Simple enough. The application doesn&#8217;t need to ship a separate file containing its menu definitions — they&#8217;re baked into the binary.</p>
+
+
+
+<p class="wp-block-paragraph">Open any executable in a PE viewer and you&#8217;ll see exactly this. Process Explorer has icons, cursors, manifests, menus, string tables, bitmaps — all standard, all interpreted by Windows through documented APIs. Nothing surprising there. But keep scrolling through the resource section and you&#8217;ll find things that are decidedly not standard.</p>
+
+
+
+<h2 class="wp-block-heading">What Can a Custom Resource Actually Be?</h2>
+
+
+
+<p class="wp-block-paragraph">Here&#8217;s where it gets interesting.</p>
+
+
+
+<p class="wp-block-paragraph">A resource doesn&#8217;t have to be one of the documented types. It can have any type name or numeric ID you like. Windows has no idea what it is, and it doesn&#8217;t need to. The only thing Windows provides is a way to locate and retrieve the raw bytes at runtime. We&#8217;ll look at that in a separate video.</p>
+
+
+
+<p class="wp-block-paragraph">In practice, this means you can embed literally any binary data inside a PE file. Configuration files, other executables, drivers, encrypted payloads, lookup tables — it doesn&#8217;t matter. As long as your code knows how to interpret the data, those files don&#8217;t need to exist as separate files on disk. The PE is self-contained.</p>
+
+
+
+<p class="wp-block-paragraph">I actually did this myself at one point. Process Explorer has a custom resource type called <code>INI</code> — it&#8217;s a dark theme resource, and I&#8217;m the one who created it. Back when Process Explorer was using my dark mode implementation (before Windows 10/11 had their own), those color values needed to come from somewhere. Embedding them as a custom resource meant the binary didn&#8217;t depend on an external config file that could get lost, moved, or placed in the wrong directory.</p>
+
+
+
+<h2 class="wp-block-heading">How Does Process Explorer Hide a Driver and a 64-bit Binary Inside Itself?</h2>
+
+
+
+<p class="wp-block-paragraph">This is the interesting question. If you run Process Explorer without admin rights, it works — but with limitations. No driver means you can&#8217;t peer inside protected processes like CSRSS (which runs as Protected Process Light, or PPL). With admin rights and a loaded driver, things are different. But look in the Sysinternals folder: where is that driver file?</p>
+
+
+
+<p class="wp-block-paragraph">It&#8217;s not there. At least, not as a standalone file.</p>
+
+
+
+<p class="wp-block-paragraph">Open the 32-bit Process Explorer executable in Total PE or Resource Hacker. Look through the resource section. Beyond the expected icons and menus, there&#8217;s a custom resource type called <code>BINRES</code>. Two entries. The viewer doesn&#8217;t know what they are — there&#8217;s no registered handler for <code>BINRES</code> — but we can take a look: both start with <code>MZ</code>, the classic PE magic header, followed by &#8220;This program cannot be run in DOS mode.&#8221;</p>
+
+
+
+<p class="wp-block-paragraph">(If you&#8217;re not already familiar with why inspecting PPL processes requires a driver in the first place, the <a href="https://trainsec.net/library/windows-internals/protected-processes-ppl-keeping-windows-heart-safe/">Protected Processes &amp; PPL</a> post covers the protection level hierarchy and why SYSTEM-level access alone isn&#8217;t enough.)</p>
+
+
+
+<p class="wp-block-paragraph">Both entries are embedded PE files.</p>
+
+
+
+<p class="wp-block-paragraph">Export them. Run the larger one — about 2 MB — through your PE viewer. It has its own resources, it&#8217;s marked as a 64-bit image, and it&#8217;s not a DLL. Extract it and run it directly: you get a fully functional 64-bit Process Explorer. The smaller one — around 32 KB — has a native subsystem, is a DLL, and its imports list only the kernel. In other words, it&#8217;s a driver.</p>
+
+
+
+<p class="wp-block-paragraph">So Process Explorer doesn&#8217;t need any of those files on disk, because they live inside the binary. At runtime, the 32-bit variant extracts them to a temp directory (or a location it has write access to), loads the driver, and launches the 64-bit version. If the files already exist in the expected location, it reuses them; if not, it re-extracts. Neat, and completely self-contained.</p>
+
+
+
+<p class="wp-block-paragraph">The 64-bit variant, by the way, also has its own <code>BINRES</code> resource — the 64-bit driver, embedded there for when the 64-bit process explorer needs to load it.</p>
+
+
+
+<h2 class="wp-block-heading">What Does the Custom Resource Technique Mean for Security Research?</h2>
+
+
+
+<p class="wp-block-paragraph">This pattern should be on your radar — both for what legitimate software does with it and for what malware does.</p>
+
+
+
+<p class="wp-block-paragraph">Embedding payloads inside PE resources is a technique that real tools like Process Explorer use for perfectly reasonable reasons: self-containment, simplified deployment, no dependency on external files. But the same mechanism is a staple of malware. A second-stage payload, shellcode, an encrypted DLL, or a configuration blob can sit quietly in the resource section of a benign-looking binary and be extracted at runtime — without ever touching disk as a standalone file in a way that a naive file-scanner would catch.</p>
+
+
+
+<p class="wp-block-paragraph">Some analysis approaches focus primarily on imported functions, section name heuristics, or overall file entropy. A resource section with an embedded PE inside a named custom type can slip through those if the outer binary otherwise looks clean. And if the embedded content is additionally encrypted or compressed, the resource-section bytes won&#8217;t show obvious PE signatures until they&#8217;re extracted and decrypted at runtime. For a related technique that also manipulates PE loading to evade detection, the <a href="https://trainsec.net/library/windows-internals/when-process-hollowing-isnt-process-hollowing/">When Process Hollowing Isn&#8217;t Process Hollowing</a> post covers how leaving the original image mapped in memory defeats naive hollowing detection — useful context if you&#8217;re building detection logic.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img fetchpriority="high" fetchpriority="high" decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Keep Learning</h2>
+
+
+
+<p class="wp-block-paragraph">If you want to go deeper on the PE format and how Windows actually loads and maps executables — including section layout, the loader internals, and how resources are accessed at runtime — the <a href="https://trainsec.net/courses/windows-internals-day-1/">Windows Internals course series</a> covers all of this at the level a security researcher actually needs.</p>
+
+
+
+<p class="wp-block-paragraph">For a thorough understanding of the Sysinternals tools — including Process Explorer, how it uses its driver, how it handles protected processes, and what it can and can&#8217;t see without one — the <a href="https://trainsec.net/courses/sysinternals-tools-deep-dive-1/">Sysinternals Tools Deep Dive 1</a> course goes well beyond what the documentation tells you.</p>
+
+
+
+<p class="wp-block-paragraph">And if you want to actually write code that embeds and retrieves custom resources — including how to do this in a Visual Studio project, which is what the next video covers — <a href="https://trainsec.net/courses/windows-system-programming-1/">Windows System Programming 1</a> covers the Win32 resource APIs and the broader programming model you&#8217;ll need.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/how-windows-pe-files-use-custom-resources-to-embed-anything/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

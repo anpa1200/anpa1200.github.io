@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows System Programming In Rust — TrainSec article | 1200km</title>
+<meta name="description" content="Windows System Programming In Rust by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/programming/windows-system-programming-in-rust/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-03-11">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/programming-windows-system-programming-in-rust.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Windows System Programming In Rust"><meta property="og:url" content="https://1200km.com/articles/trainsec/programming-windows-system-programming-in-rust.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/programming-windows-system-programming-in-rust.html#article","url":"https://1200km.com/articles/trainsec/programming-windows-system-programming-in-rust.html","headline":"Windows System Programming In Rust","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/programming-windows-system-programming-in-rust.html#webpage"},"datePublished":"2026-03-11","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/programming/windows-system-programming-in-rust/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Windows System Programming In Rust</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> March 12, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/programming/windows-system-programming-in-rust/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Rust is a system programming language, but it’s also a modern language with a strong safety story. That combination is the reason it keeps showing up in places where C and C++ used to be the only viable option.</p>
+
+
+
+<p class="wp-block-paragraph">In this post I’m going to show how to get started with <strong>Windows system programming in Rust</strong>. The assumption is that you know a bit of Rust already, but I’ll keep the Rust-specific parts simple and focus on what changes when you start calling Win32 APIs.</p>
+
+
+
+<p class="wp-block-paragraph">The example I’m going to build is a classic: <strong>enumerate processes</strong> using the Toolhelp APIs (<code><strong>CreateToolhelp32Snapshot</strong></code>, <code><strong>Process32First</strong></code>, <code><strong>Process32Next</strong></code>). It’s simple enough to be a first project, but it forces us to deal with the key topics: crates, features, <code>unsafe</code>, error handling, and UTF-16 strings.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Getting started with Windows System Programming in Rust" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/_Z0xUwuwysw?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">Safe Rust And Unsafe Rust</h2>
+
+
+
+<p class="wp-block-paragraph">Rust’s safety guarantees apply to <strong>safe Rust</strong>: you don’t get use-after-free bugs, garbled pointers, or the usual memory hazards that come from manual lifetime management. But the moment you start interacting with an operating system API that was designed for C, you’re going to cross into <strong>unsafe</strong> territory.</p>
+
+
+
+<p class="wp-block-paragraph">That’s not a Rust limitation. It’s just reality: the OS APIs are mostly C-style interfaces. Rust can’t prove at compile time that you’re using them correctly, so you explicitly mark the call site as <code>unsafe</code>. Think of it as telling the compiler: “I’m taking responsibility for this part.”<strong>4</strong>).</p>
+
+
+
+<h2 class="wp-block-heading">Choosing Windows Bindings: <code>windows-sys</code> vs <code>windows</code></h2>
+
+
+
+<p class="wp-block-paragraph">For Windows specifically, you have a few options in the ecosystem, but Microsoft maintains two crates that matter here:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong><code>windows-sys</code></strong>: low-level bindings, close to the raw Win32 types and functions.</li>
+
+
+
+<li><strong><code>windows</code></strong>: higher-level wrappers built on top of <code>windows-sys</code>, generally more ergonomic for Rust code.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">For this example, I use the <strong><code>windows</code></strong> crate. It still exposes the Win32 calls, but it’s a better starting point if you want code that feels like Rust rather than a direct mechanical translation of C headers.</p>
+
+
+
+<h2 class="wp-block-heading">Creating The Project</h2>
+
+
+
+<p class="wp-block-paragraph">Start a new executable project:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code><strong>cargo new</strong></code> (I call the sample project <code><strong>ProcList</strong></code>)</li>
+
+
+
+<li>Open it in your IDE of choice</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Most people use VS Code with the <strong>Rust Analyzer</strong> plugin, which is fine. I’m using <strong>RustRover</strong> from JetBrains in the video, but the tooling choice isn’t the point—Cargo and the crate setup are what matter.</p>
+
+
+
+<p class="wp-block-paragraph">You’ll see two things immediately:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>Cargo.toml</code> (your project metadata and dependencies)</li>
+
+
+
+<li><code>main.rs</code> (the default “Hello world”)</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Adding The windows Crate And Enabling Features</h2>
+
+
+
+<p class="wp-block-paragraph">Add the <code>windows</code> crate to <code><strong>Cargo.toml</strong></code>. The key detail is <strong>features</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">Win32 is huge. You do not want to enable everything. The correct approach is to enable the minimal set of modules you actually use.</p>
+
+
+
+<p class="wp-block-paragraph">For Toolhelp process enumeration, you’ll need the module that contains the Toolhelp APIs, and typically you’ll also need Foundation types.</p>
+
+
+
+<p class="wp-block-paragraph">A practical tip: don’t guess feature names. Use the <strong><code>windows-rs</code> </strong>documentation tooling that maps API names to features. If you search for a function like <code><strong>CreateToolhelp32Snapshot</strong></code>, it tells you which feature to enable. This saves time, and it avoids the “why won’t this import compile?” loop.</p>
+
+
+
+<h2 class="wp-block-heading">Calling Win32 APIs From Rust</h2>
+
+
+
+<p class="wp-block-paragraph">Once you import the right modules, you can start calling Win32.</p>
+
+
+
+<p class="wp-block-paragraph">The first Toolhelp call is <code><strong>CreateToolhelp32Snapshot</strong></code>.</p>
+
+
+
+<p class="wp-block-paragraph">Two things you’ll notice immediately:</p>
+
+
+
+<ol class="wp-block-list">
+<li><strong>It’s unsafe</strong><br>All Win32 calls will require <code><strong>unsafe</strong> { ... }</code>. That’s normal, as these are C APIs, which are unsafe by definition.</li>
+
+
+
+<li><strong>You’ll get Rust-style Results</strong><br>Instead of manually calling <code><strong>GetLastError</strong></code> after every step, many of the bindings surface results as Rust <code><strong>Result</strong></code><strong>&lt;&gt;</strong> values.</li>
+</ol>
+
+
+
+<p class="wp-block-paragraph">For a first demo, it’s common to use <code><strong>unwrap()</strong></code> to keep the example focused. That means: if something fails, crash and show the error. For production code, you’ll usually do proper error handling, but for learning the mechanics, <code><strong>unwrap</strong>()</code> keeps the noise down.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img fetchpriority="high" fetchpriority="high" decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Enumerating Processes With Toolhelp</h2>
+
+
+
+<p class="wp-block-paragraph">The Toolhelp enumeration pattern is the same as in C and C++:</p>
+
+
+
+<ol class="wp-block-list">
+<li>Create a snapshot</li>
+
+
+
+<li>Initialize a <strong><code>PROCESSENTRY32</code> </strong>structure</li>
+
+
+
+<li>Call <code><strong>Process32First</strong></code></li>
+
+
+
+<li>Loop with <code><strong>Process32Next</strong></code></li>
+</ol>
+
+
+
+<p class="wp-block-paragraph">In Rust, there are a few details you must get right.</p>
+
+
+
+<h2 class="wp-block-heading">Using The Wide (UTF-16) Variants</h2>
+
+
+
+<p class="wp-block-paragraph">On Windows, the “real” string API surface is UTF-16. For Toolhelp, that means using the wide types and functions:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>PROCESSENTRY32W</code></li>
+
+
+
+<li><code>Process32FirstW</code></li>
+
+
+
+<li><code>Process32NextW</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">The process name field is a fixed-size UTF-16 buffer. If you print it naïvely, you’ll get a dump of numbers, not a readable name.</p>
+
+
+
+<p class="wp-block-paragraph">We’ll fix that in a minute.</p>
+
+
+
+<h2 class="wp-block-heading">Initializing The Structure Correctly</h2>
+
+
+
+<p class="wp-block-paragraph">Toolhelp functions require you to set <code>dwSize</code> to the size of the structure.</p>
+
+
+
+<p class="wp-block-paragraph">In C++ you often do something like:</p>
+
+
+
+<ul class="wp-block-list">
+<li>zero the struct</li>
+
+
+
+<li>set <code>dwSize</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">In Rust, you can’t leave memory uninitialized. You typically start with a zeroed structure (or a default initializer provided by the bindings), then set:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>entry.dwSize = size_of::&lt;PROCESSENTRY32W&gt;() as u32;</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">If <code>dwSize</code> is wrong, enumeration fails. This is one of those Win32 rules you can’t ignore.</p>
+
+
+
+<h2 class="wp-block-heading">Handling Mutability The Rust Way</h2>
+
+
+
+<p class="wp-block-paragraph">Rust variables are immutable by default.</p>
+
+
+
+<p class="wp-block-paragraph">If the API is going to write into your process entry structure, the structure must be declared with <code><strong>mut</strong></code>. The snapshot handle doesn’t necessarily need to be mutable, but the entry does.</p>
+
+
+
+<p class="wp-block-paragraph">This is a small Rust difference that matters when you translate Win32 patterns into Rust.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Converting UTF-16 Process Names Into Strings</h2>
+
+
+
+<p class="wp-block-paragraph">The executable name in <code>PROCESSENTRY32W</code> is a UTF-16 buffer. Rust natural strings are UTF-8.</p>
+
+
+
+<p class="wp-block-paragraph">A common and practical approach is:</p>
+
+
+
+<ol class="wp-block-list">
+<li>Convert UTF-16 into a Rust <code>String</code></li>
+
+
+
+<li>Trim at the first null terminator</li>
+</ol>
+
+
+
+<p class="wp-block-paragraph">For example (conceptually):</p>
+
+
+
+<ul class="wp-block-list">
+<li>Convert the entire array with <code><strong>String::from_utf16_lossy(&amp;entry.szExeFile)</strong></code></li>
+
+
+
+<li>Then cut it at the first <code>'\0'</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">That gives you a normal readable process name.</p>
+
+
+
+<p class="wp-block-paragraph">A small Rust feature that helps here is <strong>variable shadowing</strong>. You can reuse the same variable name for each transformation step (raw → string → trimmed) without mutating the original binding. It keeps the code readable.</p>
+
+
+
+<h2 class="wp-block-heading">A Minimal Mental Model For The Final Loop</h2>
+
+
+
+<p class="wp-block-paragraph">At a high level, the logic looks like this:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Take snapshot</li>
+
+
+
+<li>Initialize entry, set <code>dwSize</code></li>
+
+
+
+<li>If <code>Process32FirstW</code> succeeds:
+<ul class="wp-block-list">
+<li>print PID + process name</li>
+
+
+
+<li>loop while <code>Process32NextW</code> succeeds:</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">The “Rust work” is mostly about correctness at the boundaries:</p>
+
+
+
+<ul class="wp-block-list">
+<li>setting structure sizes</li>
+
+
+
+<li>using <code>unsafe</code> where required</li>
+
+
+
+<li>converting UTF-16 to something printable</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Why This Matters For TrainSec Students</h2>
+
+
+
+<p class="wp-block-paragraph">If you do Windows Internals work, you end up writing small tools sooner or later. Sometimes it’s for debugging. Sometimes it’s for IR. Sometimes it’s for research or experiments.</p>
+
+
+
+<p class="wp-block-paragraph">Rust gives you a good balance:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Most of your code stays in safe Rust</li>
+
+
+
+<li>The dangerous parts are constrained to explicit <code>unsafe</code> blocks</li>
+
+
+
+<li>You still get direct access to the Win32 APIs you need</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">This example is intentionally simple, but it builds the foundation you need for anything bigger:</p>
+
+
+
+<ul class="wp-block-list">
+<li>using the <code>windows</code> crate properly</li>
+
+
+
+<li>choosing the right features</li>
+
+
+
+<li>dealing with handles and structs</li>
+
+
+
+<li>handling UTF-16 correctly</li>
+
+
+
+<li>working comfortably with Win32 from Rust</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Once you can do process enumeration cleanly, it’s a short step to building more advanced tooling.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Keep Learning with TrainSec</h2>
+
+
+
+<p class="wp-block-paragraph">This content is part of the <strong>free TrainSec Knowledge Library</strong>, where students can deepen their understanding of Windows internals, malware analysis, and reverse engineering.Subscribe for free and continue learning with us:<br><br><a href="https://trainsec.net/library">https://trainsec.net/library</a></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/programming/windows-system-programming-in-rust/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linked Lists in the Windows Kernel — TrainSec article | 1200km</title>
+<meta name="description" content="Linked Lists in the Windows Kernel by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-kernel/linked-lists-in-the-windows-kernel/"><meta name="keywords" content="Pavel Yosifovich, Windows kernel, Technical walkthrough, Windows, kernel">
+<meta property="article:published_time" content="2026-03-24">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-kernel-linked-lists-in-the-windows-kernel.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Linked Lists in the Windows Kernel"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-kernel-linked-lists-in-the-windows-kernel.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-kernel-linked-lists-in-the-windows-kernel.html#article","url":"https://1200km.com/articles/trainsec/windows-kernel-linked-lists-in-the-windows-kernel.html","headline":"Linked Lists in the Windows Kernel","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-kernel-linked-lists-in-the-windows-kernel.html#webpage"},"datePublished":"2026-03-24","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-kernel/linked-lists-in-the-windows-kernel/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows kernel · Technical walkthrough</p><h1>Linked Lists in the Windows Kernel</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> March 25, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">kernel</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-kernel/linked-lists-in-the-windows-kernel/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Linked lists sound simple. Most developers have seen the classic pattern: a structure holds some data, plus a <code>next</code> pointer and maybe a <code>previous</code> pointer, and that’s how the list is maintained.</p>
+
+
+
+<p class="wp-block-paragraph">Windows does something different.</p>
+
+
+
+<p class="wp-block-paragraph">In the kernel, and in the native API structures that are closely tied to it, linked lists are built around a small generic structure called <code>LIST_ENTRY</code>. You’ll find it everywhere: the active process list, thread lists, and the loader’s module lists in user space. Once you understand how that pattern works, a lot of Windows data structures become easier to read in a debugger and easier to work with in code.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Linked lists in the Windows kernel and NtDll" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/28u-jUySEZ8?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">Why Windows Uses A Different Pattern</h2>
+
+
+
+<p class="wp-block-paragraph">The classic linked-list design is fine, but it has two practical weaknesses.</p>
+
+
+
+<p class="wp-block-paragraph">First, it is type-specific. If you write code to insert or remove a <code>MY_DATA</code> object from a list, that code is tied to <code>MY_DATA</code>. If you want to manage some other structure, you end up rewriting the same logic for a different type.</p>
+
+
+
+<p class="wp-block-paragraph">Second, it does not scale well when the same object needs to live in more than one list at the same time. Now you need another pair of pointers, then another, and the whole thing gets messy very quickly.</p>
+
+
+
+<p class="wp-block-paragraph">Windows solves that by separating the list mechanics from the data.</p>
+
+
+
+<h2 class="wp-block-heading">The Key Structure: LIST_ENTRY</h2>
+
+
+
+<p class="wp-block-paragraph"><code>LIST_ENTRY</code> is just two pointers:</p>
+
+
+
+<ul class="wp-block-list">
+<li>forward link</li>
+
+
+
+<li>backward link</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">By itself, it looks useless. There is no payload. That is the point.</p>
+
+
+
+<p class="wp-block-paragraph">Instead of building the list around the whole data structure, Windows places a <code>LIST_ENTRY</code> <strong>inside</strong> the structure you want to manage. The list APIs only know about <code>LIST_ENTRY</code>. They do not need to know whether the owning structure is an <code>EPROCESS</code>, an <code>ETHREAD</code>, or an <code>LDR_DATA_TABLE_ENTRY</code>.</p>
+
+
+
+<p class="wp-block-paragraph">That makes the list code generic.</p>
+
+
+
+<p class="wp-block-paragraph">It also means the same structure can participate in multiple lists simply by containing multiple <code>LIST_ENTRY</code> members.</p>
+
+
+
+<h2 class="wp-block-heading">One Important Rule: These Lists Are Circular</h2>
+
+
+
+<p class="wp-block-paragraph">This is the detail that trips people up first.</p>
+
+
+
+<p class="wp-block-paragraph">Windows linked lists using <code>LIST_ENTRY</code> are always <strong>circular</strong>. The list head is itself a <code>LIST_ENTRY</code>. It does not carry data; it just marks the list and links to the first and last entries.</p>
+
+
+
+<p class="wp-block-paragraph">That means:</p>
+
+
+
+<ul class="wp-block-list">
+<li>the end of the list is <strong>not</strong> indicated by <code>NULL</code></li>
+
+
+
+<li>if you iterate until <code>NULL</code>, you will keep going forever</li>
+
+
+
+<li>iteration ends when you come back to the <strong>head</strong></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">This is convenient because a separate tail pointer is not required. With a circular list, the head already gives you enough information to insert at the front or the back.</p>
+
+
+
+<h2 class="wp-block-heading">The Missing Piece: How Do You Get Back To The Real Object?</h2>
+
+
+
+<p class="wp-block-paragraph">If all you have is a pointer to a <code>LIST_ENTRY</code>, that pointer is not necessarily the start of the owning structure. It points to the <code>LIST_ENTRY</code> member inside the next/previous structure.</p>
+
+
+
+<p class="wp-block-paragraph">So, how do you recover the actual object?</p>
+
+
+
+<p class="wp-block-paragraph">You move backward in memory by the offset of that member from the start of the structure.</p>
+
+
+
+<p class="wp-block-paragraph">Windows gives you a macro for exactly that:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>CONTAINING_RECORD</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">That macro takes:</p>
+
+
+
+<ul class="wp-block-list">
+<li>the pointer you currently have</li>
+
+
+
+<li>the type you want</li>
+
+
+
+<li>the member name that contains the list link</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">From there, you get a properly typed pointer to the full structure.</p>
+
+
+
+<p class="wp-block-paragraph">This is the trick that makes generic list handling practical.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Kernel Example: The Active Process List</h2>
+
+
+
+<p class="wp-block-paragraph">A very common example is the list of active processes.</p>
+
+
+
+<p class="wp-block-paragraph">The debugger can enumerate processes because the kernel keeps a list head in <code>PsActiveProcessHead</code>. That head points to <code>LIST_ENTRY</code> nodes stored inside <code>EPROCESS</code> objects.</p>
+
+
+
+<p class="wp-block-paragraph">The relevant member is:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>ActiveProcessLinks</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">So if you look at the list entry directly, you are <strong>not</strong> looking at the beginning of an <code>EPROCESS</code>. You are looking at the embedded list node. To get back to the process object, you need the offset of <code>ActiveProcessLinks</code> and subtract it, or use the equivalent containing-record logic.</p>
+
+
+
+<p class="wp-block-paragraph">The same idea applies to thread lists inside a process. Again, the list itself is generic; the owning structure changes.</p>
+
+
+
+<h2 class="wp-block-heading">User-Mode Example: The Loader’s Module Lists</h2>
+
+
+
+<p class="wp-block-paragraph">The same pattern appears in user mode.</p>
+
+
+
+<p class="wp-block-paragraph">Inside the PEB, the loader data (<code>PEB_LDR_DATA</code>) maintains module lists. In practice, you’ll find multiple lists that expose the same modules in different orders, such as load order and memory order.</p>
+
+
+
+<p class="wp-block-paragraph">Each entry is an <code>LDR_DATA_TABLE_ENTRY</code>, and it contains one or more <code>LIST_ENTRY</code> members that connect it to the list.</p>
+
+
+
+<p class="wp-block-paragraph">The iteration logic is exactly the same:</p>
+
+
+
+<ul class="wp-block-list">
+<li>start from the head’s forward link</li>
+
+
+
+<li>keep moving through <code>Flink</code></li>
+
+
+
+<li>stop when you reach the head again</li>
+
+
+
+<li>use <code>CONTAINING_RECORD</code> to get from the link back to the full loader entry</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Once you do that, you can get details like module base address and full DLL name.</p>
+
+
+
+<h2 class="wp-block-heading">Why Windows Still Uses Linked Lists</h2>
+
+
+
+<p class="wp-block-paragraph">Arrays and vectors are often faster because memory is contiguous. So why not use them everywhere?</p>
+
+
+
+<p class="wp-block-paragraph">Because these Windows objects are often large, frequently created and destroyed, and need cheap insertion and removal.</p>
+
+
+
+<p class="wp-block-paragraph">That matters for things like processes and threads. Removing an entry from a linked list can be constant time if you already have the node. Removing from a vector usually means shifting memory around, which is slower and more disruptive.</p>
+
+
+
+<p class="wp-block-paragraph">There is another issue: if other code holds pointers into those structures, moving memory is dangerous. Linked lists avoid that problem because each object stays where it is.</p>
+
+
+
+<p class="wp-block-paragraph">So while linked lists are not the best answer for everything, they make sense for many of the kernel’s dynamic object-tracking scenarios. In such a list, the head already gives you enough information to insert at the front or the back.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Why This Matters For TrainSec Students</h2>
+
+
+
+<p class="wp-block-paragraph">This is one of those Windows patterns that keeps showing up.</p>
+
+
+
+<p class="wp-block-paragraph">If you understand <code>LIST_ENTRY</code>, circular list iteration, and <code>CONTAINING_RECORD</code>, you can read a lot more of what the kernel and native API are doing without treating every structure as a mystery.</p>
+
+
+
+<p class="wp-block-paragraph">That helps in several places:</p>
+
+
+
+<ul class="wp-block-list">
+<li>reading debugger output</li>
+
+
+
+<li>understanding object relationships in kernel structures</li>
+
+
+
+<li>writing code that traverses native Windows structures cleanly</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Once this clicks, a lot of Windows internals start feeling less magical and more mechanical.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Keep Learning with TrainSec</h2>
+
+
+
+<p class="wp-block-paragraph">This content is part of the <strong>free TrainSec Knowledge Library</strong>, where students can deepen their understanding of Windows internals, malware analysis, and reverse engineering. Subscribe for free and continue learning with us:<br><br><a href="https://trainsec.net/library">https://trainsec.net/library</a></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-windows-subsystem-for-linux.html">How does Windows Subsystem for Linux (Version 1) actually work?</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-inside-the-windows-recycle-bin-what-really-happens-when-you-delete-a-file.html">Inside the Windows Recycle Bin - What Really Happens When You Delete a File?</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-introduction-to-windows-services.html">Introduction to Windows Services</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-kernel-allocation-tags-in-windows-explained.html">Kernel Allocation Tags in Windows Explained</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-kernel/linked-lists-in-the-windows-kernel/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

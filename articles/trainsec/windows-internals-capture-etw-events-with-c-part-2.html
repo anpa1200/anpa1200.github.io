@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capture ETW events with C++ (Part 2) — TrainSec article | 1200km</title>
+<meta name="description" content="Capture ETW events with C++ (Part 2) by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-2/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-04-12">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-2.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Capture ETW events with C++ (Part 2)"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-2.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-2.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-2.html","headline":"Capture ETW events with C++ (Part 2)","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-capture-etw-events-with-c-part-2.html#webpage"},"datePublished":"2026-04-12","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-2/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Capture ETW events with C++ (Part 2)</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> April 13, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-2/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">In Part 1, we set up an ETW session, connected it to a provider, and started receiving events. The problem is that receiving events is not the same as reading them. What we had at the end of Part 1 was a timestamp, a process ID, and a thread ID. That&#8217;s not nothing, but it&#8217;s not much either.</p>
+
+
+
+<p class="wp-block-paragraph">In this part, we go further. We use the TDH (Trace Data Helper) API to decode what&#8217;s actually inside those events: the event name, keywords, level, opcode, task, and the actual property values. By the end, you&#8217;ll have a consumer that produces output you can read and act on.</p>
+
+
+
+<p class="wp-block-paragraph">This is intermediate-level material. You should already be comfortable with basic ETW session setup. If you haven&#8217;t watched Part 1, go back and start there. <a href="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-1/">https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-1/</a></p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Consume ETW events with C++ (Part 2)" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/jcoSVEuqBvs?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">The Event Record Structure</h2>
+
+
+
+<p class="wp-block-paragraph">The <code>OnEvent</code> callback receives an <code>EVENT_RECORD</code> pointer. That structure has an <code>EventHeader</code>, which we used in Part 1 for the timestamp, process ID, and thread ID. But there&#8217;s more in that record.</p>
+
+
+
+<p class="wp-block-paragraph">Specifically, there are two members worth knowing about now: <code>UserData</code> and <code>UserDataLength</code>. This is where the actual event payload lives: a raw binary blob containing all the property values for that particular event.</p>
+
+
+
+<p class="wp-block-paragraph">The format of that blob is not officially documented. You can&#8217;t just cast it and read it directly. You have to go through the TDH API to interpret it. That&#8217;s technically a good thing, it abstracts over a lot of complexity, but it does mean you can&#8217;t shortcut it.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<h2 class="wp-block-heading">TdhGetEventInformation: The Two-Call Pattern</h2>
+
+
+
+<p class="wp-block-paragraph">The function we need is <code>TdhGetEventInformation</code>. It takes the event record and fills in a <code>TRACE_EVENT_INFO</code> structure that describes the event&#8217;s schema: its name, properties, keywords, and so on.</p>
+
+
+
+<p class="wp-block-paragraph">The complication is that <code>TRACE_EVENT_INFO</code> is variable-length. It contains string data embedded after the fixed-size header, so you can&#8217;t just declare it on the stack and pass a pointer. You have to use a two-call pattern:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>ULONG bufferSize = 0;
+TdhGetEventInformation(record, 0, nullptr, nullptr, &amp;bufferSize);
+auto buffer = std::make_unique&lt;BYTE[]>(bufferSize);
+auto info = reinterpret_cast&lt;TRACE_EVENT_INFO*>(buffer.get());
+TdhGetEventInformation(record, 0, nullptr, info, &amp;bufferSize);
+</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">ULONG bufferSize = </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #DCDCAA">TdhGetEventInformation</span><span style="color: #D4D4D4">(record, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, &amp;bufferSize);</span></span>
+<span class="line"><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> buffer = </span><span style="color: #4EC9B0">std</span><span style="color: #D4D4D4">::</span><span style="color: #DCDCAA">make_unique</span><span style="color: #D4D4D4">&lt;</span><span style="color: #4EC9B0">BYTE</span><span style="color: #D4D4D4">[]&gt;(bufferSize);</span></span>
+<span class="line"><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> info = </span><span style="color: #569CD6">reinterpret_cast</span><span style="color: #D4D4D4">&lt;TRACE_EVENT_INFO*&gt;(</span><span style="color: #9CDCFE">buffer</span><span style="color: #D4D4D4">.</span><span style="color: #DCDCAA">get</span><span style="color: #D4D4D4">());</span></span>
+<span class="line"><span style="color: #DCDCAA">TdhGetEventInformation</span><span style="color: #D4D4D4">(record, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, info, &amp;bufferSize);</span></span>
+<span class="line"></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">First call: pass null for the buffer, get the required size back. Second call: allocate that many bytes, then fill the structure. The context parameter (the second argument) is not needed for most use cases. You can pass zero and null there.</p>
+
+
+
+<p class="wp-block-paragraph">Don&#8217;t forget to link against tdh.lib:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>#pragma comment(lib, "tdh.lib")</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #C586C0">#pragma</span><span style="color: #569CD6"> </span><span style="color: #9CDCFE">comment</span><span style="color: #569CD6">(</span><span style="color: #9CDCFE">lib</span><span style="color: #569CD6">, </span><span style="color: #CE9178">&quot;tdh.lib&quot;</span><span style="color: #569CD6">)</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The header is <code>tdh.h.</code> In fact, I&#8217;d say it&#8217;s worth reading in full. The comments in that header are better documentation than anything on MSDN for understanding how ETW properties work.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<h2 class="wp-block-heading">Reading Event Metadata from TRACE_EVENT_INFO</h2>
+
+
+
+<p class="wp-block-paragraph">Once you have a filled-in <code>TRACE_EVENT_INFO</code>, you can start pulling out event metadata. The structure uses offsets: each field like <code>EventNameOffset</code>, <code>KeywordsNameOffset</code>, <code>OpcodeNameOffset</code>, <code>TaskNameOffset</code>, and <code>LevelNameOffset</code> gives you a byte offset from the beginning of the structure where the corresponding Unicode string is stored.</p>
+
+
+
+<p class="wp-block-paragraph">The pattern for reading any of these is always the same:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>if (info->EventNameOffset) {
+    auto name = reinterpret_cast&lt;PCWSTR>(
+        reinterpret_cast&lt;PBYTE>(info) + info->EventNameOffset
+    );
+    // use name
+}</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (</span><span style="color: #9CDCFE">info</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">EventNameOffset</span><span style="color: #D4D4D4">) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> name = </span><span style="color: #569CD6">reinterpret_cast</span><span style="color: #D4D4D4">&lt;PCWSTR&gt;(</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #569CD6">reinterpret_cast</span><span style="color: #D4D4D4">&lt;PBYTE&gt;(info) + </span><span style="color: #9CDCFE">info</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">EventNameOffset</span></span>
+<span class="line"><span style="color: #D4D4D4">    );</span></span>
+<span class="line"><span style="color: #6A9955">    // use name</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">Always check the offset first. If it&#8217;s zero, that field isn&#8217;t present for this event. That&#8217;s expected. Not every event has every metadata field populated.</p>
+
+
+
+<p class="wp-block-paragraph">Doing this for all five fields gives you noticeably more readable output. Instead of seeing &#8220;process 1234 generated an event,&#8221; you see something like: keywords <code>Work On Behalf</code>, opcode <code>Info</code>, task <code>CPU Priority Change</code>, level <code>Information</code>. Now you know what happened.</p>
+
+
+
+<h2 class="wp-block-heading">Enumerating Event Properties</h2>
+
+
+
+<p class="wp-block-paragraph">Metadata strings are useful, but the real payload is in the properties. That&#8217;s where you get the actual values: the new thread priority, the image path of a loaded DLL, the stack base of a terminated thread.</p>
+
+
+
+<p class="wp-block-paragraph">Properties are described by the <code>EventPropertyInfoArray</code> inside <code>TRACE_EVENT_INFO</code>. The number of top-level properties is in <code>TopLevelPropertyCount</code>. Top-level means directly attached to the event, not nested inside a sub-structure. Sub-structures exist and add complexity, but in practice most events you&#8217;ll encounter use simple top-level properties.</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>for (ULONG i = 0; i &lt; info->TopLevelPropertyCount; i++) {
+    auto&amp; pi = info->EventPropertyInfoArray[i];
+    // ...
+}</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #C586C0">for</span><span style="color: #D4D4D4"> (ULONG i = </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">; i &lt; </span><span style="color: #9CDCFE">info</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">TopLevelPropertyCount</span><span style="color: #D4D4D4">; i++) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">&amp; pi = </span><span style="color: #9CDCFE">info</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">EventPropertyInfoArray</span><span style="color: #D4D4D4">[i];</span></span>
+<span class="line"><span style="color: #6A9955">    // ...</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">Each <code>EVENT_PROPERTY_INFO</code> has a <code>NameOffset</code> for the property name, and a flags field that tells you what kind of property it is. For simple properties, flags is zero. That&#8217;s what we handle here. For arrays, sub-structures, and provider-side filters, you&#8217;ll need to handle additional cases. The TDH documentation and my ETW Studio sample on GitHub cover those. But for a first pass, simple properties cover the majority of what you&#8217;ll encounter in practice.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Formatting Property Values with TdhFormatProperty</h2>
+
+
+
+<p class="wp-block-paragraph">For simple properties, the function you want is <code>TdhFormatProperty</code>. It takes the event info, a pointer into the user data, the property&#8217;s in-type and out-type, and a buffer to write the formatted string into:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>WCHAR text[256];
+USHORT textLen = ARRAYSIZE(text);
+USHORT consumed = 0;
+ULONG status = TdhFormatProperty(
+    info,
+    nullptr,     // map info — not needed for simple types
+    pointerSize,
+    pi.nonStructType.InType,
+    pi.nonStructType.OutType, (USHORT)pi.length,
+    (USHORT)userDataLength,
+    (PBYTE)userData,
+    &amp;textLen, text, &amp;consumed);
+
+if (status == ERROR_SUCCESS) {
+    // display text
+    printf(“Value: %ws\n”, text);
+    userDataLength -= consumed;
+    userData += consumed;
+}</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">WCHAR </span><span style="color: #9CDCFE">text</span><span style="color: #D4D4D4">[</span><span style="color: #B5CEA8">256</span><span style="color: #D4D4D4">];</span></span>
+<span class="line"><span style="color: #D4D4D4">USHORT textLen = </span><span style="color: #DCDCAA">ARRAYSIZE</span><span style="color: #D4D4D4">(text);</span></span>
+<span class="line"><span style="color: #D4D4D4">USHORT consumed = </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #D4D4D4">ULONG status = </span><span style="color: #DCDCAA">TdhFormatProperty</span><span style="color: #D4D4D4">(</span></span>
+<span class="line"><span style="color: #D4D4D4">    info,</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">,</span><span style="color: #6A9955">     // map info — not needed for simple types</span></span>
+<span class="line"><span style="color: #D4D4D4">    pointerSize,</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #9CDCFE">pi</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">nonStructType</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">InType</span><span style="color: #D4D4D4">,</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #9CDCFE">pi</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">nonStructType</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">OutType</span><span style="color: #D4D4D4">, (USHORT)</span><span style="color: #9CDCFE">pi</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">length</span><span style="color: #D4D4D4">,</span></span>
+<span class="line"><span style="color: #D4D4D4">    (USHORT)userDataLength,</span></span>
+<span class="line"><span style="color: #D4D4D4">    (PBYTE)userData,</span></span>
+<span class="line"><span style="color: #D4D4D4">    &amp;textLen, text, &amp;consumed);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (status == ERROR_SUCCESS) {</span></span>
+<span class="line"><span style="color: #6A9955">    // display text</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(“Value: %ws\n”, text);</span></span>
+<span class="line"><span style="color: #D4D4D4">    userDataLength -= consumed;</span></span>
+<span class="line"><span style="color: #D4D4D4">    userData += consumed;</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">A few things worth noting here. The <code>consumed</code> output tells you how many bytes of user data this property occupied. You advance your pointer by that amount before moving to the next property. If you don&#8217;t track this correctly, everything after the first property will be garbage.</p>
+
+
+
+<p class="wp-block-paragraph">The <code>map info</code> parameter handles enumeration types where a raw integer value maps to a named string. That&#8217;s useful for symbolic constants, but it requires an additional TDH call. The pattern is in the Microsoft samples if you need it.</p>
+
+
+
+<h2 class="wp-block-heading">32-bit vs 64-bit Events</h2>
+
+
+
+<p class="wp-block-paragraph">The <code>pointerSize</code> parameter matters when a property contains a pointer. ETW events can come from 32-bit processes, even on a 64-bit system. The size of a pointer in those events is four bytes, not eight.</p>
+
+
+
+<p class="wp-block-paragraph">You can detect this from the event header flags:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>ULONG pointerSize =
+    (record->EventHeader.Flags &amp; EVENT_HEADER_FLAG_32_BIT_HEADER) ? 4 : 8;</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">ULONG pointerSize =</span></span>
+<span class="line"><span style="color: #D4D4D4">    (</span><span style="color: #9CDCFE">record</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #9CDCFE">EventHeader</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">Flags</span><span style="color: #D4D4D4"> &amp; EVENT_HEADER_FLAG_32_BIT_HEADER) ? </span><span style="color: #B5CEA8">4</span><span style="color: #D4D4D4"> : </span><span style="color: #B5CEA8">8</span><span style="color: #D4D4D4">;</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">If you always assume 64-bit, you&#8217;ll get the right answer most of the time. But if a 32-bit process fires an event with a pointer-type property, the sizing will be off and the output will be wrong. Worth handling correctly if you&#8217;re building something generic.</p>
+
+
+
+<h2 class="wp-block-heading">What You Actually See</h2>
+
+
+
+<p class="wp-block-paragraph">Running this against the Windows Kernel Process provider gives you output like:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>Thread Stop</code>: stack base, stack limit, TEB pointer, start address</li>
+
+
+
+<li><code>CPU Priority Change</code>: old priority <code>16</code>, new priority <code>8</code>, timestamp</li>
+
+
+
+<li><code>Image Load</code>: image path, process ID, load address</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">That&#8217;s a lot more useful than a timestamp and a process ID. You can start correlating events, filtering by task name, or acting on specific property values in real time.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Security and Offensive Angle</h2>
+
+
+
+<p class="wp-block-paragraph">ETW is one of the primary telemetry channels that endpoint detection and response tools use to observe process behavior. Understanding how to consume these events is directly relevant whether you&#8217;re building a detection pipeline or reasoning about what an EDR actually sees.</p>
+
+
+
+<p class="wp-block-paragraph">The image load event is a good example. Every DLL mapped into a process fires one of these. If you&#8217;re analyzing malware behavior or writing detection rules, that event stream tells you exactly what was loaded and when. Process create and thread start events are similarly valuable.</p>
+
+
+
+<p class="wp-block-paragraph">On the offensive side, ETW can be tampered with. Knowing what data flows through these kernel providers and what properties are exposed helps you reason about what tampering would and wouldn&#8217;t conceal. That&#8217;s a topic for a separate discussion, but it&#8217;s worth keeping in mind.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Key Takeaways</h2>
+
+
+
+<ul class="wp-block-list">
+<li><code>TdhGetEventInformation</code> requires a two-call pattern to handle its variable-length output</li>
+
+
+
+<li><code>TRACE_EVENT_INFO</code> stores metadata as string offsets from the structure base; always check if an offset is non-zero before reading</li>
+
+
+
+<li>Simple properties (flags == 0) cover most real-world events; complex types require additional handling</li>
+
+
+
+<li><code>TdhFormatProperty</code> consumes user data sequentially; track the <code>consumed</code> byte count and advance your pointer</li>
+
+
+
+<li>The <code>tdh.h</code> header file is better documentation than MSDN for this API</li>
+</ul>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Keep Learning with TrainSec</h2>
+
+
+
+<p class="wp-block-paragraph">This content is part of the <strong>free TrainSec Knowledge Library</strong>, where students can deepen their understanding of Windows internals, malware analysis, and reverse engineering. Subscribe for free and continue learning with us:<br><br><a href="https://trainsec.net/library">https://trainsec.net/library</a></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/capture-etw-events-with-c-part-2/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

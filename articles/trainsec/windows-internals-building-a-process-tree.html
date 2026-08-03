@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Process Tree — TrainSec article | 1200km</title>
+<meta name="description" content="Building a Process Tree">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/building-a-process-tree/"><meta name="keywords" content="Pavel Yosifovich, Windows programming, Technical walkthrough, Windows programming, C/C++">
+<meta property="article:published_time" content="2024-07-14">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-building-a-process-tree.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Building a Process Tree"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-building-a-process-tree.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-building-a-process-tree.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-building-a-process-tree.html","headline":"Building a Process Tree","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-building-a-process-tree.html#webpage"},"datePublished":"2024-07-14","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/building-a-process-tree/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows programming · Technical walkthrough</p><h1>Building a Process Tree</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> July 15, 2024</p>
+<div class="tag-row"><span class="tag">Windows programming</span><span class="tag">C/C++</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/building-a-process-tree/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">In Windows, every process is associated with a parent process, usually the one created it. This means that a process tree can be visualized, but in fact it’s a set of trees, because if the parent process no longer exists, a child process becomes a root of its own potential tree. This is not an issue, because processes in Windows have no particular dependency on their parent. For example, if process A creates process B, they live independently. If process A terminates, process B is unaffected.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph">&nbsp;Tools such as <em>Process Explorer</em> can show a process tree, indicating parent/child relationships between processes:</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" fetchpriority="high" decoding="async" width="1024" height="739" alt="Building a Process Tree in windows 1" class="wp-image-646"  src="https://trainsec.net/wp-content/uploads/2024/07/Building-a-Process-Tree-in-windows-1-1024x739.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Building-a-Process-Tree-in-windows-1-1024x739.png 1024w, https://trainsec.net/wp-content/uploads/2024/07/Building-a-Process-Tree-in-windows-1-600x433.png 600w, https://trainsec.net/wp-content/uploads/2024/07/Building-a-Process-Tree-in-windows-1-300x217.png 300w, https://trainsec.net/wp-content/uploads/2024/07/Building-a-Process-Tree-in-windows-1-768x555.png 768w, https://trainsec.net/wp-content/uploads/2024/07/Building-a-Process-Tree-in-windows-1.png 1076w" sizes="(max-width: 1024px) 100vw, 1024px"/></figure>
+
+
+
+<p class="wp-block-paragraph">The process ID of the parent process is stored in the child’s process management object (the EPROCESS structure in kernel space).</p>
+
+
+
+<p class="wp-block-paragraph">The first thing we’ll do is define a structure to hold on to some basic process information:</p>
+
+
+
+<pre class="wp-block-code"><code>struct&nbsp;ProcessInfo&nbsp;{
+
+wstring&nbsp;Name;
+
+DWORD&nbsp;Id;
+
+DWORD&nbsp;ParentId;
+
+ProcessInfo*&nbsp;Parent{&nbsp;nullptr&nbsp;};
+
+vector&lt;unique_ptr&lt;ProcessInfo&gt;&gt;&nbsp;Children;
+
+};</code></pre>
+
+
+
+<p class="wp-block-paragraph">Each process holds its executable (or other) name, id, parent id, a pointer to the process object of its parent (convenient if navigation is required), and a vector of child processes.</p>
+
+
+
+<p class="wp-block-paragraph">Processes are added into the internal kernel process list in order of creation. This is the order of processes we get when we enumerate processes with any enumeration API. This is convenient, because it means that parent processes appear earlier than their children in an enumeration.</p>
+
+
+
+<p class="wp-block-paragraph">Building the tree should be easy enough – while enumerating processes, we need to check if the parent exists, and if it does, attach the process to its parent. We can keep track of processes with a map for a quick search. Let’s enumerate processes with the ToolHelp API:</p>
+
+
+
+<pre class="wp-block-code"><code>auto&nbsp;hSnapshot&nbsp;=&nbsp;CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,&nbsp;0);
+
+PROCESSENTRY32&nbsp;pe;
+
+pe.dwSize&nbsp;=&nbsp;sizeof(pe);
+
+unordered_map&lt;DWORD,&nbsp;ProcessInfo*&gt;&nbsp;processMap;
+
+vector&lt;unique_ptr&lt;ProcessInfo&gt;&gt;&nbsp;roots;
+
+Process32First(hSnapshot,&nbsp;&amp;pe);</code></pre>
+
+
+
+<p class="wp-block-paragraph">Now we can loop around, looking for a parent. If it exists, add to its children. Otherwise, it’s a root process (its parent does not exist):</p>
+
+
+
+<pre class="wp-block-code"><code>do&nbsp;{
+
+auto&nbsp;pi&nbsp;=&nbsp;make_unique&lt;ProcessInfo&gt;();
+
+pi-&gt;Id&nbsp;=&nbsp;pe.th32ProcessID;
+
+pi-&gt;ParentId&nbsp;=&nbsp;pe.th32ParentProcessID;
+
+pi-&gt;Name&nbsp;=&nbsp;pe.szExeFile;
+
+auto&nbsp;p&nbsp;=&nbsp;pi.get();
+
+if&nbsp;(auto&nbsp;it&nbsp;=&nbsp;processMap.find(pi-&gt;ParentId);&nbsp;
+
+it&nbsp;!=&nbsp;processMap.end())&nbsp;{
+
+pi-&gt;Parent&nbsp;=&nbsp;it-&gt;second;
+
+it-&gt;second-&gt;Children.push_back(move(pi));
+
+}
+
+else&nbsp;{
+
+roots.push_back(move(pi));
+
+}
+
+processMap.insert({&nbsp;pe.th32ProcessID,&nbsp;p&nbsp;});
+
+}&nbsp;while&nbsp;(Process32Next(hSnapshot,&nbsp;&amp;pe));
+
+This looks simple enough. Now we can output the process tree with a simple recursion:
+
+void&nbsp;DisplayTree(vector&lt;unique_ptr&lt;ProcessInfo&gt;&gt;&nbsp;const&amp;&nbsp;p,&nbsp;
+
+&nbsp;&nbsp;int&nbsp;indent&nbsp;=&nbsp;0)&nbsp;{
+
+for&nbsp;(auto&amp;&nbsp;pi&nbsp;:&nbsp;p)&nbsp;{
+
+printf("%s",&nbsp;string(indent,&nbsp;'&nbsp;').c_str());
+
+printf("%ws&nbsp;(%u)\n",&nbsp;pi-&gt;Name.c_str(),&nbsp;pi-&gt;Id);
+
+DisplayTree(pi-&gt;Children,&nbsp;indent&nbsp;+&nbsp;1);
+
+}
+
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">If you run this, it would seem to work fine. However, there are three points that may not be immediately obvious. The simplest is the fact that processes that have no parent (and never did) show a parent ID of zero. This is the case for the Idle process (PID 0) and the System process (PID 4). So, for a parent of zero, the process should always be a root. This is easily fixed in the conditional:</p>
+
+
+
+<pre class="wp-block-code"><code>if&nbsp;(auto&nbsp;it&nbsp;=&nbsp;pi-&gt;ParentId&nbsp;==&nbsp;0&nbsp;?&nbsp;
+
+processMap.end()&nbsp;:&nbsp;processMap.find(pi-&gt;ParentId);&nbsp;
+
+it&nbsp;!=&nbsp;processMap.end())&nbsp;{
+
+pi-&gt;Parent&nbsp;=&nbsp;it-&gt;second;
+
+it-&gt;second-&gt;Children.push_back(move(pi));
+
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">The second point is more subtle. Process IDs in Windows may be reused. When a process is destroyed, its PID may be reused. Moreover, process IDs and thread IDs are generated from the same pool of numbers, which means that a dead thread ID can be reused for a new process, and vice versa.</p>
+
+
+
+<p class="wp-block-paragraph">This means that the parent ID that is stored in the child may refer to a process that is already dead, but that parent ID may have been reused by a new process. How do we resolve that? We need to check if the potential parent has been created before the child. If not, it’s not the real parent. We can do that by opening a handle to the parent, query its creation time, and compare it to the child (current) process creation time:</p>
+
+
+
+<pre class="wp-block-code"><code>bool&nbsp;root&nbsp;=&nbsp;true;
+
+auto&nbsp;it&nbsp;=&nbsp;pi-&gt;ParentId&nbsp;==&nbsp;0&nbsp;?&nbsp;
+
+processMap.end()&nbsp;:&nbsp;processMap.find(pi-&gt;ParentId);
+
+if(it&nbsp;!=&nbsp;processMap.end())&nbsp;{
+
+//
+
+//&nbsp;potential&nbsp;parent
+
+//
+
+root&nbsp;=&nbsp;GetCreateTime(pi-&gt;ParentId)&nbsp;&gt;&nbsp;GetCreateTime(pi-&gt;Id);
+
+}
+
+if(root)&nbsp;{
+
+roots.push_back(move(pi));
+
+}
+
+else&nbsp;{
+
+pi-&gt;Parent&nbsp;=&nbsp;it-&gt;second;
+
+it-&gt;second-&gt;Children.push_back(move(pi));
+
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph"><strong>GetCreateTime</strong> returns the creation time as a 64-bit integer:</p>
+
+
+
+<pre class="wp-block-code"><code>int64_t&nbsp;GetCreateTime(DWORD&nbsp;pid)&nbsp;{
+
+auto&nbsp;hProcess&nbsp;=&nbsp;OpenProcess(
+
+PROCESS_QUERY_LIMITED_INFORMATION,&nbsp;FALSE,&nbsp;pid);
+
+if&nbsp;(!hProcess)
+
+return&nbsp;0;
+
+FILETIME&nbsp;create{},&nbsp;dummy;
+
+GetProcessTimes(hProcess,&nbsp;&amp;create,&nbsp;&amp;dummy,&nbsp;&amp;dummy,&nbsp;&amp;dummy);
+
+CloseHandle(hProcess);
+
+return&nbsp;*(int64_t*)&amp;create;
+
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">If a process handle cannot be opened successfully, then we can’t make a good decision about the parent. The solution? Use the native API <strong>NtQuerySystemInformation </strong>to enumerate processes, where the creation time is provided for free for all processes. I’ll leave that as an exercise for the interested reader.</p>
+
+
+
+<p class="wp-block-paragraph">Lastly, a point worth mentioning about the meaning of a parent process.</p>
+
+
+
+<p class="wp-block-paragraph">What is a parent process, anyway? Intuition suggests is that a parent process is the creator of the child process. This is <strong>mostly</strong> true, but it doesn’t have to be. It’s possible to call <strong>CreateProcess</strong> and provide (through an extended process attribute) a different parent than the default being the caller process. For example, you can create a <em>Notepad</em> process that appears to be a child of <em>Mspaint</em>, even though the creator is your process (whatever that may be). Changing the parent makes the new process inherit certain attributes from that other process rather than the creator (such as current directory and environment variables). This does not change anything in the way we build the process tree, but bear in mind the meaning of “parent process”.</p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-code-injection-with-image-file-execution-options.html">Code Injection with Image File Execution Options</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-process-tree-in-windows.html">How to Build a Process Tree in Windows with Code</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-keyboard-hook-with-with-image-file-execution-options.html">Keyboard Hook with Image File Execution Options</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-understanding-uac-virtualization.html">Understanding UAC Virtualization: A Security Mechanism for Legacy Applications</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/building-a-process-tree/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

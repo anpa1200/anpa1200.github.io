@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reinventing UART Security: Leveraging the Parity Bit for Robust Protection… — TrainSec article | 1200km</title>
+<meta name="description" content="Reinventing UART Security: Leveraging the Parity Bit for Robust Protection in OT Networks by Amichai Yifrach, republished from TrainSec.net with permission.">
+<meta name="author" content="Amichai Yifrach"><meta name="trainsec-author" content="Amichai Yifrach"><meta name="trainsec-source" content="https://trainsec.net/library/hardware-hacking/uart-security-the-parity-bit/"><meta name="keywords" content="Amichai Yifrach, Hardware hacking, Hardware security research, hardware security, embedded">
+<meta property="article:published_time" content="2025-03-31">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/hardware-hacking-uart-security-the-parity-bit.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Reinventing UART Security: Leveraging the Parity Bit for Robust Protection…"><meta property="og:url" content="https://1200km.com/articles/trainsec/hardware-hacking-uart-security-the-parity-bit.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/hardware-hacking-uart-security-the-parity-bit.html#article","url":"https://1200km.com/articles/trainsec/hardware-hacking-uart-security-the-parity-bit.html","headline":"Reinventing UART Security: Leveraging the Parity Bit for Robust Protection in OT Networks","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/hardware-hacking-uart-security-the-parity-bit.html#webpage"},"datePublished":"2025-03-31","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/hardware-hacking/uart-security-the-parity-bit/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Hardware hacking · Hardware security research</p><h1>Reinventing UART Security: Leveraging the Parity Bit for Robust Protection in OT Networks</h1>
+<p class="meta"><strong>Author:</strong> Amichai Yifrach · <strong>Published:</strong> April 1, 2025</p>
+<div class="tag-row"><span class="tag">hardware security</span><span class="tag">embedded</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Amichai Yifrach. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/hardware-hacking/uart-security-the-parity-bit/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<h2 class="wp-block-heading">Introduction: The Security Blind Spot in OT Systems<strong></strong></h2>
+
+
+
+<p class="wp-block-paragraph">During my professional career, in the army and afterwards, I’ve spent days visiting industrial plants, from national critical infrastructure sites to defence, legacy and privately owned manufacturing facilities. No matter the industry – food manufacturing plant, water treatment facilities, or large-scale production lines &#8211; I’ve encountered a recurring theme: the persistence of legacy systems, sometimes as old as 20 years old PLCs, computers running Windows XP, and communication lines running all over the place with no to very low maintenance. One of the most alarming aspects of this persistence is the fact that UART-based communication protocols remain the backbone of industrial control systems (ICS) and are here to stay.</p>
+
+
+
+<p class="wp-block-paragraph">While these systems reliably operate massive machinery and keep essential processes running, they also present a gaping security hole that few in the OT industry seem willing to address. Walking through plant control rooms, I’ve seen decades-old serial devices humming along, faithfully transmitting commands over Modbus RTU, Profibus, RS485 and other UART-based protocols. Some of these systems have run unchanged for 20-30 years, untouched by modern cybersecurity improvements.</p>
+
+
+
+<h2 class="wp-block-heading">A Perfect Target for Attackers</h2>
+
+
+
+<p class="wp-block-paragraph">While IT networks have evolved with encryption, authentication, and intrusion detection (well, still struggling against as fast if not faster attack surfaces and vectors evolution), UART-based protocols remain <strong>inherently insecure</strong> by design. The vulnerabilities I’ve observed across different industries, as I describe in detail and demonstrate during my courses and workshops I give, include:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Sniffing and Traffic Capture</strong> – Serial communication lines, especially RS-232, RS-485, and CAN bus, are <strong>openly exposed</strong> to anyone with physical access. Attackers can passively listen to the data flow and extract critical information, such as authentication messages or control commands.</li>
+
+
+
+<li><strong>Command Injection and Replay Attacks</strong> – UART lacks built-in authentication, allowing attackers to <strong>inject malicious packets</strong> or replay previous legitimate commands to manipulate industrial equipment.</li>
+
+
+
+<li><strong>Man-in-the-Middle (MITM) Attacks</strong> – With simple tools, an attacker can place a rogue device between two communicating endpoints, <strong>modifying commands on the fly</strong> without detection.</li>
+
+
+
+<li><strong>Reverse Engineering of Proprietary Protocols</strong> – Even proprietary serial protocols used in specialized industrial equipment can be <strong>easily analysed</strong> by attackers who gain access to the data stream.</li>
+
+
+
+<li><strong>Baud Rate and Parameter Predictability</strong> – Traditional UART communication relies on static baud rates, start/stop bits, and parity settings, making it trivial for attackers to configure their own sniffing devices.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">If you think the above methods are minor or unlikely to cause harm, think again after the following example from my army experience. As some of you know, during one of my positions in the IDF I oversaw the border security technology. Without revealing too much, I was amazed to reveal repeatedly vendors who offered a security system for a border, a system which supposed to guard lives, using plain UART based protocols which was so vulnerable I gained full control over the system shutting its guards down using tiny MCU with some wire manipulation experience. These vulnerabilities are still out there to be found.</p>
+
+
+
+<p class="wp-block-paragraph">Despite these inherent security gaps, most plant operators and OT security teams remain hesitate to address them. Their primary concerns revolve around the cost of upgrading infrastructure, operational continuity, and the lack of security expertise in OT environments. And how can you blame them? Think about it 70+ years old food plant with hundreds of miles of wiring, countless end devices and 30-year-old control system patched over the years with fixes, changes and upgrades both in hardware and firmware, most of it undocumented but runs smoothly, so they all go by ‘if it works, don’t fix it”.</p>
+
+
+
+<h2 class="wp-block-heading">Why Security Upgrades Are Often Dismissed in OT</h2>
+
+
+
+<p class="wp-block-paragraph">During my visits, I’ve often had conversations with engineers and plant managers who <strong>acknowledge the risks</strong> but feel powerless to act. Some common reasons include:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>&#8220;It’s always worked this way.&#8221;</strong> Many legacy systems were designed in an era when security wasn’t a concern. Replacing or modifying them is seen as unnecessary unless a failure occurs.</li>
+
+
+
+<li>&#8220;If it’s air-gapped, it’s safe.&#8221; The assumption that industrial networks are isolated from the internet is no longer valid. USB devices, remote maintenance access, and supply chain vulnerabilities have introduced new attack vectors.</li>
+
+
+
+<li><strong>&#8220;Upgrading is too expensive.&#8221;</strong> Replacing an entire fleet of industrial controllers, sensors, and communication hardware can cost millions. Even adding software-based security layers can be seen as <strong>disruptive and impractical</strong>.</li>
+
+
+
+<li>&#8220;Security is an IT problem, not ours.&#8221; Many OT security teams still see cybersecurity as separate from operational reliability, leading to slow adoption of security measures.</li>
+
+
+
+<li><strong>“I only need to comply with the legislator standards” </strong>forgetting that the standards are mostly influenced by the ability of the market leaders to comply, locked in endless loop of compromise.</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Understanding UART and Its Vulnerabilities<strong></strong></h2>
+
+
+
+<p class="wp-block-paragraph">While UART (Universal Asynchronous Receiver-Transmitter) has been a <strong>reliable and widely used communication standard</strong> for decades, it was never designed with security in mind. Originally developed for simple serial data exchange, UART-based protocols still dominate OT (Operational Technology) environments, <strong>from PLC-to-sensor communication in factories to critical infrastructure control systems</strong>. However, the same simplicity that makes UART reliable and low-cost low maintenance also makes it dangerously <strong>exposed to cyber threats</strong>.</p>
+
+
+
+<h2 class="wp-block-heading">How UART Works: The Basics</h2>
+
+
+
+<p class="wp-block-paragraph">To understand its security weaknesses, let’s first break down how UART communication works:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Asynchronous Transmission</strong> – Unlike protocols that use dedicated clock signals for synchronization, UART sends data asynchronously. This means devices must agree on the transmission speed (<strong>baud rate</strong>) and format (<strong>start bits, stop bits, parity</strong>) beforehand. The upside is the ability to use these protocols for long distance use cases (like OT plants, access control systems and more), but the downside is the predictability of these parameters.</li>
+
+
+
+<li><strong>Packet Structure</strong> – A typical UART frame consists of:
+<ul class="wp-block-list">
+<li>A <strong>start bit</strong> (indicating the beginning of a transmission).</li>
+
+
+
+<li>A <strong>data payload</strong> (usually 8 bits per byte).</li>
+
+
+
+<li>An <strong>optional parity bit</strong> (used for basic error detection).</li>
+
+
+
+<li>One or more <strong>stop bits</strong> (signalling the end of the transmission).</li>
+</ul>
+</li>
+</ul>
+
+
+
+<figure class="wp-block-image size-full is-resized"><img fetchpriority="high" fetchpriority="high" decoding="async" width="577" height="233" alt="image" class="wp-image-4475" style="width:800px;height:auto"  src="https://trainsec.net/wp-content/uploads/2025/04/image.png" srcset="https://trainsec.net/wp-content/uploads/2025/04/image.png 577w, https://trainsec.net/wp-content/uploads/2025/04/image-300x121.png 300w" sizes="(max-width: 577px) 100vw, 577px"/></figure>
+
+
+
+<p class="wp-block-paragraph">This highlights the need for a convention between the network parties and stick to it for as long as the plant exists. Once a hacker is in, he is there for good.</p>
+
+
+
+<ul class="wp-block-list">
+<li>Simple and Open Protocols – Many industrial UART-based protocols, such as Modbus RTU, Profibus, and proprietary machine protocols, lack authentication, encryption, or session management.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">This simplicity means that any device listening on the same bus can <strong>read, manipulate, or inject</strong> data with minimal effort.</p>
+
+
+
+<p class="wp-block-paragraph">For more information about UART and its driven protocols, please see my UART classes in TrainSec Academy https://trainsec.net/hardware-hacking-expert-level-1/</p>
+
+
+
+<h2 class="wp-block-heading">Major Security Vulnerabilities in UART-Based Systems</h2>
+
+
+
+<p class="wp-block-paragraph">You do not believe how many beer rounds (and other trophies) the following vulnerabilities won me after a “you can never beat our system” dare was laid in front of me (yes even by defence companies from the worlds top 3).</p>
+
+
+
+<p class="wp-block-paragraph"><strong>1. Sniffing and Traffic Capture</strong></p>
+
+
+
+<p class="wp-block-paragraph">One of the easiest and most common attacks on UART-based systems is <strong>passive sniffing</strong>. Since UART communication is often <strong>not encrypted or obfuscated in any way</strong>, attackers can:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Eavesdrop on control commands</strong> between industrial controllers and field devices.</li>
+
+
+
+<li><strong>Extract credentials or authentication sequences</strong> (if present).</li>
+
+
+
+<li><strong>Reverse engineer proprietary protocols</strong> used by industrial equipment manufacturers.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph"><strong>Real-World Example</strong>: An attacker with a simple USB-to-RS-232 adapter can plug into a maintenance port or tap into a serial line, silently collecting operational data without raising alarms.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>2. Command Injection and Replay Attacks</strong></p>
+
+
+
+<p class="wp-block-paragraph">Because UART devices often lack authentication, an attacker who captures a valid command can <strong>easily inject it back into the system</strong> to manipulate behaviour.</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Replay Attacks</strong> – An attacker records a legitimate command (e.g., &#8220;open valve&#8221;, &#8220;start motor&#8221;, “set centrifuge to speed”) and replays it later to <strong>cause unauthorized actions</strong>.</li>
+
+
+
+<li><strong>Malicious Command Injection</strong> – Without authentication, an attacker can fabricate malicious UART frames, tricking a device into executing unauthorized actions.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph"><strong>Example</strong>: A hacker captures an <strong>&#8220;unlock door&#8221;</strong> command in a building access control system. Later, they replay the command to <strong>bypass security without triggering alarms</strong>.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>3. Man-in-the-Middle (MITM) Attacks</strong></p>
+
+
+
+<p class="wp-block-paragraph">A step beyond simple sniffing, MITM attacks involve <strong>intercepting and modifying data in real time</strong>. Attackers can:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Modify sensor readings</strong> sent from field devices to controllers.</li>
+
+
+
+<li><strong>Alter control commands</strong> (e.g., changing &#8220;close valve&#8221; to &#8220;open valve&#8221;).</li>
+
+
+
+<li><strong>Introduce delays</strong> or manipulate system responses to hide their presence.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph"><strong>Example</strong>: In a power grid SCADA system, an attacker intercepts temperature sensor data and <strong>sends false readings</strong> to prevent overheating alarms from triggering, leading to <strong>equipment damage or failure</strong>.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>4. Reverse Engineering of Proprietary Protocols</strong></p>
+
+
+
+<p class="wp-block-paragraph">Many industrial manufacturers use <strong>custom serial protocols</strong> over UART, assuming that &#8220;security by obscurity&#8221; is enough to protect them. However, <strong>these protocols can be reverse engineered</strong> with simple monitoring tools.</p>
+
+
+
+<ul class="wp-block-list">
+<li>Attackers capture UART traffic and analyse repeating patterns.</li>
+
+
+
+<li>Over time, they map out command structures and device behaviours.</li>
+
+
+
+<li>Once the protocol is understood, attackers can create <strong>custom tools</strong> to inject malicious commands.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph"><strong>Example</strong>: A factory&#8217;s robotic arm system uses a <strong>proprietary serial protocol</strong>. By logging UART traffic for a few hours, an attacker identifies movement commands and then <strong>injects a malicious command</strong> to disrupt operations.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>5. Static and Predictable Baud Rate &amp; Parameters</strong></p>
+
+
+
+<p class="wp-block-paragraph">UART relies on <strong>predefined communication settings</strong> (baud rate, parity, stop bits), which means attackers can easily configure their own devices to <strong>intercept and manipulate traffic</strong>.</p>
+
+
+
+<ul class="wp-block-list">
+<li>Once the baud rate and frame format are known, attackers can <strong>perfectly mimic legitimate devices</strong>.</li>
+
+
+
+<li>Without encryption, these settings are rarely changed mid-communication, making it trivial to eavesdrop on static configurations.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph"><strong>Example</strong>: A malicious technician connects a rogue device to an industrial controller, using the same baud rate and frame settings to <strong>spoof a legitimate sensor</strong> and feed false data to the system.</p>
+
+
+
+<p class="wp-block-paragraph">Again, all of these techniques and more are deeply detailed in my “Hardware Hacking Expert – Level II” on the TrainSec Academy.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Why Traditional IT Security Measures Don’t Work in OT</strong></p>
+
+
+
+<p class="wp-block-paragraph">Many OT engineers ask: <strong>Why not just add encryption and authentication?</strong> While that might be an obvious solution in IT networks, the reality of industrial environments makes it difficult:</p>
+
+
+
+<ol start="1" class="wp-block-list">
+<li><strong>Legacy Systems</strong> – Many industrial controllers were <strong>never designed</strong> for cryptographic operations. Implementing encryption may require replacing entire hardware ecosystems.</li>
+
+
+
+<li><strong>Resource Constraints</strong> – Unlike modern computers, embedded systems running UART often have <strong>limited processing power</strong> and cannot support computationally heavy encryption algorithms.</li>
+
+
+
+<li><strong>Real-Time Constraints</strong> – Many OT processes require <strong>ultra-low latency</strong>. Adding authentication handshakes and cryptographic overhead can <strong>disrupt real-time operations</strong>.</li>
+
+
+
+<li><strong>Vendor Lock-In</strong> – Some proprietary industrial systems do not allow modifications to communication protocols, making software-level encryption impractical.</li>
+</ol>
+
+
+
+<p class="wp-block-paragraph"><strong>A Different Approach: Making UART Secure Without Overhauling Infrastructure</strong></p>
+
+
+
+<p class="wp-block-paragraph">Instead of replacing UART-based systems, I propose <strong>leveraging the parity bit</strong> as a low-overhead security mechanism. By <strong>repurposing the parity bit</strong> in strategic ways, we can introduce (as a starter):</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Instruction authentication</strong> (ensuring commands follow a secure sequence).</li>
+
+
+
+<li><strong>Synchronization-based parameter changes</strong> (randomizing baud rates dynamically).</li>
+
+
+
+<li><strong>Session key rotation</strong> (establishing lightweight encryption through alternating parity-based keys).</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">This method <strong>does not require hardware replacements</strong> and can be implemented with firmware updates or middleware solutions.</p>
+
+
+
+<p class="wp-block-paragraph">In the next section, I’ll introduce how <strong>using the parity bit innovatively can transform UART security</strong>—blocking sniffing, preventing injection, and even enabling lightweight encryption.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Parity Bit: An Underutilized Resource for Security</h2>
+
+
+
+<p class="wp-block-paragraph">In the face of increasing cyber threats targeting OT environments, <strong>securing UART-based communication</strong> without replacing existing infrastructure is a major challenge. Instead of trying to add complex encryption mechanisms that industrial controllers cannot support, I propose a <strong>novel approach</strong>: <strong>leveraging the parity bit as a lightweight security feature</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">Traditionally used for basic error detection, the parity bit is an underutilized resource that can be repurposed to introduce authentication, synchronization, and even lightweight encryption into UART-based protocols. This section explores three groundbreaking methods to enhance UART security without disrupting industrial operations.</p>
+
+
+
+<h2 class="wp-block-heading">Method 1: ParityLock – Using the Parity Bit for Instruction Authentication<strong></strong></h2>
+
+
+
+<h2 class="wp-block-heading">Concept: Locking Down UART Commands with a Hidden Parity-Based Code</h2>
+
+
+
+<p class="wp-block-paragraph">Since most UART-based protocols lack built-in authentication, attackers can inject unauthorized commands or replay old ones. By using the parity bit as a <strong>covert authentication mechanism</strong>, we can enforce <strong>strict command sequence validation</strong>, ensuring that only authorized messages are accepted.</p>
+
+
+
+<p class="wp-block-paragraph">This method locks down command authentication by enforcing a hidden parity-based sequence. Just like a lock requires the right key, <strong>ParityLock</strong> ensures that only valid messages following the secret parity pattern are accepted. It blocks unauthorized commands and prevents replay attacks—acting as a lock against UART-based attacks.</p>
+
+
+
+<h2 class="wp-block-heading">How ParityLock Works</h2>
+
+
+
+<ul class="wp-block-list">
+<li>The <strong>parity bit follows a pre-defined pattern or formula</strong> known only to legitimate devices.</li>
+
+
+
+<li>Instead of being used solely for error detection, the parity bit encodes a <strong>hidden sequence of validation bits</strong> across consecutive packets.</li>
+
+
+
+<li>Devices reject commands that do not <strong>follow the expected parity pattern</strong>, preventing replay and injection attacks, alarming higher control hierarchy about the security breach.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Implementation Example</h2>
+
+
+
+<ol start="1" class="wp-block-list">
+<li>Every device participating in UART communication agrees on a <strong>secret formula</strong> that determines the expected parity bit sequence.</li>
+
+
+
+<li>This sequence is based on:
+<ul class="wp-block-list">
+<li><strong>Message timing</strong></li>
+
+
+
+<li><strong>Message order</strong></li>
+
+
+
+<li><strong>A predefined mathematical operation (e.g., XOR with a session-specific key)</strong></li>
+</ul>
+</li>
+
+
+
+<li>The receiving device <strong>validates the command&#8217;s parity sequence</strong> against the expected pattern.</li>
+
+
+
+<li>If the sequence is incorrect (e.g., an attacker injected a fake command), the command is rejected.</li>
+</ol>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="903" height="425" alt="image 1" class="wp-image-4476"  src="https://trainsec.net/wp-content/uploads/2025/04/image-1.png" srcset="https://trainsec.net/wp-content/uploads/2025/04/image-1.png 903w, https://trainsec.net/wp-content/uploads/2025/04/image-1-600x282.png 600w, https://trainsec.net/wp-content/uploads/2025/04/image-1-300x141.png 300w, https://trainsec.net/wp-content/uploads/2025/04/image-1-768x361.png 768w" sizes="(max-width: 903px) 100vw, 903px"/></figure>
+
+
+
+<h2 class="wp-block-heading">Security Impact of <strong>ParityLock</strong><strong></strong></h2>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Prevents unauthorized command injection</strong> – Attackers cannot forge valid commands without knowing the secret parity pattern.</li>
+
+
+
+<li><strong>Blocks replay attacks</strong> – Even if a hacker captures a legitimate command, it won’t work again since the parity sequence changes dynamically.</li>
+
+
+
+<li><strong>No additional bandwidth or encryption overhead</strong> – Security is achieved purely through an existing UART feature.</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Method 2: BaudMorph – Using the Parity Bit for UART Parameter Synchronization<strong></strong></h2>
+
+
+
+<h2 class="wp-block-heading">Concept: Morphing UART Settings in Real Time to Confuse Attackers</h2>
+
+
+
+<p class="wp-block-paragraph">Static UART configurations are a hacker’s dream. Once they figure out the <strong>baud rate and frame format</strong>, they can easily <strong>eavesdrop, inject packets, or launch MITM attacks</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">By <strong>embedding synchronization signals into the parity bit</strong>, we can dynamically change these settings, making sniffing and injection almost impossible.</p>
+
+
+
+<h2 class="wp-block-heading">How BaudMorph Works</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Instead of a fixed baud rate, <strong>BaudMorph</strong> dynamically shifts UART parameters in sync between devices.</li>
+
+
+
+<li>The parity bit <strong>triggers and signals changes</strong> in baud rate, stop bits, or parity mode at predefined intervals.</li>
+
+
+
+<li>Attackers who are unaware of this hidden synchronization <strong>lose track of the correct UART settings</strong>, making sniffing and injection virtually impossible.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Implementation Example</h2>
+
+
+
+<ol start="1" class="wp-block-list">
+<li><strong>The master device embeds a synchronization signal in the parity bit</strong>, signaling the slave devices to change UART parameters.</li>
+
+
+
+<li>The new baud rate and parameters are determined by:
+<ul class="wp-block-list">
+<li>A <strong>pre-agreed formula</strong> incorporating <strong>time-based factors</strong>.</li>
+
+
+
+<li>A <strong>salted hash function</strong> based on previous messages.</li>
+
+
+
+<li>An <strong>external entropy source</strong> (e.g., sensor input).</li>
+</ul>
+</li>
+
+
+
+<li>Both devices update their communication settings <strong>simultaneously</strong>, without needing a separate secure channel.</li>
+
+
+
+<li>Attackers trying to eavesdrop suddenly <strong>lose synchronization</strong> and are unable to sniff or inject packets correctly.</li>
+</ol>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="902" height="434" alt="image 3" class="wp-image-4478"  src="https://trainsec.net/wp-content/uploads/2025/04/image-3.png" srcset="https://trainsec.net/wp-content/uploads/2025/04/image-3.png 902w, https://trainsec.net/wp-content/uploads/2025/04/image-3-600x289.png 600w, https://trainsec.net/wp-content/uploads/2025/04/image-3-300x144.png 300w, https://trainsec.net/wp-content/uploads/2025/04/image-3-768x370.png 768w" sizes="(max-width: 902px) 100vw, 902px"/></figure>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Parity bits are monitored continuously.</strong></li>
+
+
+
+<li><strong>When the sequence 1-0-1 appears</strong>, the devices <strong>shift to a new baud rate</strong>.</li>
+
+
+
+<li><strong>Legitimate devices</strong> track the parity-based trigger and <strong>adjust their settings correctly</strong>.</li>
+
+
+
+<li><strong>Attackers fail to adapt</strong> once the baud rate shifts, <strong>causing sniffing/injection failures (</strong><strong>✖</strong><strong>).</strong></li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Security Impact of <strong>BaudMorph</strong><strong></strong></h2>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Breaks passive sniffing</strong> – Attackers cannot maintain a stable UART configuration to intercept data.</li>
+
+
+
+<li><strong>Disrupts MITM and injection attempts</strong> – If an attacker injects a packet at the wrong baud rate, the receiver <strong>won’t process it correctly</strong>.</li>
+
+
+
+<li><strong>Enhances security with minimal changes</strong> – No cryptographic overhead, just dynamic parameter shifting.</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1853 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img decoding="async" width="591" height="571" class="attachment-large size-large wp-image-896" alt="Hardware Hacking expert course badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Hardware-Hackign-expert-badge.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Hardware-Hackign-expert-badge.png 591w, https://trainsec.net/wp-content/uploads/2024/07/Hardware-Hackign-expert-badge-300x290.png 300w" sizes="(max-width: 591px) 100vw, 591px"/>															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,550</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><strong>$1,085 or $115× 10 payments</strong></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default"><a href="https://trainsec.net/hardware-hacking-expert-level-1/">Hardware Hacking Expert</a></h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>This comprehensive path, combining dynamic lectures and hands-on exercises, equips you with the skills, resources, and confidence to explore, manipulate, and exploit electronic systems. No prior hardware experience is required!</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/hardware-hacking-expert-level-1/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become HW Hacking Expert</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Method 3: CipherBit – Using the Parity Bit for Session Key Exchange<strong></strong></h2>
+
+
+
+<h2 class="wp-block-heading">Concept: Embedding Lightweight Encryption in UART Without Extra Bandwidth</h2>
+
+
+
+<p class="wp-block-paragraph">One of the biggest limitations in securing UART communication is the <strong>lack of encryption and key exchange mechanisms</strong>. Traditional encryption methods <strong>consume too much processing power</strong> and aren’t feasible for many industrial devices.</p>
+
+
+
+<h2 class="wp-block-heading">How CipherBit Works</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Instead of a static key, <strong>the parity bit carries fragments of a session key</strong> across multiple packets.</li>
+
+
+
+<li>Devices <strong>extract and reconstruct the session key</strong> based on a predefined rule.</li>
+
+
+
+<li>Once the key is formed, it is used for <strong>lightweight encryption</strong>, such as <strong>XOR obfuscation, rotating ciphers, or simple bit manipulations</strong>.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Implementation Example</h2>
+
+
+
+<ol start="1" class="wp-block-list">
+<li>Device A sends <strong>a sequence of UART frames</strong> where the parity bit carries <strong>fragments of a session key</strong>.</li>
+
+
+
+<li>Device B reconstructs the session key using <strong>pre-agreed reassembly rules</strong>.</li>
+
+
+
+<li>Once the session key is established, both devices <strong>encrypt their data using lightweight methods (e.g., bitwise XOR with the session key).</strong></li>
+
+
+
+<li>The session key is refreshed periodically using <strong>a new parity-encoded sequence</strong>.</li>
+</ol>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="903" height="425" alt="image 2" class="wp-image-4477"  src="https://trainsec.net/wp-content/uploads/2025/04/image-2.png" srcset="https://trainsec.net/wp-content/uploads/2025/04/image-2.png 903w, https://trainsec.net/wp-content/uploads/2025/04/image-2-600x282.png 600w, https://trainsec.net/wp-content/uploads/2025/04/image-2-300x141.png 300w, https://trainsec.net/wp-content/uploads/2025/04/image-2-768x361.png 768w" sizes="(max-width: 903px) 100vw, 903px"/></figure>
+
+
+
+<h2 class="wp-block-heading">Security Impact of <strong>CipherBit</strong><strong></strong></h2>
+
+
+
+<p class="wp-block-paragraph">✔ <strong>Introduces lightweight encryption without modifying UART</strong> – The session key is exchanged covertly using an existing UART feature.<br>✔ <strong>Prevents long-term key exposure</strong> – Even if an attacker intercepts data, the session key <strong>rotates frequently</strong>, making decryption impractical.<br>✔ <strong>No need for heavy cryptographic operations</strong> – The method is suitable for low-power industrial devices.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Practical Considerations and Challenges</h2>
+
+
+
+<p class="wp-block-paragraph">While these parity-based security enhancements are highly effective, they come with <strong>practical challenges</strong>:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Compatibility Issues</strong> – Some legacy devices may not support custom parity sequences. A firmware update might be required.</li>
+
+
+
+<li><strong>Error Handling</strong> – Traditional parity checking must be adapted to coexist with security functions without disrupting normal UART error detection.</li>
+
+
+
+<li><strong>Implementation Complexity</strong> – While lightweight, these methods require <strong>coordination between devices</strong>, meaning the OT industry must <strong>standardize such techniques</strong> for broad adoption.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Despite these challenges, implementing parity-based security is far easier and cheaper than replacing entire OT infrastructures. It allows critical industries to secure legacy UART-based systems without sacrificing performance or uptime.</p>
+
+
+
+<p class="wp-block-paragraph">And OBTW, I almost never saw the use of parity as error handling method in live systems.</p>
+
+
+
+<h2 class="wp-block-heading">Conclusion: A New Era of UART Security Without Overhauling Infrastructure</h2>
+
+
+
+<p class="wp-block-paragraph">For decades, <strong>UART-based communication has remained a foundational element of industrial control systems</strong>, yet it has been largely <strong>overlooked in cybersecurity</strong>. The OT industry has continued to rely on <strong>legacy protocols</strong>, exposing critical infrastructure to <strong>sniffing, injection, and MITM attacks</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">But securing UART <strong>does not require an expensive overhaul of infrastructure</strong>. Instead, by leveraging <strong>an often-overlooked feature &#8211; the parity bit &#8211; we can transform UART into a much more resilient communication channel.</strong></p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">The Three Pillars of Next-Gen UART Security<strong></strong></h2>
+
+
+
+<ol class="wp-block-list">
+<li><strong>ParityLock</strong> → Blocks unauthorized command injections and prevents replay attacks by enforcing a hidden parity-based authentication mechanism.</li>
+
+
+
+<li><strong>BaudMorph</strong> → Continuously disrupts passive sniffing and breaks injection attempts by dynamically morphing baud rates and UART settings using parity-based synchronization.</li>
+
+
+
+<li><strong>CipherBit</strong> → Introduces lightweight encryption by using parity bits as a session key exchange mechanism, hiding encryption keys in plain sight without computational overhead.</li>
+</ol>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Why This Approach is a Game-Changer</h2>
+
+
+
+<ul class="wp-block-list">
+<li><strong>No expensive hardware changes</strong> – Everything can be implemented through <strong>firmware updates</strong>.</li>
+
+
+
+<li><strong>Minimal performance impact</strong> – Unlike traditional cryptographic solutions, <strong>these techniques use existing UART features without adding latency</strong>.</li>
+
+
+
+<li><strong>Future-proofing legacy systems</strong> – By incorporating <strong>parity-based security</strong>, industrial networks can remain operational <strong>while closing major security gaps</strong>.</li>
+
+
+
+<li><strong>Breaks the attacker&#8217;s advantage</strong> – <strong>Attackers rely on predictability</strong> in UART communication. Parity-based techniques <strong>introduce controlled unpredictability</strong>, making attacks significantly harder.</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">The Future of OT Security Starts Here<strong></strong></h2>
+
+
+
+<p class="wp-block-paragraph">For too long, <strong>the security industry has ignored UART-based protocols</strong>, assuming that &#8220;air-gapped&#8221; systems were safe. <strong>That era is over.</strong> Threat actors <strong>are actively targeting industrial control systems</strong>, and the time to act is <strong>now</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">Instead of dismissing UART as an &#8220;unfixable&#8221; security liability, we must rethink the problem and use the tools we already have in smarter ways.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>ParityLock</strong>, <strong>BaudMorph</strong>, and <strong>CipherBit</strong> prove that securing UART is possible &#8211; without ripping out existing infrastructure.<br><br><strong></strong></p>
+
+
+
+<p class="wp-block-paragraph"><strong>With these methods, OT security teams can fight back against attacks and take control of their legacy systems.</strong><br><strong>The question is no longer whether we can secure UART—it’s whether we are ready to do it.</strong></p>
+
+
+
+<h2 class="wp-block-heading">The solution is here—it&#8217;s time to implement it.</h2>
+
+
+
+<h2 class="wp-block-heading">What’s Next?</h2>
+
+
+
+<p class="wp-block-paragraph">The next step is industry-wide <strong>experimentation and adoption</strong> of parity-based security enhancements. I invite OT security experts, engineers, and researchers to explore with me these methods further and collaborate on securing our industrial future.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/hardware-hacking-best-starter-hardware-hacking-toolkit.html">Best starter Hardware Hacking Toolkit</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html">The Hitchhiker&#39;s Guide to Breaking Secure Boot</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/hardware-hacking-trojan-horse-implementation-in-hardware.html">Trojan Horse Implementation in Hardware</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/hardware-hacking/uart-security-the-parity-bit/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

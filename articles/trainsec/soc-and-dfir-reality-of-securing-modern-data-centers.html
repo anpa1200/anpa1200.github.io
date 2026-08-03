@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You Can’t Sleep in the AI Era: The Brutal Reality of Securing Modern Data C… — TrainSec article | 1200km</title>
+<meta name="description" content="You Can’t Sleep in the AI Era: The Brutal Reality of Securing Modern Data Centers by Uriel Kosayev, republished from TrainSec.net with permission.">
+<meta name="author" content="Uriel Kosayev"><meta name="trainsec-author" content="Uriel Kosayev"><meta name="trainsec-source" content="https://trainsec.net/library/soc-and-dfir/reality-of-securing-modern-data-centers/"><meta name="keywords" content="Uriel Kosayev, SOC &amp; DFIR, Malware / security research, SOC, DFIR">
+<meta property="article:published_time" content="2025-12-24">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/soc-and-dfir-reality-of-securing-modern-data-centers.html">
+<meta property="og:type" content="article"><meta property="og:title" content="You Can’t Sleep in the AI Era: The Brutal Reality of Securing Modern Data C…"><meta property="og:url" content="https://1200km.com/articles/trainsec/soc-and-dfir-reality-of-securing-modern-data-centers.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/soc-and-dfir-reality-of-securing-modern-data-centers.html#article","url":"https://1200km.com/articles/trainsec/soc-and-dfir-reality-of-securing-modern-data-centers.html","headline":"You Can’t Sleep in the AI Era: The Brutal Reality of Securing Modern Data Centers","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/soc-and-dfir-reality-of-securing-modern-data-centers.html#webpage"},"datePublished":"2025-12-24","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/soc-and-dfir/reality-of-securing-modern-data-centers/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · SOC &amp; DFIR · Malware / security research</p><h1>You Can’t Sleep in the AI Era: The Brutal Reality of Securing Modern Data Centers</h1>
+<p class="meta"><strong>Author:</strong> Uriel Kosayev · <strong>Published:</strong> December 25, 2025</p>
+<div class="tag-row"><span class="tag">SOC</span><span class="tag">DFIR</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Uriel Kosayev. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/soc-and-dfir/reality-of-securing-modern-data-centers/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">A summary and perspective from the panel discussion at the “Data Centers &amp; Cloud 2025” conference.</p>
+
+
+
+<p class="wp-block-paragraph">In a recent panel of industry experts convened at the annual Data Centers &amp; Cloud 2025 event, we explored how data‑centres and cloud infrastructures are preparing for the AI era and why the sleep‑at‑night factor may be under threat for many organizations.</p>
+
+
+
+<h2 class="wp-block-heading">Setting the Scene</h2>
+
+
+
+<p class="wp-block-paragraph">As AI and data‑intensive workloads move to the fore, traditional data‑centre and cloud infrastructure are under unprecedented pressure. The panel, which included cloud and cyber‑security leaders from government, healthcare and enterprise, examined how legacy installation, hybrid models, regulation, infrastructure scaling, and the human factor combine to create a volatile mix.</p>
+
+
+
+<h2 class="wp-block-heading">My Key Takeaways (as Uriel Kosayev)</h2>
+
+
+
+<ol class="wp-block-list">
+<li><strong><em>“You can breach any data‑centre … and any user.”<br></em></strong>Even the most hardened data‑centre or the most privileged user account is not immune. AI brings tremendous potential but also heightened responsibility. If we don’t manage access and permissions correctly, the whole system can unravel.</li>
+
+
+
+<li><strong><em>The cloud‑transition is harder than it sounds.<br></em></strong>Many organizations still operate substantial on‑premise installations. In practice, the hybrid model becomes a bridge but also a risk vector. Maintaining parallel operations on‑premise and in the cloud adds complexity and creates new attack surfaces.</li>
+
+
+
+<li><strong><em>From defeat‑preparation to damage‑limitation? That’s not good enough.<br></em></strong>Too many organizations have moved from “we will defend and win” to “we anticipate we’ll be attacked and aim to limit damage”. That signals a weaker stance akin to buying a car without a full inspection.</li>
+</ol>
+
+
+
+<h2 class="wp-block-heading">Other Panel Highlights</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Tali Shitrit emphasized that although dedicated hardware installs will continue in the short term, the long‑term strategic direction must be cloud‑centric especially as AI workloads scale.</li>
+
+
+
+<li>Orna Granot stressed data sovereignty: keeping all sensitive data in Israel.</li>
+
+
+
+<li>Moshe Praver noted hyperscalers’ advantage but warned of availability risks in crisis scenarios.</li>
+
+
+
+<li>Alex Peleg highlighted that security focus shifts from hardware protection to entity protection in cloud environments.</li>
+</ul>
+
+
+		<div data-elementor-type="section" class="elementor elementor-6716 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/courses/edr-internals-research-development/">
+							<img fetchpriority="high" fetchpriority="high" decoding="async" width="601" height="601" class="attachment-large size-large wp-image-6395" alt="EDR Internals - Research and development"  src="https://trainsec.net/wp-content/uploads/2025/06/EDR-Internals-Research-Development.webp" srcset="https://trainsec.net/wp-content/uploads/2025/06/EDR-Internals-Research-Development.webp 601w, https://trainsec.net/wp-content/uploads/2025/06/EDR-Internals-Research-Development-300x300.webp 300w, https://trainsec.net/wp-content/uploads/2025/06/EDR-Internals-Research-Development-100x100.webp 100w, https://trainsec.net/wp-content/uploads/2025/06/EDR-Internals-Research-Development-150x150.webp 150w" sizes="(max-width: 601px) 100vw, 601px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">EDR Internals: Research &amp; Development</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>This hands-on workshop is designed to give cybersecurity professionals, malware researchers, and detection engineers a rare opportunity to explore how modern Endpoint Detection and Response (EDR) solutions truly work, and how to both research and build them from the ground up.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-57eb6fb elementor-button-success elementor-widget__width-initial elementor-mobile-align-justify elementor-widget-mobile__width-inherit elementor-align-justify elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/courses/edr-internals-research-development/" target="_blank">
+						<span class="elementor-button-content-wrapper">
+						<span class="elementor-button-icon">
+				<svg aria-hidden="true" class="e-font-icon-svg e-fas-arrow-right" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path></svg>			</span>
+									<span class="elementor-button-text">View Course</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				<div class="elementor-element elementor-element-7acf2b5 elementor-button-info elementor-widget__width-inherit elementor-align-justify elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/wp-content/uploads/2024/06/Syllabus_-EDR-Internals-%E2%80%93-Research-Development.pdf">
+						<span class="elementor-button-content-wrapper">
+						<span class="elementor-button-icon">
+				<svg aria-hidden="true" class="e-font-icon-svg e-far-file-pdf" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48zm250.2-143.7c-12.2-12-47-8.7-64.4-6.5-17.2-10.5-28.7-25-36.8-46.3 3.9-16.1 10.1-40.6 5.4-56-4.2-26.2-37.8-23.6-42.6-5.9-4.4 16.1-.4 38.5 7 67.1-10 23.9-24.9 56-35.4 74.4-20 10.3-47 26.2-51 46.2-3.3 15.8 26 55.2 76.1-31.2 22.4-7.4 46.8-16.5 68.4-20.1 18.9 10.2 41 17 55.8 17 25.5 0 28-28.2 17.5-38.7zm-198.1 77.8c5.1-13.7 24.5-29.5 30.4-35-19 30.3-30.4 35.7-30.4 35zm81.6-190.6c7.4 0 6.7 32.1 1.8 40.8-4.4-13.9-4.3-40.8-1.8-40.8zm-24.4 136.6c9.7-16.9 18-37 24.7-54.7 8.3 15.1 18.9 27.2 30.1 35.5-20.8 4.3-38.9 13.1-54.8 19.2zm131.6-5s-5 6-37.3-7.8c35.1-2.6 40.9 5.4 37.3 7.8z"></path></svg>			</span>
+									<span class="elementor-button-text">Download Syllabus</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				<div class="elementor-element elementor-element-36ee9f6 elementor-headline--style-rotate elementor-widget elementor-widget-global elementor-global-9556 elementor-widget-animated-headline" data-element_type="widget" data-e-type="widget" data-settings="{&quot;headline_style&quot;:&quot;rotate&quot;,&quot;animation_type&quot;:&quot;slide-down&quot;,&quot;rotating_text&quot;:&quot;Student?\nIndividual?\nFreelancer?&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;rotate_iteration_delay&quot;:2500}" data-widget_type="animated-headline.default">
+				<div class="elementor-widget-container">
+								<a href="https://forms.gle/UFZKqB1hrH2Wp5NFA" rel="nofollow noopener" target="_blank">
+
+					<div class="elementor-headline elementor-headline-animation-type-slide-down">
+					<span class="elementor-headline-plain-text elementor-headline-text-wrapper">Are you a</span>
+				<span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
+					<span class="elementor-headline-dynamic-text elementor-headline-text-active">
+				Student?			</span>
+					<span class="elementor-headline-dynamic-text">
+				Individual?			</span>
+					<span class="elementor-headline-dynamic-text">
+				Freelancer?			</span>
+						</span>
+					<span class="elementor-headline-plain-text elementor-headline-text-wrapper">Apply for discount!</span>
+					</div>
+		</a>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Why This Matters</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Hybrid complexity = hybrid risk.</li>
+
+
+
+<li>AI workloads demand new infrastructure scale.</li>
+
+
+
+<li>Identity becomes the critical vulnerability point.</li>
+
+
+
+<li>Organisational mindset must return to proactive defence, not passive acceptance.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Recommendations</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Avoid “lift‑and‑shift” cloud migration; start with identity/permissions design.</li>
+
+
+
+<li>Build monitoring and incident response that is hybrid‑aware.</li>
+
+
+
+<li>Evaluate cloud providers for sovereignty, regional availability, and crisis resilience.</li>
+
+
+
+<li>Test application entry points aggressively, especially those exposed through AI‑augmented services.</li>
+
+
+
+<li>Shift to continuous offensive testing: red‑teaming, penetration testing, identity audits.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Final Words</h2>
+
+
+
+<p class="wp-block-paragraph">In the AI‑era, the data‑centre is no longer a simple physical facility. It is a dynamic hybrid ecosystem of compute, cloud services, accelerators, and identity flows. Security leaders cannot sleep soundly but with the right architecture and mindset, they can stay ahead of the threat curve.</p>
+
+
+
+<h2 class="wp-block-heading">Source &amp; Attribution</h2>
+
+
+
+<p class="wp-block-paragraph">Based on a panel discussion at Data Centers &amp; Cloud 2025 and the <a href="https://www.pc.co.il/news/432600/" rel="nofollow noopener" target="_blank">original Hebrew article published by PC.co.il.</a></p>
+
+
+
+<p class="wp-block-paragraph"></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/malware-analysis-can-document-files-be-trusted.html">Can Document Files Be Trusted?</a> <span>(Uriel Kosayev)</span></li><li><a href="/articles/trainsec/malware-analysis-cyber-ai-friend-or-foe-lessons-from-the-orange-systems-inspiration-session.html">Cyber &amp; AI – Friend or Foe? Lessons from the Orange Systems Inspiration Session</a> <span>(Uriel Kosayev)</span></li><li><a href="/articles/trainsec/malware-analysis-two-sides-of-the-same-coin-from-dissected-malware-to-edr-evasion.html">Two Sides of The Same Coin - From Dissected Malware to EDR Evasion</a> <span>(Uriel Kosayev)</span></li><li><a href="/articles/trainsec/malware-analysis-back-to-the-future-of-the-cyber-landscape.html">Back to the Future of the Cyber Landscape</a> <span>(Uriel Kosayev)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/soc-and-dfir/reality-of-securing-modern-data-centers/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

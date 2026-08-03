@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Build a Process Tree in Windows with Code — TrainSec article | 1200km</title>
+<meta name="description" content="How to Build a Process Tree in Windows with Code by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/process-tree-in-windows/"><meta name="keywords" content="Pavel Yosifovich, Windows programming, Technical walkthrough, Windows programming, C/C++">
+<meta property="article:published_time" content="2025-09-04">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-process-tree-in-windows.html">
+<meta property="og:type" content="article"><meta property="og:title" content="How to Build a Process Tree in Windows with Code"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-process-tree-in-windows.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-process-tree-in-windows.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-process-tree-in-windows.html","headline":"How to Build a Process Tree in Windows with Code","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-process-tree-in-windows.html#webpage"},"datePublished":"2025-09-04","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/process-tree-in-windows/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows programming · Technical walkthrough</p><h1>How to Build a Process Tree in Windows with Code</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> September 5, 2025</p>
+<div class="tag-row"><span class="tag">Windows programming</span><span class="tag">C/C++</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/process-tree-in-windows/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">In this video we walk through how process trees are visualized in Windows, starting with what tools like Process Explorer display, then moving step by step into coding our own tree in C++. We discuss why some processes are shown without parents, how process IDs are reused, and why comparing creation times is essential.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="How to Build a Process Tree in Windows with C++ (Step-by-Step)" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/LJETx_x_6P4?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><strong>Why This Matters for TrainSec Students</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Being able to construct and analyze a process tree is a fundamental skill for students of Windows internals and security research. Malware often hides by altering its parent process or exploiting PID reuse. Forensics and reverse engineering rely heavily on understanding which process started another and how relationships are tracked. By building your own tree in code, you gain practical knowledge of how Windows handles process management, which is directly applicable in security investigations and debugging tasks.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Questions and Answers from the Video</strong></h2>
+
+
+
+<h2 class="wp-block-heading"><strong>What is a process tree?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">A process tree is a structured way to represent the running processes in Windows as parent–child relationships. Instead of a flat list of processes, the tree shows which process created which. Tools such as Process Explorer provide this by default. At the top level there are several roots, such as System, Registry, and Winlogon. Each root has its own descendants, forming smaller subtrees. Understanding this structure is important because it reflects how processes inherit properties from other processes, hinting at which process may have created them.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Why are there multiple roots instead of one tree?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Unlike some systems where everything is connected to a single “init” process, Windows allows multiple roots. For example, System, Csrss, and Wininit appear side by side. One way to think about it is to imagine a hidden node that is the “super-parent” of all these roots. In practice, though, each root starts its own tree. This explains why process explorers show several left-justified processes at the top level.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>What is the difference between a parent process and a creator process?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">The creator is the process that actually called the API to start it. Usually the creator and parent are the same, but Windows does allow them to differ. When this happens, certain properties like the current working directory are inherited from the parent, not necessarily the creator. This distinction matters for analysts: a process may look like it belongs under one parent but was actually started by another.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Why do some processes appear left-justified with no parent?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">When a process’s recorded parent no longer exists in the system, tools have no information to display, so they place the process at the root level. For example, Explorer may appear parentless because its parent process terminated long ago. The parent ID is still stored, but since that ID no longer points to a live process, the program must treat it as if the process has no parent.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Can a process ID be reused?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Yes. When a process ends, its ID can be recycled by Windows and given to another process. This creates the risk that a child process might reference a parent ID that has since been reassigned to a completely unrelated process. Without additional checks, tools would mistakenly connect the child to the wrong parent.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>How do tools avoid confusion from reused process IDs?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Process Explorer and similar tools solve this by checking creation times. If the supposed parent’s creation time is later than the child’s, then the relationship is invalid, and the child must be treated as parentless. This ensures that ID reuse does not break the accuracy of the process tree.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>How can we programmatically list processes?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">In Windows, the ToolHelp API provides functions to take a snapshot of the current system processes. Using CreateToolhelp32Snapshot, Process32First, and Process32Next, a program can iterate through all processes and capture information such as process ID, parent process ID, and executable name. This snapshot is the foundation for building a custom tree.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>What information should we store about each process?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Each process record should contain the process ID, the parent ID, and the executable name for identification. To represent the hierarchy, it should also hold a list of its children. In C++, this is conveniently expressed with a structure that contains these fields plus a vector for child pointers.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>How do we safely manage these structures in C++?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Managing memory manually with new and delete is error-prone. Instead, Pavel uses unique_ptr, a smart pointer that automatically frees memory when it goes out of scope. This ensures that when a process structure is no longer needed, the memory is released, preventing leaks and dangling pointers.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img fetchpriority="high" fetchpriority="high" decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading"><strong>How do we attach processes to their parents in code?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">The program builds a map keyed by process IDs. Each new process is looked up by its parent ID in this map. If the parent is found, the process is added as a child of that parent. If no parent is found, the process is stored in the list of root nodes. This mirrors the logic of tools like Process Explorer.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>How do we display the process tree?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">The program defines a function DisplayTree that recursively prints each process with indentation based on its depth in the tree. The function first prints the current process name and ID, then calls itself on the list of children, increasing the indentation. This makes the output look like the familiar tree view shown in graphical tools.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>How do we verify a real parent beyond checking IDs?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">The program includes a function GetStartTime that queries the start time of a process using OpenProcess and GetProcessTimes. By comparing the start time of the supposed parent to that of the child, the program can confirm whether the relationship is valid. If the parent started later than the child, the link is rejected, and the child is considered a root.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>What units are used for process start times?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Windows records times in 100-nanosecond intervals, measured since January 1, 1601. While the numbers are unusual, they are consistent across processes. For the purpose of verifying parent–child relationships, only the relative values matter.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>What happens if OpenProcess fails for a process?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Sometimes a process cannot be opened, either because of security restrictions or because it terminated between snapshot and query. In that case, the program returns zero to indicate failure. When this happens, the program defaults to trusting the parent ID, though this may not be fully accurate.</p>
+
+
+		<div data-elementor-type="container" class="elementor elementor-6767" data-elementor-post-type="elementor_library">
+				<div class="elementor-element elementor-element-33ac7bb5 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;,&quot;motion_fx_motion_fx_scrolling&quot;:&quot;yes&quot;,&quot;motion_fx_translateY_effect&quot;:&quot;yes&quot;,&quot;motion_fx_translateY_speed&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:4,&quot;sizes&quot;:[]},&quot;motion_fx_translateY_affectedRange&quot;:{&quot;unit&quot;:&quot;%&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:{&quot;start&quot;:0,&quot;end&quot;:100}},&quot;motion_fx_devices&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;]}">
+				<div class="elementor-element elementor-element-139d7c54 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Pick Your Path and Join the Elite</h2>				</div>
+				</div>
+		<div class="elementor-element elementor-element-1fea2f3c e-grid e-con-full e-con e-child" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+		<div class="elementor-element elementor-element-5a0ffe84 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+		<a class="elementor-element elementor-element-f5d558d e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container" href="https://trainsec.net/windows-master-developer-2/">
+				<div class="elementor-element elementor-element-5fcc4fb3 elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				<div class="elementor-element elementor-element-3192702b elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-2cc2af48 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a &#8220;generic&#8221; C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				</a>
+				<div class="elementor-element elementor-element-58110e61 elementor-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-78a34944 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+		<div class="elementor-element elementor-element-2b7e496f e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-6609e6bc elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img decoding="async" width="591" height="570" class="attachment-large size-large wp-image-1616" alt="Windows Security Researcher Badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Security-Researcher-Badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Security-Researcher-Badge-1.png 591w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Security-Researcher-Badge-1-300x289.png 300w" sizes="(max-width: 591px) 100vw, 591px"/>															</div>
+				</div>
+				<div class="elementor-element elementor-element-30e25227 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default"><a href="https://trainsec.net/windows-security-researcher/">Windows Security Researcher</a></h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-4f66f771 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Provides the necessary knowledge, understanding, and tools to be a successful Windows OS researcher.</p>								</div>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-31dadd1 elementor-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-security-researcher/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Security Researcher</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+				</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading"><strong>Why is recursion effective for this task?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Recursion naturally fits tree traversal. Each process displays itself, then recursively calls the function on its children. The call stack keeps track of indentation levels automatically. This allows the code to remain simple and elegant even when the tree has many nested levels.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>What is the final outcome of the code?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">The final program produces a process tree almost identical to Process Explorer’s view. It correctly shows roots and children, accounts for missing parents, and defends against PID reuse. This demonstrates that with only the ToolHelp API and some careful logic, you can replicate what advanced tools do under the hood.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Keep Learning with TrainSec</strong></h2>
+
+
+
+<p class="wp-block-paragraph">This content is part of the <strong>free TrainSec Knowledge Library</strong>, where students can deepen their understanding of Windows internals, malware analysis, and reverse engineering.Subscribe for free and continue learning with us:<a href="https://trainsec.net/library"> https://trainsec.net/library</a></p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+						</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-building-a-process-tree.html">Building a Process Tree</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-code-injection-with-image-file-execution-options.html">Code Injection with Image File Execution Options</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-keyboard-hook-with-with-image-file-execution-options.html">Keyboard Hook with Image File Execution Options</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-understanding-uac-virtualization.html">Understanding UAC Virtualization: A Security Mechanism for Legacy Applications</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/process-tree-in-windows/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

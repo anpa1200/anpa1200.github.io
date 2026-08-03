@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing Control Panel Applications — TrainSec article | 1200km</title>
+<meta name="description" content="Writing Control Panel Applications by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/writing-control-panel-applications/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-03-22">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-writing-control-panel-applications.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Writing Control Panel Applications"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-writing-control-panel-applications.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-writing-control-panel-applications.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-writing-control-panel-applications.html","headline":"Writing Control Panel Applications","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-writing-control-panel-applications.html#webpage"},"datePublished":"2026-03-22","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/writing-control-panel-applications/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Writing Control Panel Applications</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> March 23, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/writing-control-panel-applications/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Control Panel has been part of Windows forever. In recent versions, Microsoft has been moving functionality into Settings, and some classic pages now redirect. But Control Panel is still supported, and many classic applets still exist.</p>
+
+
+
+<p class="wp-block-paragraph">That means you can still write your own Control Panel items. In this post, I’ll show one practical way to do it: a classic <strong>Control Panel applet DLL</strong> (<code>.cpl</code>) that exports a function called <code>CPlApplet</code>.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Writing Control Panel Applications" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/TsrQr9tqPUw?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">Two Ways To Add A Control Panel Item</h2>
+
+
+
+<p class="wp-block-paragraph">There are two common approaches:</p>
+
+
+
+<ol class="wp-block-list">
+<li><strong>Register A Normal Executable</strong><br>You can write a regular EXE and register it so Control Panel can discover and launch it. This is straightforward and fully documented (search for “registering control panel items” in Microsoft documentation).</li>
+
+
+
+<li><strong>Write A CPL DLL (Classic Applet)</strong><br>This is the more interesting option. You write a DLL, export a function named <code>CPlApplet</code>, and Control Panel uses a defined message protocol to interact with your applet. That’s what I demonstrate here.</li>
+</ol>
+
+
+
+<h2 class="wp-block-heading">How Control Panel Finds Applets</h2>
+
+
+
+<p class="wp-block-paragraph">There are two ways:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Drop A <code>.cpl</code> Into System32</strong><br>Files in <code><strong>System32</strong></code> with the <code><strong>.cpl</strong></code> extension are picked up automatically. This is how classic Windows applets are commonly installed. The downside is obvious: writing to <code>System32</code> requires administrative privileges.</li>
+
+
+
+<li><strong>Register A CPL Located Elsewhere</strong><br>You can store the CPL anywhere and register it via the registry so Control Panel can find it. Again, this is documented by Microsoft.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">For a demo, placing the CPL in <code>System32</code> is the simplest way to validate that everything works.</p>
+
+
+
+<h2 class="wp-block-heading">Running Applets Without Clicking The UI</h2>
+
+
+
+<p class="wp-block-paragraph">Windows includes <code><strong>control.exe</strong></code> (in <code>System32</code>). You can use it to launch Control Panel items directly.</p>
+
+
+
+<p class="wp-block-paragraph">You can also use it to test your own CPL file by providing a path. This is useful while you’re developing because you don’t have to rely on Control Panel UI refresh behavior just to run the applet.</p>
+
+
+
+<h2 class="wp-block-heading">Project Setup In Visual Studio</h2>
+
+
+
+<p class="wp-block-paragraph">Create a new project using the Visual Studio Desktop wizard and select <strong>DLL</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">The wizard gives you a standard DLL skeleton (<code>DllMain</code>, headers, and example exports). You don’t need the example exports. What you do need is a correctly named exported function.</p>
+
+
+
+<h2 class="wp-block-heading">The Function You Must Export: CPlApplet</h2>
+
+
+
+<p class="wp-block-paragraph">The easiest way to discover the exact signature and required behavior is to look at the header:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>cpl.h</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">It contains the function prototype and the message values you need to handle.</p>
+
+
+
+<p class="wp-block-paragraph">The function must be named exactly:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>CPlApplet</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">If the name is wrong, Control Panel won’t find it. The function uses <code>WINAPI</code> calling convention (<code>stdcall</code>).</p>
+
+
+
+<p class="wp-block-paragraph"><code>CPlApplet</code> receives:</p>
+
+
+
+<ul class="wp-block-list">
+<li>a parent window handle (useful if you show UI)</li>
+
+
+
+<li>a message indicating what Control Panel wants</li>
+
+
+
+<li>message-specific parameters</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">A key point: you’re not “just running a DLL.” Control Panel and your applet follow a small protocol.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">The Message Protocol</h2>
+
+
+
+<p class="wp-block-paragraph">A typical applet handles these messages:</p>
+
+
+
+<h2 class="wp-block-heading">CPL_INIT</h2>
+
+
+
+<p class="wp-block-paragraph">Called early. This is your chance to initialize. Return <code>TRUE</code> to continue or <code>FALSE</code> to indicate failure.</p>
+
+
+
+<h2 class="wp-block-heading">CPL_GETCOUNT</h2>
+
+
+
+<p class="wp-block-paragraph">Control Panel asks how many applets you provide. A single DLL can host multiple applets. For this demo, return <code>1</code>.</p>
+
+
+
+<h2 class="wp-block-heading">CPL_INQUIRE</h2>
+
+
+
+<p class="wp-block-paragraph">Control Panel asks for metadata about an applet: name, description, and icon. You return this data through a <code><a href="https://learn.microsoft.com/en-us/windows/win32/api/cpl/ns-cpl-cplinfo" rel="nofollow noopener noreferrer" target="_blank">CPLINFO</a></code> structure.</p>
+
+
+
+<p class="wp-block-paragraph">The values you provide are typically <strong>resource identifiers</strong>, not literal strings. That means you need resources in your project.</p>
+
+
+
+<h2 class="wp-block-heading">CPL_DBLCLK</h2>
+
+
+
+<p class="wp-block-paragraph">Triggered when the user activates the applet. This is where you do the actual work. For a simple demo, a message box is enough.</p>
+
+
+
+<p class="wp-block-paragraph">There are other messages you can handle, but these are the minimum set to get a working item that appears in Control Panel and reacts when clicked.</p>
+
+
+
+<h2 class="wp-block-heading">Adding Resources (Strings And Icon)</h2>
+
+
+
+<p class="wp-block-paragraph">For <code>CPL_INQUIRE</code>, create resources:</p>
+
+
+
+<ul class="wp-block-list">
+<li>A <strong>String Table</strong> with:
+<ul class="wp-block-list">
+<li>applet name string</li>
+
+
+
+<li>applet description string</li>
+</ul>
+</li>
+
+
+
+<li>An <strong>Icon</strong> resource</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Then, in <code>CPLINFO</code>, reference these resources by ID.</p>
+
+
+
+<p class="wp-block-paragraph">This is how your applet appears with a proper name, description, and icon in Control Panel.</p>
+
+
+
+<h2 class="wp-block-heading">Building As A .CPL</h2>
+
+
+
+<p class="wp-block-paragraph">A CPL file is a DLL with a different extension. You can make your project produce a <code><strong>.cpl</strong></code> directly by changing the output extension in project settings.</p>
+
+
+
+<p class="wp-block-paragraph">That’s convenient because you build and you immediately get something you can copy into place.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Installing And Verifying</h2>
+
+
+
+<p class="wp-block-paragraph">For the simplest test:</p>
+
+
+
+<ol class="wp-block-list">
+<li>Build the project to produce <code>MyApplet.cpl</code> (or any name).</li>
+
+
+
+<li>Copy it to <code><strong>C:\Windows\System32</strong></code> (administrator required).</li>
+
+
+
+<li>Open Control Panel and refresh the view.</li>
+
+
+
+<li>Your new applet should appear.</li>
+
+
+
+<li>Double-click it and verify your <code>CPL_DBLCLK</code> behavior (e.g., a message box).</li>
+</ol>
+
+
+
+<h2 class="wp-block-heading">What Actually Launches A CPL</h2>
+
+
+
+<p class="wp-block-paragraph">If you inspect the running processes, you’ll see your CPL is typically launched via <code><strong><a href="https://trainsec.net/library/malware-analysis/debugging-dll-files-with-ida-disassembler/">rundll32.exe</a></strong></code>. The infrastructure loads the applet and calls into it through a Control Panel entry point.</p>
+
+
+
+<p class="wp-block-paragraph">This is useful to know for debugging, because you can run the same host process yourself.</p>
+
+
+
+<h2 class="wp-block-heading">Debugging The Applet Properly</h2>
+
+
+
+<p class="wp-block-paragraph">Since this is a DLL, you can’t “run it” like a normal EXE.</p>
+
+
+
+<p class="wp-block-paragraph">Two practical options:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Use <code><strong>control.exe</strong></code> to launch your CPL for quick testing.</li>
+
+
+
+<li>For real debugging in Visual Studio, configure the project to start <strong>rundll32.exe</strong> with the right arguments, so you can hit breakpoints reliably.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">A common form looks like:</p>
+
+
+
+<p class="wp-block-paragraph"><code><strong>rundll32.exe shell32.dll,Control_RunDLL C:\Windows\System32\MyApplet.cpl</strong></code></p>
+
+
+
+<p class="wp-block-paragraph">Once you start the host this way, you can debug the applet normally and watch the calls to <code>CPL_INIT</code>, <code>CPL_INQUIRE</code>, and <code>CPL_DBLCLK</code> as the Control Panel infrastructure interacts with your code.</p>
+
+
+
+<h2 class="wp-block-heading">Why This Matters For TrainSec Students</h2>
+
+
+
+<p class="wp-block-paragraph">This is a straightforward example of Windows extensibility that is still present in modern Windows versions.</p>
+
+
+
+<p class="wp-block-paragraph">If you can build a Control Panel applet cleanly, you’re practicing useful fundamentals:</p>
+
+
+
+<ul class="wp-block-list">
+<li>building a DLL with a strict exported entry point</li>
+
+
+
+<li>working with message-driven protocols</li>
+
+
+
+<li>managing Win32 resources (strings/icons)</li>
+
+
+
+<li>understanding how Windows hosts and launches components (<code>control.exe</code>, <code>rundll32.exe</code>)</li>
+
+
+
+<li>debugging non-EXE entry points in a reliable way</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Even if you never ship a CPL, the workflow and tooling patterns apply to a lot of Windows internals work. A CPL approach could be used for simple persistence.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Keep Learning with TrainSec</h2>
+
+
+
+<p class="wp-block-paragraph">This content is part of the <strong>free TrainSec Knowledge Library</strong>, where students can deepen their understanding of Windows internals, malware analysis, and reverse engineering. Subscribe for free and continue learning with us:<br><br><a href="https://trainsec.net/library">https://trainsec.net/library</a></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/writing-control-panel-applications/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

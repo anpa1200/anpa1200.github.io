@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creating COM Objects with the Class Moniker (CoGetObject) — TrainSec article | 1200km</title>
+<meta name="description" content="Creating COM Objects with the Class Moniker (CoGetObject) by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/creating-com-objects-with-the-class-moniker-cogetobject/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-04-28">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-creating-com-objects-with-the-class-moniker-cogetobject.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Creating COM Objects with the Class Moniker (CoGetObject)"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-creating-com-objects-with-the-class-moniker-cogetobject.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-creating-com-objects-with-the-class-moniker-cogetobject.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-creating-com-objects-with-the-class-moniker-cogetobject.html","headline":"Creating COM Objects with the Class Moniker (CoGetObject)","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-creating-com-objects-with-the-class-moniker-cogetobject.html#webpage"},"datePublished":"2026-04-28","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/creating-com-objects-with-the-class-moniker-cogetobject/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Creating COM Objects with the Class Moniker (CoGetObject)</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> April 29, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/creating-com-objects-with-the-class-moniker-cogetobject/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">If you&#8217;ve done COM programming on Windows, <code>CoCreateInstance</code> is the obvious starting point to create an object. Pass a CLSID, get an object back. Done. But it&#8217;s worth knowing what&#8217;s underneath that call — and what alternatives exist — because one of them is genuinely interesting: the class moniker.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Creating COM objects with the Class Moniker" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/P-L-gTjbtSI?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">The Standard Way: CoCreateInstance</h2>
+
+
+
+<p class="wp-block-paragraph"><code>CoCreateInstance</code> is syntactic sugar. At the end of the day, it calls <code>CoGetClassObject</code> with your class ID, which returns an <code>IClassFactory</code> implementation. Then it calls <code>CreateInstance</code> on that factory.</p>
+
+
+
+<p class="wp-block-paragraph">This is fine in most cases, but it means there&#8217;s a direct path you can take yourself: get the class factory, call <code>CreateInstance</code> directly. <code>CoGetClassObject</code> gives you that factory. <code>CoCreateInstance</code> just wraps the two steps for convenience using the most common class factory interface (<code>IClassFactory</code>).</p>
+
+
+
+<p class="wp-block-paragraph">Why does this matter? Because there&#8217;s another way to get that class factory — one that doesn&#8217;t involve a direct CLSID at the call site.</p>
+
+
+
+<h2 class="wp-block-heading">What Is a COM Moniker?</h2>
+
+
+
+<p class="wp-block-paragraph">A moniker in COM is an object that implements <code>IMoniker</code> and knows how to locate or bind to another COM object, based on a string. That&#8217;s the compact definition. The longer version is that <code>IMoniker</code> has a lot of methods — around 23, in fact — covering everything from string display names to composite chaining.</p>
+
+
+
+<p class="wp-block-paragraph">The key idea is this: instead of saying &#8220;create me an object with this class ID,&#8221; you say &#8220;here&#8217;s a string, find or create whatever object that string represents.&#8221; The moniker does the parsing and binding work. More indirect, but more flexible.</p>
+
+
+
+<p class="wp-block-paragraph">Windows ships with several built-in moniker implementations. The class moniker is one of them, and it&#8217;s the simplest to demonstrate.</p>
+
+
+
+<h2 class="wp-block-heading">The Class Moniker and CoGetObject</h2>
+
+
+
+<p class="wp-block-paragraph">The high-level way to use the class moniker is CoGetObject. It looks like this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>CComPtr cf;
+CoGetObject(L"clsid:9BA05972-F6A8-11CF-A442-00A0C90A8F39", nullptr, IID_PPV_ARGS(&amp;cf));</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">CComPtr cf;</span></span>
+<span class="line"><span style="color: #DCDCAA">CoGetObject</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">L&quot;clsid:9BA05972-F6A8-11CF-A442-00A0C90A8F39&quot;</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #DCDCAA">IID_PPV_ARGS</span><span style="color: #D4D4D4">(&amp;cf));</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The <code>clsid:</code> part is the moniker name prefix. <code>CoGetObject</code> looks that up in the registry under <code>HKCR\CLSID</code>, finds a subkey literally named <code>CLSID</code>, reads the class ID stored there — which points to the class moniker implementation in <code>combase.dll</code> — and instantiates it. The class moniker then parses the CLSID out of the string and, when asked to bind, returns the class factory for that CLSID.</p>
+
+
+
+<p class="wp-block-paragraph">The result: you have an <code>IClassFactory</code>. Call <code>CreateInstance</code> on it the same way you would after <code>CoGetClassObject</code>. The object you get back is the same as what <code>CoCreateInstance</code> would return. Same implementation, same interface pointer.</p>
+
+
+
+<p class="wp-block-paragraph">One practical note: if the class is a singleton — like IShellWindows, which represents something global in the process — you will get the same pointer each time you call <code>CreateInstance</code>. That&#8217;s not a moniker artifact. That&#8217;s just how that class factory is implemented. But it&#8217;s worth knowing.</p>
+
+
+
+<h2 class="wp-block-heading">Why Use This?</h2>
+
+
+
+<p class="wp-block-paragraph">A few reasons, depending on your scenario.</p>
+
+
+
+<p class="wp-block-paragraph">The straightforward one is generality. Instead of baking a CLSID into your code, you can store a moniker string in a config file or database, load it at runtime, and use <code>CoGetObject</code> to create the corresponding object. The creation code stays the same regardless of which class you&#8217;re targeting.</p>
+
+
+
+<p class="wp-block-paragraph">The less obvious one — and I&#8217;ll say it plainly: <code>CoGetObject</code> with a moniker string is less conspicuous than a direct <code>CoCreateInstance</code> call. If you&#8217;re thinking about what detection looks like, that matters. <code>CoCreateInstanc</code>e on a known suspicious CLSID is a straightforward indicator. A string passed to CoGetObject requires more analysis to trace back to the same class. That&#8217;s not a reason to use it maliciously — it&#8217;s a reason to understand it, because you will see it in code you analyze.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">The Full Manual Path</h2>
+
+
+
+<p class="wp-block-paragraph"><code>CoGetObject</code> is a convenience wrapper. Behind the scenes, it calls <code>MkParseDisplayName</code>. Doing it manually gives you more control and makes the mechanism visible.</p>
+
+
+
+<p class="wp-block-paragraph">The sequence looks like this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>IBindCtx* pbc = nullptr;
+CreateBindCtx(0, &amp;pbc);
+
+ULONG chEaten = 0;
+CComPtr moniker;
+MkParseDisplayName(pbc, L"clsid:9BA05972-F6A8-11CF-A442-00A0C90A8F39", &amp;chEaten, &amp;moniker);
+
+CComPtr cf;
+moniker->BindToObject(pbc, nullptr, IID_PPV_ARGS(&amp;cf));</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">IBindCtx* pbc = </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #DCDCAA">CreateBindCtx</span><span style="color: #D4D4D4">(</span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, &amp;pbc);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">ULONG chEaten = </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #D4D4D4">CComPtr moniker;</span></span>
+<span class="line"><span style="color: #DCDCAA">MkParseDisplayName</span><span style="color: #D4D4D4">(pbc, </span><span style="color: #CE9178">L&quot;clsid:9BA05972-F6A8-11CF-A442-00A0C90A8F39&quot;</span><span style="color: #D4D4D4">, &amp;chEaten, &amp;moniker);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">CComPtr cf;</span></span>
+<span class="line"><span style="color: #9CDCFE">moniker</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #DCDCAA">BindToObject</span><span style="color: #D4D4D4">(pbc, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #DCDCAA">IID_PPV_ARGS</span><span style="color: #D4D4D4">(&amp;cf));</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph"><code>MkParseDisplayName</code> takes a string and returns an <code>IMoniker</code>. The <code>chEaten</code> parameter is how many characters were consumed during parsing — useful if you are chaining monikers, which you can do using an exclamation mark as a separator between moniker strings. The bind context is required; passing null is technically invalid. <code>CreateBindCtx</code> gives you a default one with no special properties, which is all you need here.</p>
+
+
+
+<p class="wp-block-paragraph"><code>BindToObject</code> is where the actual binding happens. The second parameter is for the &#8220;left moniker&#8221; in a chain — another <code>IMoniker</code> that provides additional context when monikers are composed together. In this case, null, because there is no chain.</p>
+
+
+
+<p class="wp-block-paragraph">That&#8217;s the whole thing. The result is the same <code>IClassFactory</code> you would get from <code>CoGetClassObject</code> or <code>CoGetObject</code>.</p>
+
+
+
+<h2 class="wp-block-heading">Registry Internals: How clsid: Gets Resolved</h2>
+
+
+
+<p class="wp-block-paragraph">When <code>MkParseDisplayName</code> sees <code>clsid:</code>, it looks in <strong><code>HKCR\CLSID</code> </strong>for a subkey literally named <code>CLSID</code>. The default value of that key is a class ID. <code>MkParseDisplayName</code> instantiates that class — which turns out to be the class moniker, listed as <code>Class Moniker</code> in the registry and implemented in combase.dll.</p>
+
+
+
+<p class="wp-block-paragraph">This is the general pattern for all named monikers. If you register a key named &#8220;<code><strong>process</strong></code>&#8221; under <code>HKCR\CLSID</code>, pointing to a class ID that implements <code>IMoniker</code>, then &#8220;<code>process:1234"</code> becomes a valid moniker string. Your <code>IMoniker::BindToObject</code> receives <code>1234</code> and can do whatever makes sense with it — open a process handle, look up an object by process ID, whatever the moniker contract requires.</p>
+
+
+
+<p class="wp-block-paragraph">That&#8217;s the extension mechanism. Writing a custom <code>IMoniker</code> implementation is something I&#8217;m cosidering for a future video.</p>
+
+
+
+<h2 class="wp-block-heading">What&#8217;s Next</h2>
+
+
+
+<p class="wp-block-paragraph">If you want to go deeper on COM programming in the meantime, the full courses are at TrainSec: <a href="https://trainsec.net/courses/com-programming-1/">COM Programming 1</a> covers the foundations, and <a href="https://trainsec.net/courses/com-programming-2/">COM Programming 2</a> goes into more advanced patterns. Both are taught with working C++ code and real system examples.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p class="wp-block-paragraph"></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/creating-com-objects-with-the-class-moniker-cogetobject/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

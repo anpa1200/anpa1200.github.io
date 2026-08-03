@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exploring NTFS Alternate Streams: A Hidden Gem of the Windows File System — TrainSec article | 1200km</title>
+<meta name="description" content="Exploring NTFS Alternate Streams: A Hidden Gem of the Windows File System by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2024-11-19">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Exploring NTFS Alternate Streams: A Hidden Gem of the Windows File System"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system.html","headline":"Exploring NTFS Alternate Streams: A Hidden Gem of the Windows File System","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system.html#webpage"},"datePublished":"2024-11-19","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Exploring NTFS Alternate Streams: A Hidden Gem of the Windows File System</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> November 20, 2024</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph"><em>Note: This blog post is designed to complement the accompanying video embedded at the top of the page. The video provides a step-by-step walkthrough of the concepts and examples discussed here, making it an excellent resource for visual learners and those who want to see NTFS streams in action.</em></p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="NTFS Alternate Streams" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/61rGOwV-Fk8?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<p class="wp-block-paragraph">The NTFS file system, widely used in Windows environments, is packed with fascinating features. Among these is the concept of <em>NTFS Alternate Streams</em>, an advanced and often underutilized capability. Let’s dive into what <a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/c54dec26-1551-4d3a-a0ea-4fa40f848eb3" rel="nofollow noopener" target="_blank">NTFS streams</a> are, how they work, and their practical implications for cybersecurity and programming.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>What Are NTFS Alternate Streams?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">NTFS (New Technology File System) allows each file to contain multiple data streams, with each stream acting as an independent piece of data. The content we usually associate with a file is stored in the <em>default stream</em>, which has no explicit name. However, additional streams can be attached to a file, enabling metadata storage, extended file functionality, or even concealed data.</p>
+
+
+
+<p class="wp-block-paragraph">Each NTFS stream has:</p>
+
+
+
+<ul class="wp-block-list">
+<li>A <strong>name</strong> (optional for the default stream)</li>
+
+
+
+<li>A <strong>type</strong> (commonly <code>$DATA</code>, the default type for user-defined streams)</li>
+
+
+
+<li>A <strong>size</strong>, representing the data it contains.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading"><strong>Why Use NTFS Alternate Streams?</strong></h2>
+
+
+
+<p class="wp-block-paragraph">NTFS streams are often used by system tools and applications to store metadata or enhance functionality. For example:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Zone.Identifier Stream</strong>: Contains metadata about the file&#8217;s origin, such as whether it was downloaded from the internet. This metadata helps Explorer determine if a file is potentially unsafe.</li>
+
+
+
+<li><strong>Custom Data Storage</strong>: Developers can embed additional data or metadata within a file without altering its primary content.</li>
+</ul>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading"><strong>Tools for Analyzing NTFS Streams</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Two powerful tools can help you inspect and manipulate NTFS streams:</p>
+
+
+
+<ol class="wp-block-list">
+<li><strong>Sysinternals Streams</strong>:
+<ul class="wp-block-list">
+<li>A command-line tool that lists all streams associated with a file.</li>
+
+
+
+<li>Example: Analyzing a downloaded file might reveal a <code>Zone.Identifier</code> stream indicating its internet origin.</li>
+</ul>
+</li>
+
+
+
+<li><strong>Custom Tools</strong>:
+<ul class="wp-block-list">
+<li>Specialized applications can read stream content and even modify or remove it. The video mentions a custom NTFS streams tool, capable of examining data within streams.</li>
+</ul>
+</li>
+</ol>
+
+
+
+<h2 class="wp-block-heading"><strong>Creating and Using NTFS Streams in Code</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Developers can programmatically interact with NTFS streams using standard file system APIs. For instance:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Use <code>CreateFile</code> with the <code>:</code> syntax to open or create a stream within a file.<br>Example: <code>hello.txt:myStream</code> creates a stream named <code>myStream</code> inside <code>hello.txt</code>.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Streams can store any type of data, from simple text to large binary blobs. This makes them suitable for embedding custom metadata, hiding sensitive information, or appending extended file attributes.</p>
+
+
+
+<h2 class="wp-block-heading"><strong>Security Implications</strong></h2>
+
+
+
+<p class="wp-block-paragraph">The dual nature of NTFS streams—useful yet concealed—makes them a double-edged sword in cybersecurity:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Potential Risks</strong>:
+<ul class="wp-block-list">
+<li>Streams can hide malicious code or sensitive data, bypassing conventional file size checks.</li>
+
+
+
+<li>Attackers might exploit streams to embed payloads within seemingly innocuous files.</li>
+</ul>
+</li>
+
+
+
+<li><strong>Defensive Use</strong>:
+<ul class="wp-block-list">
+<li>Metadata storage, such as tracking a file&#8217;s origin or embedding integrity checks, can enhance security.</li>
+</ul>
+</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading"><strong>Conclusion</strong></h2>
+
+
+
+<p class="wp-block-paragraph">NTFS Alternate Streams are a hidden powerhouse in the Windows file system, offering endless possibilities for developers and cybersecurity professionals. Whether you&#8217;re leveraging them for metadata, exploring their security implications, or simply satisfying your curiosity, NTFS streams are a testament to the flexibility of NTFS.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph">For more insights into Windows internals and advanced programming concepts, keep exploring TrainSec’s Knowledge Library. Stay tuned for more deep dives into topics that empower your technical growth!</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/exploring-ntfs-alternate-streams-a-hidden-gem-of-the-windows-file-system/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

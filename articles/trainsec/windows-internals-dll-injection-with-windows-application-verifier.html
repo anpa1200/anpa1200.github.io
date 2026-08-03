@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DLL Injection with Windows Application Verifier — TrainSec article | 1200km</title>
+<meta name="description" content="DLL Injection with Windows Application Verifier by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/dll-injection-with-windows-application-verifier/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-06-21">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-dll-injection-with-windows-application-verifier.html">
+<meta property="og:type" content="article"><meta property="og:title" content="DLL Injection with Windows Application Verifier"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-dll-injection-with-windows-application-verifier.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-dll-injection-with-windows-application-verifier.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-dll-injection-with-windows-application-verifier.html","headline":"DLL Injection with Windows Application Verifier","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-dll-injection-with-windows-application-verifier.html#webpage"},"datePublished":"2026-06-21","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/dll-injection-with-windows-application-verifier/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>DLL Injection with Windows Application Verifier</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> June 22, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/dll-injection-with-windows-application-verifier/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">DLL injection is one of those techniques that never really gets old. There are several well-known approaches: <a href="https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createremotethread" rel="nofollow noopener" target="_blank"><code>CreateRemoteThread</code></a>, APCs via <a href="https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-queueuserapc" rel="nofollow noopener" target="_blank"><code>QueueUserAPC</code></a>, <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowshookexw" rel="nofollow noopener" target="_blank"><code>SetWindowsHookEx</code></a>. Each one has its own trade-offs and quirks. In this video I want to show you another one that is a bit less known: using the Windows Application Verifier infrastructure.</p>
+
+
+
+<p class="wp-block-paragraph">What makes this technique interesting is not just that it loads your DLL into a target process. It loads it <em>very early</em>, right after ntdll, before essentially anything else. And on top of that, the same infrastructure gives you a built-in way to hook APIs without any separate hooking library. That&#8217;s two capabilities for the price of one.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="DLL Injection with Application Verifier" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/_EVNmTWrHaw?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">What Is Application Verifier?</h2>
+
+
+
+<p class="wp-block-paragraph">Application Verifier is a tool that ships with the Windows SDK. Its intended purpose is testing and inspecting applications for memory issues, handle leaks, heap problems, and similar bugs. You point it at an executable by name, configure a set of tests, and every time that executable launches the verifier DLL gets loaded into the process automatically.</p>
+
+
+
+<p class="wp-block-paragraph">From the verifier&#8217;s perspective, it runs a set of provider DLLs that each perform a category of checks. The interesting side effect, from a security and internals perspective, is that this mechanism is entirely configurable via the registry, and it supports loading arbitrary DLLs into any named executable.</p>
+
+
+
+<p class="wp-block-paragraph">The downside, which I&#8217;ll come back to at the end, is that your DLL must live in <code>System32</code>. That&#8217;s a hard constraint, not a coincidence.</p>
+
+
+
+<h2 class="wp-block-heading">Configuring Application Verifier</h2>
+
+
+
+<h2 class="wp-block-heading">Using the Application Verifier UI</h2>
+
+
+
+<p class="wp-block-paragraph">The Application Verifier UI ships with the Windows SDK. You add an executable by name (no path, just the name, for example <code>mmc.exe</code>), choose which test providers to enable, and click Save. That&#8217;s it from a UI perspective.</p>
+
+
+
+<p class="wp-block-paragraph">Once you do that, you can run the executable and it will have the verifier DLLs loaded into its address space. You can verify this in Process Explorer by searching for the process and looking at its loaded DLLs: you&#8217;ll find <code>verifier.dll</code>, <code>vfbasics.dll</code>, <code>vfcore.dll</code>, and whatever other provider DLLs you enabled.</p>
+
+
+
+<h2 class="wp-block-heading">What Gets Written to the Registry</h2>
+
+
+
+<p class="wp-block-paragraph">The UI is just a front end. What actually controls the behavior is a registry key: <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options</code>.</p>
+
+
+
+<p class="wp-block-paragraph">Under that key you&#8217;ll find a subkey for each executable you&#8217;ve configured. For <code>mmc.exe</code>, for example, you&#8217;ll see a couple of values:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>GlobalFlag</strong>: set to <code>0x100</code> (decimal 256), which tells the system that Application Verifier is enabled for this executable. The GFlags tool from Debugging Tools for Windows shows this as &#8220;Application Verifier&#8221; when you look up the executable.</li>
+
+
+
+<li><strong>VerifierDlls</strong>: a space-separated list of DLL names to load. These are the provider DLLs. Importantly, there are no paths here, just names. The DLLs must be in <code>System32</code>.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">So if you want to inject your own DLL, you add its name to <code>VerifierDlls</code>. That&#8217;s all the configuration you need. The rest happens automatically when the process starts.</p>
+
+
+
+<h2 class="wp-block-heading">Creating a Verifier DLL</h2>
+
+
+
+<h2 class="wp-block-heading">The DLL Project</h2>
+
+
+
+<p class="wp-block-paragraph">The DLL itself is a standard Windows DLL project. In Visual Studio, create a new project using the Windows Desktop Wizard template, select Dynamic Link Library, and you&#8217;ll get a project with a <a href="https://learn.microsoft.com/en-us/windows/win32/dlls/dllmain" rel="nofollow noopener" target="_blank">DllMain</a> entry point already set up.</p>
+
+
+
+<p class="wp-block-paragraph">There&#8217;s one important thing to do after you build it: copy it to <code>System32</code>. Since the verifier infrastructure requires the DLL to be there, there&#8217;s no way around it. That also means you need administrator privileges to put it there.</p>
+
+
+
+<h2 class="wp-block-heading">DllMain and the Verifier Reason Code</h2>
+
+
+
+<p class="wp-block-paragraph">Here&#8217;s where things get a bit unexpected. If you just ship a bare DLL with a <code>DllMain</code> that handles <code>DLL_PROCESS_ATTACH</code>, <code>DLL_PROCESS_DETACH</code>, and the thread reasons (0, 1, 2, 3), you&#8217;ll find that <code>mmc.exe</code> (or whatever executable you chose) just silently disappears when launched. No window, no error.</p>
+
+
+
+<p class="wp-block-paragraph">The reason is that verifier DLLs receive an additional call to <code>DllMain</code> with a reason code that is not part of the standard documented set. The standard codes are:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>DLL_PROCESS_ATTACH</code> (1)</li>
+
+
+
+<li><code>DLL_THREAD_ATTACH</code> (2)</li>
+
+
+
+<li><code>DLL_THREAD_DETACH</code> (3)</li>
+
+
+
+<li><code>DLL_PROCESS_DETACH</code> (0)</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">But the verifier infrastructure calls <code>DllMain</code> with reason code <strong>4</strong>. If you don&#8217;t handle it, the process crashes and disappears.</p>
+
+
+
+<p class="wp-block-paragraph">When that call comes in, the <code>lpReserved</code> parameter, which is normally unused or indicates whether the DLL is being loaded statically, is actually a pointer-to-pointer. The verifier infrastructure expects you to fill it with a pointer to an <code>RTL_VERIFIER_PROVIDER_DESCRIPTOR</code> structure. If you don&#8217;t, it dereferences something invalid and you get an access violation.</p>
+
+
+
+<p class="wp-block-paragraph">So the first thing to fix is adding reason code 4 to your switch statement:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>#define DLL_VERIFIER 4
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    switch (ul_reason_for_call) {
+    case DLL_PROCESS_ATTACH:
+        break;
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+        break;
+    case DLL_PROCESS_DETACH:
+        break;
+    case DLL_VERIFIER:
+        // fill in lpReserved here
+        break;
+    }
+    return TRUE;
+}</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #C586C0">#define</span><span style="color: #569CD6"> DLL_VERIFIER 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">BOOL APIENTRY </span><span style="color: #DCDCAA">DllMain</span><span style="color: #D4D4D4">(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">switch</span><span style="color: #D4D4D4"> (ul_reason_for_call) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">case</span><span style="color: #D4D4D4"> DLL_PROCESS_ATTACH:</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #C586C0">break</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">case</span><span style="color: #D4D4D4"> DLL_THREAD_ATTACH:</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">case</span><span style="color: #D4D4D4"> DLL_THREAD_DETACH:</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #C586C0">break</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">case</span><span style="color: #D4D4D4"> DLL_PROCESS_DETACH:</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #C586C0">break</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">case</span><span style="color: #D4D4D4"> DLL_VERIFIER:</span></span>
+<span class="line"><span style="color: #6A9955">        // fill in lpReserved here</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #C586C0">break</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"><span style="color: #D4D4D4">    }</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">return</span><span style="color: #D4D4D4"> TRUE;</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<h2 class="wp-block-heading">The RTL_VERIFIER_PROVIDER_DESCRIPTOR Structure</h2>
+
+
+
+<p class="wp-block-paragraph">The <code>RTL_VERIFIER_PROVIDER_DESCRIPTOR</code> structure is not officially documented. You can find it in the ReactOS source code (which reverse-engineers it from the actual Windows implementation) and in the MinGW headers. The structure is fairly large, but you don&#8217;t need to fill in most of it. The essential fields are:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>Length</code>: the size of the structure. Fill this in first.</li>
+
+
+
+<li><code>ProviderDlls</code>: pointer to an <code>RTL_VERIFIER_DLL_DESCRIPTOR</code> array. Set this to point to an empty descriptor (all zeros, with a null-terminated sentinel entry) if you don&#8217;t want to hook anything, or to your actual hook list if you do.</li>
+
+
+
+<li><code>ProviderDllLoadCallback</code> and <code>ProviderDllUnloadCallback</code>: callbacks invoked when DLLs load and unload in the process. These can be empty lambdas, but they should not be null.</li>
+
+
+
+<li><code>ProviderHeapFreeCallback</code>: another callback, also non-null.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">In practice, a minimal working implementation looks like this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>static RTL_VERIFIER_DLL_DESCRIPTOR emptyDlls[] = {
+    { nullptr, 0, nullptr, nullptr }
+};
+
+static RTL_VERIFIER_PROVIDER_DESCRIPTOR g_verifierDesc = {};
+
+// Inside DLL_VERIFIER:
+g_verifierDesc.Length = sizeof(RTL_VERIFIER_PROVIDER_DESCRIPTOR);
+g_verifierDesc.ProviderDlls = emptyDlls;
+g_verifierDesc.ProviderDllLoadCallback = [](auto, auto, auto, auto) {};
+g_verifierDesc.ProviderDllUnloadCallback = [](auto, auto, auto) {};
+g_verifierDesc.ProviderHeapFreeCallback = [](auto, auto) {};
+
+*(void**)lpReserved = &amp;g_verifierDesc;</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #569CD6">static</span><span style="color: #D4D4D4"> RTL_VERIFIER_DLL_DESCRIPTOR emptyDlls[] = {</span></span>
+<span class="line"><span style="color: #D4D4D4">    { </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4"> }</span></span>
+<span class="line"><span style="color: #D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #569CD6">static</span><span style="color: #D4D4D4"> RTL_VERIFIER_PROVIDER_DESCRIPTOR g_verifierDesc = {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #6A9955">// Inside DLL_VERIFIER:</span></span>
+<span class="line"><span style="color: #9CDCFE">g_verifierDesc</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">Length</span><span style="color: #D4D4D4"> = </span><span style="color: #569CD6">sizeof</span><span style="color: #D4D4D4">(RTL_VERIFIER_PROVIDER_DESCRIPTOR);</span></span>
+<span class="line"><span style="color: #9CDCFE">g_verifierDesc</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">ProviderDlls</span><span style="color: #D4D4D4"> = emptyDlls;</span></span>
+<span class="line"><span style="color: #9CDCFE">g_verifierDesc</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">ProviderDllLoadCallback</span><span style="color: #D4D4D4"> = [](</span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">) {};</span></span>
+<span class="line"><span style="color: #9CDCFE">g_verifierDesc</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">ProviderDllUnloadCallback</span><span style="color: #D4D4D4"> = [](</span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">) {};</span></span>
+<span class="line"><span style="color: #9CDCFE">g_verifierDesc</span><span style="color: #D4D4D4">.</span><span style="color: #9CDCFE">ProviderHeapFreeCallback</span><span style="color: #D4D4D4"> = [](</span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4">) {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">*(</span><span style="color: #569CD6">void</span><span style="color: #D4D4D4">**)lpReserved = &amp;g_verifierDesc;</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">Once you do this and copy the DLL to <code>System32</code>, the target executable loads correctly. You can verify in Process Explorer that your DLL appears in the process&#8217;s loaded modules.</p>
+
+
+
+<h2 class="wp-block-heading">Hooking APIs with the Verifier Infrastructure</h2>
+
+
+
+<h2 class="wp-block-heading">RTL_VERIFIER_DLL_DESCRIPTOR</h2>
+
+
+
+<p class="wp-block-paragraph">Now for the more interesting part. The verifier infrastructure gives you a built-in API hooking mechanism. You specify the DLLs you want to hook and the functions within each DLL, and the infrastructure patches the function pointers for you. You get the original address handed back so you can call through to the real implementation.</p>
+
+
+
+<p class="wp-block-paragraph">The data structure involved is <code>RTL_VERIFIER_DLL_DESCRIPTOR</code>. It describes one DLL from which you want to hook functions, and contains:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>DllName</code>: the DLL name with extension (e.g., <code>L"kernel32.dll"</code>). The extension is required.</li>
+
+
+
+<li><code>DllFlags</code>: set to zero.</li>
+
+
+
+<li><code>DllAddress</code>: filled in by the infrastructure. Leave it alone.</li>
+
+
+
+<li><code>DllThunks</code>: pointer to an array of <code>RTL_VERIFIER_THUNK_DESCRIPTOR</code> entries. The last entry must be all zeros (null sentinel).</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Each <code>RTL_VERIFIER_THUNK_DESCRIPTOR</code> has three fields:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>ThunkName</code>: the exported function name to hook.</li>
+
+
+
+<li><code>ThunkOldAddress</code>: a placeholder. The infrastructure writes the original function address here after patching.</li>
+
+
+
+<li><code>ThunkNewAddress</code>: your hook function. This is what the infrastructure patches in.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">For example, to hook <a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc" rel="nofollow noopener" target="_blank"><code>VirtualAlloc</code></a> from <code>kernel32.dll</code>:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>// Forward declaration
+LPVOID WINAPI HookVirtualAlloc(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+
+static RTL_VERIFIER_THUNK_DESCRIPTOR g_funcs[] = {
+    { (LPSTR)"VirtualAlloc", nullptr, HookVirtualAlloc },
+    { nullptr, 0, nullptr }  // sentinel
+};
+
+static RTL_VERIFIER_DLL_DESCRIPTOR g_dlls[] = {
+    { (PWSTR)L"kernel32.dll", 0, nullptr, g_funcs },
+    { nullptr, 0, nullptr, nullptr }  // sentinel
+};</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #6A9955">// Forward declaration</span></span>
+<span class="line"><span style="color: #D4D4D4">LPVOID WINAPI </span><span style="color: #DCDCAA">HookVirtualAlloc</span><span style="color: #D4D4D4">(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #569CD6">static</span><span style="color: #D4D4D4"> RTL_VERIFIER_THUNK_DESCRIPTOR g_funcs[] = {</span></span>
+<span class="line"><span style="color: #D4D4D4">    { (LPSTR)</span><span style="color: #CE9178">&quot;VirtualAlloc&quot;</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, HookVirtualAlloc },</span></span>
+<span class="line"><span style="color: #D4D4D4">    { </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4"> }</span><span style="color: #6A9955">  // sentinel</span></span>
+<span class="line"><span style="color: #D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #569CD6">static</span><span style="color: #D4D4D4"> RTL_VERIFIER_DLL_DESCRIPTOR g_dlls[] = {</span></span>
+<span class="line"><span style="color: #D4D4D4">    { (PWSTR)</span><span style="color: #CE9178">L&quot;kernel32.dll&quot;</span><span style="color: #D4D4D4">, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, g_funcs },</span></span>
+<span class="line"><span style="color: #D4D4D4">    { </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4"> }</span><span style="color: #6A9955">  // sentinel</span></span>
+<span class="line"><span style="color: #D4D4D4">};</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">You then set <code>g_verifierDesc.ProviderDlls = g_dlls;</code> instead of the empty descriptor from before.</p>
+
+
+
+<h2 class="wp-block-heading">Implementing the Hook</h2>
+
+
+
+<p class="wp-block-paragraph">Your hook function has the same signature as the original. To call through to the original, use the <code>ThunkOldAddress</code> field that the infrastructure filled in. Since it&#8217;s a <code>void*</code>, you need to cast it to the right type. A static local variable works well here to avoid repeating the cast:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>LPVOID WINAPI HookVirtualAlloc(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect) {
+    static const auto originalFn = (decltype(&amp;VirtualAlloc))g_funcs[0].ThunkOldAddress;
+
+    auto msg = std::format("VirtualAlloc: tid={} size={} type={:#x} prot={:#x} lp={}\n",
+        GetCurrentThreadId(), dwSize, flAllocationType, flProtect, lpAddress);
+    OutputDebugStringA(msg.c_str());
+
+    LPVOID result = originalFn(lpAddress, dwSize, flAllocationType, flProtect);
+
+    auto msg2 = std::format("VirtualAlloc result: {}\n", result);
+    OutputDebugStringA(msg2.c_str());
+
+    return result;
+}</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">LPVOID WINAPI </span><span style="color: #DCDCAA">HookVirtualAlloc</span><span style="color: #D4D4D4">(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect) {</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">static</span><span style="color: #D4D4D4"> </span><span style="color: #569CD6">const</span><span style="color: #D4D4D4"> </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> originalFn = (</span><span style="color: #569CD6">decltype</span><span style="color: #D4D4D4">(&amp;VirtualAlloc))</span><span style="color: #9CDCFE">g_funcs</span><span style="color: #D4D4D4">[</span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">].</span><span style="color: #9CDCFE">ThunkOldAddress</span><span style="color: #D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> msg = </span><span style="color: #4EC9B0">std</span><span style="color: #D4D4D4">::</span><span style="color: #DCDCAA">format</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;VirtualAlloc: tid={} size={} type={:#x} prot={:#x} lp={}</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">,</span></span>
+<span class="line"><span style="color: #D4D4D4">        </span><span style="color: #DCDCAA">GetCurrentThreadId</span><span style="color: #D4D4D4">(), dwSize, flAllocationType, flProtect, lpAddress);</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">OutputDebugStringA</span><span style="color: #D4D4D4">(</span><span style="color: #9CDCFE">msg</span><span style="color: #D4D4D4">.</span><span style="color: #DCDCAA">c_str</span><span style="color: #D4D4D4">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">    LPVOID result = </span><span style="color: #DCDCAA">originalFn</span><span style="color: #D4D4D4">(lpAddress, dwSize, flAllocationType, flProtect);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #569CD6">auto</span><span style="color: #D4D4D4"> msg2 = </span><span style="color: #4EC9B0">std</span><span style="color: #D4D4D4">::</span><span style="color: #DCDCAA">format</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;VirtualAlloc result: {}</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">, result);</span></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #DCDCAA">OutputDebugStringA</span><span style="color: #D4D4D4">(</span><span style="color: #9CDCFE">msg2</span><span style="color: #D4D4D4">.</span><span style="color: #DCDCAA">c_str</span><span style="color: #D4D4D4">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">    </span><span style="color: #C586C0">return</span><span style="color: #D4D4D4"> result;</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">Note the <code>\n</code> at the end of the format string. <a href="https://learn.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-outputdebugstringa" rel="nofollow noopener" target="_blank"><code>OutputDebugStringA</code></a> does not add a newline automatically, so without it all the output runs together in DebugView (unless you set DebugView to add \n automatically).</p>
+
+
+
+<p class="wp-block-paragraph">You can extend <code>g_funcs</code> with as many functions from <code>kernel32.dll</code> as you like. If you want to hook functions from a different DLL, add another <code>RTL_VERIFIER_DLL_DESCRIPTOR</code> entry to <code>g_dlls</code> with its own thunk list.</p>
+
+
+
+<h2 class="wp-block-heading">Testing with DebugView</h2>
+
+
+
+<p class="wp-block-paragraph">To see the hook output without attaching a debugger, use <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/debugview" rel="nofollow noopener" target="_blank">DebugView</a> from Sysinternals. Make sure to enable &#8220;Capture Global Win32&#8221; so that output from elevated processes (like MMC) is captured.</p>
+
+
+
+<p class="wp-block-paragraph">With DebugView running, launch the target executable. You&#8217;ll immediately see <code>VirtualAlloc</code> calls appearing in the log, along with the parameters and return values. Every allocation the process makes goes through your hook.</p>
+
+
+
+<p class="wp-block-paragraph">In this case it&#8217;s just logging, but you can do anything in the hook: block allocations, redirect them, track them, modify parameters. The mechanism is general.</p>
+
+
+
+<h2 class="wp-block-heading">Limitations and Use Cases</h2>
+
+
+
+<p class="wp-block-paragraph">The main limitation is the <code>System32</code> requirement. Because arbitrary DLLs in arbitrary locations would be a significant security risk (any user could place a DLL that gets loaded into a privileged process), the verifier infrastructure restricts loading to <code>System32</code> only. Getting a DLL into <code>System32</code> requires administrator privileges, which limits the contexts where this technique is practical.</p>
+
+
+
+<p class="wp-block-paragraph">The second limitation is that targeting is by executable name, not by path. If you configure Application Verifier for <code>mmc.exe</code>, it applies to every <code>mmc.exe</code> that launches on the system, regardless of where it is located.</p>
+
+
+
+<p class="wp-block-paragraph">Those trade-offs aside, this technique is genuinely useful for:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Security tooling and EDR prototypes that need to observe process behavior from very early in startup</li>
+
+
+
+<li>Debugging and instrumentation of processes that are difficult to attach to conventionally</li>
+
+
+
+<li>Research into DLL loading order and process initialization behavior</li>
+
+
+
+<li>Understanding how tools like Application Verifier and GFlags are implemented internally</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">The verifier infrastructure is also interesting from a defensive perspective: if your EDR or AVAM solution supports it, you can use the <code>VerifierDlls</code> key as an indicator of potentially suspicious configuration.</p>
+
+
+
+<h2 class="wp-block-heading">Keep Learning</h2>
+
+
+
+<p class="wp-block-paragraph">If you want to go deeper on the mechanics behind this technique, the following TrainSec courses cover the relevant internals:</p>
+
+
+
+<ul class="wp-block-list">
+<li><a href="https://trainsec.net/courses/windows-internals-bundle/">Windows Internals Bundle</a>: covers process and DLL loading internals in depth across all five days</li>
+
+
+
+<li><a href="https://trainsec.net/courses/windows-internals-day-3/">Windows Internals: Day 3</a>: includes DLL loading, DllMain, and implicit/explicit DLL loading.</li>
+
+
+
+<li><a href="https://trainsec.net/courses/edr-internals-research-development/">EDR Internals: R&amp;D</a>: covers injection techniques and detection strategies from a security engineering perspective</li>
+
+
+
+<li><a href="https://trainsec.net/courses/malware-analysis-and-development/">Malware Analysis and Development</a>: covers DLL injection from the offensive and analysis perspective</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/dll-injection-with-windows-application-verifier/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sharing Kernel Objects by Name - Perks and Perils — TrainSec article | 1200km</title>
+<meta name="description" content="Sharing Kernel Objects by Name - Perks and Perils by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/programming/sharing-kernel-objects-by-name-perks-and-perils/"><meta name="keywords" content="Pavel Yosifovich, Windows kernel, Technical walkthrough, Windows, kernel">
+<meta property="article:published_time" content="2024-09-12">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/programming-sharing-kernel-objects-by-name-perks-and-perils.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Sharing Kernel Objects by Name - Perks and Perils"><meta property="og:url" content="https://1200km.com/articles/trainsec/programming-sharing-kernel-objects-by-name-perks-and-perils.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/programming-sharing-kernel-objects-by-name-perks-and-perils.html#article","url":"https://1200km.com/articles/trainsec/programming-sharing-kernel-objects-by-name-perks-and-perils.html","headline":"Sharing Kernel Objects by Name - Perks and Perils","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/programming-sharing-kernel-objects-by-name-perks-and-perils.html#webpage"},"datePublished":"2024-09-12","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/programming/sharing-kernel-objects-by-name-perks-and-perils/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows kernel · Technical walkthrough</p><h1>Sharing Kernel Objects by Name - Perks and Perils</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> September 13, 2024</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">kernel</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/programming/sharing-kernel-objects-by-name-perks-and-perils/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Some Windows kernel object types can have string-based names, which is one way such objects can be relatively easily shared between processes. However, it&#8217;s not all rainbows and unicorns.</p>
+
+
+
+<p class="wp-block-paragraph">There are fundamentally three ways to share kernel objects between processes:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Share by name (the focus of this post)</li>
+
+
+
+<li>Handle inheritance &#8211; applies when a process creates a child process and wants to duplicate some of its handles to the newly created process.</li>
+
+
+
+<li>Handle duplication &#8211; this is the most generic mechanism, employing the <code><a href="https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle" rel="nofollow noopener noreferrer" target="_blank">DuplicateHandle</a></code> API, but the most difficult in practice for reasons I&#8217;ll discuss in a future post.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">To share by name, we need to create the object with a name so that it can be used in other processes. For example, suppose we have a bunch of worker processes that are controlled by a &#8220;main&#8221; process. At some point, the controller (&#8220;main&#8221;) process may want to notify the worker processes to shut down gracefully. A kernel event object could be used for that purpose. The controller would create the object with a well-known name, and the worker processes will open their own handles to the same object. We can even have the same executable to be used by the controller and worker processes. We&#8217;ll assume that the first process creating the event will serve as the &#8220;controller&#8221;, and subsequent processes will serve as &#8220;workers&#8221;. Here is the code to create the event:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span style="display:block;padding:16px 0 0 16px;margin-bottom:-1px;width:100%;text-align:left;background-color:#1E1E1E"><svg xmlns="https://www.w3.org/2000/svg" width="54" height="14" viewBox="0 0 54 14"><g fill="none" fill-rule="evenodd" transform="translate(1 1)"><circle cx="6" cy="6" r="6" fill="#FF5F56" stroke="#E0443E" stroke-width=".5"></circle><circle cx="26" cy="6" r="6" fill="#FFBD2E" stroke="#DEA123" stroke-width=".5"></circle><circle cx="46" cy="6" r="6" fill="#27C93F" stroke="#1AAB29" stroke-width=".5"></circle></g></svg></span><span role="button" tabindex="0" data-code="HANDLE hEvent = CreateEvent(nullptr, TRUE, FALSE, L&quot;ShutdownEvent&quot;);
+if (!hEvent)
+	return 1;" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><svg xmlns="https://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">HANDLE hEvent = </span><span style="color: #DCDCAA">CreateEvent</span><span style="color: #D4D4D4">(</span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, TRUE, FALSE, </span><span style="color: #CE9178">L&quot;ShutdownEvent&quot;</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (!hEvent)</span></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #C586C0">return</span><span style="color: #D4D4D4"> </span><span style="color: #B5CEA8">1</span><span style="color: #D4D4D4">;</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The event is created as manual-reset (second argument <code>TRUE</code>) so that signaling the event can wake any number of threads waiting on it. The nice thing about the <a href="https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createeventw" target="_blank" rel="noreferrer noopener nofollow"><code>CreateEvent</code> </a>API and similar <code>Create*</code> functions when creating named objects is that the API behaves as &#8220;Create or Open&#8221; &#8211; if the object with that name already exists, it receives a handle to the existing object.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph">How can we tell if the object was just created, or a handle was opened to an existing object? The <a href="https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror" target="_blank" rel="noreferrer noopener nofollow"><code>GetLastError</code> </a>API is here to help. Normally, it reports the last error that occurred because of the latest API call. However, for a successful creation or opening of a named object, it returns a special value (<code>ERROR_ALREADY_EXISTS</code>) if the object existed prior to the Create call. If the object exists, the process assumes the role of a worker, and waits for the event to be signaled by the controller process:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span style="display:block;padding:16px 0 0 16px;margin-bottom:-1px;width:100%;text-align:left;background-color:#1E1E1E"><svg xmlns="https://www.w3.org/2000/svg" width="54" height="14" viewBox="0 0 54 14"><g fill="none" fill-rule="evenodd" transform="translate(1 1)"><circle cx="6" cy="6" r="6" fill="#FF5F56" stroke="#E0443E" stroke-width=".5"></circle><circle cx="26" cy="6" r="6" fill="#FFBD2E" stroke="#DEA123" stroke-width=".5"></circle><circle cx="46" cy="6" r="6" fill="#27C93F" stroke="#1AAB29" stroke-width=".5"></circle></g></svg></span><span role="button" tabindex="0" data-code="if (GetLastError() == ERROR_ALREADY_EXISTS) {
+	printf(&quot;Worker PID: %u\n&quot;, GetCurrentProcessId());
+
+	WaitForSingleObject(hEvent, INFINITE);
+
+	printf(&quot;Shutting down...\n&quot;);
+}" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><svg xmlns="https://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #C586C0">if</span><span style="color: #D4D4D4"> (</span><span style="color: #DCDCAA">GetLastError</span><span style="color: #D4D4D4">() == ERROR_ALREADY_EXISTS) {</span></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;Worker PID: </span><span style="color: #9CDCFE">%u</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">, </span><span style="color: #DCDCAA">GetCurrentProcessId</span><span style="color: #D4D4D4">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #DCDCAA">WaitForSingleObject</span><span style="color: #D4D4D4">(hEvent, INFINITE);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;Shutting down...</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">If <code>GetLastError</code> returns zero, it means the object was just created, so the process assumes the role of the controller, waits for the user to press ENTER, and sends the signal (by setting the event with <code><a href="https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-setevent" target="_blank" rel="noreferrer noopener nofollow">SetEvent</a></code>) to the waiting workers (this is just for demonstration purposes, of course. Pressing ENTER is not likely to be used in a real scenario, but the mechanism is the same):</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span style="display:block;padding:16px 0 0 16px;margin-bottom:-1px;width:100%;text-align:left;background-color:#1E1E1E"><svg xmlns="https://www.w3.org/2000/svg" width="54" height="14" viewBox="0 0 54 14"><g fill="none" fill-rule="evenodd" transform="translate(1 1)"><circle cx="6" cy="6" r="6" fill="#FF5F56" stroke="#E0443E" stroke-width=".5"></circle><circle cx="26" cy="6" r="6" fill="#FFBD2E" stroke="#DEA123" stroke-width=".5"></circle><circle cx="46" cy="6" r="6" fill="#27C93F" stroke="#1AAB29" stroke-width=".5"></circle></g></svg></span><span role="button" tabindex="0" data-code="else {
+	printf(&quot;Controller PID: %u\n&quot;, GetCurrentProcessId());
+
+	printf(&quot;Press ENTER to set event for graceful shutdown...\n&quot;);
+	char s[2];
+	gets_s(s);
+
+	SetEvent(hEvent);
+}" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><svg xmlns="https://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #C586C0">else</span><span style="color: #D4D4D4"> {</span></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;Controller PID: </span><span style="color: #9CDCFE">%u</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">, </span><span style="color: #DCDCAA">GetCurrentProcessId</span><span style="color: #D4D4D4">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #DCDCAA">printf</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">&quot;Press ENTER to set event for graceful shutdown...</span><span style="color: #D7BA7D">\n</span><span style="color: #CE9178">&quot;</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #569CD6">char</span><span style="color: #D4D4D4"> </span><span style="color: #9CDCFE">s</span><span style="color: #D4D4D4">[</span><span style="color: #B5CEA8">2</span><span style="color: #D4D4D4">];</span></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #DCDCAA">gets_s</span><span style="color: #D4D4D4">(s);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">	</span><span style="color: #DCDCAA">SetEvent</span><span style="color: #D4D4D4">(hEvent);</span></span>
+<span class="line"><span style="color: #D4D4D4">}</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">While the user does not press ENTER we have multiple processes, where one is a controller, and the rest are workers. Here are some output from 4 processes:</p>
+
+
+
+<pre class="wp-block-code"><code>Handle: 0x00000000000000A4
+Controller PID: 57524
+Press ENTER to set event for graceful shutdown...
+
+Handle: 0x00000000000000A4
+Worker PID: 59980
+
+Handle: 0x00000000000000A8
+Worker PID: 62228
+
+Handle: 0x00000000000000B4
+Worker PID: 56228</code></pre>
+
+
+
+<p class="wp-block-paragraph">If we run <em><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer" target="_blank" rel="noreferrer noopener nofollow">Process Explorer</a></em> and check the properties of any of the handles (before pressing ENTER in the controller), we see this:</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" fetchpriority="high" decoding="async" width="424" height="450" alt="image" class="wp-image-2316"  src="https://trainsec.net/wp-content/uploads/2024/09/image.png" srcset="https://trainsec.net/wp-content/uploads/2024/09/image.png 424w, https://trainsec.net/wp-content/uploads/2024/09/image-283x300.png 283w" sizes="(max-width: 424px) 100vw, 424px"/></figure>
+
+
+
+<p class="wp-block-paragraph">There are 4 open handles to that same event. Note the name of the event &#8211; it&#8217;s not actually &#8220;ShutdownEvent&#8221;, but has a prefix which is session relative &#8211; &#8220;\Sessions\1\BaseNamedObjects&#8221;, which implies that when working with named objects in the Windows API, the created name is stored under a session-relative directory object in the Object Manager&#8217;s namespace. We can see this object from a named-object perspective in Sysinternals <em>WinObj</em> tool:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="464" alt="image 1" class="wp-image-2317"  src="https://trainsec.net/wp-content/uploads/2024/09/image-1-1024x464.png" srcset="https://trainsec.net/wp-content/uploads/2024/09/image-1-1024x464.png 1024w, https://trainsec.net/wp-content/uploads/2024/09/image-1-600x272.png 600w, https://trainsec.net/wp-content/uploads/2024/09/image-1-300x136.png 300w, https://trainsec.net/wp-content/uploads/2024/09/image-1-768x348.png 768w, https://trainsec.net/wp-content/uploads/2024/09/image-1.png 1237w" sizes="(max-width: 1024px) 100vw, 1024px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Once we press ENTER in the controller&#8217;s console, the event is set, the worker processes wait is satisfied, and they cleanly exit.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">So, What&#8217;s Wrong with Named Objects?</h2>
+
+
+
+<p class="wp-block-paragraph">Using named objects for sharing is easy and convenient. However, there could be a couple of issues. First, the name of the object is &#8220;public&#8221;, i.e. visible using tools like <em>Process Explorer</em>, which uses an API to enumerate all handles in the system. Although that API is not officially documented (<code>NtQuerySystemInformation</code> with <code>SystemExtendedHandleInformation</code>), it&#8217;s known, and I have written about it in my latest book, &#8220;<a href="https://www.amazon.com/Windows-Native-Programming-Pavel-Yosifovich/dp/B0D7S5LVXZ" target="_blank" rel="noreferrer noopener nofollow">Windows Native API Programming</a>&#8220;. This means anyone can find the object and could potentially tamper with it.</p>
+
+
+
+<p class="wp-block-paragraph">Here is a simple example using the Windows classic media player application (<strong>wmplayer.exe</strong>). This application makes sure it&#8217;s running with a single instance by creating a named Mutex object and checking if such an object exists. If it does, it terminates, so that the first instance is the only remaining. Here is the Mutex shown in <em>Process Explorer</em>:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="474" alt="image 2" class="wp-image-2318"  src="https://trainsec.net/wp-content/uploads/2024/09/image-2-1024x474.png" srcset="https://trainsec.net/wp-content/uploads/2024/09/image-2-1024x474.png 1024w, https://trainsec.net/wp-content/uploads/2024/09/image-2-600x278.png 600w, https://trainsec.net/wp-content/uploads/2024/09/image-2-300x139.png 300w, https://trainsec.net/wp-content/uploads/2024/09/image-2-768x355.png 768w, https://trainsec.net/wp-content/uploads/2024/09/image-2.png 1279w" sizes="(max-width: 1024px) 100vw, 1024px"/></figure>
+
+
+
+<p class="wp-block-paragraph">One thing we could do to create an additional media player instance is to close the existing handle using Process Explorer (right-click and select Close Handle), and then a new instance can be launched. A malicious entity could do the opposite: create a named mutex with exactly the same name before a media player is launched, and then you&#8217;ll find that media player fails to launch entirely! It thinks there is another instance already running, and immediately shuts down. That&#8217;s a deny of service attack.</p>
+
+
+
+<p class="wp-block-paragraph">The bottom line is that named objects are visible. Can we do something about it? Fortunately, we can. Windows Vista added the ability to use <em><a href="https://learn.microsoft.com/en-us/windows/win32/sync/object-namespaces" target="_blank" rel="noreferrer noopener nofollow">Private Object Namespaces</a></em>, where a cooperating set of processes know about a private namespace for the named objects they want to share. That private namespace is not visible from user mode at all &#8211; there is no API to get it. You can find examples of using this API online or in my book, &#8220;<a href="https://www.amazon.com/Windows-10-System-Programming-Part/dp/B086Y6M7LH/" target="_blank" rel="noreferrer noopener nofollow">Windows 10 System Programming, Part 1</a>&#8220;.</p>
+
+
+
+<p class="wp-block-paragraph">The second issue with named objects is simpler &#8211; some object types cannot have names, so cannot be shared by name. Examples include tokens, processes, and threads (processes and threads have IDs, not names). </p>
+
+
+
+<h2 class="wp-block-heading">Sharing Across Sessions</h2>
+
+
+
+<p class="wp-block-paragraph">As we&#8217;ve seen The Windows API creates named objects under a session-relative directory object. What if we need to share kernel objects between processes running in different sessions? For example, a service running in session 0, and a GUI client application running in session 1. The Windows API supports using the &#8220;Global&#8221; prefix to store the object in session 0 namespace, accessible by all sessions as a &#8220;shared&#8221; named objects repository. A name like &#8220;<strong>Global\ShutdownEvent</strong>&#8221; will create the object in the &#8220;\BaseNamedObjects&#8221; directory (directly under the root). Try it out!</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-windows-subsystem-for-linux.html">How does Windows Subsystem for Linux (Version 1) actually work?</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-inside-the-windows-recycle-bin-what-really-happens-when-you-delete-a-file.html">Inside the Windows Recycle Bin - What Really Happens When You Delete a File?</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-introduction-to-windows-services.html">Introduction to Windows Services</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-kernel-allocation-tags-in-windows-explained.html">Kernel Allocation Tags in Windows Explained</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/programming/sharing-kernel-objects-by-name-perks-and-perils/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VMMap Basics: How to Read a Windows Process&#39;s Memory Layout — TrainSec article | 1200km</title>
+<meta name="description" content="Pavel Yosifovich uses VMMap to break down a process&#39;s memory layout, for developers and researchers who want to see what memory a process really uses.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/vmmap-basics-how-to-read-a-windows-processs-memory-layout/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-08-01">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-vmmap-basics-how-to-read-a-windows-processs-memory-layout.html">
+<meta property="og:type" content="article"><meta property="og:title" content="VMMap Basics: How to Read a Windows Process&#39;s Memory Layout"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-vmmap-basics-how-to-read-a-windows-processs-memory-layout.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-vmmap-basics-how-to-read-a-windows-processs-memory-layout.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-vmmap-basics-how-to-read-a-windows-processs-memory-layout.html","headline":"VMMap Basics: How to Read a Windows Process's Memory Layout","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-vmmap-basics-how-to-read-a-windows-processs-memory-layout.html#webpage"},"datePublished":"2026-08-01","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/vmmap-basics-how-to-read-a-windows-processs-memory-layout/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>VMMap Basics: How to Read a Windows Process&#39;s Memory Layout</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> August 2, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/vmmap-basics-how-to-read-a-windows-processs-memory-layout/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph"><em>Pavel Yosifovich, co-author of the Microsoft Press Windows Internals books, turns to one of the Sysinternals tools this time: VMMap. </em></p>
+
+
+
+<p class="wp-block-paragraph">In an earlier post I looked at <a href="https://trainsec.net/library/windows-internals/maximum-handles-in-a-process/">the maximum number of handles a process can hold</a>; this one is about what actually fills a process&#8217;s address space, and what each part of it is for. VMMap is free, part of the Sysinternals suite, and it will tell you more about what a process is doing with memory than Task Manager ever will. This is aimed at Windows developers and security researchers who want to look at a running process and actually understand its memory, not just its total footprint.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="VMMap Basics" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/Mnj50mg8OoE?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">What Does VMMap Actually Show You?</h2>
+
+
+
+<p class="wp-block-paragraph">VMMap opens against a single process and gives you three views at once: a summary of the whole address space at the top, a breakdown by memory type in the middle, and the full address space map at the bottom, which you can expand block by block. Pick a process like Visual Studio, and the summary immediately tells you the committed memory, the private bytes, and the working set, color coded by category. Select one of the rows in the middle section and the bottom view filters down to just that category, and you can drill into individual blocks to see exactly what is there.</p>
+
+
+
+<h2 class="wp-block-heading">How Big Is a Process Address Space, Really?</h2>
+
+
+
+<p class="wp-block-paragraph">Every process gets its own address space, starting at address zero. On 64-bit Windows that space spans up to 128 terabytes. On 32-bit, it is a lot smaller, around 2 GB by default. Either way, almost none of it is actually used. When a process starts, only the executable and ntdll get mapped in by the kernel. Ntdll then takes over, loads whatever other DLLs the executable depends on, and eventually calls the entry point, typically a C runtime stub that in turn calls the <code>main</code> function you actually wrote. Everything else you see in VMMap, every heap, every stack, every mapped file, gets added to that space afterward, while the process is running.</p>
+
+
+
+<h2 class="wp-block-heading">What Do Committed, Private Bytes, and Working Set Actually Mean?</h2>
+
+
+
+<p class="wp-block-paragraph">These three numbers look similar and are not. Committed memory is memory that has actually been allocated with something like <a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc" rel="nofollow noopener" target="_blank"><code>VirtualAlloc</code></a>, meaning you can use it right now. Private bytes, which Task Manager calls Commit Size, is the subset of that committed memory that belongs only to this process. Some committed memory is shareable: DLL images, for instance, are mostly shared between every process that loads them, so the purple bar for images in VMMap is large in the committed view but tiny in the private view. Heaps, on the other hand, are always private, so their bar looks exactly the same size in both views. Nothing about a heap can be shared with another process.</p>
+
+
+
+<p class="wp-block-paragraph">Then there is the working set, which is the part of committed memory that is currently sitting in physical RAM rather than paged out somewhere else. A process can commit far more memory than is actually resident at any given moment, and the gap between committed size and working set is exactly that: memory that has been allocated but is not currently occupying RAM.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img fetchpriority="high" fetchpriority="high" decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Why Does Memory Always Come in 4 KB Chunks?</h2>
+
+
+
+<p class="wp-block-paragraph">Every low-level allocation, whether through <code>VirtualAlloc</code> or something built on top of it, works in units of pages, and a page on Windows systems is 4 KB by default. That is why the smallest block you will ever see in VMMap is 4 KB, and why the last three hex digits of any address here are always zero. There is also a two-step dance behind every allocation: you first reserve a range of address space, then commit some or all of it. A reserved-only block has nothing behind it; try to touch it and you get an access violation. A committed block has real memory and a real protection, like read/write or execute/read, and it is possible for a single reserved region to have only parts of it actually committed, which is exactly the kind of structure you see when you expand a block in VMMap.</p>
+
+
+
+<h2 class="wp-block-heading">What Are the Memory Categories VMMap Breaks Down?</h2>
+
+
+
+<p class="wp-block-paragraph">This is really where VMMap earns its keep. Select <strong>Images</strong> and you get every PE file mapped into the process, DLLs and the executable itself. Expand one and you see it broken into sections that map straight to what is in the PE file: a read-only header, a text section where the code lives, protected as execute and read, a data section, resources, and so on. Most of an image is shareable, since multiple processes load the same DLL, but any section with private, writable data gets its own private copy per process if needed (Copy on Write).</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Mapped files</strong> look similar to images but are not necessarily PE files at all. Anything memory-mapped as a plain data file, including something like a font file, shows up here, and like images, this memory is shareable, at least potentially.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Heaps</strong> are always private. Every call to <a href="https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate" rel="nofollow noopener" target="_blank"><code>HeapCreate</code></a>, and everything built on top of it including the classic C runtime <code>malloc</code>, manages smaller allocations not on page granularity so pages are not wasted on tiny requests. A process can and often does have many heaps, each numbered by VMMap starting at zero. Any DLL loaded into the process can create its own.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Managed heap</strong> only shows up if the process is running .NET code, and stays empty otherwise.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Stacks</strong> are per thread. Each one has a committed part that is currently usable, a guard page just below it that triggers the memory manager to commit more when the thread needs it, and a reserved region below that where the stack can keep growing, since stacks grow downward in Windows.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Shareable</strong> memory is memory backed by a section object rather than a specific file. It is not necessarily shared with anyone right now, but it could be, and once every handle to that section closes, the memory is simply gone with nothing persistent behind it. One block here looked genuinely strange until I dug into it: a reserved region of roughly two terabytes with only a hundred-odd megabytes actually committed, and committed with no access at all, which sounds pointless until you recognize it. That turns out to be the bitmap behind <a href="https://learn.microsoft.com/en-us/windows/win32/secbp/control-flow-guard" rel="nofollow noopener" target="_blank">Control Flow Guard</a>, a security feature present in most Microsoft-built processes, and its no-access protection is entirely intentional: nothing is supposed to read it directly.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Private data</strong> is everything left over, the catch-all for <code>VirtualAlloc</code> blocks that VMMap cannot tie to any of the categories above. It is not completely useless, though. It is also where you find <a href="https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-teb" rel="nofollow noopener" target="_blank">Thread Environment Block</a>s, a per-thread data structure every thread has in user mode, which brings up the one genuine bug in the tool.</p>
+
+
+
+<h2 class="wp-block-heading">What Can&#8217;t VMMap Do, and Why Does That Matter?</h2>
+
+
+
+<p class="wp-block-paragraph">VMMap takes a snapshot. It does not refresh automatically, so if you want current numbers you either hit F5 (Refresh). The Timeline feature, which tracks changes across repeated refreshes and is far more interesting on a process that is actually doing something than on one sitting idle. More importantly, VMMap will show you that a block is committed and what category it falls into, but it will not show you the actual bytes inside that block. For that you need a different tool, something like <strong>System Informer</strong> (formerly <strong>Process Hacker</strong>), which can open a process and let you read its memory live.</p>
+
+
+
+<p class="wp-block-paragraph">There is also a harder limit worth naming directly: <a href="https://trainsec.net/library/windows-internals/protected-processes-ppl-keeping-windows-heart-safe/">protected processes</a> are out of reach for VMMap entirely, because you cannot obtain a powerful enough handle to open one without a kernel driver, and VMMap, at least in its current form, does not use one. </p>
+
+
+
+<h2 class="wp-block-heading">What This Means Practically</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Open VMMap against a suspicious or unfamiliar process before reaching for a debugger, to get committed, private, and working set numbers at a glance.</li>
+
+
+
+<li>Expand the Images row on any process to see a PE&#8217;s actual sections in memory, not just its file layout on disk.</li>
+
+
+
+<li>Recognize a huge reserved region with almost nothing committed as a strong hint you are looking at a security bitmap like Control Flow Guard, not a memory leak.</li>
+
+
+
+<li>Treat a &#8220;Thread Environment Block&#8221; entry in Private Data as real only when a thread ID is shown next to it; a reserved-only block cannot be a TEB, no matter what the label says.</li>
+
+
+
+<li>Reach for System Informer, not VMMap, the moment you need to read the actual bytes inside a committed block instead of just knowing it exists.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Keep Learning</h2>
+
+
+
+<p class="wp-block-paragraph">If you want to go deeper into the Sysinternals tools and the Windows internals behind them, these TrainSec courses go further:</p>
+
+
+
+<ul class="wp-block-list">
+<li><a href="https://trainsec.net/courses/sysinternals-tools-deep-dive-1/">Sysinternals Tools Deep Dive</a>: covers VMMap alongside Process Explorer, WinObj, DebugView, CPU Stress, Not My Fault, and LiveKD, with the internals context behind each one</li>
+
+
+
+<li><a href="https://trainsec.net/windows-internals-master/">Windows Internals Master</a>: the full learning path if you want to understand processes, memory, and the kernel from the ground up</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Related reading in the knowledge library: <a href="https://trainsec.net/library/windows-internals/protected-processes-ppl-keeping-windows-heart-safe/">Protected Processes &amp; PPL</a>, on why some processes are off limits even to tools like VMMap, and <a href="https://trainsec.net/library/windows-internals/maximum-handles-in-a-process/">Maximum Handles in a Process</a>, another look at per-process limits from a different angle.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/vmmap-basics-how-to-read-a-windows-processs-memory-layout/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>
