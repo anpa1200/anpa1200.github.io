@@ -7,6 +7,7 @@ const facts = JSON.parse(read('data/site-facts.json')).facts;
 const workflow = read('.github/workflows/pages.yml');
 const metadataBuilder = read('scripts/build-site-artifacts.mjs');
 const archiveStager = read('scripts/stage-article-archive-governance.mjs');
+const trainsecCatalogue = read('articles/trainsec-library.html');
 const articleIndexes = [
   'ai-offensive.html',
   'cti.html',
@@ -60,4 +61,13 @@ test('article archive routes receive authoritative sitemap dates', () => {
   assert.match(metadataBuilder, /function archiveDate\(canonical\)/);
   assert.match(metadataBuilder, /content\.local_article_archive/);
   assert.match(metadataBuilder, /archiveDate\(page\.canonical\)/);
+});
+
+test('TrainSec catalogue filters search metadata and reset stale browser state', () => {
+  assert.equal([...trainsecCatalogue.matchAll(/<article class="article-card"/g)].length, 84);
+  assert.equal([...trainsecCatalogue.matchAll(/data-tags="[^"]*"/g)].length, 84);
+  assert.match(trainsecCatalogue, /id="filter-reset"/);
+  assert.match(trainsecCatalogue, /const setControl=\(control,key\)=>/);
+  assert.match(trainsecCatalogue, /card\.dataset\.tags/);
+  assert.match(trainsecCatalogue, /history\.replaceState\(null,'',location\.pathname\)/);
 });
