@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introduction to the Windows Performance Analyzer (WPA) — TrainSec article | 1200km</title>
+<meta name="description" content="Introduction to the Windows Performance Analyzer (WPA) by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/introduction-to-the-windows-performance-analyzer/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2024-11-09">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-introduction-to-the-windows-performance-analyzer.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Introduction to the Windows Performance Analyzer (WPA)"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-introduction-to-the-windows-performance-analyzer.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-introduction-to-the-windows-performance-analyzer.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-introduction-to-the-windows-performance-analyzer.html","headline":"Introduction to the Windows Performance Analyzer (WPA)","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-introduction-to-the-windows-performance-analyzer.html#webpage"},"datePublished":"2024-11-09","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/introduction-to-the-windows-performance-analyzer/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Introduction to the Windows Performance Analyzer (WPA)</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> November 10, 2024</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/introduction-to-the-windows-performance-analyzer/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Hi, and welcome to this video about an introduction to the Windows Performance Analyzer.</p>
+
+
+
+<p class="wp-block-paragraph">We&#8217;re talking here about something called the <strong>Microsoft Windows Performance Toolkit</strong>. The Windows Performance Toolkit can be installed today using the <strong>Windows SDK</strong>, which is one component you can select while installing. There&#8217;s also the <strong>Windows ADK</strong>, the <strong>Assessment and Deployment Kit</strong>, where the Windows Performance Toolkit is included as well. You can choose that when installing; either one would work.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Introduction to the Windows Performance Analyzer" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/Cw4d3pyZwX4?feature=oembed"></iframe>
+</div><figcaption class="wp-element-caption">Introduction to the Windows Performance Analyzer by Pavel Yosifovich</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Installing the Windows Performance Analyzer Toolkit</h2>
+
+
+
+<p class="wp-block-paragraph">What you get with that is the <strong>Windows Performance Recorder</strong> first, that is the tool to record <strong>ETW</strong> (Event Tracing for Windows) events. In fact, the Windows Performance Recorder and Analyzer are all about ETW. You might recall I did a quick introduction to ETW a few videos back.</p>
+
+
+
+<p class="wp-block-paragraph">So, WPR records ETW events, and the more events you have, the more difficult it is to analyze. This is where the <strong>Windows Performance Analyzer</strong> comes into play.</p>
+
+
+
+<p class="wp-block-paragraph">You can also get the WPA in the Microsoft app store: <a href="https://apps.microsoft.com/detail/9n0w1b2bxgnz?hl=en-US&amp;gl=US" target="_blank" rel="noreferrer noopener nofollow">https://apps.microsoft.com/detail/9n0w1b2bxgnz?hl=en-US&amp;gl=US</a></p>
+
+
+
+<h2 class="wp-block-heading">Using WPR.exe and the GUI Version</h2>
+
+
+
+<p class="wp-block-paragraph">In general, there&#8217;s a command-line tool called <strong>WPR.exe</strong>, which is part of Windows, there&#8217;s no need to install that. However, there&#8217;s a GUI version of that which makes it so much easier to record traces, and this is really part of the Windows SDK or the Windows Performance Toolkit in general.</p>
+
+
+
+<p class="wp-block-paragraph">So, this is one thing you get, an easier way to utilize WPR, even though WPR, the command-line tool, has a bit more options than the UI version.</p>
+
+
+
+<h2 class="wp-block-heading">Analyzing Recordings with Windows Performance Analyzer</h2>
+
+
+
+<p class="wp-block-paragraph">Once you have a recording in place, you would like to analyze that, and for that, there&#8217;s the <strong>Windows Performance Analyzer</strong> (WPA). Now, WPA is a fairly complex tool and very powerful, and that&#8217;s because there&#8217;s lots of things that you typically have in a snapshot or a recording. You get lots and lots of events, and you want to try to make sense of that, especially when you&#8217;re trying to figure out something, maybe trying to investigate some kind of scenario, maybe a high CPU user, lots of memory, I/O stuff, maybe a combination of all of those.</p>
+
+
+
+<p class="wp-block-paragraph">Anything like that requires lots of information, not all of that is actually applicable, so Windows Performance Analyzer tries to make it easier to analyze these kinds of traces.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Downloading Windows Performance Analyzer from the Microsoft Store</h2>
+
+
+
+<p class="wp-block-paragraph">Technically, you don&#8217;t actually have to install WPA if this is the only thing that you want using the Performance Toolkit. It&#8217;s actually also available now through the <strong>Microsoft Store</strong>. Just search for <strong>WPA</strong>, Windows Performance Recorder and/or Analyzer, to be more precise, and you&#8217;ll find it. There&#8217;s even a preview version there that would allow you to install something that is kind of in the works and hasn&#8217;t been released just yet, but something you might want to perhaps look at.</p>
+
+
+
+<p class="wp-block-paragraph">So, here&#8217;s what that would look like in the store. This is what you would see if you try to install WPA from the store. I&#8217;ve already installed that, and that&#8217;s something that is just easy to do.</p>
+
+
+
+<h2 class="wp-block-heading">Introduction to the WPA User Interface</h2>
+
+
+
+<p class="wp-block-paragraph">So, let&#8217;s take a look at what that would look like and give you a basic introduction to the UI of WPA because it is non-trivial, just like the entire tool.</p>
+
+
+
+<h2 class="wp-block-heading">Recording with Windows Performance Recorder</h2>
+
+
+
+<p class="wp-block-paragraph">First, we need to record something. So, I&#8217;m running here the <strong>Windows Performance Recorder</strong>, the GUI tool, and when you launch it for the first time, it looks something like this. You can choose <strong>More options</strong> here to see more information.</p>
+
+
+
+<p class="wp-block-paragraph">What you get here is the ability to select a bunch of <strong>profiles</strong>. Every profile represents some kind of scenario, some kind of thing you&#8217;d like to get. Behind the scenes, the profile selects the appropriate, or at least, as far as the profile is concerned, the appropriate ETW providers that you need to add into the session in order to record information that will help you figure out what is going on.</p>
+
+
+
+<h2 class="wp-block-heading">Understanding Profiles in Windows Performance Analyzer</h2>
+
+
+
+<p class="wp-block-paragraph">You can see there it starts with <strong>First Level Triage</strong>, which is just a bunch of generic stuff about the system—generic events, and then some CPU, I/O, and memory stuff; basic stuff that might be good enough depending on what you&#8217;re trying to do, or maybe it&#8217;s just giving you some kind of baseline to work with.</p>
+
+
+
+<p class="wp-block-paragraph">Then you can see there are more intricate <strong>Resource Analysis</strong> sections here, such as CPU usage, disk and file I/O activity, registry, networking, heap, pool, lots of stuff. And if you go further down, you can see there&#8217;s even more elaborate scenarios, such as <strong>audio glitches</strong>, <strong>video glitches</strong>. If you get into any kind of trouble there, it&#8217;s really difficult to know which ETW providers will serve you best in order to try to figure out what is going on. So, these profiles already provide the best, or at least very close to the best, ETW providers you can get.</p>
+
+
+
+<p class="wp-block-paragraph">It&#8217;s also possible to <strong>customize</strong> these profiles or even create new profiles. These profiles are just XML files, and they&#8217;re documented in the Windows ADK, the Assessment and Deployment Toolkit, and so it&#8217;s possible to author your own profiles or customize existing profiles if you so desire.</p>
+
+
+
+<h2 class="wp-block-heading">Selecting Profiles for Recording</h2>
+
+
+
+<p class="wp-block-paragraph">So, what I&#8217;m going to do here: I&#8217;m going to unselect <strong>First Level Triage</strong> and do something like <strong>CPU usage</strong> and, let&#8217;s say, <strong>Disk I/O activity</strong>. I think it&#8217;s good enough for something very simple, relatively simple, but still, it won&#8217;t be that simple.</p>
+
+
+
+<p class="wp-block-paragraph">Here you can select the <strong>Performance Scenario</strong>, either <strong>General</strong>, which is what you would select in most of these cases, but there&#8217;s some special stuff like <strong>Boot scenarios</strong> and so on, which is not something I&#8217;m going to cover here.</p>
+
+
+
+<h2 class="wp-block-heading">Detail Level Settings</h2>
+
+
+
+<p class="wp-block-paragraph">We have a <strong>Detail level</strong>, either <strong>Verbose</strong> or <strong>Light</strong>. Verbose is the default; I suggest you stick with it, although you can try Light. Perhaps you&#8217;ll get less information, but maybe it would be easier to see through.</p>
+
+
+
+<h2 class="wp-block-heading">Logging Mode: Memory vs. File</h2>
+
+
+
+<p class="wp-block-paragraph">Then the <strong>Logging mode</strong> could be either <strong>Memory</strong> or <strong>File</strong>. Always use Memory in general because the buffers will remain in memory, able to capture things fast enough not to lose events, and then you&#8217;ll have the ability to save into a file. If you start with a file, then you might not have enough, the disk might not be fast enough to capture everything, and the only advantage there is that you&#8217;re going to make sure that you&#8217;re not going to run out of disk space.</p>
+
+
+
+<p class="wp-block-paragraph">So, for us, it&#8217;s good enough, and just remember it&#8217;s better to use small recordings rather than long ones because of the gigantic number of events typically that you get.</p>
+
+
+
+<h2 class="wp-block-heading">Starting and Saving a Recording</h2>
+
+
+
+<p class="wp-block-paragraph">So, I&#8217;m going to press <strong>Start</strong> here and just wait a few seconds. We can do stuff in the system, again, usually trying to do some kind of scenario, or maybe your system is already in a particular state where you want to see what is going on. And so once I&#8217;m done, I can go ahead and click the <strong>Save</strong> button, I think that&#8217;s enough.</p>
+
+
+
+<p class="wp-block-paragraph">It shows me this little dialog to say where I would like to save this and the name of the file. You can also add some kind of description if it makes sense, but I&#8217;m going to skip that and just click <strong>Save</strong>. So, it&#8217;s going to save this file, the recording. It might take a while depending on the size of the recording, so you might need to wait several seconds, even more.</p>
+
+
+
+<p class="wp-block-paragraph">Once the save completes, then you&#8217;ll get the option here to directly open this trace in WPA. So, it gives you the option to <strong>Open in WPA</strong> or just <strong>Open the folder</strong>.</p>
+
+
+
+<h2 class="wp-block-heading">Opening Traces in WPA</h2>
+
+
+
+<p class="wp-block-paragraph">So, let&#8217;s just open WPA directly. WPA is going to show up and then load our trace.</p>
+
+
+
+<p class="wp-block-paragraph">Now, of course, you can just open WPA as a standalone application and then go ahead and open a specific trace. So, here&#8217;s WPA here, I can go to <strong>File</strong>, then simply <strong>Open a new trace</strong> or something like that. So, not a problem. But in this case, it&#8217;s okay what we did, we just opened WPA directly after a recording.</p>
+
+
+
+<h2 class="wp-block-heading">Understanding the WPA User Interface</h2>
+
+
+
+<p class="wp-block-paragraph">What I want to do here in this little video is to talk about the basics of the UI because it&#8217;s not really that trivial to understand, and even before we do any kind of analysis, which we won&#8217;t be doing in a substantial way in this video.</p>
+
+
+
+<p class="wp-block-paragraph">You can see there&#8217;s this top-level entities here showing some stuff that was recorded. What we see here is something called the <strong>Graph Explorer</strong>, which is where you want to start from. Then you also have this <strong>Analysis View</strong>, which currently is empty. You can create more Analysis Views as needed.</p>
+
+
+
+<h2 class="wp-block-heading">Navigating the Graph Explorer and Analysis View</h2>
+
+
+
+<p class="wp-block-paragraph">So, we can open that up. Let&#8217;s say I&#8217;m going to open <strong>Computation</strong> here. This shows me the second-level items, which in this case I have the <strong>CPU Usage Precise</strong> and <strong>CPU Usage Attributed</strong>, and then CPU Usage Precise here by whatever. This just gives me a preview of the main things.</p>
+
+
+
+<p class="wp-block-paragraph">But once I open the second level here, you can see specific graphs here or specific kinds of profiles or analyses, if you will. For example, we have something like <strong>Timeline by Process and Thread</strong> or <strong>Usage by Priority</strong>, <strong>Utilization by CPU</strong>, these kinds of things that you might find useful.</p>
+
+
+
+<h2 class="wp-block-heading">Adding Views to the Analysis View</h2>
+
+
+
+<p class="wp-block-paragraph">So, if I go ahead and grab any one of them or just double-click, we can just grab and drag it into an Analysis View. What we see here is this particular view that I&#8217;ve just dragged, but in fact, all these views that are covering the CPU Usage Precise category can be seen here. If I just open that up, you can see I can switch between these various views without necessarily taking another drag of this particular view to the Analysis View unless I really want it.</p>
+
+
+
+<p class="wp-block-paragraph">Here&#8217;s an example of <strong>Analysis by CPU</strong>. If I want something else, and maybe I care about Analysis by CPU, I can go ahead and drag something else like what I did previously, <strong>Utilization by Process and Thread</strong>, which probably is interesting to me.</p>
+
+
+
+<p class="wp-block-paragraph">You notice I can resize these views in any way I see fit, and you can see that these views contain a <strong>graph</strong> and a <strong>table</strong>. So, in fact, we can see a graph and a table, or just a graph, or just a table. This is where these little buttons come into play.</p>
+
+
+
+<h2 class="wp-block-heading">Adjusting View Layouts</h2>
+
+
+
+<p class="wp-block-paragraph">So, if I do that, I can see here only the graph, and of course, I can resize if I want to see more. I can also go and see just the tables, now we see this part, just the table. This is a mixed mode where we see a table and the graph. So, really up to you, whatever you need, you can switch these views as needed.</p>
+
+
+
+<h2 class="wp-block-heading">Zooming and Selecting in the Graph</h2>
+
+
+
+<p class="wp-block-paragraph">Beyond that, one thing that is very kind of obvious, something you definitely want to use, is the fact that you might see lots of stuff here, but you want to <strong>zoom in</strong> on your specific areas. So, you can just grab and left-click with the mouse button and drag at some kind of part which is something you&#8217;re interested in, and then you can see that some other stuff gets selected, which means there&#8217;s something in this area that includes these, in this case, processes that you see here and these CPUs that you see here.</p>
+
+
+
+<p class="wp-block-paragraph">If I right-click here, I can do <strong>Zoom</strong>, and that will zoom in using my selection. If I need to zoom more, I can just select another chunk here and zoom in again. One thing that you should note is that all the views that are in the same Analysis View are always going to be <strong>synchronized in terms of time</strong>, and so the zooming I did was only in the top view here, but still, it applies to the other one as well. So, this timeline is always synchronized in a particular Analysis View.</p>
+
+
+
+<h2 class="wp-block-heading">Using Multiple Analysis Views</h2>
+
+
+
+<p class="wp-block-paragraph">If I want to have different zoom levels in different graphs, I have to put them in different <strong>Analysis Windows</strong>. For example, I can grab this one and drag it here into a new Analysis Tab, or just click the <strong>plus</strong> button to add an empty Analysis Tab, then drag it there. In this case, now that I&#8217;m looking at a different Analysis View, I can zoom something completely different if so desired, and that&#8217;s fine. This is not going to have any effect on the first Analysis View. These have different timelines, and that&#8217;s completely fine.</p>
+
+
+
+<h2 class="wp-block-heading">Synchronizing with the Graph Explorer</h2>
+
+
+
+<p class="wp-block-paragraph">Another little trick you might find useful is that there&#8217;s this little button here which keeps things synchronized between the <strong>Graph Explorer</strong> and the view. If I click that, they&#8217;re no longer synchronized. The Graph Explorer is going to show you the entire view; you can even move this little window to go into different locations in terms of the time. It always starts by default as synchronized like so, so it&#8217;s going to show you exactly what you see here, but you can unsynchronize, which perhaps could be a bit easier to see where you are in the grand scheme of things, the entire set of this entire time span you have recorded.</p>
+
+
+
+<h2 class="wp-block-heading">Understanding the Tables in Windows Performance Analyzer</h2>
+
+
+
+<p class="wp-block-paragraph">Now, the other thing that you probably are wondering about is these little tables and what you see here in these tables. So, let me give you a quick rundown of some of the ideas here.</p>
+
+
+
+<p class="wp-block-paragraph">Let me go back to something that is easier perhaps to understand. We have this view here, and one thing I can do is say, well, maybe I want this view to be visible, to be maximized. I can do that, so it will try to maximize the space for this view.</p>
+
+
+
+<p class="wp-block-paragraph">But in general, if I like it and I want to examine it perhaps in a separate window, I can just drag it to a new Analysis Window. In fact, we can even <strong>detach</strong> an Analysis Window entirely and put it, say, on a different monitor if you have another monitor and you want to do that. So, that&#8217;s something you can do as well.</p>
+
+
+
+<h2 class="wp-block-heading">Using the Gold Bar for Grouping</h2>
+
+
+
+<p class="wp-block-paragraph">What I want to show you here, maybe we have something that is perhaps easier to understand. We can close this one. I want to see this only.</p>
+
+
+
+<p class="wp-block-paragraph">So, we have here, let me <strong>unzoom</strong>. I&#8217;m going to unzoom to see everything that we had, just going back to sort of the beginning, hopefully. So, undo or just unzoom everything like so. So, we&#8217;re back at the beginning.</p>
+
+
+
+<p class="wp-block-paragraph">You see that there&#8217;s an area here which has nothing. This is sometimes called the <strong>trace rundown</strong> when the trace is kind of winding down, and so no events are being really recorded, but you still get some time in the recording, which is obviously not useful, and you typically want to filter it out, just zoom into the area that is most convenient and more important.</p>
+
+
+
+<p class="wp-block-paragraph">So, one thing here we see, we see this is a <strong>CPU Usage Precise</strong>. So, before I talk about precise, maybe we should stick with something simpler, which is CPU Utilization maybe, and something which is not precise.</p>
+
+
+
+<h2 class="wp-block-heading">CPU Usage: Precise vs. Sampled</h2>
+
+
+
+<p class="wp-block-paragraph">Let&#8217;s close this one as well and create another Analysis Window just to show another way. There&#8217;s also a <strong>CPU Usage</strong> which should be sampled. We&#8217;ll see if we get something like this; maybe we don&#8217;t. It depends on what we&#8217;re trying to do and the thing that we&#8217;ve actually selected. In this case, I think we don&#8217;t have anything other than precise, that&#8217;s what it seems here.</p>
+
+
+
+<p class="wp-block-paragraph">Okay, fine, we&#8217;ll go with that. So, the idea of CPU Usage Precise is that it is <strong>not based on sampling</strong>. Sampling means that every so and so often, every processor is checked to see what is actually running. But instead, it&#8217;s using the <strong>actual context switches</strong>, so these actual context switches that determine exactly when things change between threads and when another thread starts executing and the previous one has been context-switched out, and so on.</p>
+
+
+
+<h2 class="wp-block-heading">Sorting and Grouping in Tables</h2>
+
+
+
+<p class="wp-block-paragraph">First, you can see here the table. Now, the table has the medial area here between the <strong>gold bar</strong> and the <strong>blue bar</strong>, and this is just, well, mostly a normal kind of table. So, you can <strong>sort</strong> by whatever column that you see here. It&#8217;s also possible to sort by multiple columns, like having a sub-sort, for example, <strong>Weight</strong>, and then you want to see something else, you can just click <strong>Shift</strong> and click in kind of a secondary way. I&#8217;m not saying this particular one is actually useful, but in general, you can sort by any number of columns.</p>
+
+
+
+<p class="wp-block-paragraph">If you right-click, you can make changes, of course, in various ways, like <strong>remove the sorting</strong> entirely, like maybe something like this. So, we can definitely remove sorting and sort by some other column if you think this is better in what you&#8217;re trying to do.</p>
+
+
+
+<h2 class="wp-block-heading">Aggregation Modes </h2>
+
+
+
+<p class="wp-block-paragraph">Now, what we have here are just values, and you can see here some of them have this little string at the bottom here, like <strong>Count</strong> says <strong>Count</strong>, <strong>Ready (µs)</strong> says <strong>Sum</strong>, <strong>Ready (µs)</strong> says <strong>Max</strong>, and these kinds of stuff. These are known as <strong>aggregation modes</strong>. So, every kind of value, you can see it either as its true value or aggregating that over all the values in a particular category.</p>
+
+
+
+<h2 class="wp-block-heading">Customizing Columns with the View Editor</h2>
+
+
+
+<p class="wp-block-paragraph">But first, what is that <strong>gold bar</strong>? The purpose of the gold bar is to provide <strong>grouping</strong>. So, I can go to this column, for example, I&#8217;m going to right-click here and <strong>remove this column</strong>, and maybe I&#8217;m going to remove this column as well to make things slightly easier. And we have <strong>New Thread</strong> here.</p>
+
+
+
+<p class="wp-block-paragraph">So, what happens is that we have here <strong>New Process</strong> as the first item for grouping, and so we see processes here like <strong>svchost</strong> here, and so on. The second grouping, the subgroup, is based on the <strong>New Thread ID</strong>. If we drag this New Thread ID to the right of the gold bar, then we now have just a single grouping, which is by New Process.</p>
+
+
+
+<p class="wp-block-paragraph">If you want to also, let&#8217;s say, group by <strong>CPU</strong>, then we can drag the CPU column all the way to the left of the gold bar, and now for every process, we can see which processors (CPUs) were used by that particular process. Whether that&#8217;s actually interesting or not is immaterial for now, just a way to try to understand how you can play with these views.</p>
+
+
+
+<p class="wp-block-paragraph">Technically, you can add any number of columns that you want. In fact, you can even have a column that is here and there as well, it&#8217;s all fine. You can have as many columns as you want.</p>
+
+
+
+<p class="wp-block-paragraph">If you click, there&#8217;s a button here that looks like <strong>settings</strong>, that&#8217;s the <strong>View Editor</strong>. The View Editor allows you, perhaps in an easier way, to change what you see, so which columns you see and what kind of aggregation mode you would like to see for those items.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Count</strong> here happens to be the count of <strong>context switches</strong>, and that&#8217;s because CPU Usage Precise is the one that&#8217;s providing you context switches. So, this is what Count here means. Sometimes you need to know a little bit more about what you&#8217;re actually looking at, and not just, sometimes the column might not be perhaps clear enough, but this is really the kind of fundamental item that is used to build that kind of view.</p>
+
+
+
+<p class="wp-block-paragraph">You can see there are more columns here. You can remove columns that you don&#8217;t care about, or you can change, you can see you have the same column here called <strong>Ready</strong>, so there&#8217;s a <strong>Sum</strong> and then the <strong>maximum</strong> amount of time that the thread has spent in the <strong>Ready state</strong>.</p>
+
+
+
+<h2 class="wp-block-heading">Understanding Ready State and Aggregation</h2>
+
+
+
+<p class="wp-block-paragraph">A <strong>Ready state</strong> represents the thread that wants to run but didn&#8217;t have, but all processors were busy at the time; it couldn&#8217;t get the CPU at that point. Obviously, normally you&#8217;d like to have threads being ready as little as possible, you want them to be in the <strong>Running state</strong> as much as possible, and that&#8217;s what you typically want.</p>
+
+
+
+<p class="wp-block-paragraph">But regardless, again, I&#8217;m not focusing here on the actual <a href="https://trainsec.net/windows-internals-master/" data-type="link">Windows internals</a> kind of stuff but mostly about the UI.</p>
+
+
+
+<p class="wp-block-paragraph">If I want to see the <strong>Waiting Process</strong>, I can take it, and then we can see we have a sorting here that we can do if that makes sense, and some aggregation if that makes sense, and if so, the valid options are going to show up. So, we can make changes here as much as we like. We can drag columns here.</p>
+
+
+
+<p class="wp-block-paragraph">So, if I want something like a new column here, the <strong>New Alt Priority</strong>, I can just drag it, and again, I can use aggregation mode if that makes sense, like the <strong>maximum priority</strong>, the <strong>average priority</strong>, things like that.</p>
+
+
+
+<p class="wp-block-paragraph">Again, sorting here is also possible. So, we can use <strong>descending sort</strong>, click <strong>OK</strong>, it would apply the information, or click <strong>Apply</strong> and then <strong>OK</strong>, it doesn&#8217;t matter. So, we see what is happening here.</p>
+
+
+
+<p class="wp-block-paragraph">In this case, Waiting Process is right here, and it is the third group to be used here for sorting purposes. So, that&#8217;s what we&#8217;re trying to see here. So, this process was the waiting one in order for this process to have some kind of thread running.</p>
+
+
+
+<p class="wp-block-paragraph">Again, in this case, it&#8217;s probably not, maybe it&#8217;s not very useful. We can drag it to the other side or simply completely remove it.</p>
+
+
+
+<h2 class="wp-block-heading">Manipulating the Gold Bar</h2>
+
+
+
+<p class="wp-block-paragraph">In general, this is how you manipulate the <strong>gold bar</strong>. Stuff on the left of the gold bar represents grouping; stuff on the right of the gold bar just represents columns with values, could be the direct value or some kind of aggregation depending on what you&#8217;re trying to show here.</p>
+
+
+
+<p class="wp-block-paragraph">So, if we have something like a thread here using a certain processor, we can see the <strong>Thread ID</strong>. Aggregating that—like showing a sum of Thread IDs is probably, probably doesn&#8217;t make any sense. So, I can maybe show the sum of Thread IDs, but it&#8217;s kind of silly, it doesn&#8217;t really represent anything that makes any kind of sense. So, it does sum these Thread IDs for this particular process based on the grouping, but really it&#8217;s just kind of useless.</p>
+
+
+
+<p class="wp-block-paragraph">So, of course, you want to do the things that make sense in terms of what you&#8217;re trying to do and what you&#8217;re trying to figure out.</p>
+
+
+
+<h2 class="wp-block-heading">Filtering and Analyzing Data</h2>
+
+
+
+<p class="wp-block-paragraph">As usual, you can <strong>zoom in</strong>, and once you zoom in, everything updates, not just the graph but also the table. The table and the graph are always in sync, they&#8217;re always in sync. If you don&#8217;t want to see one or the other, you can just make them go away and see only the graph or only the table, that&#8217;s fine. But even if you see both, they&#8217;re always synchronized in terms of time.</p>
+
+
+
+<p class="wp-block-paragraph">You can also do some basic <strong>filtering</strong>. For example, let&#8217;s say I&#8217;m interested in some process, maybe a bunch of processes, maybe not just one. So, I can go ahead and select some processes, and I can right-click here and say <strong>Filter to Selection</strong>. This means that I&#8217;m now going to look at stuff which only has these processes in mind.</p>
+
+
+
+<p class="wp-block-paragraph">So, now we are focusing on this set of processes. Maybe something here is interesting, I want to zoom in, see what is going on, what exactly was here.</p>
+
+
+
+<p class="wp-block-paragraph">Notice if I just hover over the graph, when I hover over some part of the graph, we get some tooltip, like a nice tooltip, providing information about that graph based on the stuff which is shown on the right of the <strong>blue bar</strong>. So, right of the blue bar is actually what is shown in the graph. If you want to see more types of stuff in the graph, you can drag it to the blue bar, and of course, it might not make sense, but still, you could in theory do that.</p>
+
+
+
+<p class="wp-block-paragraph">If you want to go back, you&#8217;re not happy with the filter anymore, you can go ahead and <strong>undo the filter</strong> to go back to the normal kind of thing, or just <strong>clear the filter</strong>. So, undo just goes one step back, but you could clear the entire filter by selecting Clear Filter.</p>
+
+
+
+<p class="wp-block-paragraph">These are some of the options you find here, and you probably start to get the sense that this is definitely not easy. It&#8217;s not easy, not because necessarily the tool is overly complex, but because Windows is complex, and in fact, this is true for any operating system. Lots of stuff is happening at the same time, and it&#8217;s not always easy to see what is going on.</p>
+
+
+
+<p class="wp-block-paragraph">So, here we can just sort by certain <strong>context switch count</strong>, and you can see that <strong>Camtasia Recorder</strong> was the one that had the most context switches. Doesn&#8217;t mean that this is necessarily the most CPU time being consumed, but definitely the most context switches. So, this is what Count here, because we&#8217;re talking about CPU Usage Precise.</p>
+
+
+
+<p class="wp-block-paragraph">This is just to give you a sense of what is going on and just to show you some of the things we can get and how the view looks like. Hopefully, in subsequent videos, we&#8217;ll do some real analysis to try to figure out what is going on, but at least for now, you should play with this view and the tool and get a sense of how to navigate the various things here.</p>
+
+
+
+<h2 class="wp-block-heading">Trace Properties and System Configuration</h2>
+
+
+
+<p class="wp-block-paragraph">A few more notes perhaps. First, there&#8217;s the <strong>Trace</strong> here, and you can have <strong>Trace Properties</strong> providing different sets of properties for this particular trace. You can also look at <strong>System Configuration</strong> to give you some information about the system on which the particular trace was taken, and that information is also gathered as part of the trace. So, you might see some things that would make sense for whatever you&#8217;re trying to do here. At least you get some sense as to which devices were available at the time, and also in terms of storage, all the drives and things like that.</p>
+
+
+
+<h2 class="wp-block-heading">Loading Symbols</h2>
+
+
+
+<p class="wp-block-paragraph">Then I mentioned you can do <strong>Open</strong>, but another thing you can do is, well, first, there&#8217;s of course <strong>Settings</strong>, which you can play around with, like changing the settings here to the <strong>theme</strong>, to <strong>dark mode</strong> if you care about these things. So, it&#8217;s really whatever is more convenient for you.</p>
+
+
+
+<p class="wp-block-paragraph">Another thing that is important is this ability to <strong>load symbols</strong>. So, this <strong>Load Symbols</strong> option will start loading symbols, and of course, for that to work properly, you need to configure symbol paths. But if you have the standard stuff, like the path to the <strong>Microsoft symbol server</strong> using the <code>_NT_SYMBOL_PATH</code> environment variable, many of you are probably familiar with, then it will just work and go to that Microsoft symbol server to get symbols for the Microsoft binaries.</p>
+
+
+
+<p class="wp-block-paragraph">Now, this might take a while depending on the various modules that it recognized in the trace, and this is mostly important when you examine <strong>call stacks</strong>, which you can examine, but we&#8217;re not going to do that here. But just know that it is possible and sometimes definitely necessary, especially when trying to figure out which function is used a lot and stuff like that.</p>
+
+
+
+<h2 class="wp-block-heading">Exporting and Applying Views</h2>
+
+
+
+<p class="wp-block-paragraph">Another thing you can do here is to <strong>export</strong>. The idea of exporting is exporting a kind of view, all your settings. So, the next time you open up and you want to open that particular view, that particular export, this is done using the option of <strong>Apply</strong>. So, Apply would allow you to apply a previously exported view. It will open the same kind of analysis windows with the same graphs open up.</p>
+
+
+
+<p class="wp-block-paragraph">Notice it is not based on the actual trace you&#8217;re looking at, so if the particular graph doesn&#8217;t make any sense because you don&#8217;t have that information in the trace file, it will not open it. But if it can, it will open that, and you&#8217;ll have similar settings to what were saved at that time. So, that&#8217;s the option of <strong>Export</strong> and <strong>Apply</strong>. Feel free to try it out.</p>
+
+
+
+<h2 class="wp-block-heading">Conclusion</h2>
+
+
+
+<p class="wp-block-paragraph">What else I can show here, I think that&#8217;s good enough for now, and hopefully, in future videos, we&#8217;ll take a look at a more realistic scenario, try to figure out what is going on using this tool.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Analyzing Disk I/O Activity</h2>
+
+
+
+<p class="wp-block-paragraph">Here&#8217;s the last example, just to make things a bit easier. Perhaps this CPU stuff is slightly complex, we can look at <strong>storage</strong>. Here you can see there&#8217;s a <strong>Disk Storage</strong> here, and various stuff is happening here, like the <strong>I/O Type Activity by Process</strong>. We can just drag it, say, to a new column here, and you can see there are three types of operation: <strong>Write</strong>, <strong>Read</strong>, and <strong>Flush</strong>. We can see that the categories here, the grouping here, is by <strong>process</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">So, I can see that the process that did the most write operations was the <strong>System</strong> process; the next one is in terms of I/O time; the next one is <strong>WPR</strong>, and so on. We can see the number of items. We can open that up, of course, and see every item that was 680 microseconds here that were spent, and this is the size of the transfer, so there&#8217;s a 12K transfer, and then there&#8217;s a 512K transfer, and so on. Kind of interesting information here.</p>
+
+
+
+<p class="wp-block-paragraph">Of course, we can group by other stuff and do other kinds of aggregations. I leave that to you as an exercise.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+						</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/introduction-to-the-windows-performance-analyzer/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

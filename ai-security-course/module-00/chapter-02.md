@@ -367,7 +367,7 @@ You have completed this chapter when you can explain why a changed prediction do
 
 ## What comes next
 
-The next chapter will explain neural networks and optimization: forward passes, loss, gradients, backpropagation, generalization, adversarial examples, and the evidence needed to distinguish model behavior from data or configuration changes.
+[Chapter 3 — Neural Networks and Optimization](https://1200km.com/ai-security-course/module-00/chapter-03.html) explains forward passes, loss, gradients, backpropagation, generalization, adversarial examples, and the evidence needed to distinguish model behavior from data or configuration changes.
 
 ---
 

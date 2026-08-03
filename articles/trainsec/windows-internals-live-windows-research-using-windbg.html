@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows Research with WinDBG - 4H Live (7th April) masterclass with Pavel — TrainSec article | 1200km</title>
+<meta name="description" content="Windows Research with WinDBG - 4H Live (7th April) masterclass with Pavel by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/live-windows-research-using-windbg/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Video / workshop, Windows, internals">
+<meta property="article:published_time" content="2026-03-08">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-live-windows-research-using-windbg.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Windows Research with WinDBG - 4H Live (7th April) masterclass with Pavel"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-live-windows-research-using-windbg.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-live-windows-research-using-windbg.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-live-windows-research-using-windbg.html","headline":"Windows Research with WinDBG - 4H Live (7th April) masterclass with Pavel","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-live-windows-research-using-windbg.html#webpage"},"datePublished":"2026-03-08","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/live-windows-research-using-windbg/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Video / workshop</p><h1>Windows Research with WinDBG - 4H Live (7th April) masterclass with Pavel</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> March 9, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/live-windows-research-using-windbg/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Many developers and researchers view <strong>WinDbg</strong> as the tool of last resort. Something crashes, nothing else helps, and eventually someone opens WinDbg and starts digging.</p>
+
+
+
+<p class="wp-block-paragraph">But that mindset misses the real power of the tool.</p>
+
+
+
+<p class="wp-block-paragraph">WinDbg is not just a debugger used in emergencies. It is one of the most powerful research tools available for understanding how Windows actually works. Microsoft engineers use it to debug the operating system itself. With the right setup and workflow, it becomes a microscope for exploring Windows internals.</p>
+
+
+
+<p class="wp-block-paragraph">On <strong>April 7th, 2026</strong>, I’ll be running a <strong>live 4-hour masterclass</strong> where we will use WinDbg specifically as a <strong>research platform</strong> for exploring Windows components. Recording will be avaliabale for registered users after the event.</p>
+
+
+
+<p class="wp-block-paragraph">This session is designed for Trainsec students who want to go beyond theory and develop practical techniques for investigating the system from the inside.</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://trainsec.net/windows-research-with-windbg-live-4h/"><img fetchpriority="high" fetchpriority="high" decoding="async" width="1024" height="576" alt="Windows Research with WINDBG with Pavel Yosifovich" class="wp-image-10533"  src="https://trainsec.net/wp-content/uploads/2026/03/WINDBG-PAVEL-1024x576.png" srcset="https://trainsec.net/wp-content/uploads/2026/03/WINDBG-PAVEL-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2026/03/WINDBG-PAVEL-600x338.png 600w, https://trainsec.net/wp-content/uploads/2026/03/WINDBG-PAVEL-300x169.png 300w, https://trainsec.net/wp-content/uploads/2026/03/WINDBG-PAVEL-768x432.png 768w, https://trainsec.net/wp-content/uploads/2026/03/WINDBG-PAVEL-1536x864.png 1536w, https://trainsec.net/wp-content/uploads/2026/03/WINDBG-PAVEL.png 1600w" sizes="(max-width: 1024px) 100vw, 1024px"/></a></figure>
+
+
+
+<p class="wp-block-paragraph">Registration, syllabus and more: <a href="https://trainsec.net/windows-research-with-windbg-live-4h/">https://trainsec.net/windows-research-with-windbg-live-4h/</a> (Registration closed)</p>
+
+
+
+<h2 class="wp-block-heading">What we’ll cover</h2>
+
+
+
+<p class="wp-block-paragraph">During the session we will explore several practical areas:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Configuring WinDbg for research work</li>
+
+
+
+<li>Investigating <strong>user-mode components</strong></li>
+
+
+
+<li>Researching <strong>kernel-mode structures and behavior</strong></li>
+
+
+
+<li>Working with <strong>crash dumps and memory dumps</strong></li>
+
+
+
+<li>Extending WinDbg through <strong>scripting and automation</strong></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">The focus will be on real investigative workflows and techniques that can be applied when studying Windows internals, reverse engineering components, analyzing system behavior, or troubleshooting complex issues.</p>
+
+
+
+<h2 class="wp-block-heading">Why this matters for Trainsec students</h2>
+
+
+
+<p class="wp-block-paragraph">Many Trainsec courses dive deep into <strong>Windows internals, security research, reverse engineering, and malware analysis</strong>. WinDbg is one of the tools that ties these areas together.</p>
+
+
+
+<p class="wp-block-paragraph">If you know how to drive WinDbg effectively, you gain the ability to:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Inspect real system structures while Windows is running</li>
+
+
+
+<li>Explore undocumented behavior</li>
+
+
+
+<li>Understand crashes and unexpected system behavior</li>
+
+
+
+<li>Validate hypotheses about how the OS actually works</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">In short, WinDbg turns documentation and theory into <strong>observable reality</strong>.</p>
+
+
+
+<h2 class="wp-block-heading">Special bonus for attendees</h2>
+
+
+
+<p class="wp-block-paragraph">The ticket for the event is <strong>$49</strong>, but the admission works a bit differently than a typical webinar.</p>
+
+
+
+<p class="wp-block-paragraph">Every ticket also includes a <strong>$49 voucher that can be used toward any course in the Trainsec catalog</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">In other words, if you are planning to take a Trainsec course anyway, the ticket effectively becomes <strong>store credit you can use later</strong>.</p>
+
+
+
+<h2 class="wp-block-heading">Event details</h2>
+
+
+
+<p class="wp-block-paragraph"><strong>Windows Research with WinDbg – Live Masterclass</strong><br><strong>Date:</strong> April 7, 2026<br><strong>Time:</strong> 10:00 AM – 2:00 PM (EDT)<br><strong>Duration:</strong> 4 hours (live session)<br><strong>Seats:</strong> Limited<br><strong>Admission:</strong> $49 (includes a $49 Trainsec course voucher)<br><strong>Recordings</strong>: Recording will be avaliabale for registered users after the event</p>
+
+
+
+<p class="wp-block-paragraph">If you want to get more comfortable using WinDbg as a research tool rather than a last-resort debugger, this session will give you the workflows and techniques to start doing that.</p>
+
+
+
+<p class="wp-block-paragraph">Register now to reserve your seat.</p>
+
+
+
+<p class="wp-block-paragraph">Registration, syllabus and more: <a href="https://trainsec.net/windows-research-with-windbg-live-4h/">https://trainsec.net/windows-research-with-windbg-live-4h/</a> (Registration closed)</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/live-windows-research-using-windbg/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Hitchhiker&#39;s Guide to Breaking Secure Boot — TrainSec article | 1200km</title>
+<meta name="description" content="The Hitchhiker&#39;s Guide to Breaking Secure Boot by Amichai Yifrach, republished from TrainSec.net with permission.">
+<meta name="author" content="Amichai Yifrach"><meta name="trainsec-author" content="Amichai Yifrach"><meta name="trainsec-source" content="https://trainsec.net/library/hardware-hacking/the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves/"><meta name="keywords" content="Amichai Yifrach, Hardware hacking, Hardware security research, hardware security, embedded">
+<meta property="article:published_time" content="2026-04-18">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html">
+<meta property="og:type" content="article"><meta property="og:title" content="The Hitchhiker&#39;s Guide to Breaking Secure Boot"><meta property="og:url" content="https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html#article","url":"https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html","headline":"The Hitchhiker's Guide to Breaking Secure Boot","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html#webpage"},"datePublished":"2026-04-18","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/hardware-hacking/the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Hardware hacking · Hardware security research</p><h1>The Hitchhiker&#39;s Guide to Breaking Secure Boot</h1>
+<p class="meta"><strong>Author:</strong> Amichai Yifrach · <strong>Published:</strong> April 19, 2026</p>
+<div class="tag-row"><span class="tag">hardware security</span><span class="tag">embedded</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Amichai Yifrach. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/hardware-hacking/the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<h2 class="wp-block-heading"><em>Or, Why &#8220;Don&#8217;t Panic&#8221; Becomes &#8220;Panic and Give Me Root&#8221;</em></h2>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" fetchpriority="high" decoding="async" width="1365" height="1092" alt="Title banner" class="wp-image-11232"  src="https://trainsec.net/wp-content/uploads/2026/04/image1.jpeg" srcset="https://trainsec.net/wp-content/uploads/2026/04/image1.jpeg 1365w, https://trainsec.net/wp-content/uploads/2026/04/image1-300x240.jpeg 300w, https://trainsec.net/wp-content/uploads/2026/04/image1-1024x819.jpeg 1024w, https://trainsec.net/wp-content/uploads/2026/04/image1-768x614.jpeg 768w, https://trainsec.net/wp-content/uploads/2026/04/image1-600x480.jpeg 600w" sizes="(max-width: 1365px) 100vw, 1365px"/></figure>
+
+
+
+<h2 class="wp-block-heading">Mostly Harmless… Until You Read the Fine Print</h2>
+
+
+
+<p class="wp-block-paragraph">Mr. A. Dent had an unfortunate habit of discovering that the universe was run by perfectly reasonable systems that became lethal the moment they encountered a situation nobody had thought about very carefully.</p>
+
+
+
+<p class="wp-block-paragraph">Whether it was a demolition order hidden in a basement, a starship door that opens because it believes it should, or a machine that behaves impeccably right up until the exact second it starts trusting the wrong thing.</p>
+
+
+
+<p class="wp-block-paragraph">Secure Boot, as it is typically presented in engineering diagrams and vendor documentation, carries precisely the same quiet, reassuring confidence.</p>
+
+
+
+<p class="wp-block-paragraph">With its neatly provisioned keys, its signature verification stages, and its elegant chain of trust, it convinces everyone involved that the system has, in some meaningful way, developed judgment.</p>
+
+
+
+<p class="wp-block-paragraph">Even though what it has actually developed is a sequence of decisions that only appears intelligent as long as nobody asks what happens when one of those decisions is made under the wrong assumption.</p>
+
+
+
+<h2 class="wp-block-heading">So What Is This Really About?</h2>
+
+
+
+<p class="wp-block-paragraph">Recently, NVIDIA acknowledged two vulnerabilities in the Jetson platform, now tracked as CVE-2026-24154 and CVE-2026-24153.</p>
+
+
+
+<p class="wp-block-paragraph">They issued patches, updated their documentation, and credited th3_h1tchh1ker, yours truly, for the discovery (see <a href="https://nvidia.custhelp.com/app/answers/detail/a_id/5797" rel="nofollow noopener" target="_blank">https://nvidia.custhelp.com/app/answers/detail/a_id/5797</a> for details).</p>
+
+
+
+<p class="wp-block-paragraph">The public description of these vulnerabilities is clean, controlled, and technically correct, describing early boot issues under physical access conditions, involving argument injection and potential information disclosure.</p>
+
+
+
+<p class="wp-block-paragraph">All of which is accurate.</p>
+
+
+
+<p class="wp-block-paragraph">Yet at the same time, it almost completely misses the mechanism that makes these findings important.</p>
+
+
+
+<p class="wp-block-paragraph">Because what was discovered was not a pair of isolated weaknesses, but a systemic behavior.</p>
+
+
+
+<p class="wp-block-paragraph">A behavior that only becomes visible when you stop treating Secure Boot as a binary property, and start observing it as a process that unfolds step by step in a real system under real conditions.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">The Little Board Running AI, Robots, and Half the Real World</h2>
+
+
+
+<h2 class="wp-block-heading">What System Are We Actually Talking About?</h2>
+
+
+
+<p class="wp-block-paragraph">Before going further, it is worth pausing to understand what is actually being discussed here, because the system in question is not a lab curiosity or an isolated development platform.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1379" height="920" alt="Jetson Orin module" class="wp-image-11233"  src="https://trainsec.net/wp-content/uploads/2026/04/image2.jpeg" srcset="https://trainsec.net/wp-content/uploads/2026/04/image2.jpeg 1379w, https://trainsec.net/wp-content/uploads/2026/04/image2-300x200.jpeg 300w, https://trainsec.net/wp-content/uploads/2026/04/image2-1024x683.jpeg 1024w, https://trainsec.net/wp-content/uploads/2026/04/image2-768x512.jpeg 768w, https://trainsec.net/wp-content/uploads/2026/04/image2-600x400.jpeg 600w" sizes="(max-width: 1379px) 100vw, 1379px"/></figure>
+
+
+
+<p class="wp-block-paragraph">The NVIDIA Jetson Orin is widely used as the compute backbone inside edge AI deployments, robotics platforms, autonomous machines, and industrial systems that operate in the physical world. It is embedded into devices that move, decide, sense, and interact with real environments, often outside controlled data centers, often with some level of physical accessibility, and very often deployed at scale.</p>
+
+
+
+<p class="wp-block-paragraph">Which is to say, when something at this layer fails, it does not remain a local problem. It propagates into systems that act.</p>
+
+
+
+<p class="wp-block-paragraph">From a Secure Boot perspective, the platform is designed to implement a classical hardware-rooted chain of trust, and on paper it does so correctly.</p>
+
+
+
+<p class="wp-block-paragraph">Execution begins in immutable BootROM, which anchors trust using fused secrets and verifies the first mutable stage. Control then flows through NVIDIA-specific early boot stages and into the UEFI firmware environment, where additional policy, configuration, and verification logic are applied. The bootloader verifies and loads the Linux kernel, and the kernel transitions execution into initrd, which is responsible for early userspace initialization, including device discovery, decryption, and mounting of the root filesystem. Only after this sequence completes does the system pivot into the final root filesystem and hand control to the standard operating environment.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Chain of trust diagram" class="wp-image-11234"  src="https://trainsec.net/wp-content/uploads/2026/04/image3.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image3.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image3-300x201.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image3-1024x686.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image3-768x514.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image3-600x402.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+
+
+
+<p class="wp-block-paragraph">At each transition point, cryptographic verification is performed. Images are signed. Keys are provisioned. Measurements are enforced. The chain of trust, as represented in architecture diagrams, appears intact and continuous.</p>
+
+
+
+<p class="wp-block-paragraph">But Secure Boot, in its actual implementation, is not a single mechanism. It is a sequence of enforcement decisions distributed across stages, each with its own inputs, assumptions, and failure behaviors.</p>
+
+
+
+<p class="wp-block-paragraph">In general terms, Secure Boot guarantees that each stage verifies the authenticity and integrity of the next stage before transferring execution. It ensures that only code signed by trusted authorities is allowed to run.</p>
+
+
+
+<p class="wp-block-paragraph">Which is rather like a very diligent interstellar checkpoint, where every traveler is carefully inspected, their documents verified, their identity confirmed, and their luggage politely waved through once everything appears in order.</p>
+
+
+
+<p class="wp-block-paragraph">What it does not inherently guarantee is what those perfectly verified travelers choose to do once they are inside, how they interpret the instructions they are given, or how they behave when something goes slightly wrong. Because at that point, the system is no longer asking &#8220;should this be here,&#8221; but &#8220;what should this trusted thing do next,&#8221; and it turns out that those are very different questions, especially when the trusted thing encounters a situation nobody thought about quite carefully enough.</p>
+
+
+
+<p class="wp-block-paragraph">And this distinction becomes critical in the Jetson Orin implementation.</p>
+
+
+
+<p class="wp-block-paragraph">Because by the time execution reaches initrd, the system has already completed its cryptographic verification chain for the kernel and early userspace environment. At that point, the system is no longer making decisions about whether code is trusted. It is executing code that has already been deemed trusted, and it is making decisions based on configuration, inputs, and internal logic.</p>
+
+
+
+<p class="wp-block-paragraph">One of those inputs is the kernel command line.</p>
+
+
+
+<p class="wp-block-paragraph">The kernel command line is parsed early, propagated into initrd, and used to control fundamental aspects of system initialization, including how the root filesystem is identified, how devices are waited for, and how the transition into the final runtime environment is performed. These parameters are not passive configuration. They are active control inputs into the boot sequence.</p>
+
+
+
+<p class="wp-block-paragraph">This means that, in practice, the effective trust boundary extends beyond signature verification and into the interpretation of these inputs within early userspace. The system verifies what it executes, but it does not inherently constrain how that execution path is shaped once control has been handed over to trusted components.</p>
+
+
+
+<p class="wp-block-paragraph">In the Jetson Orin boot architecture, this creates a subtle but important condition. The system is cryptographically strict at the boundaries between stages, but behaviorally permissive within those stages, particularly during early userspace initialization. Recovery logic, debugging affordances, parameter parsing, and device handling all operate under the assumption that the environment is controlled and that failures are operational rather than adversarial.</p>
+
+
+
+<p class="wp-block-paragraph">Which is to say, the platform enforces trust at the point of entry, but it does not consistently enforce trust throughout execution.</p>
+
+
+
+<p class="wp-block-paragraph">And because this platform is not sitting in isolation, but inside AI systems, robotics platforms, and industrial deployments, that gap does not remain theoretical. It becomes a pathway through which control at boot time can translate into control of systems that exist well beyond the board itself.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">The Guide Says It&#8217;s Safe. The Guide Is Not the System.</h2>
+
+
+
+<h2 class="wp-block-heading">This is not about CVEs.</h2>
+
+
+
+<p class="wp-block-paragraph">Secure Boot is not judgment, and it never was, even though it is often described that way. Because what it actually implements is choreography.</p>
+
+
+
+<p class="wp-block-paragraph">A carefully ordered sequence of trust decisions that determines what is allowed to execute, when it is allowed to execute, and under which assumptions that execution continues.</p>
+
+
+
+<p class="wp-block-paragraph">If you observe that sequence closely enough, not through documentation but through actual system behavior, you eventually stop seeing a chain of trust, and start seeing a collection of assumptions that are internally consistent, but externally fragile.</p>
+
+
+
+<p class="wp-block-paragraph">Which is to say, the system behaves less like an all-knowing guardian and more like a very polite bureaucrat, following its checklist with absolute confidence, right up until the checklist quietly stops covering reality.</p>
+
+
+
+<p class="wp-block-paragraph">The CVEs that were assigned are simply the visible artifacts of that fragility, rather than its root cause.</p>
+
+
+
+<p class="wp-block-paragraph">They are the equivalent of finding the warning label after the improbable thing has already happened.</p>
+
+
+
+<p class="wp-block-paragraph">The deeper technical story, as laid out in my report, begins with the distinction between the findings that directly manifested as CVEs and the earlier findings that made those conditions reachable in the first place.</p>
+
+
+
+<p class="wp-block-paragraph">It shows that the platform transitions from a development-oriented environment into what is assumed to be a production-secure state without enforcing the same level of trust across that transition, resulting in a system that correctly verifies its components yet does not enforce the integrity of the decisions made between them.</p>
+
+
+
+<p class="wp-block-paragraph">In other words, the system checks the tickets at the entrance with impressive rigor, and then proceeds to leave several internal doors politely ajar, on the reasonable assumption that anyone who made it this far must clearly belong there.</p>
+
+
+
+<p class="wp-block-paragraph">This creates a subtle but critical gap where earlier conditions increase the accessibility and reliability of the later ones.</p>
+
+
+
+<p class="wp-block-paragraph">In that gap, control becomes possible not by breaking cryptography, bypassing signatures, or exploiting memory corruption, but by navigating the system through its own legitimate execution paths at the exact points where enforcement has not yet fully taken effect.</p>
+
+
+
+<p class="wp-block-paragraph">Which, in Hitchhiker terms, is less about forcing the universe to do something unexpected, and more about asking it the right question at precisely the moment it has run out of answers.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" srcset="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-300x169.png 300w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-768x432.png 768w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1536x864.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-600x338.png 600w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner.png 1600w" sizes="(max-width: 1024px) 100vw, 1024px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">&#8220;Don&#8217;t Panic… Panic Correctly and Provide a Shell&#8221;</h2>
+
+
+
+<h2 class="wp-block-heading">CVE-2026-24154 – Kernel Command Line Fault Injection</h2>
+
+
+
+<p class="wp-block-paragraph">The first CVE maps to my report&#8217;s Finding 2, &#8220;Kernel Command Line Fault Injection to Root Shell.&#8221; The title matters because it reveals the actual class of issue. This is not memory corruption. This is not a broken signature check. This is a boot-time control-flow failure caused by trusting malformed input and handling the resulting failure path like a frightened intern with root privileges.</p>
+
+
+
+<p class="wp-block-paragraph">My report describes the logic cleanly.</p>
+
+
+
+<p class="wp-block-paragraph">The boot process parses kernel command line arguments sequentially, and later values override earlier ones. Supplying a bogus root UUID together with otherwise valid arguments forces the init script into a failure state. Instead of halting, requiring authenticated recovery, or failing closed, the init logic falls back to spawning /bin/bash. That is the vulnerability in one sentence. The system interprets &#8220;the root filesystem cannot be mounted&#8221; not as &#8220;boot must stop,&#8221; but as &#8220;someone should probably be given a root shell.&#8221;</p>
+
+
+
+<p class="wp-block-paragraph">The exact proof of concept parameter injection used in the report is this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>root=UUID=00000000-0000-0000-0000-000000000000 rw rootwait rootfstype=ext4 console=ttyTCU0,115200n8</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">root=UUID=00000000-0000-0000-0000-000000000000 rw rootwait rootfstype=ext4 console=ttyTCU0,115200n8</span></span></code></pre></div>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" width="643" height="403" alt="PoC injection" class="wp-image-11235" style="width:800px;height:auto"  src="https://trainsec.net/wp-content/uploads/2026/04/image4.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image4.png 643w, https://trainsec.net/wp-content/uploads/2026/04/image4-300x188.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image4-600x376.png 600w" sizes="(max-width: 643px) 100vw, 643px"/></figure>
+
+
+
+<p class="wp-block-paragraph">The attack sequence is embarrassingly straightforward. Interrupt boot at the available boot interface, modify the kernel command line, save, continue, and watch the system fail mounting the root filesystem and fall back to an interactive root shell. My report shows this clearly across the reproduction steps and boot evidence.</p>
+
+
+
+<p class="wp-block-paragraph">What matters for a professional reader is not just the string, but the control logic behind it. Reconstructing the initrd reasoning from the report, the sequence works like this: The bootloader hands the kernel a command line. The kernel passes that into early user space. The init script attempts to resolve the root= parameter, waits for the specified root device, and expects that device to exist and mount cleanly. The injected UUID is syntactically valid enough to be accepted as configuration, but semantically invalid because it points to nowhere. That pushes the init logic into its error-handling path. At that point the system has already crossed into highly privileged early boot execution, but has not yet pivoted into the final root filesystem or handed off control to the normal operating environment. Instead of a locked recovery state, the error path drops into a root shell.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="449" alt="Root shell reached" class="wp-image-11236"  src="https://trainsec.net/wp-content/uploads/2026/04/image5.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image5.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image5-300x73.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image5-1024x249.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image5-768x187.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image5-1536x374.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image5-600x146.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+
+
+
+<p class="wp-block-paragraph">In line-level logic, the reasoning chain looks like this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>parse cmdline → select last root= value → attempt rootfs resolution → attempt mount → mount fails → enter fallback path → spawn /bin/bash</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">parse cmdline → select last root= value → attempt rootfs resolution → attempt mount → mount fails → enter fallback path → spawn /bin/bash</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">That is why the Hitchhiker metaphor here is not just &#8220;Don&#8217;t Panic.&#8221; It is &#8220;Don&#8217;t Panic… unless the system sees a problem, in which case panic immediately and hand the nearest person root.&#8221; The Guide&#8217;s cover phrase is charming because it reassures humans in absurd situations. It is catastrophic when translated into boot logic. A secure platform cannot treat panic as an invitation to interactive administration.</p>
+
+
+
+<p class="wp-block-paragraph">This vulnerability provides direct root access in early boot and bypasses protections expected from Secure Boot and encrypted storage. Once the root shell is reached, the attacker can mount the encrypted root filesystem, extract secrets, implant persistence, and disable security controls. The consequence is full compromise below the operating system boundary.</p>
+
+
+
+<p class="wp-block-paragraph">That last phrase is where the professional lesson lives. Secure Boot verified code. It did not verify post-verification intent. The binaries were trusted. The failure policy was not trustworthy. The code executed exactly as designed. That was the problem.</p>
+
+
+
+<p class="wp-block-paragraph">The exact parameter used in my proof of concept demonstrates how minimal the manipulation required is, because the string is syntactically correct, passes through parsing without resistance, and only reveals its invalidity at the moment the system attempts to mount the filesystem. At which point the control flow transitions into an error-handling path that implicitly assumes a trusted operator is present, effectively converting a failure condition into an elevation mechanism.</p>
+
+
+
+<p class="wp-block-paragraph">Which is roughly equivalent to leaving a note for the boot process that says, in very polite technical language, &#8220;please panic and give me a root shell,&#8221; and having the system interpret that request not as an anomaly but as a perfectly reasonable instruction to follow, because from its perspective the failure is operational rather than adversarial, and therefore the correct response is assistance rather than restriction.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="916" alt="Polite panic note" class="wp-image-11237"  src="https://trainsec.net/wp-content/uploads/2026/04/image6.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image6.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image6-300x200.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image6-1024x683.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image6-768x512.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image6-600x400.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+
+
+
+<h2 class="wp-block-heading">Reconstructing the Initrd Trust Boundary</h2>
+
+
+
+<p class="wp-block-paragraph">My report does not merely say &#8220;a shell appears.&#8221; It gives enough evidence to reconstruct the shape of the mistake. The early stages of my research, as detailed in my report, show that the initrd contains an init.bash whose transition into the real system is centered on an exec chroot /sbin/init line.</p>
+
+
+
+<p class="wp-block-paragraph">Why does that matter for CVE-2026-24154? Because it shows exactly where the early boot trust boundary lives. The initrd is not a mysterious pre-OS fog. It is a concrete execution environment with shell logic, mount operations, error handling, and a final handoff into the real system. If the system is willing to interpret command line parameters inside that environment and then resolve failures by spawning a shell, the trust boundary is already broken before the final root filesystem even takes over.</p>
+
+
+
+<p class="wp-block-paragraph">In plain engineering terms, this is the sort of mistake you get when development ergonomics are allowed to masquerade as recovery design. Someone, somewhere, decided that debugging boot failures required a shell. That is understandable on a bench. It is indefensible in a product that claims boot-time trust.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Milliways: Dining at the Exact Moment Encryption Ends</h2>
+
+
+
+<h2 class="wp-block-heading">CVE-2026-24153 – Decryption Exposure</h2>
+
+
+
+<p class="wp-block-paragraph">If the first CVE is about telling the system to panic and obtaining a root shell, the second CVE is about what becomes visible once you are seated inside early boot while the system unlocks itself. This maps to Finding 3 in my report, &#8220;Decryption Keys and Rootfs Exposed in Intermediate Shell.&#8221;</p>
+
+
+
+<p class="wp-block-paragraph">The report&#8217;s description is unusually clear. Jetson Orin NX uses an init shell script to decrypt the encrypted root filesystem before handing control to the main operating system. The script calls cryptsetup, retrieves keys, and mounts the decrypted rootfs. If an attacker gains a root shell during the intermediate kernel stage, for example through the command line fault injection just described, or by retrieving init script behavior via exposed boot interfaces, the decryption routine and key material are fully exposed. The attacker can inspect the init script, extract the relevant cryptsetup invocation, and re-run it manually. Keys can be redirected into attacker-controlled files, and the decrypted root filesystem can be mounted under arbitrary locations.</p>
+
+
+
+<p class="wp-block-paragraph">This is where the correct Hitchhiker metaphor is not panic but Milliways, the Restaurant at the End of the Universe. The point of Milliways is not that the universe ends. The point is that you have a front-row seat for the exact moment everything becomes visible in a way that was never meant to be a dining experience. CVE-2026-24153 is not about breaking encryption mathematically. It is about arriving at the table at the exact moment the system decrypts everything for its own consumption, then calmly reading the menu while the universe, or at least the filesystem, opens before you.</p>
+
+
+
+<p class="wp-block-paragraph">The report&#8217;s proof of concept is explicit and operational. First, gain an intermediate root shell by injecting the faulty kernel parameters from Finding 2. Second, inspect /init and locate the cryptsetup invocation.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1280" height="865" alt="Init script inspection" class="wp-image-11238"  src="https://trainsec.net/wp-content/uploads/2026/04/image7.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image7.png 1280w, https://trainsec.net/wp-content/uploads/2026/04/image7-300x203.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image7-1024x692.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image7-768x519.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image7-600x405.png 600w" sizes="(max-width: 1280px) 100vw, 1280px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Third, copy the relevant lines into a helper script named thh_init.sh. Fourth, run that helper script manually to perform decryption. Fifth, observe the decrypted root filesystem mounted under an attacker-selected path and key material saved to files.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="951" alt="Helper script execution" class="wp-image-11239"  src="https://trainsec.net/wp-content/uploads/2026/04/image8.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image8.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image8-300x155.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image8-1024x528.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image8-768x396.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image8-1536x792.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image8-600x309.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+
+
+
+<p class="wp-block-paragraph">The proof of concept evidence shows the manual mounting of the decrypted rootfs at /mnt/rootfs, extraction and saving of decryption keys into /mnt/rootfs/.recovery,</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="2146" height="576" alt="Decrypted rootfs mounted" class="wp-image-11240"  src="https://trainsec.net/wp-content/uploads/2026/04/image9.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image9.png 2146w, https://trainsec.net/wp-content/uploads/2026/04/image9-300x81.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image9-1024x275.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image9-768x206.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image9-1536x412.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image9-2048x550.png 2048w, https://trainsec.net/wp-content/uploads/2026/04/image9-600x161.png 600w" sizes="(max-width: 2146px) 100vw, 2146px"/></figure>
+
+
+
+<p class="wp-block-paragraph">and verification that sensitive directories such as /etc and /root were accessible.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Sensitive directories accessible" class="wp-image-11241"  src="https://trainsec.net/wp-content/uploads/2026/04/image11.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image11.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image11-300x201.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image11-1024x686.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image11-768x514.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image11-600x402.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Again, the mechanics matter. The init script is doing legitimate work. It needs keys. It needs to call cryptsetup. It needs to mount the decrypted root filesystem so the device can continue booting. The vulnerability is that this work happens in a context that has already been made interactive and attacker-visible. That means the trusted decryption routine can be copied, replayed, and redirected.</p>
+
+
+
+<p class="wp-block-paragraph">A line-level reconstruction of the logic looks roughly like this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>obtain early root shell (or get the SDK source from the vendor) → inspect /init → locate cryptsetup + key handling section → extract relevant commands into helper script → run helper script manually → mount decrypted rootfs at attacker-chosen location → save key material into attacker-controlled files → browse plaintext filesystem</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">obtain early root shell (or get the SDK source from the vendor) → inspect /init → locate cryptsetup + key handling section → extract relevant commands into helper script → run helper script manually → mount decrypted rootfs at attacker-chosen location → save key material into attacker-controlled files → browse plaintext filesystem</span></span></code></pre></div>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1899" height="168" alt="Logic reconstruction" class="wp-image-11242"  src="https://trainsec.net/wp-content/uploads/2026/04/image12.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image12.png 1899w, https://trainsec.net/wp-content/uploads/2026/04/image12-300x27.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image12-1024x91.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image12-768x68.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image12-1536x136.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image12-600x53.png 600w" sizes="(max-width: 1899px) 100vw, 1899px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Encryption on Jetson devices is ineffective if an attacker can reach the intermediate shell, because the design leaks both the cryptographic keys and decrypted data. Attackers can retrieve keys, mount the decrypted rootfs, copy SSH keys, configuration files, credentials, or proprietary binaries, and install persistence mechanisms within the rootfs before the final system init takes over.</p>
+
+
+
+<p class="wp-block-paragraph">That is not an encryption failure. It is a trust sequencing failure. Encryption is doing what it should. The platform decrypts the data for legitimate boot purposes. The problem is that the legitimate boot environment has already been converted into hostile observation space.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">The Parts the Guide Didn&#8217;t Warn You About</h2>
+
+
+
+<h2 class="wp-block-heading">Why the Real Problem Starts Before the CVEs?</h2>
+
+
+
+<p class="wp-block-paragraph">A reader might be tempted to stop at the two CVEs and conclude that the lesson ends there. It does not. Findings 4 through 7 in my research explain why these issues are not isolated code defects but evidence of a wider pattern in development-to-production transition.</p>
+
+
+
+<p class="wp-block-paragraph">Finding 4 shows that kernel arguments can also be used to force systemd emergency mode on the decrypted root filesystem by appending:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>rootwait rw systemd.unit=emergency.target console=ttyTCU0,115200n8</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">rootwait rw systemd.unit=emergency.target console=ttyTCU0,115200n8</span></span></code></pre></div>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="421" alt="systemd emergency target" class="wp-image-11243"  src="https://trainsec.net/wp-content/uploads/2026/04/image13.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image13.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image13-300x68.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image13-1024x234.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image13-768x175.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image13-1536x351.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image13-600x137.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+
+
+
+<p class="wp-block-paragraph">This yields an unauthenticated root shell on the real rootfs, not just the intermediate initrd environment. It proves that boot parameter control is a broader attack primitive, not a one-off initrd glitch.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="2018" height="412" alt="Root shell on real rootfs" class="wp-image-11244"  src="https://trainsec.net/wp-content/uploads/2026/04/image14.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image14.png 2018w, https://trainsec.net/wp-content/uploads/2026/04/image14-300x61.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image14-1024x209.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image14-768x157.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image14-1536x314.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image14-600x122.png 600w" sizes="(max-width: 2018px) 100vw, 2018px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Finding 5 shows that UART boot logs leak sensitive information even when Secure Boot and encrypted rootfs are enabled. My report explicitly lists disclosure of UEFI Secure Boot certificates loaded from the UEFI database and kernel keyring, the root filesystem UUID, cryptsetup usage and device-mapper identifiers, exact firmware and kernel versions, and detailed platform metadata. In other words, the platform narrates its own security assumptions over a debug channel.</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" srcset="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-300x169.png 300w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-768x432.png 768w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1536x864.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-600x338.png 600w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner.png 1600w" sizes="(max-width: 1024px) 100vw, 1024px" /></a></figure>
+
+
+
+<p class="wp-block-paragraph">UEFI Secure Boot certificates (X.509 keys loaded from UEFI db and kernel keyring)</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="2018" height="412" alt="UEFI certificates over UART" class="wp-image-11244"  src="https://trainsec.net/wp-content/uploads/2026/04/image14.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image14.png 2018w, https://trainsec.net/wp-content/uploads/2026/04/image14-300x61.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image14-1024x209.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image14-768x157.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image14-1536x314.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image14-600x122.png 600w" sizes="(max-width: 2018px) 100vw, 2018px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Kernel configuration and Root filesystem UUID (UUID=aab0c457-cb9f-4cb7-b946-f61e789e3d60)</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1941" height="543" alt="Root filesystem UUID" class="wp-image-11245"  src="https://trainsec.net/wp-content/uploads/2026/04/image16.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image16.png 1941w, https://trainsec.net/wp-content/uploads/2026/04/image16-300x84.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image16-1024x286.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image16-768x215.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image16-1536x430.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image16-600x168.png 600w" sizes="(max-width: 1941px) 100vw, 1941px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Cryptsetup usage and device-mapper encrypted volume identifiers (dm-0, dm-1)</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="983" height="129" alt="dm-0 dm-1" class="wp-image-11246"  src="https://trainsec.net/wp-content/uploads/2026/04/image17.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image17.png 983w, https://trainsec.net/wp-content/uploads/2026/04/image17-300x39.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image17-768x101.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image17-600x79.png 600w" sizes="(max-width: 983px) 100vw, 983px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Finding 6 shows that pressing ESC during boot exposes an unauthenticated UEFI Setup interface. From there, an attacker can alter boot order, affect Secure Boot settings, or redirect boot to rogue devices. The report is careful to point out that developers may believe Secure Boot prevents unauthorized configuration changes, while in practice the setup screen remains reachable without authentication.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1380" height="886" alt="UEFI Setup unauthenticated" class="wp-image-11247"  src="https://trainsec.net/wp-content/uploads/2026/04/image18.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image18.png 1380w, https://trainsec.net/wp-content/uploads/2026/04/image18-300x193.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image18-1024x657.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image18-768x493.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image18-600x385.png 600w" sizes="(max-width: 1380px) 100vw, 1380px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Finding 7 shows that UEFI Shell access provides read-write capabilities over critical partitions. That matters because it gives an attacker the pre-OS ability to enumerate filesystems, navigate partitions, read or modify files, and alter boot configuration variables. In practical terms, it is the service hatch through which the rest of the attack chain walks calmly carrying luggage.</p>
+
+
+
+<p class="wp-block-paragraph">Device mapping</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="931" alt="UEFI shell device mapping" class="wp-image-11248"  src="https://trainsec.net/wp-content/uploads/2026/04/image19.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image19.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image19-300x151.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image19-1024x517.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image19-768x388.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image19-1536x775.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image19-600x303.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Full file systems access</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1844" height="931" alt="UEFI shell filesystem access" class="wp-image-11249"  src="https://trainsec.net/wp-content/uploads/2026/04/image20.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image20.png 1844w, https://trainsec.net/wp-content/uploads/2026/04/image20-300x151.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image20-1024x517.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image20-768x388.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image20-1536x775.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/image20-600x303.png 600w" sizes="(max-width: 1844px) 100vw, 1844px"/></figure>
+
+
+
+<p class="wp-block-paragraph">These are exactly the kinds of issues that drive documentation changes rather than just CVE entries. They answer the professional question that matters most: not merely &#8220;is there a bug?&#8221; but &#8220;is the platform teaching integrators to deploy trust incorrectly?&#8221; The report explicitly frames these as systemic design and documentation issues that can mislead teams into shipping insecure products.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1374" height="920" alt="Systemic framing" class="wp-image-11250"  src="https://trainsec.net/wp-content/uploads/2026/04/image21.png" srcset="https://trainsec.net/wp-content/uploads/2026/04/image21.png 1374w, https://trainsec.net/wp-content/uploads/2026/04/image21-300x201.png 300w, https://trainsec.net/wp-content/uploads/2026/04/image21-1024x686.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/image21-768x514.png 768w, https://trainsec.net/wp-content/uploads/2026/04/image21-600x402.png 600w" sizes="(max-width: 1374px) 100vw, 1374px"/></figure>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">How to Read the Guide Instead of Believing It</h2>
+
+
+
+<h2 class="wp-block-heading">The Deeper Lesson: This Was Never About Bug Hunting</h2>
+
+
+
+<p class="wp-block-paragraph">What ties all of this together is not cleverness. It is disciplined observation.</p>
+
+
+
+<p class="wp-block-paragraph">The methodology is brutally simple and, for that reason, extremely teachable. Start from boot evidence. Reconstruct the actual execution chain. Identify where configuration becomes authority. Identify where secrets become plaintext. Identify where failure paths become privilege. Then test those boundaries under constrained access until the system tells you, usually in a surprisingly polite tone, exactly where it trusts too much.</p>
+
+
+
+<p class="wp-block-paragraph">That is why this matters for a community whose motto is where pros train pros. Professionals do not need another fairy tale about Secure Boot being either on or off. They need to know how to inspect boot-time evidence, reason about trust boundaries, reconstruct initrd logic, read recovery behavior as attack surface, and turn a line like root=UUID=00000000-0000-0000-0000-000000000000 from &#8220;weird boot parameter&#8221; into &#8220;reliable root shell trigger.&#8221;</p>
+
+
+
+<p class="wp-block-paragraph">They also need to understand why something as mundane as a UART console or an ESC prompt at boot can completely reframe a threat model. Not because hardware access is exotic, but because in the real world of production devices, supply chains, field technicians, installers, and service access are all perfectly ordinary.</p>
+
+
+
+<p class="wp-block-paragraph">In my report, and in the work I do advising large organizations, I explicitly state that these actors must be part of the threat model, because that is exactly what turns seemingly limited physical-access issues into strategically important findings.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">The System Assumes You Belong Here</h2>
+
+
+
+<p class="wp-block-paragraph">At the center of all findings is the principle that trust is assumed rather than enforced.</p>
+
+
+
+<p class="wp-block-paragraph">The easiest way to misunderstand Secure Boot is to treat it like a static property. Enabled or disabled. Correct or broken. Trusted or untrusted. My research shows something more uncomfortable and more useful. Secure Boot is a conversation the system has with itself across multiple stages. The vulnerability class appears when one stage says, &#8220;I trust the next stage,&#8221; while also leaving a side note that says, &#8220;unless someone asks me nicely to do something else.&#8221;</p>
+
+
+
+<p class="wp-block-paragraph">CVE-2026-24154 is what happens when &#8220;Don&#8217;t Panic&#8221; becomes &#8220;panic and give me root.&#8221; CVE-2026-24153 is what happens when you arrive at Milliways exactly when the filesystem is being decrypted and the house specials are keys, plaintext, and persistence.</p>
+
+
+
+<p class="wp-block-paragraph">And the broader Jetson findings show the rest of the restaurant. The open side doors. The helpful signs. The waiter who explains the vault layout before seating you.</p>
+
+
+
+<p class="wp-block-paragraph">This is not an argument against Secure Boot. It is an argument against lazy trust sequencing. Secure Boot verifies what starts. It does not, by itself, guarantee that the system will behave sanely after verification, during failure, or while unlocking its own secrets.</p>
+
+
+
+<p class="wp-block-paragraph">That gap is where this research lived. It is also where professional boot security assessment begins.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">This Is Not the Only Spaceship with This Problem</h2>
+
+
+
+<p class="wp-block-paragraph">It would be convenient to treat these findings as specific to Jetson.</p>
+
+
+
+<p class="wp-block-paragraph">But the patterns observed are not platform-dependent.</p>
+
+
+
+<p class="wp-block-paragraph">They are a direct result of a broader and far more concerning issue, the systematic underestimation of what it means to transition from development to production.</p>
+
+
+
+<p class="wp-block-paragraph">Across many systems, mechanisms that were designed for flexibility, observability, and recovery during development are carried forward into production environments with only partial restriction, under the assumption that surrounding controls will compensate for them.</p>
+
+
+
+<p class="wp-block-paragraph">Initrd logic, early boot scripting, verbose debug interfaces, and recovery pathways are all essential during development, but when their trust boundaries are not redefined and strictly enforced before production deployment, they become latent control surfaces rather than harmless utilities.</p>
+
+
+
+<p class="wp-block-paragraph">This is especially critical in edge AI devices, embedded systems, and industrial platforms, where physical access is not exceptional but expected, and where deployment environments are inherently less controlled than traditional data centers.</p>
+
+
+
+<p class="wp-block-paragraph">In these contexts, the line between development convenience and production security is not just blurred, it is often never fully redrawn.</p>
+
+
+
+<p class="wp-block-paragraph">It is closer to the Hitchhiker&#8217;s Guide&#8217;s 13th floor. A place that, for all official purposes, does not exist in the building&#8217;s structure, is not referenced, is not documented, and is not meant to be part of the system&#8217;s usable space, and yet remains physically present, reachable to those who know where to look, and ultimately becomes the exact place from which control is regained, bypassing all the carefully designed external protections.</p>
+
+
+
+<p class="wp-block-paragraph">Which is to say, this is not a story about one platform behaving incorrectly.</p>
+
+
+
+<p class="wp-block-paragraph">It is a story about an industry repeatedly underestimating the security implications of its own development practices, and carrying those assumptions into production systems that are expected to operate in adversarial environments.</p>
+
+
+
+<p class="wp-block-paragraph">If left unaddressed, this gap will not remain a niche concern. It will scale with the adoption of connected devices, edge compute, and autonomous systems, turning what today appears as isolated technical findings into a systemic and recurring class of security failures.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">The Guide Has Been Updated. The Universe Remains the Same.</h2>
+
+
+
+<h2 class="wp-block-heading">NVIDIA Response</h2>
+
+
+
+<p class="wp-block-paragraph">NVIDIA&#8217;s response addressed the vulnerabilities through a software update for Jetson Linux and a formal security bulletin that explicitly lists CVE-2026-24154 and CVE-2026-24153, describes their impact, and identifies the updated versions that contain the fixes.</p>
+
+
+
+<p class="wp-block-paragraph">For these two CVEs, the bulletin states that affected Jetson Linux versions prior to 35.6.4 and 36.5, and for some platforms 38.2, were updated to 35.6.4, 36.5, and 38.4 respectively.</p>
+
+
+
+<p class="wp-block-paragraph">The bulletin describes CVE-2026-24154 as an initrd vulnerability in which an unprivileged attacker with physical access could inject incorrect command line arguments, potentially leading to code execution, escalation of privileges, denial of service, data tampering, and information disclosure, and it rates that issue High with a CVSS base score of 7.6.</p>
+
+
+
+<p class="wp-block-paragraph">It describes CVE-2026-24153 as an initrd vulnerability in which the nvluks trusted application is not disabled, potentially leading to information disclosure, and it rates that issue Medium with a CVSS base score of 5.2.</p>
+
+
+
+<p class="wp-block-paragraph">In parallel, the internal PSIRT tracking reflects that these findings were not only fixed but also marked as &#8220;documentation updated. Resolved.&#8221;, which is a subtle but important signal that the response extended beyond code changes into deployment and usage guidance.</p>
+
+
+
+<p class="wp-block-paragraph">This distinction matters.</p>
+
+
+
+<p class="wp-block-paragraph">Because while the bulletin itself focuses on the technical remediation and affected versions, the documentation updates indicate that the issue was also recognized at the level of how the platform is expected to be configured, deployed, and interpreted by integrators.</p>
+
+
+
+<p class="wp-block-paragraph">In other words, the fix is not only in the code that runs, but in the assumptions that engineers are expected to make about that code.</p>
+
+
+
+<p class="wp-block-paragraph">That is significant, because it implicitly acknowledges the underlying problem:</p>
+
+
+
+<p class="wp-block-paragraph">Boot-time behavior is part of the security boundary, not something that happens before it.</p>
+
+
+
+<p class="wp-block-paragraph">The moment execution begins, trust decisions are already being made, inputs are already being interpreted, and control flow is already being shaped.</p>
+
+
+
+<p class="wp-block-paragraph">If enforcement is delayed until later stages, such as after the operating system takes control, then the system has already passed through a phase where assumptions can be influenced without restriction.</p>
+
+
+
+<p class="wp-block-paragraph">What this response reflects is not just a patch cycle, but a correction in perspective.</p>
+
+
+
+<p class="wp-block-paragraph">Security does not begin when the system is fully up.</p>
+
+
+
+<p class="wp-block-paragraph">It begins at the very first instruction, and it must be enforced consistently from that point onward, otherwise the gap between verification and enforcement remains exploitable.</p>
+
+
+
+<p class="wp-block-paragraph">The bulletin also publicly acknowledges th3_h1tchh1ker for reporting both CVEs, which matters because it places the findings in the context of a formal vendor response rather than an isolated research claim. In practical terms, that means these issues were significant enough not only to receive CVE assignments, but also to drive official remediation across supported Jetson Linux branches.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Bring a Towel. Learn How to Read the System.</h2>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://trainsec.net/bypassing-secure-boot-live-4h/"><img   decoding="async" width="1024" height="576" src="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png" alt="Bypassing the Secure Boot banner" class="wp-image-11270" srcset="https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-300x169.png 300w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-768x432.png 768w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-1536x864.png 1536w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner-600x338.png 600w, https://trainsec.net/wp-content/uploads/2026/04/Bypassing-the-Secure-Boot-banner.png 1600w" sizes="(max-width: 1024px) 100vw, 1024px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">The Method, Not the CVE</h2>
+
+
+
+<p class="wp-block-paragraph">If you followed this reasoning, then you have already moved beyond the CVEs themselves and into the method that produced them.</p>
+
+
+
+<p class="wp-block-paragraph">You begin to understand how to observe a system, reconstruct its trust decisions, identify where it stops enforcing and starts assuming, and turn that moment into control.</p>
+
+
+
+<p class="wp-block-paragraph">This is exactly the approach behind the upcoming TrainSec session, where I will walk through this methodology in depth, not as a theoretical discussion, but as a hands-on, practitioner-level exploration of how to analyze, reason about, and ultimately control boot-time behavior in real systems.</p>
+
+
+
+<p class="wp-block-paragraph">Because Secure Boot is not a feature.</p>
+
+
+
+<p class="wp-block-paragraph">It is a sequence.</p>
+
+
+
+<p class="wp-block-paragraph">And if you can follow that sequence closely enough, you will always find the point where the system trusts you more than it should.</p>
+
+
+
+<h2 class="wp-block-heading"><em>Meet Th3_H1tchH1ker:&nbsp; </em><em><br></em><em>A Towel, a Terminal, and a Habit of Helping Systems Break Themselves</em></h2>
+
+
+
+<h2 class="wp-block-heading"><strong>About the Author</strong></h2>
+
+
+
+<p class="wp-block-paragraph">Amichai (AKA: Th3_H1tchH1ker) is a cybersecurity architect and researcher with over 30 years of experience in embedded systems, firmware, and system-level security. He is the founder and CEO of AYMOP, an Israeli multidisciplinary company specializing in research, system architecture, engineering, project leadership, and cybersecurity services for government, defense, critical infrastructure, and private-sector environments.</p>
+
+
+
+<p class="wp-block-paragraph">Through AYMOP, Amichai leads engagements focused on high-level system architecture, secure-by-design methodologies, and complex system analysis, particularly in domains such as HLS, secure communications, embedded platforms, and cyber hardening. His work emphasizes the transition between development assumptions and real-world operational systems, including how trust boundaries are defined, propagated, and often misinterpreted in production environments.</p>
+
+
+
+<p class="wp-block-paragraph">Amichai is the founder of CYMDALL, where he is building a new approach to endpoint security by embedding behavioral enforcement directly at the firmware and hardware interaction layer. His work challenges the traditional reliance on software-only defenses by focusing on visibility and control beneath the operating system.</p>
+
+
+
+<p class="wp-block-paragraph">In parallel to his research and product work, Amichai advises leading organizations and global consulting firms on advanced security architecture, hardware security validation, and AI system assurance. His consulting work emphasizes bridging the gap between design intent and operational reality, particularly in complex, high-assurance systems.</p>
+
+
+
+<p class="wp-block-paragraph">His recent research into Secure Boot bypass techniques on NVIDIA Jetson platforms, including CVE-2026-24154 and CVE-2026-24153, highlights systemic issues in development-to-production transitions and trust sequencing. Rather than focusing on isolated vulnerabilities, his work exposes repeatable methods for identifying and exploiting enforcement gaps across platforms.</p>
+
+
+
+<p class="wp-block-paragraph">Through his TrainSec initiative, Amichai teaches practitioners how to move beyond vulnerability hunting and toward structured, evidence-driven security reasoning. His approach equips engineers and security professionals with the methodology required to analyze, model, and ultimately control system behavior from boot to runtime.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p class="wp-block-paragraph"><em>Acknowledgment: Special thanks to <a href="https://trainsec.net/uriel-kosayev/" data-type="page">Uriel Kosayev</a>, my wingman in this journey, for the kind of thinking, questioning, and persistence that helps systems explain themselves, sometimes more honestly than they would prefer.</em></p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/hardware-hacking-best-starter-hardware-hacking-toolkit.html">Best starter Hardware Hacking Toolkit</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/hardware-hacking-uart-security-the-parity-bit.html">Reinventing UART Security: Leveraging the Parity Bit for Robust Protection in OT Networks</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/hardware-hacking-trojan-horse-implementation-in-hardware.html">Trojan Horse Implementation in Hardware</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/hardware-hacking/the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

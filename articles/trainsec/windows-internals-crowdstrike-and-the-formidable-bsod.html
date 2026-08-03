@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CrowdStrike and the Formidable BSOD — TrainSec article | 1200km</title>
+<meta name="description" content="CrowdStrike and the Formidable BSOD">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/crowdstrike-and-the-formidable-bsod/"><meta name="keywords" content="Pavel Yosifovich, Malware analysis, Malware / security research, malware, reverse engineering">
+<meta property="article:published_time" content="2024-07-20">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-crowdstrike-and-the-formidable-bsod.html">
+<meta property="og:type" content="article"><meta property="og:title" content="CrowdStrike and the Formidable BSOD"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-crowdstrike-and-the-formidable-bsod.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-crowdstrike-and-the-formidable-bsod.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-crowdstrike-and-the-formidable-bsod.html","headline":"CrowdStrike and the Formidable BSOD","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-crowdstrike-and-the-formidable-bsod.html#webpage"},"datePublished":"2024-07-20","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/crowdstrike-and-the-formidable-bsod/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Malware analysis · Malware / security research</p><h1>CrowdStrike and the Formidable BSOD</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> July 21, 2024</p>
+<div class="tag-row"><span class="tag">malware</span><span class="tag">reverse engineering</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/crowdstrike-and-the-formidable-bsod/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Millions of machines around the world crashed a few days ago, showing the dreaded “Blue Screen of Death” (BSOD), affecting banks, airports, hospitals, and many other businesses, all using the Windows OS and CrowdStrike’s Event Decetion and Response (EDR) software. What was going on? How can such a calamity happen in one single swoop?</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" fetchpriority="high" decoding="async" width="1024" height="576" src="https://trainsec.net/wp-content/uploads/2024/07/image1-5-1024x576.png" alt="image1 5" class="wp-image-887" srcset="https://trainsec.net/wp-content/uploads/2024/07/image1-5-1024x576.png 1024w, https://trainsec.net/wp-content/uploads/2024/07/image1-5-600x338.png 600w, https://trainsec.net/wp-content/uploads/2024/07/image1-5-300x169.png 300w, https://trainsec.net/wp-content/uploads/2024/07/image1-5-768x432.png 768w, https://trainsec.net/wp-content/uploads/2024/07/image1-5.png 1200w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<p class="wp-block-paragraph">First, foul play was suspected – a cyber security attack. But it turned out to be a bad update of CrowStrike’s “Falcon” software agent that caused all this mess. What is a BSOD anyway?</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph">Code running on Windows can run in two primary modes – user mode and kernel mode. User mode is restricted in its access, which cannot harm the OS. This is the mode applications run with – such as Explorer, Word, Notepad, and any other application. Kernel mode, however, has (almost) unlimited power. But, as the American hero movies like to say, “With great power comes great responsibility” – and this is where things can go wrong.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="664" alt="image2 4" class="wp-image-888"  src="https://trainsec.net/wp-content/uploads/2024/07/image2-4-1024x664.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/image2-4-1024x664.png 1024w, https://trainsec.net/wp-content/uploads/2024/07/image2-4-600x389.png 600w, https://trainsec.net/wp-content/uploads/2024/07/image2-4-300x195.png 300w, https://trainsec.net/wp-content/uploads/2024/07/image2-4-768x498.png 768w, https://trainsec.net/wp-content/uploads/2024/07/image2-4-1536x996.png 1536w, https://trainsec.net/wp-content/uploads/2024/07/image2-4.png 1693w" sizes="(max-width: 1024px) 100vw, 1024px"/></figure>
+
+
+
+<p class="wp-block-paragraph">Kernel code is trusted, by definition, because it can do anything. The Windows kernel is the main part of kernel space, but 3<sup>rd</sup> party components may be installed in the kernel, called device drivers. Classic device drivers are required to manage hardware devices – connecting them to the rest of the OS. The fact that you can move your cursor with the mouse, see something on the screen, hear game sounds, etc., means there are device drivers dealing with the hardware correctly, some of which are not written by Microsoft.</p>
+
+
+
+<p class="wp-block-paragraph">If a driver misbehaves, such as causing an exception to occur, the system crashes with the infamous BSOD. This is not some kind of punishment, but a protection mechanism. If a driver misbehaves (or any other kernel component), it’s best to stop now, rather than letting the code continue execution which might cause more damage, like data corruption, and even prevent Windows from starting successfully.</p>
+
+
+
+<p class="wp-block-paragraph">3<sup>rd</sup> party drivers are the only entities that Microsoft has no full control over. Drivers must be properly signed, but that only guarantees that they have not been tampered with, but it does not guarantee quality.</p>
+
+
+
+<p class="wp-block-paragraph">Most Windows systems have some Anti-virus or EDR software protecting them. By default, you get Windows Defender, but there are more powerful EDRs out there, CrowdStrike’s Falcon being one of the leaders in the world.</p>
+
+
+
+<p class="wp-block-paragraph">The “incident” involved a bad update that caused a BSOD when Windows restarted. Restarting again did not help, as a BSOD was showing immediately. The only recourse is to boot in Safe Mode, where a minimal set of drivers is loaded, disable the problematic driver, and reboot again. Unfortunately, this has to be done manually on millions of machines.</p>
+
+
+
+<p class="wp-block-paragraph">The Windows kernel treats all kernel components in the same way, regardless of whether that component is from Microsoft or not. Any driver, no matter how insignificant, that causes an exception, will crash the system with a BSOD. Perhaps it would be wise to somehow designate drivers as “important” or “not that important” so they may be treated differently in case of failure. But that is not how Windows works.</p>
+
+
+
+<p class="wp-block-paragraph">This entire incident certainly raises questions and concerns – a single point of failure has shown itself in full force. Perhaps a different approach to handling kernel components should be considered. But that’s a topic for another post.</p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-process-tree.html">Building a Process Tree</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/crowdstrike-and-the-formidable-bsod/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

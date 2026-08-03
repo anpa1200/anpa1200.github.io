@@ -298,7 +298,7 @@ function inferDomain(url, title, html, collection) {
   const path = new URL(url).pathname;
   const text = `${path} ${title} ${findMetaContent(html, 'description')}`;
   if (/^\/threat-matrix\//i.test(path)) return 'threat-intelligence';
-  if (collection && collection.id !== 'collection:medium-export') return collection.primary_domain;
+  if (collection && !['collection:medium-export', 'collection:trainsec-library'].includes(collection.id)) return collection.primary_domain;
   if (/^\/ITDR\//.test(path) || /identity|kerberos|active directory|entra|oauth|saml/i.test(text)) return 'identity-security';
   if (/embedded|firmware|hardware|uefi|bmc/i.test(text)) return 'application-security';
   if (/malware|reverse engineering|debugger|unpack/i.test(text)) return 'malware-analysis';
@@ -418,6 +418,11 @@ function mediumSourceFromHtml(html, pageUrl) {
   return (suffix && candidates.find((value) => value.toLowerCase().endsWith(suffix.toLowerCase()))) || candidates[0];
 }
 
+function trainsecSourceFromHtml(html) {
+  const source = findMetaContent(html, 'trainsec-source');
+  return source ? normalizedUrl(source) : null;
+}
+
 function sourceForThreatMatrix(url) {
   const path = new URL(url).pathname;
   const actor = path.match(/^\/threat-matrix\/actors\/(G\d{4})\//i)?.[1];
@@ -441,11 +446,13 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
   const primaryDomain = inferDomain(canonical, title, html, collection);
   const defaults = defaultsForType(primaryType, primaryDomain);
   const dates = htmlDates(html);
+  const author = findMetaContent(html, 'author');
   const topics = classifyTopics(canonical, html).map((topic) => TOPIC_TAGS.get(topic)).filter(Boolean);
   const path = new URL(canonical).pathname;
   const identifier = path.match(/\/(?:actors|techniques)\/([^/]+)\//i)?.[1]?.toLowerCase();
   const sourceUrl = sourceForThreatMatrix(canonical)
     || (collection?.id === 'collection:medium-export' ? mediumSourceFromHtml(html, canonical) : null)
+    || (collection?.id === 'collection:trainsec-library' ? trainsecSourceFromHtml(html) : null)
     || (collection?.source_url && collection.source_url !== canonical ? collection.source_url : null);
   const version = title.match(/\b(?:AdversaryGraph|ThreatMapper)\s+v(\d+(?:\.\d+){0,2})/i)?.[1]
     || (collection?.id === 'collection:adversarygraph-docs' ? path.match(/-v(\d+(?:-\d+)*)\/?$/i)?.[1]?.replace(/-/g, '.') : null);
@@ -468,6 +475,7 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
     tags: [...new Set([
       ...topics,
       ...(identifier ? [identifier] : []),
+      ...(author ? [`author:${author}`] : []),
       primaryDomain,
       primaryType,
     ])].sort(),

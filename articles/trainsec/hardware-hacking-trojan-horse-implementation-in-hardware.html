@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trojan Horse Implementation in Hardware — TrainSec article | 1200km</title>
+<meta name="description" content="Trojan Horse Implementation in Hardware by Amichai Yifrach, republished from TrainSec.net with permission.">
+<meta name="author" content="Amichai Yifrach"><meta name="trainsec-author" content="Amichai Yifrach"><meta name="trainsec-source" content="https://trainsec.net/library/hardware-hacking/trojan-horse-implementation-in-hardware/"><meta name="keywords" content="Amichai Yifrach, Hardware hacking, Hardware security research, hardware security, embedded">
+<meta property="article:published_time" content="2024-09-15">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/hardware-hacking-trojan-horse-implementation-in-hardware.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Trojan Horse Implementation in Hardware"><meta property="og:url" content="https://1200km.com/articles/trainsec/hardware-hacking-trojan-horse-implementation-in-hardware.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/hardware-hacking-trojan-horse-implementation-in-hardware.html#article","url":"https://1200km.com/articles/trainsec/hardware-hacking-trojan-horse-implementation-in-hardware.html","headline":"Trojan Horse Implementation in Hardware","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/hardware-hacking-trojan-horse-implementation-in-hardware.html#webpage"},"datePublished":"2024-09-15","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/hardware-hacking/trojan-horse-implementation-in-hardware/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Hardware hacking · Hardware security research</p><h1>Trojan Horse Implementation in Hardware</h1>
+<p class="meta"><strong>Author:</strong> Amichai Yifrach · <strong>Published:</strong> September 16, 2024</p>
+<div class="tag-row"><span class="tag">hardware security</span><span class="tag">embedded</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Amichai Yifrach. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/hardware-hacking/trojan-horse-implementation-in-hardware/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">When I speak about Hardware Hacking and its crucial role in the safety of our future, I always get asked a version of: &#8220;Why can’t I just use tools like Flipper Zero and do what hackers do, without going through the effort and dedication you are talking about?&#8221; It’s a fair question for someone new to Hardware Hacking, but it also points out a major misconception about what it means to truly be a hacker. I call these people Mimickers—those who rely on pre-made devices to mimic what they think hacking is.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph">In my point of view, after few decades doing what I do, hardware hacking is about much more than just running someone else’s tools or following a YouTube video. It’s about old school understanding, morphing and adapting capabilities, and innovating towards development of defenses to be used by engineers in future systems. Mimickers are limited by the tools they buy or by the video they see, while true hardware hackers are only limited by their knowledge, imagination and creativity.</p>
+
+
+
+<p class="wp-block-paragraph">Putting the right ingredients in a pot, following a recipe, and even producing a great dish you saw online will not make you a chef, no matter how many good, sophisticated and expensive kitchen tools and gadgets you have. A good chef can adapt and make a Michelin dish from whatever scraps are in the fridge and with only a few basic tools. Same goes for Hardware Hacking Expert.</p>
+
+
+
+<p class="wp-block-paragraph">In this blog, I want to demonstrate the vast difference between the two by walking through a Trojan Horse attack I built from the ground up. This attack showcases how a deep understanding of hardware and software results in more powerful, efficient, and impactful exploits than anything a Mimicker could dream of launching with an Internet bought tool or any other ‘Marine Mammal 0’.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Mastering Hardware Hacking: The Real Skills Behind the Scenes</strong></p>
+
+
+
+<p class="wp-block-paragraph">Hardware hacking is not for the faint of heart. It demands an extensive knowledge base across several realms such as embedded systems, electronics, firmware, and communication protocols, among many other things and true hand-on experience analyzing embedded systems, reverse engineering and vulnerabilities research and the development of specially crafted toolset. You must know how to read datasheets, reverse engineer hardware, solder components, and write code in languages like C or VHDL. Beyond that, you need to understand how different protocols work, how signals are transmitted, and where vulnerabilities might lie, way before you launch your first attack.</p>
+
+
+
+<p class="wp-block-paragraph">This level of understanding allows you to create custom attacks that target specific targets or systems. A Mimicker, who relies on internet bought tools, has no idea how or why those tools work. In contrast, a real hardware hacker builds tools from scratch or customizes existing ones to exploit specific weaknesses in a target. This knowledge and experience stand in the foundation of the ability of hackers to manipulate devices and systems in ways that are simply impossible with commercial gadgets.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1853 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="591" height="571" class="attachment-large size-large wp-image-896" alt="Hardware Hacking expert course badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Hardware-Hackign-expert-badge.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Hardware-Hackign-expert-badge.png 591w, https://trainsec.net/wp-content/uploads/2024/07/Hardware-Hackign-expert-badge-300x290.png 300w" sizes="(max-width: 591px) 100vw, 591px"/>															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,550</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><strong>$1,085 or $115× 10 payments</strong></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default"><a href="https://trainsec.net/hardware-hacking-expert-level-1/">Hardware Hacking Expert</a></h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>This comprehensive path, combining dynamic lectures and hands-on exercises, equips you with the skills, resources, and confidence to explore, manipulate, and exploit electronic systems. No prior hardware experience is required!</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/hardware-hacking-expert-level-1/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become HW Hacking Expert</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph"><strong>Trojan Horse Attack: A High-Impact Hardware Exploit</strong></p>
+
+
+
+<p class="wp-block-paragraph">A classic example of this is a Trojan Horse attack, which I recently implemented and demonstrated on an RFID based access control system. At its core, a Trojan Horse in hardware is a malicious device disguised as something harmless. Once it’s inside the target system, it unleashes its payload, often unnoticed by the system’s security mechanisms.</p>
+
+
+
+<p class="wp-block-paragraph">The attack begins with extensive reconnaissance finding the weakest soft spot of a facility I want to attack, finding the exact device I want to use as my Trojan horse. Then I buy the device online.</p>
+
+
+
+<p class="wp-block-paragraph">Once I had a twin of the victim device in my lab, I used a combination of inexpensive hardware components and custom code to augment the device. The setup was simple but highly effective. It included a cheap RFID reader a perfect match to the victim device ($15), an FPGA (10-99$), a Bluetooth module ($11), and a DC/DC converter ($7). With this basic hardware, I was able to build a Trojan Horse that intercepted, modified, and transmitted RFID card data—all while remaining undetected.</p>
+
+
+
+<p class="wp-block-paragraph">For the installation some social engineering and guts required, but mastering yet another craftsmanship Hardware Hackers must conquer – stripping and rewiring, it takes me about 2 minutes to make the replacement once all eyes are turned away…</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="439" alt="image3" class="wp-image-2349"  src="https://trainsec.net/wp-content/uploads/2024/09/image3-1024x439.png" srcset="https://trainsec.net/wp-content/uploads/2024/09/image3-1024x439.png 1024w, https://trainsec.net/wp-content/uploads/2024/09/image3-600x257.png 600w, https://trainsec.net/wp-content/uploads/2024/09/image3-300x129.png 300w, https://trainsec.net/wp-content/uploads/2024/09/image3-768x329.png 768w, https://trainsec.net/wp-content/uploads/2024/09/image3.png 1178w" sizes="(max-width: 1024px) 100vw, 1024px"/></figure>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="768" alt="image5" class="wp-image-2350"  src="https://trainsec.net/wp-content/uploads/2024/09/image5-1024x768.jpg" srcset="https://trainsec.net/wp-content/uploads/2024/09/image5-1024x768.jpg 1024w, https://trainsec.net/wp-content/uploads/2024/09/image5-600x450.jpg 600w, https://trainsec.net/wp-content/uploads/2024/09/image5-300x225.jpg 300w, https://trainsec.net/wp-content/uploads/2024/09/image5-768x576.jpg 768w, https://trainsec.net/wp-content/uploads/2024/09/image5-1536x1153.jpg 1536w, https://trainsec.net/wp-content/uploads/2024/09/image5.jpg 1999w" sizes="(max-width: 1024px) 100vw, 1024px"/></figure>
+
+
+
+<p class="wp-block-paragraph"><strong>How It Works: Exploiting the System from Within</strong></p>
+
+
+
+<p class="wp-block-paragraph">The core of the attack exploits the vulnerabilities in the Wiegand protocol, which is often used in RFID-based access control systems. The Wiegand protocol transmits binary data between the RFID reader and the access control system. The signals are represented as pulsed voltages, with D0 and D1 wires indicating binary &#8216;0&#8217; and &#8216;1,&#8217; respectively.</p>
+
+
+
+<p class="wp-block-paragraph">The FPGA in my setup plays a critical role in converting the Wiegand signals into UART signals, which can then be transmitted via Bluetooth or other means. This conversion allows the data to be wirelessly sent to my mobile device, where I monitor and log every RFID card scanned by my horsey. The FPGA is a cost-effective solution, as you can get one for as low as $10, yet it’s powerful to handle this conversion in real time.</p>
+
+
+
+<p class="wp-block-paragraph">OBTW, this FPGA (with some modifications and adjustments) stars in my other tools I built over the years for almost every task I need, like universal sniffers, fault injectors, power analysis, MITM and many others. Again, Mimicker would need to buy a special tool for each one of these tasks (assuming accurately following the right procedure), while I use the same building blocks add-hock reconfigured to my needs.</p>
+
+
+
+<p class="wp-block-paragraph">The DC/DC converter is essential for powering the malicious implant inside the access control system. It steps down the voltage from the system to the required 3.3V, ensuring the FPGA, Bluetooth module, and other components operate smoothly without drawing attention.</p>
+
+
+
+<p class="wp-block-paragraph">The Bluetooth module, while inexpensive, is the final piece of the puzzle that enables remote data collection. By sitting just a few yards away from the Trojan Horse device, I can intercept and collect RFID card information without ever needing to physically interact with the system again. This is where the power of hardware hacking truly shines—while a tool like the Flipper Zero requires you to be physically close to each person’s RFID tag, my Trojan Horse passively collects data from everyone who uses the system, all from a safe distance.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="453" alt="image4" class="wp-image-2351"  src="https://trainsec.net/wp-content/uploads/2024/09/image4-1024x453.png" srcset="https://trainsec.net/wp-content/uploads/2024/09/image4-1024x453.png 1024w, https://trainsec.net/wp-content/uploads/2024/09/image4-600x266.png 600w, https://trainsec.net/wp-content/uploads/2024/09/image4-300x133.png 300w, https://trainsec.net/wp-content/uploads/2024/09/image4-768x340.png 768w, https://trainsec.net/wp-content/uploads/2024/09/image4-1536x680.png 1536w, https://trainsec.net/wp-content/uploads/2024/09/image4.png 1932w" sizes="(max-width: 1024px) 100vw, 1024px"/></figure>
+
+
+
+<p class="wp-block-paragraph"><strong>The Impact: Gathering Intelligence and Designing Future Attacks</strong></p>
+
+
+
+<p class="wp-block-paragraph">The data gathered from this attack is not limited to a single use. By intercepting every RFID card that is presented to my horsey, I can build a detailed profile of the facility I’m targeting. I’ll know who enters and exits the building, their work schedules, and even how often they access restricted areas. With this data, combined with some OSINT gathering, I can design more sophisticated deadlier future attacks.</p>
+
+
+
+<p class="wp-block-paragraph">For example, with enough data, I could clone several employee’s RFID cards, gaining unauthorized escalated physical access deeper and deeper into the facility. But beyond that, I could correlate work schedules with employee habits to launch social engineering attacks, such as spear phishing, or even target specific individuals with malware designed to exploit weak points in the facility’s network, avoiding detection algorithms such as double entry alert or suspicious access behavior.</p>
+
+
+
+<p class="wp-block-paragraph">The sheer amount of information gathered from a single point of attack is devastating. It goes far beyond what a Mimicker could achieve with whatever tool they bought online, which requires physically getting close to each person you want to clone. With the Trojan Horse, I can sit remotely, collecting and analyzing all this vast amounts of data without ever having to physically interact with any of its users.</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="735" height="734" alt="image1" class="wp-image-2352"  src="https://trainsec.net/wp-content/uploads/2024/09/image1.png" srcset="https://trainsec.net/wp-content/uploads/2024/09/image1.png 735w, https://trainsec.net/wp-content/uploads/2024/09/image1-300x300.png 300w, https://trainsec.net/wp-content/uploads/2024/09/image1-100x100.png 100w, https://trainsec.net/wp-content/uploads/2024/09/image1-600x599.png 600w, https://trainsec.net/wp-content/uploads/2024/09/image1-150x150.png 150w" sizes="(max-width: 735px) 100vw, 735px"/></figure>
+
+
+
+<p class="wp-block-paragraph"><strong>Why Mimickers Can’t Compete: The Power of Real Knowledge</strong></p>
+
+
+
+<p class="wp-block-paragraph">This is where the difference between Mimickers and real hardware hackers becomes crystal clear. A Mimicker can only launch attacks that their off-the-shelf tool was designed to handle. They can run pre-made scripts and commands, but they have no idea how to adapt or modify their attacks when faced with a system that behaves unexpectedly.</p>
+
+
+
+<p class="wp-block-paragraph">On the other hand, a hardware hacker with real knowledge and experience can exploit vulnerabilities that aren’t covered by commercial tools. In my Trojan Horse attack, I was able to manipulate the system at a low level—sniffing communications, injecting commands, and bypassing security measures—using tools and techniques that I developed and sharpened through decades of experience. This level of adaptability and precision simply can’t be matched by someone who relies on mimicking others.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>Conclusion: Lead, Don’t Mimic</strong></p>
+
+
+
+<p class="wp-block-paragraph">The point I’m making is simple: don’t mimic—lead. If you’re serious about becoming a hardware hacker, don’t waste your time trying to take shortcuts with off-the-shelf tools like the Flipper Zero. Instead, invest the time and effort into mastering the skills that matter—learn the fundamentals of embedded systems, understand how hardware communicates, and get comfortable with writing code that manipulates physical devices, and gather experience in gradually escalating attack skills using basic toolset and old school techniques.</p>
+
+
+
+<p class="wp-block-paragraph">When you master these skills, you won’t just be mimicking attacks that someone else created. You’ll be developing your own attack vectors, discovering new vulnerabilities, and exploiting systems in ways that no one else has thought of, building yourself to lead the engineers of our ever evolving digital world towards safer more secured future. That’s the difference between a Mimicker and a true hardware hacker—and it’s the reason why the attacks you can create will always outclass anything a Mimicker can do.</p>
+
+
+
+<p class="wp-block-paragraph">So, if you want to lead in this field, stop looking for shortcuts. Go all in, master all trades, and become the hacker that others aspire to be.</p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/hardware-hacking-best-starter-hardware-hacking-toolkit.html">Best starter Hardware Hacking Toolkit</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/hardware-hacking-uart-security-the-parity-bit.html">Reinventing UART Security: Leveraging the Parity Bit for Robust Protection in OT Networks</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/hardware-hacking-the-hitchhikers-guide-to-breaking-secure-boot-jetson-orin-cves.html">The Hitchhiker&#39;s Guide to Breaking Secure Boot</a> <span>(Amichai Yifrach)</span></li><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/hardware-hacking/trojan-horse-implementation-in-hardware/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

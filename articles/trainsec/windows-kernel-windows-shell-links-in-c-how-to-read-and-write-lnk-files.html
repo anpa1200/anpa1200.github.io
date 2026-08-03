@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows Shell Links in C++: How to Read and Write .lnk Files — TrainSec article | 1200km</title>
+<meta name="description" content="Windows Shell Links in C++: How to Read and Write .lnk Files by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-kernel/windows-shell-links-in-c-how-to-read-and-write-lnk-files/"><meta name="keywords" content="Pavel Yosifovich, Windows kernel, Technical walkthrough, Windows, kernel">
+<meta property="article:published_time" content="2026-05-09">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-kernel-windows-shell-links-in-c-how-to-read-and-write-lnk-files.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Windows Shell Links in C++: How to Read and Write .lnk Files"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-kernel-windows-shell-links-in-c-how-to-read-and-write-lnk-files.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-kernel-windows-shell-links-in-c-how-to-read-and-write-lnk-files.html#article","url":"https://1200km.com/articles/trainsec/windows-kernel-windows-shell-links-in-c-how-to-read-and-write-lnk-files.html","headline":"Windows Shell Links in C++: How to Read and Write .lnk Files","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-kernel-windows-shell-links-in-c-how-to-read-and-write-lnk-files.html#webpage"},"datePublished":"2026-05-09","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-kernel/windows-shell-links-in-c-how-to-read-and-write-lnk-files/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows kernel · Technical walkthrough</p><h1>Windows Shell Links in C++: How to Read and Write .lnk Files</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> May 10, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">kernel</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-kernel/windows-shell-links-in-c-how-to-read-and-write-lnk-files/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">Shell shortcuts are everywhere. Desktop icons, Start Menu entries, taskbar pins — they&#8217;re all .lnk files under the hood. Most developers have interacted with them for years without thinking much about what&#8217;s actually inside. And why would they? Explorer handles it all.</p>
+
+
+
+<p class="wp-block-paragraph">Until you need to create one programmatically. Or read one. Or modify one without launching Explorer. That&#8217;s when you discover that shell links are implemented as COM objects.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="How do you work with Shell shortcuts?" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/6Te8L-Yhe-M?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">Shell Links Are COM Objects, Not Text Files</h2>
+
+
+
+<p class="wp-block-paragraph">The official name for a desktop shortcut is a <strong>shell link</strong>. The .lnk extension is how Explorer knows to treat the file specially, handing it off to the underlying COM implementation rather than opening it as a document.</p>
+
+
+
+<p class="wp-block-paragraph">These files are binary (not textual). If you try to open a .lnk in Notepad, what you get is the <em>target</em> — Explorer helpfully opens the file the shortcut points to, not the .lnk itself. Same thing with a hex editor like HxD: double-clicking hands you the PE, not the link file. You have to explicitly paste the .lnk path into the tool to get at the actual bytes. And when you do, it&#8217;s clearly binary. You can spot the target path buried in there if you look — but there&#8217;s no sane way to parse that manually.</p>
+
+
+
+<p class="wp-block-paragraph">So the right approach is programmatic, through COM.</p>
+
+
+
+<h2 class="wp-block-heading">The IShellLink Interface</h2>
+
+
+
+<p class="wp-block-paragraph">The COM interface for working with shell links is <code>IShellLink</code> (or <code>IShellLinkW</code> for Unicode, which is what you want on any modern project). To get one, you use <code>CoCreateInstance</code> with <code><strong>CLSID_ShellLink</strong></code>:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>#include &lt;shlobj.h>    // IShellLink, CLSID_ShellLink
+#include &lt;atlbase.h>   // ATL smart pointers (CComPtr, CComQIPtr)
+
+CComPtr&lt;IShellLink> link;
+HRESULT hr = link.CoCreateInstance(__uuidof(ShellLink)); // or CLSID_ShellLink</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #C586C0">#include</span><span style="color: #569CD6"> </span><span style="color: #CE9178">&lt;shlobj.h&gt;</span><span style="color: #569CD6">    </span><span style="color: #6A9955">// IShellLink, CLSID_ShellLink</span></span>
+<span class="line"><span style="color: #C586C0">#include</span><span style="color: #569CD6"> </span><span style="color: #CE9178">&lt;atlbase.h&gt;</span><span style="color: #569CD6">   </span><span style="color: #6A9955">// ATL smart pointers (CComPtr, CComQIPtr)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #D4D4D4">CComPtr&lt;IShellLink&gt; link;</span></span>
+<span class="line"><span style="color: #D4D4D4">HRESULT hr = </span><span style="color: #9CDCFE">link</span><span style="color: #D4D4D4">.</span><span style="color: #DCDCAA">CoCreateInstance</span><span style="color: #D4D4D4">(</span><span style="color: #DCDCAA">__uuidof</span><span style="color: #D4D4D4">(ShellLink));</span><span style="color: #6A9955"> // or CLSID_ShellLink</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">At this point you have a valid COM object — but an empty one. Calling <code>GetPath</code> on a freshly created shell link returns <code>S_FALSE</code>, which is one of those results that trips people up. It&#8217;s not an error (the HRESULT value is non-negative), but here it means &#8220;I ran fine, there&#8217;s just nothing here.&#8221; The path buffer will have a null terminator as its first character. That&#8217;s expected — the link is empty.</p>
+
+
+
+<h2 class="wp-block-heading">Loading an Existing .lnk File with IPersistFile</h2>
+
+
+
+<p class="wp-block-paragraph">To read an existing shortcut — or to save one you&#8217;ve built or modified — you need a second interface: <code><strong>IPersistFile</strong></code>. This is a standard COM interface, and the shell link object implements it. You get to it through <code>QueryInterface</code>, which with ATL smart pointers looks like this:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>CComQIPtr&lt;IPersistFile> persist(link);
+// persist is non-null if IPersistFile is supported (it is)</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #4EC9B0">CComQIPtr</span><span style="color: #D4D4D4">&lt;</span><span style="color: #4EC9B0">IPersistFile</span><span style="color: #D4D4D4">&gt; </span><span style="color: #DCDCAA">persist</span><span style="color: #D4D4D4">(</span><span style="color: #4EC9B0">link</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #6A9955">// persist is non-null if IPersistFile is supported (it is)</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph"><code>IPersistFile</code> has two methods that matter here: <code>Load</code> and <code>Save</code>. Loading an existing shortcut:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>hr = persist->Load(L"C:\\Users\\Pavel\\Desktop\\VLC.lnk", STGM_READ);</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">hr = </span><span style="color: #9CDCFE">persist</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #DCDCAA">Load</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">L&quot;C:</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">Users</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">Pavel</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">Desktop</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">VLC.lnk&quot;</span><span style="color: #D4D4D4">, STGM_READ);</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The second parameter is a storage mode constant from the <code><strong>STGM_</strong>*</code> family — the same flags used by compound files, which is its own topic. For reading, <code>STGM_READ</code> is fine. For modifying and saving, you&#8217;ll want <code>STGM_READWRITE</code>.</p>
+
+
+
+<p class="wp-block-paragraph">Once loaded, you can read any property the interface exposes:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>WCHAR path[MAX_PATH];
+hr = link->GetPath(path, MAX_PATH, nullptr, 0);
+// path now contains the target, e.g. "C:\Program Files\VideoLAN\VLC\vlc.exe"</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">WCHAR </span><span style="color: #9CDCFE">path</span><span style="color: #D4D4D4">[MAX_PATH];</span></span>
+<span class="line"><span style="color: #D4D4D4">hr = </span><span style="color: #9CDCFE">link</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #DCDCAA">GetPath</span><span style="color: #D4D4D4">(path, MAX_PATH, </span><span style="color: #569CD6">nullptr</span><span style="color: #D4D4D4">, </span><span style="color: #B5CEA8">0</span><span style="color: #D4D4D4">);</span></span>
+<span class="line"><span style="color: #6A9955">// path now contains the target, e.g. &quot;C:\Program Files\VideoLAN\VLC\vlc.exe&quot;</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The <code>nullptr</code> for <strong><code>WIN32_FIND_DATA</code></strong> means you&#8217;re not asking for file metadata — creation time, attributes, and so on. Pass a pointer if you want those details. The flags parameter at the end is mostly uninteresting; zero is good enough in most cases.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<h2 class="wp-block-heading">Setting Properties and Saving</h2>
+
+
+
+<p class="wp-block-paragraph"><code>IShellLink</code> has a corresponding <code>Set*</code> methods for every property you can read:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>SetPath</code> — the target file or folder</li>
+
+
+
+<li><code>SetArguments</code> — command-line arguments passed to the target</li>
+
+
+
+<li><code>SetDescription</code> — the tooltip description</li>
+
+
+
+<li><code>SetHotkey</code> — keyboard shortcut to launch the link</li>
+
+
+
+<li><code>SetIconLocation</code> — icon file path and index (doesn&#8217;t have to come from the executable)</li>
+
+
+
+<li><code>SetShowCmd</code> — how the window opens: normal, minimized, maximized</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">There are also advanced properties accessible through related interfaces — like setting the &#8220;run as administrator&#8221; flag, which is more interesting than it might sound (more on that below).</p>
+
+
+
+<p class="wp-block-paragraph">After making your changes, you save with:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>hr = persist->Save(L"C:\\Users\\Pavel\\Desktop\\VLC.lnk", TRUE);</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #D4D4D4">hr = </span><span style="color: #9CDCFE">persist</span><span style="color: #D4D4D4">-&gt;</span><span style="color: #DCDCAA">Save</span><span style="color: #D4D4D4">(</span><span style="color: #CE9178">L&quot;C:</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">Users</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">Pavel</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">Desktop</span><span style="color: #D7BA7D">\\</span><span style="color: #CE9178">VLC.lnk&quot;</span><span style="color: #D4D4D4">, TRUE);</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph">The second parameter controls whether this path becomes the current file path for the object. <code>TRUE</code> is the typical value.</p>
+
+
+
+<h2 class="wp-block-heading">Discovering Interfaces: OleView and the Registry</h2>
+
+
+
+<p class="wp-block-paragraph">You might wonder how you&#8217;d know that <code>IPersistFile</code> is implemented by the same object as <code>IShellLink</code>. In general, for any COM class you&#8217;re not familiar with, there&#8217;s a tool for this: <strong>OleView</strong> (OLE/COM Object Viewer), included with a Visual Studio installation (and the Windows SDK).</p>
+
+
+
+<p class="wp-block-paragraph">Launch it from a Visual Studio developer command prompt, go to &#8220;All Objects&#8221; — which despite the name means all <em>registered COM classes</em> — and search for &#8220;Shortcut.&#8221; Once you find the right entry, verify the CLSID against the one in your code (<strong><code>CLSID_ShellLink</code> </strong>has lots of zeros — it&#8217;s been hardcoded by Microsoft). Double-click to instantiate it. OleView calls <code>CoCreateInstance</code> and then queries the object for every interface registered in <code><strong>HKEY_CLASSES_ROOT\Interface</strong></code>. You&#8217;ll see <code>IPersistFile</code> in the list. You&#8217;ll also see <code>IShellLink</code> listed by its interface ID rather than a friendly name — because its registry entry doesn&#8217;t include one. A minor nuisance, but you can verify it matches by pressing F12 on <code>IShellLinkW</code> in your code.</p>
+
+
+
+<p class="wp-block-paragraph">This brings up an interesting limitation of classic COM. The <code><strong>IUnknown</strong></code> interface — the base of everything — only gives you <code><strong>QueryInterface</strong></code>, <code><strong>AddRef</strong></code>, and <code><strong>Release</strong></code>. There is no way to ask a COM object &#8220;what interfaces do you support?&#8221; You can only ask &#8220;do you support <em>this specific</em> interface?&#8221; OleView works around this by querying every interface registered in <code>HKCR\Interface</code> — a big list, but not necessarily complete. A class might implement interfaces that aren&#8217;t registered, and OleView will never find those.</p>
+
+
+
+<p class="wp-block-paragraph">The Windows Runtime solved this with <strong><code>IInspectable</code></strong>, which extends <code>IUnknown</code> and adds a <code>GetIids</code> method — exactly what you&#8217;d want. That was largely driven by the need to support JavaScript in UWP. In classic COM, we work with what we have.</p>
+
+
+
+<h2 class="wp-block-heading">Security Angle: LNK Persistence</h2>
+
+
+
+<p class="wp-block-paragraph">Programmatic creation of .lnk files is a well-known persistence mechanism. An attacker with write access to a startup folder — user-level or system-level — can drop a shell link pointing to any target, with any arguments, and have it execute on the next login. The target doesn&#8217;t even have to exist at creation time; you can create a shell link pointing to a path that isn&#8217;t there yet, which is useful for staged payloads.</p>
+
+
+
+<p class="wp-block-paragraph">From a defensive perspective: any monitoring solution that tracks .lnk file creation or modification in startup locations should inspect not just the file name but the target, arguments, and working directory. A VLC shortcut that suddenly has a different target or unexpected arguments is worth flagging.</p>
+
+
+
+<h2 class="wp-block-heading">Key Takeaways</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Shell links (.lnk files) are implemented as COM objects. Work with them through <code>IShellLink</code>.</li>
+
+
+
+<li><code>GetPath</code> returning <code>S_FALSE</code> on a fresh link is expected behavior — it means empty, not failure.</li>
+
+
+
+<li><code>IPersistFile</code> is what you need to touch the disk. <code>IShellLink</code> alone doesn&#8217;t load or save anything.</li>
+
+
+
+<li>OleView is a good tool for exploring a COM class&#8217;s supported interfaces — but it can only find interfaces registered in <code>HKCR\Interface</code>.</li>
+
+
+
+<li>Classic COM has no <code>GetIids</code>. WinRT does, via <code>IInspectable</code>.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Keep Learning</h2>
+
+
+
+<p class="wp-block-paragraph">If this made you want to go deeper on COM — how it actually works, how to implement your own COM objects, and why so much of Windows is built on it — the <strong>COM Programming 1</strong> course at TrainSec covers it from first principles: interfaces, ATL, DLL servers, and advanced COM techniques.</p>
+
+
+
+<p class="wp-block-paragraph">For working with the Windows API more broadly — processes, handles, kernel objects, and memory — <strong>Windows System Programming 1</strong> is the right starting point.</p>
+
+
+
+<p class="wp-block-paragraph">Both are part of the Windows Master Developer learning path on trainsec.net.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-windows-subsystem-for-linux.html">How does Windows Subsystem for Linux (Version 1) actually work?</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-inside-the-windows-recycle-bin-what-really-happens-when-you-delete-a-file.html">Inside the Windows Recycle Bin - What Really Happens When You Delete a File?</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-introduction-to-windows-services.html">Introduction to Windows Services</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-kernel-allocation-tags-in-windows-explained.html">Kernel Allocation Tags in Windows Explained</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-kernel/windows-shell-links-in-c-how-to-read-and-write-lnk-files/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Looking into Windows Access Masks — TrainSec article | 1200km</title>
+<meta name="description" content="Looking into Windows Access Masks by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/looking-into-windows-access-masks/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2026-02-12">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-looking-into-windows-access-masks.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Looking into Windows Access Masks"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-looking-into-windows-access-masks.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-looking-into-windows-access-masks.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-looking-into-windows-access-masks.html","headline":"Looking into Windows Access Masks","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-looking-into-windows-access-masks.html#webpage"},"datePublished":"2026-02-12","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/looking-into-windows-access-masks/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Looking into Windows Access Masks</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> February 13, 2026</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/looking-into-windows-access-masks/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<p class="wp-block-paragraph">In this video, I’m looking at <strong>access masks</strong>: what they are, where they appear in Windows, and how you can inspect them with a few practical tools.</p>
+
+
+
+<p class="wp-block-paragraph">An access mask is one of those things that’s easy to ignore until something doesn’t work. A good example is when an API call fails with <strong>Access Denied</strong>, even though you <em>think</em> you have a valid handle. In many cases, the missing piece is simply that the handle doesn’t have the rights that specific call requires. So the goal here is to make access masks less mysterious and more observable.</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Looking into Access Masks" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/paFwtAiDcCM?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<h2 class="wp-block-heading">What An Access Mask Is</h2>
+
+
+
+<p class="wp-block-paragraph">An access mask is a compact way to represent access rights for an object. It’s a <strong>32-bit value</strong>, where different bits have different meanings. Those bits represent what someone can do with the object.</p>
+
+
+
+<p class="wp-block-paragraph">Access masks typically show up in two locations:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>In A Handle</strong><br>Every time you open a handle to an object, you must specify what access you want. If the security checks succeed, Windows gives you a handle and stores the granted access mask <em>inside that handle</em>. This also means that even if multiple handles refer to the same object, they’re not necessarily equal—some handles are more powerful than others, depending on the access mask that was used to open them.</li>
+
+
+
+<li><strong>In An ACE (Access Control Entry)</strong><br>Access masks also appear in <strong>ACEs</strong>, which are part of an <strong>ACL (Access Control List)</strong>. The ACL answers “who can do what” with an object. The “what” part is represented by the access mask stored in each ACE.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">So, the access mask is a core part of both “what access did I actually get on this handle?” and “what access is allowed according to the ACL?”</p>
+
+
+
+<h2 class="wp-block-heading">Looking At Access Masks In Process Explorer</h2>
+
+
+
+<p class="wp-block-paragraph">A quick way to see access masks on handles is <strong>Process Explorer</strong>. Pick any handle, and you’ll see each handle’s properties: the handle value, object type, object name (if it has one), and the <strong>Access</strong> column.</p>
+
+
+
+<p class="wp-block-paragraph">That Access value is the access mask—a set of bits corresponding to a 32-bit number. Since an access mask is just a number, you usually need Windows headers or documentation to translate it into something meaningful.</p>
+
+
+
+<p class="wp-block-paragraph">To make this easier, there’s also a <strong>Decoded Access</strong> column that shows the access mask in a readable form. That way, you don’t have to go hunting through headers every time you want to understand what a handle can actually do.</p>
+
+
+
+<p class="wp-block-paragraph">For example:</p>
+
+
+
+<ul class="wp-block-list">
+<li>An unnamed event might show <strong>EVENT_ALL_ACCESS</strong>, meaning the handle can do anything with that event.</li>
+
+
+
+<li>A file handle might decode to something like <strong>SYNCHRONIZE</strong> and <strong>EXECUTE</strong>.<br>“Execute” means you can execute the file (or, for a directory, list contents). “Synchronize” means you can wait on the object—what that means depends on the object type (for a file it often relates to I/O completion behavior).</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Another useful example is a registry key handle opened with <strong>READ_CONTROL</strong> and <strong>KEY_READ</strong> only. If code tries to write to that registry key using this handle, it will fail with <strong>Access Denied</strong>, because the handle simply doesn’t have write permissions.</p>
+
+
+
+<p class="wp-block-paragraph">One detail that trips people up: if you double-click a handle in Process Explorer, the dialog you get is about the <strong>object</strong>, not about the <strong>handle</strong>. The handle-specific access is what you see in the handle list itself.</p>
+
+
+
+<h2 class="wp-block-heading">Seeing Access Masks In The Security Dialog</h2>
+
+
+
+<p class="wp-block-paragraph">Another view is the classic Windows security dialog (for example, via the <strong>Security</strong> tab and then <strong>Advanced</strong>).</p>
+
+
+
+<p class="wp-block-paragraph">In the Advanced view you’ll see the list of <strong>ACEs</strong>. Each ACE is essentially a triplet:</p>
+
+
+
+<ul class="wp-block-list">
+<li>the ACE type (allow/deny),</li>
+
+
+
+<li>the user or group it applies to,</li>
+
+
+
+<li>and the <strong>access</strong> (the access mask).</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Sometimes the UI shows “Special.” That doesn’t mean it’s unusual—it usually means there isn’t a single neat label for that exact combination of bits. If you click <strong>Edit</strong> or <strong>View</strong>, you can see the detailed permissions behind that entry (including things like delete, change permissions, change owner, and others).</p>
+
+
+
+<h2 class="wp-block-heading">Seeing The Same Data In A Kernel Debugger</h2>
+
+
+
+<p class="wp-block-paragraph">You can also view the same information through a kernel debugger. The underlying idea is:</p>
+
+
+
+<ul class="wp-block-list">
+<li>every object has an <strong>object header</strong>,</li>
+
+
+
+<li>the object header contains a pointer to a <strong>security descriptor</strong>,</li>
+
+
+
+<li>and the security descriptor contains the ACL/ACEs.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">When I do this locally in a debugger, I can locate the object, then look at the object header structure. One practical detail is that the object header is <strong>48 bytes before the object</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">From there, you can grab the security descriptor pointer and use the <code><strong>!sd</strong></code> command to dump it. If you get an error related to flags, one fix is to zero out the last digit of the address—on 64-bit Windows, object addresses are 16-byte aligned, so the lower four bits are always zero.</p>
+
+
+
+<p class="wp-block-paragraph">Once you dump the security descriptor, you’ll see the ACEs listed with SIDs and access masks (in a more raw form). The ordering and identities match what you see in the Security UI, but here you’ll also see the numeric masks directly.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1860 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget__width-initial elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" fetchpriority="high" decoding="async" width="587" height="566" class="attachment-large size-large wp-image-1615" alt="Windows master developer badge 1" src="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1.png 587w, https://trainsec.net/wp-content/uploads/2024/07/Windows-master-developer-badge-1-300x289.png 300w" sizes="(max-width: 587px) 100vw, 587px">															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$2,111</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,478 or $150 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Takes you from a “generic” C programmer to a master Windows programmer in user mode and kernel mode.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-master-developer/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Master Developer</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">What Access Masks Are Made Of</h2>
+
+
+
+<p class="wp-block-paragraph">A 32-bit access mask includes several categories of rights:</p>
+
+
+
+<h2 class="wp-block-heading">Specific Rights</h2>
+
+
+
+<p class="wp-block-paragraph">The <strong>lower 16 bits</strong> are <strong>specific rights</strong>, and these depend on the object type. A process has different specific rights than a file, thread, desktop, and so on. There can be no more than 16 object-specific bits.</p>
+
+
+
+<h2 class="wp-block-heading">Standard Rights</h2>
+
+
+
+<p class="wp-block-paragraph">There are also <strong>standard rights</strong> that apply broadly across object types:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>DELETE</strong> (meaningful for some objects like files)</li>
+
+
+
+<li><strong>READ_CONTROL</strong> (read the DACL)</li>
+
+
+
+<li><strong>WRITE_DAC</strong> (write/modify the DACL)</li>
+
+
+
+<li><strong>WRITE_OWNER</strong> (change the owner)</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Ownership matters because the owner always has a certain level of control—objects should not become permanently inaccessible due to a bad DACL. And if you have the <strong>Take Ownership</strong> privilege (administrators typically do by default), you can change the owner even without having “write owner” granted through the normal access bits.</p>
+
+
+
+<h2 class="wp-block-heading">SYNCHRONIZE</h2>
+
+
+
+<p class="wp-block-paragraph"><strong>SYNCHRONIZE</strong> is the right to wait on an object. It only makes sense for objects where “signaled” has meaning (processes, threads, events, mutexes, semaphores, and similar). A process, for example, becomes signaled when it terminates.</p>
+
+
+
+<h2 class="wp-block-heading">MAXIMUM_ALLOWED</h2>
+
+
+
+<p class="wp-block-paragraph"><strong>MAXIMUM_ALLOWED</strong> means “give me the maximum access I can get without failing.” Whether that’s enough for what you want to do depends on your use case.</p>
+
+
+
+<h2 class="wp-block-heading">Generic Rights</h2>
+
+
+
+<p class="wp-block-paragraph">Finally, there are <strong>generic rights</strong>:</p>
+
+
+
+<ul class="wp-block-list">
+<li>GENERIC_READ</li>
+
+
+
+<li>GENERIC_WRITE</li>
+
+
+
+<li>GENERIC_EXECUTE</li>
+
+
+
+<li>GENERIC_ALL</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">These are translated behind the scenes into object-specific rights. One way to see what they translate to is by looking at object-type mappings in <strong>Object Explorer</strong> (for example, for process objects: generic read maps to a specific set of rights such as VM read and query information).</p>
+
+
+
+<p class="wp-block-paragraph">In general, if you’re doing programming work, I recommend being explicit rather than using generic rights. Generic rights can request more than you actually need—and if you ask for more than you need, you may end up getting nothing.</p>
+
+
+
+<h2 class="wp-block-heading">A Practical Example: OpenProcess And The “ALL_ACCESS” Trap</h2>
+
+
+
+<p class="wp-block-paragraph">Let’s say you want to terminate a process. You call <code>OpenProcess</code>, and the first parameter is the desired access mask—what you want to be able to do if the call succeeds.</p>
+
+
+
+<p class="wp-block-paragraph">A lazy approach is to request <strong>PROCESS_ALL_ACCESS</strong>. That’s usually a bad idea:</p>
+
+
+
+<ul class="wp-block-list">
+<li>it requests more than you need,</li>
+
+
+
+<li>it’s often “all or nothing” (if you can’t get all the requested rights, the call fails),</li>
+
+
+
+<li>it increases the attack surface because a successful handle is very powerful,</li>
+
+
+
+<li>and it’s slightly slower because more bits must be checked.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">If your goal is termination, you should request <strong>PROCESS_TERMINATE</strong>. If you also want to wait for the process to actually terminate, add <strong>SYNCHRONIZE</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">Now here’s the catch: if you then try to call <strong><code>GetProcessTimes</code></strong> using that handle, it will fail with <strong>Access Denied</strong>. Why? Because <code>GetProcessTimes</code> requires <strong>PROCESS_QUERY_INFORMATION</strong> or <strong>PROCESS_QUERY_LIMITED_INFORMATION</strong>, and you didn’t ask for that access—so you don’t have it in this handle.</p>
+
+
+
+<p class="wp-block-paragraph">The fix isn’t “use ALL_ACCESS.” The fix is to request exactly what you need:</p>
+
+
+
+<ul class="wp-block-list">
+<li>PROCESS_TERMINATE</li>
+
+
+
+<li>SYNCHRONIZE (if you plan to wait)</li>
+
+
+
+<li>PROCESS_QUERY_LIMITED_INFORMATION (if you plan to query basic details/times)</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">That’s the larger point: the access mask stored in the handle directly controls what you can successfully do with it.</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1869 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-a954284 e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-4dec8bb e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-273cf8a elementor-widget elementor-widget-image" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+																<a href="https://trainsec.net/windows-internals-master/">
+							<img decoding="async" width="592" height="570" class="attachment-large size-large wp-image-1614" alt="Windows Internal master badge"  src="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png" srcset="https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1.png 592w, https://trainsec.net/wp-content/uploads/2024/07/Windows-Internal-master-badge-1-300x289.png 300w" sizes="(max-width: 592px) 100vw, 592px"/>								</a>
+															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-8e73ccd e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-182ce98 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>$1,938</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-69bfa18 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><b>$1,356 or $140 X 10 payments</b></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Windows Internals Master</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Broadens and deepens your understanding of the inner workings of Windows.</p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-19ed755 elementor-align-left elementor-tablet-align-center elementor-widget elementor-widget-button" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="https://trainsec.net/windows-internals-master/">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Become Windows Internal Master</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+
+
+
+<h2 class="wp-block-heading">Why This Matters For TrainSec Students</h2>
+
+
+
+<p class="wp-block-paragraph">Access masks show up everywhere once you start paying attention. They’re in the handles you open, and they’re in the ACEs that decide who gets what access.</p>
+
+
+
+<p class="wp-block-paragraph">If you can read access masks, you stop guessing:</p>
+
+
+
+<ul class="wp-block-list">
+<li>You can understand why a handle can terminate a process but can’t query information from it.</li>
+
+
+
+<li>You can look at an ACL and understand what a user or group is actually allowed to do.</li>
+
+
+
+<li>You can make cleaner decisions when writing code by requesting only the rights you really need.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">That’s a practical skill in Windows internals work, and it also shows up in security contexts where you’re trying to understand what a process can actually do with the objects it has open.</p>
+
+
+
+<h2 class="wp-block-heading">Keep Learning With TrainSec</h2>
+
+
+
+<p class="wp-block-paragraph">If you want more material like this, browse the free TrainSec Knowledge Library:<br><a href="https://trainsec.net/library/?utm_source=chatgpt.com">https://trainsec.net/library/</a></p>
+
+
+
+<p class="wp-block-paragraph">And if you’re following along, try inspecting access masks in two places for the same system: a handle view (Process Explorer) and an ACE view (Security → Advanced). Seeing both perspectives is usually where the concept clicks.</p>
+				</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/looking-into-windows-access-masks/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>

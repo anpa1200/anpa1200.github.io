@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kernel Debugging Windows VMs – A Practical Walk-Through — TrainSec article | 1200km</title>
+<meta name="description" content="Kernel Debugging Windows VMs – A Practical Walk-Through by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/kernel-debugging-windows-vms-a-practical-walk-through/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
+<meta property="article:published_time" content="2025-07-30">
+<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-kernel-debugging-windows-vms-a-practical-walk-through.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Kernel Debugging Windows VMs – A Practical Walk-Through"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-kernel-debugging-windows-vms-a-practical-walk-through.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-kernel-debugging-windows-vms-a-practical-walk-through.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-kernel-debugging-windows-vms-a-practical-walk-through.html","headline":"Kernel Debugging Windows VMs – A Practical Walk-Through","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-kernel-debugging-windows-vms-a-practical-walk-through.html#webpage"},"datePublished":"2025-07-30","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/kernel-debugging-windows-vms-a-practical-walk-through/"}</script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
+</style></head><body>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
+<main class="wrap" data-pagefind-body><article class="article">
+<p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Kernel Debugging Windows VMs – A Practical Walk-Through</h1>
+<p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> July 31, 2025</p>
+<div class="tag-row"><span class="tag">Windows</span><span class="tag">internals</span></div>
+<aside class="rights-disclaimer"><strong>Rights and attribution.</strong> All rights reserved. Rights belong to TrainSec.net and Pavel Yosifovich. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="https://trainsec.net/library/windows-internals/kernel-debugging-windows-vms-a-practical-walk-through/" target="_blank" rel="noopener noreferrer">Original source ↗</a></aside>
+<div class="trainsec-content">
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="Kernel Debugging with Virtual Machine" width="800" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-rocket-lazyload="fitvidscompatible" src="https://www.youtube.com/embed/wpBbd5FoRMw?feature=oembed"></iframe>
+</div></figure>
+
+
+
+<p class="wp-block-paragraph"><em>Note: This blog post is designed to complement the accompanying video embedded at the top of the page. The video provides an in-depth, visual demonstration of the concepts and code discussed here, making it an invaluable resource for learners.</em></p>
+
+
+
+<p class="wp-block-paragraph">Debugging Windows at kernel level lets you watch every CPU instruction, intercept system calls, and step through driver code. In the video above, Pavel Yosifovich shows how to do this safely by treating a virtual machine (VM) as the target while you run WinDbg on the host. Below is a concise recap, extra tips, and links to TrainSec paths that will help you turn these first steps into real expertise.</p>
+
+
+
+<p class="wp-block-paragraph">Over the years I’ve debugged Windows on every device you can imagine—from bare-metal servers in noisy labs to tiny IoT boards on my desk. Yet my favourite setup is still the simplest: <strong>kernel-debugging a virtual machine (VM) from the comfort of the host</strong>. In the video above I walk you through the process step-by-step; below is a written companion you can keep open while you experiment.</p>
+
+
+
+<h2 class="wp-block-heading">Why we need a VM / “second machine”?</h2>
+
+
+
+<p class="wp-block-paragraph">Kernel breakpoints freeze the <em>entire</em> OS. If you tried them on your daily-driver PC you’d lock yourself out of mouse, disk, and network until the debugger says “go”. By running the <em>target</em> inside a VM and WinDbg on the <em>host</em>, we isolate the crash-and-break cycles and keep our tools responsive.</p>
+
+
+
+<h2 class="wp-block-heading">Setting up the guest</h2>
+
+
+
+<p class="wp-block-paragraph"><strong>STEP 1:</strong> Turn on debug mode inside the VM:</p>
+
+
+
+<div class="wp-block-kevinbatdorf-code-block-pro" data-code-block-pro-font-family="Code-Pro-JetBrains-Mono" style="font-size:.875rem;font-family:Code-Pro-JetBrains-Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;line-height:1.25rem;--cbp-tab-width:2;tab-size:var(--cbp-tab-width, 2)"><span role="button" tabindex="0" style="color:#D4D4D4;display:none" aria-label="Copy" class="code-block-pro-copy-button"><pre class="code-block-pro-copy-button-pre" aria-hidden="true"><textarea class="code-block-pro-copy-button-textarea" tabindex="-1" aria-hidden="true" readonly>bcdedit /debug on
+bcdedit /dbgsettings net hostip:&lt;HOST_IP> port:55000 key:1.2.3.4</textarea></pre><svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path class="with-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path><path class="without-check" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></span><pre class="shiki dark-plus" style="background-color: #1E1E1E" tabindex="0"><code><span class="line"><span style="color: #9CDCFE">bcdedit</span><span style="color: #D4D4D4"> /</span><span style="color: #9CDCFE">debug</span><span style="color: #D4D4D4"> </span><span style="color: #9CDCFE">on</span></span>
+<span class="line"><span style="color: #9CDCFE">bcdedit</span><span style="color: #D4D4D4"> /</span><span style="color: #9CDCFE">dbgsettings</span><span style="color: #D4D4D4"> </span><span style="color: #9CDCFE">net</span><span style="color: #D4D4D4"> </span><span style="color: #C8C8C8">hostip</span><span style="color: #D4D4D4">:</span><span style="color: #808080">&lt;</span><span style="color: #4EC9B0">HOST_IP</span><span style="color: #808080">&gt;</span><span style="color: #D4D4D4"> port:55000 key:1.2.3.4</span></span></code></pre></div>
+
+
+
+<p class="wp-block-paragraph"><strong>STEP 2: </strong>Temporarily <strong>disable Secure Boot</strong> so Windows accepts the change.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>STEP 3: </strong>Reboot the guest—don’t worry, it will pause almost immediately when we attach.</p>
+
+
+
+<h2 class="wp-block-heading">Listening from the host</h2>
+
+
+
+<ul class="wp-block-list">
+<li>Open WinDbg as Administrator.</li>
+
+
+
+<li>Choose <strong>File → Kernel Debug → NET</strong>, enter the same port and key, and press <strong>OK</strong>.</li>
+
+
+
+<li>WinDbg shows “Waiting to reconnect…”. The moment the VM restarts you’ll see a <code>KD></code> prompt, often inside <code>KdInitSystem</code>, meaning you’ve caught Windows before it even loads the GUI.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">First breakpoint adventures</h2>
+
+
+
+<ul class="wp-block-list">
+<li><code>bp nt!NtCreateFile</code> stops <em>all</em> processes whenever the kernel creates a file.</li>
+
+
+
+<li>Want to watch just one process? Pair the breakpoint with its EPROCESS pointer:<br><code>bp /p &lt;EProcessAddr> nt!NtCreateFile</code></li>
+
+
+
+<li>Use <strong>Ctrl + Break</strong> at any time to halt the entire guest and inspect memory, handles, or IRPs.</li>
+</ul>
+
+
+
+<h2 class="wp-block-heading">Common speed-bumps</h2>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td><strong>Symptom</strong></td><td><strong>Quick fix</strong></td></tr><tr><td>WinDbg refuses to listen</td><td>Another app grabbed the port—pick a higher number.</td></tr><tr><td>Symbols don’t load</td><td>Add <code>srv*</code> to <em>File → Symbol File Path</em> and reload.</td></tr><tr><td>VM no longer connects</td><td>DHCP changed your host IP—rerun <code>bcdedit /dbgsettings</code> inside the guest.</td></tr></tbody></table></figure>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<h2 class="wp-block-heading">Turning this demo into mastery</h2>
+
+
+
+<p class="wp-block-paragraph">If today’s exercise felt empowering, imagine chaining dozens of such techniques together—single-stepping drivers, inspecting IRPs, analysing dump files, and writing your own kernel code. That’s exactly what we cover in:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong><a href="https://trainsec.net/courses/mastering-windbg/" data-type="link">Mastering WinDbg</a></strong> – 67 hands-on lessons dedicated to both user- and kernel-mode debugging.</li>
+
+
+
+<li><strong><a href="https://trainsec.net/all-courses/#windows-kernel">Windows Kernel Programming 1 &amp; 2</a></strong> – build real drivers and learn the kernel APIs you just traced.</li>
+
+
+
+<li><strong><a href="https://trainsec.net/windows-internals-master/">Windows Internals Master</a></strong> – a five-part deep dive into the OS architecture behind every breakpoint you set.</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Each path is self-paced, comes with lab VMs, and plugs straight into our Discord so you’re never stuck alone.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading">Before you go…</h2>
+
+
+
+<p class="wp-block-paragraph">The <strong>TrainSec Knowledge Library</strong> hosts this article, dozens of free write-ups, and curated links to help you grow from curious developer to seasoned cybersecurity professional. New pieces constantly drop, subscribe to our mailing list and I’ll make sure fresh kernel tips (and occasional war stories) land directly in your inbox.</p>
+
+
+
+<p class="wp-block-paragraph">See you at the next breakpoint!</p>
+
+
+		<div data-elementor-type="section" class="elementor elementor-1903 elementor-location-single" data-elementor-post-type="elementor_library">
+			<div class="elementor-element elementor-element-6b107e4d e-flex e-con-boxed e-con e-parent" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+					<div class="e-con-inner">
+		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="white-space-collapse: preserve;">Subscribe to the free TrainSec knowledge library, and get insider access to new content, discounts and additional materials. </span></p>								</div>
+				</div>
+				<div class="elementor-element elementor-element-e01f929 elementor-widget elementor-widget-html" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<div class="ml-embedded" data-form="2W0Zsi"></div>				</div>
+				</div>
+				</div>
+					</div>
+				</div>
+				</div>
+						</div>
+<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul><li><a href="/articles/trainsec/windows-internals-application-types-on-windows.html">“Application Types” on Windows</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-anti-malware-scan-interface-c-sharp.html">AMSI Scanning in C#: P/Invoke, Memory-Mapped Files, and Safe Interop</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">Building a Simple RPC Client and Server: A Step-by-Step Guide</a> <span>(Pavel Yosifovich)</span></li><li><a href="/articles/trainsec/windows-internals-capture-etw-events-with-c-part-1.html">Capture ETW events with C++ (Part 1)</a> <span>(Pavel Yosifovich)</span></li></ul></section>
+<p class="source-attribution"><strong>Original publication:</strong> <a href="https://trainsec.net/library/windows-internals/kernel-debugging-windows-vms-a-practical-walk-through/" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
+</article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
+</body></html>
