@@ -327,6 +327,8 @@ await fs.writeFile(path.join(outputRoot, 'domains.html'), directoryPage('domains
 // TrainSec link in each Source line and rights notice.
 const cataloguePath = path.join(root, 'articles', 'trainsec-library.html');
 let catalogue = await fs.readFile(cataloguePath, 'utf8');
+const authorMeta = '<meta name="author" content="Andrey Pautov"><meta property="article:published_time" content="2026-08-03">';
+catalogue = catalogue.replace(/(?:<meta name="author" content="Andrey Pautov"><meta property="article:published_time" content="2026-08-03">)+/g, authorMeta);
 for (const article of payload.articles) {
   if (!article.local_path) continue;
   const titleAnchor = `<h2><a href="${article.url}" target="_blank" rel="noopener noreferrer">`;
@@ -335,8 +337,11 @@ for (const article of payload.articles) {
   // The catalogue's data-title attribute is lower-cased text (not escaped
   // entity text), so match it exactly even when a title contains an apostrophe.
   const normalizedTitle = article.title.toLowerCase();
-  const cardStart = `<article class="article-card" data-title="${normalizedTitle}"`;
-  const cardPosition = catalogue.indexOf(cardStart);
+  const cardStarts = [normalizedTitle, escapeHtml(normalizedTitle)]
+    .map((title) => `<article class="article-card" data-title="${title}"`);
+  const cardPosition = cardStarts.reduce((position, cardStart) => (
+    position >= 0 ? position : catalogue.indexOf(cardStart)
+  ), -1);
   if (cardPosition >= 0 && article.cover_path && !catalogue.slice(cardPosition, cardPosition + 900).includes('article-card-cover')) {
     const openingEnd = catalogue.indexOf('>', cardPosition);
     const cover = `<a class="article-card-cover" href="${article.local_path}" aria-label="Read ${escapeHtml(article.title)}"><img src="${article.cover_path}" alt="" loading="lazy"></a>`;
@@ -345,14 +350,21 @@ for (const article of payload.articles) {
   if (cardPosition >= 0) {
     const nextTag = catalogue.indexOf('>', cardPosition);
     const cardOpening = catalogue.slice(cardPosition, nextTag + 1);
-    if (!cardOpening.includes('data-category=')) {
-      const markedOpening = `${cardOpening.slice(0, -1)} data-category="TrainSec">`;
+    const cardAttributes = [];
+    if (!cardOpening.includes('data-category=')) cardAttributes.push('data-category="TrainSec"');
+    if (!cardOpening.includes('data-tags=')) {
+      cardAttributes.push(`data-tags="${escapeHtml((article.tags || []).join(' ').toLowerCase())}"`);
+    }
+    if (cardAttributes.length) {
+      const markedOpening = `${cardOpening.slice(0, -1)} ${cardAttributes.join(' ')}>`;
       catalogue = `${catalogue.slice(0, cardPosition)}${markedOpening}${catalogue.slice(nextTag + 1)}`;
     }
   }
 }
 catalogue = catalogue.replace('A source-linked catalogue of TrainSec’s public knowledge-library articles integrated into the 1200km article ecosystem. Browse by author, domain, mode, and topic, then follow the attribution link to the original publication.', 'A permitted integration of TrainSec’s Knowledge Library. Read the complete original text with screenshots, infographics, and embedded videos in the original order, then follow the attribution link to TrainSec.net.');
-catalogue = catalogue.replace('<meta name="description"', '<meta name="author" content="Andrey Pautov"><meta property="article:published_time" content="2026-08-03"><meta name="description"');
+if (!catalogue.includes('<meta name="author"')) {
+  catalogue = catalogue.replace('<meta name="description"', `${authorMeta}<meta name="description"`);
+}
 if (!catalogue.includes('data-trainsec-catalogue-graph')) {
   catalogue = catalogue.replace('</head>', `<script type="application/ld+json" data-trainsec-catalogue-graph>${siteArticleJsonLd('https://1200km.com/articles/trainsec-library.html', 'TrainSec Knowledge Library')}</script>\n</head>`);
 }
@@ -360,7 +372,13 @@ if (!catalogue.includes('data-trainsec-directory-links')) {
   catalogue = catalogue.replace('<p><strong>TrainSec source integration.</strong>', '<p data-trainsec-directory-links><strong>TrainSec source integration.</strong> <a href="/articles/trainsec/authors.html">Author index ↗</a> · <a href="/articles/trainsec/domains.html">Domain index ↗</a> ·');
 }
 if (!catalogue.includes('.article-card-cover')) {
-  catalogue = catalogue.replace('</style>', '.article-grid{align-items:stretch}.article-card{height:100%;min-height:430px;display:flex;flex-direction:column}.article-card .rights-disclaimer{margin-top:auto}.article-card-cover{display:block;height:150px;margin:-20px -20px 8px;overflow:hidden;border-radius:10px 10px 0 0;background:#08152b}.article-card-cover img{display:block;width:100%;height:100%;object-fit:cover}.article-card .tag-row{min-height:28px}@media(max-width:700px){.article-card{min-height:0}.article-card-cover{height:170px}}</style>');
+  catalogue = catalogue.replace('</style>', '.article-grid{align-items:stretch}.article-card{height:100%;min-height:430px;display:flex;flex-direction:column}.article-card .rights-disclaimer{margin-top:auto}.article-card-cover{display:block;height:150px;margin:-20px -20px 8px;overflow:hidden;border-radius:10px 10px 0 0;background:#08152b}.article-card-cover img{display:block;width:100%;height:100%;object-fit:cover}.article-card .tag-row{min-height:28px}.toolbar button{min-height:42px;padding:0 14px;border:1px solid #294574;border-radius:7px;background:#102449;color:#e5efff;cursor:pointer}.toolbar button:hover{border-color:#72aaff;background:#16315e}@media(max-width:700px){.article-card{min-height:0}.article-card-cover{height:170px}}</style>');
+}
+if (!catalogue.includes('.toolbar button')) {
+  catalogue = catalogue.replace('</style>', '.toolbar button{min-height:42px;padding:0 14px;border:1px solid #294574;border-radius:7px;background:#102449;color:#e5efff;cursor:pointer}.toolbar button:hover{border-color:#72aaff;background:#16315e}</style>');
+}
+if (!catalogue.includes('id="filter-reset"')) {
+  catalogue = catalogue.replace('<span id="result-count"', '<button id="filter-reset" type="button">Clear filters</button><span id="result-count"');
 }
 if (!catalogue.includes('id="category-filter"')) {
   catalogue = catalogue.replace('<input id="article-search"', '<input id="article-search" autocomplete="off"');
@@ -375,6 +393,8 @@ catalogue = catalogue.replace('const matchesAuthor=!author.value||card.dataset.a
 catalogue = catalogue.replace('&&matchesAuthor&&matchesDomain&&matchesMode;', '&&matchesCategory&&matchesAuthor&&matchesDomain&&matchesMode;');
 catalogue = catalogue.replace('[search,author,domain,mode].forEach(control=>control.addEventListener("input",apply));', '[search,category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("input",apply));');
 catalogue = catalogue.replace('[author,domain,mode].forEach(control=>control.addEventListener("change",apply))', '[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("change",apply));apply()');
+const filterScript = `<script>(()=>{const cards=[...document.querySelectorAll(".article-card")],category=document.querySelector("#category-filter"),search=document.querySelector("#article-search"),author=document.querySelector("#author-filter"),domain=document.querySelector("#domain-filter"),mode=document.querySelector("#mode-filter"),reset=document.querySelector("#filter-reset"),count=document.querySelector("#result-count"),controls=[search,category,author,domain,mode].filter(Boolean),params=new URLSearchParams(location.search);const setControl=(control,key)=>{if(!control)return;if(control.tagName==='SELECT'){const value=params.get(key);control.value=value&&[...control.options].some(option=>option.value===value)?value:''}else{control.value=params.get(key)||''}};setControl(search,'q');setControl(category,'category');setControl(author,'author');setControl(domain,'domain');setControl(mode,'mode');const apply=()=>{const q=search.value.trim().toLowerCase();let shown=0;cards.forEach(card=>{const haystack=[card.dataset.title,card.dataset.author,card.dataset.domain,card.dataset.mode,card.dataset.tags].filter(Boolean).join(' ').toLowerCase();const ok=(!q||haystack.includes(q))&&(!category||!category.value||card.dataset.category===category.value)&&(!author||!author.value||card.dataset.author===author.value)&&(!domain||!domain.value||card.dataset.domain===domain.value)&&(!mode||!mode.value||card.dataset.mode===mode.value);card.hidden=!ok;if(ok)shown+=1});count.textContent=shown+' shown'};controls.forEach(control=>control.addEventListener('input',apply));[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener('change',apply));reset?.addEventListener('click',()=>{controls.forEach(control=>{control.value=''});history.replaceState(null,'',location.pathname);apply();search.focus()});apply()})();</script>`;
+catalogue = catalogue.replace(/<script>\(\(\)=>\{const cards=.*?<\/script>/, filterScript);
 await fs.writeFile(cataloguePath, catalogue);
 
 // Add every local mirror to both sitemaps after the catalogue URL.
