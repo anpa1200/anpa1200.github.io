@@ -242,7 +242,7 @@ ${publishedIso ? `<meta property="article:published_time" content="${publishedIs
 <script type="application/ld+json">${siteArticleJsonLd(`${siteOrigin}/${localPath}`, article.title, publishedIso || retrievedAt, source)}</script>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
- .article-cover{max-width:420px;margin:24px 0;padding:8px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style></head><body>
+ .article-cover{max-width:860px;margin:28px 0;padding:10px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style></head><body>
 <header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
 <main class="wrap" data-pagefind-body><article class="article">
 <p class="eyebrow">TrainSec source integration · ${category} · ${mode}</p><h1>${title}</h1>
@@ -332,13 +332,49 @@ for (const article of payload.articles) {
   const titleAnchor = `<h2><a href="${article.url}" target="_blank" rel="noopener noreferrer">`;
   const localAnchor = `<h2><a href="${article.local_path}">`;
   catalogue = catalogue.replace(titleAnchor, localAnchor);
+  // The catalogue's data-title attribute is lower-cased text (not escaped
+  // entity text), so match it exactly even when a title contains an apostrophe.
+  const normalizedTitle = article.title.toLowerCase();
+  const cardStart = `<article class="article-card" data-title="${normalizedTitle}"`;
+  const cardPosition = catalogue.indexOf(cardStart);
+  if (cardPosition >= 0 && article.cover_path && !catalogue.slice(cardPosition, cardPosition + 900).includes('article-card-cover')) {
+    const openingEnd = catalogue.indexOf('>', cardPosition);
+    const cover = `<a class="article-card-cover" href="${article.local_path}" aria-label="Read ${escapeHtml(article.title)}"><img src="${article.cover_path}" alt="" loading="lazy"></a>`;
+    catalogue = `${catalogue.slice(0, openingEnd + 1)}${cover}${catalogue.slice(openingEnd + 1)}`;
+  }
+  if (cardPosition >= 0) {
+    const nextTag = catalogue.indexOf('>', cardPosition);
+    const cardOpening = catalogue.slice(cardPosition, nextTag + 1);
+    if (!cardOpening.includes('data-category=')) {
+      const markedOpening = `${cardOpening.slice(0, -1)} data-category="TrainSec">`;
+      catalogue = `${catalogue.slice(0, cardPosition)}${markedOpening}${catalogue.slice(nextTag + 1)}`;
+    }
+  }
 }
 catalogue = catalogue.replace('A source-linked catalogue of TrainSec’s public knowledge-library articles integrated into the 1200km article ecosystem. Browse by author, domain, mode, and topic, then follow the attribution link to the original publication.', 'A permitted integration of TrainSec’s Knowledge Library. Read the complete original text with screenshots, infographics, and embedded videos in the original order, then follow the attribution link to TrainSec.net.');
 catalogue = catalogue.replace('<meta name="description"', '<meta name="author" content="Andrey Pautov"><meta property="article:published_time" content="2026-08-03"><meta name="description"');
 if (!catalogue.includes('data-trainsec-catalogue-graph')) {
   catalogue = catalogue.replace('</head>', `<script type="application/ld+json" data-trainsec-catalogue-graph>${siteArticleJsonLd('https://1200km.com/articles/trainsec-library.html', 'TrainSec Knowledge Library')}</script>\n</head>`);
 }
-catalogue = catalogue.replace('<p><strong>TrainSec source integration.</strong>', '<p><strong>TrainSec source integration.</strong> <a href="/articles/trainsec/authors.html">Author index ↗</a> · <a href="/articles/trainsec/domains.html">Domain index ↗</a> ·');
+if (!catalogue.includes('data-trainsec-directory-links')) {
+  catalogue = catalogue.replace('<p><strong>TrainSec source integration.</strong>', '<p data-trainsec-directory-links><strong>TrainSec source integration.</strong> <a href="/articles/trainsec/authors.html">Author index ↗</a> · <a href="/articles/trainsec/domains.html">Domain index ↗</a> ·');
+}
+if (!catalogue.includes('.article-card-cover')) {
+  catalogue = catalogue.replace('</style>', '.article-grid{align-items:stretch}.article-card{height:100%;min-height:430px;display:flex;flex-direction:column}.article-card .rights-disclaimer{margin-top:auto}.article-card-cover{display:block;height:150px;margin:-20px -20px 8px;overflow:hidden;border-radius:10px 10px 0 0;background:#08152b}.article-card-cover img{display:block;width:100%;height:100%;object-fit:cover}.article-card .tag-row{min-height:28px}@media(max-width:700px){.article-card{min-height:0}.article-card-cover{height:170px}}</style>');
+}
+if (!catalogue.includes('id="category-filter"')) {
+  catalogue = catalogue.replace('<input id="article-search"', '<input id="article-search" autocomplete="off"');
+  catalogue = catalogue.replace('<label class="visually-hidden" for="author-filter">Author</label><select id="author-filter"', '<label class="visually-hidden" for="category-filter">Category</label><select id="category-filter" autocomplete="off"><option value="">All categories</option><option value="TrainSec">TrainSec</option></select><label class="visually-hidden" for="author-filter">Author</label><select id="author-filter" autocomplete="off"');
+  catalogue = catalogue.replace('<select id="domain-filter"', '<select id="domain-filter" autocomplete="off"').replace('<select id="mode-filter"', '<select id="mode-filter" autocomplete="off"');
+  catalogue = catalogue.replace('const cards=[...document.querySelectorAll(".article-card")],search=document.querySelector("#article-search"),author=', 'const cards=[...document.querySelectorAll(".article-card")],category=document.querySelector("#category-filter"),search=document.querySelector("#article-search"),author=');
+  catalogue = catalogue.replace(')&&(!author.value||card.dataset.author===author.value)', ')&&(!category.value||card.dataset.category===category.value)&&(!author.value||card.dataset.author===author.value)');
+  catalogue = catalogue.replace('[search,author,domain,mode].forEach(control=>control.addEventListener("input",apply));[author,domain,mode].forEach(control=>control.addEventListener("change",apply))})();', '[search,category,author,domain,mode].forEach(control=>control.addEventListener("input",apply));[category,author,domain,mode].forEach(control=>control.addEventListener("change",apply));apply()})();');
+}
+catalogue = catalogue.replace('const cards=[...document.querySelectorAll(".article-card")],search=...,author=', 'const cards=[...document.querySelectorAll(".article-card")],category=document.querySelector("#category-filter"),search=...,author=');
+catalogue = catalogue.replace('const matchesAuthor=!author.value||card.dataset.author===author.value;', 'const matchesCategory=!category||!category.value||card.dataset.category===category.value;const matchesAuthor=!author.value||card.dataset.author===author.value;');
+catalogue = catalogue.replace('&&matchesAuthor&&matchesDomain&&matchesMode;', '&&matchesCategory&&matchesAuthor&&matchesDomain&&matchesMode;');
+catalogue = catalogue.replace('[search,author,domain,mode].forEach(control=>control.addEventListener("input",apply));', '[search,category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("input",apply));');
+catalogue = catalogue.replace('[author,domain,mode].forEach(control=>control.addEventListener("change",apply))', '[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("change",apply));apply()');
 await fs.writeFile(cataloguePath, catalogue);
 
 // Add every local mirror to both sitemaps after the catalogue URL.
@@ -347,9 +383,10 @@ const directoryEntries = ['authors', 'domains'].map((name) => `  <url>\n    <loc
 for (const sitemapName of ['sitemap.xml', 'sitemap-all.xml']) {
   const sitemapPath = path.join(root, sitemapName);
   let sitemap = await fs.readFile(sitemapPath, 'utf8');
+  const firstTrainsecUrl = payload.articles.find((article) => article.local_path)?.local_path || '';
   const additions = [
     !sitemap.includes('/articles/trainsec/authors.html') ? directoryEntries : '',
-    !sitemap.includes('/articles/trainsec/vmmap-basics-how-to-read-a-windows-processs-memory-layout.html') ? sitemapEntries : '',
+    firstTrainsecUrl && !sitemap.includes(`${siteOrigin}${firstTrainsecUrl}`) ? sitemapEntries : '',
   ].filter(Boolean).join('\n');
   if (additions) {
     const anchor = '  <url>\n    <loc>https://1200km.com/articles/trainsec-library.html</loc>';

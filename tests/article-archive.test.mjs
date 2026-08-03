@@ -30,7 +30,7 @@ test('Pages deploys the pinned article source into the canonical /articles route
     facts['content.local_article_archive'].source.some((url) => url.includes(`/blob/${pinnedCommit}/`)),
     'article fact must cite the pinned catalog commit',
   );
-  assert.match(archiveStager, /articleFact\.value !== catalog\.length/);
+  assert.match(archiveStager, /articleFact\.value !== expectedArticleCount/);
   assert.match(archiveStager, /canonical_status_counts/);
   assert.match(archiveStager, /bg-cyber-\[\^\)"'\]\+\\\.png/);
   assert.match(archiveStager, /\/assets\/bg-cyber\.png/);
