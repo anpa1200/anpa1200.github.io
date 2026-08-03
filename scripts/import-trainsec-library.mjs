@@ -346,7 +346,8 @@ for (const article of payload.articles) {
     const nextTag = catalogue.indexOf('>', cardPosition);
     const cardOpening = catalogue.slice(cardPosition, nextTag + 1);
     if (!cardOpening.includes('data-category=')) {
-      catalogue = `${catalogue.slice(0, cardPosition)}${cardOpening.replace('>', ' data-category="TrainSec">')}${catalogue.slice(nextTag + 1)}`;
+      const markedOpening = `${cardOpening.slice(0, -1)} data-category="TrainSec">`;
+      catalogue = `${catalogue.slice(0, cardPosition)}${markedOpening}${catalogue.slice(nextTag + 1)}`;
     }
   }
 }
@@ -370,7 +371,6 @@ if (!catalogue.includes('id="category-filter"')) {
   catalogue = catalogue.replace('[search,author,domain,mode].forEach(control=>control.addEventListener("input",apply));[author,domain,mode].forEach(control=>control.addEventListener("change",apply))})();', '[search,category,author,domain,mode].forEach(control=>control.addEventListener("input",apply));[category,author,domain,mode].forEach(control=>control.addEventListener("change",apply));apply()})();');
 }
 catalogue = catalogue.replace('const cards=[...document.querySelectorAll(".article-card")],search=...,author=', 'const cards=[...document.querySelectorAll(".article-card")],category=document.querySelector("#category-filter"),search=...,author=');
-catalogue = catalogue.replace('const ok=(!q||title.includes(q)||text.includes(q))', 'const ok=(!q||title.includes(q)||text.includes(q))');
 catalogue = catalogue.replace('const matchesAuthor=!author.value||card.dataset.author===author.value;', 'const matchesCategory=!category||!category.value||card.dataset.category===category.value;const matchesAuthor=!author.value||card.dataset.author===author.value;');
 catalogue = catalogue.replace('&&matchesAuthor&&matchesDomain&&matchesMode;', '&&matchesCategory&&matchesAuthor&&matchesDomain&&matchesMode;');
 catalogue = catalogue.replace('[search,author,domain,mode].forEach(control=>control.addEventListener("input",apply));', '[search,category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("input",apply));');
