@@ -24,17 +24,23 @@ const schemaPath = join(archiveRoot, 'src', 'data', 'article-catalog.schema.json
 const reportPath = join(archiveRoot, 'reports', 'article-canonical-migration.csv');
 const archiveFactsPath = join(archiveRoot, 'static', 'archive-facts.json');
 const siteFactsPath = join(sourceRoot, 'data', 'site-facts.json');
-const [catalog, archiveFacts, siteFacts] = await Promise.all([
+const trainsecPath = join(sourceRoot, 'data', 'trainsec-library.json');
+const [catalog, archiveFacts, siteFacts, trainsecPayload] = await Promise.all([
   readFile(catalogPath, 'utf8').then(JSON.parse),
   readFile(archiveFactsPath, 'utf8').then(JSON.parse),
   readFile(siteFactsPath, 'utf8').then(JSON.parse),
+  readFile(trainsecPath, 'utf8').then(JSON.parse),
 ]);
 
 if (!Array.isArray(catalog) || !catalog.length) throw new Error('Article catalog is empty or malformed.');
 const articleFact = siteFacts?.facts?.['content.local_article_archive'];
 if (!articleFact) throw new Error('The content.local_article_archive site fact is missing.');
-if (articleFact.value !== catalog.length) {
-  throw new Error(`Article fact reports ${articleFact.value}; validated catalog contains ${catalog.length}.`);
+const trainsecCount = Array.isArray(trainsecPayload?.articles)
+  ? trainsecPayload.articles.filter((article) => article.local_path).length
+  : 0;
+const expectedArticleCount = catalog.length + trainsecCount;
+if (articleFact.value !== expectedArticleCount) {
+  throw new Error(`Article fact reports ${articleFact.value}; validated archive contains ${catalog.length} canonical and ${trainsecCount} TrainSec articles.`);
 }
 if (archiveFacts.article_count !== catalog.length) {
   throw new Error(`Archive facts report ${archiveFacts.article_count}; catalog contains ${catalog.length}.`);
