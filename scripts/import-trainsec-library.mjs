@@ -55,12 +55,31 @@ function youtubeIdFrom(src) {
   return src.match(/(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{6,})/i)?.[1] || '';
 }
 
+function stripUnsafeBlocks(value) {
+  let out = value;
+  for (const tag of ['script', 'style', 'form', 'noscript']) {
+    let lower = out.toLowerCase();
+    let start = lower.indexOf(`<${tag}`);
+    while (start >= 0) {
+      const openEnd = lower.indexOf('>', start);
+      if (openEnd < 0) break;
+      const closeStart = lower.indexOf(`</${tag}`, openEnd + 1);
+      if (closeStart < 0) {
+        out = out.slice(0, start);
+        break;
+      }
+      const closeEnd = lower.indexOf('>', closeStart);
+      if (closeEnd < 0) break;
+      out = out.slice(0, start) + out.slice(closeEnd + 1);
+      lower = out.toLowerCase();
+      start = lower.indexOf(`<${tag}`);
+    }
+  }
+  return out;
+}
+
 function normalizeMedia(body, article) {
-  let out = body
-    .replace(/<script\b[\s\S]*?<\/script>/gi, '')
-    .replace(/<style\b[\s\S]*?<\/style>/gi, '')
-    .replace(/<form\b[\s\S]*?<\/form>/gi, '')
-    .replace(/<noscript\b[\s\S]*?<\/noscript>/gi, '')
+  let out = stripUnsafeBlocks(body)
     .replace(/<((?:img|iframe)\b)([^>]*?)(\/?)>/gi, (full, tagName, attrs, slash) => {
       const valueOf = (name) => {
         const match = attrs.match(new RegExp(`\\s${name}=("|')([^"']*)\\1`, 'i'));

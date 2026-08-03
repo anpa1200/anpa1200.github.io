@@ -39,10 +39,31 @@ function assertModel() {
   }
 }
 
+function stripUnsafeBlocks(value) {
+  let out = value;
+  for (const tag of ['script', 'style']) {
+    let lower = out.toLowerCase();
+    let start = lower.indexOf(`<${tag}`);
+    while (start >= 0) {
+      const openEnd = lower.indexOf('>', start);
+      if (openEnd < 0) break;
+      const closeStart = lower.indexOf(`</${tag}`, openEnd + 1);
+      if (closeStart < 0) {
+        out = out.slice(0, start);
+        break;
+      }
+      const closeEnd = lower.indexOf('>', closeStart);
+      if (closeEnd < 0) break;
+      out = out.slice(0, start) + out.slice(closeEnd + 1);
+      lower = out.toLowerCase();
+      start = lower.indexOf(`<${tag}`);
+    }
+  }
+  return out;
+}
+
 function stripHtml(value) {
-  return value
-    .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+  return stripUnsafeBlocks(value)
     .replace(/<[^>]+>/g, ' ')
     .replace(/&(?:[a-z]+|#\d+|#x[\da-f]+);/gi, ' ')
     .replace(/\s+/g, ' ')
