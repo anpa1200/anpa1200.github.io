@@ -82,3 +82,10 @@ test('TrainSec catalogue filters search metadata and reset stale browser state',
   assert.match(read('assets/trainsec-library-filters.js'), /syncUrl/);
   assert.match(read('assets/trainsec-library-filters.js'), /tagValue/);
 });
+
+test('guides catalogue keeps panels aligned and excludes full-article discovery navigation', () => {
+  const guides = read('guides.html');
+  assert.match(guides, /#main-content \.guide-grid\s*\{\s*align-items:\s*stretch\s*!important/);
+  assert.match(guides, /#main-content \.guide-list\s*\{\s*height:\s*100%/);
+  assert.match(guides, /#main-content > \.article-discovery\s*\{\s*display:\s*none\s*!important/);
+});
