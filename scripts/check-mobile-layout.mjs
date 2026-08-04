@@ -61,6 +61,12 @@ if (existsSync(deployableCatalogPath)) {
   }
 }
 
+const pageFilterIndex = args.indexOf('--page');
+if (pageFilterIndex >= 0 && args[pageFilterIndex + 1]) {
+  const selected = new Set(args[pageFilterIndex + 1].split(',').map((value) => value.trim()).filter(Boolean));
+  pages.splice(0, pages.length, ...pages.filter(([name]) => selected.has(name)));
+}
+
 const viewports = [
   { label: '320', width: 320, height: 900, mobile: true },
   { label: '360', width: 360, height: 900, mobile: true },
@@ -74,6 +80,12 @@ const viewports = [
   // A 1280px browser at 200% zoom exposes roughly a 640 CSS-pixel layout viewport.
   { label: 'zoom-200', width: 640, height: 900, mobile: false, screenshot: true, zoom: 2 },
 ];
+
+const viewportFilterIndex = args.indexOf('--viewport');
+if (viewportFilterIndex >= 0 && args[viewportFilterIndex + 1]) {
+  const selected = new Set(args[viewportFilterIndex + 1].split(',').map((value) => value.trim()).filter(Boolean));
+  viewports.splice(0, viewports.length, ...viewports.filter(({ label }) => selected.has(label)));
+}
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -322,6 +334,16 @@ function layoutExpression(checkFixture) {
         : null,
       topLevelNavigationCount: document.querySelectorAll('.site-header .nav-list > a, .site-header .nav-list > details').length,
     };
+    const platformSidebar = document.getElementById('platform-sidenav');
+    const platformSidebarRect = platformSidebar?.getBoundingClientRect();
+    const bodyRect = document.body.getBoundingClientRect();
+    const headerRect = document.querySelector('.site-header')?.getBoundingClientRect();
+    const headerNavRect = document.querySelector('.site-header > .nav')?.getBoundingClientRect();
+    const navLinksRect = document.querySelector('.site-header .nav-links')?.getBoundingClientRect();
+    const navListRect = document.querySelector('.site-header .nav-list')?.getBoundingClientRect();
+    const searchRect = document.querySelector('.site-header .site-search-host')?.getBoundingClientRect();
+    const themeRect = document.querySelector('.site-header .theme-btn')?.getBoundingClientRect();
+    const box = (rect) => rect ? { left: round(rect.left), right: round(rect.right), width: round(rect.width) } : null;
 
     return {
       viewport: window.innerWidth,
@@ -333,6 +355,21 @@ function layoutExpression(checkFixture) {
       controlOverflow,
       overflowElements,
       productTitle,
+      platformSidebar: {
+        present: Boolean(platformSidebar),
+        visible: Boolean(platformSidebar && getComputedStyle(platformSidebar).display !== 'none' && platformSidebarRect.width > 0),
+        width: round(platformSidebarRect?.width || 0),
+        globalLinks: platformSidebar?.querySelectorAll('a[href^="/"]').length || 0,
+      },
+      layoutBoxes: {
+        body: bodyRect ? { ...box(bodyRect), paddingLeft: round(parseFloat(getComputedStyle(document.body).paddingLeft) || 0) } : null,
+        header: box(headerRect),
+        headerNav: box(headerNavRect),
+        navLinks: box(navLinksRect),
+        navList: box(navListRect),
+        search: box(searchRect),
+        theme: box(themeRect),
+      },
       fixture,
       p2,
     };
@@ -560,6 +597,15 @@ try {
       if (state.badWrap.length) failures.push(`${name}@${viewport.label}: ordinary prose uses emergency wrapping ${JSON.stringify(state.badWrap)}`);
       if (state.narrowProse.length) failures.push(`${name}@${viewport.label}: ordinary prose is unnecessarily narrow ${JSON.stringify(state.narrowProse)}`);
       if (state.controlOverflow.length) failures.push(`${name}@${viewport.label}: navigation or CTA overflow ${JSON.stringify(state.controlOverflow)}`);
+      if (!state.platformSidebar.present || state.platformSidebar.globalLinks < 10) {
+        failures.push(`${name}@${viewport.label}: governed platform sidebar is missing or incomplete ${JSON.stringify(state.platformSidebar)}`);
+      }
+      if (viewport.width >= 1380 && (!state.platformSidebar.visible || state.platformSidebar.width !== 240)) {
+        failures.push(`${name}@${viewport.label}: desktop platform sidebar is not visible at 240px ${JSON.stringify(state.platformSidebar)}`);
+      }
+      if (viewport.width < 1380 && state.platformSidebar.visible) {
+        failures.push(`${name}@${viewport.label}: platform sidebar must remain hidden below the desktop breakpoint ${JSON.stringify(state.platformSidebar)}`);
+      }
       if (state.p2.topLevelNavigationCount && state.p2.topLevelNavigationCount > 5) {
         failures.push(`${name}@${viewport.label}: ${state.p2.topLevelNavigationCount} top-level navigation controls exceed the five-item IA`);
       }

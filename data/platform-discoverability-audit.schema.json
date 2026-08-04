@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1200km.com/data/platform-discoverability-audit.schema.json",
+  "title": "1200km platform discoverability audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "report_version", "generated_at", "site_root", "pages", "taxonomy", "ai_and_search_discovery", "exclusions", "violations"],
+  "properties": {
+    "$schema": { "const": "https://1200km.com/data/platform-discoverability-audit.schema.json" },
+    "report_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "site_root": { "type": "string", "minLength": 1 },
+    "pages": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "taxonomy": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "ai_and_search_discovery": {
+      "type": "object",
+      "required": ["files", "remote_docusaurus_sidebar_bridge"],
+      "properties": {
+        "files": { "type": "object", "additionalProperties": { "type": "boolean" } },
+        "remote_docusaurus_sidebar_bridge": { "type": "boolean" }
+      }
+    },
+    "exclusions": {
+      "type": "object",
+      "required": ["count", "policy"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "policy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "violations": { "type": "array", "items": { "type": "string" } }
+  }
+}

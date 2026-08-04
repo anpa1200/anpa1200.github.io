@@ -72,6 +72,18 @@ test('offensive indexes are not assigned catch-all CTI taxonomy', () => {
   }
 });
 
+test('discovery tags are specific and support multi-facet retrieval', () => {
+  assert.equal(catalog.items.filter((item) => item.tags.includes('security-research')).length, 0);
+  const windows = catalog.items.find((item) => item.canonical_url.includes('/articles/trainsec/windows-internals-vmmap-basics'));
+  assert.equal(windows?.primary_domain, 'application-security');
+  assert.ok(windows?.tags.includes('windows-internals'));
+  const malware = catalog.items.find((item) => item.canonical_url.includes('/articles/trainsec/malware-analysis-wannacry-dropper'));
+  assert.equal(malware?.primary_domain, 'malware-analysis');
+  assert.ok(malware?.tags.includes('reverse-engineering'));
+  assert.ok(taxonomyAudit.tagging.unique_tag_count > 20);
+  assert.equal(taxonomyAudit.tagging.generic_security_research_count, 0);
+});
+
 test('current, superseded, archived, and externally sourced entities remain distinct', () => {
   assert.ok(catalog.items.some((item) => item.status === 'current-development'));
   assert.ok(catalog.items.some((item) => item.status === 'superseded'));

@@ -36,6 +36,8 @@ test('homepage emits a WebPage connected to the current AdversaryGraph source en
   const website = objectById(graph, WEBSITE_ID);
   assert.equal(page['@type'], 'WebPage');
   assert.deepEqual(page.isPartOf, { '@id': WEBSITE_ID });
+  assert.ok(page.about.some((item) => item.name === 'Cyber threat intelligence'));
+  assert.match(page.keywords, /Cyber threat intelligence/);
   assert.deepEqual(page.mainEntity, { '@id': SOFTWARE_ID });
   assert.deepEqual(software.mainEntityOfPage, { '@id': page['@id'] });
   assert.deepEqual(software.author, { '@id': PERSON_ID });
@@ -95,6 +97,8 @@ test('an archive article receives connected article semantics and deterministic 
   assert.match(output, /<meta property="article:published_time" content="2026-02-03"/);
   assert.match(output, /<meta property="article:modified_time" content="2026-02-05"/);
   assert.match(output, /<title>Example Research \| 1200km<\/title>/);
+  assert.match(output, /<meta property="og:title" content="Example Research"/);
+  assert.match(output, /<meta name="twitter:title" content="Example Research"/);
   assert.equal(output.includes('legacy, keywords'), false);
   assert.match(output, /data-content-freshness/);
   assert.match(output, /data-article-discovery/);
@@ -141,6 +145,15 @@ test('metadata description normalization is idempotent on an already-normalized 
   const twicePassed = normalizeMetaDescriptions(oncePassed);
   assert.equal(oncePassed, twicePassed, 'reprocessing must not re-prepend the title onto an already-normalized description');
   assert.doesNotMatch(twicePassed, /ecosystem\.\. Public evidence/);
+});
+
+test('generated fallback descriptions retain exactly one page-specific title across releases', () => {
+  const input = '<html><head><title>Dcsync | ITDR</title><meta name="description" content="Dcsync. Dcsync. Practical security guidance with scope, evidence, and validation…"></head><body><main><h1>Dcsync</h1></main></body></html>';
+  const oncePassed = normalizeMetaDescriptions(input);
+  const twicePassed = normalizeMetaDescriptions(oncePassed);
+  assert.equal(oncePassed, twicePassed);
+  assert.match(twicePassed, /content="Dcsync\. Practical security guidance/);
+  assert.doesNotMatch(twicePassed, /Dcsync\. Dcsync\./);
 });
 
 test('archive series descriptions remain page-specific without truncation ellipses', () => {

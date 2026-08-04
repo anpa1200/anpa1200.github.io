@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import { transformHtmlElements } from './html-token-utils.mjs';
+import { topicsFromText } from './content-topic-lib.mjs';
 
 export const PERSON_ID = 'https://1200km.com/#person';
 export const WEBSITE_ID = 'https://1200km.com/#website';
@@ -120,6 +121,11 @@ export function normalizeDocumentTitles(html) {
     if (!['og:title', 'twitter:title'].includes(key) || !attributes.content) return tag;
     return replaceAttribute(tag, 'content', normalizeSeoTitle(attributes.content));
   });
+  const title = pageTitle(transformed);
+  if (title) {
+    transformed = upsertMeta(transformed, 'property', 'og:title', title);
+    transformed = upsertMeta(transformed, 'name', 'twitter:title', title);
+  }
   return transformed;
 }
 
@@ -140,22 +146,21 @@ export function normalizeMetaDescriptions(html) {
   const current = metaContent(html, 'description');
   if (!current) return html;
   const decodedCurrent = decodeEntities(current);
-  // Preserve complete, authored descriptions. Older release passes prepended
-  // the title and then truncated the result, which repeated the H1, wasted the
-  // search-snippet budget, and left literal ellipses in deployable output.
-  const alreadyPrefixed = decodedCurrent === title || decodedCurrent.startsWith(`${title}. `);
-  const generic = !alreadyPrefixed && /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodedCurrent);
-  const base = alreadyPrefixed
-    ? decodedCurrent.slice(title.length).replace(/^\.\s*/, '') || decodedCurrent
-    : generic
-      ? `${title}. Practical security guidance with scope, evidence, and validation boundaries.`
-      : decodedCurrent;
+  // Preserve complete authored descriptions, but make generated fallbacks
+  // uniquely page-specific. Earlier release passes could prepend the title
+  // repeatedly and a later pass could then remove it entirely; normalize both
+  // states to one stable sentence.
+  const guidance = 'Practical security guidance with scope, evidence, and validation boundaries.';
+  const generatedFallback = /Practical security guidance with scope, evidence/i.test(decodedCurrent)
+    || /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodedCurrent);
+  const base = generatedFallback ? `${title}. ${guidance}` : decodedCurrent;
+  const alreadyPrefixed = base === title || base.startsWith(`${title}. `);
   // Archive series often share an authored summary across multiple parts.
   // Include the page-specific title so every canonical article retains a
   // distinct search snippet. End at a word boundary with a real sentence
   // terminator rather than publishing a literal truncation ellipsis.
   const archiveBase = canonical?.includes('/articles/read/')
-    ? `${title}. ${base}`
+    ? (alreadyPrefixed ? base : `${title}. ${base}`)
     : base;
   const description = canonical?.includes('/articles/read/')
     ? conciseDescription(archiveBase, 159).replace(/…$/, '.')
@@ -401,6 +406,8 @@ export function buildConnectedGraph(html, {
   const title = pageTitle(html);
   const description = metaContent(html, 'description');
   const image = metaContent(html, 'og:image');
+  const topics = topicsFromText(`${new URL(canonical).pathname} ${title} ${description}`);
+  const about = topics.map((name) => ({ '@type': 'Thing', name }));
   const personSource = firstObjectWithType(objects, new Set(['Person'])) || {};
   const websiteSource = firstObjectWithType(objects, new Set(['WebSite'])) || {};
   const pageSource = firstObjectWithType(objects, WEB_PAGE_TYPES) || {};
@@ -467,6 +474,7 @@ export function buildConnectedGraph(html, {
     breadcrumb: { '@id': breadcrumb['@id'] },
     author: { '@id': PERSON_ID },
     inLanguage: pageSource.inLanguage || 'en',
+    ...(about.length ? { about, keywords: topics.join(', ') } : {}),
   };
   if (image && !page.primaryImageOfPage) page.primaryImageOfPage = { '@type': 'ImageObject', url: image };
   if (dateModified) page.dateModified = dateModified;
@@ -533,6 +541,10 @@ export function buildConnectedGraph(html, {
       if (description) normalized.description = description;
       if (image && !normalized.image) normalized.image = image;
       if (datePublished) normalized.datePublished = datePublished;
+      if (about.length) {
+        normalized.about = about;
+        normalized.keywords = topics.join(', ');
+      }
     }
     primary.push(normalized);
   }

@@ -49,6 +49,9 @@ The crawler policy allows conventional search, AI search indexing, and
 user-requested retrieval while disallowing recognized model-training crawlers.
 The exact policy and its unavoidable provider limitations are documented in
 [SEO-NOTES.md](SEO-NOTES.md).
+The measured cross-platform navigation, taxonomy, SEO, AI-discovery, and UX
+review is in
+[reports/platform-seo-ai-ux-audit-2026-08-04.md](reports/platform-seo-ai-ux-audit-2026-08-04.md).
 
 ## Authoritative facts
 
@@ -109,9 +112,12 @@ git archive HEAD | tar -x -C "$site_dir"
 npm run build-shell -- --site "$site_dir"
 node scripts/inject-search-loader.mjs --site "$site_dir"
 npm run build-metadata:remote -- --site "$site_dir" --source "$PWD"
+npm run build-sidebar -- --site "$site_dir"
 npm run check-facts -- --site "$site_dir"
 npm run check-seo -- --site "$site_dir" --require-release-transform
 npm run build-content:remote -- --site "$site_dir" --source "$PWD" --sitemap "$site_dir/sitemap.xml"
+npm run check-discoverability -- --site "$site_dir" --report /tmp/1200km-platform-discoverability.json
+npm run build-lifecycle-banners -- --site "$site_dir"
 npm run build-search:remote -- \
   --site "$site_dir" \
   --sitemap "$site_dir/sitemap.xml" \
@@ -142,8 +148,9 @@ events. Only non-PR runs deploy the already-tested artifact. It:
 1. validates the authoritative fact model, code, search behavior, SEO,
    agent-readiness, and internal links;
 2. stages only publishable files;
-3. generates the canonical metadata and release HTML;
-4. validates every local canonical page;
+3. generates canonical metadata, release HTML, and the governed platform sidebar;
+4. validates every local canonical page and audits discovery, taxonomy, and
+   navigation coverage;
 5. builds Pagefind across local and approved remote pages with zero stale-URL
    tolerance;
 6. tests ranking, facets, deep links, responsive UI, and accessibility behavior

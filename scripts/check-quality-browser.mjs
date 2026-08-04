@@ -248,12 +248,20 @@ try {
       const state = await evaluate(devtools, sessionId, `(async () => {
         const audit = await axe.run(document, { resultTypes: ['violations'] });
         const resources = performance.getEntriesByType('resource');
+        const platformSidebar = document.getElementById('platform-sidenav');
+        const platformSidebarRect = platformSidebar?.getBoundingClientRect();
         return {
           url: location.href,
           title: document.title,
           h1Count: document.querySelectorAll('h1').length,
           mainCount: document.querySelectorAll('main').length,
           horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1,
+          platform_sidebar: {
+            present: Boolean(platformSidebar),
+            visible: Boolean(platformSidebar && getComputedStyle(platformSidebar).display !== 'none' && platformSidebarRect.width > 0),
+            width: Math.round(platformSidebarRect?.width || 0),
+            global_links: platformSidebar?.querySelectorAll('a[href^="/"]').length || 0,
+          },
           cls: Number((window.__quality?.cls || 0).toFixed(4)),
           layout_shifts: window.__quality?.shifts || [],
           lcp_ms: Math.round(window.__quality?.lcp || 0),
@@ -279,6 +287,15 @@ try {
       if (state.h1Count !== 1) failures.push(`${name}@${viewport.label}: expected one h1, found ${state.h1Count}`);
       if (state.mainCount !== 1) failures.push(`${name}@${viewport.label}: expected one main landmark, found ${state.mainCount}`);
       if (state.horizontalOverflow) failures.push(`${name}@${viewport.label}: horizontal page overflow`);
+      if (!state.platform_sidebar.present || state.platform_sidebar.global_links < 10) {
+        failures.push(`${name}@${viewport.label}: governed platform sidebar is missing or incomplete ${JSON.stringify(state.platform_sidebar)}`);
+      }
+      if (viewport.width >= 1380 && (!state.platform_sidebar.visible || state.platform_sidebar.width !== 240)) {
+        failures.push(`${name}@${viewport.label}: desktop platform sidebar is not visible at 240px ${JSON.stringify(state.platform_sidebar)}`);
+      }
+      if (viewport.width < 1380 && state.platform_sidebar.visible) {
+        failures.push(`${name}@${viewport.label}: platform sidebar must defer to mobile/tablet navigation ${JSON.stringify(state.platform_sidebar)}`);
+      }
       if (state.cls > budget.cls) failures.push(`${name}@${viewport.label}: CLS ${state.cls} exceeds ${budget.cls} (${budgetClass})`);
       if (state.lcp_ms > budget.lcp_ms) failures.push(`${name}@${viewport.label}: local LCP ${state.lcp_ms}ms exceeds ${budget.lcp_ms}ms (${budgetClass})`);
       if (state.transfer_bytes > budget.transfer_bytes) failures.push(`${name}@${viewport.label}: transfer ${state.transfer_bytes} exceeds ${budget.transfer_bytes} (${budgetClass})`);
