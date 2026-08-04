@@ -76,6 +76,7 @@ test('TrainSec catalogue filters search metadata and reset stale browser state',
   assert.match(trainsecCatalogue, /grid-auto-rows:auto/);
   assert.doesNotMatch(trainsecCatalogue, /Continue research/);
   assert.match(read('scripts/import-trainsec-library.mjs'), /trainsec-card-layout-fix/);
+  assert.match(read('scripts/release-html-lib.mjs'), /trainsec-library\\\.html/);
   assert.match(trainsecCatalogue, /trainsec-library-filters\.js/);
   assert.match(read('assets/trainsec-library-filters.js'), /card\.dataset\.tags/);
   assert.match(read('assets/trainsec-library-filters.js'), /syncUrl/);
