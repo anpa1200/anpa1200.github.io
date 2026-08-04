@@ -90,6 +90,7 @@ test('guides catalogue keeps panels aligned and excludes full-article discovery 
   assert.match(guides, /#main-content \.guide-list\s*\{\s*display:\s*contents\s*!important/);
   assert.match(guides, /#main-content \.guide-item[\s\S]*min-height:\s*235px/);
   assert.match(guides, /#main-content > \.article-discovery\s*\{\s*display:\s*none\s*!important/);
+  assert.match(guides, /@media \(max-width: 900px\)[\s\S]*#guides-catalogue-controls/);
   assert.match(guides, /#guides-catalogue-controls/);
   assert.match(guides, /guides-catalogue\.js/);
   assert.match(guides, /guide-card-cover/);
