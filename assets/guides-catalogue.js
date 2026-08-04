@@ -11,18 +11,8 @@
     card.dataset.title = title;
     card.dataset.tags = tags.join(' ');
     card.dataset.tagList = tags.map((tag) => tag.toLowerCase()).join('|');
-    if (titleLink && !card.querySelector('.guide-card-cover')) {
-      const cover = document.createElement('a');
-      cover.className = 'guide-card-cover';
-      cover.href = titleLink.href;
-      cover.setAttribute('aria-label', `Open ${title}`);
-      const image = document.createElement('img');
-      image.loading = 'lazy';
-      image.alt = '';
-      image.src = coverFor(group.id);
-      cover.append(image);
-      card.insertBefore(cover, titleLink);
-    }
+    card.dataset.guideCover = coverFor(group.id);
+    card.style.setProperty('--guide-cover', `url("${card.dataset.guideCover}")`);
     return card;
   }));
 
@@ -113,18 +103,18 @@
 
   function coverFor(groupId) {
     const covers = {
-      cti: '/assets/cyber-knowledge-og/cti.png',
-      detection: '/assets/cyber-knowledge-og/blue-team.png',
-      'network-recon': '/assets/cyber-knowledge-og/osint.png',
-      'web-app': '/assets/cyber-knowledge-og/secure-code.png',
-      'password-attacks': '/assets/cyber-knowledge-og/vulnerability-research.png',
-      exploitation: '/assets/cyber-knowledge-og/red-team.png',
-      'ai-pentesting': '/assets/cyber-knowledge-og/ai-security.png',
-      'malware-analysis': '/assets/cyber-knowledge-og/malware-analysis.png',
-      'cloud-k8s-ad': '/assets/cyber-knowledge-og/cloud-security.png',
-      'ai-security': '/assets/cyber-knowledge-og/ai-security.png',
+      cti: '/assets/cyber-knowledge-og/cti.svg',
+      detection: '/assets/cyber-knowledge-og/blue-team.svg',
+      'network-recon': '/assets/cyber-knowledge-og/osint.svg',
+      'web-app': '/assets/cyber-knowledge-og/secure-code.svg',
+      'password-attacks': '/assets/cyber-knowledge-og/vulnerability-research.svg',
+      exploitation: '/assets/cyber-knowledge-og/red-team.svg',
+      'ai-pentesting': '/assets/cyber-knowledge-og/ai-security.svg',
+      'malware-analysis': '/assets/cyber-knowledge-og/malware-analysis.svg',
+      'cloud-k8s-ad': '/assets/cyber-knowledge-og/cloud-security.svg',
+      'ai-security': '/assets/cyber-knowledge-og/ai-security.svg',
     };
-    return covers[groupId] || '/assets/cyber-knowledge-og/hub.png';
+    return covers[groupId] || '/assets/cyber-knowledge-og/hub.svg';
   }
 
   function escapeHtml(value) {
