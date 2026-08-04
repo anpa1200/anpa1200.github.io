@@ -380,10 +380,13 @@ for (const article of payload.articles) {
     const value = escapeHtml(tag);
     catalogue = catalogue.replaceAll(
       `<span class="tag">${value}</span>`,
-      `<button class="tag filter-chip" type="button" data-filter="search" data-filter-value="${value}">${value}</button>`,
+      `<button class="tag filter-chip" type="button" data-filter="tag" data-filter-value="${value}">${value}</button>`,
     );
   }
 }
+// Older generated catalogues used the search field for tag chips. Normalize
+// them to the dedicated tag facet in both newly generated and existing pages.
+catalogue = catalogue.replaceAll('data-filter="search"', 'data-filter="tag"');
 catalogue = catalogue.replace('A source-linked catalogue of TrainSec’s public knowledge-library articles integrated into the 1200km article ecosystem. Browse by author, domain, mode, and topic, then follow the attribution link to the original publication.', 'A permitted integration of TrainSec’s Knowledge Library. Read the complete original text with screenshots, infographics, and embedded videos in the original order, then follow the attribution link to TrainSec.net.');
 if (!catalogue.includes('<meta name="author"')) {
   catalogue = catalogue.replace('<meta name="description"', `${authorMeta}<meta name="description"`);
@@ -409,6 +412,16 @@ if (!catalogue.includes('id="filter-reset"')) {
 if (!catalogue.includes('id="filter-search"')) {
   catalogue = catalogue.replace('<span id="result-count"', '<button id="filter-search" type="button">Search</button><span id="result-count"');
 }
+if (!catalogue.includes('id="tag-filter"')) {
+  const tags = [...new Map(
+    payload.articles.flatMap((article) => (article.tags || []).map((tag) => [tag.toLowerCase(), tag])),
+  ).entries()].sort(([a], [b]) => a.localeCompare(b));
+  const tagOptions = tags.map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
+  catalogue = catalogue.replace(
+    '<button id="filter-reset"',
+    `<label class="visually-hidden" for="tag-filter">Topic tag</label><select id="tag-filter" autocomplete="off"><option value="">All tags</option>${tagOptions}</select><button id="filter-reset"`,
+  );
+}
 if (!catalogue.includes('id="category-filter"')) {
   catalogue = catalogue.replace('<input id="article-search"', '<input id="article-search" autocomplete="off"');
   catalogue = catalogue.replace('<label class="visually-hidden" for="author-filter">Author</label><select id="author-filter"', '<label class="visually-hidden" for="category-filter">Category</label><select id="category-filter" autocomplete="off"><option value="">All categories</option><option value="TrainSec">TrainSec</option></select><label class="visually-hidden" for="author-filter">Author</label><select id="author-filter" autocomplete="off"');
@@ -422,8 +435,11 @@ catalogue = catalogue.replace('const matchesAuthor=!author.value||card.dataset.a
 catalogue = catalogue.replace('&&matchesAuthor&&matchesDomain&&matchesMode;', '&&matchesCategory&&matchesAuthor&&matchesDomain&&matchesMode;');
 catalogue = catalogue.replace('[search,author,domain,mode].forEach(control=>control.addEventListener("input",apply));', '[search,category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("input",apply));');
 catalogue = catalogue.replace('[author,domain,mode].forEach(control=>control.addEventListener("change",apply))', '[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener("change",apply));apply()');
-const filterScript = `<script>(()=>{const cards=[...document.querySelectorAll(".article-card")],category=document.querySelector("#category-filter"),search=document.querySelector("#article-search"),author=document.querySelector("#author-filter"),domain=document.querySelector("#domain-filter"),mode=document.querySelector("#mode-filter"),filterSearch=document.querySelector("#filter-search"),reset=document.querySelector("#filter-reset"),count=document.querySelector("#result-count"),controls=[search,category,author,domain,mode].filter(Boolean),chips=[...document.querySelectorAll("[data-filter-value]")],params=new URLSearchParams(location.search);const setControl=(control,key)=>{if(!control)return;if(control.tagName==='SELECT'){const value=params.get(key);control.value=value&&[...control.options].some(option=>option.value===value)?value:''}else{control.value=params.get(key)||''}};setControl(search,'q');setControl(category,'category');setControl(author,'author');setControl(domain,'domain');setControl(mode,'mode');const apply=()=>{const q=search.value.trim().toLowerCase();let shown=0;cards.forEach(card=>{const haystack=[card.dataset.title,card.dataset.author,card.dataset.domain,card.dataset.mode,card.dataset.tags].filter(Boolean).join(' ').toLowerCase();const ok=(!q||haystack.includes(q))&&(!category||!category.value||card.dataset.category===category.value)&&(!author||!author.value||card.dataset.author===author.value)&&(!domain||!domain.value||card.dataset.domain===domain.value)&&(!mode||!mode.value||card.dataset.mode===mode.value);card.hidden=!ok;if(ok)shown+=1});count.textContent=shown+' shown'};const applyChip=(chip)=>{const target=chip.dataset.filter,value=chip.dataset.filterValue;if(target==='search')search.value=value;else{const control={category,author,domain,mode}[target];if(control)control.value=value}apply();history.replaceState(null,'',location.pathname+'?'+new URLSearchParams({[target==='search'?'q':target]:value}).toString())};controls.forEach(control=>control.addEventListener('input',apply));[category,author,domain,mode].filter(Boolean).forEach(control=>control.addEventListener('change',apply));chips.forEach(chip=>chip.addEventListener('click',()=>applyChip(chip)));filterSearch?.addEventListener('click',()=>{apply();document.querySelector('#article-grid')?.scrollIntoView({behavior:'smooth',block:'start'})});reset?.addEventListener('click',()=>{controls.forEach(control=>{control.value=''});history.replaceState(null,'',location.pathname);apply();search.focus()});apply()})();</script>`;
-catalogue = catalogue.replace(/<script>\(\(\)=>\{const cards=.*?<\/script>/, filterScript);
+const filterScript = '<script src="/assets/trainsec-library-filters.js?v=20260804-1" defer></script>';
+catalogue = catalogue.replace(/<script>\(\(\)=>\{const cards=[\s\S]*?<\/script>/, filterScript);
+if (!catalogue.includes('/assets/trainsec-library-filters.js')) {
+  catalogue = catalogue.replace('</body>', `${filterScript}\n</body>`);
+}
 await fs.writeFile(cataloguePath, catalogue);
 
 // Add every local mirror to both sitemaps after the catalogue URL.
