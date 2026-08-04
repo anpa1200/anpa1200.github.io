@@ -99,5 +99,5 @@ test('guides catalogue keeps panels aligned and excludes full-article discovery 
   assert.match(catalogueScript, /id="guides-tag"/);
   assert.match(catalogueScript, /history\.replaceState/);
   assert.match(catalogueScript, /guideCover/);
-  assert.match(catalogueScript, /cyber-knowledge-og\/cti\.png/);
+  assert.match(catalogueScript, /cyber-knowledge-og\/cti\.svg/);
 });
