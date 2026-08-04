@@ -85,8 +85,17 @@ test('TrainSec catalogue filters search metadata and reset stale browser state',
 
 test('guides catalogue keeps panels aligned and excludes full-article discovery navigation', () => {
   const guides = read('guides.html');
+  const catalogueScript = read('assets/guides-catalogue.js');
   assert.match(guides, /#main-content \.guide-grid[\s\S]*grid-template-columns:\s*repeat\(auto-fit/);
   assert.match(guides, /#main-content \.guide-list\s*\{\s*display:\s*contents\s*!important/);
   assert.match(guides, /#main-content \.guide-item[\s\S]*min-height:\s*235px/);
   assert.match(guides, /#main-content > \.article-discovery\s*\{\s*display:\s*none\s*!important/);
+  assert.match(guides, /#guides-catalogue-controls/);
+  assert.match(guides, /guides-catalogue\.js/);
+  assert.match(guides, /guide-card-cover/);
+  assert.match(catalogueScript, /id="guides-search"/);
+  assert.match(catalogueScript, /id="guides-category"/);
+  assert.match(catalogueScript, /id="guides-tag"/);
+  assert.match(catalogueScript, /history\.replaceState/);
+  assert.match(catalogueScript, /cyber-knowledge-og\/cti\.png/);
 });
