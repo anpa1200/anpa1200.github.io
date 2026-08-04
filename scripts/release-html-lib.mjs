@@ -344,6 +344,7 @@ function articleDocument(html, canonical, objects) {
 export function editorialArticleDocument(canonical) {
   if (!canonical) return false;
   const pathname = new URL(canonical).pathname;
+  if (/^\/articles\/trainsec-library\.html$/i.test(pathname)) return false;
   return /^\/articles\/read\/\d{4}\/[^/]+\/?$/i.test(pathname)
     || /^\/articles\/[^/]+\.html$/i.test(pathname)
     || /^\/(?:newest-detection-engineering-techniques|embedded-systems-hardware-firmware)\/?$/i.test(pathname);
