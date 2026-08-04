@@ -11,18 +11,8 @@
     card.dataset.title = title;
     card.dataset.tags = tags.join(' ');
     card.dataset.tagList = tags.map((tag) => tag.toLowerCase()).join('|');
-    if (titleLink && !card.querySelector('.guide-card-cover')) {
-      const cover = document.createElement('a');
-      cover.className = 'guide-card-cover';
-      cover.href = titleLink.href;
-      cover.setAttribute('aria-label', `Open ${title}`);
-      const image = document.createElement('img');
-      image.loading = 'lazy';
-      image.alt = '';
-      image.src = coverFor(group.id);
-      cover.append(image);
-      card.insertBefore(cover, titleLink);
-    }
+    card.dataset.guideCover = coverFor(group.id);
+    card.style.setProperty('--guide-cover', `url("${card.dataset.guideCover}")`);
     return card;
   }));
 

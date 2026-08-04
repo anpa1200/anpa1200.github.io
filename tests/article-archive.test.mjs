@@ -93,10 +93,11 @@ test('guides catalogue keeps panels aligned and excludes full-article discovery 
   assert.match(guides, /@media \(max-width: 900px\)[\s\S]*#guides-catalogue-controls/);
   assert.match(guides, /#guides-catalogue-controls/);
   assert.match(guides, /guides-catalogue\.js/);
-  assert.match(guides, /guide-card-cover/);
+  assert.match(guides, /guide-item::before/);
   assert.match(catalogueScript, /id="guides-search"/);
   assert.match(catalogueScript, /id="guides-category"/);
   assert.match(catalogueScript, /id="guides-tag"/);
   assert.match(catalogueScript, /history\.replaceState/);
+  assert.match(catalogueScript, /guideCover/);
   assert.match(catalogueScript, /cyber-knowledge-og\/cti\.png/);
 });
