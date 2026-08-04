@@ -85,6 +85,8 @@ test('runtime JavaScript enhances but does not reconstruct the standalone shell'
 test('Docusaurus and Threat Matrix retain native shells with explicit ecosystem routes', () => {
   const ecosystem = readFileSync(join(ROOT, 'assets', 'docusaurus-ecosystem.js'), 'utf8');
   assert.doesNotMatch(ecosystem, /addNavigation|data-ecosystem-nav|insertBefore\(link/);
+  assert.match(ecosystem, /loadPlatformSidebar/);
+  assert.match(ecosystem, /platform-sidebar\.js\?v=20260804-1/);
 
   for (const path of ['adversarygraph-docs/index.html', 'ITDR/index.html']) {
     const html = readFileSync(join(ROOT, path), 'utf8');

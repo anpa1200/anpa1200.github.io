@@ -77,6 +77,8 @@ jobs:
           --archive-commit "${ARTICLE_ARCHIVE_COMMIT}"
       - name: Build canonical metadata and release HTML
         run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
+      - name: Integrate governed platform sidebar
+        run: npm run build-sidebar -- --site "${RUNNER_TEMP}/site"
       - name: Validate complete staged site
         run: |
           npm run check-semantics -- --site "${RUNNER_TEMP}/site"
@@ -89,6 +91,11 @@ jobs:
           --site "${RUNNER_TEMP}/site"
           --source "${GITHUB_WORKSPACE}"
           --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
+      - name: Audit platform discoverability, taxonomy, and sidebar coverage
+        run: >-
+          npm run check-discoverability --
+          --site "${RUNNER_TEMP}/site"
+          --report "${RUNNER_TEMP}/platform-discoverability.json"
       - name: Apply governed article lifecycle notices
         run: npm run build-lifecycle-banners -- --site "${RUNNER_TEMP}/site"
       - name: Build canonical domain-wide search index
@@ -148,6 +155,7 @@ jobs:
             ${{ runner.temp }}/site/pagefind/search-governance.json
             ${{ runner.temp }}/site/pagefind/pagefind-entry.json
             ${{ runner.temp }}/site/data/content-catalog.json
+            ${{ runner.temp }}/platform-discoverability.json
             ${{ runner.temp }}/site/data/article-catalog.json
             ${{ runner.temp }}/site/data/article-archive-build.json
             ${{ runner.temp }}/site/reports/article-canonical-migration.csv

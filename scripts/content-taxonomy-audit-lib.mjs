@@ -33,6 +33,14 @@ function reviewItem(item) {
   };
 }
 
+function tagCounts(items) {
+  const values = new Map();
+  for (const item of items) {
+    for (const tag of item.tags || []) values.set(tag, (values.get(tag) || 0) + 1);
+  }
+  return [...values].sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+}
+
 export function buildTaxonomyAudit(catalog) {
   const items = catalog.items || [];
   const generated = items.filter((item) => ['reference-entity', 'generated-reference'].includes(item.primary_type));
@@ -41,6 +49,9 @@ export function buildTaxonomyAudit(catalog) {
   const unverified = authored.filter((item) => item.evidence_level === 'unverified');
   const maintainedWithoutDate = items.filter((item) => item.lifecycle === 'maintained' && !item.updated_at);
   const historicalCore = items.filter((item) => ['archived', 'historical', 'preserved', 'superseded'].includes(item.lifecycle) && item.collection_tier === 'core');
+  const genericTagItems = items.filter((item) => item.tags?.includes('security-research'));
+  const underspecifiedTags = authored.filter((item) => (item.tags || []).length < 2);
+  const tags = tagCounts(items);
   const warnings = [];
 
   if (generated.length) warnings.push({
@@ -73,6 +84,18 @@ export function buildTaxonomyAudit(catalog) {
     count: historicalCore.length,
     message: `${historicalCore.length} preserved, historical, superseded, or archived items are incorrectly assigned to the core tier.`,
   });
+  if (genericTagItems.length) warnings.push({
+    code: 'GENERIC_SECURITY_RESEARCH_TAG',
+    severity: 'error',
+    count: genericTagItems.length,
+    message: `${genericTagItems.length} items use the non-discriminating security-research tag; assign subject-specific tags instead.`,
+  });
+  if (underspecifiedTags.length) warnings.push({
+    code: 'UNDERSPECIFIED_TAGS',
+    severity: 'review',
+    count: underspecifiedTags.length,
+    message: `${underspecifiedTags.length} authored items have fewer than two discovery tags.`,
+  });
 
   return {
     $schema: '../data/content-taxonomy-audit.schema.json',
@@ -85,6 +108,13 @@ export function buildTaxonomyAudit(catalog) {
     authored_only: {
       item_count: authored.length,
       ...distributions(authored),
+    },
+    tagging: {
+      unique_tag_count: tags.length,
+      generic_security_research_count: genericTagItems.length,
+      underspecified_authored_count: underspecifiedTags.length,
+      authored_with_author_tag: authored.filter((item) => item.tags?.some((tag) => tag.startsWith('author:'))).length,
+      top_tags: Object.fromEntries(tags.slice(0, 40)),
     },
     review_queues: {
       currentness_unknown: currentnessUnknown.map(reviewItem),

@@ -107,8 +107,31 @@ const TOPIC_TAGS = new Map([
   ['Incident response', 'incident-response'],
   ['Cloud security', 'cloud-security'],
   ['Embedded security', 'embedded-security'],
-  ['Security research', 'security-research'],
 ]);
+
+const SUBJECT_TAG_RULES = Object.freeze([
+  ['windows-internals', /windows internals|\/windows-internals-|\bvmmap\b|\betw\b|\bamsi\b|windows sessions?|windows services?/i],
+  ['windows-kernel', /windows kernel|\/windows-kernel-|kernel debugging|kernel allocation|kernel objects?|protected process|\bppl\b/i],
+  ['reverse-engineering', /reverse engineering|disassembl|\bwindbg\b|\bida\b|unpack|malware triage|malware analys/i],
+  ['malware-behavior', /malware|ransomware|trojan|keylog|process hollow|code injection|dll injection|remote thread injection/i],
+  ['digital-forensics', /\bdfir\b|digital forensic|memory forensic|incident response|process snapshot|event trac/i],
+  ['hardware-security', /hardware hacking|secure boot|\buart\b|firmware|embedded systems?|\bbmc\b|\buefi\b/i],
+  ['identity-and-access', /identity|active directory|kerberos|entra|\biam\b|oauth|saml|access token|privilege|\buac\b/i],
+  ['cloud-and-container-security', /cloud security|kubernetes|container security|\baws\b|\bazure\b|\bgcp\b/i],
+  ['detection-content', /detection engineering|detection rule|sigma|yara|siem|telemetry|threat hunt/i],
+  ['attack-emulation', /attack simulation|adversary emulation|red team|offensive security|penetration test/i],
+  ['llm-and-agent-security', /prompt injection|large language model|\bllm\b|agentic|\brag\b|model security|\bmcp\b/i],
+  ['security-governance', /governance|compliance|risk management|security assurance|editorial policy/i],
+  ['career-development', /\/career-guides-|career guide|career roadmap|cybersecurity salar|professional development/i],
+  ['c-plus-plus', /\bc\+\+\b|\bcpp\b/i],
+  ['rust', /\brust\b/i],
+  ['mitre-attack', /mitre|att&ck|attack technique|\bT\d{4}(?:\.\d{3})?\b|\bG\d{4}\b/i],
+]);
+
+function subjectTags(url, title, html) {
+  const text = `${new URL(url).pathname} ${title} ${findMetaContent(html, 'description')} ${findMetaContent(html, 'keywords')}`;
+  return SUBJECT_TAG_RULES.filter(([, pattern]) => pattern.test(text)).map(([tag]) => tag).slice(0, 8);
+}
 
 function isoDate(value) {
   const match = String(value || '').match(/^\d{4}-\d{2}-\d{2}/);
@@ -298,7 +321,15 @@ function inferDomain(url, title, html, collection) {
   const path = new URL(url).pathname;
   const text = `${path} ${title} ${findMetaContent(html, 'description')}`;
   if (/^\/threat-matrix\//i.test(path)) return 'threat-intelligence';
+  if (collection?.id === 'collection:trainsec-library') {
+    if (/\/career-guides-(?:cybersecurity-salaries|is-malware-analysis-right-for-you)/i.test(path)) return 'professional-profile';
+    if (/\/hardware-hacking-/i.test(path)) return 'vulnerability-research';
+    if (/\/soc-and-dfir-/i.test(path)) return 'incident-response';
+    if (/\/malware-analysis-|malware|ransomware|trojan|keylog|reverse engineering|debugg|injection|process hollow/i.test(text)) return 'malware-analysis';
+    if (/\/(?:windows-internals|windows-kernel|programming)-/i.test(path)) return 'application-security';
+  }
   if (collection && !['collection:medium-export', 'collection:trainsec-library'].includes(collection.id)) return collection.primary_domain;
+  if (/^\/cyber-knowledge\/(?:glossary|sources|editorial-policy)\/?$/i.test(path)) return 'site-governance';
   if (/^\/ITDR\//.test(path) || /identity|kerberos|active directory|entra|oauth|saml/i.test(text)) return 'identity-security';
   if (/embedded|firmware|hardware|uefi|bmc/i.test(text)) return 'application-security';
   if (/malware|reverse engineering|debugger|unpack/i.test(text)) return 'malware-analysis';
@@ -448,6 +479,7 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
   const dates = htmlDates(html);
   const author = findMetaContent(html, 'author');
   const topics = classifyTopics(canonical, html).map((topic) => TOPIC_TAGS.get(topic)).filter(Boolean);
+  const subjects = subjectTags(canonical, title, html);
   const path = new URL(canonical).pathname;
   const identifier = path.match(/\/(?:actors|techniques)\/([^/]+)\//i)?.[1]?.toLowerCase();
   const sourceUrl = sourceForThreatMatrix(canonical)
@@ -474,6 +506,7 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
     summary: cleanSummary(html, title),
     tags: [...new Set([
       ...topics,
+      ...subjects,
       ...(identifier ? [identifier] : []),
       ...(author ? [`author:${author}`] : []),
       ...(collection?.id === 'collection:trainsec-library' ? ['trainsec'] : []),

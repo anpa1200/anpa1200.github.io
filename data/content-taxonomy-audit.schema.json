@@ -4,7 +4,7 @@
   "title": "1200km content taxonomy audit report",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "report_version", "generated_at", "catalog_version", "scope", "item_count", "distributions", "authored_only", "review_queues", "warnings"],
+  "required": ["$schema", "report_version", "generated_at", "catalog_version", "scope", "item_count", "distributions", "authored_only", "tagging", "review_queues", "warnings"],
   "properties": {
     "$schema": { "const": "../data/content-taxonomy-audit.schema.json" },
     "report_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
@@ -22,6 +22,18 @@
           "properties": { "item_count": { "type": "integer", "minimum": 0 } }
         }
       ]
+    },
+    "tagging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unique_tag_count", "generic_security_research_count", "underspecified_authored_count", "authored_with_author_tag", "top_tags"],
+      "properties": {
+        "unique_tag_count": { "type": "integer", "minimum": 0 },
+        "generic_security_research_count": { "type": "integer", "minimum": 0 },
+        "underspecified_authored_count": { "type": "integer", "minimum": 0 },
+        "authored_with_author_tag": { "type": "integer", "minimum": 0 },
+        "top_tags": { "$ref": "#/$defs/counts" }
+      }
     },
     "review_queues": {
       "type": "object",
