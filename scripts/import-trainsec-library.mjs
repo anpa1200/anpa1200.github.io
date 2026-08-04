@@ -406,6 +406,9 @@ if (!catalogue.includes('.toolbar button')) {
 if (!catalogue.includes('.filter-chip')) {
   catalogue = catalogue.replace('</style>', '.filter-chip{font:inherit;color:#72aaff;background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.filter-chip:hover,.filter-chip:focus-visible{color:#b7d2ff;text-decoration-color:currentColor;outline:0}.tag.filter-chip{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;text-decoration:none;font-size:.75rem}.tag.filter-chip:hover,.tag.filter-chip:focus-visible{background:#1b3c71;color:#fff}.article-meta .filter-chip{font-size:inherit}.article-kicker{display:flex;flex-wrap:wrap;align-items:center;gap:.35em}.article-card{overflow-wrap:anywhere}@media(max-width:700px){.article-grid{grid-template-columns:minmax(0,1fr);align-items:start}.article-card{height:auto !important;min-height:0;overflow:hidden}.article-card-cover{height:auto;aspect-ratio:16/9}.article-card .rights-disclaimer{margin-top:0}}</style>');
 }
+if (!catalogue.includes('trainsec-card-layout-fix')) {
+  catalogue = catalogue.replace('</head>', '<style id="trainsec-card-layout-fix">.article-grid{align-items:start;grid-auto-rows:max-content}.article-card{height:auto;min-height:430px;align-self:start;box-sizing:border-box}@media(max-width:700px){.article-card{height:auto !important;min-height:0}}</style>\n</head>');
+}
 if (!catalogue.includes('id="filter-reset"')) {
   catalogue = catalogue.replace('<span id="result-count"', '<button id="filter-search" type="button">Search</button><button id="filter-reset" type="button">Clear filters</button><span id="result-count"');
 }

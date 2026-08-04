@@ -72,6 +72,9 @@ test('TrainSec catalogue filters search metadata and reset stale browser state',
   assert.equal([...trainsecCatalogue.matchAll(/data-filter="author"/g)].length, 84);
   assert.equal([...trainsecCatalogue.matchAll(/data-filter="(?:search|tag)"/g)].length, 168);
   assert.match(trainsecCatalogue, /height:auto !important/);
+  assert.match(trainsecCatalogue, /id="trainsec-card-layout-fix"/);
+  assert.match(trainsecCatalogue, /grid-auto-rows:max-content/);
+  assert.match(read('scripts/import-trainsec-library.mjs'), /trainsec-card-layout-fix/);
   assert.match(trainsecCatalogue, /trainsec-library-filters\.js/);
   assert.match(read('assets/trainsec-library-filters.js'), /card\.dataset\.tags/);
   assert.match(read('assets/trainsec-library-filters.js'), /syncUrl/);
