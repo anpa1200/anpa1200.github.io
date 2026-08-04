@@ -68,10 +68,12 @@ test('TrainSec catalogue filters search metadata and reset stale browser state',
   assert.equal([...trainsecCatalogue.matchAll(/data-tags="[^"]*"/g)].length, 84);
   assert.match(trainsecCatalogue, /id="filter-reset"/);
   assert.match(trainsecCatalogue, /id="filter-search"/);
+  assert.match(trainsecCatalogue, /id="tag-filter"/);
   assert.equal([...trainsecCatalogue.matchAll(/data-filter="author"/g)].length, 84);
-  assert.equal([...trainsecCatalogue.matchAll(/data-filter="search"/g)].length, 168);
+  assert.equal([...trainsecCatalogue.matchAll(/data-filter="(?:search|tag)"/g)].length, 168);
   assert.match(trainsecCatalogue, /height:auto !important/);
-  assert.match(trainsecCatalogue, /const setControl=\(control,key\)=>/);
-  assert.match(trainsecCatalogue, /card\.dataset\.tags/);
-  assert.match(trainsecCatalogue, /history\.replaceState\(null,'',location\.pathname\)/);
+  assert.match(trainsecCatalogue, /trainsec-library-filters\.js/);
+  assert.match(read('assets/trainsec-library-filters.js'), /card\.dataset\.tags/);
+  assert.match(read('assets/trainsec-library-filters.js'), /syncUrl/);
+  assert.match(read('assets/trainsec-library-filters.js'), /tagValue/);
 });
