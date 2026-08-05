@@ -31,6 +31,29 @@ function ghSearch(args) {
   return runJson('gh', ['search', 'prs', ...args, '--json', 'repository,number,title,url,state,createdAt,updatedAt,closedAt']);
 }
 
+// `gh search prs --author X --limit 100` sorts by best-match/recency across ALL of the
+// author's repos before any post-filtering happens. Once the author's own repos rack up
+// more than 100 recently-updated PRs, older external PRs fall outside that window and
+// silently vanish from the count even though they still exist upstream. Excluding the
+// author's own repos in the query itself (via `-user:`) keeps the 100-item window scoped
+// to only the PRs we actually care about, no matter how active the own-repo history is.
+function ghSearchExternalPrs(stateQuery) {
+  const query = `is:pr author:anpa1200 -user:anpa1200 ${stateQuery}`;
+  const items = [];
+  for (let page = 1; ; page += 1) {
+    const result = runJson('gh', ['api', '-X', 'GET', 'search/issues', '-f', `q=${query}`, '-f', 'per_page=100', '-f', `page=${page}`]);
+    items.push(...result.items);
+    if (result.items.length < 100 || items.length >= result.total_count) break;
+  }
+  return items.map(item => ({
+    repository: { nameWithOwner: item.repository_url.replace(/^.*\/repos\//, '') },
+    number: item.number,
+    title: item.title,
+    url: item.html_url,
+    state: item.state,
+  }));
+}
+
 function ghRepo(nameWithOwner) {
   return runJson('gh', ['api', `repos/${nameWithOwner}`]);
 }
@@ -227,9 +250,9 @@ function isExternalRepo(pr) {
 }
 
 const github = {
-  open_search: ghSearch(['--author', 'anpa1200', '--state', 'open', '--limit', '100']).filter(isExternalRepo).map(pr => ghPrDetails(pr, true)),
-  merged_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--merged', '--limit', '100']).filter(isExternalRepo).map(pr => ghPrDetails(pr)),
-  closed_search: ghSearch(['--author', 'anpa1200', '--state', 'closed', '--limit', '100']).filter(isExternalRepo).map(pr => ghPrDetails(pr)),
+  open_search: ghSearchExternalPrs('is:open').filter(isExternalRepo).map(pr => ghPrDetails(pr, true)),
+  merged_search: ghSearchExternalPrs('is:closed is:merged').filter(isExternalRepo).map(pr => ghPrDetails(pr)),
+  closed_search: ghSearchExternalPrs('is:closed is:unmerged').filter(isExternalRepo).map(pr => ghPrDetails(pr)),
 };
 github.open = github.open_search.filter(pr => pr.canonical_state === 'open' && !pr.merged_at);
 github.merged = github.merged_search.filter(pr => pr.merged_at);
