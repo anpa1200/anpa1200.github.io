@@ -116,6 +116,8 @@ if (siteRoot !== sourceRoot) {
 const stable = fact('adversarygraph.stable_release').value;
 const stableTag = fact('adversarygraph.latest_release_tag').value;
 const sourceRelease = fact('adversarygraph.current_source_release').value;
+const acceptedExternalText = `Accepted external contributions: **${fact('contributions.accepted_external').value}**`;
+const openExternalText = `Open external submissions: **${fact('contributions.open_external').value}**`;
 const sourceVersion = String(sourceRelease).replace(/^v/, '');
 const sourceCommit = fact('adversarygraph.current_source_commit').value;
 if (stableTag !== `v${stable}`) fail('Stable release and latest release tag disagree.');
@@ -346,7 +348,7 @@ const textSurfaceRequirements = new Map([
   ['index.md', [sourceRelease, stableTag, 'data/site-facts.json']],
   ['projects.md', [sourceRelease, stableTag, 'Threat Matrix', 'ThreatMapper']],
   ['adversarygraph.md', [sourceRelease, stableTag, 'data/site-facts.json']],
-  ['llms.txt', [sourceRelease, stableTag, 'Accepted external contributions: **8**', 'Open external submissions: **31**']],
+  ['llms.txt', [sourceRelease, stableTag, acceptedExternalText, openExternalText]],
   ['llms-full.txt', [sourceRelease, stableTag, 'Threat Matrix']],
   ['agent-index.md', [sourceRelease, stableTag, 'data/site-facts.json']],
   ['adversarygraph-docs/index.md', [`Current source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
