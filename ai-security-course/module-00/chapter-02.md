@@ -3,7 +3,7 @@ title: "AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Da
 description: "Data, features, labels, parameters, hyperparameters, training, validation, testing, inference, and CTI evidence for AI security."
 module: "00"
 chapter: "2"
-status: "Published companion / course under construction"
+status: "Complete"
 canonical: "https://1200km.com/ai-security-course/module-00/chapter-02.html"
 medium: "https://medium.com/@1200km/ai-security-course-module-00-chapter-2-69381c74a59c?postPublishedType=repub"
 author: "Andrey Pautov"
@@ -11,9 +11,20 @@ author: "Andrey Pautov"
 
 # AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data
 
-> **Published companion / under construction:** This course chapter is published as a companion to the [Medium article](https://medium.com/@1200km/ai-security-course-module-00-chapter-2-69381c74a59c?postPublishedType=repub), but remains part of a course under construction. The syllabus, examples, references, exercises, and terminology may change during creation and pilot delivery. The Medium publication remains the source version for this chapter.
+> **Chapter status: Complete.** This learner-ready chapter was finalized on 5 August 2026. The [Medium article](https://medium.com/@1200km/ai-security-course-module-00-chapter-2-69381c74a59c?postPublishedType=repub) is the original companion publication; this page is the canonical course version and includes the assessed exercise and completion rubric.
 
 Data, features, labels, parameters, hyperparameters, training, validation, testing, and inference are different security objects. This chapter turns that vocabulary into an evidence-preserving workflow for AI security engineering.
+
+## Learning objectives
+
+After completing this chapter, you will be able to:
+
+1. distinguish data, features, labels, learned parameters, training hyperparameters, deployment configuration, and inference evidence;
+2. trace how provenance, authorization, integrity, and retention requirements change as the same content moves through an AI lifecycle;
+3. explain how poisoning, evasion, leakage, parser mismatch, and configuration drift can change an outcome without changing the base model;
+4. separate training, validation, held-out testing, and operational monitoring evidence;
+5. build an evidence graph that links a security-relevant output to its inputs, transformations, artifact, configuration, identity, policy decision, and downstream action; and
+6. write a bounded incident hypothesis that separates observations, reproductions, inferences, and unknowns.
 
 ## Table of contents
 
@@ -295,11 +306,12 @@ An attacker does not need to “hack the neural network” to influence the outc
 | Features | Domain age, URL tokens, authentication results | Did parsing and normalization match the evaluated pipeline? |
 | Labels | `phishing`, `benign`, analyst confidence | Was the disposition independently reviewed? |
 | Parameters | Classifier weights and normalization statistics | Does the digest match the approved checkpoint? |
-| Hyperparameters | Threshold, feature window, regularization | Which configuration turned the score into action? |
+| Training hyperparameters | Learning rate, regularization, feature window | Which training configuration produced the approved checkpoint? |
+| Deployment configuration | Decision threshold, parser version, policy route | Which release configuration turned the score into action? |
 | Evaluation | Later campaigns and held-out senders | Was the test set independent and representative? |
 | Inference | Score, decision, quarantine event | Which identity and policy produced the side effect? |
 
-NIST describes poisoning attacks as interference during training, including malicious data or changes to the training process. MITRE ATLAS maps the behavior to techniques such as [Poison Training Data](https://atlas.mitre.org/techniques/AML.T0020). These references help an analyst name the behavior, but a defensible case still needs the local data manifest, label history, model digest, configuration, and event timeline.
+NIST describes poisoning attacks as interference during training, including malicious data or changes to the training process. MITRE ATLAS maps the behavior to techniques such as Poison Training Data (`AML.T0020`) in its [official ATLAS dataset](https://github.com/mitre-atlas/atlas-data/blob/main/dist/ATLAS.yaml). These references help an analyst name the behavior, but a defensible case still needs the local data manifest, label history, model digest, configuration, and event timeline.
 
 > **Evidence standard:** Report what is observed, what is reproduced, what is inferred, and what remains unknown. A research demonstration of poisoning is not automatically a confirmed intrusion. A provider report of abuse is not automatically evidence that your tenant was affected.
 
@@ -317,7 +329,8 @@ The terms become useful when they assign ownership and a control point.
 | Features | Schema, canonicalization, parser parity, drift monitoring | Extraction version, statistics, pre/post samples, alerts |
 | Labels | Policy, reviewer separation, confidence, correction workflow | Label event, annotator, disagreement, adjudication |
 | Parameters | Signing, registry controls, loader isolation, rollback | Digest, signature, parent, adapter, loader, approval |
-| Hyperparameters | Versioned configuration, review, change detection | Threshold, prompt, route, retrieval, decoding settings |
+| Training hyperparameters | Versioned experiment configuration, review, reproducibility | Learning rate, optimizer, regularization, batch size, seed |
+| Deployment configuration | Versioned release policy, review, change detection | Threshold, prompt, route, retrieval, decoding, tool settings |
 | Training | Isolated builds, pinned dependencies, least privilege | Code, lockfile, runner identity, seed, logs, checkpoints |
 | Validation/testing | Immutable manifests, leakage checks, adversarial cases | Split rule, test hash, metrics, evaluator, exceptions |
 | Inference | Authentication, authorization, output validation, bounded effects | Caller, tenant, context IDs, policy result, side effect |
@@ -336,11 +349,40 @@ Choose one AI system you can inspect safely: a local classifier, a RAG demo, or 
 
 *Figure 19 — The exercise turns the chapter vocabulary into a traceable analyst workflow.*
 
-1. Draw the request and learning lifecycle from source data to downstream action.
-2. Inventory one example of data, feature, label, parameter, hyperparameter, training run, validation decision, test result, and inference event.
+### Required deliverables
+
+Submit one concise evidence pack containing:
+
+1. A lifecycle diagram from source data to downstream action, including feedback or retraining where applicable.
+2. An inventory with at least one example of data, feature, label, learned parameter or model artifact, training hyperparameter, deployment configuration, training run, validation decision, held-out test result, and inference event.
 3. Assign an owner, access rule, integrity control, retention decision, and evidence source to each object.
 4. Describe one poisoning, evasion, leakage, or configuration-drift path and the deterministic control that limits it.
 5. Write a one-paragraph incident hypothesis with separate observed facts, reproductions, inferences, and unknowns.
+
+### Answer framework
+
+A strong submission does not need to prove an intrusion. It should make each conclusion testable:
+
+- **Observed:** identify the exact event, timestamp, identity or tenant, input identifier, output or action, and evidence source.
+- **Reproduced:** state the controlled conditions, artifact digest, parser or tokenizer version, deployment configuration, and whether the result repeated.
+- **Inferred:** name the most likely explanation, competing explanations, confidence, and the evidence supporting the judgment.
+- **Unknown:** list the missing artifact or telemetry and the collection step that would resolve the gap.
+- **Control test:** identify a deterministic control, the expected deny/allow behavior, and the event that proves the control operated.
+
+For example, a changed phishing decision is an observation. It does not establish model tampering. The investigation should compare the message and feature representation, model digest, training record, parser version, decision threshold, policy route, and prior known-good inference before attributing the change.
+
+### Assessment rubric
+
+| Criterion | Points | Full-credit standard |
+|---|---:|---|
+| Scope and safe execution | 10 | Names the authorized system and avoids confidential or third-party data. |
+| Lifecycle and trust boundaries | 20 | Shows the request, learning/evaluation path, identities, policy decision, downstream action, and feedback path. |
+| Security-object inventory | 20 | Correctly separates all required objects and records stable identifiers or versions. |
+| Ownership, controls, and evidence | 20 | Assigns an owner, access rule, integrity control, retention decision, and usable evidence source to every object. |
+| Threat path and deterministic control | 15 | Describes prerequisites, influence path, affected decision, bounded impact, control, and observable test. |
+| Incident hypothesis and uncertainty | 15 | Clearly separates observations, reproductions, inferences, competing explanations, unknowns, and confidence. |
+
+**Passing standard:** 70/100, with at least half credit in every criterion. Revise any submission that treats a model output as authorization, labels an unverified report as ground truth, or claims model compromise without comparing the artifact and release configuration.
 
 You have completed this chapter when you can explain why a changed prediction does not automatically imply a changed model, and when you can identify the artifact and evidence needed to test each alternative explanation.
 
@@ -358,11 +400,11 @@ You have completed this chapter when you can explain why a changed prediction do
 - [NIST AI 100-2 E2025 — Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations](https://csrc.nist.gov/pubs/ai/100/2/e2025/final)
 - [NIST AI 100-3 — The Language of Trustworthy AI](https://doi.org/10.6028/NIST.AI.100-3)
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)
-- [MITRE ATLAS AML.T0020 — Poison Training Data](https://atlas.mitre.org/techniques/AML.T0020)
+- [MITRE ATLAS dataset — AML.T0020 Poison Training Data](https://github.com/mitre-atlas/atlas-data/blob/main/dist/ATLAS.yaml)
 - [Google Cloud — Monitor models for training-serving skew](https://cloud.google.com/blog/topics/developers-practitioners/monitor-models-training-serving-skew-vertex-ai)
 - [Google Machine Learning Crash Course — Overfitting and generalization](https://developers.google.com/machine-learning/crash-course/overfitting/)
 - [JFrog Security Research — Malicious Hugging Face ML Models](https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/)
-- [Mithril Security — PoisonGPT demonstration](https://www.mithrilsecurity.io/blog/poisongpt-how-we-hid-a-lobotomized-llm-on-hugging-face-to-spread-fake-news) (research case, not a confirmed campaign)
+- [Mithril Security — PoisonGPT demonstration](https://blog.mithrilsecurity.io/poisongpt-how-we-hid-a-lobotomized-llm-on-hugging-face-to-spread-fake-news/) (research case, not a confirmed campaign)
 - [Lewis et al. — Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://arxiv.org/abs/2005.11401)
 
 ## What comes next
@@ -371,6 +413,6 @@ You have completed this chapter when you can explain why a changed prediction do
 
 ---
 
-**AI Security Engineering Course — under construction.** The syllabus, examples, references, labs, and assessment criteria may change during creation.
+**Chapter 2 status: complete.** Finalized 5 August 2026 as a learner-ready chapter with an assessed analyst exercise.
 
 [1200km.com](https://1200km.com) · [Main course article on Medium](https://medium.com/@1200km/im-building-an-ai-security-engineering-course-55e29e6c035e)

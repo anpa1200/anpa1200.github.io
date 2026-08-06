@@ -98,7 +98,7 @@
         "headline": "AI Security Course, Module 00 — Chapter 2: How Learning Systems Use Data",
         "description": "The published Chapter 2 foundation for AI security: data, model artifacts, lifecycle evidence, and adversarial machine-learning research.",
         "url": "https://1200km.com/ai-security-course/module-00/chapter-02.html",
-        "dateModified": "2026-08-02",
+        "dateModified": "2026-08-05",
         "author": { "@type": "Person", "name": "Andrey Pautov", "url": "https://1200km.com/" },
         "isPartOf": { "@type": "Course", "name": "AI Security Engineering: From Models to Agentic Systems", "url": "https://1200km.com/ai-security-course.html" },
         "inLanguage": "en"
@@ -119,8 +119,8 @@
         <p class="eyebrow"><a href="/ai-security-course.html">AI Security Engineering</a> / Module 00 / Chapter 2</p>
         <h1>How Learning Systems Use Data</h1>
         <p class="lead">Data, features, labels, parameters, hyperparameters, training, validation, testing, and inference are different security objects. This published chapter turns that vocabulary into an evidence-preserving workflow for AI security engineering.</p>
-        <aside class="notice" role="status" aria-label="Chapter development status"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Under construction</strong><p>This course chapter is published as a companion to the Medium article, but remains part of a course under construction. The syllabus, examples, references, exercises, and terminology may change during creation and pilot delivery. The original publication remains the source version for this chapter.</p></div></aside>
-        <div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 2</span><span class="pill">Published companion</span><span class="pill">CTI evidence base</span></div>
+        <aside class="notice" role="status" aria-label="Chapter completion status"><span class="notice-icon" aria-hidden="true">✓</span><div><strong>Chapter complete</strong><p>This learner-ready chapter was finalized on 5 August 2026. The Medium article is the original companion publication; this page is the canonical course version and includes the assessed exercise and completion rubric.</p></div></aside>
+        <div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 2</span><span class="pill">Complete</span><span class="pill">CTI evidence base</span></div>
         <div class="actions"><a class="button primary" href="/ai-security-course/module-00.html">← Module 00</a><a class="button" href="https://medium.com/@1200km/ai-security-course-module-00-chapter-2-69381c74a59c?postPublishedType=repub" target="_blank" rel="noopener noreferrer">Read on Medium ↗</a><a class="button" href="/ai-security-course/module-00/chapter-01.html">Chapter 1</a><a class="button" href="/ai-security-course.html">Course syllabus</a><a class="button" href="/ai-security-course/glossary.html">Terminology dictionary</a></div>
       </div>
     </div>
@@ -142,6 +142,8 @@
   → telemetry, feedback, drift, and the next data version</pre>
         <blockquote><strong>Course rule:</strong> treat every data copy, model artifact, configuration value, and decision as an identifiable security object. If it cannot be named and versioned, it cannot be reliably investigated.</blockquote>
       </section>
+
+      <section id="learning-objectives" class="prose"><h2>Learning objectives</h2><p>After completing this chapter, you will be able to:</p><ol><li>distinguish data, features, labels, learned parameters, training hyperparameters, deployment configuration, and inference evidence;</li><li>trace how provenance, authorization, integrity, and retention requirements change as the same content moves through an AI lifecycle;</li><li>explain how poisoning, evasion, leakage, parser mismatch, and configuration drift can change an outcome without changing the base model;</li><li>separate training, validation, held-out testing, and operational monitoring evidence;</li><li>build an evidence graph linking an output to its inputs, transformations, artifact, configuration, identity, policy decision, and downstream action; and</li><li>write a bounded incident hypothesis that separates observations, reproductions, inferences, and unknowns.</li></ol></section>
 
       <section aria-labelledby="contents-title">
         <h2 id="contents-title">Table of contents</h2>
@@ -322,11 +324,11 @@
           <tr><td>Features</td><td>Domain age, URL tokens, authentication results</td><td>Did parsing and normalization match the evaluated pipeline?</td></tr>
           <tr><td>Labels</td><td><code>phishing</code>, <code>benign</code>, analyst confidence</td><td>Was the disposition independently reviewed?</td></tr>
           <tr><td>Parameters</td><td>Classifier weights and normalization statistics</td><td>Does the digest match the approved checkpoint?</td></tr>
-          <tr><td>Hyperparameters</td><td>Threshold, feature window, regularization</td><td>Which configuration turned the score into action?</td></tr>
+          <tr><td>Training hyperparameters</td><td>Learning rate, regularization, feature window</td><td>Which training configuration produced the approved checkpoint?</td></tr><tr><td>Deployment configuration</td><td>Decision threshold, parser version, policy route</td><td>Which release configuration turned the score into action?</td></tr>
           <tr><td>Evaluation</td><td>Later campaigns and held-out senders</td><td>Was the test set independent and representative?</td></tr>
           <tr><td>Inference</td><td>Score, decision, quarantine event</td><td>Which identity and policy produced the side effect?</td></tr>
         </tbody></table>
-        <p>NIST describes poisoning attacks as interference during training, including malicious data or changes to the training process. MITRE ATLAS maps the behavior to techniques such as <a href="https://atlas.mitre.org/techniques/AML.T0020" target="_blank" rel="noopener noreferrer">Poison Training Data</a>. These references help an analyst name the behavior, but a defensible case still needs the local data manifest, label history, model digest, configuration, and event timeline.</p>
+        <p>NIST describes poisoning attacks as interference during training, including malicious data or changes to the training process. MITRE ATLAS maps the behavior to techniques such as Poison Training Data (<code>AML.T0020</code>) in its <a href="https://github.com/mitre-atlas/atlas-data/blob/main/dist/ATLAS.yaml" target="_blank" rel="noopener noreferrer">official ATLAS dataset</a>. These references help an analyst name the behavior, but a defensible case still needs the local data manifest, label history, model digest, configuration, and event timeline.</p>
         <p><strong>Evidence standard:</strong> report what is observed, what is reproduced, what is inferred, and what remains unknown. A research demonstration of poisoning is not automatically a confirmed intrusion. A provider report of abuse is not automatically evidence that your tenant was affected.</p>
       </section>
 
@@ -339,7 +341,7 @@
           <tr><td>Features</td><td>Schema, canonicalization, parser parity, drift monitoring</td><td>Extraction version, statistics, pre/post samples, alerts</td></tr>
           <tr><td>Labels</td><td>Policy, reviewer separation, confidence, correction workflow</td><td>Label event, annotator, disagreement, adjudication</td></tr>
           <tr><td>Parameters</td><td>Signing, registry controls, loader isolation, rollback</td><td>Digest, signature, parent, adapter, loader, approval</td></tr>
-          <tr><td>Hyperparameters</td><td>Versioned configuration, review, change detection</td><td>Threshold, prompt, route, retrieval, decoding settings</td></tr>
+          <tr><td>Training hyperparameters</td><td>Versioned experiment configuration, review, reproducibility</td><td>Learning rate, optimizer, regularization, batch size, seed</td></tr><tr><td>Deployment configuration</td><td>Versioned release policy, review, change detection</td><td>Threshold, prompt, route, retrieval, decoding, tool settings</td></tr>
           <tr><td>Training</td><td>Isolated builds, pinned dependencies, least privilege</td><td>Code, lockfile, runner identity, seed, logs, checkpoints</td></tr>
           <tr><td>Validation/testing</td><td>Immutable manifests, leakage checks, adversarial cases</td><td>Split rule, test hash, metrics, evaluator, exceptions</td></tr>
           <tr><td>Inference</td><td>Authentication, authorization, output validation, bounded effects</td><td>Caller, tenant, context IDs, policy result, side effect</td></tr>
@@ -352,13 +354,15 @@
         <h2>12. Analyst exercise and completion criteria</h2>
         <p>Choose one AI system you can inspect safely: a local classifier, a RAG demo, or a course-owned LLM application. Do not upload confidential data or test a system without authorization.</p>
         <figure class="inline-media"><img src="/ai-security-course/assets/chapter-02/18-exercise.png" alt="Analyst exercise workflow for tracing an AI system, inventorying artifacts, assigning controls, and writing an evidence-based hypothesis" width="1400" height="788" loading="lazy" /><figcaption>Figure 19 — The exercise turns the chapter vocabulary into a traceable analyst workflow. <a href="/ai-security-course/assets/chapter-02/18-exercise.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
-        <ol>
-          <li>Draw the request and learning lifecycle from source data to downstream action.</li>
-          <li>Inventory one example of data, feature, label, parameter, hyperparameter, training run, validation decision, test result, and inference event.</li>
+        <h3>Required deliverables</h3><p>Submit one concise evidence pack containing:</p><ol>
+          <li>A lifecycle diagram from source data to downstream action, including feedback or retraining where applicable.</li>
+          <li>An inventory with at least one example of data, feature, label, learned parameter or model artifact, training hyperparameter, deployment configuration, training run, validation decision, held-out test result, and inference event.</li>
           <li>Assign an owner, access rule, integrity control, retention decision, and evidence source to each object.</li>
           <li>Describe one poisoning, evasion, leakage, or configuration-drift path and the deterministic control that limits it.</li>
           <li>Write a one-paragraph incident hypothesis with separate observed facts, reproductions, inferences, and unknowns.</li>
         </ol>
+        <h3>Answer framework</h3><p>A strong submission does not need to prove an intrusion. It should make each conclusion testable:</p><ul><li><strong>Observed:</strong> identify the exact event, timestamp, identity or tenant, input identifier, output or action, and evidence source.</li><li><strong>Reproduced:</strong> state the controlled conditions, artifact digest, parser or tokenizer version, deployment configuration, and whether the result repeated.</li><li><strong>Inferred:</strong> name the most likely explanation, competing explanations, confidence, and the evidence supporting the judgment.</li><li><strong>Unknown:</strong> list the missing artifact or telemetry and the collection step that would resolve the gap.</li><li><strong>Control test:</strong> identify a deterministic control, the expected deny/allow behavior, and the event that proves the control operated.</li></ul><p>For example, a changed phishing decision is an observation. It does not establish model tampering. Compare the message and feature representation, model digest, training record, parser version, decision threshold, policy route, and prior known-good inference before attributing the change.</p>
+        <h3>Assessment rubric</h3><table class="data-table"><thead><tr><th>Criterion</th><th>Points</th><th>Full-credit standard</th></tr></thead><tbody><tr><td>Scope and safe execution</td><td>10</td><td>Names the authorized system and avoids confidential or third-party data.</td></tr><tr><td>Lifecycle and trust boundaries</td><td>20</td><td>Shows the request, learning/evaluation path, identities, policy decision, downstream action, and feedback path.</td></tr><tr><td>Security-object inventory</td><td>20</td><td>Correctly separates all required objects and records stable identifiers or versions.</td></tr><tr><td>Ownership, controls, and evidence</td><td>20</td><td>Assigns an owner, access rule, integrity control, retention decision, and usable evidence source to every object.</td></tr><tr><td>Threat path and deterministic control</td><td>15</td><td>Describes prerequisites, influence path, affected decision, bounded impact, control, and observable test.</td></tr><tr><td>Incident hypothesis and uncertainty</td><td>15</td><td>Clearly separates observations, reproductions, inferences, competing explanations, unknowns, and confidence.</td></tr></tbody></table><p><strong>Passing standard:</strong> 70/100, with at least half credit in every criterion. Revise any submission that treats a model output as authorization, labels an unverified report as ground truth, or claims model compromise without comparing the artifact and release configuration.</p>
         <p>You have completed this chapter when you can explain why a changed prediction does not automatically imply a changed model, and when you can identify the artifact and evidence needed to test each alternative explanation.</p>
       </section>
 
@@ -380,11 +384,11 @@
           <li><a href="https://csrc.nist.gov/pubs/ai/100/2/e2025/final" target="_blank" rel="noopener noreferrer">NIST AI 100-2 E2025 — Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations</a></li>
           <li><a href="https://doi.org/10.6028/NIST.AI.100-3" target="_blank" rel="noopener noreferrer">NIST AI 100-3 — The Language of Trustworthy AI</a></li>
           <li><a href="https://atlas.mitre.org/" target="_blank" rel="noopener noreferrer">MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems</a></li>
-          <li><a href="https://atlas.mitre.org/techniques/AML.T0020" target="_blank" rel="noopener noreferrer">MITRE ATLAS AML.T0020 — Poison Training Data</a></li>
+          <li><a href="https://github.com/mitre-atlas/atlas-data/blob/main/dist/ATLAS.yaml" target="_blank" rel="noopener noreferrer">MITRE ATLAS dataset — AML.T0020 Poison Training Data</a></li>
           <li><a href="https://cloud.google.com/blog/topics/developers-practitioners/monitor-models-training-serving-skew-vertex-ai" target="_blank" rel="noopener noreferrer">Google Cloud — Monitor models for training-serving skew</a></li>
           <li><a href="https://developers.google.com/machine-learning/crash-course/overfitting/" target="_blank" rel="noopener noreferrer">Google Machine Learning Crash Course — Overfitting and generalization</a></li>
           <li><a href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/" target="_blank" rel="noopener noreferrer">JFrog Security Research — Malicious Hugging Face ML Models</a></li>
-          <li><a href="https://www.mithrilsecurity.io/blog/poisongpt-how-we-hid-a-lobotomized-llm-on-hugging-face-to-spread-fake-news" target="_blank" rel="noopener noreferrer">Mithril Security — PoisonGPT demonstration (research case, not a confirmed campaign)</a></li>
+          <li><a href="https://blog.mithrilsecurity.io/poisongpt-how-we-hid-a-lobotomized-llm-on-hugging-face-to-spread-fake-news/" target="_blank" rel="noopener noreferrer">Mithril Security — PoisonGPT demonstration (research case, not a confirmed campaign)</a></li>
           <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener noreferrer">Lewis et al. — Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a></li>
         </ul>
       </section>
@@ -395,6 +399,6 @@
       </section>
     </main>
 
-    <footer><div class="wrap"><p><strong>AI Security Engineering Course — under construction.</strong> The syllabus, examples, references, labs, and assessment criteria may change during creation. <a href="https://1200km.com">1200km.com</a> · <a href="https://medium.com/@1200km/im-building-an-ai-security-engineering-course-55e29e6c035e" target="_blank" rel="noopener noreferrer">Main course article on Medium ↗</a> · <a href="/ai-security-course/module-00.html">Module 00</a> · <a href="#top">Back to top ↑</a></p></div></footer>
+    <footer><div class="wrap"><p><strong>Chapter 2 status: complete.</strong> Finalized 5 August 2026 as a learner-ready chapter with an assessed analyst exercise. <a href="https://1200km.com">1200km.com</a> · <a href="https://medium.com/@1200km/im-building-an-ai-security-engineering-course-55e29e6c035e" target="_blank" rel="noopener noreferrer">Main course article on Medium ↗</a> · <a href="/ai-security-course/module-00.html">Module 00</a> · <a href="#top">Back to top ↑</a></p></div></footer>
   </body>
 </html>
