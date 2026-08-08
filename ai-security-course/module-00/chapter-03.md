@@ -168,7 +168,7 @@ An **optimizer** is an update rule that uses gradients to change parameters. **S
 
 ![The training loop from forward pass through loss, backward pass, parameter update, and the evidence to retain at each step.](/ai-security-course/assets/chapter-03/06-training-loop.png)
 
-*Figure 4 — Forward, loss, backward, and update steps, with the evidence to retain at each stage. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/04-training-loop.png)*
+*Figure 4 — Forward, loss, backward, and update steps, with the evidence to retain at each stage. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/06-training-loop.png)*
 
 ```text
 dataset manifest + code + configuration
@@ -185,7 +185,7 @@ Optimization is a build process. Treat the runner, dependencies, manifest, confi
 
 ![Optimization as a software build pipeline with supply-chain control points.](/ai-security-course/assets/chapter-03/07-optimization-build.png)
 
-*Figure 5 — Optimization as a software build pipeline with supply-chain control points. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/05-optimization-build.png)*
+*Figure 5 — Optimization as a software build pipeline with supply-chain control points. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/07-optimization-build.png)*
 
 | Setting | What it changes | Evidence to retain |
 |---|---|---|
@@ -250,7 +250,7 @@ An evasion or extraction result is not meaningful without an access level. **Whi
 
 ![The four attacker access levels, their required knowledge, and the budgets needed to make a claim falsifiable.](/ai-security-course/assets/chapter-03/12-attacker-access.png)
 
-*Figure 6 — White-box, gray-box, black-box query, and transfer-from-surrogate access levels with their required knowledge and budgets. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/06-attacker-access.png)*
+*Figure 6 — White-box, gray-box, black-box query, and transfer-from-surrogate access levels with their required knowledge and budgets. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/12-attacker-access.png)*
 
 A **perturbation budget** is the permitted change to an input, expressed by a stated norm or a real-world constraint such as preserving a valid file and its function. A **query budget** is the maximum number of probes available to an attacker with query access. These budgets make a robustness claim falsifiable: a result under unlimited, unlogged queries is not equivalent to a result under a rate-limited production identity.
 
@@ -278,7 +278,7 @@ The problem-space and feature-space distinction is especially important for malw
 
 ![A semantically trivial file change producing a large feature-space movement, with realizability constraints.](/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png)
 
-*Figure 7 — Problem-space versus feature-space changes, including functionality, file-format, and realizability constraints. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/07-problem-vs-feature-space.png)*
+*Figure 7 — Problem-space versus feature-space changes, including functionality, file-format, and realizability constraints. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png)*
 
 **Security consequence:** Ask whether the change can be applied to the real artifact while preserving its purpose. Record input hash, transformation, access level, both budgets, artifact digest, and consequence; do not generalize an image-space result to malware without problem-space validation.
 
@@ -353,7 +353,7 @@ The researchers analyzed the CylancePROTECT engine and model using publicly avai
 
 ![The AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and evidence-ladder classification.](/ai-security-course/assets/chapter-03/19-cylance-case.png)
 
-*Figure 8 — AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and where each claim sits on the evidence ladder. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/08-cylance-case.png)*
+*Figure 8 — AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and where each claim sits on the evidence ladder. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/19-cylance-case.png)*
 
 ### Why gradients were never needed
 
