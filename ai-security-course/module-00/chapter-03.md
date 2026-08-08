@@ -3,25 +3,29 @@ title: "AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimiz
 description: "A CTI-grounded foundation for neural-network computation, optimization, reproducibility, attacker access, adversarial examples, robustness evaluation, poisoning, backdoors, inference attacks, and defensible AI security evidence."
 module: "00"
 chapter: "3"
-status: "Under construction"
+status: "Published"
 canonical: "https://1200km.com/ai-security-course/module-00/chapter-03.html"
+medium: "https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6"
+published: "2026-08-08"
 author: "Andrey Pautov"
 ---
 
 <a id="top"></a>
 [AI Security Engineering](https://1200km.com/ai-security-course.html) / [Module 00](https://1200km.com/ai-security-course/module-00.html) / Chapter 3
 
-**Module 00** · **Chapter 3** · **Published companion placeholder** · **CTI evidence base**
+**Module 00** · **Chapter 3** · **Published** · **CTI evidence base**
 
 Navigation: [Module 00](https://1200km.com/ai-security-course/module-00.html) · [Chapter 2](https://1200km.com/ai-security-course/module-00/chapter-02.html) · [Course syllabus](https://1200km.com/ai-security-course.html) · [Terminology dictionary](https://1200km.com/ai-security-course/glossary.html)
 
-Medium companion: *To be linked when this chapter is published.*
+Medium companion: [Read the original publication](https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6).
 
 # AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization
 
-> **Under construction:** This course chapter is a working draft. The syllabus, examples, references, exercises, and terminology may change during creation and pilot delivery. A published companion article will be linked here when available.
+> **Chapter status: Published.** This learner-ready chapter was published on 8 August 2026. The Medium article is the original companion publication; this page is the canonical course version with locally preserved visuals, cross-links, and the assessed analyst exercise.
 
 This chapter explains neural-network computation, optimization, reproducibility, attacker access, adversarial claims, and defensible evidence for security practitioners without a calculus prerequisite.
+
+![AI Security Course Chapter 3 cover: Neural Networks and Optimization for security practitioners](/ai-security-course/assets/chapter-03/00-cover.png)
 
 ## Table of contents
 
@@ -51,7 +55,7 @@ Security teams do not need calculus, but they do need a causal model of changed 
 
 During incident response, a changed output may result from a modified input, parser, tokenizer, checkpoint, adapter, threshold, random seed, library, or serving route. A score is evidence for a policy decision, never the policy or an authorization. Ask which observable component changed and what evidence connects it to the outcome.
 
-![The full Chapter 3 arc from an input tensor through layers, loss, gradients, optimization, a released artifact, inference, downstream policy, and evidence.](https://1200km.com/ai-security-course/assets/chapter-03/01-overview.png)
+![The full Chapter 3 arc from an input tensor through layers, loss, gradients, optimization, a released artifact, inference, downstream policy, and evidence.](/ai-security-course/assets/chapter-03/01-overview.png)
 
 <!-- Open Graph image candidate: https://1200km.com/ai-security-course/assets/chapter-03/01-overview.png -->
 
@@ -80,7 +84,7 @@ Training and inference are different paths. Loss, gradients, and updates normall
 
 An **architecture** is the ordered computation graph specifying layers, connections, and operations. **Parameters** are learned numeric values, such as weights and biases. **Activations** are intermediate values for one input. **Gradients** describe how an objective changes when a parameter or input changes.
 
-![Architecture, parameters, activations, gradients, artifacts, and dependencies as distinct security objects.](https://1200km.com/ai-security-course/assets/chapter-03/02-security-objects.png)
+![Architecture, parameters, activations, gradients, artifacts, and dependencies as distinct security objects.](/ai-security-course/assets/chapter-03/02-security-objects.png)
 
 *Figure 2 — Architecture, parameters, activations, gradients, artifacts, and dependencies are distinct security objects. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/02-security-objects.png)*
 
@@ -116,7 +120,7 @@ a = activation(z)
 
 Convolutional networks apply local filters, recurrent networks carry state through a sequence, and Transformer blocks combine attention with feed-forward transformations. Whatever the architecture, ask which input, operations, parameters, and post-processing produced the output.
 
-![One layer's computation and the places where preprocessing, dtype, and normalization can silently diverge.](https://1200km.com/ai-security-course/assets/chapter-03/03-forward-pass.png)
+![One layer's computation and the places where preprocessing, dtype, and normalization can silently diverge.](/ai-security-course/assets/chapter-03/03-forward-pass.png)
 
 *Figure 3 — One layer's computation and where preprocessing, dtype, and normalization can silently diverge. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/03-forward-pass.png)*
 
@@ -128,6 +132,8 @@ Capture a minimal request fixture and run it against the approved artifact. Comp
 ## 4. Loss functions and objectives
 
 A **loss function** turns a prediction and a target into a number that training tries to minimize. Cross-entropy is common for classification, mean-squared error is common for regression, and ranking or contrastive objectives are common for retrieval and representation learning. The objective is selected by people and code; it is not a neutral description of risk.
+
+![Loss functions, objectives, class weighting, thresholds, and their security questions.](/ai-security-course/assets/chapter-03/04-loss-objectives.png)
 
 Class weights, focal loss, label smoothing, data filtering, reward models, and safety penalties change which errors receive attention. A security team should ask who chose the objective, which examples had the greatest influence, what cost function was used, and whether safety and abuse outcomes were measured separately from task performance.
 
@@ -142,6 +148,8 @@ Class weights, focal loss, label smoothing, data filtering, reward models, and s
 ## 5. Gradients and backpropagation
 
 **Backpropagation** is the procedure that sends the loss signal backward through the computation graph to compute gradients for the parameters. A gradient is information about local sensitivity, not an attacker by itself. During training, the optimizer uses these values to decide how to update parameters; during an authorized white-box evaluation, an analyst may use input gradients to search for an evasion condition.
+
+![Forward computation, backward gradient propagation, and parameter updates.](/ai-security-course/assets/chapter-03/05-backpropagation.png)
 
 ```text
 forward:  input → activations → loss
@@ -158,7 +166,7 @@ Exploding gradients, vanishing gradients, saturated activations, or unstable los
 
 An **optimizer** is an update rule that uses gradients to change parameters. **Stochastic gradient descent (SGD)** estimates an update from a batch; momentum smooths updates; Adam adapts step sizes. A **learning rate** is the scale of an update. Batch size, epochs, schedule, weight decay, initialization, and seed can change the artifact.
 
-![The training loop from forward pass through loss, backward pass, parameter update, and the evidence to retain at each step.](https://1200km.com/ai-security-course/assets/chapter-03/04-training-loop.png)
+![The training loop from forward pass through loss, backward pass, parameter update, and the evidence to retain at each step.](/ai-security-course/assets/chapter-03/06-training-loop.png)
 
 *Figure 4 — Forward, loss, backward, and update steps, with the evidence to retain at each stage. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/04-training-loop.png)*
 
@@ -175,7 +183,7 @@ dataset manifest + code + configuration
 
 Optimization is a build process. Treat the runner, dependencies, manifest, configuration, logs, checkpoint, and release approval as one supply chain. A model digest without build context cannot fully explain behavior.
 
-![Optimization as a software build pipeline with supply-chain control points.](https://1200km.com/ai-security-course/assets/chapter-03/05-optimization-build.png)
+![Optimization as a software build pipeline with supply-chain control points.](/ai-security-course/assets/chapter-03/07-optimization-build.png)
 
 *Figure 5 — Optimization as a software build pipeline with supply-chain control points. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/05-optimization-build.png)*
 
@@ -194,9 +202,13 @@ Optimization is a build process. Treat the runner, dependencies, manifest, confi
 
 **Generalization** is performance on conditions not used to fit or repeatedly tune the model. **Overfitting** occurs when a model learns training-specific patterns that do not transfer. **Underfitting** occurs when it has not captured enough useful structure. **Regularization** is a constraint or training choice intended to improve generalization, such as weight decay, dropout, augmentation, label smoothing, or early stopping.
 
+![Generalization, overfitting, underfitting, regularization, and their security implications.](/ai-security-course/assets/chapter-03/08-generalization.png)
+
 Regularization can reduce ordinary overfitting, but it is not a security guarantee. A backdoor can remain hidden because its trigger-to-target association costs almost nothing in clean-set accuracy; standard validation then has little signal to detect it. That is a property of model capacity and evaluation design, not ordinary overfitting. An evasion gap can likewise arise from a deployment/threat-model mismatch, not simply underfitting.
 
 **Distribution shift** is already defined in Module 00 and Chapter 2 as a difference between development and deployment conditions. **Concept drift** is when the relationship between an input and its target changes over time, such as a new malware family using features absent from the training corpus or a changed label policy.
+
+![Drift-monitoring evidence across slices, time windows, campaign families, parsers, and high-cost errors.](/ai-security-course/assets/chapter-03/09-drift-monitoring.png)
 
 **Security consequence:** Monitor slices, time windows, campaign families, parser versions, abstentions, and high-cost errors. A clean validation score can coexist with a new deployment condition, a concealed trigger, or a changed label policy.
 
@@ -211,11 +223,15 @@ Regularization can reduce ordinary overfitting, but it is not a security guarant
 
 **Nondeterminism** means that the same nominal program, data, and configuration can produce different execution results because hidden or implementation-dependent choices are not fixed. A second run can therefore produce a different checkpoint without an attacker changing the source code or dataset.
 
+![Sources of nondeterminism in seeds, kernels, precision, data loading, frameworks, drivers, and hardware.](/ai-security-course/assets/chapter-03/10-reproducibility.png)
+
 Seed handling is a source. A project may seed one library but not the framework, augmentation library, workers, or device generator. Record every seed and its consumer. GPU kernels can complete parallel reductions in different orders; record determinism flags, kernels, device, and workers.
 
 Mixed-precision arithmetic can round intermediate values differently from full precision, especially near a decision boundary. Record precision mode, loss-scaling settings, and accelerator type. Data-loader ordering and parallelism can change the order in which examples reach an optimizer, even when the dataset bytes are identical. Record shuffle policy, worker count, queue behavior, and batch order for a reproducibility fixture.
 
 Framework, driver, compiler, and hardware versions can change kernels or numerical behavior. Record the lockfile, versions, accelerator, operating-system image, container digest, and a known-input fixture with expected ranges.
+
+![Reproducibility evidence required to distinguish ordinary nondeterminism from tampering.](/ai-security-course/assets/chapter-03/11-reproducibility-evidence.png)
 
 | Nondeterminism source | Possible effect | Record-keeping requirement |
 |---|---|---|
@@ -232,11 +248,13 @@ Framework, driver, compiler, and hardware versions can change kernels or numeric
 
 An evasion or extraction result is not meaningful without an access level. **White-box access** means target weights, architecture, gradients, or equivalent internal detail. **Gray-box access** means architecture, feature schema, training assumptions, or score semantics without weights. **Black-box query access** means submitted inputs and returned labels or scores without internals. **Transfer from a surrogate** means another model is used without direct target access.
 
-![The four attacker access levels, their required knowledge, and the budgets needed to make a claim falsifiable.](https://1200km.com/ai-security-course/assets/chapter-03/06-attacker-access.png)
+![The four attacker access levels, their required knowledge, and the budgets needed to make a claim falsifiable.](/ai-security-course/assets/chapter-03/12-attacker-access.png)
 
 *Figure 6 — White-box, gray-box, black-box query, and transfer-from-surrogate access levels with their required knowledge and budgets. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/06-attacker-access.png)*
 
 A **perturbation budget** is the permitted change to an input, expressed by a stated norm or a real-world constraint such as preserving a valid file and its function. A **query budget** is the maximum number of probes available to an attacker with query access. These budgets make a robustness claim falsifiable: a result under unlimited, unlogged queries is not equivalent to a result under a rate-limited production identity.
+
+![Perturbation and query budgets required for a falsifiable adversarial robustness claim.](/ai-security-course/assets/chapter-03/13-attack-budgets.png)
 
 | Access level | Attacker knowledge or capability | Evidence to request |
 |---|---|---|
@@ -252,11 +270,13 @@ A **perturbation budget** is the permitted change to an input, expressed by a st
 
 An **adversarial example** is an input intentionally modified to produce an unwanted result under a specified threat model. Evasion occurs at test time, after training, and a capability demonstration is not automatically an intrusion.
 
+![Adversarial examples and test-time evasion under an explicit threat model.](/ai-security-course/assets/chapter-03/14-adversarial-examples.png)
+
 The research lineage matters. Szegedy et al. (2013) first documented the phenomenon in neural networks. Biggio et al. (2013), working in the security literature, independently demonstrated test-time evasion against malware and PDF classifiers. Goodfellow et al. (2014) provided a linear explanation and the fast-gradient method. Madry et al. (2017) framed robustness as constrained optimization against a first-order adversary. Each contribution answers a different question; none by itself proves that a particular production tenant was affected.
 
 The problem-space and feature-space distinction is especially important for malware. A **feature-space perturbation** changes coordinates consumed by a classifier, while a **problem-space perturbation** changes the real artifact that must remain valid and functional. A semantically trivial file change—such as appended strings, repacking, or added sections—can move a feature vector substantially, but many mathematically convenient feature changes cannot be realized as a functioning file. A real malware attacker must preserve functionality, respect the file format, and work without arbitrary access to feature coordinates.
 
-![A semantically trivial file change producing a large feature-space movement, with realizability constraints.](https://1200km.com/ai-security-course/assets/chapter-03/07-problem-vs-feature-space.png)
+![A semantically trivial file change producing a large feature-space movement, with realizability constraints.](/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png)
 
 *Figure 7 — Problem-space versus feature-space changes, including functionality, file-format, and realizability constraints. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/07-problem-vs-feature-space.png)*
 
@@ -264,6 +284,8 @@ The problem-space and feature-space distinction is especially important for malw
 
 <a id="robustness"></a>
 ## 11. Evaluating robustness claims
+
+![Robustness evaluation requirements: adaptive attacks, access assumptions, budgets, baselines, and bypass conditions.](/ai-security-course/assets/chapter-03/16-robustness-evaluation.png)
 
 An **adaptive attack** is an evaluation that uses knowledge of the proposed defense and chooses an attack strategy intended to test that defense, rather than repeating a fixed weak attack. A defense that merely makes gradients uninformative can appear robust under a weak gradient method and collapse under an adaptive method. Athalye, Carlini, and Wagner called this failure mode obfuscated or masked gradients; Carlini and Wagner provided a practical framework for evaluating adversarial robustness.
 
@@ -289,6 +311,8 @@ Adversarial training includes transformed examples, but is bounded by its threat
 
 **Poisoning** changes training data or the training process so a learned artifact behaves incorrectly. A **backdoor** is a hidden trigger-to-target association that causes a selected behavior while ordinary inputs appear acceptable. A **trigger** is the condition that activates the backdoor, such as a pattern, token, or artifact property. The attacker can target collection, labels, augmentation, a dependency, a checkpoint, or a loader.
 
+![Poisoning and backdoor attack surfaces across datasets, labels, dependencies, checkpoints, and loaders.](/ai-security-course/assets/chapter-03/17-poisoning-backdoors.png)
+
 Backdoor detection needs explicit methods and assumptions. **Trigger reconstruction** searches for a compact input pattern that causes a target output; it assumes the trigger is sufficiently simple and that the search objective exposes it, so distributed or semantic triggers can be missed. **Activation clustering** groups internal activations to find a suspicious cluster associated with poisoned examples; it assumes poisoned and clean representations separate enough to cluster, so weak or entangled triggers can evade it. **Fine-pruning** removes neurons that appear dormant on clean data and then evaluates behavior; it assumes backdoor functionality depends on removable dormant capacity, so triggers using ordinary shared features can survive and pruning can damage legitimate behavior. BadNets is the canonical reference for the backdoor threat model.
 
 The VirusTotal Poisoning case, listed by MITRE ATLAS as AML.CS0002 and reported by McAfee Advanced Threat Research, is a short parallel: adversarial samples were submitted to a shared detection service. Use only that disclosed fact; service, provenance, and downstream effect require the case record and local telemetry.
@@ -301,6 +325,8 @@ When investigating a suspected poisoning event, preserve the original dataset an
 ## 13. What inference reveals about training
 
 Inference can reveal information about training even when the attacker cannot read the artifact. A **model extraction attack**, also called model stealing, uses target-service outputs to build an approximation of its decision function. It needs query access; confidence scores or logits help more than labels alone; and the query budget affects cost and detectability. Ask who queried, at what rate, from which identity, with what output granularity, and whether responses and model-route identifiers were observable.
+
+![Model extraction, membership inference, and model inversion through inference interfaces.](/ai-security-course/assets/chapter-03/18-inference-attacks.png)
 
 **Security consequence:** Record caller, tenant, source, request count, timing, output fields, model version, and rate-limit decisions. Coarse outputs and quotas reduce exposure but do not eliminate surrogate transfer.
 
@@ -325,7 +351,7 @@ The researchers analyzed the CylancePROTECT engine and model using publicly avai
 
 **Security consequence:** The exploitable surface described by the researchers was feature extraction plus a scoring-policy override. The attacker did not need to touch weights or gradients. The relevant local evidence would therefore include the original and modified file hashes, parser output, extracted strings, score, model route, policy decision, and release version.
 
-![The AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and evidence-ladder classification.](https://1200km.com/ai-security-course/assets/chapter-03/08-cylance-case.png)
+![The AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and evidence-ladder classification.](/ai-security-course/assets/chapter-03/19-cylance-case.png)
 
 *Figure 8 — AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and where each claim sits on the evidence ladder. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/08-cylance-case.png)*
 
@@ -378,7 +404,11 @@ The CTI publication guides the hypothesis; it does not replace local evidence. P
 <a id="controls"></a>
 ## 15. Controls, ATLAS mapping, and analyst exercise
 
+![Control points connecting AI security objects, owners, evidence, and deterministic policy.](/ai-security-course/assets/chapter-03/20-controls-atlas.png)
+
 The terminology becomes operational when each object has an owner, a control point, and a record an analyst can collect. MITRE ATLAS supplies vocabulary and mapping; a defensible case still requires local artifacts, configuration, and telemetry. Because ATLAS has been renaming “ML” to “AI” in technique titles, use the ID as the stable identifier and verify the current title before publication.
+
+![MITRE ATLAS mappings for evasion, poisoning, backdoors, extraction, and inference risks.](/ai-security-course/assets/chapter-03/21-atlas-mapping.png)
 
 | ATLAS ID and title | Chapter connection | Local evidence to preserve |
 |---|---|---|
@@ -392,6 +422,8 @@ The terminology becomes operational when each object has an owner, a control poi
 | AML.CS0003 — Bypassing Cylance's AI Malware Detection [VERIFY current title] | Section 14: feature and policy case | Report, version, parser, remediation |
 
 ### Control checklist
+
+![Chapter 3 control checklist for training provenance, release integrity, inference telemetry, and robustness evaluation.](/ai-security-course/assets/chapter-03/22-control-checklist.png)
 
 | Security question | Control focus | Evidence |
 |---|---|---|
@@ -457,7 +489,7 @@ You have completed this chapter when, for a misclassification, you can name an o
 <a id="next"></a>
 ## 18. What comes next
 
-[The next Module 00 chapter](https://1200km.com/ai-security-course/module-00.html#llms) will connect this mechanism to Transformers, tokenization, embeddings, attention, and LLM generation—then trace the new attack surfaces and CTI evidence requirements. This chapter will remain under construction until its examples, references, and exercises are reviewed.
+[The next Module 00 chapter](https://1200km.com/ai-security-course/module-00.html#llms) will connect this mechanism to Transformers, tokenization, embeddings, attention, and LLM generation—then trace the new attack surfaces and CTI evidence requirements.
 
 ---
 
