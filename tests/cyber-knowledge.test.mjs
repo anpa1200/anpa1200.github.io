@@ -107,6 +107,30 @@ test('Cyber Knowledge reference indexes are canonical, static, and source-linked
   }
 });
 
+test('Helping Materials is the canonical collection and Short Guides is only a legacy redirect', () => {
+  const helpingMaterials = source('helping-materials/index.html');
+  const helpingEntries = jsonLdEntries(helpingMaterials);
+  const collection = helpingEntries.find((entry) => entry['@type'] === 'CollectionPage');
+
+  assert.equal(
+    linkHref(helpingMaterials, 'canonical'),
+    'https://1200km.com/cyber-knowledge/helping-materials/',
+  );
+  assert.match(tagContent(helpingMaterials, 'name="robots"'), /index,\s*follow/i);
+  assert.equal(collection?.mainEntity?.['@type'], 'ItemList');
+  assert.equal(collection?.mainEntity?.numberOfItems, 3);
+  assert.equal((helpingMaterials.match(/class="article-card"/g) || []).length, 3);
+  assert.match(helpingMaterials, /One library, reusable tags/);
+
+  const legacy = source('short-guides/index.html');
+  assert.match(tagContent(legacy, 'name="robots"'), /noindex,\s*follow/i);
+  assert.equal(
+    linkHref(legacy, 'canonical'),
+    'https://1200km.com/cyber-knowledge/helping-materials/',
+  );
+  assert.match(legacy, /http-equiv="refresh"[^>]+helping-materials/i);
+});
+
 test('each module has consistent SEO, AI-readable structure, and source-review status', () => {
   for (const module of modules) {
     const html = source(`${module}.html`);
