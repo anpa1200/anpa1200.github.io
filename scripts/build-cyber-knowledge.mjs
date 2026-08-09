@@ -703,7 +703,7 @@ function transformHub(html, stats, edges) {
             <a class="button" href="#entry-paths">Browse by workflow</a>
             <a class="button" href="/search.html?q=cybersecurity">Search the knowledge base</a>
             <a class="button" href="/articles/">Articles</a>
-            <a class="button" href="/cyber-knowledge/short-guides/">Short Guides</a>
+            <a class="button" href="/cyber-knowledge/helping-materials/">Helping Materials</a>
             <a class="button" href="/ai-security-course.html">AI Security Engineering course</a>
           </nav>`,
     'role-based starting points',
