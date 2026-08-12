@@ -22,8 +22,8 @@ records and technique pages are `generated-reference` records backed by the
 corresponding MITRE ATT&CK URL. They are neither mirrors nor authored CTI
 articles.
 
-The production build adds the pinned 185-article archive plus 84 permitted
-TrainSec full mirrors (269 integrated article pages total) and regenerates the
+The production build adds the pinned 187-article archive plus 84 permitted
+TrainSec full mirrors (271 integrated article pages total) and regenerates the
 full-domain catalogue and taxonomy report from the deployable output. Article
 publication status and editorial lifecycle are separate: an article remains a
 released publication even when its currentness is unknown or it is preserved
