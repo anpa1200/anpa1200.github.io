@@ -276,7 +276,9 @@ const governedArticleIds = [
   ...(articlePolicy.stable_reference_ids || []),
   ...(articlePolicy.historical_ids || []),
 ];
+const governedArticleSlugs = articlePolicy.current_core_slugs || [];
 if (new Set(governedArticleIds).size !== governedArticleIds.length) fail('article_lifecycle_policy contains an ID in more than one lifecycle set.');
+if (new Set(governedArticleSlugs).size !== governedArticleSlugs.length) fail('article_lifecycle_policy contains a duplicate native article slug.');
 if (catalog.scope === 'deployable-domain-catalog') {
   const archiveBuildPath = join(siteRoot, 'data', 'article-archive-build.json');
   const archiveFacts = existsSync(archiveBuildPath) ? JSON.parse(read(archiveBuildPath) || '{}') : null;
@@ -286,6 +288,9 @@ if (catalog.scope === 'deployable-domain-catalog') {
   else if (archiveArticles.length !== expectedArticleCount) fail(`Article lifecycle coverage is ${archiveArticles.length}, expected ${expectedArticleCount}.`);
   for (const id of governedArticleIds) {
     if (!archiveArticles.some((item) => item.canonical_url.toLowerCase().includes(`-${id}/`))) fail(`article_lifecycle_policy ID ${id} is absent from the deployed archive.`);
+  }
+  for (const slug of governedArticleSlugs) {
+    if (!archiveArticles.some((item) => new URL(item.canonical_url).pathname.replace(/\/$/, '').endsWith(`/${slug}`))) fail(`article_lifecycle_policy native slug ${slug} is absent from the deployed archive.`);
   }
   if (archiveArticles.some((item) => item.status === 'maintained')) fail('Published archive articles must not use maintained as publication status.');
   for (const lifecycle of ['maintained', 'stable-reference', 'preserved', 'historical', 'currentness-unknown']) {
