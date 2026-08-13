@@ -319,37 +319,159 @@
       .knowledge-map {
         overflow: hidden;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: var(--panel);
+        border-radius: 20px;
+        background:
+          radial-gradient(circle at 50% 48%, rgba(56,189,248,0.12), transparent 27%),
+          linear-gradient(145deg, rgba(15,98,254,0.07), transparent 48%),
+          var(--panel);
         box-shadow: var(--shadow);
       }
-      .knowledge-map svg {
+      .knowledge-map__summary {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 22px;
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--line);
+        color: var(--panel-muted);
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .knowledge-map__summary span {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+      .knowledge-map__summary strong {
+        color: var(--accent-soft);
+        font-size: 1rem;
+      }
+      .knowledge-map__canvas {
+        overflow: auto hidden;
+        scrollbar-color: var(--accent) transparent;
+        outline: none;
+      }
+      .knowledge-map__canvas:focus-visible {
+        box-shadow: inset 0 0 0 3px var(--accent);
+      }
+      .knowledge-map__canvas svg {
         display: block;
         width: 100%;
         height: auto;
-        min-height: 360px;
+        min-width: 760px;
+        min-height: 460px;
+      }
+      .knowledge-map__orbit {
+        fill: none;
+        stroke: var(--accent-soft);
+        stroke-width: 1.5;
+        stroke-dasharray: 4 11;
+        opacity: 0.35;
       }
       .knowledge-map__edges line {
         stroke: var(--line);
-        stroke-width: 2;
-        opacity: 0.64;
-        transition: stroke 0.15s, opacity 0.15s;
+        stroke-width: 1.6;
+        opacity: 0.44;
+        transition: stroke 0.16s, stroke-width 0.16s, opacity 0.16s;
       }
       .knowledge-map__edges a:hover line,
-      .knowledge-map__edges a:focus line {
-        stroke: var(--accent);
+      .knowledge-map__edges a:focus-visible line {
+        stroke: #38bdf8;
+        stroke-width: 4;
         opacity: 1;
       }
-      .knowledge-map__nodes circle {
-        fill: var(--chip);
-        stroke: var(--accent);
+      .knowledge-map__hub > circle:first-child {
+        fill: url(#knowledge-map-hub-fill);
+        stroke: #38bdf8;
         stroke-width: 2;
+        filter: url(#knowledge-map-node-glow);
       }
-      .knowledge-map__nodes text {
+      .knowledge-map__hub .knowledge-map__hub-ring {
+        fill: rgba(5,12,26,0.82);
+        stroke: rgba(147,197,253,0.55);
+        stroke-width: 1.5;
+        stroke-dasharray: 5 5;
+      }
+      .knowledge-map__hub path,
+      .knowledge-map__hub circle:not(:first-child) {
+        fill: none;
+        stroke: #e0f2fe;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .knowledge-map__hub text {
         fill: var(--panel-ink);
-        font: 800 18px Inter, system-ui, sans-serif;
+        font: 800 12px Inter, system-ui, sans-serif;
+        letter-spacing: 0.13em;
+        text-anchor: middle;
+      }
+      .knowledge-map__node { --node-color: #38bdf8; }
+      .knowledge-map__node--cti { --node-color: #38bdf8; }
+      .knowledge-map__node--red-team { --node-color: #fb7185; }
+      .knowledge-map__node--blue-team { --node-color: #60a5fa; }
+      .knowledge-map__node--vulnerability-research { --node-color: #f59e0b; }
+      .knowledge-map__node--malware-analysis { --node-color: #ef4444; }
+      .knowledge-map__node--secure-code { --node-color: #a78bfa; }
+      .knowledge-map__node--dfir { --node-color: #22d3ee; }
+      .knowledge-map__node--cloud-security { --node-color: #818cf8; }
+      .knowledge-map__node--grc { --node-color: #34d399; }
+      .knowledge-map__node--osint { --node-color: #2dd4bf; }
+      .knowledge-map__node--ai-security { --node-color: #e879f9; }
+      .knowledge-map__node-halo {
+        fill: var(--node-color);
+        opacity: 0.13;
+        transition: opacity 0.16s;
+      }
+      .knowledge-map__node-disc {
+        fill: color-mix(in srgb, var(--node-color) 23%, #071326);
+        stroke: var(--node-color);
+        stroke-width: 2.3;
+        transition: fill 0.16s, stroke-width 0.16s;
+      }
+      .knowledge-map__icon {
+        fill: none;
+        stroke: #f8fbff;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        pointer-events: none;
+      }
+      .knowledge-map__number-disc {
+        fill: var(--node-color);
+        stroke: #071326;
+        stroke-width: 3;
+      }
+      .knowledge-map__number {
+        fill: #04101f;
+        font: 900 11px Inter, system-ui, sans-serif;
         text-anchor: middle;
         pointer-events: none;
+      }
+      .knowledge-map__label-bg {
+        fill: rgba(5,12,26,0.92);
+        stroke: var(--node-color);
+        stroke-width: 1;
+      }
+      .knowledge-map__label {
+        fill: #f8fbff;
+        font: 750 13px Inter, system-ui, sans-serif;
+        text-anchor: middle;
+        pointer-events: none;
+      }
+      .knowledge-map__node:hover .knowledge-map__node-halo,
+      .knowledge-map__node:focus-visible .knowledge-map__node-halo {
+        opacity: 0.34;
+        filter: url(#knowledge-map-node-glow);
+      }
+      .knowledge-map__node:hover .knowledge-map__node-disc,
+      .knowledge-map__node:focus-visible .knowledge-map__node-disc {
+        fill: color-mix(in srgb, var(--node-color) 40%, #071326);
+        stroke-width: 4;
+      }
+      .knowledge-map__node:focus-visible {
+        outline: none;
       }
       .knowledge-map__text {
         padding: 16px 20px;
@@ -379,6 +501,8 @@
       @media (max-width: 720px) {
         .domain-grid { grid-template-columns: 1fr; }
         .knowledge-map__text ul { columns: 1; }
+        .knowledge-map__summary { justify-content: flex-start; }
+        .knowledge-map__canvas svg { width: 840px; min-width: 840px; }
       }
 
       @media (max-width: 600px) {

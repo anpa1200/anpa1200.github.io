@@ -9,8 +9,8 @@ This report is generated from deployable source HTML. External URLs are inventor
 | Measure | Result |
 |---|---:|
 | Pages | 15 |
-| Words | 130,917 |
-| Internal links | 4,737 |
+| Words | 130,647 |
+| Internal links | 4,701 |
 | External links | 586 |
 | Broken internal links | 0 |
 | Missing anchors | 0 |
@@ -20,7 +20,7 @@ This report is generated from deployable source HTML. External URLs are inventor
 
 | Page | Type | Words | Headings | Internal | External | Indexability |
 |---|---|---:|---:|---:|---:|---|
-| [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3300 | 43 | 356 | 1 | indexable |
+| [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3030 | 43 | 320 | 1 | indexable |
 | [Cyber Threat Intelligence (CTI)](https://1200km.com/cyber-knowledge/cti.html) | field guide | 12670 | 24 | 403 | 174 | indexable |
 | [Red Team & Offensive Security](https://1200km.com/cyber-knowledge/red-team.html) | field guide | 25633 | 289 | 585 | 17 | indexable |
 | [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13200 | 158 | 455 | 13 | indexable |

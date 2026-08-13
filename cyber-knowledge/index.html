@@ -319,37 +319,159 @@
       .knowledge-map {
         overflow: hidden;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: var(--panel);
+        border-radius: 20px;
+        background:
+          radial-gradient(circle at 50% 48%, rgba(56,189,248,0.12), transparent 27%),
+          linear-gradient(145deg, rgba(15,98,254,0.07), transparent 48%),
+          var(--panel);
         box-shadow: var(--shadow);
       }
-      .knowledge-map svg {
+      .knowledge-map__summary {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 22px;
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--line);
+        color: var(--panel-muted);
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .knowledge-map__summary span {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+      .knowledge-map__summary strong {
+        color: var(--accent-soft);
+        font-size: 1rem;
+      }
+      .knowledge-map__canvas {
+        overflow: auto hidden;
+        scrollbar-color: var(--accent) transparent;
+        outline: none;
+      }
+      .knowledge-map__canvas:focus-visible {
+        box-shadow: inset 0 0 0 3px var(--accent);
+      }
+      .knowledge-map__canvas svg {
         display: block;
         width: 100%;
         height: auto;
-        min-height: 360px;
+        min-width: 760px;
+        min-height: 460px;
+      }
+      .knowledge-map__orbit {
+        fill: none;
+        stroke: var(--accent-soft);
+        stroke-width: 1.5;
+        stroke-dasharray: 4 11;
+        opacity: 0.35;
       }
       .knowledge-map__edges line {
         stroke: var(--line);
-        stroke-width: 2;
-        opacity: 0.64;
-        transition: stroke 0.15s, opacity 0.15s;
+        stroke-width: 1.6;
+        opacity: 0.44;
+        transition: stroke 0.16s, stroke-width 0.16s, opacity 0.16s;
       }
       .knowledge-map__edges a:hover line,
-      .knowledge-map__edges a:focus line {
-        stroke: var(--accent);
+      .knowledge-map__edges a:focus-visible line {
+        stroke: #38bdf8;
+        stroke-width: 4;
         opacity: 1;
       }
-      .knowledge-map__nodes circle {
-        fill: var(--chip);
-        stroke: var(--accent);
+      .knowledge-map__hub > circle:first-child {
+        fill: url(#knowledge-map-hub-fill);
+        stroke: #38bdf8;
         stroke-width: 2;
+        filter: url(#knowledge-map-node-glow);
       }
-      .knowledge-map__nodes text {
+      .knowledge-map__hub .knowledge-map__hub-ring {
+        fill: rgba(5,12,26,0.82);
+        stroke: rgba(147,197,253,0.55);
+        stroke-width: 1.5;
+        stroke-dasharray: 5 5;
+      }
+      .knowledge-map__hub path,
+      .knowledge-map__hub circle:not(:first-child) {
+        fill: none;
+        stroke: #e0f2fe;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .knowledge-map__hub text {
         fill: var(--panel-ink);
-        font: 800 18px Inter, system-ui, sans-serif;
+        font: 800 12px Inter, system-ui, sans-serif;
+        letter-spacing: 0.13em;
+        text-anchor: middle;
+      }
+      .knowledge-map__node { --node-color: #38bdf8; }
+      .knowledge-map__node--cti { --node-color: #38bdf8; }
+      .knowledge-map__node--red-team { --node-color: #fb7185; }
+      .knowledge-map__node--blue-team { --node-color: #60a5fa; }
+      .knowledge-map__node--vulnerability-research { --node-color: #f59e0b; }
+      .knowledge-map__node--malware-analysis { --node-color: #ef4444; }
+      .knowledge-map__node--secure-code { --node-color: #a78bfa; }
+      .knowledge-map__node--dfir { --node-color: #22d3ee; }
+      .knowledge-map__node--cloud-security { --node-color: #818cf8; }
+      .knowledge-map__node--grc { --node-color: #34d399; }
+      .knowledge-map__node--osint { --node-color: #2dd4bf; }
+      .knowledge-map__node--ai-security { --node-color: #e879f9; }
+      .knowledge-map__node-halo {
+        fill: var(--node-color);
+        opacity: 0.13;
+        transition: opacity 0.16s;
+      }
+      .knowledge-map__node-disc {
+        fill: color-mix(in srgb, var(--node-color) 23%, #071326);
+        stroke: var(--node-color);
+        stroke-width: 2.3;
+        transition: fill 0.16s, stroke-width 0.16s;
+      }
+      .knowledge-map__icon {
+        fill: none;
+        stroke: #f8fbff;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        pointer-events: none;
+      }
+      .knowledge-map__number-disc {
+        fill: var(--node-color);
+        stroke: #071326;
+        stroke-width: 3;
+      }
+      .knowledge-map__number {
+        fill: #04101f;
+        font: 900 11px Inter, system-ui, sans-serif;
         text-anchor: middle;
         pointer-events: none;
+      }
+      .knowledge-map__label-bg {
+        fill: rgba(5,12,26,0.92);
+        stroke: var(--node-color);
+        stroke-width: 1;
+      }
+      .knowledge-map__label {
+        fill: #f8fbff;
+        font: 750 13px Inter, system-ui, sans-serif;
+        text-anchor: middle;
+        pointer-events: none;
+      }
+      .knowledge-map__node:hover .knowledge-map__node-halo,
+      .knowledge-map__node:focus-visible .knowledge-map__node-halo {
+        opacity: 0.34;
+        filter: url(#knowledge-map-node-glow);
+      }
+      .knowledge-map__node:hover .knowledge-map__node-disc,
+      .knowledge-map__node:focus-visible .knowledge-map__node-disc {
+        fill: color-mix(in srgb, var(--node-color) 40%, #071326);
+        stroke-width: 4;
+      }
+      .knowledge-map__node:focus-visible {
+        outline: none;
       }
       .knowledge-map__text {
         padding: 16px 20px;
@@ -379,6 +501,8 @@
       @media (max-width: 720px) {
         .domain-grid { grid-template-columns: 1fr; }
         .knowledge-map__text ul { columns: 1; }
+        .knowledge-map__summary { justify-content: flex-start; }
+        .knowledge-map__canvas svg { width: 840px; min-width: 840px; }
       }
 
       @media (max-width: 600px) {
@@ -1532,108 +1656,187 @@
       <!-- cyber-knowledge:relationship-map:start -->
       <section id="domain-map" aria-labelledby="domain-map-title">
         <h2 id="domain-map-title">How the eleven domains connect</h2>
-        <p class="section-intro">This map is generated from cross-domain links in the field guides. Each connection reflects an existing route to another guide.</p>
+        <p class="section-intro">This map is generated from cross-domain links in the field guides. Select an icon to open that domain; select a connection to follow one of the underlying routes.</p>
         <div class="knowledge-map">
-          <svg viewBox="0 0 1000 520" role="group" aria-labelledby="knowledge-map-svg-title knowledge-map-svg-desc">
+          <div class="knowledge-map__summary" aria-label="Relationship map summary"><span><strong>11</strong> practitioner domains</span><span><strong>45</strong> unique relationships</span><span><strong>81</strong> documented routes</span></div>
+          <div class="knowledge-map__canvas" tabindex="0" aria-label="Scrollable Cyber Knowledge relationship map">
+          <svg viewBox="0 0 1200 720" role="group" aria-labelledby="knowledge-map-svg-title knowledge-map-svg-desc">
             <title id="knowledge-map-svg-title">Cyber Knowledge cross-domain relationship map</title>
-            <desc id="knowledge-map-svg-desc">Eleven domain nodes connected by links already present in the field guides. A complete text equivalent follows the diagram.</desc>
+            <desc id="knowledge-map-svg-desc">Eleven color-coded security domain icons surround the Cyber Knowledge hub. Lines represent unique relationships derived from links in the field guides. A complete text equivalent follows the diagram.</desc>
+            <defs>
+              <filter id="knowledge-map-node-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <radialGradient id="knowledge-map-hub-fill"><stop offset="0" stop-color="#38bdf8" stop-opacity=".34"/><stop offset="1" stop-color="#2563eb" stop-opacity=".08"/></radialGradient>
+            </defs>
+            <circle class="knowledge-map__orbit" cx="600" cy="360" r="250" />
             <g class="knowledge-map__edges">
-              <a href="/cyber-knowledge/ai-security.html"><title>Cyber Threat Intelligence (CTI) to AI Security</title><line x1="500.0" y1="55.0" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/red-team.html"><title>Cyber Threat Intelligence (CTI) to Red Team &amp; Offensive Security</title><line x1="500.0" y1="55.0" x2="610.8" y2="87.5" /></a>
-              <a href="/cyber-knowledge/blue-team.html#m1"><title>Cyber Threat Intelligence (CTI) to Blue Team &amp; Defensive Security</title><line x1="500.0" y1="55.0" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/osint.html#module-2"><title>Cyber Threat Intelligence (CTI) to OSINT &amp; Reconnaissance</title><line x1="500.0" y1="55.0" x2="313.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/grc.html#module-7"><title>Cyber Threat Intelligence (CTI) to Governance, Risk &amp; Compliance (GRC)</title><line x1="500.0" y1="55.0" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/cti.html"><title>Red Team &amp; Offensive Security to Cyber Threat Intelligence (CTI)</title><line x1="610.8" y1="87.5" x2="500.0" y2="55.0" /></a>
-              <a href="/cyber-knowledge/blue-team.html"><title>Red Team &amp; Offensive Security to Blue Team &amp; Defensive Security</title><line x1="610.8" y1="87.5" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/osint.html"><title>Red Team &amp; Offensive Security to OSINT &amp; Reconnaissance</title><line x1="610.8" y1="87.5" x2="313.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/grc.html#module-1"><title>Red Team &amp; Offensive Security to Governance, Risk &amp; Compliance (GRC)</title><line x1="610.8" y1="87.5" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/vulnerability-research.html"><title>Red Team &amp; Offensive Security to Vulnerability Research &amp; Exploit Development</title><line x1="610.8" y1="87.5" x2="702.9" y2="289.2" /></a>
-              <a href="/cyber-knowledge/secure-code.html"><title>Red Team &amp; Offensive Security to Secure Code &amp; Application Security</title><line x1="610.8" y1="87.5" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/cloud-security.html#module-9"><title>Red Team &amp; Offensive Security to Cloud Security</title><line x1="610.8" y1="87.5" x2="345.1" y2="394.2" /></a>
-              <a href="/cyber-knowledge/dfir.html#module-2"><title>Red Team &amp; Offensive Security to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="610.8" y1="87.5" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/ai-security.html#module-10"><title>Red Team &amp; Offensive Security to AI Security</title><line x1="610.8" y1="87.5" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/red-team.html"><title>Blue Team &amp; Defensive Security to Red Team &amp; Offensive Security</title><line x1="686.5" y1="174.8" x2="610.8" y2="87.5" /></a>
-              <a href="/cyber-knowledge/vulnerability-research.html"><title>Blue Team &amp; Defensive Security to Vulnerability Research &amp; Exploit Development</title><line x1="686.5" y1="174.8" x2="702.9" y2="289.2" /></a>
-              <a href="/cyber-knowledge/cti.html"><title>Blue Team &amp; Defensive Security to Cyber Threat Intelligence (CTI)</title><line x1="686.5" y1="174.8" x2="500.0" y2="55.0" /></a>
-              <a href="/cyber-knowledge/grc.html#module-1"><title>Blue Team &amp; Defensive Security to Governance, Risk &amp; Compliance (GRC)</title><line x1="686.5" y1="174.8" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/osint.html#module-13"><title>Blue Team &amp; Defensive Security to OSINT &amp; Reconnaissance</title><line x1="686.5" y1="174.8" x2="313.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/cloud-security.html#module-10"><title>Blue Team &amp; Defensive Security to Cloud Security</title><line x1="686.5" y1="174.8" x2="345.1" y2="394.2" /></a>
-              <a href="/cyber-knowledge/dfir.html#module-2"><title>Blue Team &amp; Defensive Security to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="686.5" y1="174.8" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/secure-code.html#module-7"><title>Blue Team &amp; Defensive Security to Secure Code &amp; Application Security</title><line x1="686.5" y1="174.8" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/ai-security.html#module-11"><title>Blue Team &amp; Defensive Security to AI Security</title><line x1="686.5" y1="174.8" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/blue-team.html"><title>Vulnerability Research &amp; Exploit Development to Blue Team &amp; Defensive Security</title><line x1="702.9" y1="289.2" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/malware-analysis.html"><title>Vulnerability Research &amp; Exploit Development to Malware Analysis &amp; Reverse Engineering</title><line x1="702.9" y1="289.2" x2="654.9" y2="394.2" /></a>
-              <a href="/cyber-knowledge/grc.html#module-1"><title>Vulnerability Research &amp; Exploit Development to Governance, Risk &amp; Compliance (GRC)</title><line x1="702.9" y1="289.2" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/secure-code.html#module-13"><title>Vulnerability Research &amp; Exploit Development to Secure Code &amp; Application Security</title><line x1="702.9" y1="289.2" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/red-team.html#m11"><title>Vulnerability Research &amp; Exploit Development to Red Team &amp; Offensive Security</title><line x1="702.9" y1="289.2" x2="610.8" y2="87.5" /></a>
-              <a href="/cyber-knowledge/ai-security.html#module-10"><title>Vulnerability Research &amp; Exploit Development to AI Security</title><line x1="702.9" y1="289.2" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/vulnerability-research.html"><title>Malware Analysis &amp; Reverse Engineering to Vulnerability Research &amp; Exploit Development</title><line x1="654.9" y1="394.2" x2="702.9" y2="289.2" /></a>
-              <a href="/cyber-knowledge/secure-code.html"><title>Malware Analysis &amp; Reverse Engineering to Secure Code &amp; Application Security</title><line x1="654.9" y1="394.2" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/dfir.html#module-3"><title>Malware Analysis &amp; Reverse Engineering to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="654.9" y1="394.2" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/cti.html#m3"><title>Malware Analysis &amp; Reverse Engineering to Cyber Threat Intelligence (CTI)</title><line x1="654.9" y1="394.2" x2="500.0" y2="55.0" /></a>
-              <a href="/cyber-knowledge/ai-security.html#module-5"><title>Malware Analysis &amp; Reverse Engineering to AI Security</title><line x1="654.9" y1="394.2" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/malware-analysis.html"><title>Secure Code &amp; Application Security to Malware Analysis &amp; Reverse Engineering</title><line x1="557.8" y1="456.7" x2="654.9" y2="394.2" /></a>
-              <a href="/cyber-knowledge/dfir.html"><title>Secure Code &amp; Application Security to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="557.8" y1="456.7" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/vulnerability-research.html"><title>Secure Code &amp; Application Security to Vulnerability Research &amp; Exploit Development</title><line x1="557.8" y1="456.7" x2="702.9" y2="289.2" /></a>
-              <a href="/cyber-knowledge/grc.html#module-2"><title>Secure Code &amp; Application Security to Governance, Risk &amp; Compliance (GRC)</title><line x1="557.8" y1="456.7" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/blue-team.html#m9"><title>Secure Code &amp; Application Security to Blue Team &amp; Defensive Security</title><line x1="557.8" y1="456.7" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/red-team.html#m4"><title>Secure Code &amp; Application Security to Red Team &amp; Offensive Security</title><line x1="557.8" y1="456.7" x2="610.8" y2="87.5" /></a>
-              <a href="/cyber-knowledge/cloud-security.html#module-5"><title>Secure Code &amp; Application Security to Cloud Security</title><line x1="557.8" y1="456.7" x2="345.1" y2="394.2" /></a>
-              <a href="/cyber-knowledge/ai-security.html"><title>Secure Code &amp; Application Security to AI Security</title><line x1="557.8" y1="456.7" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/secure-code.html"><title>Digital Forensics &amp; Incident Response (DFIR) to Secure Code &amp; Application Security</title><line x1="442.2" y1="456.7" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/cloud-security.html"><title>Digital Forensics &amp; Incident Response (DFIR) to Cloud Security</title><line x1="442.2" y1="456.7" x2="345.1" y2="394.2" /></a>
-              <a href="/cyber-knowledge/grc.html#module-11"><title>Digital Forensics &amp; Incident Response (DFIR) to Governance, Risk &amp; Compliance (GRC)</title><line x1="442.2" y1="456.7" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/blue-team.html#m6"><title>Digital Forensics &amp; Incident Response (DFIR) to Blue Team &amp; Defensive Security</title><line x1="442.2" y1="456.7" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/malware-analysis.html#module-1"><title>Digital Forensics &amp; Incident Response (DFIR) to Malware Analysis &amp; Reverse Engineering</title><line x1="442.2" y1="456.7" x2="654.9" y2="394.2" /></a>
-              <a href="/cyber-knowledge/cti.html#m5"><title>Digital Forensics &amp; Incident Response (DFIR) to Cyber Threat Intelligence (CTI)</title><line x1="442.2" y1="456.7" x2="500.0" y2="55.0" /></a>
-              <a href="/cyber-knowledge/vulnerability-research.html"><title>Digital Forensics &amp; Incident Response (DFIR) to Vulnerability Research &amp; Exploit Development</title><line x1="442.2" y1="456.7" x2="702.9" y2="289.2" /></a>
-              <a href="/cyber-knowledge/dfir.html"><title>Cloud Security to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="345.1" y1="394.2" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/grc.html"><title>Cloud Security to Governance, Risk &amp; Compliance (GRC)</title><line x1="345.1" y1="394.2" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/blue-team.html#m9"><title>Cloud Security to Blue Team &amp; Defensive Security</title><line x1="345.1" y1="394.2" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/secure-code.html#module-8"><title>Cloud Security to Secure Code &amp; Application Security</title><line x1="345.1" y1="394.2" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/red-team.html#m5"><title>Cloud Security to Red Team &amp; Offensive Security</title><line x1="345.1" y1="394.2" x2="610.8" y2="87.5" /></a>
-              <a href="/cyber-knowledge/osint.html#module-13"><title>Cloud Security to OSINT &amp; Reconnaissance</title><line x1="345.1" y1="394.2" x2="313.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/ai-security.html#module-9"><title>Cloud Security to AI Security</title><line x1="345.1" y1="394.2" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/cloud-security.html"><title>Governance, Risk &amp; Compliance (GRC) to Cloud Security</title><line x1="297.1" y1="289.2" x2="345.1" y2="394.2" /></a>
-              <a href="/cyber-knowledge/osint.html"><title>Governance, Risk &amp; Compliance (GRC) to OSINT &amp; Reconnaissance</title><line x1="297.1" y1="289.2" x2="313.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/blue-team.html#m1"><title>Governance, Risk &amp; Compliance (GRC) to Blue Team &amp; Defensive Security</title><line x1="297.1" y1="289.2" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/vulnerability-research.html#m14"><title>Governance, Risk &amp; Compliance (GRC) to Vulnerability Research &amp; Exploit Development</title><line x1="297.1" y1="289.2" x2="702.9" y2="289.2" /></a>
-              <a href="/cyber-knowledge/secure-code.html#module-1"><title>Governance, Risk &amp; Compliance (GRC) to Secure Code &amp; Application Security</title><line x1="297.1" y1="289.2" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/cti.html#m5"><title>Governance, Risk &amp; Compliance (GRC) to Cyber Threat Intelligence (CTI)</title><line x1="297.1" y1="289.2" x2="500.0" y2="55.0" /></a>
-              <a href="/cyber-knowledge/dfir.html"><title>Governance, Risk &amp; Compliance (GRC) to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="297.1" y1="289.2" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/ai-security.html#module-13"><title>Governance, Risk &amp; Compliance (GRC) to AI Security</title><line x1="297.1" y1="289.2" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/grc.html"><title>OSINT &amp; Reconnaissance to Governance, Risk &amp; Compliance (GRC)</title><line x1="313.5" y1="174.8" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/ai-security.html"><title>OSINT &amp; Reconnaissance to AI Security</title><line x1="313.5" y1="174.8" x2="389.2" y2="87.5" /></a>
-              <a href="/cyber-knowledge/cti.html"><title>OSINT &amp; Reconnaissance to Cyber Threat Intelligence (CTI)</title><line x1="313.5" y1="174.8" x2="500.0" y2="55.0" /></a>
-              <a href="/cyber-knowledge/red-team.html#m2"><title>OSINT &amp; Reconnaissance to Red Team &amp; Offensive Security</title><line x1="313.5" y1="174.8" x2="610.8" y2="87.5" /></a>
-              <a href="/cyber-knowledge/secure-code.html"><title>OSINT &amp; Reconnaissance to Secure Code &amp; Application Security</title><line x1="313.5" y1="174.8" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/cloud-security.html"><title>OSINT &amp; Reconnaissance to Cloud Security</title><line x1="313.5" y1="174.8" x2="345.1" y2="394.2" /></a>
-              <a href="/cyber-knowledge/dfir.html"><title>OSINT &amp; Reconnaissance to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="313.5" y1="174.8" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/osint.html"><title>AI Security to OSINT &amp; Reconnaissance</title><line x1="389.2" y1="87.5" x2="313.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/cti.html"><title>AI Security to Cyber Threat Intelligence (CTI)</title><line x1="389.2" y1="87.5" x2="500.0" y2="55.0" /></a>
-              <a href="/cyber-knowledge/grc.html#module-14"><title>AI Security to Governance, Risk &amp; Compliance (GRC)</title><line x1="389.2" y1="87.5" x2="297.1" y2="289.2" /></a>
-              <a href="/cyber-knowledge/secure-code.html#module-2"><title>AI Security to Secure Code &amp; Application Security</title><line x1="389.2" y1="87.5" x2="557.8" y2="456.7" /></a>
-              <a href="/cyber-knowledge/cloud-security.html#module-2"><title>AI Security to Cloud Security</title><line x1="389.2" y1="87.5" x2="345.1" y2="394.2" /></a>
-              <a href="/cyber-knowledge/malware-analysis.html#module-10"><title>AI Security to Malware Analysis &amp; Reverse Engineering</title><line x1="389.2" y1="87.5" x2="654.9" y2="394.2" /></a>
-              <a href="/cyber-knowledge/red-team.html#m9"><title>AI Security to Red Team &amp; Offensive Security</title><line x1="389.2" y1="87.5" x2="610.8" y2="87.5" /></a>
-              <a href="/cyber-knowledge/blue-team.html#m9"><title>AI Security to Blue Team &amp; Defensive Security</title><line x1="389.2" y1="87.5" x2="686.5" y2="174.8" /></a>
-              <a href="/cyber-knowledge/dfir.html#module-10"><title>AI Security to Digital Forensics &amp; Incident Response (DFIR)</title><line x1="389.2" y1="87.5" x2="442.2" y2="456.7" /></a>
-              <a href="/cyber-knowledge/vulnerability-research.html#m13"><title>AI Security to Vulnerability Research &amp; Exploit Development</title><line x1="389.2" y1="87.5" x2="702.9" y2="289.2" /></a>
+              <a href="/cyber-knowledge/ai-security.html" aria-label="Open a route between Cyber Threat Intelligence (CTI) and AI Security"><title>Cyber Threat Intelligence (CTI) ↔ AI Security</title><line x1="600.0" y1="110.0" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/red-team.html" aria-label="Open a route between Cyber Threat Intelligence (CTI) and Red Team &amp; Offensive Security"><title>Cyber Threat Intelligence (CTI) ↔ Red Team &amp; Offensive Security</title><line x1="600.0" y1="110.0" x2="735.2" y2="149.7" /></a>
+              <a href="/cyber-knowledge/blue-team.html#m1" aria-label="Open a route between Cyber Threat Intelligence (CTI) and Blue Team &amp; Defensive Security"><title>Cyber Threat Intelligence (CTI) ↔ Blue Team &amp; Defensive Security</title><line x1="600.0" y1="110.0" x2="827.4" y2="256.1" /></a>
+              <a href="/cyber-knowledge/osint.html#module-2" aria-label="Open a route between Cyber Threat Intelligence (CTI) and OSINT &amp; Reconnaissance"><title>Cyber Threat Intelligence (CTI) ↔ OSINT &amp; Reconnaissance</title><line x1="600.0" y1="110.0" x2="372.6" y2="256.1" /></a>
+              <a href="/cyber-knowledge/grc.html#module-7" aria-label="Open a route between Cyber Threat Intelligence (CTI) and Governance, Risk &amp; Compliance (GRC)"><title>Cyber Threat Intelligence (CTI) ↔ Governance, Risk &amp; Compliance (GRC)</title><line x1="600.0" y1="110.0" x2="352.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/blue-team.html" aria-label="Open a route between Red Team &amp; Offensive Security and Blue Team &amp; Defensive Security"><title>Red Team &amp; Offensive Security ↔ Blue Team &amp; Defensive Security</title><line x1="735.2" y1="149.7" x2="827.4" y2="256.1" /></a>
+              <a href="/cyber-knowledge/osint.html" aria-label="Open a route between Red Team &amp; Offensive Security and OSINT &amp; Reconnaissance"><title>Red Team &amp; Offensive Security ↔ OSINT &amp; Reconnaissance</title><line x1="735.2" y1="149.7" x2="372.6" y2="256.1" /></a>
+              <a href="/cyber-knowledge/grc.html#module-1" aria-label="Open a route between Red Team &amp; Offensive Security and Governance, Risk &amp; Compliance (GRC)"><title>Red Team &amp; Offensive Security ↔ Governance, Risk &amp; Compliance (GRC)</title><line x1="735.2" y1="149.7" x2="352.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/vulnerability-research.html" aria-label="Open a route between Red Team &amp; Offensive Security and Vulnerability Research &amp; Exploit Development"><title>Red Team &amp; Offensive Security ↔ Vulnerability Research &amp; Exploit Development</title><line x1="735.2" y1="149.7" x2="847.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/secure-code.html" aria-label="Open a route between Red Team &amp; Offensive Security and Secure Code &amp; Application Security"><title>Red Team &amp; Offensive Security ↔ Secure Code &amp; Application Security</title><line x1="735.2" y1="149.7" x2="670.4" y2="599.9" /></a>
+              <a href="/cyber-knowledge/cloud-security.html#module-9" aria-label="Open a route between Red Team &amp; Offensive Security and Cloud Security"><title>Red Team &amp; Offensive Security ↔ Cloud Security</title><line x1="735.2" y1="149.7" x2="411.1" y2="523.7" /></a>
+              <a href="/cyber-knowledge/dfir.html#module-2" aria-label="Open a route between Red Team &amp; Offensive Security and Digital Forensics &amp; Incident Response (DFIR)"><title>Red Team &amp; Offensive Security ↔ Digital Forensics &amp; Incident Response (DFIR)</title><line x1="735.2" y1="149.7" x2="529.6" y2="599.9" /></a>
+              <a href="/cyber-knowledge/ai-security.html#module-10" aria-label="Open a route between Red Team &amp; Offensive Security and AI Security"><title>Red Team &amp; Offensive Security ↔ AI Security</title><line x1="735.2" y1="149.7" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/vulnerability-research.html" aria-label="Open a route between Blue Team &amp; Defensive Security and Vulnerability Research &amp; Exploit Development"><title>Blue Team &amp; Defensive Security ↔ Vulnerability Research &amp; Exploit Development</title><line x1="827.4" y1="256.1" x2="847.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/grc.html#module-1" aria-label="Open a route between Blue Team &amp; Defensive Security and Governance, Risk &amp; Compliance (GRC)"><title>Blue Team &amp; Defensive Security ↔ Governance, Risk &amp; Compliance (GRC)</title><line x1="827.4" y1="256.1" x2="352.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/osint.html#module-13" aria-label="Open a route between Blue Team &amp; Defensive Security and OSINT &amp; Reconnaissance"><title>Blue Team &amp; Defensive Security ↔ OSINT &amp; Reconnaissance</title><line x1="827.4" y1="256.1" x2="372.6" y2="256.1" /></a>
+              <a href="/cyber-knowledge/cloud-security.html#module-10" aria-label="Open a route between Blue Team &amp; Defensive Security and Cloud Security"><title>Blue Team &amp; Defensive Security ↔ Cloud Security</title><line x1="827.4" y1="256.1" x2="411.1" y2="523.7" /></a>
+              <a href="/cyber-knowledge/dfir.html#module-2" aria-label="Open a route between Blue Team &amp; Defensive Security and Digital Forensics &amp; Incident Response (DFIR)"><title>Blue Team &amp; Defensive Security ↔ Digital Forensics &amp; Incident Response (DFIR)</title><line x1="827.4" y1="256.1" x2="529.6" y2="599.9" /></a>
+              <a href="/cyber-knowledge/secure-code.html#module-7" aria-label="Open a route between Blue Team &amp; Defensive Security and Secure Code &amp; Application Security"><title>Blue Team &amp; Defensive Security ↔ Secure Code &amp; Application Security</title><line x1="827.4" y1="256.1" x2="670.4" y2="599.9" /></a>
+              <a href="/cyber-knowledge/ai-security.html#module-11" aria-label="Open a route between Blue Team &amp; Defensive Security and AI Security"><title>Blue Team &amp; Defensive Security ↔ AI Security</title><line x1="827.4" y1="256.1" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/malware-analysis.html" aria-label="Open a route between Vulnerability Research &amp; Exploit Development and Malware Analysis &amp; Reverse Engineering"><title>Vulnerability Research &amp; Exploit Development ↔ Malware Analysis &amp; Reverse Engineering</title><line x1="847.5" y1="395.6" x2="788.9" y2="523.7" /></a>
+              <a href="/cyber-knowledge/grc.html#module-1" aria-label="Open a route between Vulnerability Research &amp; Exploit Development and Governance, Risk &amp; Compliance (GRC)"><title>Vulnerability Research &amp; Exploit Development ↔ Governance, Risk &amp; Compliance (GRC)</title><line x1="847.5" y1="395.6" x2="352.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/secure-code.html#module-13" aria-label="Open a route between Vulnerability Research &amp; Exploit Development and Secure Code &amp; Application Security"><title>Vulnerability Research &amp; Exploit Development ↔ Secure Code &amp; Application Security</title><line x1="847.5" y1="395.6" x2="670.4" y2="599.9" /></a>
+              <a href="/cyber-knowledge/ai-security.html#module-10" aria-label="Open a route between Vulnerability Research &amp; Exploit Development and AI Security"><title>Vulnerability Research &amp; Exploit Development ↔ AI Security</title><line x1="847.5" y1="395.6" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/secure-code.html" aria-label="Open a route between Malware Analysis &amp; Reverse Engineering and Secure Code &amp; Application Security"><title>Malware Analysis &amp; Reverse Engineering ↔ Secure Code &amp; Application Security</title><line x1="788.9" y1="523.7" x2="670.4" y2="599.9" /></a>
+              <a href="/cyber-knowledge/dfir.html#module-3" aria-label="Open a route between Malware Analysis &amp; Reverse Engineering and Digital Forensics &amp; Incident Response (DFIR)"><title>Malware Analysis &amp; Reverse Engineering ↔ Digital Forensics &amp; Incident Response (DFIR)</title><line x1="788.9" y1="523.7" x2="529.6" y2="599.9" /></a>
+              <a href="/cyber-knowledge/cti.html#m3" aria-label="Open a route between Malware Analysis &amp; Reverse Engineering and Cyber Threat Intelligence (CTI)"><title>Malware Analysis &amp; Reverse Engineering ↔ Cyber Threat Intelligence (CTI)</title><line x1="788.9" y1="523.7" x2="600.0" y2="110.0" /></a>
+              <a href="/cyber-knowledge/ai-security.html#module-5" aria-label="Open a route between Malware Analysis &amp; Reverse Engineering and AI Security"><title>Malware Analysis &amp; Reverse Engineering ↔ AI Security</title><line x1="788.9" y1="523.7" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/dfir.html" aria-label="Open a route between Secure Code &amp; Application Security and Digital Forensics &amp; Incident Response (DFIR)"><title>Secure Code &amp; Application Security ↔ Digital Forensics &amp; Incident Response (DFIR)</title><line x1="670.4" y1="599.9" x2="529.6" y2="599.9" /></a>
+              <a href="/cyber-knowledge/grc.html#module-2" aria-label="Open a route between Secure Code &amp; Application Security and Governance, Risk &amp; Compliance (GRC)"><title>Secure Code &amp; Application Security ↔ Governance, Risk &amp; Compliance (GRC)</title><line x1="670.4" y1="599.9" x2="352.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/cloud-security.html#module-5" aria-label="Open a route between Secure Code &amp; Application Security and Cloud Security"><title>Secure Code &amp; Application Security ↔ Cloud Security</title><line x1="670.4" y1="599.9" x2="411.1" y2="523.7" /></a>
+              <a href="/cyber-knowledge/ai-security.html" aria-label="Open a route between Secure Code &amp; Application Security and AI Security"><title>Secure Code &amp; Application Security ↔ AI Security</title><line x1="670.4" y1="599.9" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/cloud-security.html" aria-label="Open a route between Digital Forensics &amp; Incident Response (DFIR) and Cloud Security"><title>Digital Forensics &amp; Incident Response (DFIR) ↔ Cloud Security</title><line x1="529.6" y1="599.9" x2="411.1" y2="523.7" /></a>
+              <a href="/cyber-knowledge/grc.html#module-11" aria-label="Open a route between Digital Forensics &amp; Incident Response (DFIR) and Governance, Risk &amp; Compliance (GRC)"><title>Digital Forensics &amp; Incident Response (DFIR) ↔ Governance, Risk &amp; Compliance (GRC)</title><line x1="529.6" y1="599.9" x2="352.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/cti.html#m5" aria-label="Open a route between Digital Forensics &amp; Incident Response (DFIR) and Cyber Threat Intelligence (CTI)"><title>Digital Forensics &amp; Incident Response (DFIR) ↔ Cyber Threat Intelligence (CTI)</title><line x1="529.6" y1="599.9" x2="600.0" y2="110.0" /></a>
+              <a href="/cyber-knowledge/vulnerability-research.html" aria-label="Open a route between Digital Forensics &amp; Incident Response (DFIR) and Vulnerability Research &amp; Exploit Development"><title>Digital Forensics &amp; Incident Response (DFIR) ↔ Vulnerability Research &amp; Exploit Development</title><line x1="529.6" y1="599.9" x2="847.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/grc.html" aria-label="Open a route between Cloud Security and Governance, Risk &amp; Compliance (GRC)"><title>Cloud Security ↔ Governance, Risk &amp; Compliance (GRC)</title><line x1="411.1" y1="523.7" x2="352.5" y2="395.6" /></a>
+              <a href="/cyber-knowledge/osint.html#module-13" aria-label="Open a route between Cloud Security and OSINT &amp; Reconnaissance"><title>Cloud Security ↔ OSINT &amp; Reconnaissance</title><line x1="411.1" y1="523.7" x2="372.6" y2="256.1" /></a>
+              <a href="/cyber-knowledge/ai-security.html#module-9" aria-label="Open a route between Cloud Security and AI Security"><title>Cloud Security ↔ AI Security</title><line x1="411.1" y1="523.7" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/osint.html" aria-label="Open a route between Governance, Risk &amp; Compliance (GRC) and OSINT &amp; Reconnaissance"><title>Governance, Risk &amp; Compliance (GRC) ↔ OSINT &amp; Reconnaissance</title><line x1="352.5" y1="395.6" x2="372.6" y2="256.1" /></a>
+              <a href="/cyber-knowledge/ai-security.html#module-13" aria-label="Open a route between Governance, Risk &amp; Compliance (GRC) and AI Security"><title>Governance, Risk &amp; Compliance (GRC) ↔ AI Security</title><line x1="352.5" y1="395.6" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/ai-security.html" aria-label="Open a route between OSINT &amp; Reconnaissance and AI Security"><title>OSINT &amp; Reconnaissance ↔ AI Security</title><line x1="372.6" y1="256.1" x2="464.8" y2="149.7" /></a>
+              <a href="/cyber-knowledge/secure-code.html" aria-label="Open a route between OSINT &amp; Reconnaissance and Secure Code &amp; Application Security"><title>OSINT &amp; Reconnaissance ↔ Secure Code &amp; Application Security</title><line x1="372.6" y1="256.1" x2="670.4" y2="599.9" /></a>
+              <a href="/cyber-knowledge/dfir.html" aria-label="Open a route between OSINT &amp; Reconnaissance and Digital Forensics &amp; Incident Response (DFIR)"><title>OSINT &amp; Reconnaissance ↔ Digital Forensics &amp; Incident Response (DFIR)</title><line x1="372.6" y1="256.1" x2="529.6" y2="599.9" /></a>
+              <a href="/cyber-knowledge/dfir.html#module-10" aria-label="Open a route between AI Security and Digital Forensics &amp; Incident Response (DFIR)"><title>AI Security ↔ Digital Forensics &amp; Incident Response (DFIR)</title><line x1="464.8" y1="149.7" x2="529.6" y2="599.9" /></a>
+            </g>
+            <g class="knowledge-map__hub" aria-hidden="true">
+              <circle cx="600" cy="360" r="76" />
+              <circle class="knowledge-map__hub-ring" cx="600" cy="360" r="58" />
+              <path d="M600 320 626 330v20c0 22-12 39-26 49-14-10-26-27-26-49v-20z" />
+              <circle cx="600" cy="348" r="7" />
+              <path d="M600 355v16M583 338l11 7M617 338l-11 7M582 369l12-11M618 369l-12-11" />
+              <text x="600" y="424">CYBER KNOWLEDGE</text>
             </g>
             <g class="knowledge-map__nodes">
-              <a href="/cyber-knowledge/cti.html"><circle cx="500.0" cy="55.0" r="34" /><text x="500.0" y="60.0">01</text><title>Cyber Threat Intelligence (CTI)</title></a>
-              <a href="/cyber-knowledge/red-team.html"><circle cx="610.8" cy="87.5" r="34" /><text x="610.8" y="92.5">02</text><title>Red Team &amp; Offensive Security</title></a>
-              <a href="/cyber-knowledge/blue-team.html"><circle cx="686.5" cy="174.8" r="34" /><text x="686.5" y="179.8">03</text><title>Blue Team &amp; Defensive Security</title></a>
-              <a href="/cyber-knowledge/vulnerability-research.html"><circle cx="702.9" cy="289.2" r="34" /><text x="702.9" y="294.2">04</text><title>Vulnerability Research &amp; Exploit Development</title></a>
-              <a href="/cyber-knowledge/malware-analysis.html"><circle cx="654.9" cy="394.2" r="34" /><text x="654.9" y="399.2">05</text><title>Malware Analysis &amp; Reverse Engineering</title></a>
-              <a href="/cyber-knowledge/secure-code.html"><circle cx="557.8" cy="456.7" r="34" /><text x="557.8" y="461.7">06</text><title>Secure Code &amp; Application Security</title></a>
-              <a href="/cyber-knowledge/dfir.html"><circle cx="442.2" cy="456.7" r="34" /><text x="442.2" y="461.7">07</text><title>Digital Forensics &amp; Incident Response (DFIR)</title></a>
-              <a href="/cyber-knowledge/cloud-security.html"><circle cx="345.1" cy="394.2" r="34" /><text x="345.1" y="399.2">08</text><title>Cloud Security</title></a>
-              <a href="/cyber-knowledge/grc.html"><circle cx="297.1" cy="289.2" r="34" /><text x="297.1" y="294.2">09</text><title>Governance, Risk &amp; Compliance (GRC)</title></a>
-              <a href="/cyber-knowledge/osint.html"><circle cx="313.5" cy="174.8" r="34" /><text x="313.5" y="179.8">10</text><title>OSINT &amp; Reconnaissance</title></a>
-              <a href="/cyber-knowledge/ai-security.html"><circle cx="389.2" cy="87.5" r="34" /><text x="389.2" y="92.5">11</text><title>AI Security</title></a>
+              <a class="knowledge-map__node knowledge-map__node--cti" href="/cyber-knowledge/cti.html" aria-label="Open domain 01: Cyber Threat Intelligence (CTI)">
+                <title>01 · Cyber Threat Intelligence (CTI)</title>
+                <circle class="knowledge-map__node-halo" cx="600.0" cy="110.0" r="49" />
+                <circle class="knowledge-map__node-disc" cx="600.0" cy="110.0" r="40" />
+                <g class="knowledge-map__icon" transform="translate(585.0 95.0) scale(1.25)"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></g>
+                <circle class="knowledge-map__number-disc" cx="634.0" cy="76.0" r="13" />
+                <text class="knowledge-map__number" x="634.0" y="80.0">01</text>
+                <rect class="knowledge-map__label-bg" x="556.0" y="161.0" width="88.0" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="600.0" y="182.0">CTI</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--red-team" href="/cyber-knowledge/red-team.html" aria-label="Open domain 02: Red Team &amp; Offensive Security">
+                <title>02 · Red Team &amp; Offensive Security</title>
+                <circle class="knowledge-map__node-halo" cx="735.2" cy="149.7" r="49" />
+                <circle class="knowledge-map__node-disc" cx="735.2" cy="149.7" r="40" />
+                <g class="knowledge-map__icon" transform="translate(720.2 134.7) scale(1.25)"><path d="M13 2 5 13h6l-1 9 9-12h-6z"/></g>
+                <circle class="knowledge-map__number-disc" cx="769.2" cy="115.7" r="13" />
+                <text class="knowledge-map__number" x="769.2" y="119.7">02</text>
+                <rect class="knowledge-map__label-bg" x="687.6" y="200.7" width="95.2" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="735.2" y="221.7">Red Team</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--blue-team" href="/cyber-knowledge/blue-team.html" aria-label="Open domain 03: Blue Team &amp; Defensive Security">
+                <title>03 · Blue Team &amp; Defensive Security</title>
+                <circle class="knowledge-map__node-halo" cx="827.4" cy="256.1" r="49" />
+                <circle class="knowledge-map__node-disc" cx="827.4" cy="256.1" r="40" />
+                <g class="knowledge-map__icon" transform="translate(812.4 241.1) scale(1.25)"><path d="M12 2 20 5v6c0 5-3.4 8.7-8 11-4.6-2.3-8-6-8-11V5z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></g>
+                <circle class="knowledge-map__number-disc" cx="861.4" cy="222.1" r="13" />
+                <text class="knowledge-map__number" x="861.4" y="226.1">03</text>
+                <rect class="knowledge-map__label-bg" x="775.6" y="307.1" width="103.6" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="827.4" y="328.1">Blue Team</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--vulnerability-research" href="/cyber-knowledge/vulnerability-research.html" aria-label="Open domain 04: Vulnerability Research &amp; Exploit Development">
+                <title>04 · Vulnerability Research &amp; Exploit Development</title>
+                <circle class="knowledge-map__node-halo" cx="847.5" cy="395.6" r="49" />
+                <circle class="knowledge-map__node-disc" cx="847.5" cy="395.6" r="40" />
+                <g class="knowledge-map__icon" transform="translate(832.5 380.6) scale(1.25)"><path d="M9 9h6v7a3 3 0 0 1-6 0zM12 9V5M9 6l3-2 3 2M5 12h4M15 12h4M6 8l3 3M18 8l-3 3M6 18l3-3M18 18l-3-3"/></g>
+                <circle class="knowledge-map__number-disc" cx="881.5" cy="361.6" r="13" />
+                <text class="knowledge-map__number" x="881.5" y="365.6">04</text>
+                <rect class="knowledge-map__label-bg" x="762.1" y="446.6" width="170.8" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="847.5" y="467.6">Vulnerability R&amp;D</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--malware-analysis" href="/cyber-knowledge/malware-analysis.html" aria-label="Open domain 05: Malware Analysis &amp; Reverse Engineering">
+                <title>05 · Malware Analysis &amp; Reverse Engineering</title>
+                <circle class="knowledge-map__node-halo" cx="788.9" cy="523.7" r="49" />
+                <circle class="knowledge-map__node-disc" cx="788.9" cy="523.7" r="40" />
+                <g class="knowledge-map__icon" transform="translate(773.9 508.7) scale(1.25)"><path d="M9 8h6l2 3v7H7v-7zM10 8V5h4v3M4 12h3M17 12h3M4 17h3M17 17h3"/><path d="m10 13 4 3m0-3-4 3"/></g>
+                <circle class="knowledge-map__number-disc" cx="822.9" cy="489.7" r="13" />
+                <text class="knowledge-map__number" x="822.9" y="493.7">05</text>
+                <rect class="knowledge-map__label-bg" x="707.7" y="574.7" width="162.4" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="788.9" y="595.7">Malware Analysis</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--secure-code" href="/cyber-knowledge/secure-code.html" aria-label="Open domain 06: Secure Code &amp; Application Security">
+                <title>06 · Secure Code &amp; Application Security</title>
+                <circle class="knowledge-map__node-halo" cx="670.4" cy="599.9" r="49" />
+                <circle class="knowledge-map__node-disc" cx="670.4" cy="599.9" r="40" />
+                <g class="knowledge-map__icon" transform="translate(655.4 584.9) scale(1.25)"><path d="m8 5-5 7 5 7M16 5l5 7-5 7M14 3l-4 18"/><rect x="9" y="10" width="6" height="7" rx="1.5"/><path d="M10.5 10V8.5a1.5 1.5 0 0 1 3 0V10"/></g>
+                <circle class="knowledge-map__number-disc" cx="704.4" cy="565.9" r="13" />
+                <text class="knowledge-map__number" x="704.4" y="569.9">06</text>
+                <rect class="knowledge-map__label-bg" x="610.2" y="650.9" width="120.4" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="670.4" y="671.9">Secure Code</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--dfir" href="/cyber-knowledge/dfir.html" aria-label="Open domain 07: Digital Forensics &amp; Incident Response (DFIR)">
+                <title>07 · Digital Forensics &amp; Incident Response (DFIR)</title>
+                <circle class="knowledge-map__node-halo" cx="529.6" cy="599.9" r="49" />
+                <circle class="knowledge-map__node-disc" cx="529.6" cy="599.9" r="40" />
+                <g class="knowledge-map__icon" transform="translate(514.6 584.9) scale(1.25)"><circle cx="10" cy="10" r="6"/><path d="m14.5 14.5 5 5M7.5 10a2.5 2.5 0 0 1 5 0c0 3-1.3 5-2.5 6M5 10a5 5 0 0 1 10 0"/></g>
+                <circle class="knowledge-map__number-disc" cx="563.6" cy="565.9" r="13" />
+                <text class="knowledge-map__number" x="563.6" y="569.9">07</text>
+                <rect class="knowledge-map__label-bg" x="485.6" y="650.9" width="88.0" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="529.6" y="671.9">DFIR</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--cloud-security" href="/cyber-knowledge/cloud-security.html" aria-label="Open domain 08: Cloud Security">
+                <title>08 · Cloud Security</title>
+                <circle class="knowledge-map__node-halo" cx="411.1" cy="523.7" r="49" />
+                <circle class="knowledge-map__node-disc" cx="411.1" cy="523.7" r="40" />
+                <g class="knowledge-map__icon" transform="translate(396.1 508.7) scale(1.25)"><path d="M7 18h10a4 4 0 0 0 .7-7.9A6 6 0 0 0 6.2 8.4 4.8 4.8 0 0 0 7 18z"/><path d="M12 11v5m-2-3 2-2 2 2"/></g>
+                <circle class="knowledge-map__number-disc" cx="445.1" cy="489.7" r="13" />
+                <text class="knowledge-map__number" x="445.1" y="493.7">08</text>
+                <rect class="knowledge-map__label-bg" x="338.3" y="574.7" width="145.6" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="411.1" y="595.7">Cloud Security</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--grc" href="/cyber-knowledge/grc.html" aria-label="Open domain 09: Governance, Risk &amp; Compliance (GRC)">
+                <title>09 · Governance, Risk &amp; Compliance (GRC)</title>
+                <circle class="knowledge-map__node-halo" cx="352.5" cy="395.6" r="49" />
+                <circle class="knowledge-map__node-disc" cx="352.5" cy="395.6" r="40" />
+                <g class="knowledge-map__icon" transform="translate(337.5 380.6) scale(1.25)"><path d="M12 3v18M5 6h14M7 6l-4 7h8zM17 6l-4 7h8zM8 21h8"/></g>
+                <circle class="knowledge-map__number-disc" cx="386.5" cy="361.6" r="13" />
+                <text class="knowledge-map__number" x="386.5" y="365.6">09</text>
+                <rect class="knowledge-map__label-bg" x="308.5" y="446.6" width="88.0" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="352.5" y="467.6">GRC</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--osint" href="/cyber-knowledge/osint.html" aria-label="Open domain 10: OSINT &amp; Reconnaissance">
+                <title>10 · OSINT &amp; Reconnaissance</title>
+                <circle class="knowledge-map__node-halo" cx="372.6" cy="256.1" r="49" />
+                <circle class="knowledge-map__node-disc" cx="372.6" cy="256.1" r="40" />
+                <g class="knowledge-map__icon" transform="translate(357.6 241.1) scale(1.25)"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c2 2 3 4.3 3 7s-1 5-3 7c-2-2-3-4.3-3-7s1-5 3-7m5.5 12.5L21 21"/></g>
+                <circle class="knowledge-map__number-disc" cx="406.6" cy="222.1" r="13" />
+                <text class="knowledge-map__number" x="406.6" y="226.1">10</text>
+                <rect class="knowledge-map__label-bg" x="328.6" y="307.1" width="88.0" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="372.6" y="328.1">OSINT</text>
+              </a>
+              <a class="knowledge-map__node knowledge-map__node--ai-security" href="/cyber-knowledge/ai-security.html" aria-label="Open domain 11: AI Security">
+                <title>11 · AI Security</title>
+                <circle class="knowledge-map__node-halo" cx="464.8" cy="149.7" r="49" />
+                <circle class="knowledge-map__node-disc" cx="464.8" cy="149.7" r="40" />
+                <g class="knowledge-map__icon" transform="translate(449.8 134.7) scale(1.25)"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-1 5.8V15a3 3 0 0 0 4 2.8V20M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 1 5.8V15a3 3 0 0 1-4 2.8V20M9 4c0-2 3-2 3 0v16c0 2-3 2-3 0M15 4c0-2-3-2-3 0"/><path d="M7 9h2M15 9h2M7 15h2M15 15h2"/></g>
+                <circle class="knowledge-map__number-disc" cx="498.8" cy="115.7" r="13" />
+                <text class="knowledge-map__number" x="498.8" y="119.7">11</text>
+                <rect class="knowledge-map__label-bg" x="404.6" y="200.7" width="120.4" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="464.8" y="221.7">AI Security</text>
+              </a>
             </g>
           </svg>
+          </div>
           <details class="knowledge-map__text">
             <summary>Text equivalent: 81 cross-domain routes</summary>
             <ul>

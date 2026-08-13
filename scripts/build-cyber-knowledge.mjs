@@ -585,9 +585,39 @@ function crossDomainEdges(source) {
   return [...edges.values()];
 }
 
+const DOMAIN_ICON_MARKUP = Object.freeze({
+  cti: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/>',
+  'red-team': '<path d="M13 2 5 13h6l-1 9 9-12h-6z"/>',
+  'blue-team': '<path d="M12 2 20 5v6c0 5-3.4 8.7-8 11-4.6-2.3-8-6-8-11V5z"/><path d="m8.5 12 2.2 2.2 4.8-5"/>',
+  'vulnerability-research': '<path d="M9 9h6v7a3 3 0 0 1-6 0zM12 9V5M9 6l3-2 3 2M5 12h4M15 12h4M6 8l3 3M18 8l-3 3M6 18l3-3M18 18l-3-3"/>',
+  'malware-analysis': '<path d="M9 8h6l2 3v7H7v-7zM10 8V5h4v3M4 12h3M17 12h3M4 17h3M17 17h3"/><path d="m10 13 4 3m0-3-4 3"/>',
+  'secure-code': '<path d="m8 5-5 7 5 7M16 5l5 7-5 7M14 3l-4 18"/><rect x="9" y="10" width="6" height="7" rx="1.5"/><path d="M10.5 10V8.5a1.5 1.5 0 0 1 3 0V10"/>',
+  dfir: '<circle cx="10" cy="10" r="6"/><path d="m14.5 14.5 5 5M7.5 10a2.5 2.5 0 0 1 5 0c0 3-1.3 5-2.5 6M5 10a5 5 0 0 1 10 0"/>',
+  'cloud-security': '<path d="M7 18h10a4 4 0 0 0 .7-7.9A6 6 0 0 0 6.2 8.4 4.8 4.8 0 0 0 7 18z"/><path d="M12 11v5m-2-3 2-2 2 2"/>',
+  grc: '<path d="M12 3v18M5 6h14M7 6l-4 7h8zM17 6l-4 7h8zM8 21h8"/>',
+  osint: '<circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c2 2 3 4.3 3 7s-1 5-3 7c-2-2-3-4.3-3-7s1-5 3-7m5.5 12.5L21 21"/>',
+  'ai-security': '<path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-1 5.8V15a3 3 0 0 0 4 2.8V20M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 1 5.8V15a3 3 0 0 1-4 2.8V20M9 4c0-2 3-2 3 0v16c0 2-3 2-3 0M15 4c0-2-3-2-3 0"/><path d="M7 9h2M15 9h2M7 15h2M15 15h2"/>',
+});
+
+function domainIcon(domain) {
+  const markup = DOMAIN_ICON_MARKUP[domain.id];
+  if (!markup) throw new Error(`Missing Cyber Knowledge mesh icon for ${domain.id}`);
+  return markup;
+}
+
+function uniqueDomainEdges(edges) {
+  const unique = new Map();
+  for (const edge of edges) {
+    const pair = [edge.source.id, edge.target.id].sort().join('|');
+    if (!unique.has(pair)) unique.set(pair, edge);
+  }
+  return [...unique.values()];
+}
+
 function renderRelationshipMap(edges) {
-  const centre = { x: 500, y: 260 };
-  const radius = 205;
+  const centre = { x: 600, y: 360 };
+  const radius = 250;
+  const visualEdges = uniqueDomainEdges(edges);
   const points = new Map(domains.map((domain, index) => {
     const angle = (-Math.PI / 2) + (index * Math.PI * 2 / domains.length);
     return [domain.id, {
@@ -598,25 +628,51 @@ function renderRelationshipMap(edges) {
   return `      <!-- cyber-knowledge:relationship-map:start -->
       <section id="domain-map" aria-labelledby="domain-map-title">
         <h2 id="domain-map-title">How the eleven domains connect</h2>
-        <p class="section-intro">This map is generated from cross-domain links in the field guides. Each connection reflects an existing route to another guide.</p>
+        <p class="section-intro">This map is generated from cross-domain links in the field guides. Select an icon to open that domain; select a connection to follow one of the underlying routes.</p>
         <div class="knowledge-map">
-          <svg viewBox="0 0 1000 520" role="group" aria-labelledby="knowledge-map-svg-title knowledge-map-svg-desc">
+          <div class="knowledge-map__summary" aria-label="Relationship map summary"><span><strong>11</strong> practitioner domains</span><span><strong>${visualEdges.length}</strong> unique relationships</span><span><strong>${edges.length}</strong> documented routes</span></div>
+          <div class="knowledge-map__canvas" tabindex="0" aria-label="Scrollable Cyber Knowledge relationship map">
+          <svg viewBox="0 0 1200 720" role="group" aria-labelledby="knowledge-map-svg-title knowledge-map-svg-desc">
             <title id="knowledge-map-svg-title">Cyber Knowledge cross-domain relationship map</title>
-            <desc id="knowledge-map-svg-desc">Eleven domain nodes connected by links already present in the field guides. A complete text equivalent follows the diagram.</desc>
+            <desc id="knowledge-map-svg-desc">Eleven color-coded security domain icons surround the Cyber Knowledge hub. Lines represent unique relationships derived from links in the field guides. A complete text equivalent follows the diagram.</desc>
+            <defs>
+              <filter id="knowledge-map-node-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <radialGradient id="knowledge-map-hub-fill"><stop offset="0" stop-color="#38bdf8" stop-opacity=".34"/><stop offset="1" stop-color="#2563eb" stop-opacity=".08"/></radialGradient>
+            </defs>
+            <circle class="knowledge-map__orbit" cx="600" cy="360" r="250" />
             <g class="knowledge-map__edges">
-${edges.map((edge) => {
+${visualEdges.map((edge) => {
     const from = points.get(edge.source.id);
     const to = points.get(edge.target.id);
-    return `              <a href="${escapeHtml(edge.href)}"><title>${escapeHtml(edge.source.name)} to ${escapeHtml(edge.target.name)}</title><line x1="${from.x.toFixed(1)}" y1="${from.y.toFixed(1)}" x2="${to.x.toFixed(1)}" y2="${to.y.toFixed(1)}" /></a>`;
+    return `              <a href="${escapeHtml(edge.href)}" aria-label="Open a route between ${escapeHtml(edge.source.name)} and ${escapeHtml(edge.target.name)}"><title>${escapeHtml(edge.source.name)} ↔ ${escapeHtml(edge.target.name)}</title><line x1="${from.x.toFixed(1)}" y1="${from.y.toFixed(1)}" x2="${to.x.toFixed(1)}" y2="${to.y.toFixed(1)}" /></a>`;
   }).join('\n')}
+            </g>
+            <g class="knowledge-map__hub" aria-hidden="true">
+              <circle cx="600" cy="360" r="76" />
+              <circle class="knowledge-map__hub-ring" cx="600" cy="360" r="58" />
+              <path d="M600 320 626 330v20c0 22-12 39-26 49-14-10-26-27-26-49v-20z" />
+              <circle cx="600" cy="348" r="7" />
+              <path d="M600 355v16M583 338l11 7M617 338l-11 7M582 369l12-11M618 369l-12-11" />
+              <text x="600" y="424">CYBER KNOWLEDGE</text>
             </g>
             <g class="knowledge-map__nodes">
 ${domains.map((domain) => {
     const point = points.get(domain.id);
-    return `              <a href="/${domain.path}"><circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="34" /><text x="${point.x.toFixed(1)}" y="${(point.y + 5).toFixed(1)}">${String(domain.position).padStart(2, '0')}</text><title>${escapeHtml(domain.name)}</title></a>`;
+    const labelWidth = Math.min(184, Math.max(88, domain.short.length * 8.4 + 28));
+    return `              <a class="knowledge-map__node knowledge-map__node--${domain.id}" href="/${domain.path}" aria-label="Open domain ${String(domain.position).padStart(2, '0')}: ${escapeHtml(domain.name)}">
+                <title>${String(domain.position).padStart(2, '0')} · ${escapeHtml(domain.name)}</title>
+                <circle class="knowledge-map__node-halo" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="49" />
+                <circle class="knowledge-map__node-disc" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="40" />
+                <g class="knowledge-map__icon" transform="translate(${(point.x - 15).toFixed(1)} ${(point.y - 15).toFixed(1)}) scale(1.25)">${domainIcon(domain)}</g>
+                <circle class="knowledge-map__number-disc" cx="${(point.x + 34).toFixed(1)}" cy="${(point.y - 34).toFixed(1)}" r="13" />
+                <text class="knowledge-map__number" x="${(point.x + 34).toFixed(1)}" y="${(point.y - 30).toFixed(1)}">${String(domain.position).padStart(2, '0')}</text>
+                <rect class="knowledge-map__label-bg" x="${(point.x - labelWidth / 2).toFixed(1)}" y="${(point.y + 51).toFixed(1)}" width="${labelWidth.toFixed(1)}" height="31" rx="15.5" />
+                <text class="knowledge-map__label" x="${point.x.toFixed(1)}" y="${(point.y + 72).toFixed(1)}">${escapeHtml(domain.short)}</text>
+              </a>`;
   }).join('\n')}
             </g>
           </svg>
+          </div>
           <details class="knowledge-map__text">
             <summary>Text equivalent: ${edges.length} cross-domain routes</summary>
             <ul>
