@@ -4,6 +4,11 @@ Source and production pipeline for [1200km Security Research](https://1200km.com
 Andrey Pautov's CTI, detection-engineering, threat-hunting, security-lab, and
 open-source project site.
 
+The current malware-analysis platform guide is the
+[AIDebug 3.1 full release review](https://1200km.com/articles/read/2026/2026-08-13-aidebug-3-1-full-release-review/),
+connected to the site’s PE, assembly, strings-analysis, safe-lab, projects, and
+Cyber Knowledge indexes.
+
 The repository publishes plain static HTML plus generated documentation
 snapshots. GitHub Pages builds a canonical domain-wide search index and applies
 release-only metadata normalization without modifying framework-hydrated page
