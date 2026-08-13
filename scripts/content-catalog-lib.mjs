@@ -389,16 +389,22 @@ function articleIdFromUrl(value) {
   return new URL(value).pathname.match(/-([a-f0-9]{12})\/?$/i)?.[1]?.toLowerCase() || null;
 }
 
+function articleSlugFromUrl(value) {
+  return new URL(value).pathname.match(/^\/articles\/read\/\d{4}\/([^/]+)\/?$/i)?.[1]?.toLowerCase() || null;
+}
+
 function applyArticleGovernance(item, config) {
   if (item.collection_id !== 'collection:medium-export' || item.primary_type !== 'article') return item;
   const id = articleIdFromUrl(item.canonical_url);
+  const slug = articleSlugFromUrl(item.canonical_url);
   const policy = config.article_lifecycle_policy || {};
   const currentCore = new Set(policy.current_core_ids || []);
+  const currentCoreSlugs = new Set(policy.current_core_slugs || []);
   const stableReference = new Set(policy.stable_reference_ids || []);
   const historical = new Set(policy.historical_ids || []);
   const published = item.published_at || '';
 
-  if (currentCore.has(id)) return {
+  if (currentCore.has(id) || currentCoreSlugs.has(slug)) return {
     ...item,
     status: 'released',
     lifecycle: 'maintained',
