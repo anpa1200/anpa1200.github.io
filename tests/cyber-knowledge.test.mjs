@@ -87,6 +87,28 @@ test('Cyber Knowledge hub is the canonical collection for eleven maintained guid
   }
 });
 
+test('Cyber Knowledge relationship mesh uses eleven accessible semantic icon nodes', () => {
+  const html = source('index.html');
+  const mesh = html.match(/<!-- cyber-knowledge:relationship-map:start -->([\s\S]*?)<!-- cyber-knowledge:relationship-map:end -->/)?.[1] || '';
+  assert.ok(mesh, 'generated relationship map is required');
+  assert.equal((mesh.match(/class="knowledge-map__node knowledge-map__node--/g) || []).length, modules.length);
+  assert.equal((mesh.match(/class="knowledge-map__icon"/g) || []).length, modules.length);
+  assert.match(mesh, /class="knowledge-map__hub"/);
+  assert.match(mesh, /class="knowledge-map__canvas" tabindex="0"/);
+  assert.match(mesh, /11<\/strong> practitioner domains/);
+  assert.match(mesh, /documented routes/);
+  assert.match(mesh, /complete text equivalent follows the diagram/i);
+  for (const [index, module] of modules.entries()) {
+    const domain = knowledgeModel.domains.find((item) => item.id === module);
+    assert.match(mesh, new RegExp(`knowledge-map__node--${module}`), module);
+    assert.match(
+      mesh,
+      new RegExp(`aria-label="Open domain ${String(index + 1).padStart(2, '0')}: ${domain.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll('&', '&amp;')}"`),
+      module,
+    );
+  }
+});
+
 test('Cyber Knowledge reference indexes are canonical, static, and source-linked', () => {
   const cases = [
     ['glossary/index.html', 'https://1200km.com/cyber-knowledge/glossary/', 'DefinedTermSet'],
