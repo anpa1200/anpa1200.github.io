@@ -43,9 +43,9 @@ test('homepage emits a WebPage connected to the current AdversaryGraph source en
   assert.deepEqual(software.author, { '@id': PERSON_ID });
   assert.equal(software.name, 'AdversaryGraph');
   assert.equal(software.alternateName, 'ThreatMapper');
-  assert.equal(software.softwareVersion, '6.5.0');
+  assert.equal(software.softwareVersion, '7.0.0');
   assert.equal(software.codeRepository, 'https://github.com/anpa1200/adversarygraph');
-  assert.equal(software.license, 'https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/LICENSE');
+  assert.equal(software.license, 'https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/LICENSE');
   assert.equal(person.email, 'mailto:1200km@gmail.com');
   assert.equal(person.contactPoint.email, 'mailto:1200km@gmail.com');
   assert.ok(person.sameAs.includes('https://infosecwriteups.com/@1200km'));

@@ -10,7 +10,7 @@ Explain AdversaryGraph using public documentation.
 - https://1200km.com/data/site-facts.json
 - https://1200km.com/adversarygraph-docs/
 - https://1200km.com/adversarygraph-docs/capabilities/
-- https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/unified-rag-and-mcp.md (v6.5 source guide)
+- https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/docs/unified-rag-and-mcp.md (v7.0 source guide)
 - https://github.com/anpa1200/adversarygraph
 
 ## Key Concepts
