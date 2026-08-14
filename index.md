@@ -19,9 +19,9 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench for mapping reports, 
 
 Canonical page: https://1200km.com/adversarygraph/
 
-Current source release: v6.5.0, merged and CI-validated on `main` at
-`aeee13dcaec1e2993b9f0969290c9ee414bb4cf6`. The latest published immutable
-GitHub release remains v6.0.0 until the protected v6.5.0 tag workflow completes.
+Current source release: v7.0.0, merged and CI-validated on `main` at
+`2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`, matching the latest published
+immutable GitHub release v7.0.0.
 
 Authoritative fact model: https://1200km.com/data/site-facts.json
 

@@ -35,12 +35,31 @@ articles must not be used to establish a current version or metric.
 
 ## Release boundary
 
-AdversaryGraph has two explicit release facts. The current merged and
-CI-validated source release is `v6.5.0` at commit
-`aeee13dcaec1e2993b9f0969290c9ee414bb4cf6`. The latest non-draft,
-non-prerelease immutable GitHub release is still `v6.0.0`. Until the protected
-v6.5.0 tag workflow publishes successfully, pages must state both facts and
-must not link to or imply the existence of a v6.5.0 GitHub release tag.
+AdversaryGraph has two explicit release facts, tracked separately even when
+their values are equal. The current merged and CI-validated source release is
+`v7.0.0` at commit `2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`. The latest
+non-draft, non-prerelease immutable GitHub release is also `v7.0.0`: the
+protected v6.5.0 tag workflow was superseded and the project published v7.0.0
+directly, closing the source-ahead-of-tag gap that existed while `v6.5.0` was
+merged but unreleased. `adversarygraph.current_source_release` and
+`adversarygraph.development_status` keep `status: "current-development"` by
+convention even when the value matches the latest tag — that status labels the
+fact type (tracks whatever is merged on `main`), not a claim that the value
+itself is unpublished.
+
+### 2026-08-14 reassessment
+
+The AdversaryGraph release boundary closed when `v7.0.0` published on
+2026-08-12 (commit `2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`, tag object
+`b19f7a869cefe4fbc88802ea432e3cec80b27a05`). A full site reassessment updated
+`data/site-facts.json`, ~13 dependent HTML/JSON-LD/Markdown surfaces, and
+regenerated `feed.xml`/`sitemap.xml` accordingly; `npm run check-facts` passes
+against the reconciled state. Note: the AdversaryGraph repo's general `CI`
+workflow failed on this commit due to a transient upstream 503 fetching
+`nuclei-templates` during the scanner-mcp image build (run `31626631081`); the
+`Release` workflow that gates and publishes the tag completed successfully
+(run `31626704258`), which is the run cited by
+`adversarygraph.current_source_ci`.
 
 ## Count definitions
 

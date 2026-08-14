@@ -27,7 +27,7 @@ Core capabilities:
 - Investigation reporting
 - Analyst review workflow
 
-Current v6.5.0 source-release capabilities:
+Current v7.0.0 source-release capabilities:
 
 - Unified RAG over 12 governed source types: ATT&CK techniques, groups, and
   campaigns; actor intelligence; IOCs; CVEs; analysis reports; knowledge;
@@ -41,8 +41,8 @@ Current v6.5.0 source-release capabilities:
   `search_intelligence`, `ask_intelligence`, `get_indexed_entity`, and
   `propose_navigator_layer`
 
-These RAG/MCP capabilities are merged and CI-validated in the v6.5.0 source
-release, but are not part of the older immutable v6.0.0 tag. RAG analysis requires `run_analysis`, profile
+These RAG/MCP capabilities are merged, CI-validated, and part of the immutable
+v7.0.0 tag; they are not part of the older v6.0.0 tag. RAG analysis requires `run_analysis`, profile
 administration requires `manage_intel`, and index administration requires
 `manage_feeds`. MCP cannot reindex, confirm proposals, or mutate platform state.
 
