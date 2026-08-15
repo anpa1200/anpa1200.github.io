@@ -489,7 +489,7 @@ You have completed this chapter when, for a misclassification, you can name an o
 <a id="next"></a>
 ## 18. What comes next
 
-[The next Module 00 chapter](https://1200km.com/ai-security-course/module-00.html#llms) will connect this mechanism to Transformers, tokenization, embeddings, attention, and LLM generation—then trace the new attack surfaces and CTI evidence requirements.
+[Chapter 4: Transformers and LLM Generation](https://1200km.com/ai-security-course/module-00/chapter-04.html) connects this mechanism to tokenization, embeddings, attention, generation controls, prompt injection, context leakage, and the evidence required for defensible analysis.
 
 ---
 
