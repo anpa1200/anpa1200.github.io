@@ -268,7 +268,12 @@ for (const path of files) {
   const html = await readFile(path, 'utf8');
   const url = urlForFile(path);
   const validation = validatePage(url, html);
-  if (!validation.indexable) continue;
+  if (!validation.indexable) {
+    if (['off-origin-canonical', 'multiple-canonicals'].includes(validation.reason)) {
+      throw new Error(`${relative(siteRoot, path)}: invalid canonical declaration (${validation.reason})`);
+    }
+    continue;
+  }
   const canonical = canonicalFromHtml(html) ? normalizeCanonical(canonicalFromHtml(html), url) : normalizeCanonical(url);
   if (!canonical || canonical !== normalizeCanonical(url)) continue;
   const title = stripHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1]

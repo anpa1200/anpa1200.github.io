@@ -40,7 +40,8 @@ form is labelled “Search all 1200km research” and opens the domain-wide sear
 
 The release pipeline generates:
 
-- one self-canonical URL per indexable local page;
+- one self-canonical URL per indexable local page, with exact allowlisted
+  cross-domain canonicals for permitted TrainSec article mirrors;
 - flat, deduplicated `sitemap.xml` and `sitemap-all.xml` files;
 - an RSS 2.0 article feed with canonical item URLs;
 - one connected Schema.org `@graph` per page with stable Person, WebSite,

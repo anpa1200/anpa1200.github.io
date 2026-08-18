@@ -9,9 +9,11 @@ import {
   classifyTopics,
   classifyUrl,
   discoveryWeight,
+  LOCAL_SEARCH_MINIMUM_PAGES,
   normalizeCanonical,
   parseSitemap,
   prepareHtmlForSearch,
+  REMOTE_SEARCH_MINIMUM_PAGES,
   validatePage,
 } from '../scripts/search-index-lib.mjs';
 import {
@@ -19,6 +21,7 @@ import {
   rerankSearchResults,
   shouldApplyDiscoveryGovernance,
 } from '../scripts/search-governance-lib.mjs';
+import { trainsecCanonicalEntries } from '../scripts/trainsec-canonical-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -34,6 +37,32 @@ test('sitemap parser distinguishes indexes and deduplicates URLs', () => {
   assert.deepEqual(parsed.locations, ['https://1200km.com/a/sitemap.xml']);
 });
 
+test('canonical sitemap union preserves remote pages and excludes syndicated TrainSec mirrors', () => {
+  const local = new Set(parseSitemap(readFileSync(join(ROOT, 'sitemap-all.xml'), 'utf8')).locations);
+  const complete = new Set(parseSitemap(readFileSync(join(ROOT, 'sitemap.xml'), 'utf8')).locations);
+  assert.ok(complete.size > local.size, 'complete sitemap must retain canonical remote collection pages');
+  for (const url of local) assert.ok(complete.has(url), `complete sitemap is missing local canonical ${url}`);
+  for (const entry of trainsecCanonicalEntries) {
+    assert.equal(local.has(entry.local_url), false, entry.local_url);
+    assert.equal(complete.has(entry.local_url), false, entry.local_url);
+    assert.equal(local.has(entry.canonical_url), false, entry.canonical_url);
+    assert.equal(complete.has(entry.canonical_url), false, entry.canonical_url);
+  }
+  for (const url of [
+    'https://1200km.com/articles/trainsec-library.html',
+    'https://1200km.com/articles/trainsec/authors.html',
+    'https://1200km.com/articles/trainsec/domains.html',
+  ]) {
+    assert.ok(local.has(url), url);
+    assert.ok(complete.has(url), url);
+  }
+  const feed = readFileSync(join(ROOT, 'feed.xml'), 'utf8');
+  for (const entry of trainsecCanonicalEntries) {
+    assert.equal(feed.includes(entry.local_url), false, entry.local_url);
+    assert.equal(feed.includes(entry.canonical_url), false, entry.canonical_url);
+  }
+});
+
 test('canonical extraction supports attribute order', () => {
   assert.equal(canonicalFromHtml('<link href="https://1200km.com/a/" rel="canonical">'), 'https://1200km.com/a/');
 });
@@ -46,6 +75,71 @@ test('validation rejects redirects, noindex pages, aliases, and external canonic
   assert.equal(validatePage('https://1200km.com/a/', base.replace('<head>', '<head><meta http-equiv="refresh" content="0; /b/">')).reason, 'redirect');
   assert.equal(validatePage('https://1200km.com/a/', base.replace('<head>', '<head><link rel="canonical" href="https://1200km.com/b/">')).reason, 'canonical-alias');
   assert.equal(validatePage('https://1200km.com/a/', base.replace('<head>', '<head><link rel="canonical" href="https://example.com/a/">')).reason, 'off-origin-canonical');
+});
+
+test('validation recognizes only exact allowlisted TrainSec external canonicals', () => {
+  const entry = trainsecCanonicalEntries[0];
+  const mirror = `<html><head><title>TrainSec mirror</title>
+    <meta name="trainsec-source" content="${entry.canonical_url}">
+    <meta name="trainsec-mirror" content="${entry.local_url}">
+    <link rel="canonical" href="${entry.canonical_url}">
+    </head><body>Main</body></html>`;
+  assert.deepEqual(validatePage(entry.local_url, mirror), {
+    indexable: false,
+    reason: 'external-canonical',
+    canonicalUrl: entry.canonical_url,
+  });
+  assert.equal(
+    validatePage(entry.local_url, mirror.replace(
+      `<link rel="canonical" href="${entry.canonical_url}">`,
+      `<link rel="canonical" href="${entry.canonical_url}?copy=1">`,
+    )).reason,
+    'off-origin-canonical',
+  );
+  assert.equal(
+    validatePage(entry.local_url, mirror.replace(
+      `<meta name="trainsec-source" content="${entry.canonical_url}">`,
+      '<meta name="trainsec-source" content="https://trainsec.net/library/wrong/">',
+    )).reason,
+    'off-origin-canonical',
+  );
+  assert.equal(
+    validatePage('https://1200km.com/articles/trainsec/not-in-manifest.html', mirror).reason,
+    'off-origin-canonical',
+  );
+  assert.equal(
+    validatePage(entry.local_url, mirror.replace(`<meta name="trainsec-mirror" content="${entry.local_url}">`, '')).reason,
+    'off-origin-canonical',
+  );
+  assert.equal(
+    validatePage(entry.local_url, mirror.replace(
+      '</head>',
+      '<link rel="canonical" href="https://example.com/escape"></head>',
+    )).reason,
+    'multiple-canonicals',
+  );
+  assert.equal(
+    validatePage(entry.local_url, mirror.replace(
+      '</head>',
+      `<meta name="trainsec-source" content="${entry.canonical_url}"></head>`,
+    )).reason,
+    'off-origin-canonical',
+  );
+  assert.equal(
+    validatePage(entry.local_url, mirror.replace(
+      '</head>',
+      `<meta name="trainsec-mirror" content="${entry.local_url}"></head>`,
+    )).reason,
+    'off-origin-canonical',
+  );
+  const other = trainsecCanonicalEntries[1];
+  assert.equal(
+    validatePage(other.local_url, mirror.replace(
+      `<meta name="trainsec-mirror" content="${entry.local_url}">`,
+      `<meta name="trainsec-mirror" content="${other.local_url}">`,
+    )).reason,
+    'off-origin-canonical',
+  );
 });
 
 test('search preprocessing marks canonical bodies and boosts entity identity', () => {
@@ -215,4 +309,8 @@ test('remote index builds prefer release files and require stable ranking fixtur
   assert.match(builder, /maxStalePages/);
   assert.match(builder, /canonicalSitemapOutput/);
   assert.match(builder, /skippedDetails/);
+  assert.equal(LOCAL_SEARCH_MINIMUM_PAGES, 1000);
+  assert.equal(REMOTE_SEARCH_MINIMUM_PAGES, 1500);
+  assert.match(builder, /REMOTE_SEARCH_MINIMUM_PAGES/);
+  assert.match(readFileSync(join(ROOT, 'scripts', 'check-search-index.mjs'), 'utf8'), /REMOTE_SEARCH_MINIMUM_PAGES/);
 });

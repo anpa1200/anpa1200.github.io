@@ -3,11 +3,14 @@ import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { VOCABULARIES } from '../scripts/content-catalog-lib.mjs';
+import { createContentItem, VOCABULARIES } from '../scripts/content-catalog-lib.mjs';
+import { trainsecCanonicalEntries } from '../scripts/trainsec-canonical-lib.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const catalog = JSON.parse(readFileSync(join(ROOT, 'data', 'content-catalog.json'), 'utf8'));
 const taxonomyAudit = JSON.parse(readFileSync(join(ROOT, 'reports', 'content-taxonomy-audit.json'), 'utf8'));
+const config = JSON.parse(readFileSync(join(ROOT, 'data', 'content-catalog.config.json'), 'utf8'));
+const trainsecCanonicalSet = new Set(trainsecCanonicalEntries.map((entry) => entry.canonical_url));
 
 test('catalogue has one stable ID and canonical URL per item', () => {
   assert.equal(new Set(catalog.items.map((item) => item.id)).size, catalog.items.length);
@@ -55,7 +58,12 @@ test('core, reference, and archive are distinct governed discovery tiers', () =>
 test('mirrors identify a distinct source and archived records explain lifecycle', () => {
   for (const item of catalog.items.filter((entry) => entry.primary_type === 'mirror')) {
     assert.ok(item.source_url, item.id);
-    assert.notEqual(item.source_url, item.canonical_url, item.id);
+    if (trainsecCanonicalSet.has(item.canonical_url)) {
+      assert.equal(item.source_url, item.canonical_url, item.id);
+      assert.equal(item.indexable, false, item.id);
+      assert.equal(item.alternate_urls?.length, 1, item.id);
+      assert.match(item.alternate_urls[0], /^https:\/\/1200km\.com\/articles\/trainsec\/.+\.html$/, item.id);
+    } else assert.notEqual(item.source_url, item.canonical_url, item.id);
   }
   for (const item of catalog.items.filter((entry) => ['archived', 'superseded'].includes(entry.status))) {
     assert.ok(item.archive_reason, item.id);
@@ -74,14 +82,66 @@ test('offensive indexes are not assigned catch-all CTI taxonomy', () => {
 
 test('discovery tags are specific and support multi-facet retrieval', () => {
   assert.equal(catalog.items.filter((item) => item.tags.includes('security-research')).length, 0);
-  const windows = catalog.items.find((item) => item.canonical_url.includes('/articles/trainsec/windows-internals-vmmap-basics'));
+  const windows = catalog.items.find((item) => item.alternate_urls?.some((url) => url.includes('/articles/trainsec/windows-internals-vmmap-basics')));
   assert.equal(windows?.primary_domain, 'application-security');
   assert.ok(windows?.tags.includes('windows-internals'));
-  const malware = catalog.items.find((item) => item.canonical_url.includes('/articles/trainsec/malware-analysis-wannacry-dropper'));
+  const malware = catalog.items.find((item) => item.alternate_urls?.some((url) => url.includes('/articles/trainsec/malware-analysis-wannacry-dropper')));
   assert.equal(malware?.primary_domain, 'malware-analysis');
   assert.ok(malware?.tags.includes('reverse-engineering'));
   assert.ok(taxonomyAudit.tagging.unique_tag_count > 20);
   assert.equal(taxonomyAudit.tagging.generic_security_research_count, 0);
+});
+
+test('TrainSec mirrors retain exact external canonical identities and local alternates', () => {
+  const trainsecItems = catalog.items.filter((item) => item.canonical_url.startsWith('https://trainsec.net/'));
+  assert.equal(trainsecItems.length, trainsecCanonicalEntries.length);
+  for (const entry of trainsecCanonicalEntries) {
+    const item = trainsecItems.find((candidate) => candidate.canonical_url === entry.canonical_url);
+    assert.ok(item, entry.canonical_url);
+    assert.equal(item.primary_type, 'mirror');
+    assert.equal(item.collection_id, 'collection:trainsec-library');
+    assert.equal(item.source_url, entry.canonical_url);
+    assert.equal(item.source_platform, 'TrainSec');
+    assert.equal(item.canonical_owner, 'TrainSec.net');
+    assert.deepEqual(item.alternate_urls, [entry.local_url]);
+    assert.equal(item.indexable, false);
+  }
+  for (const url of [
+    'https://1200km.com/articles/trainsec-library.html',
+    'https://1200km.com/articles/trainsec/authors.html',
+    'https://1200km.com/articles/trainsec/domains.html',
+  ]) {
+    const item = catalog.items.find((candidate) => candidate.canonical_url === url);
+    assert.equal(item?.primary_type, 'index', url);
+    assert.equal(item?.indexable, true, url);
+  }
+});
+
+test('catalogue creation fails closed around TrainSec mirror metadata', () => {
+  const entry = trainsecCanonicalEntries[0];
+  const html = `<html><head><title>VMMap Basics</title>
+    <meta name="description" content="A sufficiently detailed TrainSec mirror description for catalogue generation.">
+    <meta name="author" content="Pavel Yosifovich">
+    <meta name="trainsec-source" content="${entry.canonical_url}">
+    <meta name="trainsec-mirror" content="${entry.local_url}">
+    <meta property="article:published_time" content="2026-08-02">
+    <link rel="canonical" href="${entry.canonical_url}">
+    </head><body><main><h1>VMMap Basics</h1></main></body></html>`;
+  const item = createContentItem({
+    url: entry.local_url,
+    html,
+    updatedAt: '2026-08-18',
+    source: 'external-canonical-mirror',
+  }, config);
+  assert.equal(item.canonical_url, entry.canonical_url);
+  assert.deepEqual(item.alternate_urls, [entry.local_url]);
+  assert.equal(item.indexable, false);
+  assert.throws(() => createContentItem({
+    url: entry.local_url,
+    html: html.replace(`<meta name="trainsec-mirror" content="${entry.local_url}">`, ''),
+    updatedAt: '2026-08-18',
+    source: 'external-canonical-mirror',
+  }, config), /metadata or canonical mapping is invalid/);
 });
 
 test('current, superseded, archived, and externally sourced entities remain distinct', () => {

@@ -7,6 +7,8 @@ import { gunzipSync } from 'node:zlib';
 import * as pagefind from 'pagefind';
 import { governanceBoost } from './search-governance-lib.mjs';
 import {
+  LOCAL_SEARCH_MINIMUM_PAGES,
+  REMOTE_SEARCH_MINIMUM_PAGES,
   SITE_ORIGIN,
   collectLocalSitemapUrls,
   localFileForUrl,
@@ -31,7 +33,9 @@ const remote = args.includes('--remote');
 const quiet = args.includes('--quiet');
 const siteRoot = resolve(option('--site', ROOT));
 const outputPath = resolve(option('--output', join(ROOT, 'pagefind')));
-const minimumPages = Number.parseInt(option('--minimum-pages', remote ? '1600' : '1000'), 10);
+const minimumPages = Number.parseInt(option('--minimum-pages', String(
+  remote ? REMOTE_SEARCH_MINIMUM_PAGES : LOCAL_SEARCH_MINIMUM_PAGES,
+)), 10);
 const maxPageFailures = Number.parseInt(option('--max-page-failures', remote ? '12' : '0'), 10);
 const maxStalePages = Number.parseInt(option('--max-stale-pages', '0'), 10);
 const concurrency = Math.max(1, Math.min(24, Number.parseInt(option('--concurrency', '12'), 10)));

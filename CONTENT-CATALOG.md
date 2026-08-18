@@ -7,15 +7,17 @@ and a CTI item.
 
 ## What the inventory found
 
-The source catalogue generated on 2026-07-22 contains:
+The source catalogue generated on 2026-08-18 contains:
 
-- 1,055 governed identities, including 1,043 canonical pages in the local deployment sitemap;
+- 1,245 governed identities, including 1,149 indexable catalogue items;
 - one intentionally noindex post-v6 AdversaryGraph development guide;
-- 12 declared external repository or package identities;
+- 96 externally canonical identities: 84 permitted TrainSec mirrors plus 12
+  declared external repository or package identities;
 - four GitHub repositories explicitly marked archived;
-- ten separately deployed documentation, guide, case-study, lab, research, or article collections.
+- eleven separately deployed documentation, guide, case-study, lab, research,
+  or article collections.
 
-The large local page count is not an article count. It includes 816 generated
+The large local page count is not an article count. It includes 888 generated
 ATT&CK actor and technique pages, 124 ITDR pages, and the checked-in
 AdversaryGraph documentation output. ATT&CK actors are `reference-entity`
 records and technique pages are `generated-reference` records backed by the
@@ -154,6 +156,10 @@ catalogue and schema.
   source when it can be extracted from the page.
 - External articles without a local edition keep their publication URL as
   canonical and are not added to the 1200km sitemap.
+- Permitted TrainSec reproductions also keep the exact matching TrainSec
+  article as canonical. The readable 1200km mirror is recorded as an alternate
+  URL, remains linked from the local TrainSec hub, and is excluded from
+  1200km sitemaps, RSS, and Pagefind.
 - Legacy ThreatMapper and old article slugs are aliases, not catalogue items.
   They remain noindex redirects to the maintained identity.
 - Historical AdversaryGraph content remains public only with an explicit

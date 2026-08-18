@@ -20,6 +20,7 @@ import {
   tagAttributes,
   transformReleaseHtml,
 } from './release-html-lib.mjs';
+import { trainsecCanonicalEntries } from './trainsec-canonical-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -259,7 +260,12 @@ for (const path of files) {
   const html = readFileSync(path, 'utf8');
   const url = urlForFile(path);
   const validation = validatePage(url, html);
-  if (!validation.indexable) continue;
+  if (!validation.indexable) {
+    if (['off-origin-canonical', 'multiple-canonicals'].includes(validation.reason)) {
+      failures.push(`${relative(siteRoot, path).replace(/\\/g, '/')}: invalid canonical declaration (${validation.reason})`);
+    }
+    continue;
+  }
   const rel = relative(siteRoot, path).replace(/\\/g, '/');
   const canonicalLinks = [...html.matchAll(/<link\b[^>]*rel=["'][^"']*canonical[^"']*["'][^>]*>/gi)];
   if (canonicalLinks.length !== 1) failures.push(`${rel}: expected one canonical link, found ${canonicalLinks.length}`);
@@ -377,8 +383,26 @@ const sitemapAllPath = join(siteRoot, 'sitemap-all.xml');
 const sitemapPath = join(siteRoot, 'sitemap.xml');
 if (!existsSync(sitemapAllPath) || !existsSync(sitemapPath)) failures.push('sitemap files are missing');
 else {
-  const local = parseSitemapEntries(readFileSync(sitemapAllPath, 'utf8'));
-  const complete = parseSitemapEntries(readFileSync(sitemapPath, 'utf8'));
+  const localXml = readFileSync(sitemapAllPath, 'utf8');
+  const completeXml = readFileSync(sitemapPath, 'utf8');
+  for (const [name, xml] of [['sitemap-all.xml', localXml], ['sitemap.xml', completeXml]]) {
+    const rawLocations = [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/gi)].map((match) => match[1].trim());
+    for (const location of rawLocations) {
+      try {
+        if (new URL(location).hostname !== '1200km.com') {
+          failures.push(`${name}: off-origin URL must not be published in a 1200km sitemap (${location})`);
+        }
+      } catch {
+        failures.push(`${name}: invalid raw sitemap location (${location})`);
+      }
+    }
+    const rawLocationSet = new Set(rawLocations);
+    for (const entry of trainsecCanonicalEntries) {
+      if (rawLocationSet.has(entry.local_url)) failures.push(`${name}: contains externally canonical TrainSec mirror ${entry.local_url}`);
+    }
+  }
+  const local = parseSitemapEntries(localXml);
+  const complete = parseSitemapEntries(completeXml);
   if (local.isIndex || complete.isIndex) failures.push('sitemaps must be flat URL sets generated from canonical pages');
   const localUrls = new Set(local.entries.map((entry) => entry.loc));
   if (localUrls.size !== expectedLocalSitemapUrls.size) failures.push(`sitemap-all.xml has ${localUrls.size} URLs; expected ${expectedLocalSitemapUrls.size}`);

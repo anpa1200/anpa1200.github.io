@@ -3,16 +3,26 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building a Simple RPC Client and Server: A Step-by-Step Guide — TrainSec article | 1200km</title>
 <meta name="description" content="Building a Simple RPC Client and Server: A Step-by-Step Guide by Pavel Yosifovich, republished from TrainSec.net with permission.">
-<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/"><meta name="keywords" content="Pavel Yosifovich, Windows internals, Technical walkthrough, Windows, internals">
-<meta property="article:published_time" content="2024-11-19">
-<link rel="canonical" href="https://1200km.com/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">
-<meta property="og:type" content="article"><meta property="og:title" content="Building a Simple RPC Client and Server: A Step-by-Step Guide"><meta property="og:url" content="https://1200km.com/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","@id":"https://1200km.com/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html#article","url":"https://1200km.com/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html","headline":"Building a Simple RPC Client and Server: A Step-by-Step Guide","author":{"@id":"https://1200km.com/#person"},"publisher":{"@id":"https://1200km.com/#person"},"mainEntityOfPage":{"@id":"https://1200km.com/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html#webpage"},"datePublished":"2024-11-19","dateModified":"2026-08-03","isBasedOn":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/"}</script>
+<meta name="author" content="Pavel Yosifovich"><meta name="trainsec-author" content="Pavel Yosifovich"><meta name="trainsec-source" content="https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/"><meta name="trainsec-mirror" content="https://1200km.com/articles/trainsec/windows-internals-building-a-simple-rpc-client-and-server-a-step-by-step-guide.html">
+<meta property="article:published_time" content="2024-11-20">
+<link rel="canonical" href="https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/">
+<meta property="og:type" content="article"><meta property="og:title" content="Building a Simple RPC Client and Server: A Step-by-Step Guide"><meta property="og:url" content="https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/#webpage","url":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/","name":"Building a Simple RPC Client and Server: A Step-by-Step Guide","mainEntity":{"@id":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/#article"}},{"@type":"Article","@id":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/#article","url":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/","headline":"Building a Simple RPC Client and Server: A Step-by-Step Guide","author":{"@type":"Person","name":"Pavel Yosifovich"},"publisher":{"@type":"Organization","name":"TrainSec","url":"https://trainsec.net/"},"mainEntityOfPage":{"@id":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/#webpage"},"datePublished":"2024-11-20","isBasedOn":"https://trainsec.net/library/windows-internals/building-a-simple-rpc-client-and-server-a-step-by-step-guide/"}]}</script>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
- .article-cover{max-width:860px;margin:28px 0;padding:10px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style></head><body>
+ .article-cover{max-width:860px;margin:28px 0;padding:10px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style><meta property="og:site_name" content="TrainSec">
+<meta property="og:description" content="Building a Simple RPC Client and Server: A Step-by-Step Guide by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Building a Simple RPC Client and Server: A Step-by-Step Guide">
+<meta name="twitter:description" content="Building a Simple RPC Client and Server: A Step-by-Step Guide by Pavel Yosifovich, republished from TrainSec.net with permission.">
+<meta property="og:image" content="https://trainsec.net/wp-content/uploads/2024/11/rpc-1024x576.jpg">
+<meta property="og:image:alt" content="Cover image for Building a Simple RPC Client and Server: A Step-by-Step Guide">
+<meta name="twitter:image" content="https://trainsec.net/wp-content/uploads/2024/11/rpc-1024x576.jpg">
+<meta name="twitter:image:alt" content="Cover image for Building a Simple RPC Client and Server: A Step-by-Step Guide">
+<link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml">
+</head><body>
 <header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
-<main class="wrap" data-pagefind-body><article class="article">
+<main class="wrap" data-pagefind-ignore="all"><article class="article">
 <p class="eyebrow">TrainSec source integration · Windows internals · Technical walkthrough</p><h1>Building a Simple RPC Client and Server: A Step-by-Step Guide</h1>
 <p class="meta"><strong>Author:</strong> Pavel Yosifovich · <strong>Published:</strong> November 20, 2024</p>
 <div class="tag-row"><span class="tag">TrainSec</span><span class="tag">Windows</span><span class="tag">internals</span></div>
@@ -38,7 +48,7 @@
 
 
 
-<h2 class="wp-block-heading"><strong>What Is RPC?</strong></h2>
+<h2 class="wp-block-heading" id="what-is-rpc"><strong>What Is RPC?</strong></h2>
 
 
 
@@ -87,7 +97,7 @@
 				</div>
 				<div class="elementor-element elementor-element-7e71a8f elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
 				<div class="elementor-widget-container">
-					<h2 class="elementor-heading-title elementor-size-default">Windows Master Developer</h2>				</div>
+					<h2 class="elementor-heading-title elementor-size-default" id="windows-master-developer">Windows Master Developer</h2>				</div>
 				</div>
 				<div class="elementor-element elementor-element-9e9db60 elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
 				<div class="elementor-widget-container">
@@ -111,7 +121,7 @@
 
 
 
-<h2 class="wp-block-heading"><strong>Step 1: Define the Interface</strong></h2>
+<h2 class="wp-block-heading" id="step-1-define-the-interface"><strong>Step 1: Define the Interface</strong></h2>
 
 
 
@@ -137,7 +147,7 @@
 
 
 
-<h2 class="wp-block-heading"><strong>Step 2: Generate Necessary Files</strong></h2>
+<h2 class="wp-block-heading" id="step-2-generate-necessary-files"><strong>Step 2: Generate Necessary Files</strong></h2>
 
 
 
@@ -163,7 +173,7 @@
 
 
 
-<h2 class="wp-block-heading"><strong>Step 3: Build the RPC Server</strong></h2>
+<h2 class="wp-block-heading" id="step-3-build-the-rpc-server"><strong>Step 3: Build the RPC Server</strong></h2>
 
 
 
@@ -203,7 +213,7 @@
 
 
 
-<h2 class="wp-block-heading"><strong>Step 4: Build the RPC Client</strong></h2>
+<h2 class="wp-block-heading" id="step-4-build-the-rpc-client"><strong>Step 4: Build the RPC Client</strong></h2>
 
 
 
@@ -243,7 +253,7 @@ printf(&quot;Result: %d\n&quot;, result);" style="color:#D4D4D4;display:none" ar
 
 
 
-<h2 class="wp-block-heading"><strong>Step 5: Test the Setup</strong></h2>
+<h2 class="wp-block-heading" id="step-5-test-the-setup"><strong>Step 5: Test the Setup</strong></h2>
 
 
 
@@ -255,7 +265,7 @@ printf(&quot;Result: %d\n&quot;, result);" style="color:#D4D4D4;display:none" ar
 
 
 
-<h2 class="wp-block-heading"><strong>Practical Applications</strong></h2>
+<h2 class="wp-block-heading" id="practical-applications"><strong>Practical Applications</strong></h2>
 
 
 
@@ -281,7 +291,7 @@ printf(&quot;Result: %d\n&quot;, result);" style="color:#D4D4D4;display:none" ar
 
 
 
-<h2 class="wp-block-heading"><strong>Conclusion</strong></h2>
+<h2 class="wp-block-heading" id="conclusion"><strong>Conclusion</strong></h2>
 
 
 
@@ -297,7 +307,7 @@ printf(&quot;Result: %d\n&quot;, result);" style="color:#D4D4D4;display:none" ar
 
 
 
-<h2 class="wp-block-heading"></h2>
+<h2 class="wp-block-heading" id="section"></h2>
 
 
 
@@ -310,7 +320,7 @@ printf(&quot;Result: %d\n&quot;, result);" style="color:#D4D4D4;display:none" ar
 		<div class="elementor-element elementor-element-60b2ad76 e-con-full e-flex e-con e-child" data-element_type="container" data-e-type="container">
 				<div class="elementor-element elementor-element-629e0fe6 elementor-widget elementor-widget-heading" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
 				<div class="elementor-widget-container">
-					<h2 class="elementor-heading-title elementor-size-default">Liked the content? </h2>				</div>
+					<h2 class="elementor-heading-title elementor-size-default" id="liked-the-content">Liked the content? </h2>				</div>
 				</div>
 				<div class="elementor-element elementor-element-5eb3479f elementor-widget elementor-widget-text-editor" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
 				<div class="elementor-widget-container">
