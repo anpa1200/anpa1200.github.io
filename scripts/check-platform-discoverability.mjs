@@ -48,6 +48,9 @@ for (const path of (await walk()).sort()) {
   const rel = relative(siteRoot, path).replace(/\\/g, '/');
   const url = urlForFile(path);
   const validation = validatePage(url, html);
+  if (['off-origin-canonical', 'multiple-canonicals'].includes(validation.reason)) {
+    violations.push(`${rel}: invalid canonical declaration (${validation.reason})`);
+  }
   const sidebarEligible = isSidebarEligible(html);
   const sidebarPresent = /\bid=["']platform-sidenav["']/i.test(html);
   const sidebarIgnored = /<aside\b[^>]*\bid=["']platform-sidenav["'][^>]*\bdata-pagefind-ignore\b/i.test(html);

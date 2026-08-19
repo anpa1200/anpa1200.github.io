@@ -1,6 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import {
+  TRAINSEC_EXPECTED_ARTICLE_COUNT,
+  buildTrainsecCanonicalEntries,
+  isAuthorizedTrainsecCanonical,
+} from './trainsec-canonical-lib.mjs';
 
 const root = process.cwd();
 const dataPath = path.join(root, 'data', 'trainsec-library.json');
@@ -9,6 +14,7 @@ const coverRoot = path.join(root, 'assets', 'trainsec', 'covers');
 const mediaRoot = path.join(root, 'assets', 'trainsec', 'media');
 const siteOrigin = 'https://1200km.com';
 const retrievedAt = new Date().toISOString().slice(0, 10);
+const metadataOnly = process.argv.slice(2).includes('--metadata-only');
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -18,6 +24,76 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll("'", '&#39;');
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const calendarMonths = new Map([
+  ['january', 1], ['february', 2], ['march', 3], ['april', 4],
+  ['may', 5], ['june', 6], ['july', 7], ['august', 8],
+  ['september', 9], ['october', 10], ['november', 11], ['december', 12],
+]);
+
+function calendarDateIso(value) {
+  const isoMatch = String(value || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const year = Number(isoMatch[1]);
+    const month = Number(isoMatch[2]);
+    const day = Number(isoMatch[3]);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+      ? isoMatch[0]
+      : '';
+  }
+  const match = String(value || '').trim().match(/^([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})$/);
+  if (!match) return '';
+  const month = calendarMonths.get(match[1].toLowerCase());
+  const day = Number(match[2]);
+  const year = Number(match[3]);
+  if (!month || day < 1 || day > 31 || year < 1) return '';
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return '';
+  return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function trainsecImageUrl(article) {
+  if (!article.image) return '';
+  let image;
+  try {
+    image = new URL(article.image);
+  } catch {
+    throw new Error(`TrainSec image URL is invalid: ${article.image}`);
+  }
+  if (image.protocol !== 'https:' || image.hostname !== 'trainsec.net' || image.username || image.password || image.hash
+    || image.href !== article.image) {
+    throw new Error(`TrainSec image URL is not an exact authorized TrainSec URL: ${article.image}`);
+  }
+  return image.href;
+}
+
+function headingSlug(value) {
+  return String(value || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&(?:amp|#38);/gi, ' and ')
+    .replace(/&[a-z0-9#]+;/gi, ' ')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 96)
+    .replace(/-+$/g, '') || 'section';
+}
+
+function addStableHeadingIds(html) {
+  const used = new Set([...html.matchAll(/\bid\s*=\s*["']([^"']+)["']/gi)].map((match) => match[1]));
+  return html.replace(/<h([2-6])\b([^>]*)>([\s\S]*?)<\/h\1>/gi, (full, level, attributes, content) => {
+    if (/\bid\s*=/i.test(attributes)) return full;
+    const base = headingSlug(content);
+    let id = base;
+    let suffix = 2;
+    while (used.has(id)) id = `${base}-${suffix++}`;
+    used.add(id);
+    return `<h${level}${attributes} id="${escapeHtml(id)}">${content}</h${level}>`;
+  });
+}
 
 function slugFor(article) {
   const pathname = new URL(article.url).pathname.replace(/^\/library\//, '').replace(/\/+$/, '');
@@ -206,6 +282,258 @@ function siteArticleJsonLd(canonical, headline, datePublished = retrievedAt, sou
   }).replaceAll('<', '\\u003c');
 }
 
+function trainsecArticleJsonLd(article, canonical, datePublished) {
+  const webpageId = `${canonical}#webpage`;
+  const articleId = `${canonical}#article`;
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': webpageId,
+        url: canonical,
+        name: article.title,
+        mainEntity: { '@id': articleId },
+      },
+      {
+        '@type': 'Article',
+        '@id': articleId,
+        url: canonical,
+        headline: article.title,
+        author: { '@type': 'Person', name: article.author },
+        publisher: { '@type': 'Organization', name: 'TrainSec', url: 'https://trainsec.net/' },
+        mainEntityOfPage: { '@id': webpageId },
+        datePublished,
+        isBasedOn: canonical,
+      },
+    ],
+  }).replaceAll('<', '\\u003c');
+}
+
+function matchingTags(html, tagName, predicate) {
+  return [...html.matchAll(new RegExp(`<${tagName}\\b[^>]*>`, 'gi'))]
+    .map((match) => match[0])
+    .filter(predicate);
+}
+
+function oneTag(html, tagName, predicate, label) {
+  const matches = matchingTags(html, tagName, predicate);
+  if (matches.length !== 1) throw new Error(`Expected exactly one ${label}; found ${matches.length}.`);
+  return matches[0];
+}
+
+function replaceOneLiteral(html, before, after, label) {
+  const first = html.indexOf(before);
+  if (first < 0 || html.indexOf(before, first + before.length) >= 0) {
+    throw new Error(`Could not replace exactly one ${label}.`);
+  }
+  return `${html.slice(0, first)}${after}${html.slice(first + before.length)}`;
+}
+
+function insertBeforeHeadClose(html, value) {
+  const matches = [...html.matchAll(/<\/head>/gi)];
+  if (matches.length !== 1) throw new Error(`Expected exactly one closing head tag; found ${matches.length}.`);
+  return `${html.slice(0, matches[0].index)}${value}\n${html.slice(matches[0].index)}`;
+}
+
+function upsertMeta(html, attribute, key, content) {
+  const matches = matchingTags(
+    html,
+    'meta',
+    (tag) => attributeValue(tag, attribute).toLowerCase() === key.toLowerCase(),
+  );
+  if (matches.length > 1) throw new Error(`Expected at most one ${key} metadata tag; found ${matches.length}.`);
+  const tag = `<meta ${attribute}="${escapeHtml(key)}" content="${escapeHtml(content)}">`;
+  return matches.length ? replaceOneLiteral(html, matches[0], tag, `${key} metadata tag`) : insertBeforeHeadClose(html, tag);
+}
+
+function removeMeta(html, attribute, key) {
+  const matches = matchingTags(
+    html,
+    'meta',
+    (tag) => attributeValue(tag, attribute).toLowerCase() === key.toLowerCase(),
+  );
+  if (matches.length > 1) throw new Error(`Expected at most one ${key} metadata tag; found ${matches.length}.`);
+  return matches.length ? replaceOneLiteral(html, matches[0], '', `${key} metadata tag`) : html;
+}
+
+function ensureRssDiscovery(html) {
+  const matches = matchingTags(html, 'link', (tag) => (
+    attributeValue(tag, 'rel').toLowerCase().split(/\s+/).includes('alternate')
+      && attributeValue(tag, 'type').toLowerCase() === 'application/rss+xml'
+  ));
+  if (matches.length > 1) throw new Error(`Expected at most one RSS discovery link; found ${matches.length}.`);
+  const tag = '<link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml">';
+  return matches.length ? replaceOneLiteral(html, matches[0], tag, 'RSS discovery link') : insertBeforeHeadClose(html, tag);
+}
+
+function ensurePagefindIgnored(html) {
+  let output = html.replace(/\sdata-pagefind-body(?:=(?:"[^"]*"|'[^']*'|[^\s>]+))?/gi, '');
+  const main = oneTag(output, 'main', () => true, 'main element');
+  const ignorePattern = /\sdata-pagefind-ignore(?:=(?:"[^"]*"|'[^']*'|[^\s>]+))?/gi;
+  const ignoreAttributes = [...main.matchAll(ignorePattern)];
+  if (ignoreAttributes.length > 1) throw new Error(`Expected at most one Pagefind ignore attribute; found ${ignoreAttributes.length}.`);
+  const normalizedMain = ignoreAttributes.length
+    ? main.replace(ignorePattern, ' data-pagefind-ignore="all"')
+    : main.replace(/>$/, ' data-pagefind-ignore="all">');
+  return replaceOneLiteral(output, main, normalizedMain, 'main element');
+}
+
+function enhanceTrainsecReleaseMetadata(html, article) {
+  const description = article.excerpt || `${article.title} by ${article.author}, republished from TrainSec.net with permission.`;
+  const image = trainsecImageUrl(article);
+  let output = html;
+  output = removeMeta(output, 'name', 'keywords');
+  output = upsertMeta(output, 'property', 'og:site_name', 'TrainSec');
+  output = upsertMeta(output, 'property', 'og:description', description);
+  output = upsertMeta(output, 'name', 'twitter:card', 'summary_large_image');
+  output = upsertMeta(output, 'name', 'twitter:title', article.title);
+  output = upsertMeta(output, 'name', 'twitter:description', description);
+  if (image) {
+    const alt = `Cover image for ${article.title}`;
+    output = upsertMeta(output, 'property', 'og:image', image);
+    output = upsertMeta(output, 'property', 'og:image:alt', alt);
+    output = upsertMeta(output, 'name', 'twitter:image', image);
+    output = upsertMeta(output, 'name', 'twitter:image:alt', alt);
+  }
+  output = ensureRssDiscovery(output);
+  output = ensurePagefindIgnored(output);
+  return addStableHeadingIds(output);
+}
+
+function metadataOnlyPage(article, canonicalEntry, html) {
+  const { canonical_url: canonical, local_url: localMirror } = canonicalEntry;
+  if (article.url !== canonical || !isAuthorizedTrainsecCanonical(localMirror, canonical)) {
+    throw new Error('Manifest canonical mapping is not authorized.');
+  }
+  if (!html.includes(`<h1>${escapeHtml(article.title)}</h1>`)) {
+    throw new Error('Visible H1 does not match the manifest title.');
+  }
+  if (!html.includes(`<strong>Published:</strong> ${escapeHtml(article.date)}`)) {
+    throw new Error('Visible publication date does not match the manifest date.');
+  }
+
+  const sourceTag = oneTag(
+    html,
+    'meta',
+    (tag) => attributeValue(tag, 'name').toLowerCase() === 'trainsec-source',
+    'TrainSec source metadata tag',
+  );
+  if (attributeValue(sourceTag, 'content') !== canonical) throw new Error('TrainSec source metadata disagrees with the manifest.');
+
+  const canonicalTag = oneTag(
+    html,
+    'link',
+    (tag) => attributeValue(tag, 'rel').toLowerCase().split(/\s+/).includes('canonical'),
+    'canonical link',
+  );
+  const priorCanonical = attributeValue(canonicalTag, 'href');
+  if (![localMirror, canonical].includes(priorCanonical)) {
+    throw new Error(`Existing canonical is neither the authorized mirror nor source URL: ${priorCanonical || '(missing)'}`);
+  }
+
+  const ogUrlTag = oneTag(
+    html,
+    'meta',
+    (tag) => attributeValue(tag, 'property').toLowerCase() === 'og:url',
+    'Open Graph URL tag',
+  );
+  const priorOgUrl = attributeValue(ogUrlTag, 'content');
+  if (![localMirror, canonical].includes(priorOgUrl)) {
+    throw new Error(`Existing og:url is neither the authorized mirror nor source URL: ${priorOgUrl || '(missing)'}`);
+  }
+
+  const authorTags = [
+    oneTag(
+      html,
+      'meta',
+      (tag) => attributeValue(tag, 'name').toLowerCase() === 'author',
+      'author metadata tag',
+    ),
+    oneTag(
+      html,
+      'meta',
+      (tag) => attributeValue(tag, 'name').toLowerCase() === 'trainsec-author',
+      'TrainSec author metadata tag',
+    ),
+  ];
+
+  const publishedTag = oneTag(
+    html,
+    'meta',
+    (tag) => attributeValue(tag, 'property').toLowerCase() === 'article:published_time',
+    'article publication date tag',
+  );
+  const jsonLdTag = oneTag(
+    html,
+    'script',
+    (tag) => attributeValue(tag, 'type').toLowerCase() === 'application/ld+json',
+    'JSON-LD script',
+  );
+  const jsonLdClose = html.indexOf('</script>', html.indexOf(jsonLdTag) + jsonLdTag.length);
+  if (jsonLdClose < 0) throw new Error('JSON-LD script is not closed.');
+  const jsonLdBlock = html.slice(html.indexOf(jsonLdTag), jsonLdClose + '</script>'.length);
+
+  const publishedIso = calendarDateIso(article.date);
+  if (!publishedIso) throw new Error(`Unsupported TrainSec publication date: ${article.date || '(missing)'}`);
+
+  let output = html;
+  output = replaceOneLiteral(output, canonicalTag, `<link rel="canonical" href="${escapeHtml(canonical)}">`, 'canonical link');
+  output = replaceOneLiteral(output, ogUrlTag, `<meta property="og:url" content="${escapeHtml(canonical)}">`, 'Open Graph URL tag');
+  output = replaceOneLiteral(output, publishedTag, `<meta property="article:published_time" content="${publishedIso}">`, 'article publication date tag');
+  for (const tag of authorTags) {
+    const name = attributeValue(tag, 'name').toLowerCase();
+    output = replaceOneLiteral(output, tag, `<meta name="${name}" content="${escapeHtml(article.author)}">`, `${name} metadata tag`);
+  }
+  const mirrorTags = matchingTags(output, 'meta', (tag) => attributeValue(tag, 'name').toLowerCase() === 'trainsec-mirror');
+  if (mirrorTags.length > 1) throw new Error(`Expected at most one TrainSec mirror metadata tag; found ${mirrorTags.length}.`);
+  if (mirrorTags.length === 1) {
+    const previousMirror = attributeValue(mirrorTags[0], 'content');
+    if (previousMirror !== localMirror) throw new Error('TrainSec mirror metadata disagrees with the manifest.');
+    output = replaceOneLiteral(output, mirrorTags[0], `<meta name="trainsec-mirror" content="${escapeHtml(localMirror)}">`, 'TrainSec mirror metadata tag');
+  } else {
+    output = replaceOneLiteral(output, sourceTag, `${sourceTag}<meta name="trainsec-mirror" content="${escapeHtml(localMirror)}">`, 'TrainSec source metadata tag');
+  }
+  output = replaceOneLiteral(
+    output,
+    jsonLdBlock,
+    `<script type="application/ld+json">${trainsecArticleJsonLd(article, canonical, publishedIso)}</script>`,
+    'JSON-LD block',
+  );
+  return enhanceTrainsecReleaseMetadata(output, article);
+}
+
+async function updateExistingTrainsecMetadata(payload, canonicalEntries) {
+  const expectedFiles = canonicalEntries.map((entry) => path.basename(entry.local_path)).sort();
+  const actualFiles = (await fs.readdir(outputRoot, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.html') && !['authors.html', 'domains.html'].includes(entry.name))
+    .map((entry) => entry.name)
+    .sort();
+  if (JSON.stringify(actualFiles) !== JSON.stringify(expectedFiles)) {
+    throw new Error(`TrainSec mirror file set mismatch: expected ${expectedFiles.length}, found ${actualFiles.length}.`);
+  }
+
+  const articleByLocalPath = new Map(payload.articles.map((article) => [article.local_path, article]));
+  const pendingWrites = [];
+  for (const entry of canonicalEntries) {
+    const article = articleByLocalPath.get(entry.local_path);
+    if (!article) throw new Error(`No manifest article found for ${entry.local_path}.`);
+    const target = path.resolve(root, `.${entry.local_path}`);
+    if (!target.startsWith(`${path.resolve(outputRoot)}${path.sep}`)) throw new Error(`Unsafe TrainSec mirror path: ${entry.local_path}`);
+    const html = await fs.readFile(target, 'utf8');
+    try {
+      pendingWrites.push([target, metadataOnlyPage(article, entry, html)]);
+    } catch (error) {
+      throw new Error(`${entry.local_path}: ${error.message || error}`);
+    }
+  }
+
+  // Validation above is intentionally complete before the first write so a
+  // mismatched manifest or page cannot leave a partially migrated corpus.
+  for (const [target, html] of pendingWrites) await fs.writeFile(target, html);
+  return pendingWrites.length;
+}
+
 function relatedMarkup(article, articles) {
   const related = articles
     .filter((candidate) => candidate.url !== article.url)
@@ -218,33 +546,39 @@ function relatedMarkup(article, articles) {
   return `<section class="related-links" aria-labelledby="related-heading"><h2 id="related-heading">Related TrainSec publications</h2><ul>${related.map((candidate) => `<li><a href="${localPathFor(candidate)}">${escapeHtml(candidate.title)}</a> <span>(${escapeHtml(candidate.author)})</span></li>`).join('')}</ul></section>`;
 }
 
-function pageFor(article, body, localPath, allArticles) {
+function pageFor(article, body, localPath, allArticles, canonicalEntry) {
   const title = escapeHtml(article.title);
   const seoTitle = escapeHtml(article.title.length > 78 ? `${article.title.slice(0, 75).replace(/[\s,:;]+$/, '')}…` : article.title);
   const author = escapeHtml(article.author);
   const date = escapeHtml(article.date);
   const category = escapeHtml(article.domain || article.category);
   const mode = escapeHtml(article.mode || 'Article');
-  const source = escapeHtml(article.url);
-  const published = new Date(article.date);
-  const publishedIso = Number.isNaN(published.valueOf()) ? '' : published.toISOString().slice(0, 10);
+  const canonical = canonicalEntry?.canonical_url || '';
+  const localMirror = canonicalEntry?.local_url || '';
+  if (!isAuthorizedTrainsecCanonical(localMirror, canonical) || canonical !== article.url) {
+    throw new Error(`TrainSec canonical mapping is not authorized for ${localPath}.`);
+  }
+  const source = escapeHtml(canonical);
+  const mirror = escapeHtml(localMirror);
+  const publishedIso = calendarDateIso(article.date);
+  if (!publishedIso) throw new Error(`Unsupported TrainSec publication date for ${localPath}: ${article.date || '(missing)'}`);
   const rights = `All rights reserved. Rights belong to TrainSec.net and ${author}. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders.`;
   const tags = (article.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${seoTitle} — TrainSec article | 1200km</title>
 <meta name="description" content="${escapeHtml(article.excerpt || `${article.title} by ${article.author}, republished from TrainSec.net with permission.`)}">
-<meta name="author" content="${author}"><meta name="trainsec-author" content="${author}"><meta name="trainsec-source" content="${source}"><meta name="keywords" content="${escapeHtml([article.author, article.domain, article.mode, ...(article.tags || [])].join(', '))}">
-${publishedIso ? `<meta property="article:published_time" content="${publishedIso}">` : ''}
-<link rel="canonical" href="${siteOrigin}/${localPath}">
-<meta property="og:type" content="article"><meta property="og:title" content="${seoTitle}"><meta property="og:url" content="${siteOrigin}/${localPath}">
-<script type="application/ld+json">${siteArticleJsonLd(`${siteOrigin}/${localPath}`, article.title, publishedIso || retrievedAt, source)}</script>
+<meta name="author" content="${author}"><meta name="trainsec-author" content="${author}"><meta name="trainsec-source" content="${source}"><meta name="trainsec-mirror" content="${mirror}">
+<meta property="article:published_time" content="${publishedIso}">
+<link rel="canonical" href="${source}">
+<meta property="og:type" content="article"><meta property="og:title" content="${seoTitle}"><meta property="og:url" content="${source}">
+<script type="application/ld+json">${trainsecArticleJsonLd(article, canonical, publishedIso)}</script>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
  .article-cover{max-width:860px;margin:28px 0;padding:10px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style></head><body>
 <header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
-<main class="wrap" data-pagefind-body><article class="article">
+<main class="wrap" data-pagefind-ignore="all"><article class="article">
 <p class="eyebrow">TrainSec source integration · ${category} · ${mode}</p><h1>${title}</h1>
 <p class="meta"><strong>Author:</strong> ${author} · <strong>Published:</strong> ${date}</p>
 <div class="tag-row"><span class="tag">TrainSec</span>${tags}</div>
@@ -255,6 +589,7 @@ ${relatedMarkup(article, allArticles)}
 <p class="source-attribution"><strong>Original publication:</strong> <a href="${source}" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a><br>Original text, screenshots, infographics, videos, and author biography remain attributed to TrainSec.net and the named author. This page is hosted by 1200km.com with permission from the TrainSec rights holders.</p>
 </article></main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/trainsec/authors.html">Authors</a> · <a href="/articles/trainsec/domains.html">Domains</a> · <a href="/articles/">All articles</a></div></footer>
 </body></html>`;
+  return enhanceTrainsecReleaseMetadata(html, article);
 }
 
 function directoryPage(kind, groups) {
@@ -280,6 +615,13 @@ async function fetchArticle(article) {
 }
 
 const payload = JSON.parse(await fs.readFile(dataPath, 'utf8'));
+const canonicalEntries = buildTrainsecCanonicalEntries(payload);
+const canonicalByLocalPath = new Map(canonicalEntries.map((entry) => [entry.local_path, entry]));
+
+if (metadataOnly) {
+  const updated = await updateExistingTrainsecMetadata(payload, canonicalEntries);
+  console.log(`TrainSec metadata update complete: ${updated}/${TRAINSEC_EXPECTED_ARTICLE_COUNT} mirrors updated; source text, media files, directories, catalogues, and sitemaps unchanged.`);
+} else {
 await fs.mkdir(outputRoot, { recursive: true });
 await fs.mkdir(coverRoot, { recursive: true });
 await fs.mkdir(mediaRoot, { recursive: true });
@@ -294,13 +636,19 @@ async function worker() {
     const article = payload.articles[index];
     const slug = slugFor(article);
     const localPath = `articles/trainsec/${slug}.html`;
+    const canonicalEntry = canonicalByLocalPath.get(`/${localPath}`);
+    if (!canonicalEntry) {
+      failures.push({ url: article.url, title: article.title, error: `No authorized canonical mapping for /${localPath}` });
+      process.stdout.write(`FAILED ${article.title}: no authorized canonical mapping\n`);
+      continue;
+    }
     try {
       const { body, coverUrl } = await fetchArticle(article);
       article.local_path = `/${localPath}`;
       article.image = coverUrl || article.image || '';
       article.cover_path = await downloadCover(article.image, article);
       const mediaReadyBody = await localizeBodyImages(rewriteSourceLinks(normalizeMedia(body, article)));
-      await fs.writeFile(path.join(outputRoot, `${slug}.html`), pageFor(article, mediaReadyBody, localPath, payload.articles));
+      await fs.writeFile(path.join(outputRoot, `${slug}.html`), pageFor(article, mediaReadyBody, localPath, payload.articles, canonicalEntry));
       completed += 1;
       process.stdout.write(`Imported ${completed}/${payload.articles.length}: ${article.title}\n`);
     } catch (error) {
@@ -449,28 +797,6 @@ if (!catalogue.includes('/assets/trainsec-library-filters.js')) {
 }
 await fs.writeFile(cataloguePath, catalogue);
 
-// Add every local mirror to both sitemaps after the catalogue URL.
-const sitemapEntries = payload.articles.filter((article) => article.local_path).map((article) => `  <url>\n    <loc>${siteOrigin}${article.local_path}</loc>\n    <lastmod>${retrievedAt}</lastmod>\n  </url>`).join('\n');
-const directoryEntries = ['authors', 'domains'].map((name) => `  <url>\n    <loc>${siteOrigin}/articles/trainsec/${name}.html</loc>\n    <lastmod>${retrievedAt}</lastmod>\n  </url>`).join('\n');
-for (const sitemapName of ['sitemap.xml', 'sitemap-all.xml']) {
-  const sitemapPath = path.join(root, sitemapName);
-  let sitemap = await fs.readFile(sitemapPath, 'utf8');
-  const firstTrainsecUrl = payload.articles.find((article) => article.local_path)?.local_path || '';
-  const additions = [
-    !sitemap.includes('/articles/trainsec/authors.html') ? directoryEntries : '',
-    firstTrainsecUrl && !sitemap.includes(`${siteOrigin}${firstTrainsecUrl}`) ? sitemapEntries : '',
-  ].filter(Boolean).join('\n');
-  if (additions) {
-    const anchor = '  <url>\n    <loc>https://1200km.com/articles/trainsec-library.html</loc>';
-    const position = sitemap.indexOf(anchor);
-    if (position >= 0) {
-      const close = sitemap.indexOf('  </url>', position);
-      sitemap = `${sitemap.slice(0, close + '  </url>'.length)}\n${additions}${sitemap.slice(close + '  </url>'.length)}`;
-    }
-  }
-  await fs.writeFile(sitemapPath, sitemap);
-}
-
 const indexPath = path.join(root, 'articles', 'index.html');
 let indexHtml = await fs.readFile(indexPath, 'utf8');
 indexHtml = indexHtml.replace('TrainSec Knowledge Library: 84 source-linked articles', 'TrainSec Knowledge Library: 84 permitted full mirrors');
@@ -479,3 +805,4 @@ await fs.writeFile(indexPath, indexHtml);
 
 console.log(`\nTrainSec import complete: ${completed} imported, ${failures.length} failed.`);
 if (failures.length) process.exitCode = 1;
+}

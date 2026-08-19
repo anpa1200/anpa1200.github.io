@@ -4,12 +4,16 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { rerankSearchResults } from './search-governance-lib.mjs';
+import {
+  LOCAL_SEARCH_MINIMUM_PAGES,
+  REMOTE_SEARCH_MINIMUM_PAGES,
+} from './search-index-lib.mjs';
 
 const args = process.argv.slice(2);
 const bundleIndex = args.indexOf('--bundle');
 const bundle = resolve(bundleIndex >= 0 ? args[bundleIndex + 1] : 'pagefind');
 const remote = args.includes('--remote');
-const minimumPages = remote ? 1600 : 1000;
+const minimumPages = remote ? REMOTE_SEARCH_MINIMUM_PAGES : LOCAL_SEARCH_MINIMUM_PAGES;
 const required = [
   'pagefind.js',
   'pagefind-component-ui.js',

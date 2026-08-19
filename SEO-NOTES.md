@@ -1,6 +1,6 @@
 # SEO, Search, and AI Discovery Notes
 
-Last reviewed: 2026-07-21
+Last reviewed: 2026-08-18
 Canonical origin: `https://1200km.com`
 
 This document is the maintenance contract for public search, internal search,
@@ -10,13 +10,18 @@ provider.
 
 ## Canonical authority model
 
-- `1200km.com` is the canonical origin for portfolio pages, local articles, and
-  hosted project documentation.
+- `1200km.com` is the canonical origin for portfolio pages, authored local
+  articles, and hosted project documentation.
 - `https://1200km.com/#person` is the stable Person identifier for Andrey
   Pautov.
 - `https://1200km.com/#website` is the stable WebSite identifier.
-- Every public HTML page has one self-canonical URL and one page identifier:
-  `<canonical>#webpage`.
+- Every indexable 1200km HTML page has one self-canonical URL and one page
+  identifier: `<canonical>#webpage`.
+- The 84 permitted TrainSec article reproductions are the narrow exception:
+  each local mirror declares the exact matching TrainSec source article as its
+  cross-domain canonical. The mapping is allowlisted in
+  `data/trainsec-library.json`; the local TrainSec hub and author/domain indexes
+  remain self-canonical.
 - Page-specific entities use stable canonical fragments and reference their
   WebPage and author by `@id`.
 - Breadcrumbs are generated only from canonical parent pages that actually
@@ -56,6 +61,9 @@ metric changes, update the visible page first, then JSON-LD, `llms.txt`,
 - Never use deployment time or copied filesystem modification time as a content
   date.
 - `sitemap-all.xml` contains every indexable local canonical URL.
+- Externally canonical TrainSec mirrors remain readable and crawlable but are
+  excluded from both 1200km sitemaps, the RSS feed, and Pagefind. Their local
+  hub remains the on-site discovery surface.
 - `sitemap.xml` is the flat local-plus-approved-remote union and is rewritten
   after search indexing so it advertises only successfully indexed URLs.
 - Deployment fails on duplicates, missing local canonicals, missing local

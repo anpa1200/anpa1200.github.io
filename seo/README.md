@@ -20,6 +20,8 @@ date. If no authoritative publication date exists, it is omitted.
 ## Release invariants
 
 - one self-referential canonical for every indexable local page;
+- exact, dataset-allowlisted TrainSec cross-domain canonicals for permitted
+  article mirrors, which are excluded from 1200km sitemaps and Pagefind;
 - stable graph IDs for `#person`, `#website`, and `#software`;
 - page-specific `#webpage`, `#breadcrumb`, and `#article` IDs;
 - no meta-keywords tags;

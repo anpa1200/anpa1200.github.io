@@ -16,6 +16,7 @@ import {
   parseSitemapEntries,
   validatePage,
 } from './search-index-lib.mjs';
+import { trainsecCanonicalEntries } from './trainsec-canonical-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -36,6 +37,11 @@ const config = JSON.parse(await readFile(join(sourceRoot, 'data', 'content-catal
 const parsed = parseSitemapEntries(await readFile(sitemapPath, 'utf8'), SITE_ORIGIN);
 if (parsed.isIndex) throw new Error('Content catalogue requires a flat sitemap URL set.');
 const catalogueEntries = parsed.entries.filter((entry) => new URL(entry.loc).pathname !== '/llms.txt');
+const trainsecMirrorUrls = new Set(trainsecCanonicalEntries.map((entry) => entry.local_url));
+const syndicatedSitemapEntries = catalogueEntries.filter((entry) => trainsecMirrorUrls.has(entry.loc));
+if (syndicatedSitemapEntries.length) {
+  throw new Error(`Externally canonical TrainSec mirrors must not appear in the 1200km sitemap:\n${syndicatedSitemapEntries.map((entry) => entry.loc).join('\n')}`);
+}
 
 function gitDate(path) {
   if (!path || !existsSync(path)) return null;
@@ -131,6 +137,21 @@ if (failures.length) throw new Error(`Content catalogue could not read ${failure
 
 const sitemapItemCount = pages.length;
 const localItems = pages.map((page) => createContentItem(page, config));
+for (const entry of trainsecCanonicalEntries) {
+  const path = join(siteRoot, entry.local_path.replace(/^\/+/, ''));
+  if (!existsSync(path)) throw new Error(`Missing TrainSec mirror page: ${entry.local_path}`);
+  const html = await readFile(path, 'utf8');
+  const validation = validatePage(entry.local_url, html);
+  if (validation.reason !== 'external-canonical' || validation.canonicalUrl !== entry.canonical_url) {
+    throw new Error(`${entry.local_path}: expected exact externally canonical TrainSec mirror; received ${validation.reason || 'indexable page'}.`);
+  }
+  localItems.push(createContentItem({
+    url: entry.local_url,
+    html,
+    updatedAt: gitDate(join(sourceRoot, entry.local_path.replace(/^\/+/, ''))),
+    source: 'external-canonical-mirror',
+  }, config));
+}
 for (const relativePath of config.additional_pages || []) {
   const path = join(siteRoot, relativePath);
   if (!existsSync(path)) throw new Error(`Missing configured additional page: ${relativePath}`);
@@ -170,4 +191,4 @@ if (check) {
   console.log(`Wrote ${catalog.inventory.item_count} content identities to ${output}.`);
   console.log(`Wrote taxonomy audit to ${taxonomyOutput}.`);
 }
-console.log(`Coverage: ${sitemapItemCount} sitemap pages, ${(config.additional_pages || []).length} additional noindex page(s), ${externalItems.length} externally canonical articles, ${catalog.inventory.indexable_count} indexable items.`);
+console.log(`Coverage: ${sitemapItemCount} sitemap pages, ${trainsecCanonicalEntries.length} externally canonical TrainSec mirror(s), ${(config.additional_pages || []).length} additional noindex page(s), ${externalItems.length} linked external article(s), ${catalog.inventory.indexable_count} indexable items.`);

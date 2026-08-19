@@ -7,7 +7,8 @@ import {
   VOCABULARIES,
   normalizeContentUrl,
 } from './content-catalog-lib.mjs';
-import { parseSitemapEntries, stripHtml } from './search-index-lib.mjs';
+import { parseSitemapEntries, stripHtml, validatePage } from './search-index-lib.mjs';
+import { trainsecCanonicalEntries } from './trainsec-canonical-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -187,6 +188,47 @@ for (const [index, item] of (catalog.items || []).entries()) {
   if (['archived', 'superseded'].includes(item.status) && item.collection_tier !== 'archive') fail(`${label}: archived or superseded content must use the archive tier.`);
 }
 
+const trainsecCanonicalSet = new Set(trainsecCanonicalEntries.map((entry) => entry.canonical_url));
+const cataloguedTrainsec = (catalog.items || []).filter((item) => {
+  try {
+    return new URL(item.canonical_url).hostname === 'trainsec.net';
+  } catch {
+    return false;
+  }
+});
+if (cataloguedTrainsec.length !== trainsecCanonicalEntries.length) {
+  fail(`TrainSec catalogue coverage is ${cataloguedTrainsec.length}, expected ${trainsecCanonicalEntries.length}.`);
+}
+for (const item of cataloguedTrainsec) {
+  if (!trainsecCanonicalSet.has(item.canonical_url)) fail(`${item.id}: unapproved TrainSec canonical URL ${item.canonical_url}.`);
+}
+for (const entry of trainsecCanonicalEntries) {
+  const matches = (catalog.items || []).filter((item) => item.canonical_url === entry.canonical_url);
+  if (matches.length !== 1) {
+    fail(`${entry.canonical_url}: expected one catalogue identity, found ${matches.length}.`);
+    continue;
+  }
+  const item = matches[0];
+  if (item.primary_type !== 'mirror') fail(`${item.id}: TrainSec reproduction must be typed as mirror.`);
+  if (item.collection_id !== 'collection:trainsec-library') fail(`${item.id}: TrainSec mirror is outside its governed collection.`);
+  if (item.indexable) fail(`${item.id}: externally canonical TrainSec mirror must be non-indexable in 1200km discovery.`);
+  if (item.source_url !== entry.canonical_url) fail(`${item.id}: source_url must equal the exact TrainSec canonical URL.`);
+  if (item.source_platform !== 'TrainSec') fail(`${item.id}: source_platform must be TrainSec.`);
+  if (item.canonical_owner !== 'TrainSec.net') fail(`${item.id}: canonical_owner must be TrainSec.net.`);
+  if (JSON.stringify(item.alternate_urls) !== JSON.stringify([entry.local_url])) {
+    fail(`${item.id}: alternate_urls must contain only its exact 1200km mirror route.`);
+  }
+  const path = localPathForUrl(entry.local_url);
+  if (!path) {
+    fail(`${item.id}: local TrainSec mirror route is missing.`);
+    continue;
+  }
+  const validation = validatePage(entry.local_url, read(path));
+  if (validation.reason !== 'external-canonical' || validation.canonicalUrl !== entry.canonical_url) {
+    fail(`${item.id}: local TrainSec mirror does not declare its exact authorized external canonical.`);
+  }
+}
+
 for (const collection of catalog.declared_collections || []) {
   if (!String(collection.id || '').startsWith('collection:')) fail('Declared collection IDs must start with collection:.');
   if (!VOCABULARIES.primary_types.includes(collection.primary_type)) fail(`${collection.id}: unknown primary_type.`);
@@ -225,12 +267,44 @@ for (const alias of catalog.aliases || []) {
   }
 }
 
+for (const candidate of ['sitemap.xml', 'sitemap-all.xml']) {
+  const xml = read(join(siteRoot, candidate));
+  const rawLocations = [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/gi)].map((match) => match[1].trim());
+  for (const location of rawLocations) {
+    try {
+      if (new URL(location).hostname !== '1200km.com') {
+        fail(`${candidate}: off-origin URL must not be published in a 1200km sitemap: ${location}.`);
+      }
+    } catch {
+      fail(`${candidate}: invalid raw sitemap location ${location}.`);
+    }
+  }
+  const rawLocationSet = new Set(rawLocations);
+  for (const entry of trainsecCanonicalEntries) {
+    if (rawLocationSet.has(entry.local_url)) fail(`${candidate}: externally canonical TrainSec mirror must be omitted: ${entry.local_url}.`);
+  }
+}
+
 const sitemapName = catalog.scope === 'deployable-domain-catalog' ? 'sitemap.xml' : 'sitemap-all.xml';
 const sitemap = parseSitemapEntries(read(join(siteRoot, sitemapName))).entries
   .map((entry) => entry.loc)
   .filter((url) => new URL(url).pathname !== '/llms.txt');
 const sitemapSet = new Set(sitemap);
 for (const url of sitemap) if (!itemByAnyUrl.has(normalizeContentUrl(url))) fail(`${sitemapName}: indexed URL has no catalogue identity: ${url}.`);
+for (const entry of trainsecCanonicalEntries) {
+  if (sitemapSet.has(entry.local_url)) fail(`${sitemapName}: externally canonical TrainSec mirror must be omitted: ${entry.local_url}.`);
+}
+for (const localCanonical of [
+  'https://1200km.com/articles/trainsec-library.html',
+  'https://1200km.com/articles/trainsec/authors.html',
+  'https://1200km.com/articles/trainsec/domains.html',
+]) {
+  const item = itemByAnyUrl.get(localCanonical);
+  if (!item || item.canonical_url !== localCanonical || item.primary_type !== 'index'
+    || !item.indexable || !sitemapSet.has(localCanonical)) {
+    fail(`${localCanonical}: TrainSec hub/directory must remain locally canonical, indexable, and present in ${sitemapName}.`);
+  }
+}
 for (const item of catalog.items || []) {
   if (item.indexable && item.canonical_url.startsWith('https://1200km.com/') && !sitemapSet.has(item.canonical_url)) {
     fail(`${item.id}: indexable 1200km URL is absent from ${sitemapName}.`);
@@ -259,6 +333,11 @@ const feed = read(join(siteRoot, 'feed.xml'));
 for (const match of feed.matchAll(/<(?:link|guid)(?:\s[^>]*)?>(https:\/\/1200km\.com\/[^<]+)<\//gi)) {
   const url = normalizeContentUrl(match[1]);
   if (!itemByAnyUrl.has(url)) fail(`feed.xml: item has no catalogue identity: ${url}.`);
+}
+for (const entry of trainsecCanonicalEntries) {
+  if (feed.includes(entry.local_url) || feed.includes(entry.canonical_url)) {
+    fail(`feed.xml: externally canonical TrainSec mirror must be omitted: ${entry.local_url}.`);
+  }
 }
 
 for (const [path, expected] of [

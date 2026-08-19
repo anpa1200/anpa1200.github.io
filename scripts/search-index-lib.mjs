@@ -2,8 +2,17 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { addHeadingIds, markPagefindContent } from './release-html-lib.mjs';
 import { topicsFromText } from './content-topic-lib.mjs';
+import {
+  isAuthorizedTrainsecCanonical,
+  trainsecCanonicalForLocalUrl,
+} from './trainsec-canonical-lib.mjs';
 
 export const SITE_ORIGIN = 'https://1200km.com';
+export const LOCAL_SEARCH_MINIMUM_PAGES = 1000;
+// The domain currently exposes roughly 1,550 canonical search pages after the
+// 84 externally canonical TrainSec mirrors are intentionally excluded. Keep a
+// meaningful regression floor without treating syndicated copies as coverage.
+export const REMOTE_SEARCH_MINIMUM_PAGES = 1500;
 
 const LEGACY_PREFIXES = ['/threatmapper/', '/threatmapper-docs/'];
 const ENTITY_PATH = /^\/threat-matrix\/(actors|techniques)\/([^/]+)\/$/i;
@@ -74,6 +83,15 @@ export function canonicalFromHtml(html) {
     if (rel.includes('canonical')) return attributes.href || '';
   }
   return '';
+}
+
+function metaContents(html, name) {
+  const values = [];
+  for (const match of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const attributes = attributesFromTag(match[0]);
+    if ((attributes.name || '').toLowerCase() === name.toLowerCase()) values.push(attributes.content || '');
+  }
+  return values;
 }
 
 export function normalizeSiteUrl(value, base = SITE_ORIGIN) {
@@ -173,10 +191,33 @@ export function validatePage(urlValue, html) {
   const title = stripHtml(html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '');
   if (/^(redirecting|page not found|404\b)/i.test(title)) return { indexable: false, reason: 'redirect-or-not-found' };
 
-  const canonical = canonicalFromHtml(html);
+  const canonicalLinks = [...html.matchAll(/<link\b[^>]*>/gi)].filter((match) => {
+    const rel = (attributesFromTag(match[0]).rel || '').toLowerCase().split(/\s+/);
+    return rel.includes('canonical');
+  });
+  if (canonicalLinks.length > 1) return { indexable: false, reason: 'multiple-canonicals' };
+  const canonical = canonicalLinks.length ? attributesFromTag(canonicalLinks[0][0]).href || '' : '';
   if (canonical) {
     const canonicalUrl = normalizeCanonical(canonical, url.href);
-    if (!canonicalUrl) return { indexable: false, reason: 'off-origin-canonical' };
+    if (!canonicalUrl) {
+      const expectedCanonical = trainsecCanonicalForLocalUrl(url.href);
+      const declaredSources = metaContents(html, 'trainsec-source');
+      const declaredMirrors = metaContents(html, 'trainsec-mirror');
+      if (expectedCanonical
+        && canonical === expectedCanonical
+        && declaredSources.length === 1
+        && declaredSources[0] === expectedCanonical
+        && declaredMirrors.length === 1
+        && declaredMirrors[0] === url.href
+        && isAuthorizedTrainsecCanonical(url.href, canonical)) {
+        return {
+          indexable: false,
+          reason: 'external-canonical',
+          canonicalUrl: expectedCanonical,
+        };
+      }
+      return { indexable: false, reason: 'off-origin-canonical' };
+    }
     if (canonicalUrl !== url.href) return { indexable: false, reason: 'canonical-alias' };
   }
   return { indexable: true, reason: null };

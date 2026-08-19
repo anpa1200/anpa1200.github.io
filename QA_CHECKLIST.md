@@ -60,7 +60,7 @@ Run through this list before pushing changes to the main portfolio site
 
 ## SEO / metadata
 
-- [ ] Every indexed page has one meaningful H1, a gap-free heading hierarchy, a main landmark, a meaningful title/description, and a self-canonical `1200km.com` URL.
+- [ ] Every indexed local page has one meaningful H1, a gap-free heading hierarchy, a main landmark, a meaningful title/description, and a self-canonical `1200km.com` URL; permitted TrainSec mirrors use only their exact allowlisted source canonical and stay out of 1200km sitemaps.
 - [ ] `sitemap.xml`, `sitemap-all.xml`, `feed.xml`, `robots.txt`, `llms.txt`, and `llms-full.txt` load with HTTP 200 after deploy.
 - [ ] One consolidated JSON-LD graph is present on representative homepage, article, project, Threat Matrix, and Docusaurus pages; every internal `@id` resolves within its graph.
 - [ ] Homepage FAQ structured data matches the visible direct-answer section.

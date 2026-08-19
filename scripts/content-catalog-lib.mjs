@@ -6,6 +6,10 @@ import {
   normalizeCanonical,
   stripHtml,
 } from './search-index-lib.mjs';
+import {
+  isAuthorizedTrainsecCanonical,
+  trainsecCanonicalEntryForLocalUrl,
+} from './trainsec-canonical-lib.mjs';
 
 export const VOCABULARIES = Object.freeze({
   primary_types: [
@@ -90,6 +94,7 @@ export const VOCABULARIES = Object.freeze({
 export const CANONICAL_POLICY = Object.freeze({
   identity: 'One catalogue item represents one public artefact. Its stable ID is independent of display category, and its canonical URL is unique.',
   medium_and_local_mirrors: 'A locally hosted companion or export is typed as mirror and records the Medium publication as source_url. The 1200km archive URL is the preferred stable URL when it contains durable local context or assets; otherwise the external publication remains canonical. Duplicate source links are not emitted as second items.',
+  trainsec_permitted_mirrors: 'Each permitted TrainSec reproduction uses the exact TrainSec source URL as canonical identity, records the 1200km mirror route as an alternate URL, remains available through the local TrainSec hub, and is excluded from 1200km sitemaps, feeds, and full-site search.',
   versioned_material: 'Version-specific pages remain public only with an explicit version or applies_to boundary. Superseded material requires an archive reason and a visible historical or archive notice.',
   redirects: 'Legacy URLs are aliases, not independent catalogue items. They remain noindex redirects to the maintained canonical identity.',
 });
@@ -112,7 +117,7 @@ const TOPIC_TAGS = new Map([
 const SUBJECT_TAG_RULES = Object.freeze([
   ['windows-internals', /windows internals|\/windows-internals-|\bvmmap\b|\betw\b|\bamsi\b|windows sessions?|windows services?/i],
   ['windows-kernel', /windows kernel|\/windows-kernel-|kernel debugging|kernel allocation|kernel objects?|protected process|\bppl\b/i],
-  ['reverse-engineering', /reverse engineering|disassembl|\bwindbg\b|\bida\b|unpack|malware triage|malware analys/i],
+  ['reverse-engineering', /reverse engineering|disassembl|\bwindbg\b|\bida\b|unpack|malware triage|malware[- ]analys/i],
   ['malware-behavior', /malware|ransomware|trojan|keylog|process hollow|code injection|dll injection|remote thread injection/i],
   ['digital-forensics', /\bdfir\b|digital forensic|memory forensic|incident response|process snapshot|event trac/i],
   ['hardware-security', /hardware hacking|secure boot|\buart\b|firmware|embedded systems?|\bbmc\b|\buefi\b/i],
@@ -131,6 +136,20 @@ const SUBJECT_TAG_RULES = Object.freeze([
 function subjectTags(url, title, html) {
   const text = `${new URL(url).pathname} ${title} ${findMetaContent(html, 'description')} ${findMetaContent(html, 'keywords')}`;
   return SUBJECT_TAG_RULES.filter(([, pattern]) => pattern.test(text)).map(([tag]) => tag).slice(0, 8);
+}
+
+const TRAINSEC_TAG_ALIASES = Object.freeze({
+  'c/c++': 'c-plus-plus',
+  dfir: 'digital-forensics',
+  soc: 'security-operations',
+});
+
+function trainsecManifestTags(entry) {
+  return (entry?.tags || []).map((value) => {
+    const normalized = value.trim().toLowerCase();
+    return TRAINSEC_TAG_ALIASES[normalized]
+      || normalized.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }).filter(Boolean);
 }
 
 function isoDate(value) {
@@ -220,6 +239,7 @@ function platformForUrl(value) {
       'medium.com': 'Medium',
       'infosecwriteups.com': 'InfoSec Write-ups',
       'pypi.org': 'PyPI',
+      'trainsec.net': 'TrainSec',
     })[hostname] || hostname;
   } catch {
     return '1200km';
@@ -236,6 +256,7 @@ function canonicalOwner(value) {
     if (hostname === 'infosecwriteups.com') return 'InfoSec Write-ups / Andrey Pautov';
     if (hostname === 'attack.mitre.org') return 'MITRE ATT&CK';
     if (hostname === 'pypi.org') return 'anpa1200';
+    if (hostname === 'trainsec.net') return 'TrainSec.net';
     return hostname;
   } catch {
     return '1200km / Andrey Pautov';
@@ -289,6 +310,8 @@ function governedItem(item, config) {
 
 function inferType(url, title, html, collection) {
   const path = new URL(url).pathname;
+  if (path === '/articles/trainsec-library.html'
+    || /^\/articles\/trainsec\/(?:authors|domains)\.html$/i.test(path)) return 'index';
   if (collection) {
     if (collection.id === 'collection:medium-export') {
       if (/^\/articles\/(?:read\/)?$/i.test(path)) return 'index';
@@ -475,21 +498,37 @@ function applyOverride(item, override = {}) {
 }
 
 export function createContentItem({ url: rawUrl, html, updatedAt = null, source = 'local' }, config) {
-  const canonical = normalizeCanonical(canonicalFromHtml(html) || rawUrl, rawUrl) || normalizedUrl(rawUrl);
+  const deployedUrl = normalizeCanonical(rawUrl, rawUrl) || normalizedUrl(rawUrl);
+  if (!deployedUrl) throw new Error(`Cannot catalogue invalid deployed URL: ${rawUrl}`);
+  const declaredCanonical = canonicalFromHtml(html);
+  const trainsecEntry = trainsecCanonicalEntryForLocalUrl(deployedUrl);
+  const expectedTrainsecCanonical = trainsecEntry?.canonical_url || null;
+  const isTrainsecMirror = Boolean(expectedTrainsecCanonical
+    && declaredCanonical === expectedTrainsecCanonical
+    && findMetaContent(html, 'trainsec-source') === expectedTrainsecCanonical
+    && findMetaContent(html, 'trainsec-mirror') === deployedUrl
+    && isAuthorizedTrainsecCanonical(deployedUrl, declaredCanonical));
+  if (source === 'external-canonical-mirror' && !isTrainsecMirror) {
+    throw new Error(`TrainSec mirror metadata or canonical mapping is invalid: ${deployedUrl}`);
+  }
+  const canonical = isTrainsecMirror
+    ? expectedTrainsecCanonical
+    : normalizeCanonical(declaredCanonical || rawUrl, rawUrl) || normalizedUrl(rawUrl);
   if (!canonical) throw new Error(`Cannot catalogue invalid URL: ${rawUrl}`);
   const title = cleanTitle(html, canonical);
-  const collection = collectionForUrl(canonical, config);
-  const primaryType = inferType(canonical, title, html, collection);
-  const primaryDomain = inferDomain(canonical, title, html, collection);
+  const collection = collectionForUrl(deployedUrl, config);
+  const primaryType = inferType(deployedUrl, title, html, collection);
+  const primaryDomain = inferDomain(deployedUrl, title, html, collection);
   const defaults = defaultsForType(primaryType, primaryDomain);
   const dates = htmlDates(html);
   const author = findMetaContent(html, 'author');
-  const topics = classifyTopics(canonical, html).map((topic) => TOPIC_TAGS.get(topic)).filter(Boolean);
-  const subjects = subjectTags(canonical, title, html);
-  const path = new URL(canonical).pathname;
+  const topics = classifyTopics(deployedUrl, html).map((topic) => TOPIC_TAGS.get(topic)).filter(Boolean);
+  const subjects = subjectTags(deployedUrl, title, html);
+  const path = new URL(deployedUrl).pathname;
   const identifier = path.match(/\/(?:actors|techniques)\/([^/]+)\//i)?.[1]?.toLowerCase();
-  const sourceUrl = sourceForThreatMatrix(canonical)
-    || (collection?.id === 'collection:medium-export' ? mediumSourceFromHtml(html, canonical) : null)
+  const sourceUrl = (isTrainsecMirror ? canonical : null)
+    || sourceForThreatMatrix(deployedUrl)
+    || (collection?.id === 'collection:medium-export' ? mediumSourceFromHtml(html, deployedUrl) : null)
     || (collection?.id === 'collection:trainsec-library' ? trainsecSourceFromHtml(html) : null)
     || (collection?.source_url && collection.source_url !== canonical ? collection.source_url : null);
   const version = title.match(/\b(?:AdversaryGraph|ThreatMapper)\s+v(\d+(?:\.\d+){0,2})/i)?.[1]
@@ -507,23 +546,25 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
     applies_to: collection?.applies_to || 'current published 1200km content',
     canonical_url: canonical,
     ...(sourceUrl ? { source_url: sourceUrl } : {}),
+    ...(isTrainsecMirror ? { alternate_urls: [deployedUrl] } : {}),
     published_at: dates.published,
     updated_at: dates.updated || isoDate(updatedAt),
     summary: cleanSummary(html, title),
     tags: [...new Set([
       ...topics,
       ...subjects,
+      ...(isTrainsecMirror ? trainsecManifestTags(trainsecEntry) : []),
       ...(identifier ? [identifier] : []),
       ...(author ? [`author:${author}`] : []),
       ...(collection?.id === 'collection:trainsec-library' ? ['trainsec'] : []),
       primaryDomain,
       primaryType,
     ])].sort(),
-    featured: config.featured_urls.includes(canonical),
-    indexable: !['external-index', 'nonindex-local'].includes(source),
+    featured: config.featured_urls.includes(canonical) || config.featured_urls.includes(deployedUrl),
+    indexable: !['external-index', 'nonindex-local', 'external-canonical-mirror'].includes(source),
     ...(collection ? { collection_id: collection.id } : {}),
   };
-  return governedItem(applyOverride(item, config.overrides[canonical]), config);
+  return governedItem(applyOverride(item, config.overrides[deployedUrl] || config.overrides[canonical]), config);
 }
 
 function anchorSummary(html, offset, title) {
