@@ -140,9 +140,11 @@ test('Helping Materials is the canonical collection and Short Guides is only a l
   );
   assert.match(tagContent(helpingMaterials, 'name="robots"'), /index,\s*follow/i);
   assert.equal(collection?.mainEntity?.['@type'], 'ItemList');
-  assert.equal(collection?.mainEntity?.numberOfItems, 4);
-  assert.equal((helpingMaterials.match(/class="article-card"/g) || []).length, 4);
+  assert.equal(collection?.mainEntity?.numberOfItems, 5);
+  assert.equal((helpingMaterials.match(/class="article-card"/g) || []).length, 5);
   assert.match(helpingMaterials, /pe-file-structure-for-malware-analysis-d93acb97d9f3/);
+  assert.match(helpingMaterials, /strings-analysis-for-malware-analysis-turning-391815ee35e2/);
+  assert.match(helpingMaterials, /course-review-trainsec-malware-analyst-professional-level-1-203ca89b76a2/);
   assert.match(helpingMaterials, /One library, reusable tags/);
 
   const legacy = source('short-guides/index.html');
