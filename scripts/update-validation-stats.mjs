@@ -94,6 +94,11 @@ function ghLatestRelease(nameWithOwner, fallbackTag) {
   return release ? { tag: release.tag_name, url: release.html_url, published_at: release.published_at } : { tag: fallbackTag, url: '', published_at: null };
 }
 
+function pypiVersion(packageName, fallback) {
+  const info = runJson('curl', ['-fsSL', `https://pypi.org/pypi/${packageName}/json`], null);
+  return info?.info?.version || fallback;
+}
+
 function gitlabMr(projectPath, iid) {
   const encodedProject = encodeURIComponent(projectPath);
   return runJson(
@@ -287,8 +292,9 @@ const topPublicRepos = [...publicRepos]
 
 const releases = {
   adversarygraph: ghLatestRelease('anpa1200/adversarygraph', 'v3.1.0'),
-  aidebug: ghLatestRelease('anpa1200/AIDebug', 'v1.1.0'),
+  aidebug: ghLatestRelease('anpa1200/AIDebug', 'v3.0.0'),
 };
+const aidebugPypiVersion = pypiVersion('1200km-aidebug', releases.aidebug.tag.replace(/^v/, ''));
 
 function ghCloneTraffic(nameWithOwner) {
   return runJson('gh', ['api', `repos/${nameWithOwner}/traffic/clones`], null);
@@ -414,6 +420,7 @@ const stats = {
       pushed_at: repos.aidebug.pushed_at,
       release: releases.aidebug.tag,
       release_url: releases.aidebug.url,
+      pypi_version: aidebugPypiVersion,
     },
     top_by_stars: topPublicRepos,
   },
@@ -548,9 +555,21 @@ html = replaceOrThrow(
 );
 html = replaceOrThrow(
   html,
-  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip release">PyPI 1\.1\.0<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork<\/span>/,
+  /<span class="chip release">Release v[^<]+<\/span>(\s+<span class="chip release">PyPI [\d.]+<\/span>[\s\S]*?)<span class="chip">\d+ stars<\/span>\s+<span class="chip">\d+ fork(?:s)?<\/span>/,
   `<span class="chip release">Release ${stats.repositories.aidebug.release}</span>$1<span class="chip">${stats.repositories.aidebug.stars} stars</span>\n              <span class="chip">${stats.repositories.aidebug.forks} fork${stats.repositories.aidebug.forks === 1 ? '' : 's'}</span>`,
   'AIDebug release chips',
+);
+html = replaceOrThrow(
+  html,
+  /<span class="chip release">PyPI [\d.]+<\/span>/,
+  `<span class="chip release">PyPI ${stats.repositories.aidebug.pypi_version}</span>`,
+  'AIDebug PyPI version chip',
+);
+html = replaceOrThrow(
+  html,
+  /https:\/\/github\.com\/anpa1200\/AIDebug\/blob\/main\/docs\/release-notes\/v[^"]+\.md/,
+  `https://github.com/anpa1200/AIDebug/blob/main/docs/release-notes/${stats.repositories.aidebug.release}.md`,
+  'AIDebug release notes link',
 );
 html = replaceOrThrow(
   html,
