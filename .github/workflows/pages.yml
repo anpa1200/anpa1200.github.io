@@ -26,7 +26,19 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth: 0 (full history) is required here, not cosmetic: both
+      # build-content-catalog.mjs and build-site-artifacts.mjs date pages via
+      # `git log -1 -- <path>`. With the default shallow (depth-1) checkout,
+      # git has no prior commits to compare against, so it silently returns
+      # the single checked-out commit's own date for every tracked file
+      # instead of each file's real last-changed date. That makes the
+      # committed content-catalog.json "stale" relative to a fresh rebuild on
+      # almost every PR that touches it, since the date it would recompute
+      # depends on which exact commit is being tested rather than on the
+      # file's actual history.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 22
