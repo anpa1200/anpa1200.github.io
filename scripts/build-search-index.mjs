@@ -45,6 +45,10 @@ const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-
 const requiredIndexUrls = [
   `${SITE_ORIGIN}/`,
   `${SITE_ORIGIN}/search.html`,
+  `${SITE_ORIGIN}/references/`,
+  `${SITE_ORIGIN}/ai-attack-statistics/`,
+  `${SITE_ORIGIN}/ai-attack-statistics/dashboard/`,
+  `${SITE_ORIGIN}/ai-attack-statistics/data/`,
   `${SITE_ORIGIN}/threat-matrix/techniques/T1059.003/`,
   `${SITE_ORIGIN}/threat-matrix/actors/G0034/`,
   `${SITE_ORIGIN}/threat-matrix/actors/G0069/`,

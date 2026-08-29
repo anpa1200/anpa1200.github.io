@@ -43,3 +43,8 @@ await validate(
   join(ROOT, 'data', 'cyber-knowledge.schema.json'),
   join(siteRoot, 'data', 'cyber-knowledge.json'),
 );
+await validate(
+  'reference-library.json',
+  join(ROOT, 'data', 'reference-library.schema.json'),
+  join(siteRoot, 'data', 'reference-library.json'),
+);

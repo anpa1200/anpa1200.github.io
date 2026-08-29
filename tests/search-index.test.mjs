@@ -280,9 +280,9 @@ test('portfolio navigation is compact and search is click-only', () => {
   assert.match(html, /class="skip-link"[^>]+href="#main-content"/);
 
   const primary = html.match(/<!-- site-shell:primary-navigation:start -->([\s\S]*?)<!-- site-shell:primary-navigation:end -->/)?.[1] || '';
-  assert.equal((primary.match(/<a\b/g) || []).length, 8);
+  assert.equal((primary.match(/<a\b/g) || []).length, 9);
   assert.equal((primary.match(/<details class="nav-more"/g) || []).length, 1);
-  for (const label of ['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'About', 'CV', 'External validation']) {
+  for (const label of ['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'References', 'About', 'CV', 'External validation']) {
     assert.match(primary.replace(/&amp;/g, '&'), new RegExp(`>${label}<`));
   }
   assert.match(search, /setAttribute\('show-sub-results', 'true'\)/);

@@ -60,3 +60,8 @@ test('shared Docusaurus bridge loads the same platform navigation assets', () =>
   assert.match(bridge, /platform-sidebar\.css\?v=20260804-1/);
   assert.match(bridge, /platform-sidebar\.js\?v=20260804-1/);
 });
+
+test('runtime sidebar classifies the AI attack study routes as threat intelligence', () => {
+  const runtime = readFileSync(resolve(ROOT, 'assets/platform-sidebar.js'), 'utf8');
+  assert.match(runtime, /\/ai-attack-statistics\//);
+});
