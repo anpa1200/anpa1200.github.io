@@ -12,6 +12,7 @@ const OUTPUT = join(ROOT, 'ai-attack-statistics', 'index.html');
 const DATA_DIRECTORY = join(ROOT, 'ai-attack-statistics', 'data');
 const DATA_OUTPUT = join(DATA_DIRECTORY, 'index.html');
 const check = process.argv.includes('--check');
+const MEDIUM_EDITION_URL = 'https://medium.com/@1200km/ai-in-cyberattacks-a-statistical-cti-study-of-114-publications-b8416d856b94';
 
 const DATA_DOWNLOADS = [
   { filename: 'README.md', label: 'Dataset guide', encodingFormat: 'text/markdown', grain: 'Documentation', purpose: 'Schema, field definitions, interpretation cautions, and reproducibility boundary.' },
@@ -209,6 +210,7 @@ function page(articleBody, sourceHash) {
         image: { '@type': 'ImageObject', url: cover, width: 1672, height: 941 },
         about: ['Artificial intelligence in cyberattacks', 'Cyber threat intelligence', 'Incident response', 'MITRE ATT&CK', 'Detection engineering'],
         isBasedOn: { '@id': `${datasetCanonical}#dataset` },
+        sameAs: MEDIUM_EDITION_URL,
         citation: 'https://1200km.com/references/',
       },
       {
@@ -285,7 +287,7 @@ function page(articleBody, sourceHash) {
         <h1 class="ai-study-title" id="study-title">${headline}</h1>
         <p class="ai-study-deck">A visualization-rich analysis of ${summary.analysis_eligible_publications} eligible publications shows where AI appears in attacker workflows, which evidence is strongest, and which conclusions remain unsafe to make.</p>
         <div class="ai-study-meta"><span class="ai-study-chip">${summary.unique_publications} deduplicated publications</span><span class="ai-study-chip">${summary.analysis_eligible_publications}-publication denominator</span><span class="ai-study-chip">31 visualizations</span><span class="ai-study-chip">Evidence-bounded</span></div>
-        <div class="ai-study-actions"><a class="ai-study-button ai-study-button--primary" href="/ai-attack-statistics/dashboard/">Open interactive dashboard</a><a class="ai-study-button" href="/references/">Search all references</a><a class="ai-study-button" href="/ai-attack-statistics/data/">Explore the dataset</a></div>
+        <div class="ai-study-actions"><a class="ai-study-button ai-study-button--primary" href="/ai-attack-statistics/dashboard/">Open interactive dashboard</a><a class="ai-study-button" href="/references/">Search all references</a><a class="ai-study-button" href="/ai-attack-statistics/data/">Explore the dataset</a><a class="ai-study-button" href="${MEDIUM_EDITION_URL}" target="_blank" rel="noopener noreferrer" aria-label="Read the Medium snapshot edition with 114 publications and a 106-publication denominator">Medium snapshot (114/106) ↗</a></div>
         <picture><source srcset="/assets/cti/ai-in-cyberattacks-statistical-study/cover.webp" type="image/webp" /><img class="ai-study-cover" src="/assets/cti/ai-in-cyberattacks-statistical-study/cover.png" alt="AI in Cyberattacks: A Statistical CTI Study cover showing a red and blue data stream forming a digital brain above research documents" width="1672" height="941" loading="eager" decoding="async" fetchpriority="high" /></picture>
       </div>
     </section>

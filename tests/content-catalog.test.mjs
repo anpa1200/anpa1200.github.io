@@ -155,6 +155,16 @@ test('current, superseded, archived, and externally sourced entities remain dist
   ));
 });
 
+test('AI cyberattack study keeps 1200km canonical and records the Medium snapshot source', () => {
+  const mediumUrl = 'https://medium.com/@1200km/ai-in-cyberattacks-a-statistical-cti-study-of-114-publications-b8416d856b94';
+  const item = catalog.items.find((entry) => entry.canonical_url === 'https://1200km.com/ai-attack-statistics/');
+  assert.ok(item);
+  assert.equal(item.source_url, mediumUrl);
+  assert.equal(item.source_platform, '1200km');
+  assert.equal(item.original_publication, 'https://1200km.com/ai-attack-statistics/');
+  assert.equal(catalog.items.some((entry) => entry.canonical_url === mediumUrl), false);
+});
+
 test('taxonomy audit separates generated references from authored distribution', () => {
   assert.equal(taxonomyAudit.item_count, catalog.items.length);
   assert.equal(
