@@ -10,13 +10,13 @@ const html = readFileSync(join(ROOT, 'references', 'index.html'), 'utf8');
 const client = readFileSync(join(ROOT, 'assets', 'reference-library.js'), 'utf8');
 
 test('reference library contains the complete deduplicated usable corpus', () => {
-  assert.equal(model.record_count, 111);
-  assert.equal(model.core_count, 106);
+  assert.equal(model.record_count, 108);
+  assert.equal(model.core_count, 103);
   assert.equal(model.context_count, 5);
-  assert.equal(model.records.length, 111);
-  assert.equal(new Set(model.records.map((record) => record.id)).size, 111);
-  assert.equal(new Set(model.records.map((record) => record.url.replace(/\/$/, ''))).size, 111);
-  assert.equal(model.records.filter((record) => record.inclusion === 'core').length, 106);
+  assert.equal(model.records.length, 108);
+  assert.equal(new Set(model.records.map((record) => record.id)).size, 108);
+  assert.equal(new Set(model.records.map((record) => record.url.replace(/\/$/, ''))).size, 108);
+  assert.equal(model.records.filter((record) => record.inclusion === 'core').length, 103);
   assert.equal(model.records.filter((record) => record.inclusion === 'context').length, 5);
 });
 
@@ -39,8 +39,8 @@ test('all normalized tag facets are retained for search and correlation', () => 
   const types = new Set(assignments.map((tag) => tag.type));
   assert.equal(assignments.length, model.tag_assignment_count);
   assert.equal(keys.size, model.unique_tag_count);
-  assert.equal(model.tag_assignment_count, 7677);
-  assert.equal(model.unique_tag_count, 1514);
+  assert.equal(model.tag_assignment_count, 7574);
+  assert.equal(model.unique_tag_count, 1520);
   for (const required of [
     'actor_motivation', 'ai_technology', 'ai_use_case', 'attack_vector', 'campaign',
     'country_or_region', 'cve', 'data_type', 'evidence_landscape', 'impact',
@@ -54,8 +54,8 @@ test('all normalized tag facets are retained for search and correlation', () => 
 });
 
 test('generated module exposes every reference and every tag without inline executable code', () => {
-  assert.equal((html.match(/data-reference-card\b/g) || []).length, 111);
-  assert.equal((html.match(/data-reference-tag(?:\s|>)/g) || []).length, 7677);
+  assert.equal((html.match(/data-reference-card\b/g) || []).length, 108);
+  assert.equal((html.match(/data-reference-tag(?:\s|>)/g) || []).length, 7574);
   assert.match(html, /<link rel="canonical" href="https:\/\/1200km\.com\/references\/"/);
   assert.match(html, /data-pagefind-body/);
   assert.match(html, /reference-library\.css\?v=20260829-1/);

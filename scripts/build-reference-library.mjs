@@ -60,6 +60,7 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
           <p class="page-eyebrow">1200km research ecosystem · Source reference module</p>
           <h1 id="reference-library-title">AI Usage in Cyberattacks — References</h1>
           <p class="page-lead">${escapeHtml(model.description)} Search titles and descriptions, filter every normalized tag, pivot across facets, and find references connected by shared evidence metadata.</p>
+          <div class="page-hero-links"><a class="button primary" href="/ai-attack-statistics/">Read the statistical study</a><a class="button" href="/ai-attack-statistics/dashboard/">Explore the interactive dashboard</a></div>
         </div>
         <aside class="reference-boundary" aria-label="Evidence boundary"><strong>Evidence boundary</strong><p>${escapeHtml(model.evidence_boundary)}</p></aside>
       </section>

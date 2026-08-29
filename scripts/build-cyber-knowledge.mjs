@@ -444,6 +444,33 @@ function renderPathway(domain) {
     </nav>`;
 }
 
+const aiAttackStudyDomainContext = new Map([
+  ['cti', 'Use the source explorer and normalized tags to compare how 103 core publications describe adversary AI use, campaign context, providers, sectors, and ATT&CK coverage.'],
+  ['ai-security', 'Move from AI security concepts into a source-backed corpus of reported adversary AI use, with explicit denominators and evidence-quality limits.'],
+  ['blue-team', 'Use the ATT&CK, Kill Chain, telemetry, sector, and defensive-control views as leads for detection and defensive validation—not as incident prevalence.'],
+  ['dfir', 'Explore the incident-response and DFIR subset while keeping publication coverage separate from victim counts, dwell time, blast radius, or confirmed impact.'],
+  ['malware-analysis', 'Compare reported AI-assisted malware development, tooling, evasion, and code-generation coverage across the indexed publications.'],
+]);
+
+function renderAiAttackStudyBridge(domain) {
+  const context = aiAttackStudyDomainContext.get(domain.id);
+  if (!context) return '';
+  return `      <!-- cyber-knowledge:ai-attack-study:start -->
+      <section id="ai-attack-statistics-research" aria-labelledby="ai-attack-statistics-research-title">
+        <div class="group-header">
+          <p class="page-eyebrow">Connected original research</p>
+          <h2 class="group-title" id="ai-attack-statistics-research-title">AI in Cyberattacks: statistical CTI study</h2>
+        </div>
+        <p>${escapeHtml(context)}</p>
+        <p class="page-hero-links">
+          <a class="button primary" href="/ai-attack-statistics/">Read the study</a>
+          <a class="button" href="/ai-attack-statistics/dashboard/">Explore the dashboard</a>
+          <a class="button" href="/references/?q=AI%20cyberattack">Search 108 indexed references</a>
+        </p>
+      </section>
+      <!-- cyber-knowledge:ai-attack-study:end -->`;
+}
+
 function transformDomain(html, domain) {
   const modifiedAt = domain.modified_at || collection.reviewed_at;
   html = html.replace(
@@ -505,6 +532,9 @@ function transformDomain(html, domain) {
   html = ensureGlossaryTermAnchors(html, domain);
   if (definedTerms(html, domain).length) html = removeLegacyJsonLdType(html, 'DefinedTermSet');
   html = ensureModuleCrosslinks(html, domain);
+  if (aiAttackStudyDomainContext.has(domain.id)) {
+    html = generatedRegion(html, 'ai-attack-study', renderAiAttackStudyBridge(domain), /[ \t]*<\/main>/i);
+  }
   html = ensureGeneratedJsonLd(html, 'cyber-knowledge-structured-data', domainStructuredData(html, domain));
   html = ensureEnhancementScript(html);
   html = html.replace(/^[ \t]+$/gm, '');
@@ -699,6 +729,7 @@ function renderEcosystem() {
           <article class="domain-card"><span class="domain-index">Platform</span><h3 class="domain-title"><a href="/adversarygraph/">AdversaryGraph</a></h3><p class="domain-desc">Product overview, deployment routes, documentation, and validation evidence.</p></article>
           <article class="domain-card"><span class="domain-index">Public workspace</span><h3 class="domain-title"><a href="/threat-matrix/">Threat Matrix</a></h3><p class="domain-desc">Browse ATT&amp;CK groups, techniques, comparisons, coverage leads, and Navigator layers.</p></article>
           <article class="domain-card"><span class="domain-index">Research</span><h3 class="domain-title"><a href="/cti.html">CTI research</a></h3><p class="domain-desc">Actor profiles, campaigns, detection research, and source-linked analysis.</p></article>
+          <article class="domain-card"><span class="domain-index">Original research</span><h3 class="domain-title"><a href="/ai-attack-statistics/">AI in Cyberattacks study</a></h3><p class="domain-desc">A statistical CTI study of 103 core publications, with an interactive dashboard and 108 indexed references.</p><p><a href="/ai-attack-statistics/dashboard/">Open the dashboard →</a></p></article>
           <article class="domain-card"><span class="domain-index">Practice</span><h3 class="domain-title"><a href="/labs.html">Security labs</a></h3><p class="domain-desc">Controlled lab environments, validation walkthroughs, and reproducible evidence.</p></article>
           <article class="domain-card"><span class="domain-index">Writing</span><h3 class="domain-title"><a href="/articles/">Article archive</a></h3><p class="domain-desc">Local, searchable versions of published long-form research and technical articles.</p></article>
           <article class="domain-card"><span class="domain-index">Evidence</span><h3 class="domain-title"><a href="/external-validation.html">External validation</a></h3><p class="domain-desc">Source-backed external contributions, references, and acceptance evidence.</p></article>

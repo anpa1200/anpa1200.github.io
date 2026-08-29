@@ -106,6 +106,10 @@ function titleCase(value) {
   return String(value).replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function defangDomain(value) {
+  return String(value).split('[.]').map((part) => part.replaceAll('.', '[.]')).join('[.]');
+}
+
 function record(row) {
   const tags = [
     tag('Publisher', row.publisher, 'publisher'),
@@ -133,7 +137,10 @@ function record(row) {
   }
   for (const indicator of row.iocs || []) {
     const kind = titleCase(indicator.ioc_type);
-    tags.push(tag(`IOC · ${kind}`, indicator.value, 'ioc'));
+    const value = indicator.ioc_type === 'defanged_domain'
+      ? defangDomain(indicator.value)
+      : indicator.value;
+    tags.push(tag(`IOC · ${kind}`, value, 'ioc'));
   }
   for (const metric of row.metrics || []) {
     const confidence = metric.confidence ? ` · ${metric.confidence} confidence` : '';
@@ -167,8 +174,8 @@ const records = included.map(record).sort((left, right) => {
   return dateOrder || left.title.localeCompare(right.title);
 });
 const urls = new Set(records.map((item) => item.url.replace(/\/$/, '')));
-if (records.length !== 111 || urls.size !== records.length) {
-  throw new Error(`Expected 111 unique usable references; found ${records.length} records and ${urls.size} URLs.`);
+if (records.length !== 108 || urls.size !== records.length) {
+  throw new Error(`Expected 108 unique usable references; found ${records.length} records and ${urls.size} URLs.`);
 }
 
 const tagKeys = new Set(records.flatMap((item) => item.tags.map((itemTag) => itemTag.key)));
@@ -180,7 +187,7 @@ const payload = {
   title: 'AI Usage in Cyberattacks Reference Library',
   description: 'Deduplicated CTI, IR, government, provider, academic, and threat-research references about AI use in cyberattacks.',
   evidence_boundary: 'Tags, IOCs, and metrics are machine-extracted discovery metadata. A value or co-occurrence does not prove malicious use, attribution, exploitation, causality, prevalence, or current indicator validity.',
-  source_dataset: 'AI_Attack_statistics/dataset/publications.jsonl',
+  source_dataset: '/ai-attack-statistics/data/publications.csv',
   record_count: records.length,
   core_count: records.filter((item) => item.inclusion === 'core').length,
   context_count: records.filter((item) => item.inclusion === 'context').length,

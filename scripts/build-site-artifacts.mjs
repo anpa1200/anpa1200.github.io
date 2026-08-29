@@ -212,6 +212,7 @@ function feedCandidate(rel, types, html) {
     && metaContent(html, 'og:type').toLowerCase() !== 'article') return false;
   return articleRoute
     || rel.startsWith('articles/')
+    || rel === 'ai-attack-statistics/index.html'
     || rel.startsWith('newest-detection-engineering-techniques/')
     || rel.startsWith('embedded-systems-hardware-firmware/');
 }

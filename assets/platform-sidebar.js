@@ -4,7 +4,7 @@
   var MAX_PAGE_LINKS = 7;
   var sections = [
     { label: 'Explore', links: [
-      ['Threat intelligence', '/cti.html', ['/cti.html', '/cti-analyst-field-manual/', '/israel-government-threat-actors-cti/', '/CTI_as_a_Code/', '/operation-desert-hydra/', '/customer-driven-ai-cti-project/']],
+      ['Threat intelligence', '/cti.html', ['/cti.html', '/cti-analyst-field-manual/', '/israel-government-threat-actors-cti/', '/CTI_as_a_Code/', '/operation-desert-hydra/', '/customer-driven-ai-cti-project/', '/ai-attack-statistics/']],
       ['AdversaryGraph', '/adversarygraph/', ['/adversarygraph/', '/adversarygraph-docs/', '/threat-matrix/']],
       ['Security labs', '/labs.html', ['/labs.html']],
       ['Guides', '/guides.html', ['/guides.html', '/anomaly-detection-atlas/', '/insider-threat-detection/', '/opencti-intelligent-shield/', '/ITDR/']],

@@ -352,7 +352,7 @@ export function editorialArticleDocument(canonical) {
   if (/^\/articles\/trainsec-library\.html$/i.test(pathname)) return false;
   return /^\/articles\/read\/\d{4}\/[^/]+\/?$/i.test(pathname)
     || /^\/articles\/[^/]+\.html$/i.test(pathname)
-    || /^\/(?:newest-detection-engineering-techniques|embedded-systems-hardware-firmware)\/?$/i.test(pathname);
+    || /^\/(?:ai-attack-statistics|newest-detection-engineering-techniques|embedded-systems-hardware-firmware)\/?$/i.test(pathname);
 }
 
 function metaContent(html, key) {
@@ -749,6 +749,19 @@ export function addArticleDiscovery(html, {
     ...related.map((item) => `<a href="${escapeAttribute(item.url)}">${escapeHtml(item.title)}</a>`),
   ];
   const navigation = `<nav class="article-discovery" data-article-discovery aria-label="Continue research"><h2 id="continue-research">Continue research</h2><div>${links.join('')}</div></nav>`;
+  const separateStandaloneDiscovery = /^\/ai-attack-statistics\/?$/i.test(new URL(canonical).pathname);
+  if (separateStandaloneDiscovery) {
+    if (!/\bdata-content-freshness\b/i.test(transformed) && dates) {
+      const freshness = `<p class="content-freshness" data-content-freshness>${dates}</p>`;
+      transformed = transformed.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i, `$1\n${freshness}`);
+    }
+    transformed = transformed.replace(/\s*<nav\b[^>]*\bdata-article-discovery\b[^>]*>[\s\S]*?<\/nav>/i, '');
+    const block = `<section class="container margin-vert--lg" data-article-discovery-shell aria-label="Related research">${navigation}</section>`;
+    if (/\s*<section\b[^>]*\bdata-article-discovery-shell\b[^>]*>[\s\S]*?<\/section>/i.test(transformed)) {
+      return transformed.replace(/\s*<section\b[^>]*\bdata-article-discovery-shell\b[^>]*>[\s\S]*?<\/section>/i, `\n${block}`);
+    }
+    return transformed.replace(/<\/main>/i, `</main>\n${block}`);
+  }
   if (outsideHydrationRoot) {
     if (/\bdata-article-discovery\b/i.test(transformed)) return transformed;
     const block = `<section class="container margin-vert--lg" aria-label="Article publication and related research">${dates ? `<p class="content-freshness" data-content-freshness>${dates}</p>` : ''}${navigation}</section>`;

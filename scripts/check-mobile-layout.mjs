@@ -43,6 +43,9 @@ const pages = [
   ['cyber-knowledge-osint', '/cyber-knowledge/osint.html'],
   ['docs-long', '/adversarygraph-docs/full-flow/'],
   ['threat-matrix', '/threat-matrix/'],
+  ['ai-attack-study', '/ai-attack-statistics/'],
+  ['ai-attack-dashboard', '/ai-attack-statistics/dashboard/'],
+  ['ai-attack-data', '/ai-attack-statistics/data/'],
 ];
 
 const deployableCatalogPath = join(site, 'data', 'content-catalog.json');
