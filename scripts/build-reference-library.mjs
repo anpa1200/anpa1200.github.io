@@ -3,6 +3,8 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { transformHtmlElements } from './html-token-utils.mjs';
+import { tagAttributes } from './release-html-lib.mjs';
 import { applySiteShell, loadSiteShell } from './site-shell-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -152,8 +154,17 @@ const itemList = {
 const title = 'AI Cyberattack Research References — Searchable CTI Index | 1200km';
 const description = `Search ${model.record_count} deduplicated CTI, IR, government, provider, academic, and threat-research references about AI usage in cyberattacks across ${model.unique_tag_count.toLocaleString('en-US')} normalized tags.`;
 const keywords = 'AI cyberattacks, CTI references, incident response reports, threat research, artificial intelligence, threat actors, MITRE ATT&CK, TTPs, LLM abuse, deepfakes, malware, phishing, vulnerability research';
+const removedScriptMarker = '__REFERENCE_BASE_SCRIPT_REMOVED__';
 
-let html = base
+let html = transformHtmlElements(base, 'script', (element) => {
+  const attributes = tagAttributes(element.openTag);
+  const type = (attributes.type || '').toLowerCase();
+  const source = attributes.src || '';
+  return type === 'application/ld+json' || source === '/assets/cyber-knowledge.js'
+    ? removedScriptMarker
+    : element.full;
+})
+  .replace(/\s*__REFERENCE_BASE_SCRIPT_REMOVED__/g, '')
   .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`)
   .replace(/<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${escapeHtml(description)}" />`)
   .replace(/<meta name="author" content="[^"]*"\s*\/?>/i, '<meta name="author" content="Andrey Pautov" />\n    <meta name="keywords" content="' + escapeHtml(keywords) + '" />')
@@ -169,10 +180,8 @@ let html = base
   .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/i, '<meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />')
   .replace(/<meta name="twitter:image:alt" content="[^"]*"\s*\/?>/i, '<meta name="twitter:image:alt" content="AI usage in cyberattacks reference library at 1200km" />')
   .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${canonical}" />`)
-  .replace(/\s*<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '')
   .replace('<link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />', '<link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />\n    <link rel="stylesheet" href="/assets/reference-library.css?v=20260829-1" />')
   .replace(/<main\b[\s\S]*?<\/main>/i, `<main data-pagefind-body id="main-content">\n${body}\n    </main>`)
-  .replace(/\s*<script src="\/assets\/cyber-knowledge\.js" defer><\/script>/i, '')
   .replace('</body>', '    <script src="/assets/reference-library.js?v=20260829-1" defer></script>\n  </body>')
   .replace('</head>', `    <script type="application/ld+json" id="reference-library-structured-data">\n${safeJson(itemList).split('\n').map((line) => `      ${line}`).join('\n')}\n    </script>\n  </head>`)
   .replace(/^[ \t]+$/gm, '');

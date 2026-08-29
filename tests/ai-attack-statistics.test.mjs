@@ -5,6 +5,8 @@ import { join, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { inflateRawSync } from 'node:zlib';
+import { transformHtmlElements } from '../scripts/html-token-utils.mjs';
+import { decodeEntities, tagAttributes } from '../scripts/release-html-lib.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const html = readFileSync(join(ROOT, 'ai-attack-statistics', 'dashboard', 'index.html'), 'utf8');
@@ -205,12 +207,7 @@ test('every rendered bar and heatmap value is recalculated from the sanitized lo
     .filter((record) => eligibleIds.has(record.publication_id));
   const eligibleIocs = parseCsvRecords(readFileSync(join(dataDirectory, 'iocs_long.csv'), 'utf8'))
     .filter((record) => eligibleIds.has(record.publication_id));
-  const decodeHtml = (value) => value
-    .replaceAll('&amp;', '&')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#039;', "'")
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>');
+  const decodeHtml = (value) => decodeEntities(value);
   const titleCase = (value) => {
     const special = new Map([
       ['operational_cti', 'Operational CTI'], ['ipv4', 'IPv4'], ['md5', 'MD5'],
@@ -350,12 +347,17 @@ test('CSP uses same-origin external assets and allows no inline executable code'
   assert.doesNotMatch(html, /\son[a-z]+="/i);
   assert.doesNotMatch(html, /javascript:/i);
 
-  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
+  const scripts = [];
+  transformHtmlElements(html, 'script', (element) => {
+    scripts.push(element);
+    return element.full;
+  });
   assert.ok(scripts.length >= 4);
-  for (const [, attributes, body] of scripts) {
-    if (/type="application\/ld\+json"/i.test(attributes)) continue;
-    assert.match(attributes, /\bsrc="\//, attributes);
-    assert.equal(body.trim(), '', attributes);
+  for (const script of scripts) {
+    const attributes = tagAttributes(script.openTag);
+    if ((attributes.type || '').toLowerCase() === 'application/ld+json') continue;
+    assert.ok((attributes.src || '').startsWith('/'), script.openTag);
+    assert.equal(script.content.trim(), '', script.openTag);
   }
 });
 
