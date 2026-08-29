@@ -33,9 +33,9 @@ function links(html) {
 }
 
 test('every standalone page contains the generated canonical header and footer', () => {
-  assert.equal(shell.pages.length, 38);
+  assert.equal(shell.pages.length, 39);
   assert.deepEqual(expectedLabels, ['Research', 'Library', 'Products & Labs', 'AdversaryGraph']);
-  assert.deepEqual(expectedSecondaryLabels, ['Cyber Knowledge', 'About', 'CV', 'External validation']);
+  assert.deepEqual(expectedSecondaryLabels, ['Cyber Knowledge', 'References', 'About', 'CV', 'External validation']);
   assert.ok(expectedHrefs.every((href) => href.startsWith('/')), 'primary destinations must be root-relative');
   assert.ok(expectedSecondaryHrefs.every((href) => href.startsWith('/')), 'secondary destinations must be root-relative');
 

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1200km.com/data/reference-library.schema.json",
+  "title": "1200km AI-attack reference library",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "generated_at",
+    "title",
+    "description",
+    "evidence_boundary",
+    "source_dataset",
+    "record_count",
+    "core_count",
+    "context_count",
+    "unique_tag_count",
+    "tag_assignment_count",
+    "records"
+  ],
+  "properties": {
+    "$schema": { "const": "./reference-library.schema.json" },
+    "schema_version": { "const": 1 },
+    "generated_at": { "type": "string", "format": "date" },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "evidence_boundary": { "type": "string", "minLength": 1 },
+    "source_dataset": { "type": "string", "minLength": 1 },
+    "record_count": { "const": 111 },
+    "core_count": { "const": 106 },
+    "context_count": { "const": 5 },
+    "unique_tag_count": { "type": "integer", "minimum": 1 },
+    "tag_assignment_count": { "type": "integer", "minimum": 111 },
+    "records": {
+      "type": "array",
+      "minItems": 111,
+      "maxItems": 111,
+      "items": { "$ref": "#/$defs/reference" }
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "description", "url", "publisher", "published_at", "inclusion", "tags"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^ai-attack-reference:pub-[0-9]{3}$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "description": { "type": "string", "minLength": 20, "maxLength": 300 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "publisher": { "type": "string", "minLength": 1 },
+        "published_at": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[0-9]{4}(?:-[0-9]{2})?(?:-[0-9]{2})?$" },
+            { "type": "null" }
+          ]
+        },
+        "inclusion": { "enum": ["core", "context"] },
+        "tags": {
+          "type": "array",
+          "minItems": 7,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/tag" }
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["facet", "type", "value", "key"],
+      "properties": {
+        "facet": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "value": { "type": "string", "minLength": 1 },
+        "key": { "type": "string", "pattern": "^[a-z0-9-]+:[a-z0-9.+/-]+$" }
+      }
+    }
+  }
+}
