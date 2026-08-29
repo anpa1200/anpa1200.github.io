@@ -17,6 +17,7 @@ const referencesHtml = readFileSync(join(ROOT, 'references', 'index.html'), 'utf
 const client = readFileSync(join(ROOT, 'assets', 'ai-attack-statistics', 'dashboard.js'), 'utf8');
 const styles = readFileSync(join(ROOT, 'assets', 'ai-attack-statistics', 'dashboard.css'), 'utf8');
 const articleStyles = readFileSync(join(ROOT, 'assets', 'ai-attack-statistics-article.css'), 'utf8');
+const mediumEditionUrl = 'https://medium.com/@1200km/ai-in-cyberattacks-a-statistical-cti-study-of-114-publications-b8416d856b94';
 const dataStyles = readFileSync(join(ROOT, 'assets', 'ai-attack-statistics-data.css'), 'utf8');
 const dataDirectory = join(ROOT, 'ai-attack-statistics', 'data');
 const studyAssetDirectory = join(ROOT, 'assets', 'cti', 'ai-in-cyberattacks-statistical-study');
@@ -509,11 +510,19 @@ test('article structured data exposes both the TechArticle and reproducible Data
   assert.ok(nodeTypes.has('Dataset'));
   const article = nodes.find((node) => node['@type'] === 'TechArticle');
   assert.equal(article.description, articleDescription);
+  assert.equal(article.sameAs, mediumEditionUrl);
   const dataset = nodes.find((node) => node['@type'] === 'Dataset');
   assert.equal(dataset['@id'], 'https://1200km.com/ai-attack-statistics/data/#dataset');
   assert.equal(dataset.url, 'https://1200km.com/ai-attack-statistics/data/');
   assert.ok(dataset.description.includes('116 retrieved records'));
   assert.equal(dataset.distribution.length >= 3, true);
+});
+
+test('article records the Medium snapshot without replacing the governed canonical edition', () => {
+  assert.match(articleHtml, /<link rel="canonical" href="https:\/\/1200km\.com\/ai-attack-statistics\/" \/>/);
+  assert.match(articleHtml, new RegExp(`href="${mediumEditionUrl}"[^>]*target="_blank"[^>]*rel="noopener noreferrer"`));
+  assert.match(articleHtml, /Medium snapshot \(114\/106\)/);
+  assert.match(articleHtml, /aria-label="Read the Medium snapshot edition with 114 publications and a 106-publication denominator"/);
 });
 
 test('article, dashboard, dataset, and reference library form a reciprocal research path', () => {
