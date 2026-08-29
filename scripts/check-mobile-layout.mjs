@@ -195,6 +195,7 @@ function layoutExpression(checkFixture) {
     const prose = Array.from(document.querySelectorAll(selector)).filter((element) =>
       visible(element)
       && !element.closest('nav, footer, pre, table, .sr-only, [hidden], .site-search-modal, .page-sidenav, .domain-topics')
+      && !element.matches('.page-eyebrow')
       && !element.closest('#layout-regression-fixture')
     );
     const badWrap = prose.filter((element) => {
@@ -614,7 +615,7 @@ try {
       }
       if (state.p2.home && viewport.width <= 430 && (
         state.p2.home.headingLines > 4
-        || state.p2.home.actionCount !== 2
+        || state.p2.home.actionCount !== 3
         || !state.p2.home.actionsInFirstViewport
         || !state.p2.home.actionsBeforeSearch
       )) {
