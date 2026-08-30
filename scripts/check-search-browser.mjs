@@ -479,7 +479,7 @@ try {
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'References', 'About', 'CV', 'External validation'])
+  if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'Courses', 'References', 'About', 'CV', 'External validation'])
     || staticMobileState.footerCount !== 8
     || !staticMobileState.privacy
     || staticMobileState.search !== '/search.html'
@@ -572,6 +572,7 @@ try {
     { label: 'Products & Labs', path: '/projects.html', current: null },
     { label: 'AdversaryGraph', path: '/adversarygraph/', current: null },
     { label: 'Cyber Knowledge', path: '/cyber-knowledge/', current: null },
+    { label: 'Courses', path: '/courses/', current: null },
     { label: 'References', path: '/references/', current: null },
     { label: 'About', path: '/about.html', current: null },
     { label: 'CV', path: '/cv.html', current: null },
@@ -641,7 +642,7 @@ try {
   await waitForExpression(
     devtools,
     standardHome.sessionId,
-    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn')) && document.querySelectorAll('.site-header .nav-list a').length === 9`,
+    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn')) && document.querySelectorAll('.site-header .nav-list a').length === 10`,
     'standard desktop header readiness'
   );
   const standardHeaderState = await evaluate(devtools, standardHome.sessionId, `(() => {
@@ -756,7 +757,7 @@ try {
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (mobileMenuState.count !== 5 || mobileMenuState.secondaryCount !== 5 || mobileMenuState.minTargetHeight < 44 || !mobileMenuState.withinViewport || mobileMenuState.overflow) {
+  if (mobileMenuState.count !== 5 || mobileMenuState.secondaryCount !== 6 || mobileMenuState.minTargetHeight < 44 || !mobileMenuState.withinViewport || mobileMenuState.overflow) {
     failures.push(`mobile navigation disclosure failed: ${JSON.stringify(mobileMenuState)}`);
   }
   await evaluate(devtools, homePage.sessionId, `document.querySelector('.nav-more > summary').click()`);

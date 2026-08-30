@@ -118,6 +118,10 @@ async function checkQueries() {
       { query: 'Operation Desert Hydra', expectedPrefixes: ['/operation-desert-hydra/', '/labs.html'], expectedUrls: ['/'], requiredTier: 'core' },
       { query: 'RAG MCP', expectedPrefixes: ['/adversarygraph', '/ai-offensive.html'] },
       { query: 'AIDebug', expectedPrefixes: ['/external-validation.html', '/labs.html', '/ai-offensive.html'] },
+      // The completed learning record and full narrative review are distinct
+      // resources for the same course title. Keep the current record in the
+      // first two results without suppressing the deeper review article.
+      { query: 'TrainSec Malware Analyst Professional Level 1', expectedPrefixes: ['/courses/trainsec-malware-analyst-professional-level-1/'], maxRank: 2, requiredTier: 'core' },
       { query: 'detection validation', expectedPrefixes: ['/adversarygraph', '/labs.html', '/newest-detection-engineering-techniques/'] },
       { query: 'IOC enrichment', expectedPrefixes: ['/adversarygraph'], requiredTier: 'core' },
       // Generic ecosystem terms may legitimately rank the homepage or flagship
@@ -137,7 +141,7 @@ async function checkQueries() {
       { query: 'malware analysis', expectedPrefixes: ['/cyber-knowledge/malware-analysis.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'Historical AdversaryGraph v4 Capability Map', expectedPrefixes: ['/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html'], requiredTier: 'archive', matchedLifecycle: 'superseded' },
     ];
-    for (const { query, expectedPrefixes, expectedUrls = [], first = false, matchedTier, matchedSource, matchedType, matchedLifecycle, requiredTier, broad = false } of checks) {
+    for (const { query, expectedPrefixes, expectedUrls = [], first = false, maxRank = null, matchedTier, matchedSource, matchedType, matchedLifecycle, requiredTier, broad = false } of checks) {
       const result = await search.search(query);
       const ranked = rerankSearchResults(result.results, query, governance.records);
       const top = await Promise.all(ranked.slice(0, 10).map((item) => item.data()));
@@ -152,6 +156,9 @@ async function checkQueries() {
       }
       if (first && expected !== 0) {
         failures.push(`identifier query "${query}" should rank its entity first (rank was ${expected + 1})`);
+      }
+      if (Number.isInteger(maxRank) && expected >= maxRank) {
+        failures.push(`query "${query}" should rank its governed entity in the top ${maxRank} (rank was ${expected + 1})`);
       }
       const matched = expected >= 0 ? top[expected] : null;
       if (matchedTier && matched?.meta?.collection_tier !== matchedTier) {

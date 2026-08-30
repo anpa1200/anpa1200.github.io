@@ -46,6 +46,8 @@ const pages = [
   ['ai-attack-study', '/ai-attack-statistics/'],
   ['ai-attack-dashboard', '/ai-attack-statistics/dashboard/'],
   ['ai-attack-data', '/ai-attack-statistics/data/'],
+  ['courses', '/courses/'],
+  ['course-review', '/courses/trainsec-malware-analyst-professional-level-1/'],
 ];
 
 const deployableCatalogPath = join(site, 'data', 'content-catalog.json');

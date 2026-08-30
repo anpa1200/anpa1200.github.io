@@ -35,8 +35,8 @@ test('platform sidebar is static, searchable-content-neutral, and idempotent', (
   assert.match(first, /data-pagefind-ignore/);
   assert.match(first, /href="#first" data-section="first"/);
   assert.match(first, /href="\/articles\/" aria-current="location"/);
-  assert.match(first, /platform-sidebar\.css\?v=20260804-1/);
-  assert.match(first, /platform-sidebar\.js\?v=20260804-1/);
+  assert.match(first, /platform-sidebar\.css\?v=20260830-1/);
+  assert.match(first, /platform-sidebar\.js\?v=20260830-1/);
   assert.doesNotMatch(first, /<h2[^>]*>On this page<\/h2>/i);
 });
 
@@ -57,11 +57,16 @@ test('governed rail contains every configured platform route', () => {
 test('shared Docusaurus bridge loads the same platform navigation assets', () => {
   const bridge = readFileSync(resolve(ROOT, 'assets/docusaurus-ecosystem.js'), 'utf8');
   assert.match(bridge, /loadPlatformSidebar/);
-  assert.match(bridge, /platform-sidebar\.css\?v=20260804-1/);
-  assert.match(bridge, /platform-sidebar\.js\?v=20260804-1/);
+  assert.match(bridge, /platform-sidebar\.css\?v=20260830-1/);
+  assert.match(bridge, /platform-sidebar\.js\?v=20260830-1/);
 });
 
 test('runtime sidebar classifies the AI attack study routes as threat intelligence', () => {
   const runtime = readFileSync(resolve(ROOT, 'assets/platform-sidebar.js'), 'utf8');
   assert.match(runtime, /\/ai-attack-statistics\//);
+});
+
+test('runtime sidebar exposes and classifies the Courses module', () => {
+  const runtime = readFileSync(resolve(ROOT, 'assets/platform-sidebar.js'), 'utf8');
+  assert.match(runtime, /\['Courses', '\/courses\/', \['\/courses\/', '\/ai-security-course\.html', '\/ai-security-course\/'\]\]/);
 });

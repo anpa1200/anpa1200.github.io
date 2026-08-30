@@ -99,8 +99,8 @@ test('dashboard publishes professional metadata at the canonical nested route', 
   assert.match(html, /rel="preload" as="image" href="\/assets\/cti\/ai-in-cyberattacks-statistical-study\/cover\.webp" type="image\/webp"/);
   assert.doesNotMatch(html, /rel="preload" as="image" href="[^"]*cover\.png"/);
   assert.match(html, /<aside class="page-sidenav platform-sidenav" id="platform-sidenav"/);
-  assert.match(html, /href="\/assets\/platform-sidebar\.css\?v=20260804-1"/);
-  assert.match(html, /src="\/assets\/platform-sidebar\.js\?v=20260804-1"/);
+  assert.match(html, /href="\/assets\/platform-sidebar\.css\?v=20260830-1"/);
+  assert.match(html, /src="\/assets\/platform-sidebar\.js\?v=20260830-1"/);
 });
 
 test('dataset landing page governs all public downloads at a canonical route', () => {

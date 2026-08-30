@@ -111,7 +111,7 @@ const discoveryFiles = Object.fromEntries(requiredDiscovery.map((name) => [name,
 for (const [name, present] of Object.entries(discoveryFiles)) if (!present) violations.push(`${name}: required discovery surface is missing`);
 
 const bridge = await readFile(join(siteRoot, 'assets', 'docusaurus-ecosystem.js'), 'utf8');
-const remoteSidebarBridge = /platform-sidebar\.js\?v=20260804-1/.test(bridge) && /platform-sidebar\.css\?v=20260804-1/.test(bridge);
+const remoteSidebarBridge = /platform-sidebar\.js\?v=20260830-1/.test(bridge) && /platform-sidebar\.css\?v=20260830-1/.test(bridge);
 if (!remoteSidebarBridge) violations.push('Docusaurus ecosystem bridge does not load governed platform navigation');
 
 const metric = (field) => indexable.filter((page) => page[field]).length;

@@ -33,9 +33,9 @@ function links(html) {
 }
 
 test('every standalone page contains the generated canonical header and footer', () => {
-  assert.equal(shell.pages.length, 42);
+  assert.equal(shell.pages.length, 44);
   assert.deepEqual(expectedLabels, ['Research', 'Library', 'Products & Labs', 'AdversaryGraph']);
-  assert.deepEqual(expectedSecondaryLabels, ['Cyber Knowledge', 'References', 'About', 'CV', 'External validation']);
+  assert.deepEqual(expectedSecondaryLabels, ['Cyber Knowledge', 'Courses', 'References', 'About', 'CV', 'External validation']);
   assert.ok(expectedHrefs.every((href) => href.startsWith('/')), 'primary destinations must be root-relative');
   assert.ok(expectedSecondaryHrefs.every((href) => href.startsWith('/')), 'secondary destinations must be root-relative');
 
@@ -86,7 +86,7 @@ test('Docusaurus and Threat Matrix retain native shells with explicit ecosystem 
   const ecosystem = readFileSync(join(ROOT, 'assets', 'docusaurus-ecosystem.js'), 'utf8');
   assert.doesNotMatch(ecosystem, /addNavigation|data-ecosystem-nav|insertBefore\(link/);
   assert.match(ecosystem, /loadPlatformSidebar/);
-  assert.match(ecosystem, /platform-sidebar\.js\?v=20260804-1/);
+  assert.match(ecosystem, /platform-sidebar\.js\?v=20260830-1/);
 
   for (const path of ['adversarygraph-docs/index.html', 'ITDR/index.html']) {
     const html = readFileSync(join(ROOT, path), 'utf8');
