@@ -8,7 +8,9 @@
       ['AdversaryGraph', '/adversarygraph/', ['/adversarygraph/', '/adversarygraph-docs/', '/threat-matrix/']],
       ['Security labs', '/labs.html', ['/labs.html']],
       ['Guides', '/guides.html', ['/guides.html', '/anomaly-detection-atlas/', '/insider-threat-detection/', '/opencti-intelligent-shield/', '/ITDR/']],
+      ['Courses', '/courses/', ['/courses/', '/ai-security-course.html', '/ai-security-course/']],
       ['Cyber Knowledge', '/cyber-knowledge/', ['/cyber-knowledge/']],
+      ['References', '/references/', ['/references/']],
       ['Articles', '/articles/', ['/articles/']],
       ['Projects', '/projects.html', ['/projects.html']]
     ] },

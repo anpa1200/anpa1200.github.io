@@ -46,6 +46,8 @@ let pages = [
   ['ai-attack-study', '/ai-attack-statistics/', 'image-heavy'],
   ['ai-attack-dashboard', '/ai-attack-statistics/dashboard/', 'interactive'],
   ['ai-attack-data', '/ai-attack-statistics/data/', 'default'],
+  ['courses', '/courses/', 'interactive'],
+  ['course-review', '/courses/trainsec-malware-analyst-professional-level-1/', 'image-heavy'],
   ['docs', '/adversarygraph-docs/full-flow/', 'documentation'],
   ['cyber-knowledge-index', '/cyber-knowledge/', 'documentation'],
   ['cyber-knowledge-cti', '/cyber-knowledge/cti.html', 'documentation'],

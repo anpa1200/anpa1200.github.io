@@ -2,7 +2,7 @@ import { stripHtml, tagAttributes } from './release-html-lib.mjs';
 
 export const SIDEBAR_START = '<!-- platform-sidebar:start -->';
 export const SIDEBAR_END = '<!-- platform-sidebar:end -->';
-export const SIDEBAR_ASSET_VERSION = '20260804-1';
+export const SIDEBAR_ASSET_VERSION = '20260830-1';
 
 const SIDEBAR_REGION = new RegExp(
   `${SIDEBAR_START.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?${SIDEBAR_END.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*`,

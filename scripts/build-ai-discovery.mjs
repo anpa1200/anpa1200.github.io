@@ -10,6 +10,7 @@ const siteRoot = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
 const check = args.includes('--check');
 const facts = JSON.parse(readFileSync(join(ROOT, 'data', 'site-facts.json'), 'utf8')).facts;
 const references = JSON.parse(readFileSync(join(ROOT, 'data', 'reference-library.json'), 'utf8'));
+const courses = JSON.parse(readFileSync(join(ROOT, 'data', 'course-library.json'), 'utf8'));
 
 function value(key) {
   if (!facts[key] || !Object.hasOwn(facts[key], 'value')) throw new Error(`Missing site fact ${key}`);
@@ -74,6 +75,12 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 - [Operation Desert Hydra](https://1200km.com/operation-desert-hydra/)
 - [Newest Detection Engineering Techniques](https://1200km.com/newest-detection-engineering-techniques/)
 - [Local article archive](https://1200km.com/articles/)
+
+## Courses and learning paths
+
+- [Courses & Learning Paths](https://1200km.com/courses/) — ${courses.courses.length} original course, ${courses.reviews.length} completed independent review, and ${courses.learning_paths.length} evidence-backed learning path
+- [AI Security Engineering](https://1200km.com/ai-security-course.html) — original course in active development with ${courses.courses[0].available_modules} of ${courses.courses[0].planned_modules} modules currently available
+- [TrainSec Malware Analyst Professional Level 1 learning record](https://1200km.com/courses/trainsec-malware-analyst-professional-level-1/) — completed independent record with evidence, strengths, limitations, disclosures, and five original companion guides
 
 ## Products and labs
 

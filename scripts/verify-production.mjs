@@ -116,6 +116,16 @@ function pageChecks(path, body, articleCount) {
     '/privacy.html': [...common,
       { label: 'Privacy and Data Handling', pass: body.includes('Privacy and Data Handling') },
     ],
+    '/courses/': [...common,
+      { label: 'Courses and Learning Paths H1', pass: headingContent(body) === 'Courses & Learning Paths' },
+      { label: 'completed TrainSec learning record', pass: body.includes('/courses/trainsec-malware-analyst-professional-level-1/') && body.includes('Recommended for practical learners') },
+      { label: 'original AI Security course', pass: body.includes('/ai-security-course.html') && body.includes('Current Development') },
+    ],
+    '/courses/trainsec-malware-analyst-professional-level-1/': [...common,
+      { label: 'TrainSec learning record H1', pass: headingContent(body) === 'TrainSec Malware Analyst Professional Level 1' },
+      { label: 'learning-record boundary', pass: body.includes('Independent Learning Record') && body.includes('advertised 8.5 hours') },
+      { label: 'canonical course identity', pass: /rel=["']canonical["'][^>]*href=["']https:\/\/1200km\.com\/courses\/trainsec-malware-analyst-professional-level-1\//i.test(body) || /href=["']https:\/\/1200km\.com\/courses\/trainsec-malware-analyst-professional-level-1\/["'][^>]*rel=["']canonical["']/i.test(body) },
+    ],
   };
   return checks[path] || common;
 }
@@ -138,7 +148,7 @@ async function verifyOrigin(origin, attempt) {
     { label: 'build.json artifact digest', pass: /^sha256:[0-9a-f]{64}$/i.test(build?.artifact_digest || '') },
     { label: 'site facts available', pass: factsRecord.status === 200 && Number.isInteger(articleCount) },
   ];
-  for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/threat-matrix/', '/privacy.html']) {
+  for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/threat-matrix/', '/privacy.html', '/courses/', '/courses/trainsec-malware-analyst-professional-level-1/']) {
     const record = await fetchRecord(origin.url, path, attempt);
     record.fingerprints = pageChecks(path, record.body, articleCount);
     records.push(record);

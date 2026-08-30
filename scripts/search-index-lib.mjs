@@ -257,6 +257,7 @@ export function classifyUrl(urlValue) {
   const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
   if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actors';
   if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK techniques';
+  if (/^\/courses\//i.test(pathname) || /^\/ai-security-course(?:\.html|\/)/i.test(pathname)) return 'Courses & learning';
   if (/^\/articles\//i.test(pathname)) return 'Articles';
   if (/^\/adversarygraph-docs\//i.test(pathname)) return 'AdversaryGraph docs';
   if (/^\/ITDR\//.test(pathname)) return 'Identity security';
@@ -270,6 +271,9 @@ export function classifyContentType(urlValue) {
   const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
   if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actor profile';
   if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK technique';
+  if (pathname === '/courses/') return 'Collection';
+  if (/^\/courses\/[^/]+\//i.test(pathname)) return 'Course learning record';
+  if (/^\/ai-security-course(?:\.html|\/)/i.test(pathname)) return 'Course';
   if (/^\/articles\//i.test(pathname) || /newest-detection|embedded-systems/i.test(pathname)) return 'Article';
   if (/\/docs?\/|\/adversarygraph-docs\//i.test(pathname)) return 'Documentation';
   if (/lab|simulation/i.test(pathname)) return 'Lab';

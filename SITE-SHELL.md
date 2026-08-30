@@ -8,9 +8,11 @@ runtime.
 
 ## Canonical information architecture
 
-The primary navigation contains, in order: Research, AdversaryGraph, Labs,
-Library, Projects, and About. Internal destinations are root-relative. Site
-search has a static link fallback, and the theme control follows it.
+The four direct primary destinations are Research, Library, Products & Labs,
+and AdversaryGraph. The governed More menu contains Cyber Knowledge, Courses,
+References, About, CV, and External validation. Internal destinations are
+root-relative. Site search has a static link fallback, and the theme control
+follows it.
 
 The compact footer repeats the global destinations and adds Privacy / Data
 Handling, Contact, GitHub, copyright, and a native fragment link back to the top

@@ -194,11 +194,16 @@ test('search sections classify entities and documentation', () => {
   assert.equal(classifyUrl('https://1200km.com/threat-matrix/actors/G0069/'), 'Threat actors');
   assert.equal(classifyUrl('https://1200km.com/threat-matrix/techniques/T1059/'), 'ATT&CK techniques');
   assert.equal(classifyUrl('https://1200km.com/adversarygraph-docs/api/rag-mcp/'), 'AdversaryGraph docs');
+  assert.equal(classifyUrl('https://1200km.com/courses/'), 'Courses & learning');
+  assert.equal(classifyUrl('https://1200km.com/ai-security-course.html'), 'Courses & learning');
 });
 
 test('search facets use deterministic content types and controlled topics', () => {
   assert.equal(classifyContentType('https://1200km.com/threat-matrix/actors/G0069/'), 'Threat actor profile');
   assert.equal(classifyContentType('https://1200km.com/articles/example.html'), 'Article');
+  assert.equal(classifyContentType('https://1200km.com/courses/'), 'Collection');
+  assert.equal(classifyContentType('https://1200km.com/courses/trainsec-malware-analyst-professional-level-1/'), 'Course learning record');
+  assert.equal(classifyContentType('https://1200km.com/ai-security-course.html'), 'Course');
   assert.deepEqual(
     classifyTopics('https://1200km.com/guide/', '<title>Threat hunting with Sigma</title><meta name="description" content="Detection engineering">'),
     ['Threat hunting', 'Detection engineering'],
@@ -280,9 +285,9 @@ test('portfolio navigation is compact and search is click-only', () => {
   assert.match(html, /class="skip-link"[^>]+href="#main-content"/);
 
   const primary = html.match(/<!-- site-shell:primary-navigation:start -->([\s\S]*?)<!-- site-shell:primary-navigation:end -->/)?.[1] || '';
-  assert.equal((primary.match(/<a\b/g) || []).length, 9);
+  assert.equal((primary.match(/<a\b/g) || []).length, 10);
   assert.equal((primary.match(/<details class="nav-more"/g) || []).length, 1);
-  for (const label of ['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'References', 'About', 'CV', 'External validation']) {
+  for (const label of ['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'Courses', 'References', 'About', 'CV', 'External validation']) {
     assert.match(primary.replace(/&amp;/g, '&'), new RegExp(`>${label}<`));
   }
   assert.match(search, /setAttribute\('show-sub-results', 'true'\)/);

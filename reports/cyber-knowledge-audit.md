@@ -10,7 +10,7 @@ This report is generated from deployable source HTML. External URLs are inventor
 |---|---:|
 | Pages | 15 |
 | Words | 130,867 |
-| Internal links | 4,733 |
+| Internal links | 4,748 |
 | External links | 586 |
 | Broken internal links | 0 |
 | Missing anchors | 0 |
@@ -20,21 +20,21 @@ This report is generated from deployable source HTML. External URLs are inventor
 
 | Page | Type | Words | Headings | Internal | External | Indexability |
 |---|---|---:|---:|---:|---:|---|
-| [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3056 | 44 | 323 | 1 | indexable |
-| [Cyber Threat Intelligence (CTI)](https://1200km.com/cyber-knowledge/cti.html) | field guide | 12713 | 25 | 407 | 174 | indexable |
-| [Red Team & Offensive Security](https://1200km.com/cyber-knowledge/red-team.html) | field guide | 25633 | 289 | 586 | 17 | indexable |
-| [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13239 | 159 | 459 | 13 | indexable |
-| [Vulnerability Research & Exploit Development](https://1200km.com/cyber-knowledge/vulnerability-research.html) | field guide | 10698 | 127 | 347 | 42 | indexable |
-| [Malware Analysis & Reverse Engineering](https://1200km.com/cyber-knowledge/malware-analysis.html) | field guide | 7390 | 96 | 337 | 21 | indexable |
-| [Secure Code & Application Security](https://1200km.com/cyber-knowledge/secure-code.html) | field guide | 7120 | 73 | 346 | 16 | indexable |
-| [Digital Forensics & Incident Response (DFIR)](https://1200km.com/cyber-knowledge/dfir.html) | field guide | 8217 | 70 | 341 | 17 | indexable |
-| [Cloud Security](https://1200km.com/cyber-knowledge/cloud-security.html) | field guide | 8788 | 69 | 358 | 20 | indexable |
-| [Governance, Risk & Compliance (GRC)](https://1200km.com/cyber-knowledge/grc.html) | field guide | 9084 | 89 | 356 | 39 | indexable |
-| [OSINT & Reconnaissance](https://1200km.com/cyber-knowledge/osint.html) | field guide | 10145 | 114 | 303 | 29 | indexable |
-| [AI Security](https://1200km.com/cyber-knowledge/ai-security.html) | field guide | 5483 | 65 | 360 | 15 | indexable |
-| [Cyber Knowledge Glossary](https://1200km.com/cyber-knowledge/glossary/index.html) | glossary | 4939 | 144 | 164 | 1 | indexable |
-| [Cyber Knowledge Source Index](https://1200km.com/cyber-knowledge/sources/index.html) | source index | 4149 | 186 | 22 | 179 | indexable |
-| [Editorial and Source Policy](https://1200km.com/cyber-knowledge/editorial-policy/index.html) | supporting page | 213 | 8 | 24 | 2 | indexable |
+| [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3056 | 44 | 324 | 1 | indexable |
+| [Cyber Threat Intelligence (CTI)](https://1200km.com/cyber-knowledge/cti.html) | field guide | 12713 | 25 | 408 | 174 | indexable |
+| [Red Team & Offensive Security](https://1200km.com/cyber-knowledge/red-team.html) | field guide | 25633 | 289 | 587 | 17 | indexable |
+| [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13239 | 159 | 460 | 13 | indexable |
+| [Vulnerability Research & Exploit Development](https://1200km.com/cyber-knowledge/vulnerability-research.html) | field guide | 10698 | 127 | 348 | 42 | indexable |
+| [Malware Analysis & Reverse Engineering](https://1200km.com/cyber-knowledge/malware-analysis.html) | field guide | 7390 | 96 | 338 | 21 | indexable |
+| [Secure Code & Application Security](https://1200km.com/cyber-knowledge/secure-code.html) | field guide | 7120 | 73 | 347 | 16 | indexable |
+| [Digital Forensics & Incident Response (DFIR)](https://1200km.com/cyber-knowledge/dfir.html) | field guide | 8217 | 70 | 342 | 17 | indexable |
+| [Cloud Security](https://1200km.com/cyber-knowledge/cloud-security.html) | field guide | 8788 | 69 | 359 | 20 | indexable |
+| [Governance, Risk & Compliance (GRC)](https://1200km.com/cyber-knowledge/grc.html) | field guide | 9084 | 89 | 357 | 39 | indexable |
+| [OSINT & Reconnaissance](https://1200km.com/cyber-knowledge/osint.html) | field guide | 10145 | 114 | 304 | 29 | indexable |
+| [AI Security](https://1200km.com/cyber-knowledge/ai-security.html) | field guide | 5483 | 65 | 361 | 15 | indexable |
+| [Cyber Knowledge Glossary](https://1200km.com/cyber-knowledge/glossary/index.html) | glossary | 4939 | 144 | 165 | 1 | indexable |
+| [Cyber Knowledge Source Index](https://1200km.com/cyber-knowledge/sources/index.html) | source index | 4149 | 186 | 23 | 179 | indexable |
+| [Editorial and Source Policy](https://1200km.com/cyber-knowledge/editorial-policy/index.html) | supporting page | 213 | 8 | 25 | 2 | indexable |
 
 ## Validation interpretation
 

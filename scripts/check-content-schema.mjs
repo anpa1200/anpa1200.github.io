@@ -48,3 +48,8 @@ await validate(
   join(ROOT, 'data', 'reference-library.schema.json'),
   join(siteRoot, 'data', 'reference-library.json'),
 );
+await validate(
+  'course-library.json',
+  join(ROOT, 'data', 'course-library.schema.json'),
+  join(siteRoot, 'data', 'course-library.json'),
+);
