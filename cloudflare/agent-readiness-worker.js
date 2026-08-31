@@ -31,6 +31,22 @@ const JSON_WELL_KNOWN_PATHS = new Set([
   '/.well-known/skills/index.json',
 ]);
 
+// Outbound links tracked under /go/<slug>. Each hit increments a KV counter
+// (best-effort, not strongly consistent — fine for a public read-through
+// count, not for anything that needs to be exact) and then redirects.
+// The count is exposed read-only at /api/click-count/<slug> so a page can
+// display it. Add an entry here to track a new outbound link; no other code
+// changes needed.
+const TRACKED_LINKS = new Map([
+  [
+    'trainsec-malware-analyst-l1',
+    {
+      target: 'https://training.trainsec.net/malware-analyst-professional-level-1',
+      utm: { utm_source: '1200km.com', utm_medium: 'link', utm_campaign: 'course-review' },
+    },
+  ],
+]);
+
 const SECURITY_HEADERS = {
   'Content-Security-Policy': [
     "default-src 'self'",
@@ -90,6 +106,50 @@ function addDiscoveryHeaders(response, pathname) {
   return headers;
 }
 
+function withSecurityHeaders(response) {
+  const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+async function bumpClickCount(env, slug) {
+  if (!env.CLICK_COUNTERS) return; // KV binding not configured yet — degrade to untracked redirect.
+  const key = `count:${slug}`;
+  const current = parseInt((await env.CLICK_COUNTERS.get(key)) || '0', 10) || 0;
+  await env.CLICK_COUNTERS.put(key, String(current + 1));
+}
+
+function handleTrackedRedirect(request, env, ctx, slug) {
+  const link = TRACKED_LINKS.get(slug);
+  if (!link) return withSecurityHeaders(new Response('Not found', { status: 404 }));
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return withSecurityHeaders(new Response('Method not allowed', { status: 405 }));
+  }
+  if (request.method === 'GET') ctx.waitUntil(bumpClickCount(env, slug));
+
+  const destination = new URL(link.target);
+  for (const [param, value] of Object.entries(link.utm || {})) {
+    if (!destination.searchParams.has(param)) destination.searchParams.set(param, value);
+  }
+  return withSecurityHeaders(new Response(null, { status: 302, headers: { Location: destination.toString(), 'Cache-Control': 'no-store' } }));
+}
+
+async function handleClickCount(env, slug) {
+  if (!TRACKED_LINKS.has(slug)) return withSecurityHeaders(new Response('Not found', { status: 404 }));
+  const raw = env.CLICK_COUNTERS ? await env.CLICK_COUNTERS.get(`count:${slug}`) : null;
+  const count = parseInt(raw || '0', 10) || 0;
+  return withSecurityHeaders(
+    new Response(JSON.stringify({ slug, count }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=60',
+        'Access-Control-Allow-Origin': 'https://1200km.com',
+      },
+    })
+  );
+}
+
 async function serveMarkdown(request, url) {
   const mdPath = MARKDOWN_ROUTES.get(url.pathname);
   if (!mdPath) return null;
@@ -116,8 +176,15 @@ async function serveMarkdown(request, url) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (url.pathname.startsWith('/go/')) {
+      return handleTrackedRedirect(request, env, ctx, url.pathname.slice('/go/'.length));
+    }
+    if (request.method === 'GET' && url.pathname.startsWith('/api/click-count/')) {
+      return handleClickCount(env, url.pathname.slice('/api/click-count/'.length));
+    }
 
     if (request.method === 'GET' && wantsMarkdown(request)) {
       const markdownResponse = await serveMarkdown(request, url);

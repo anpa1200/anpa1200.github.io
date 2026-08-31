@@ -6,7 +6,20 @@ routes = [
   { pattern = "1200km.com/*", zone_name = "1200km.com" }
 ]
 
-# Read-only edge layer for AI Agent Readiness:
+# Edge layer for AI Agent Readiness and outbound-link click counting:
 # - RFC 8288 Link response headers
 # - Accept: text/markdown negotiation
 # - correct content types for well-known discovery metadata
+# - /go/<slug> tracked redirects and /api/click-count/<slug> read-back (see
+#   TRACKED_LINKS in cloudflare/agent-readiness-worker.js)
+
+# One-time manual setup required before this deploys successfully:
+#   1. wrangler login
+#   2. wrangler kv namespace create CLICK_COUNTERS
+#   3. Replace REPLACE_WITH_KV_NAMESPACE_ID below with the "id" it prints.
+# Until step 3 is done, `wrangler deploy` for this file will fail (the click
+# counter degrades to an untracked redirect in code, but the binding still
+# has to resolve to a real namespace for CI's deploy step to succeed).
+kv_namespaces = [
+  { binding = "CLICK_COUNTERS", id = "REPLACE_WITH_KV_NAMESPACE_ID" }
+]

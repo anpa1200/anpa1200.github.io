@@ -35,6 +35,10 @@ const LIVE_1200KM_ROOTS = [
   '/operation-desert-hydra/',
 ];
 const BUILD_TIME_LOCAL_ROOTS = ['/articles/read/'];
+// Routes served by the Cloudflare edge Worker (cloudflare/agent-readiness-worker.js),
+// never present as static files at any build stage — checked against
+// TRACKED_LINKS in the worker source instead of the filesystem.
+const EDGE_WORKER_ROUTES = ['/go/'];
 
 function walkHtml(dir = ROOT) {
   const files = [];
@@ -67,12 +71,31 @@ for (const f of htmlFiles) {
   idsByFile[f] = ids;
 }
 
+let workerTrackedSlugs = null;
+function trackedByEdgeWorker(slug) {
+  if (workerTrackedSlugs === null) {
+    try {
+      const src = readFileSync(join(defaultRoot, 'cloudflare', 'agent-readiness-worker.js'), 'utf8');
+      workerTrackedSlugs = new Set([...src.matchAll(/^\s*'([a-z0-9-]+)',?\s*$/gm)].map((m) => m[1]));
+    } catch {
+      workerTrackedSlugs = new Set();
+    }
+  }
+  return workerTrackedSlugs.has(slug);
+}
+
 function localPathExists(rel) {
   const clean = rel.split('#')[0].split('?')[0];
   if (clean === '' || clean === '/') return true;
   // Article pages are built from the pinned archive repository in the Pages
   // workflow. Exact paths are checked again after the assembled site is staged.
   if (!checkingAssembledSite && BUILD_TIME_LOCAL_ROOTS.some(root => clean.startsWith(root))) return true;
+  // /go/<slug> is served entirely by the edge Worker and never exists as a
+  // static file at any build stage — verify the slug is actually declared
+  // there instead of checking the filesystem.
+  for (const root of EDGE_WORKER_ROUTES) {
+    if (clean.startsWith(root)) return trackedByEdgeWorker(clean.slice(root.length));
+  }
   const p = normalize(join(ROOT, decodeURIComponent(clean.replace(/^\//, ''))));
   if (!p.startsWith(ROOT)) return false;
   if (!existsSync(p)) return false;

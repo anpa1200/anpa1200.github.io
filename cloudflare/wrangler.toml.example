@@ -7,7 +7,12 @@ compatibility_date = "2026-07-01"
 #   { pattern = "1200km.com/*", zone_name = "1200km.com" }
 # ]
 
-# The Worker is intentionally read-only:
+# The Worker:
 # - adds RFC 8288 Link response headers
 # - serves Markdown mirrors when Accept: text/markdown is requested
 # - fixes content types for agent discovery files
+# - tracks clicks on outbound links declared in TRACKED_LINKS via
+#   /go/<slug>, backed by a KV namespace bound as CLICK_COUNTERS:
+# kv_namespaces = [
+#   { binding = "CLICK_COUNTERS", id = "<from `wrangler kv namespace create CLICK_COUNTERS`>" }
+# ]

@@ -153,13 +153,27 @@ test('TrainSec detail remains a distinct learning record synchronized with the m
     assert.match(detail, new RegExp(escapeRegex(value)));
   }
   assert.match(detail, /article:published_time" content="2026-08-19"/);
-  assert.match(detail, /article:modified_time" content="2026-08-30"/);
+  assert.match(detail, /article:modified_time" content="2026-08-31"/);
   assert.match(detail, /src="\/assets\/site-og-v2\.png"/);
   assert.match(detail, /class="course-table-scroll" role="region"[^>]*tabindex="0"><table>/);
   assert.match(detail, /aria-current="location" href="\/courses\/">Courses<\/a>/);
   assert.match(detail, /id="platform-sidenav"/);
   assert.match(detail, /id="main-content"/);
   assert.doesNotMatch(detail, /href="https:\/\/training\.trainsec\.net\/malware-analyst-professional-level-1\/v6dfz"/);
+});
+
+test('TrainSec outbound link is routed through the tracked edge-worker redirect', () => {
+  // The visible button goes through /go/<slug> so clicks are counted; the
+  // real course URL still appears in structured data for search engines.
+  assert.match(detail, /href="\/go\/trainsec-malware-analyst-l1" target="_blank"/);
+  assert.doesNotMatch(detail, /class="button" href="https:\/\/training\.trainsec\.net\//);
+  assert.match(detail, /"url": "https:\/\/training\.trainsec\.net\/malware-analyst-professional-level-1"/);
+  assert.match(detail, /data-click-count-slug="trainsec-malware-analyst-l1"/);
+  assert.match(detail, /src="\/assets\/click-count-badge\.js" defer/);
+
+  const worker = readFileSync(join(ROOT, 'cloudflare', 'agent-readiness-worker.js'), 'utf8');
+  assert.match(worker, /'trainsec-malware-analyst-l1'/);
+  assert.match(worker, /target: 'https:\/\/training\.trainsec\.net\/malware-analyst-professional-level-1'/);
 });
 
 test('client provides progressive filtering, URL restoration, sorting, reset, and live status', () => {
