@@ -126,6 +126,12 @@ function pageChecks(path, body, articleCount) {
       { label: 'learning-record boundary', pass: body.includes('Independent Learning Record') && body.includes('advertised 8.5 hours') },
       { label: 'canonical course identity', pass: /rel=["']canonical["'][^>]*href=["']https:\/\/1200km\.com\/courses\/trainsec-malware-analyst-professional-level-1\//i.test(body) || /href=["']https:\/\/1200km\.com\/courses\/trainsec-malware-analyst-professional-level-1\/["'][^>]*rel=["']canonical["']/i.test(body) },
     ],
+    '/ai-security-course/module-00/chapter-03.html': [...common,
+      { label: 'Chapter 3 H1', pass: headingContent(body) === 'AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization' },
+      { label: 'Chapter 3 completion status', pass: /<strong[^>]*>Chapter complete<\/strong>/.test(body) && body.includes('Chapter 3 status: complete.') },
+      { label: 'Chapter 3 evidence release', pass: body.includes('MITRE ATLAS v2026.07 release') && body.includes('/ai-security-course/module-00-workbook.html#chapter-03-assessment') },
+      { label: 'Chapter 3 publication identity', pass: body.includes('"dateModified":"2026-08-30"') && body.includes('https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6') },
+    ],
   };
   return checks[path] || common;
 }
@@ -148,7 +154,7 @@ async function verifyOrigin(origin, attempt) {
     { label: 'build.json artifact digest', pass: /^sha256:[0-9a-f]{64}$/i.test(build?.artifact_digest || '') },
     { label: 'site facts available', pass: factsRecord.status === 200 && Number.isInteger(articleCount) },
   ];
-  for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/threat-matrix/', '/privacy.html', '/courses/', '/courses/trainsec-malware-analyst-professional-level-1/']) {
+  for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/threat-matrix/', '/privacy.html', '/courses/', '/courses/trainsec-malware-analyst-professional-level-1/', '/ai-security-course/module-00/chapter-03.html']) {
     const record = await fetchRecord(origin.url, path, attempt);
     record.fingerprints = pageChecks(path, record.body, articleCount);
     records.push(record);

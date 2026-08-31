@@ -3,17 +3,18 @@ title: "AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimiz
 description: "A CTI-grounded foundation for neural-network computation, optimization, reproducibility, attacker access, adversarial examples, robustness evaluation, poisoning, backdoors, inference attacks, and defensible AI security evidence."
 module: "00"
 chapter: "3"
-status: "Published"
+status: "Complete"
 canonical: "https://1200km.com/ai-security-course/module-00/chapter-03.html"
 medium: "https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6"
 published: "2026-08-08"
+updated: "2026-08-30"
 author: "Andrey Pautov"
 ---
 
 <a id="top"></a>
 [AI Security Engineering](https://1200km.com/ai-security-course.html) / [Module 00](https://1200km.com/ai-security-course/module-00.html) / Chapter 3
 
-**Module 00** · **Chapter 3** · **Published** · **CTI evidence base**
+**Module 00** · **Chapter 3** · **Complete** · **CTI evidence base**
 
 Navigation: [Module 00](https://1200km.com/ai-security-course/module-00.html) · [Chapter 2](https://1200km.com/ai-security-course/module-00/chapter-02.html) · [Course syllabus](https://1200km.com/ai-security-course.html) · [Terminology dictionary](https://1200km.com/ai-security-course/glossary.html)
 
@@ -21,11 +22,22 @@ Medium companion: [Read the original publication](https://medium.com/@1200km/ai-
 
 # AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization
 
-> **Chapter status: Published.** This learner-ready chapter was published on 8 August 2026. The Medium article is the original companion publication; this page is the canonical course version with locally preserved visuals, cross-links, and the assessed analyst exercise.
+> **Chapter status: Complete.** Originally published on 8 August 2026 and finalized on 30 August 2026, this canonical course version closes the evidence review, preserves all visuals locally, and includes the assessed analyst exercise. The Medium article remains the original companion publication.
 
 This chapter explains neural-network computation, optimization, reproducibility, attacker access, adversarial claims, and defensible evidence for security practitioners without a calculus prerequisite.
 
 ![AI Security Course Chapter 3 cover: Neural Networks and Optimization for security practitioners](/ai-security-course/assets/chapter-03/00-cover.png)
+
+## Learning objectives
+
+After completing this chapter, you will be able to:
+
+1. distinguish architecture, parameters, activations, gradients, artifacts, configuration, and inference evidence;
+2. trace the forward pass and training loop without confusing a model score with a policy decision or authorization;
+3. state attacker access, perturbation, and query-budget assumptions for an adversarial-machine-learning claim;
+4. evaluate evasion, robustness, poisoning, backdoor, extraction, membership-inference, and inversion claims against reproducible evidence;
+5. map the chapter's security mechanisms to version-pinned MITRE ATLAS techniques and case studies; and
+6. complete an evidence-preserving analyst exercise that separates observed, reproduced, demonstrated, inferred, and unknown claims.
 
 ## Table of contents
 
@@ -276,14 +288,14 @@ The research lineage matters. Szegedy et al. (2013) first documented the phenome
 
 The problem-space and feature-space distinction is especially important for malware. A **feature-space perturbation** changes coordinates consumed by a classifier, while a **problem-space perturbation** changes the real artifact that must remain valid and functional. A semantically trivial file change—such as appended strings, repacking, or added sections—can move a feature vector substantially, but many mathematically convenient feature changes cannot be realized as a functioning file. A real malware attacker must preserve functionality, respect the file format, and work without arbitrary access to feature coordinates.
 
-![A semantically trivial file change producing a large feature-space movement, with realizability constraints.](/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png)
-
-*Figure 7 — Problem-space versus feature-space changes, including functionality, file-format, and realizability constraints. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png)*
-
 **Security consequence:** Ask whether the change can be applied to the real artifact while preserving its purpose. Record input hash, transformation, access level, both budgets, artifact digest, and consequence; do not generalize an image-space result to malware without problem-space validation.
 
 <a id="robustness"></a>
 ## 11. Evaluating robustness claims
+
+![A robustness-review poster covering adaptive attacks, explicit access and budgets, defense limits, review questions, and the five-term evidence ladder.](/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png)
+
+*Figure 7 — Robustness claims require adaptive testing, explicit budgets, known defense limits, and proposition-level evidence. [Open infographic ↗](https://1200km.com/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png)*
 
 ![Robustness evaluation requirements: adaptive attacks, access assumptions, budgets, baselines, and bypass conditions.](/ai-security-course/assets/chapter-03/16-robustness-evaluation.png)
 
@@ -315,7 +327,7 @@ Adversarial training includes transformed examples, but is bounded by its threat
 
 Backdoor detection needs explicit methods and assumptions. **Trigger reconstruction** searches for a compact input pattern that causes a target output; it assumes the trigger is sufficiently simple and that the search objective exposes it, so distributed or semantic triggers can be missed. **Activation clustering** groups internal activations to find a suspicious cluster associated with poisoned examples; it assumes poisoned and clean representations separate enough to cluster, so weak or entangled triggers can evade it. **Fine-pruning** removes neurons that appear dormant on clean data and then evaluates behavior; it assumes backdoor functionality depends on removable dormant capacity, so triggers using ordinary shared features can survive and pruning can damage legitimate behavior. BadNets is the canonical reference for the backdoor threat model.
 
-The VirusTotal Poisoning case, listed by MITRE ATLAS as AML.CS0002 and reported by McAfee Advanced Threat Research, is a short parallel: adversarial samples were submitted to a shared detection service. Use only that disclosed fact; service, provenance, and downstream effect require the case record and local telemetry.
+The [MITRE ATLAS AML.CS0002 VirusTotal Poisoning case](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L6142-L6166), reported by McAfee Advanced Threat Research, is a short parallel: adversarial samples were submitted to a shared detection service. Use only that disclosed fact; service, provenance, and downstream effect require the case record and local telemetry.
 
 When investigating a suspected poisoning event, preserve the original dataset and manifest, compare lineage with the approved version, record label history, test for unusual clusters or trigger correlations, and rerun with a clean reference. Do not overwrite the only copy by “cleaning” it in place. Preserve the suspect bytes, access history, and chain of custody before making a derivative dataset.
 
@@ -334,7 +346,7 @@ Inference can reveal information about training even when the attacker cannot re
 
 **Security consequence:** Preserve query fixtures, candidate hashes, response detail, rate, tenant, and data-use authorization. Reduce unnecessary confidence exposure and test privacy on the deployment distribution.
 
-**Model inversion** attempts to infer sensitive features or representative inputs from outputs, gradients, or other observations. It needs an output interface and, for stronger variants, knowledge about classes, features, or internals. Query budget and output granularity affect what can be inferred. Ask who requested which classes or slices, how many probes were made, what scores or gradients were returned, and whether route and policy were logged.
+**Model inversion**, as demonstrated by [Fredrikson, Jha, and Ristenpart](https://doi.org/10.1145/2810103.2813677), attempts to infer sensitive features or representative inputs from outputs, gradients, or other observations. It needs an output interface and, for stronger variants, knowledge about classes, features, or internals. Query budget and output granularity affect what can be inferred. Ask who requested which classes or slices, how many probes were made, what scores or gradients were returned, and whether route and policy were logged.
 
 **Security consequence:** Treat outputs, embeddings, gradients, and explanations as information-bearing. Minimize granularity, authorize by tenant and purpose, rate-limit probing, and retain keyed telemetry. Map these controls to Section 15.
 
@@ -343,11 +355,11 @@ These mechanisms identify what could be tested; they do not prove that training 
 <a id="cti-case"></a>
 ## 14. CTI case study: evading a malware classifier
 
-MITRE ATLAS case study AML.CS0003, **Bypassing Cylance's AI Malware Detection**, documents work by Skylight Cyber researchers Adi Ashkenazy and Shahar Zini, published in July 2019. This is a disclosed research case, not evidence that every Cylance customer was compromised.
+The [MITRE ATLAS AML.CS0003 case study, **Bypassing Cylance's AI Malware Detection**](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L6167-L6192), documents work by Skylight Cyber researchers Adi Ashkenazy and Shahar Zini, published in July 2019. This is a disclosed research case, not evidence that every Cylance customer was compromised.
 
 ### What the researchers did
 
-The researchers analyzed the CylancePROTECT engine and model using publicly available information and verbose logging. They reverse-engineered which attributes carried positive or negative weight, found that feature extraction relied heavily on strings, and reported a strong bias toward one specific video game. They also discovered a secondary model that could override the primary decision. By appending a selected list of strings to a malicious file, they changed its score enough to avoid detection. The report described the result as effective against 100% of the top ten malware samples of May 2019 and close to 90% of a 384-sample set.
+The researchers analyzed the CylancePROTECT engine and model using publicly available information and verbose logging. They reverse-engineered which attributes carried positive or negative weight, found that feature extraction relied heavily on strings, and reported a strong bias toward one specific video game. They also discovered a secondary model that could override the primary decision. By appending a selected list of strings to a malicious file, they changed its score enough to avoid detection. Their report states that the method bypassed detection for all ten malware samples in its May 2019 set, 83.59% of a separate 384-sample set after one application, and 88.54% after repeated application. These are researcher-reported results for the tested engine, samples, and procedure—not a global product-detection rate.
 
 **Security consequence:** The exploitable surface described by the researchers was feature extraction plus a scoring-policy override. The attacker did not need to touch weights or gradients. The relevant local evidence would therefore include the original and modified file hashes, parser output, extracted strings, score, model route, policy decision, and release version.
 
@@ -359,9 +371,9 @@ The researchers analyzed the CylancePROTECT engine and model using publicly avai
 
 The case is not a white-box gradient example. The reported method used public information, verbose logging, feature observations, and score behavior. The change was applied to the problem-space file and evaluated through the released detector. An analyst can therefore test a feature-extraction and policy path without possessing weights or gradients.
 
-### The vendor's dispute and remediation
+### The vendor's response and remediation boundary
 
-Cylance/BlackBerry disputed the “universal bypass” characterization, describing manipulation of one feature type that in limited circumstances led to an incorrect conclusion. The vendor reported parser anti-tampering controls, model changes to detect disproportionately weighted features, and removal of the implicated features.
+[CERT/CC Vulnerability Note VU#489481](https://www.kb.cert.org/vuls/id/489481) records Cylance's response and identifies products before 21 July 2019 as affected. The vendor disputed the “universal bypass” characterization, describing manipulation of one feature type that in limited circumstances led to an incorrect conclusion. It reported parser anti-tampering controls, model changes to detect disproportionately weighted features, removal of the most susceptible features, and automatic patch deployment. CERT/CC assessed that these changes should stop the disclosed string set but did not establish that every similar forced-misclassification method was eliminated.
 
 **Security consequence:** The disagreement is useful CTI context but does not resolve every environment. Identify engine version, parser, features, route, and remediation state in scope.
 
@@ -373,7 +385,7 @@ The researchers' claim requires samples, transformation, feature output, score c
 
 Use the same five terms: **Observed** — a production event or provider report. **Reproduced** — the same failure under documented local conditions. **Demonstrated** — a research proof-of-concept on a stated model, not necessarily yours. **Inferred** — a hypothesis linking observations. **Unknown** — an explicitly recorded gap.
 
-- **Observed:** the Skylight publication and the vendor's public response are provider or researcher reports.
+- **Observed:** CERT/CC preserves the vendor statement and records the affected-version and patch boundary as published facts; this does not independently prove a customer outcome.
 - **Reproduced:** a local rerun against the same engine version and documented conditions would support this level.
 - **Demonstrated:** the published research result is a proof-of-concept on the stated Cylance engine and sample sets, not automatically on every deployment.
 - **Inferred:** a hypothesis that the same feature or policy path explains a missed local sample.
@@ -404,22 +416,24 @@ The CTI publication guides the hypothesis; it does not replace local evidence. P
 <a id="controls"></a>
 ## 15. Controls, ATLAS mapping, and analyst exercise
 
-![Control points connecting AI security objects, owners, evidence, and deterministic policy.](/ai-security-course/assets/chapter-03/20-controls-atlas.png)
+![Four-panel control map showing current MITRE ATLAS v2026.07 identifiers, five investigation questions, an eight-part learner deliverable, and a ten-point rubric with the Observed–Unknown evidence ladder.](/ai-security-course/assets/chapter-03/20-controls-atlas.png)
 
-The terminology becomes operational when each object has an owner, a control point, and a record an analyst can collect. MITRE ATLAS supplies vocabulary and mapping; a defensible case still requires local artifacts, configuration, and telemetry. Because ATLAS has been renaming “ML” to “AI” in technique titles, use the ID as the stable identifier and verify the current title before publication.
+The terminology becomes operational when each object has an owner, a control point, and a record an analyst can collect. MITRE ATLAS supplies vocabulary and mapping; a defensible case still requires local artifacts, configuration, and telemetry. The table below was verified against the version-pinned [MITRE ATLAS v2026.07 release](https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.07). Preserve both the stable ID and the ATLAS content version because technique titles and scopes evolve.
 
 ![MITRE ATLAS mappings for evasion, poisoning, backdoors, extraction, and inference risks.](/ai-security-course/assets/chapter-03/21-atlas-mapping.png)
 
 | ATLAS ID and title | Chapter connection | Local evidence to preserve |
 |---|---|---|
-| AML.T0043 — Craft Adversarial Data [VERIFY current title] | Sections 10 and 14: feature manipulation | Bytes, features, access, budget |
-| AML.T0015 — Evade ML/AI Model [VERIFY current title] | Sections 9, 10, and 14: evasion | Version, constraint, queries, action |
-| AML.T0018 — Backdoor ML Model [VERIFY current title] | Section 12: trigger behavior | Lineage, trigger tests, activations |
-| AML.T0020 — Poison Training Data [VERIFY current title] | Section 12: altered data | Manifest, labels, source, rerun |
-| AML.T0024 — Exfiltration via ML/AI Inference API [VERIFY current title] | Section 13: response data | Caller, tenant, output, rate |
-| AML.T0040 — ML/AI Model Inference API Access [VERIFY current title] | Sections 9 and 13: query access | Authentication, route, count |
-| AML.T0044 — Full ML Model Access [VERIFY current title] | Sections 2, 8, and 9: artifact access | Registry, identity, digest |
-| AML.CS0003 — Bypassing Cylance's AI Malware Detection [VERIFY current title] | Section 14: feature and policy case | Report, version, parser, remediation |
+| [AML.T0043 — Craft Adversarial Data](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L2234-L2279) | Sections 10 and 14: feature manipulation | Bytes, features, access, budget |
+| [AML.T0015 — Evade AI Model](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L1469-L1491) | Sections 9, 10, and 14: evasion | Version, constraint, queries, action |
+| [AML.T0018 — Manipulate AI Model](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L1659-L1679) | Section 12: artifact manipulation | Artifact digest, architecture, weights, loader |
+| [AML.T0018.000 — Poison AI Model](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L1678-L1697) | Section 12: poisoned model behavior | Lineage, weights, clean rerun, target tests |
+| [AML.T0020 — Training Data Poisoning](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L1764-L1791) | Section 12: altered data | Manifest, labels, source, rerun |
+| [AML.T0043.004 — Insert Backdoor Trigger](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L2362-L2378) | Section 12: trigger activation | Trigger fixture, target output, clean controls |
+| [AML.T0024 — Exfiltration via AI Inference API](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L1808-L1839) | Section 13: response data | Caller, tenant, output, rate |
+| [AML.T0040 — AI Model Inference API Access](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L2156-L2184) | Sections 9 and 13: query access | Authentication, route, count |
+| [AML.T0044 — Full AI Model Access](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L2379-L2401) | Sections 2, 8, and 9: artifact access | Registry, identity, digest |
+| [AML.CS0003 — Bypassing Cylance's AI Malware Detection](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L6167-L6192) | Section 14: feature and policy case | Report, version, parser, remediation |
 
 ### Control checklist
 
@@ -445,7 +459,19 @@ Choose a local classifier or course-owned demonstration. Do not upload confident
 6. Separate **Observed** — a production event or provider report; **Reproduced** — the same failure under documented local conditions; **Demonstrated** — a research proof-of-concept on a stated model, not necessarily yours; **Inferred** — a hypothesis linking observations; and **Unknown** — an explicitly recorded gap.
 7. Propose one deterministic control and one monitoring signal, and document the bypass condition or residual unknown.
 
-You have completed this chapter when, for a misclassification, you can name an observable distinguishing evasion, distribution shift, parser or feature change, threshold change, and swapped artifact; state the access level and both budgets; apply the five-term ladder; and identify control and telemetry needed to test it.
+**Deliverable:** Submit a one-page evidence sheet or completed [Module 00 workbook](/ai-security-course/module-00-workbook.html#chapter-03-assessment) containing the system graph, versioned artifacts, one bounded hypothesis, the access and budget statement, the five-term evidence classification, one deterministic control, and one monitoring signal. Use synthetic or explicitly authorized data only.
+
+| Assessment criterion | Points |
+|---|---:|
+| System graph distinguishes model, parser or feature step, configuration, policy, and downstream action | 2 |
+| Artifact and event evidence is versioned and sufficient to reproduce the comparison | 2 |
+| Hypothesis names the competing explanations and one observable that distinguishes them | 2 |
+| Access level, perturbation budget, query budget, and evidence-ladder labels are explicit | 2 |
+| Control, telemetry, bypass condition, and residual unknown are documented | 2 |
+
+**Pass standard:** 8/10, with full credit on the access-and-evidence criterion. Revise any submission that treats a score as authorization, labels a research demonstration as a local incident, or omits the affected artifact or route version.
+
+You have completed this chapter when the deliverable meets that pass standard and, for a misclassification, you can name an observable distinguishing evasion, distribution shift, parser or feature change, threshold change, and swapped artifact; state the access level and both budgets; apply the five-term ladder; and identify control and telemetry needed to test it.
 
 <a id="key-takeaways"></a>
 ## 16. Key takeaways
@@ -469,6 +495,7 @@ You have completed this chapter when, for a misclassification, you can name an o
 - [Kingma and Ba — Adam: A Method for Stochastic Optimization](https://arxiv.org/abs/1412.6980)
 - [NIST AI 100-2 E2025 — Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations](https://csrc.nist.gov/pubs/ai/100/2/e2025/final)
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)
+- [MITRE ATLAS data release v2026.07](https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.07)
 - [Google Machine Learning Crash Course — Neural networks](https://developers.google.com/machine-learning/crash-course/neural-networks)
 - [Szegedy et al. — Intriguing Properties of Neural Networks](https://arxiv.org/abs/1312.6199)
 - [Biggio et al. — Evasion Attacks against Machine Learning at Test Time](https://arxiv.org/abs/1708.06131)
@@ -478,13 +505,15 @@ You have completed this chapter when, for a misclassification, you can name an o
 - [Pierazzi et al. — Intriguing Properties of Adversarial ML Attacks in the Problem Space](https://arxiv.org/abs/1911.02142)
 - [Tramèr et al. — Stealing Machine Learning Models via Prediction APIs](https://arxiv.org/abs/1609.02943)
 - [Shokri et al. — Membership Inference Attacks Against Machine Learning Models](https://arxiv.org/abs/1610.05820)
+- [Fredrikson, Jha, and Ristenpart — Model Inversion Attacks that Exploit Confidence Information and Basic Countermeasures](https://doi.org/10.1145/2810103.2813677)
 - [Carlini et al. — Poisoning Web-Scale Training Datasets Is Practical](https://arxiv.org/abs/2302.10149)
 - [Liu, Dolan-Gavitt, and Garg — Fine-Pruning](https://arxiv.org/abs/1805.12185)
 - [Chen et al. — Detecting Backdoor Attacks through Activation Clustering](https://arxiv.org/abs/1811.03728)
-- Wang et al. — Neural Cleanse (IEEE S&P 2019) [VERIFY: canonical URL]
-- MITRE ATLAS case study AML.CS0003 — Bypassing Cylance's AI Malware Detection [VERIFY: supplied study URL returned 404; canonical URL needed]
-- MITRE ATLAS case study AML.CS0002 — VirusTotal Poisoning [VERIFY: supplied study URL returned 404; canonical URL needed]
+- [Wang et al. — Neural Cleanse: Identifying and Mitigating Backdoor Attacks in Neural Networks (IEEE S&P 2019)](https://doi.org/10.1109/SP.2019.00031)
+- [MITRE ATLAS AML.CS0003 — Bypassing Cylance's AI Malware Detection (v2026.07)](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L6167-L6192)
+- [MITRE ATLAS AML.CS0002 — VirusTotal Poisoning (v2026.07)](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L6142-L6166)
 - [Skylight Cyber — Cylance, I Kill You!](https://skylightcyber.com/2019/07/18/cylance-i-kill-you/)
+- [CERT/CC VU#489481 — Cylance Antivirus Products Susceptible to Concatenation Bypass](https://www.kb.cert.org/vuls/id/489481)
 
 <a id="next"></a>
 ## 18. What comes next
@@ -493,27 +522,6 @@ You have completed this chapter when, for a misclassification, you can name an o
 
 ---
 
-**AI Security Engineering Course — under construction.** The syllabus, examples, references, labs, and assessment criteria may change during creation.
+**Chapter 3 status: complete.** Finalized 30 August 2026 as a learner-ready chapter with version-pinned ATLAS mappings, a reviewed evidence boundary, and an assessed analyst exercise. The wider AI Security Engineering course remains under construction.
 
 [1200km.com](https://1200km.com) · [Main course article on Medium](https://medium.com/@1200km/im-building-an-ai-security-engineering-course-55e29e6c035e) · [Back to top ↑](#top)
-
-<!-- GLOSSARY DELTA -->
-
-- **Tensor:** A typed, shaped array of numbers used as a model input or intermediate value.
-- **Activation:** The value produced by a layer for a particular input.
-- **Logit:** An unnormalized model output score before a probability transformation.
-- **Forward pass:** Applying an architecture and its parameters to an input to produce activations and an output.
-- **Loss function:** A function that converts a prediction and target into a value used to guide training.
-- **Backpropagation:** Computing gradients by sending the loss signal backward through the computation graph.
-- **Optimizer:** An update rule that uses gradients to change learned parameters.
-- **Learning rate:** The scale applied to an optimizer's parameter update.
-- **Adversarial example:** An intentionally modified input that causes an unwanted model result under a stated threat model.
-- **Perturbation budget:** The permitted input change expressed by a norm or real-world constraint.
-- **Query budget:** The maximum number of probes available to an attacker with query access.
-- **Adaptive attack:** A defense-aware evaluation that selects an attack strategy to test the proposed defense.
-- **Backdoor:** A hidden trigger-to-target association that causes selected behavior while ordinary inputs appear acceptable.
-- **Trigger:** The condition that activates a backdoor.
-- **Model extraction:** Using target-service outputs to build an approximation of the target decision function.
-- **Membership inference:** Testing whether a particular record was part of a model's training data.
-- **Model inversion:** Inferring sensitive features or representative inputs from model outputs or other observations.
-- **Nondeterminism:** The condition in which the same nominal program, data, and configuration can produce different results because hidden or implementation-dependent choices are not fixed.

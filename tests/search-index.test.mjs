@@ -196,6 +196,7 @@ test('search sections classify entities and documentation', () => {
   assert.equal(classifyUrl('https://1200km.com/adversarygraph-docs/api/rag-mcp/'), 'AdversaryGraph docs');
   assert.equal(classifyUrl('https://1200km.com/courses/'), 'Courses & learning');
   assert.equal(classifyUrl('https://1200km.com/ai-security-course.html'), 'Courses & learning');
+  assert.equal(classifyUrl('https://1200km.com/ai-security-course/module-00/chapter-03.html'), 'Courses & learning');
 });
 
 test('search facets use deterministic content types and controlled topics', () => {
@@ -204,6 +205,7 @@ test('search facets use deterministic content types and controlled topics', () =
   assert.equal(classifyContentType('https://1200km.com/courses/'), 'Collection');
   assert.equal(classifyContentType('https://1200km.com/courses/trainsec-malware-analyst-professional-level-1/'), 'Course learning record');
   assert.equal(classifyContentType('https://1200km.com/ai-security-course.html'), 'Course');
+  assert.equal(classifyContentType('https://1200km.com/ai-security-course/module-00/chapter-03.html'), 'Course');
   assert.deepEqual(
     classifyTopics('https://1200km.com/guide/', '<title>Threat hunting with Sigma</title><meta name="description" content="Detection engineering">'),
     ['Threat hunting', 'Detection engineering'],

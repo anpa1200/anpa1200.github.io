@@ -13,6 +13,15 @@ const html = readFileSync(join(ROOT, 'courses', 'index.html'), 'utf8');
 const detail = readFileSync(join(ROOT, 'courses', 'trainsec-malware-analyst-professional-level-1', 'index.html'), 'utf8');
 const client = readFileSync(join(ROOT, 'assets', 'course-library.js'), 'utf8');
 const helpingMaterials = readFileSync(join(ROOT, 'cyber-knowledge', 'helping-materials', 'index.html'), 'utf8');
+const chapter03Markdown = readFileSync(join(ROOT, 'ai-security-course', 'module-00', 'chapter-03.md'), 'utf8');
+const chapter03Html = readFileSync(join(ROOT, 'ai-security-course', 'module-00', 'chapter-03.html'), 'utf8');
+const module00Html = readFileSync(join(ROOT, 'ai-security-course', 'module-00.html'), 'utf8');
+const courseRootHtml = readFileSync(join(ROOT, 'ai-security-course.html'), 'utf8');
+const module00Workbook = readFileSync(join(ROOT, 'ai-security-course', 'module-00-workbook.html'), 'utf8');
+const module00Instructor = readFileSync(join(ROOT, 'ai-security-course', 'module-00-instructor.html'), 'utf8');
+const courseGlossary = readFileSync(join(ROOT, 'ai-security-course', 'glossary.html'), 'utf8');
+const chapter03SvgNames = ['19-cylance-case.svg', '20-controls-atlas.svg', '21-atlas-mapping.svg'];
+const chapter03Svgs = chapter03SvgNames.map((name) => readFileSync(join(ROOT, 'ai-security-course', 'assets', 'chapter-03', name), 'utf8'));
 
 function count(text, pattern) {
   return (text.match(pattern) || []).length;
@@ -159,4 +168,94 @@ test('client provides progressive filtering, URL restoration, sorting, reset, an
     'data-course-topic', 'data-course-level', 'data-course-sort', 'data-course-reset',
     'data-course-count', 'data-course-empty', 'entry.hidden', 'list.appendChild',
   ]) assert.match(client, new RegExp(escapeRegex(token)), token);
+});
+
+test('AI Security Course Chapter 3 completion remains synchronized and evidence-closed', () => {
+  const mediumUrl = 'https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6';
+  const normalizedChapter03Html = chapter03Html.replaceAll('&#39;', "'").replaceAll('&amp;', '&');
+  assert.match(chapter03Markdown, /^status: "Complete"$/m);
+  assert.match(chapter03Markdown, /^published: "2026-08-08"$/m);
+  assert.match(chapter03Markdown, /^updated: "2026-08-30"$/m);
+  assert.match(chapter03Markdown, new RegExp(`^medium: "${escapeRegex(mediumUrl)}"$`, 'm'));
+
+  const structuredArticleSource = chapter03Html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(structuredArticleSource, 'Chapter 3 must expose TechArticle structured data');
+  const structuredArticle = JSON.parse(structuredArticleSource);
+  assert.equal(structuredArticle['@type'], 'TechArticle');
+  assert.equal(structuredArticle.datePublished, '2026-08-08');
+  assert.equal(structuredArticle.dateModified, '2026-08-30');
+  assert.equal(structuredArticle.sameAs, mediumUrl);
+  assert.match(chapter03Html, /<h1 id="chapter-title">AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization<\/h1>/);
+  assert.match(chapter03Html, /<strong[^>]*>Chapter complete<\/strong>/);
+  assert.match(chapter03Html, /<span class="pill">Complete<\/span>/);
+
+  assert.match(module00Html, /href="\/ai-security-course\/module-00\/chapter-03\.html">Chapter 3: complete<\/a>/);
+  assert.match(courseRootHtml, /href="\/ai-security-course\/module-00\/chapter-03\.html">Chapter 3 complete<\/a>/);
+
+  const reviewedSources = [chapter03Markdown, chapter03Html, ...chapter03Svgs];
+  const staleAtlasLabels = /Evade (?:ML|ML\/AI) Model|Manipulate ML Model|Backdoor ML Model|Poison ML Model|Poison Training Data|Exfiltration via (?:ML|ML\/AI) Inference API|(?:ML|ML\/AI) Model Inference API Access|Full ML Model Access|Cylance Case \(2012\)/;
+  for (const source of reviewedSources) {
+    assert.doesNotMatch(source, /\[VERIFY\b/i);
+    assert.doesNotMatch(source, staleAtlasLabels);
+  }
+
+  const atlasMappings = [
+    ['AML.T0043', 'Craft Adversarial Data'],
+    ['AML.T0015', 'Evade AI Model'],
+    ['AML.T0018', 'Manipulate AI Model'],
+    ['AML.T0018.000', 'Poison AI Model'],
+    ['AML.T0020', 'Training Data Poisoning'],
+    ['AML.T0043.004', 'Insert Backdoor Trigger'],
+    ['AML.T0024', 'Exfiltration via AI Inference API'],
+    ['AML.T0040', 'AI Model Inference API Access'],
+    ['AML.T0044', 'Full AI Model Access'],
+    ['AML.CS0003', "Bypassing Cylance's AI Malware Detection"],
+  ];
+  for (const [id, title] of atlasMappings) {
+    const mapping = `${id} — ${title}`;
+    assert.ok(chapter03Markdown.includes(mapping), `Markdown is missing current ATLAS mapping: ${mapping}`);
+    assert.ok(normalizedChapter03Html.includes(mapping), `HTML is missing current ATLAS mapping: ${mapping}`);
+    assert.ok(chapter03Svgs[2].includes(mapping), `ATLAS mapping SVG is missing: ${mapping}`);
+  }
+  for (const id of atlasMappings.map(([atlasId]) => atlasId)) {
+    assert.ok(chapter03Svgs[1].includes(id), `Controls SVG is missing current ATLAS ID: ${id}`);
+  }
+  assert.match(chapter03Markdown, /AML\.CS0002 — VirusTotal Poisoning/);
+  assert.match(chapter03Html, /AML\.CS0002 VirusTotal Poisoning/);
+
+  const primaryUrls = [
+    mediumUrl,
+    'https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.07',
+    'https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L',
+    'https://doi.org/10.1109/SP.2019.00031',
+    'https://doi.org/10.1145/2810103.2813677',
+    'https://skylightcyber.com/2019/07/18/cylance-i-kill-you/',
+    'https://www.kb.cert.org/vuls/id/489481',
+  ];
+  for (const url of primaryUrls) {
+    assert.ok(chapter03Markdown.includes(url), `Markdown is missing primary source: ${url}`);
+    assert.ok(chapter03Html.includes(url), `HTML is missing primary source: ${url}`);
+  }
+
+  const markdownPngs = [...chapter03Markdown.matchAll(/!\[[^\]]*\]\((\/ai-security-course\/assets\/chapter-03\/[^)\s]+\.png)\)/g)].map((match) => match[1]);
+  const htmlPngs = [...chapter03Html.matchAll(/<img\b[^>]*\bsrc="(\/ai-security-course\/assets\/chapter-03\/[^"\s]+\.png)"/g)].map((match) => match[1]);
+  assert.equal(markdownPngs.length, 23, 'Markdown must reference the complete 23-image set once each');
+  assert.equal(new Set(markdownPngs).size, 23, 'Markdown Chapter 3 PNG references must be unique');
+  assert.deepEqual(htmlPngs, markdownPngs, 'HTML and Markdown Chapter 3 image order must stay synchronized');
+  for (const asset of markdownPngs) assert.ok(existsSync(join(ROOT, asset.replace(/^\//, ''))), `missing Chapter 3 image: ${asset}`);
+
+  assert.match(module00Workbook, /id="chapter-03-assessment"/);
+  assert.match(module00Workbook, /Chapter 3 pass standard:<\/strong>\s*8\/10/);
+  for (const field of ['Attacker access level:', 'Perturbation budget:', 'Query budget:', 'Deterministic control:', 'Bypass condition or residual unknown:']) {
+    assert.ok(module00Workbook.includes(field), `Workbook is missing Chapter 3 field: ${field}`);
+  }
+  assert.match(module00Instructor, /<h2>Chapter 3 evidence-sheet rubric<\/h2>/);
+  const chapter03Rubric = module00Instructor.match(/<h2>Chapter 3 evidence-sheet rubric<\/h2>([\s\S]*?)(?=<h2>)/)?.[1];
+  assert.ok(chapter03Rubric, 'Instructor guide must contain a bounded Chapter 3 rubric section');
+  assert.equal(count(chapter03Rubric, /<tr><td>[^<]+<\/td><td>2<\/td><\/tr>/g), 5);
+  assert.match(module00Instructor, /Chapter 3 pass standard:<\/strong>\s*8\/10 with 2\/2 on access and evidence/);
+
+  for (const term of ['Activation', 'Adaptive attack', 'Nondeterminism', 'Perturbation budget', 'Query budget', 'Trigger']) {
+    assert.match(courseGlossary, new RegExp(`\\["${escapeRegex(term)}",`), `glossary is missing ${term}`);
+  }
 });
