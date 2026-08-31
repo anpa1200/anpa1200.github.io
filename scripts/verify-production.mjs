@@ -130,7 +130,7 @@ function pageChecks(path, body, articleCount) {
       { label: 'Chapter 3 H1', pass: headingContent(body) === 'AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization' },
       { label: 'Chapter 3 completion status', pass: /<strong[^>]*>Chapter complete<\/strong>/.test(body) && body.includes('Chapter 3 status: complete.') },
       { label: 'Chapter 3 evidence release', pass: body.includes('MITRE ATLAS v2026.07 release') && body.includes('/ai-security-course/module-00-workbook.html#chapter-03-assessment') },
-      { label: 'Chapter 3 publication identity', pass: body.includes('"dateModified":"2026-08-30"') && body.includes('https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6') },
+      { label: 'Chapter 3 publication identity', pass: /"dateModified"\s*:\s*"2026-08-30"/.test(body) && body.includes('https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6') },
     ],
   };
   return checks[path] || common;
