@@ -1,4 +1,5 @@
 import { stripHtml, tagAttributes } from './release-html-lib.mjs';
+import { HEADER_END } from './site-shell-lib.mjs';
 
 export const SIDEBAR_START = '<!-- platform-sidebar:start -->';
 export const SIDEBAR_END = '<!-- platform-sidebar:end -->';
@@ -153,11 +154,21 @@ export function isSidebarEligible(html) {
 
 export function applyPlatformSidebar(html, shell, { pathname = '/' } = {}) {
   if (!isSidebarEligible(html)) return html;
+  const existingSidebar = html.indexOf(SIDEBAR_START);
+  const existingHeaderEnd = html.indexOf(HEADER_END);
+  const preserveHeaderFirst = existingHeaderEnd >= 0 && existingSidebar > existingHeaderEnd;
   const withoutSidebar = stripExistingSidebar(html);
   const pageLinks = extractPageLinks(withoutSidebar, shell.sidebar.max_page_links);
   const sidebar = renderPlatformSidebar(shell, { pathname, pageLinks });
   let transformed = ensureBodyState(withoutSidebar);
-  transformed = transformed.replace(/<body\b[^>]*>/i, (body) => `${body}\n${sidebar}\n`);
+  if (preserveHeaderFirst && transformed.includes(HEADER_END)) {
+    transformed = transformed.replace(
+      /<!-- site-shell:header:end -->\s*/i,
+      `${HEADER_END}\n${sidebar}\n`,
+    );
+  } else {
+    transformed = transformed.replace(/<body\b[^>]*>/i, (body) => `${body}\n${sidebar}\n`);
+  }
   transformed = ensureHeadAsset(
     transformed,
     /href=["'][^"']*\/assets\/platform-sidebar\.css/i,

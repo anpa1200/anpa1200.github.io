@@ -40,6 +40,18 @@ test('platform sidebar is static, searchable-content-neutral, and idempotent', (
   assert.doesNotMatch(first, /<h2[^>]*>On this page<\/h2>/i);
 });
 
+test('standalone shell skip link precedes every sidebar link in focus order', () => {
+  const seededSidebar = renderPlatformSidebar(shell, { pathname: '/ai-security-course/module-00/chapter-03.html' });
+  const standalone = fixture.replace(
+    '<body>',
+    `<body><!-- site-shell:header:start --><header><a class="skip-link" href="#main-content">Skip to main content</a></header><!-- site-shell:header:end -->${seededSidebar}`,
+  );
+  const generated = applyPlatformSidebar(standalone, shell, { pathname: '/ai-security-course/module-00/chapter-03.html' });
+  assert.ok(generated.indexOf('class="skip-link"') < generated.indexOf('id="platform-sidenav"'));
+  assert.ok(generated.indexOf('<!-- site-shell:header:end -->') < generated.indexOf('<!-- platform-sidebar:start -->'));
+  assert.equal(applyPlatformSidebar(generated, shell, { pathname: '/ai-security-course/module-00/chapter-03.html' }), generated);
+});
+
 test('redirect documents are not converted into navigable duplicate pages', () => {
   const redirect = '<html><head><title>Redirecting</title><meta http-equiv="refresh" content="0;url=/maintained/"></head><body></body></html>';
   assert.equal(isSidebarEligible(redirect), false);

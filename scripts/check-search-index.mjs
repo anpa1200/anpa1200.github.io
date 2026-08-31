@@ -122,6 +122,7 @@ async function checkQueries() {
       // resources for the same course title. Keep the current record in the
       // first two results without suppressing the deeper review article.
       { query: 'TrainSec Malware Analyst Professional Level 1', expectedPrefixes: ['/courses/trainsec-malware-analyst-professional-level-1/'], maxRank: 2, requiredTier: 'core' },
+      { query: 'AI Security Course Module 00 Chapter 3 Neural Networks and Optimization', expectedPrefixes: ['/ai-security-course/module-00/chapter-03.html'], first: true, matchedTier: 'reference', matchedSource: 'Medium', matchedType: 'guide', matchedLifecycle: 'maintained' },
       { query: 'detection validation', expectedPrefixes: ['/adversarygraph', '/labs.html', '/newest-detection-engineering-techniques/'] },
       { query: 'IOC enrichment', expectedPrefixes: ['/adversarygraph'], requiredTier: 'core' },
       // Generic ecosystem terms may legitimately rank the homepage or flagship
