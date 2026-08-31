@@ -185,6 +185,7 @@ test('AI Security Course Chapter 3 completion remains synchronized and evidence-
   assert.equal(structuredArticle.datePublished, '2026-08-08');
   assert.equal(structuredArticle.dateModified, '2026-08-30');
   assert.equal(structuredArticle.sameAs, mediumUrl);
+  assert.match(chapter03Html, /<h1 id="chapter-title">AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization<\/h1>/);
   assert.match(chapter03Html, /<strong[^>]*>Chapter complete<\/strong>/);
   assert.match(chapter03Html, /<span class="pill">Complete<\/span>/);
 
