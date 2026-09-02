@@ -132,6 +132,12 @@ function pageChecks(path, body, articleCount) {
       { label: 'Chapter 3 evidence release', pass: body.includes('MITRE ATLAS v2026.07 release') && body.includes('/ai-security-course/module-00-workbook.html#chapter-03-assessment') },
       { label: 'Chapter 3 publication identity', pass: /"dateModified"\s*:\s*"2026-08-30"/.test(body) && body.includes('https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6') },
     ],
+    '/ai-security-course/module-00/chapter-04.html': [...common,
+      { label: 'Chapter 4 H1', pass: headingContent(body) === 'AI Security Course, Module 00 — Chapter 4: Transformers and LLM Generation' },
+      { label: 'Chapter 4 completion status', pass: /<strong[^>]*>Chapter complete<\/strong>/.test(body) && body.includes('Chapter 4 status: complete.') },
+      { label: 'Chapter 4 evidence release', pass: body.includes('https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.07') && body.includes('/ai-security-course/module-00-workbook.html#chapter-04-assessment') },
+      { label: 'Chapter 4 publication identity', pass: /"dateModified"\s*:\s*"2026-08-31"/.test(body) && body.includes('https://medium.com/@1200km/ai-security-course-module-00-chapter-4-b8e3de0c3a9d') },
+    ],
   };
   return checks[path] || common;
 }
@@ -154,7 +160,7 @@ async function verifyOrigin(origin, attempt) {
     { label: 'build.json artifact digest', pass: /^sha256:[0-9a-f]{64}$/i.test(build?.artifact_digest || '') },
     { label: 'site facts available', pass: factsRecord.status === 200 && Number.isInteger(articleCount) },
   ];
-  for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/threat-matrix/', '/privacy.html', '/courses/', '/courses/trainsec-malware-analyst-professional-level-1/', '/ai-security-course/module-00/chapter-03.html']) {
+  for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/threat-matrix/', '/privacy.html', '/courses/', '/courses/trainsec-malware-analyst-professional-level-1/', '/ai-security-course/module-00/chapter-03.html', '/ai-security-course/module-00/chapter-04.html']) {
     const record = await fetchRecord(origin.url, path, attempt);
     record.fingerprints = pageChecks(path, record.body, articleCount);
     records.push(record);

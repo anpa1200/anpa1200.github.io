@@ -150,6 +150,8 @@ function chips(values) {
 }
 
 function reviewCard(review) {
+  const courseLinkLabel = review.commercial_disclosure.affiliate_link ? 'Official course (affiliate)' : 'Official course';
+  const courseLinkRel = review.commercial_disclosure.affiliate_link ? 'sponsored noopener noreferrer' : 'noopener noreferrer';
   const search = [
     review.title, review.provider, review.summary, review.level, review.format,
     review.recommendation_label, ...review.topics, ...review.audiences,
@@ -180,7 +182,7 @@ function reviewCard(review) {
             <div class="course-actions">
               <a class="button primary" href="${escapeHtml(localPath(review.canonical_url))}">Open learning record</a>
               <a class="button" href="${escapeHtml(localPath(review.full_review_url))}">Read full review</a>
-              <a class="button" href="${escapeHtml(review.course_url)}" target="_blank" rel="noopener noreferrer">Official course <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+              <a class="button" href="${escapeHtml(review.course_url)}" target="_blank" rel="${courseLinkRel}">${courseLinkLabel} <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
             </div>
           </div>
         </article>`;

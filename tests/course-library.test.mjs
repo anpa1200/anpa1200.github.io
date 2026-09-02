@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
+import { runInNewContext } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
@@ -12,9 +13,12 @@ const schema = JSON.parse(readFileSync(join(ROOT, 'data', 'course-library.schema
 const html = readFileSync(join(ROOT, 'courses', 'index.html'), 'utf8');
 const detail = readFileSync(join(ROOT, 'courses', 'trainsec-malware-analyst-professional-level-1', 'index.html'), 'utf8');
 const client = readFileSync(join(ROOT, 'assets', 'course-library.js'), 'utf8');
+const sitePerformance = readFileSync(join(ROOT, 'assets', 'site-performance.js'), 'utf8');
 const helpingMaterials = readFileSync(join(ROOT, 'cyber-knowledge', 'helping-materials', 'index.html'), 'utf8');
 const chapter03Markdown = readFileSync(join(ROOT, 'ai-security-course', 'module-00', 'chapter-03.md'), 'utf8');
 const chapter03Html = readFileSync(join(ROOT, 'ai-security-course', 'module-00', 'chapter-03.html'), 'utf8');
+const chapter04Markdown = readFileSync(join(ROOT, 'ai-security-course', 'module-00', 'chapter-04.md'), 'utf8');
+const chapter04Html = readFileSync(join(ROOT, 'ai-security-course', 'module-00', 'chapter-04.html'), 'utf8');
 const module00Html = readFileSync(join(ROOT, 'ai-security-course', 'module-00.html'), 'utf8');
 const courseRootHtml = readFileSync(join(ROOT, 'ai-security-course.html'), 'utf8');
 const module00Workbook = readFileSync(join(ROOT, 'ai-security-course', 'module-00-workbook.html'), 'utf8');
@@ -22,6 +26,8 @@ const module00Instructor = readFileSync(join(ROOT, 'ai-security-course', 'module
 const courseGlossary = readFileSync(join(ROOT, 'ai-security-course', 'glossary.html'), 'utf8');
 const chapter03SvgNames = ['19-cylance-case.svg', '20-controls-atlas.svg', '21-atlas-mapping.svg'];
 const chapter03Svgs = chapter03SvgNames.map((name) => readFileSync(join(ROOT, 'ai-security-course', 'assets', 'chapter-03', name), 'utf8'));
+const chapter04SvgNames = ['11-decoding-controls.svg', '13-reproducibility-evidence.svg', '20-atlas-mapping.svg', '24-what-comes-next.svg', '25-conclusion.svg'];
+const chapter04Svgs = chapter04SvgNames.map((name) => readFileSync(join(ROOT, 'ai-security-course', 'assets', 'chapter-04', name), 'utf8'));
 
 function count(text, pattern) {
   return (text.match(pattern) || []).length;
@@ -79,6 +85,12 @@ test('review policy publishes only completed evidence-backed decisions with disc
     assert.ok(review.facts_verified_at >= review.published_at);
     assert.ok(review.syllabus_verified_at >= review.published_at);
   }
+  const trainsec = model.reviews.find((review) => review.id === 'trainsec-malware-analyst-professional-level-1');
+  assert.ok(trainsec);
+  assert.equal(trainsec.course_url, 'https://training.trainsec.net/malware-analyst-professional-level-1/v6dfz');
+  assert.equal(trainsec.commercial_disclosure.affiliate_link, true);
+  assert.ok(trainsec.official_fact_sources.includes(trainsec.course_url));
+  assert.doesNotMatch(model.editorial_policy.commercial_rule, /No current entry uses an affiliate link/i);
 });
 
 test('course and review source URLs are HTTPS and cover assets exist', () => {
@@ -127,6 +139,7 @@ test('hub statically renders every record with one canonical identity', () => {
   assert.match(html, /href="\/courses\/"[^>]*>Courses<\/a>/);
   assert.match(html, /aria-current="page" href="\/courses\/">Courses<\/a>/);
   assert.match(html, /id="platform-sidenav"/);
+  assert.match(html, /href="https:\/\/training\.trainsec\.net\/malware-analyst-professional-level-1\/v6dfz"[^>]*rel="sponsored noopener noreferrer"[^>]*>Official course \(affiliate\)/);
   assert.doesNotMatch(html, /<script(?![^>]*type="application\/ld\+json")[^>]*>[^<]/);
   for (const entry of [...model.courses, ...model.reviews, ...model.learning_paths]) {
     assert.equal(count(html, new RegExp(`id="(?:course|review|path)-${escapeRegex(entry.id)}"`, 'g')), 1, entry.id);
@@ -153,13 +166,14 @@ test('TrainSec detail remains a distinct learning record synchronized with the m
     assert.match(detail, new RegExp(escapeRegex(value)));
   }
   assert.match(detail, /article:published_time" content="2026-08-19"/);
-  assert.match(detail, /article:modified_time" content="2026-08-30"/);
+  assert.match(detail, new RegExp(`article:modified_time" content="${escapeRegex(review.updated_at)}"`));
   assert.match(detail, /src="\/assets\/site-og-v2\.png"/);
   assert.match(detail, /class="course-table-scroll" role="region"[^>]*tabindex="0"><table>/);
   assert.match(detail, /aria-current="location" href="\/courses\/">Courses<\/a>/);
   assert.match(detail, /id="platform-sidenav"/);
   assert.match(detail, /id="main-content"/);
-  assert.doesNotMatch(detail, /href="https:\/\/training\.trainsec\.net\/malware-analyst-professional-level-1\/v6dfz"/);
+  assert.match(detail, /href="https:\/\/training\.trainsec\.net\/malware-analyst-professional-level-1\/v6dfz"[^>]*rel="sponsored noopener noreferrer"[^>]*>Explore the course \(affiliate\)/);
+  assert.match(detail, /The course destination is an affiliate link and is labeled accordingly\./);
 });
 
 test('client provides progressive filtering, URL restoration, sorting, reset, and live status', () => {
@@ -168,6 +182,47 @@ test('client provides progressive filtering, URL restoration, sorting, reset, an
     'data-course-topic', 'data-course-level', 'data-course-sort', 'data-course-reset',
     'data-course-count', 'data-course-empty', 'entry.hidden', 'list.appendChild',
   ]) assert.match(client, new RegExp(escapeRegex(token)), token);
+});
+
+test('affiliate destination queues a dedicated analytics event before lazy GA loading completes', () => {
+  const affiliateUrl = 'https://training.trainsec.net/malware-analyst-professional-level-1/v6dfz';
+  const listeners = new Map();
+  const appendedScripts = [];
+  class MockElement {
+    constructor(anchor) { this.anchor = anchor; }
+    closest(selector) { return selector === 'a[href]' ? this.anchor : null; }
+  }
+  const context = {
+    Element: MockElement,
+    URL,
+    document: {
+      currentScript: { dataset: { googleAnalyticsId: 'G-TEST' } },
+      addEventListener(name, handler, options) { listeners.set(`document:${name}`, { handler, options }); },
+      createElement() { return {}; },
+      head: { appendChild(node) { appendedScripts.push(node); } },
+    },
+    window: {
+      location: { href: 'https://1200km.com/courses/' },
+      addEventListener(name, handler, options) { listeners.set(`window:${name}`, { handler, options }); },
+      setTimeout() {},
+    },
+  };
+
+  runInNewContext(sitePerformance, context);
+  const click = listeners.get('document:click');
+  assert.ok(click);
+  assert.equal(click.options.capture, true);
+  click.handler({ target: new MockElement({ href: affiliateUrl }) });
+
+  const queued = Array.from(context.window.dataLayer, (entry) => Array.from(entry));
+  assert.deepEqual(queued.map((entry) => entry[0]), ['js', 'config', 'event']);
+  assert.equal(queued[1][1], 'G-TEST');
+  assert.equal(queued[2][1], 'affiliate_click');
+  assert.equal(queued[2][2].affiliate_id, 'trainsec-malware-analyst-professional-level-1');
+  assert.equal(queued[2][2].link_domain, 'training.trainsec.net');
+  assert.equal(queued[2][2].link_url, affiliateUrl);
+  assert.equal(appendedScripts.length, 1);
+  assert.match(appendedScripts[0].src, /^https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-TEST$/);
 });
 
 test('AI Security Course Chapter 3 completion remains synchronized and evidence-closed', () => {
@@ -256,6 +311,112 @@ test('AI Security Course Chapter 3 completion remains synchronized and evidence-
   assert.match(module00Instructor, /Chapter 3 pass standard:<\/strong>\s*8\/10 with 2\/2 on access and evidence/);
 
   for (const term of ['Activation', 'Adaptive attack', 'Nondeterminism', 'Perturbation budget', 'Query budget', 'Trigger']) {
+    assert.match(courseGlossary, new RegExp(`\\["${escapeRegex(term)}",`), `glossary is missing ${term}`);
+  }
+});
+
+test('AI Security Course Chapter 4 completion remains synchronized, assessed, and evidence-closed', () => {
+  const mediumUrl = 'https://medium.com/@1200km/ai-security-course-module-00-chapter-4-b8e3de0c3a9d';
+  const normalizedChapter04Html = chapter04Html.replaceAll('&#39;', "'").replaceAll('&amp;', '&');
+  assert.match(chapter04Markdown, /^status: "Complete"$/m);
+  assert.match(chapter04Markdown, /^published: "2026-08-15"$/m);
+  assert.match(chapter04Markdown, /^updated: "2026-08-31"$/m);
+  assert.match(chapter04Markdown, new RegExp(`^medium: "${escapeRegex(mediumUrl)}"$`, 'm'));
+
+  const structuredGraphSource = chapter04Html.match(/<script type="application\/ld\+json" data-site-graph>([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(structuredGraphSource, 'Chapter 4 must expose governed structured data');
+  const structuredGraph = JSON.parse(structuredGraphSource)['@graph'];
+  const structuredArticle = structuredGraph.find((entry) => entry['@type'] === 'TechArticle');
+  assert.ok(structuredArticle, 'Chapter 4 graph must contain a TechArticle');
+  assert.equal(structuredArticle.datePublished, '2026-08-15');
+  assert.equal(structuredArticle.dateModified, '2026-08-31');
+  assert.equal(structuredArticle.sameAs, mediumUrl);
+  assert.match(chapter04Html, /<h1 id="chapter-title">AI Security Course, Module 00 — Chapter 4: Transformers and LLM Generation<\/h1>/);
+  assert.match(chapter04Html, /<strong[^>]*>Chapter complete<\/strong>/);
+  assert.match(chapter04Html, /<span class="pill">Complete<\/span>/);
+  assert.match(module00Html, /href="\/ai-security-course\/module-00\/chapter-04\.html">Chapter 4: complete<\/a>/);
+  assert.match(courseRootHtml, /href="\/ai-security-course\/module-00\/chapter-04\.html">Chapter 4 complete<\/a>/);
+
+  const reviewedSources = [chapter04Markdown, chapter04Html, ...chapter04Svgs];
+  for (const source of reviewedSources) {
+    assert.doesNotMatch(source, /\[VERIFY\b/i);
+    assert.doesNotMatch(source, /2026\.06|Raw next-token log probabilities|n»t|GLOSSARY DELTA/i);
+    assert.doesNotMatch(source, /AIM Security/);
+  }
+  assert.match(chapter04Svgs[0], /unnormalized/);
+  assert.match(chapter04Svgs[0], /next-token/);
+  assert.match(chapter04Svgs[0], /scores/);
+  assert.match(chapter04Svgs[1], /digest supports comparison only with documented canonicalization/i);
+  assert.match(chapter04Svgs[1], /and a protected reference/i);
+  assert.match(chapter04Svgs[3], /not one mandatory linear sequence/i);
+  assert.match(chapter04Svgs[4], /not one opaque model event/i);
+
+  const atlasMappings = [
+    ['AML.T0051.000', 'LLM Prompt Injection: Direct'],
+    ['AML.T0051.001', 'LLM Prompt Injection: Indirect'],
+    ['AML.T0051.002', 'LLM Prompt Injection: Triggered'],
+    ['AML.T0070', 'RAG Poisoning'],
+    ['AML.T0077', 'LLM Response Rendering'],
+    ['AML.T0085.000', 'Data from AI Services:'],
+    ['AML.T0086', 'Exfiltration via AI Agent'],
+  ];
+  const atlasSvgText = chapter04Svgs[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+  for (const [id, title] of atlasMappings) {
+    assert.ok(chapter04Markdown.includes(id), `Markdown is missing current ATLAS ID: ${id}`);
+    assert.ok(chapter04Markdown.includes(title), `Markdown is missing current ATLAS title: ${title}`);
+    assert.ok(normalizedChapter04Html.includes(id), `HTML is missing current ATLAS ID: ${id}`);
+    assert.ok(normalizedChapter04Html.includes(title), `HTML is missing current ATLAS title: ${title}`);
+    assert.ok(atlasSvgText.includes(id), `ATLAS mapping SVG is missing: ${id}`);
+    assert.ok(atlasSvgText.includes(title), `ATLAS mapping SVG is missing title: ${title}`);
+  }
+
+  const primaryUrls = [
+    mediumUrl,
+    'https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.07',
+    'https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L',
+    'https://doi.org/10.1609/aaaiss.v7i1.36899',
+    'https://arxiv.org/abs/2104.09864',
+    'https://aclanthology.org/N19-1357/',
+    'https://doi.org/10.6028/NIST.AI.100-2e2025',
+    'https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32711',
+  ];
+  for (const url of primaryUrls) {
+    assert.ok(chapter04Markdown.includes(url), `Markdown is missing primary source: ${url}`);
+    assert.ok(chapter04Html.includes(url), `HTML is missing primary source: ${url}`);
+  }
+  for (const source of [chapter04Markdown, chapter04Html]) {
+    assert.ok(source.includes('Pavan Reddy and Aditya Sanjay Gujral'), 'EchoLeak paper authors must match the DOI record');
+    assert.ok(source.includes('EchoLeak: The First Real-World Zero-Click Prompt Injection Exploit in a Production LLM System'), 'EchoLeak paper title must match the DOI record');
+    assert.doesNotMatch(source, /Liu, J\. et al\./);
+  }
+
+  const tableLandmarks = [...chapter04Html.matchAll(/class="table-wrap" role="region" aria-label="([^"]+)" tabindex="0"/g)].map((match) => match[1]);
+  assert.equal(tableLandmarks.length, 5, 'all Chapter 4 data tables need keyboard-focusable landmarks');
+  assert.equal(new Set(tableLandmarks).size, tableLandmarks.length, 'Chapter 4 table landmark labels must be unique');
+  assert.equal((chapter04Html.match(/<pre\b/g) || []).length, (chapter04Html.match(/<pre tabindex="0">/g) || []).length, 'every scrollable Chapter 4 code block must be keyboard focusable');
+  assert.match(chapter04Html, /\[data-theme='light'\]\{--bg:#f0f4ff;/);
+
+  const markdownPngs = [...chapter04Markdown.matchAll(/!\[[^\]]*\]\((\/ai-security-course\/assets\/chapter-04\/[^)\s]+\.png)\)/g)].map((match) => match[1]);
+  const htmlPngs = [...chapter04Html.matchAll(/<img\b[^>]*\bsrc="(\/ai-security-course\/assets\/chapter-04\/[^"\s]+\.png)"/g)].map((match) => match[1]);
+  assert.equal(markdownPngs.length, 26, 'Markdown must reference the complete 26-image set once each');
+  assert.equal(new Set(markdownPngs).size, 26, 'Markdown Chapter 4 PNG references must be unique');
+  assert.deepEqual(htmlPngs, markdownPngs, 'HTML and Markdown Chapter 4 image order must stay synchronized');
+  for (const asset of markdownPngs) assert.ok(existsSync(join(ROOT, asset.replace(/^\//, ''))), `missing Chapter 4 image: ${asset}`);
+
+  assert.match(module00Workbook, /id="chapter-04-assessment"/);
+  assert.match(module00Workbook, /Chapter 4 pass standard:<\/strong>\s*70\/100/);
+  for (const field of ['Authorized system and scope:', 'Context sources, provenance, tenant, and authorization decision:', 'Observed / Reproduced / Inferred / Unknown findings:', 'Detection hypothesis, required telemetry, and benign cases:', 'Deterministic control and evidence it operated:', 'Residual limitation or unavailable evidence:']) {
+    assert.ok(module00Workbook.includes(field), `Workbook is missing Chapter 4 field: ${field}`);
+  }
+  assert.match(module00Instructor, /<h2>Chapter 4 LLM request-trace rubric<\/h2>/);
+  const chapter04Rubric = module00Instructor.match(/<h2>Chapter 4 LLM request-trace rubric<\/h2>([\s\S]*?)(?=<h2>)/)?.[1];
+  assert.ok(chapter04Rubric, 'Instructor guide must contain a bounded Chapter 4 rubric section');
+  const rubricPoints = [...chapter04Rubric.matchAll(/<tr><td>[^<]+<\/td><td>(\d+)<\/td>/g)].map((match) => Number(match[1]));
+  assert.deepEqual(rubricPoints, [10, 20, 20, 20, 20, 10]);
+  assert.equal(rubricPoints.reduce((sum, points) => sum + points, 0), 100);
+  assert.match(module00Instructor, /Chapter 4 pass standard:<\/strong>\s*70\/100 with at least half credit in every criterion/);
+
+  for (const term of ['Causal mask', 'Chat template', 'Context leakage', 'Direct prompt injection', 'Grammar-constrained generation', 'Greedy decoding', 'Positional information', 'Repetition penalty', 'Special token', 'Stop sequence', 'Token embedding', 'Triggered prompt injection', 'Truncation policy', 'Vocabulary']) {
     assert.match(courseGlossary, new RegExp(`\\["${escapeRegex(term)}",`), `glossary is missing ${term}`);
   }
 });
