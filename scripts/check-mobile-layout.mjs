@@ -49,6 +49,7 @@ const pages = [
   ['courses', '/courses/'],
   ['course-review', '/courses/trainsec-malware-analyst-professional-level-1/'],
   ['ai-course-chapter-03', '/ai-security-course/module-00/chapter-03.html'],
+  ['ai-course-chapter-04', '/ai-security-course/module-00/chapter-04.html'],
 ];
 
 const deployableCatalogPath = join(site, 'data', 'content-catalog.json');

@@ -49,6 +49,7 @@ let pages = [
   ['courses', '/courses/', 'interactive'],
   ['course-review', '/courses/trainsec-malware-analyst-professional-level-1/', 'image-heavy'],
   ['ai-course-chapter-03', '/ai-security-course/module-00/chapter-03.html', 'image-heavy'],
+  ['ai-course-chapter-04', '/ai-security-course/module-00/chapter-04.html', 'image-heavy'],
   ['docs', '/adversarygraph-docs/full-flow/', 'documentation'],
   ['cyber-knowledge-index', '/cyber-knowledge/', 'documentation'],
   ['cyber-knowledge-cti', '/cyber-knowledge/cti.html', 'documentation'],
