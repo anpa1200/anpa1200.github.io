@@ -23,9 +23,9 @@ const EXCLUDED_URLS = new Set([
 function decodeHtml(value) {
   return String(value)
     .replace(/<[^>]*>/g, ' ')
-    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
     .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ').trim();
 }
 
