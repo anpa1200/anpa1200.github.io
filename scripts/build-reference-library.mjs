@@ -15,7 +15,10 @@ const check = process.argv.slice(2).includes('--check');
 const modelPath = join(SITE_ROOT, 'data', 'reference-library.json');
 const outputPath = join(SITE_ROOT, 'references', 'index.html');
 const model = JSON.parse(await readFile(modelPath, 'utf8'));
-const base = await readFile(join(SITE_ROOT, 'cyber-knowledge', 'index.html'), 'utf8');
+const base = await readFile(
+  existsSync(outputPath) ? outputPath : join(SITE_ROOT, 'cyber-knowledge', 'index.html'),
+  'utf8',
+);
 const canonical = 'https://1200km.com/references/';
 const shell = loadSiteShell(SITE_ROOT);
 const page = shell.pages.find((item) => item.path === 'references/index.html');
@@ -167,11 +170,13 @@ let html = transformHtmlElements(base, 'script', (element) => {
   const attributes = tagAttributes(element.openTag);
   const type = (attributes.type || '').toLowerCase();
   const source = attributes.src || '';
-  return type === 'application/ld+json' || source === '/assets/cyber-knowledge.js'
+  return type === 'application/ld+json' || source === '/assets/cyber-knowledge.js' || source.startsWith('/assets/reference-library.js')
     ? removedScriptMarker
     : element.full;
 })
   .replace(/\s*__REFERENCE_BASE_SCRIPT_REMOVED__/g, '')
+  .replace(/\s*<link rel="stylesheet" href="\/assets\/reference-library\.css[^"]*"\s*\/?>/g, '')
+  .replace(/\s*<meta name="keywords" content="[^"]*"\s*\/?>/g, '')
   .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`)
   .replace(/<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${escapeHtml(description)}" />`)
   .replace(/<meta name="author" content="[^"]*"\s*\/?>/i, '<meta name="author" content="Andrey Pautov" />\n    <meta name="keywords" content="' + escapeHtml(keywords) + '" />')
