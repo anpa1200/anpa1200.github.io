@@ -23,7 +23,7 @@
   loadSiteSearch();
 
   function preferredTheme() {
-    return localStorage.getItem('theme') || (media.matches ? 'light' : 'dark');
+    return localStorage.getItem('theme') || 'light';
   }
 
   function applyTheme(theme, persist) {
@@ -31,7 +31,7 @@
     root.setAttribute('data-theme', next);
 
     if (persist) localStorage.setItem('theme', next);
-    if (themeColor) themeColor.setAttribute('content', next === 'light' ? '#f4f7fc' : '#07101f');
+    if (themeColor) themeColor.setAttribute('content', next === 'light' ? '#f5f5f4' : '#211d1e');
 
     const button = document.getElementById('theme-btn');
     if (button) {

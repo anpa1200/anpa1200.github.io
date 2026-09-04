@@ -231,7 +231,7 @@ function pageFor(article, body, localPath, allArticles) {
   const rights = `All rights reserved. Rights belong to TrainSec.net and ${author}. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders.`;
   const tags = (article.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
   return `<!doctype html>
-<html lang="en"><head>
+<html lang="en" data-theme="light"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${seoTitle} — TrainSec article | 1200km</title>
 <meta name="description" content="${escapeHtml(article.excerpt || `${article.title} by ${article.author}, republished from TrainSec.net with permission.`)}">
@@ -242,7 +242,7 @@ ${publishedIso ? `<meta property="article:published_time" content="${publishedIs
 <script type="application/ld+json">${siteArticleJsonLd(`${siteOrigin}/${localPath}`, article.title, publishedIso || retrievedAt, source)}</script>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.article{padding:54px 0 70px}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.article h1{max-width:900px;margin:10px 0 12px;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08}.meta{color:#91a8ca}.rights-disclaimer{margin:26px 0;padding:16px 18px;border:1px solid #2a6c68;border-radius:10px;background:rgba(13,67,66,.28);color:#c1dad7}.rights-disclaimer a,.source-attribution a,.related-links a{color:#72aaff}.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}.tag{padding:4px 8px;border-radius:999px;background:#11294e;color:#9fc1f7;font-size:.75rem}.trainsec-content{margin-top:34px}.trainsec-content h2,.trainsec-content h3{line-height:1.25;color:#eef5ff;margin-top:2.2em}.trainsec-content img{display:block;max-width:100%;height:auto;margin:1.5rem auto;border-radius:8px}.trainsec-content figure{margin:1.8rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.trainsec-content figcaption{color:#9fb4d4;font-size:.9rem}.trainsec-content iframe{display:block;width:100%;min-height:360px;border:0;border-radius:8px}.trainsec-content pre{overflow:auto;padding:16px;border:1px solid #243e68;border-radius:8px;background:#071225}.trainsec-content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.related-links{margin-top:42px;padding-top:22px;border-top:1px solid #1a3060}.related-links h2{color:#eef5ff}.source-attribution{margin-top:30px;padding-top:22px;border-top:1px solid #1a3060;color:#a9bbd8}.source-attribution strong{color:#eef5ff}footer{padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}.article{padding-top:38px}.trainsec-content iframe{min-height:230px}}
- .article-cover{max-width:860px;margin:28px 0;padding:10px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style></head><body>
+ .article-cover{max-width:860px;margin:28px 0;padding:10px;border:1px solid #243e68;border-radius:10px;background:#08152b}.article-cover img{display:block;width:100%;height:auto;border-radius:7px}.article-cover figcaption{padding:6px 4px 0;color:#9fb4d4;font-size:.82rem}.video-embed{margin:2rem 0;padding:12px;border:1px solid #243e68;border-radius:9px;background:#08152b}.video-fallback{margin:.65rem 0 0;color:#9fb4d4;font-size:.9rem}.video-fallback a{color:#72aaff}</style><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red"></head><body>
 <header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/articles/">Articles</a><a href="/cyber-knowledge/">Cyber Knowledge</a></nav></div></header>
 <main class="wrap" data-pagefind-body><article class="article">
 <p class="eyebrow">TrainSec source integration · ${category} · ${mode}</p><h1>${title}</h1>
@@ -320,8 +320,14 @@ await fs.writeFile(dataPath, `${JSON.stringify(payload, null, 2)}\n`);
 
 const authorGroups = payload.authors.map((group) => ({ name: group.name, articles: payload.articles.filter((article) => article.author === group.name) }));
 const domainGroups = payload.domains.map((group) => ({ name: group.name, articles: payload.articles.filter((article) => article.domain === group.name) }));
-await fs.writeFile(path.join(outputRoot, 'authors.html'), directoryPage('authors', authorGroups));
-await fs.writeFile(path.join(outputRoot, 'domains.html'), directoryPage('domains', domainGroups));
+function applyGreyRedTheme(html) {
+  return html
+    .replace('<html lang="en">', '<html lang="en" data-theme="light">')
+    .replace('</style></head>', '</style><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red"></head>');
+}
+
+await fs.writeFile(path.join(outputRoot, 'authors.html'), applyGreyRedTheme(directoryPage('authors', authorGroups)));
+await fs.writeFile(path.join(outputRoot, 'domains.html'), applyGreyRedTheme(directoryPage('domains', domainGroups)));
 
 // Point catalogue titles at the local mirrors while retaining the original
 // TrainSec link in each Source line and rights notice.
