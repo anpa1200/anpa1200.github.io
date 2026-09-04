@@ -1,5 +1,5 @@
 (function applyStoredTheme() {
-  let theme = 'dark';
+  let theme = 'light';
   try {
     theme = localStorage.getItem('theme') || theme;
   } catch {
