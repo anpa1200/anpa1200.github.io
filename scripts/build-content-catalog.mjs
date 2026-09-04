@@ -170,7 +170,13 @@ for (const relativePath of config.major_indexes) {
   indexDocuments.push({ relativePath, html: await readFile(path, 'utf8') });
 }
 const declaredItems = config.declared_items || [];
-const externalItems = externalArticleItems(indexDocuments, config, [...localItems, ...declaredItems]);
+// The reference library indexes citations, not first-party article identities.
+// Do not promote its external source cards into the governed content catalogue.
+const externalItems = externalArticleItems(
+  indexDocuments.filter(({ relativePath }) => relativePath !== 'references/index.html'),
+  config,
+  [...localItems, ...declaredItems],
+);
 const catalog = buildCatalog([...localItems, ...declaredItems, ...externalItems], config, remote ? 'deployable-domain-catalog' : 'local-source-catalog');
 const taxonomyAudit = buildTaxonomyAudit(catalog);
 

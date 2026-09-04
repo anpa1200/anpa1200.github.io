@@ -695,7 +695,7 @@ test('public downloads omit copied evidence excerpts and private archive paths',
   assert.match(publicReadme, /omit copied evidence excerpts and local archive paths/i);
   assert.match(publicReadme, /No open-data license is granted for this published snapshot\./);
 
-  const referenceModel = JSON.parse(readFileSync(join(ROOT, 'data', 'reference-library.json'), 'utf8'));
+  const referenceModel = JSON.parse(readFileSync(join(ROOT, 'data', 'ai-attack-reference-library.json'), 'utf8'));
   assert.equal(referenceModel.source_dataset, '/ai-attack-statistics/data/publications.csv');
 });
 

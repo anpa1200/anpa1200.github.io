@@ -317,6 +317,7 @@ for (const relativePath of config.major_indexes || []) {
   const base = relativePath === 'index.html' ? 'https://1200km.com/' : `https://1200km.com/${relativePath}`;
   for (const url of parseLinks(html, base)) {
     const parsedUrl = new URL(url);
+    if (relativePath === 'references/index.html' && parsedUrl.hostname !== '1200km.com') continue;
     if (parsedUrl.hostname === 'github.com' || parsedUrl.hostname === 'pypi.org' || parsedUrl.hostname === 'linkedin.com') continue;
     if (/\.(?:json|xml|txt|pdf|png|jpe?g|webp|svg)$/i.test(parsedUrl.pathname)) continue;
     if (url === 'https://medium.com/@1200km') continue;

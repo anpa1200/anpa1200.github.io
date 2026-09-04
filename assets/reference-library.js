@@ -63,7 +63,7 @@
     refreshTagValues(params.get('tag') || '');
     publisher.value = params.get('publisher') || '';
     year.value = params.get('year') || '';
-    sort.value = params.get('sort') || 'date-desc';
+    sort.value = params.get('sort') || 'title';
   }
 
   function writeUrl() {
@@ -73,7 +73,7 @@
     if (tagValue.value) params.set('tag', tagValue.value);
     if (publisher.value) params.set('publisher', publisher.value);
     if (year.value) params.set('year', year.value);
-    if (sort.value !== 'date-desc') params.set('sort', sort.value);
+    if (sort.value !== 'title') params.set('sort', sort.value);
     const query = params.toString();
     history.replaceState(null, '', query ? `${location.pathname}?${query}` : location.pathname);
   }
@@ -188,7 +188,7 @@
     refreshTagValues();
     publisher.value = '';
     year.value = '';
-    sort.value = 'date-desc';
+    sort.value = 'title';
     relatedList.replaceChildren();
     relatedHelp.textContent = 'Select Find related on a reference to rank other sources by shared normalized tags.';
     apply();
