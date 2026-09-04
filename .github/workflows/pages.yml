@@ -103,6 +103,14 @@ jobs:
           --site "${RUNNER_TEMP}/site"
           --source "${GITHUB_WORKSPACE}"
           --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
+      - name: Build complete article and guide reference library
+        run: |
+          node scripts/build-site-reference-library.mjs --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
+          node scripts/build-reference-library.mjs --site "${RUNNER_TEMP}/site"
+          npm run build-content:remote -- \
+            --site "${RUNNER_TEMP}/site" \
+            --source "${GITHUB_WORKSPACE}" \
+            --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
       - name: Audit platform discoverability, taxonomy, and sidebar coverage
         run: >-
           npm run check-discoverability --

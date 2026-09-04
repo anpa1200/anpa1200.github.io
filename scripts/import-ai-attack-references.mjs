@@ -15,7 +15,7 @@ const input = resolve(option(
   '--input',
   join(ROOT, '..', 'AI_Attack_statistics', 'dataset', 'publications.jsonl'),
 ));
-const output = resolve(option('--output', join(ROOT, 'data', 'reference-library.json')));
+const output = resolve(option('--output', join(ROOT, 'data', 'ai-attack-reference-library.json')));
 
 const TYPE_LABELS = {
   actor_motivation: 'Actor motivation',

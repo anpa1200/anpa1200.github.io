@@ -8,13 +8,16 @@ import { tagAttributes } from './release-html-lib.mjs';
 import { applySiteShell, loadSiteShell } from './site-shell-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const args = process.argv.slice(2);
+function option(name, fallback) { const index = args.indexOf(name); return index >= 0 && args[index + 1] ? resolve(args[index + 1]) : fallback; }
+const SITE_ROOT = option('--site', ROOT);
 const check = process.argv.slice(2).includes('--check');
-const modelPath = join(ROOT, 'data', 'reference-library.json');
-const outputPath = join(ROOT, 'references', 'index.html');
+const modelPath = join(SITE_ROOT, 'data', 'reference-library.json');
+const outputPath = join(SITE_ROOT, 'references', 'index.html');
 const model = JSON.parse(await readFile(modelPath, 'utf8'));
-const base = await readFile(join(ROOT, 'cyber-knowledge', 'index.html'), 'utf8');
+const base = await readFile(join(SITE_ROOT, 'cyber-knowledge', 'index.html'), 'utf8');
 const canonical = 'https://1200km.com/references/';
-const shell = loadSiteShell(ROOT);
+const shell = loadSiteShell(SITE_ROOT);
 const page = shell.pages.find((item) => item.path === 'references/index.html');
 if (!page) throw new Error('references/index.html is missing from data/site-shell.json.');
 
@@ -39,6 +42,7 @@ function referenceCard(record) {
   const remaining = record.tags.slice(12);
   const tagKeys = record.tags.map((tag) => tag.key).join('|');
   const search = [record.title, record.description, record.publisher, ...record.tags.flatMap((tag) => [tag.facet, tag.value, tag.key])].join(' ').toLowerCase();
+  const usedIn = record.used_in.slice(0, 8);
   return `          <article class="reference-card" data-reference-card data-reference-id="${escapeHtml(record.id)}" data-reference-title="${escapeHtml(record.title.toLowerCase())}" data-reference-publisher="${escapeHtml(record.publisher)}" data-reference-year="${escapeHtml(record.published_at?.slice(0, 4) || 'Unknown')}" data-reference-inclusion="${escapeHtml(record.inclusion)}" data-tag-keys="${escapeHtml(tagKeys)}" data-search="${escapeHtml(search)}">
             <div class="reference-card-heading">
               <span class="reference-context">${escapeHtml(record.inclusion === 'core' ? 'Core research' : 'Context')}</span>
@@ -48,6 +52,7 @@ function referenceCard(record) {
             <p>${escapeHtml(record.description)}</p>
             <div class="reference-tags" aria-label="Reference tags">${visible.map(tagButton).join('')}</div>
 ${remaining.length ? `            <details class="reference-more-tags"><summary>Show ${remaining.length} more tags</summary><div class="reference-tags">${remaining.map(tagButton).join('')}</div></details>` : ''}
+${usedIn.length ? `            <details class="reference-used-in"><summary>Used in ${record.used_in.length} ${record.used_in.length === 1 ? 'page' : 'pages'}</summary><ul>${usedIn.map((source) => `<li><a href="${escapeHtml(new URL(source.url).pathname)}">${escapeHtml(source.title)}</a> <span>${escapeHtml(source.type)}</span></li>`).join('')}</ul>${record.used_in.length > usedIn.length ? `<p>Showing 8 of ${record.used_in.length} internal crosslinks.</p>` : ''}</details>` : ''}
           </article>`;
 }
 
@@ -60,9 +65,9 @@ const cards = model.records.map(referenceCard).join('\n');
 const body = `<section class="reference-intro" aria-labelledby="reference-library-title">
         <div>
           <p class="page-eyebrow">1200km research ecosystem · Source reference module</p>
-          <h1 id="reference-library-title">AI Usage in Cyberattacks — References</h1>
+          <h1 id="reference-library-title">Articles and Guides — References</h1>
           <p class="page-lead">${escapeHtml(model.description)} Search titles and descriptions, filter every normalized tag, pivot across facets, and find references connected by shared evidence metadata.</p>
-          <div class="page-hero-links"><a class="button primary" href="/ai-attack-statistics/">Read the statistical study</a><a class="button" href="/ai-attack-statistics/dashboard/">Explore the interactive dashboard</a></div>
+          <div class="page-hero-links"><a class="button primary" href="/articles/">Browse articles</a><a class="button" href="/guides.html">Browse guides</a><a class="button" href="/ai-attack-statistics/">AI cyberattack study</a><a class="button" href="/ai-attack-statistics/dashboard/">AI study dashboard</a></div>
         </div>
         <aside class="reference-boundary" aria-label="Evidence boundary"><strong>Evidence boundary</strong><p>${escapeHtml(model.evidence_boundary)}</p></aside>
       </section>
@@ -70,6 +75,8 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
         <article><strong>${model.record_count}</strong><span>unique references</span></article>
         <article><strong>${model.core_count}</strong><span>core research</span></article>
         <article><strong>${model.context_count}</strong><span>context references</span></article>
+        <article><strong>${model.site_count}</strong><span>site-wide citations</span></article>
+        <article><strong>${model.usage_link_count.toLocaleString('en-US')}</strong><span>internal usage links</span></article>
         <article><strong>${model.unique_tag_count.toLocaleString('en-US')}</strong><span>unique tags</span></article>
         <article><strong>${model.tag_assignment_count.toLocaleString('en-US')}</strong><span>tag assignments</span></article>
         <article><strong>${facets.length}</strong><span>search facets</span></article>
@@ -82,7 +89,7 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
           <label><span>Tag value</span><select data-reference-tag-value disabled><option value="">All tag values</option></select></label>
           <label><span>Publisher</span><select data-reference-publisher><option value="">All publishers</option>${publishers.map((publisher) => `<option value="${escapeHtml(publisher)}">${escapeHtml(publisher)}</option>`).join('')}</select></label>
           <label><span>Year</span><select data-reference-year><option value="">All years</option>${years.map((year) => `<option value="${escapeHtml(year)}">${escapeHtml(year)}</option>`).join('')}</select></label>
-          <label><span>Sort</span><select data-reference-sort><option value="date-desc">Newest first</option><option value="date-asc">Oldest first</option><option value="title">Title A–Z</option><option value="publisher">Publisher A–Z</option><option value="tags">Most tagged</option></select></label>
+          <label><span>Sort</span><select data-reference-sort><option value="title">Title A–Z</option><option value="date-desc">Newest first</option><option value="date-asc">Oldest first</option><option value="publisher">Publisher A–Z</option><option value="tags">Most tagged</option></select></label>
           <button type="button" class="button" data-reference-reset>Reset filters</button>
         </div>
         <div class="reference-status" aria-live="polite"><strong data-reference-count>${model.record_count}</strong> references shown <span data-reference-active></span></div>
@@ -151,8 +158,8 @@ const itemList = {
   ],
 };
 
-const title = 'AI Cyberattack Research References — Searchable CTI Index | 1200km';
-const description = `Search ${model.record_count} deduplicated CTI, IR, government, provider, academic, and threat-research references about AI usage in cyberattacks across ${model.unique_tag_count.toLocaleString('en-US')} normalized tags.`;
+const title = 'Article and Guide References — Searchable Source Index | 1200km';
+const description = `Search ${model.record_count} deduplicated external sources cited across maintained 1200km articles, guides, research, case studies, documentation, and labs.`;
 const keywords = 'AI cyberattacks, CTI references, incident response reports, threat research, artificial intelligence, threat actors, MITRE ATT&CK, TTPs, LLM abuse, deepfakes, malware, phishing, vulnerability research';
 const removedScriptMarker = '__REFERENCE_BASE_SCRIPT_REMOVED__';
 
@@ -180,9 +187,9 @@ let html = transformHtmlElements(base, 'script', (element) => {
   .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/i, '<meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />')
   .replace(/<meta name="twitter:image:alt" content="[^"]*"\s*\/?>/i, '<meta name="twitter:image:alt" content="AI usage in cyberattacks reference library at 1200km" />')
   .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${canonical}" />`)
-  .replace('<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />', '<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />\n    <link rel="stylesheet" href="/assets/reference-library.css?v=20260829-1" />')
+  .replace('<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />', '<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />\n    <link rel="stylesheet" href="/assets/reference-library.css?v=20260904-sitewide" />')
   .replace(/<main\b[\s\S]*?<\/main>/i, `<main data-pagefind-body id="main-content">\n${body}\n    </main>`)
-  .replace('</body>', '    <script src="/assets/reference-library.js?v=20260829-1" defer></script>\n  </body>')
+  .replace('</body>', '    <script src="/assets/reference-library.js?v=20260904-sitewide" defer></script>\n  </body>')
   .replace('</head>', `    <script type="application/ld+json" id="reference-library-structured-data">\n${safeJson(itemList).split('\n').map((line) => `      ${line}`).join('\n')}\n    </script>\n  </head>`)
   .replace(/^[ \t]+$/gm, '');
 html = applySiteShell(html, shell, page);
