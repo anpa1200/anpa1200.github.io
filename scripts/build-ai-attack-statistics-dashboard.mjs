@@ -552,7 +552,7 @@ ${section.widgets.map((name) => barWidget(name, allSeries.get(name), model)).joi
     <link rel="icon" href="/assets/ap-logo.png" type="image/png" />
     <link rel="preload" as="image" href="/assets/cti/ai-in-cyberattacks-statistical-study/cover.webp" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="/assets/ai-attack-statistics/dashboard.css" />
-    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red" />
     <meta property="article:published_time" content="${escapeHtml(metadata.published)}" />
     <meta property="article:modified_time" content="${escapeHtml(modified)}" />
     <script type="application/ld+json" data-site-graph>${JSON.stringify(structured, null, 2).replace(/<\//g, '<\\/')}</script>
@@ -618,7 +618,7 @@ ${downloads}
     </main>
     <footer><div><a href="/">1200km.com</a> · <a href="mailto:1200km@gmail.com">1200km@gmail.com</a></div></footer>
     <script src="/assets/ai-attack-statistics/dashboard.js" defer></script>
-    <script src="/assets/site-theme.js?v=20260721-shell" defer></script>
+    <script src="/assets/site-theme.js?v=20260904-grey-red" defer></script>
   </body>
 </html>`;
 }

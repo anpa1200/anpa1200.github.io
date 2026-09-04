@@ -149,12 +149,12 @@ function ensureMainTarget(html) {
 
 function ensureStaticThemeStyles(html) {
   if (/href=["'][^"']*\/assets\/site-theme\.css/i.test(html)) return html;
-  return html.replace(/<\/head>/i, '    <link rel="stylesheet" href="/assets/site-theme.css?v=20260721-shell" />\n  </head>');
+  return html.replace(/<\/head>/i, '    <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red" />\n  </head>');
 }
 
 function ensureStaticThemeScript(html) {
   if (/src=["'][^"']*\/assets\/site-theme\.js/i.test(html)) return html;
-  return html.replace(/<\/head>/i, '    <script src="/assets/site-theme.js?v=20260721-shell" defer></script>\n  </head>');
+  return html.replace(/<\/head>/i, '    <script src="/assets/site-theme.js?v=20260904-grey-red" defer></script>\n  </head>');
 }
 
 export function applySiteShell(html, shell, page) {
