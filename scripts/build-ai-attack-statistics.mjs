@@ -274,10 +274,10 @@ function page(articleBody, sourceHash) {
     <link rel="preload" as="image" href="/assets/cti/ai-in-cyberattacks-statistical-study/cover.webp" type="image/webp" fetchpriority="high" />
     <link rel="icon" href="/assets/ap-logo.png" type="image/png" />
     <link rel="stylesheet" href="/assets/ai-attack-statistics-article.css?v=20260829-1" />
-    <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red" />
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />
     <script type="application/ld+json">${JSON.stringify(structured).replace(/<\//g, '<\\/')}</script>
     <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
-    <script src="/assets/site-theme.js?v=20260904-grey-red" defer></script>
+    <script src="/assets/site-theme.js?v=20260904-light-default" defer></script>
   </head>
   <body id="top">
     <header class="site-header"><nav class="nav" aria-label="Primary navigation"><a class="brand" href="/">Andrey Pautov</a><div class="nav-links"><a href="/cti.html">Research</a><a href="/guides.html">Library</a><a href="/projects.html">Products &amp; Labs</a><a href="/adversarygraph/">AdversaryGraph</a></div></nav></header>
@@ -410,10 +410,10 @@ function dataPage(manifestHash) {
     <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
     <link rel="icon" href="/assets/ap-logo.png" type="image/png" />
     <link rel="stylesheet" href="/assets/ai-attack-statistics-data.css?v=20260829-1" />
-    <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red" />
+    <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />
     <script type="application/ld+json">${JSON.stringify(structured).replace(/<\//g, '<\\/')}</script>
     <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
-    <script src="/assets/site-theme.js?v=20260904-grey-red" defer></script>
+    <script src="/assets/site-theme.js?v=20260904-light-default" defer></script>
   </head>
   <body id="top">
     <header class="site-header"><nav class="nav" aria-label="Primary navigation"><a class="brand" href="/">Andrey Pautov</a></nav></header>
