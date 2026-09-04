@@ -62,6 +62,7 @@ test('generated module exposes every reference and every tag without inline exec
   assert.equal((html.match(/data-reference-tag(?:\s|>)/g) || []).length, model.tag_assignment_count);
   assert.match(html, /<link rel="canonical" href="https:\/\/1200km\.com\/references\/"/);
   assert.match(html, /data-pagefind-body/);
+  assert.match(html, /data-reference-grid data-pagefind-ignore/);
   assert.match(html, /reference-library\.css\?v=20260904-sitewide/);
   assert.match(html, /reference-library\.js\?v=20260904-sitewide/);
   assert.doesNotMatch(html, /<script(?![^>]*type="application\/ld\+json")[^>]*>[^<]/);

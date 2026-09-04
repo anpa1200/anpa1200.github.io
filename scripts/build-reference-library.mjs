@@ -109,7 +109,7 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
       <section aria-labelledby="reference-results-title">
         <h2 id="reference-results-title">Reference index</h2>
         <p class="section-intro">Cards intentionally contain only a title, short description, canonical resource link, and discovery tags. Every tag remains visible and clickable; expand a card to inspect the complete tag set.</p>
-        <div class="reference-grid" data-reference-grid>
+        <div class="reference-grid" data-reference-grid data-pagefind-ignore>
 ${cards}
         </div>
         <p class="reference-empty" data-reference-empty hidden>No references match the current filters.</p>
