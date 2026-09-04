@@ -180,7 +180,7 @@ let html = transformHtmlElements(base, 'script', (element) => {
   .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/i, '<meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />')
   .replace(/<meta name="twitter:image:alt" content="[^"]*"\s*\/?>/i, '<meta name="twitter:image:alt" content="AI usage in cyberattacks reference library at 1200km" />')
   .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${canonical}" />`)
-  .replace('<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red" />', '<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-grey-red" />\n    <link rel="stylesheet" href="/assets/reference-library.css?v=20260829-1" />')
+  .replace('<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />', '<link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />\n    <link rel="stylesheet" href="/assets/reference-library.css?v=20260829-1" />')
   .replace(/<main\b[\s\S]*?<\/main>/i, `<main data-pagefind-body id="main-content">\n${body}\n    </main>`)
   .replace('</body>', '    <script src="/assets/reference-library.js?v=20260829-1" defer></script>\n  </body>')
   .replace('</head>', `    <script type="application/ld+json" id="reference-library-structured-data">\n${safeJson(itemList).split('\n').map((line) => `      ${line}`).join('\n')}\n    </script>\n  </head>`)

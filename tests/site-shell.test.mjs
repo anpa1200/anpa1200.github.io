@@ -47,8 +47,8 @@ test('every standalone page contains the generated canonical header and footer',
     assert.equal(footer, renderFooter(shell, page), `${page.path}: footer differs from generated source`);
     assert.equal((html.match(/data-site-shell="standalone"/g) || []).length, 2, `${page.path}: shell regions must be unique`);
     assert.match(html, /<body\b[^>]*\bid="top"/, `${page.path}: back-to-top target is missing`);
-    assert.match(html, /href="\/assets\/site-theme\.css\?v=20260904-grey-red"/, `${page.path}: shared shell CSS must be static`);
-    assert.match(html, /src="\/assets\/site-theme\.js\?v=20260904-grey-red"/, `${page.path}: shared shell interactions must load statically`);
+    assert.match(html, /href="\/assets\/site-theme\.css\?v=20260904-light-default"/, `${page.path}: shared shell CSS must be static`);
+    assert.match(html, /src="\/assets\/site-theme\.js\?v=20260904-light-default"/, `${page.path}: shared shell interactions must load statically`);
 
     const primary = region(header, '<!-- site-shell:primary-navigation:start -->', '<!-- site-shell:primary-navigation:end -->');
     const direct = primary.slice(0, primary.indexOf('<details class="nav-more"'));

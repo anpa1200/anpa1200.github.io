@@ -50,6 +50,17 @@ test('shared styles distinguish prose from unbroken technical content', () => {
   assert.match(styles, /grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*10rem\),\s*1fr\)\)/);
 });
 
+test('light is the default theme and dark mode uses the neutral gray palette', () => {
+  const styles = readFileSync(join(ROOT, 'assets', 'site-theme.css'), 'utf8');
+  const bootstrap = readFileSync(join(ROOT, 'assets', 'theme-bootstrap.js'), 'utf8');
+  const runtime = readFileSync(join(ROOT, 'assets', 'site-theme.js'), 'utf8');
+  assert.match(styles, /:root,\s*\n\[data-theme="light"\]\s*\{[\s\S]*?--bg:\s*#f5f5f4;/);
+  assert.match(styles, /\[data-theme="dark"\]\s*\{[\s\S]*?--bg:\s*#151515;[\s\S]*?--accent:\s*#c7c7ca;/);
+  assert.match(bootstrap, /let theme = 'light';/);
+  assert.match(runtime, /localStorage\.getItem\('theme'\) \|\| 'light'/);
+  assert.match(runtime, /next === 'light' \? '#f5f5f4' : '#151515'/);
+});
+
 test('AdversaryGraph product hero remains an unbroken responsive wordmark', () => {
   const source = readFileSync(join(ROOT, 'adversarygraph', 'index.html'), 'utf8');
   assert.match(source, /<h1[^>]*class="hero-title"[^>]*data-product-name="AdversaryGraph"[^>]*>AdversaryGraph<\/h1>/);

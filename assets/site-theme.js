@@ -31,7 +31,7 @@
     root.setAttribute('data-theme', next);
 
     if (persist) localStorage.setItem('theme', next);
-    if (themeColor) themeColor.setAttribute('content', next === 'light' ? '#f5f5f4' : '#211d1e');
+    if (themeColor) themeColor.setAttribute('content', next === 'light' ? '#f5f5f4' : '#151515');
 
     const button = document.getElementById('theme-btn');
     if (button) {
