@@ -14,7 +14,13 @@ const coverRoot = path.join(root, 'assets', 'trainsec', 'covers');
 const mediaRoot = path.join(root, 'assets', 'trainsec', 'media');
 const siteOrigin = 'https://1200km.com';
 const retrievedAt = new Date().toISOString().slice(0, 10);
-const metadataOnly = process.argv.slice(2).includes('--metadata-only');
+const cliArgs = process.argv.slice(2);
+const metadataOnly = cliArgs.includes('--metadata-only');
+const newOnly = cliArgs.includes('--new-only');
+const cacheOption = cliArgs.indexOf('--cache-dir');
+const cacheRoot = cacheOption >= 0 && cliArgs[cacheOption + 1]
+  ? path.resolve(cliArgs[cacheOption + 1])
+  : '';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -200,8 +206,13 @@ function normalizeMedia(body, article) {
   return out;
 }
 
-function rewriteSourceLinks(body) {
-  return body.replace(/(href|src)=("|')\/(?!\/)/g, '$1=$2https://trainsec.net/');
+function rewriteSourceLinks(body, articles = []) {
+  let rewritten = body.replace(/(href|src)=("|')\/(?!\/)/g, '$1=$2https://trainsec.net/');
+  for (const article of articles) {
+    rewritten = rewritten.replaceAll(`href="${article.url}"`, `href="${localPathFor(article)}"`);
+    rewritten = rewritten.replaceAll(`href='${article.url}'`, `href='${localPathFor(article)}'`);
+  }
+  return rewritten;
 }
 
 function localPathFor(article) {
@@ -535,10 +546,14 @@ async function updateExistingTrainsecMetadata(payload, canonicalEntries) {
 }
 
 function relatedMarkup(article, articles) {
+  const articleTags = new Set((article.tags || []).map((tag) => tag.toLowerCase()));
   const related = articles
     .filter((candidate) => candidate.url !== article.url)
     .sort((a, b) => {
-      const score = (candidate) => (candidate.author === article.author ? 2 : 0) + (candidate.domain === article.domain ? 1 : 0);
+      const score = (candidate) => {
+        const sharedTags = (candidate.tags || []).filter((tag) => articleTags.has(tag.toLowerCase())).length;
+        return (candidate.author === article.author ? 2 : 0) + (candidate.domain === article.domain ? 1 : 0) + sharedTags * 2;
+      };
       return score(b) - score(a) || a.title.localeCompare(b.title);
     })
     .slice(0, 4);
@@ -602,7 +617,38 @@ function directoryPage(kind, groups) {
   return `<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title} — TrainSec | 1200km</title><meta name="description" content="${escapeHtml(intro)}"><meta name="author" content="Andrey Pautov"><meta property="article:published_time" content="${retrievedAt}"><link rel="canonical" href="${canonical}"><script type="application/ld+json">${siteArticleJsonLd(canonical, title)}</script><style>:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050c1a;color:#dbe7fb;font:16px/1.7 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.site-header{border-bottom:1px solid #1a3060}.site-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:18px}.brand{color:#eef5ff;text-decoration:none;font-weight:700}.brand small{display:block;color:#8fa8cf;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}nav{display:flex;flex-wrap:wrap;gap:14px}nav a{color:#a9c0e4;text-decoration:none}.hero{padding:52px 0 32px;border-bottom:1px solid #1a3060}.eyebrow{color:#42d6a1;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.08;margin:10px 0}.lead{max-width:850px;color:#a9bbd8}.directory-group{margin:28px 0;padding:22px;border:1px solid #24406f;border-radius:10px;background:#08152b}.directory-group h2{margin:0;color:#eef5ff}.count{color:#91a8ca;margin:3px 0 12px}.directory-group li{margin:6px 0}.directory-group a,footer a{color:#72aaff}.directory-group span{color:#91a8ca}footer{margin-top:40px;padding:25px 0 45px;border-top:1px solid #1a3060;color:#91a8ca}@media(max-width:680px){.site-header .wrap{align-items:flex-start;flex-direction:column;padding:14px 0}}</style><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"></head><body><header class="site-header"><div class="wrap"><a class="brand" href="/"><strong>Andrey Pautov</strong><small>Security research</small></a><nav aria-label="Primary"><a href="/articles/trainsec-library.html">Library</a><a href="/articles/trainsec/authors.html">Authors</a><a href="/articles/trainsec/domains.html">Domains</a><a href="/articles/">Articles</a></nav></div></header><main class="wrap" data-pagefind-body><section class="hero"><p class="eyebrow">TrainSec source integration · directory</p><h1>${title}</h1><p class="lead">${escapeHtml(intro)}</p></section>${sections}</main><footer><div class="wrap"><a href="/articles/trainsec-library.html">Back to TrainSec Knowledge Library</a> · <a href="/articles/">All articles</a></div></footer></body></html>`;
 }
 
+function catalogueCard(article) {
+  const tags = article.tags || [];
+  const domain = article.domain || article.category || '';
+  const mode = article.mode || 'Article';
+  const media = article.image
+    ? ` · <a href="${escapeHtml(article.image)}" target="_blank" rel="noopener noreferrer">Original media ↗</a>`
+    : '';
+  return `<article class="article-card" data-title="${escapeHtml(article.title.toLowerCase())}" data-author="${escapeHtml(article.author)}" data-domain="${escapeHtml(domain)}" data-mode="${escapeHtml(mode)}" data-category="TrainSec" data-tags="${escapeHtml(tags.join(' ').toLowerCase())}">${article.cover_path ? `<a class="article-card-cover" href="${escapeHtml(article.local_path)}" aria-label="Read ${escapeHtml(article.title)}"><img src="${escapeHtml(article.cover_path)}" alt="" loading="lazy"></a>` : ''}
+<p class="article-kicker"><button class="filter-chip" type="button" data-filter="domain" data-filter-value="${escapeHtml(domain)}">${escapeHtml(domain)}</button> · <button class="filter-chip" type="button" data-filter="mode" data-filter-value="${escapeHtml(mode)}">${escapeHtml(mode)}</button></p>
+<h2><a href="${escapeHtml(article.local_path)}">${escapeHtml(article.title)} ↗</a></h2>
+<p class="article-excerpt">${escapeHtml(article.excerpt || 'Open the original TrainSec page for the complete article, screenshots, diagrams, and any embedded video.')}</p>
+<div class="tag-row">${tags.map((tag) => `<button class="tag filter-chip" type="button" data-filter="tag" data-filter-value="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`).join('')}</div>
+<p class="article-meta"><strong>Author:</strong> <button class="filter-chip" type="button" data-filter="author" data-filter-value="${escapeHtml(article.author)}">${escapeHtml(article.author)}</button> · <strong>Published:</strong> ${escapeHtml(article.date)}</p>
+<p class="source-line"><strong>Source:</strong> <a href="${escapeHtml(article.url)}" target="_blank" rel="noopener noreferrer">TrainSec Knowledge Library ↗</a>${media}</p>
+<p class="rights-disclaimer"><strong>All rights reserved.</strong> Rights belong to TrainSec.net and ${escapeHtml(article.author)}. 1200km.com is the publishing platform. Published with permission from the TrainSec rights holders. <a href="${escapeHtml(article.url)}" target="_blank" rel="noopener noreferrer">Original source ↗</a></p>
+</article>`;
+}
+
 async function fetchArticle(article) {
+  const cachedPath = cacheRoot ? path.join(cacheRoot, `${slugFor(article)}.html`) : '';
+  if (cachedPath) {
+    try {
+      const html = await fs.readFile(cachedPath, 'utf8');
+      const body = findElementorContent(html);
+      if (!body || body.length < 100) throw new Error('article content container not found');
+      const imageMeta = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)/i)
+        || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']/i);
+      return { body, coverUrl: imageMeta?.[1] ? new URL(imageMeta[1], article.url).href : article.image || '' };
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  }
   const response = await fetch(article.url, { headers: { 'user-agent': '1200km-TrainSec-permitted-import/1.0' } });
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
   const html = await response.text();
@@ -629,11 +675,21 @@ const failures = [];
 let completed = 0;
 const concurrency = 5;
 let cursor = 0;
+const articlesToImport = newOnly
+  ? (await Promise.all(payload.articles.map(async (article) => {
+      try {
+        await fs.access(path.join(root, article.local_path.replace(/^\//, '')));
+        return null;
+      } catch {
+        return article;
+      }
+    }))).filter(Boolean)
+  : payload.articles;
 async function worker() {
   while (true) {
     const index = cursor++;
-    if (index >= payload.articles.length) return;
-    const article = payload.articles[index];
+    if (index >= articlesToImport.length) return;
+    const article = articlesToImport[index];
     const slug = slugFor(article);
     const localPath = `articles/trainsec/${slug}.html`;
     const canonicalEntry = canonicalByLocalPath.get(`/${localPath}`);
@@ -647,10 +703,10 @@ async function worker() {
       article.local_path = `/${localPath}`;
       article.image = coverUrl || article.image || '';
       article.cover_path = await downloadCover(article.image, article);
-      const mediaReadyBody = await localizeBodyImages(rewriteSourceLinks(normalizeMedia(body, article)));
+      const mediaReadyBody = await localizeBodyImages(rewriteSourceLinks(normalizeMedia(body, article), payload.articles));
       await fs.writeFile(path.join(outputRoot, `${slug}.html`), pageFor(article, mediaReadyBody, localPath, payload.articles, canonicalEntry));
       completed += 1;
-      process.stdout.write(`Imported ${completed}/${payload.articles.length}: ${article.title}\n`);
+      process.stdout.write(`Imported ${completed}/${articlesToImport.length}: ${article.title}\n`);
     } catch (error) {
       failures.push({ url: article.url, title: article.title, error: String(error.message || error) });
       process.stdout.write(`FAILED ${article.title}: ${error.message || error}\n`);
@@ -663,7 +719,7 @@ payload.retrieved_at = retrievedAt;
 payload.license_note = 'Full article text and embedded media are reproduced with permission from TrainSec rights holders. Rights remain with TrainSec.net and each named author; 1200km.com is the publishing platform.';
 payload.authors = [...new Set(payload.articles.map((article) => article.author))].sort().map((name) => ({ name, articles: payload.articles.filter((article) => article.author === name).map((article) => article.local_path) }));
 payload.domains = [...new Set(payload.articles.map((article) => article.domain))].sort().map((name) => ({ name, articles: payload.articles.filter((article) => article.domain === name).map((article) => article.local_path) }));
-payload.import_status = { imported: completed, failed: failures.length, failures };
+payload.import_status = { imported: payload.articles.length - failures.length, failed: failures.length, failures };
 await fs.writeFile(dataPath, `${JSON.stringify(payload, null, 2)}\n`);
 
 const authorGroups = payload.authors.map((group) => ({ name: group.name, articles: payload.articles.filter((article) => article.author === group.name) }));
@@ -675,6 +731,18 @@ await fs.writeFile(path.join(outputRoot, 'domains.html'), directoryPage('domains
 // TrainSec link in each Source line and rights notice.
 const cataloguePath = path.join(root, 'articles', 'trainsec-library.html');
 let catalogue = await fs.readFile(cataloguePath, 'utf8');
+const missingCards = payload.articles.filter((article) => !catalogue.includes(`href="${article.local_path}"`));
+if (missingCards.length) {
+  catalogue = catalogue.replace(
+    '<div class="article-grid" id="article-grid">',
+    `<div class="article-grid" id="article-grid">${missingCards.map(catalogueCard).join('\n')}`,
+  );
+}
+catalogue = catalogue
+  .replace(/Source-linked catalogue of \d+ TrainSec Knowledge Library articles/, `Source-linked catalogue of ${payload.article_count} TrainSec Knowledge Library articles`)
+  .replace(/reviewed \d{1,2} [A-Za-z]+ \d{4}/, `reviewed ${new Date(`${retrievedAt}T00:00:00Z`).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric', timeZone:'UTC' })}`)
+  .replace(/<span class="stat">\d+ source articles<\/span>/, `<span class="stat">${payload.article_count} source articles</span>`)
+  .replace(/<span id="result-count" class="stat" aria-live="polite">\d+ shown<\/span>/, `<span id="result-count" class="stat" aria-live="polite">${payload.article_count} shown</span>`);
 // Catalogue cards must never inherit the full-article discovery navigation.
 // Keep “Continue research” on article pages only, even if a source export
 // accidentally includes that navigation in the catalogue fragment.
@@ -799,8 +867,8 @@ await fs.writeFile(cataloguePath, catalogue);
 
 const indexPath = path.join(root, 'articles', 'index.html');
 let indexHtml = await fs.readFile(indexPath, 'utf8');
-indexHtml = indexHtml.replace('TrainSec Knowledge Library: 84 source-linked articles', 'TrainSec Knowledge Library: 84 permitted full mirrors');
-indexHtml = indexHtml.replace('Source-linked metadata catalogue of TrainSec articles with rights and attribution notices.', 'Permitted full mirrors of 84 TrainSec articles with original text, screenshots, infographics, videos, author attribution, and source links.');
+indexHtml = indexHtml.replace(/TrainSec Knowledge Library: \d+ source-linked articles/, `TrainSec Knowledge Library: ${payload.article_count} permitted full mirrors`);
+indexHtml = indexHtml.replace('Source-linked metadata catalogue of TrainSec articles with rights and attribution notices.', `Permitted full mirrors of ${payload.article_count} TrainSec articles with original text, screenshots, infographics, videos, author attribution, and source links.`);
 await fs.writeFile(indexPath, indexHtml);
 
 console.log(`\nTrainSec import complete: ${completed} imported, ${failures.length} failed.`);

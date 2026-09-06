@@ -10,7 +10,7 @@ import {
 export const SITE_ORIGIN = 'https://1200km.com';
 export const LOCAL_SEARCH_MINIMUM_PAGES = 1000;
 // The domain currently exposes roughly 1,550 canonical search pages after the
-// 84 externally canonical TrainSec mirrors are intentionally excluded. Keep a
+// Externally canonical TrainSec mirrors are intentionally excluded. Keep a
 // meaningful regression floor without treating syndicated copies as coverage.
 export const REMOTE_SEARCH_MINIMUM_PAGES = 1500;
 

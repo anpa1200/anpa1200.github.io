@@ -83,9 +83,9 @@ function runMetadataOnly(root) {
   });
 }
 
-test('metadata-only import maps all 84 mirrors to their exact TrainSec canonical without date drift', () => {
-  assert.equal(manifest.article_count, 84);
-  assert.equal(manifest.articles.length, 84);
+test('metadata-only import maps all 87 mirrors to their exact TrainSec canonical without date drift', () => {
+  assert.equal(manifest.article_count, 87);
+  assert.equal(manifest.articles.length, 87);
   const root = makeFixture();
   try {
     const untouched = new Map([
@@ -145,8 +145,8 @@ test('metadata-only import maps all 84 mirrors to their exact TrainSec canonical
       localUrls.add(localUrl);
       sourceUrls.add(article.url);
     }
-    assert.equal(localUrls.size, 84);
-    assert.equal(sourceUrls.size, 84);
+    assert.equal(localUrls.size, 87);
+    assert.equal(sourceUrls.size, 87);
 
     assert.equal(readFileSync(join(root, 'articles/trainsec-library.html'), 'utf8'), untouched.get('hub'));
     assert.equal(readFileSync(join(root, 'articles/trainsec/authors.html'), 'utf8'), untouched.get('authors'));
@@ -177,9 +177,9 @@ test('metadata-only import maps all 84 mirrors to their exact TrainSec canonical
   }
 });
 
-test('checked-in TrainSec mirrors and discovery outputs match the exact 84-page canonical policy', () => {
-  assert.equal(manifest.article_count, 84);
-  assert.equal(manifest.articles.length, 84);
+test('checked-in TrainSec mirrors and discovery outputs match the exact 87-page canonical policy', () => {
+  assert.equal(manifest.article_count, 87);
+  assert.equal(manifest.articles.length, 87);
   const localUrls = new Set();
   const sourceUrls = new Set();
 
@@ -213,8 +213,8 @@ test('checked-in TrainSec mirrors and discovery outputs match the exact 84-page 
     sourceUrls.add(article.url);
   }
 
-  assert.equal(localUrls.size, 84);
-  assert.equal(sourceUrls.size, 84);
+  assert.equal(localUrls.size, 87);
+  assert.equal(sourceUrls.size, 87);
 
   const localIndexes = [
     ['articles/trainsec-library.html', 'https://1200km.com/articles/trainsec-library.html'],
@@ -244,7 +244,7 @@ test('checked-in TrainSec mirrors and discovery outputs match the exact 84-page 
 
   const catalog = JSON.parse(readFileSync(join(repositoryRoot, 'data/content-catalog.json'), 'utf8'));
   const trainsecItems = catalog.items.filter((item) => sourceUrls.has(item.canonical_url));
-  assert.equal(trainsecItems.length, 84);
+  assert.equal(trainsecItems.length, 87);
   for (const item of trainsecItems) {
     assert.equal(item.primary_type, 'mirror', item.id);
     assert.equal(item.source_url, item.canonical_url, item.id);

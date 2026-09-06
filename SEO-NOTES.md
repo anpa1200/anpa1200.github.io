@@ -17,7 +17,7 @@ provider.
 - `https://1200km.com/#website` is the stable WebSite identifier.
 - Every indexable 1200km HTML page has one self-canonical URL and one page
   identifier: `<canonical>#webpage`.
-- The 84 permitted TrainSec article reproductions are the narrow exception:
+- The 87 permitted TrainSec article reproductions are the narrow exception:
   each local mirror declares the exact matching TrainSec source article as its
   cross-domain canonical. The mapping is allowlisted in
   `data/trainsec-library.json`; the local TrainSec hub and author/domain indexes

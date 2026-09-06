@@ -11,7 +11,7 @@ The source catalogue generated on 2026-08-18 contains:
 
 - 1,245 governed identities, including 1,149 indexable catalogue items;
 - one intentionally noindex post-v6 AdversaryGraph development guide;
-- 96 externally canonical identities: 84 permitted TrainSec mirrors plus 12
+- 99 externally canonical identities: 87 permitted TrainSec mirrors plus 12
   declared external repository or package identities;
 - four GitHub repositories explicitly marked archived;
 - eleven separately deployed documentation, guide, case-study, lab, research,
@@ -24,8 +24,8 @@ records and technique pages are `generated-reference` records backed by the
 corresponding MITRE ATT&CK URL. They are neither mirrors nor authored CTI
 articles.
 
-The production build adds the pinned 190-article archive plus 84 permitted
-TrainSec full mirrors (274 integrated article pages total) and regenerates the
+The production build adds the pinned 190-article archive plus 87 permitted
+TrainSec full mirrors (277 integrated article pages total) and regenerates the
 full-domain catalogue and taxonomy report from the deployable output. Article
 publication status and editorial lifecycle are separate: an article remains a
 released publication even when its currentness is unknown or it is preserved

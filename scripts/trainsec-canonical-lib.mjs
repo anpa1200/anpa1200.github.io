@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 export const TRAINSEC_SOURCE_ORIGIN = 'https://trainsec.net';
 export const TRAINSEC_MIRROR_ORIGIN = 'https://1200km.com';
-export const TRAINSEC_EXPECTED_ARTICLE_COUNT = 84;
+export const TRAINSEC_EXPECTED_ARTICLE_COUNT = 87;
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MANIFEST_PATH = resolve(ROOT, 'data', 'trainsec-library.json');

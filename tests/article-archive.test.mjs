@@ -64,13 +64,13 @@ test('article archive routes receive authoritative sitemap dates', () => {
 });
 
 test('TrainSec catalogue filters search metadata and reset stale browser state', () => {
-  assert.equal([...trainsecCatalogue.matchAll(/<article class="article-card"/g)].length, 84);
-  assert.equal([...trainsecCatalogue.matchAll(/data-tags="[^"]*"/g)].length, 84);
+  assert.equal([...trainsecCatalogue.matchAll(/<article class="article-card"/g)].length, 87);
+  assert.equal([...trainsecCatalogue.matchAll(/data-tags="[^"]*"/g)].length, 87);
   assert.match(trainsecCatalogue, /id="filter-reset"/);
   assert.match(trainsecCatalogue, /id="filter-search"/);
   assert.match(trainsecCatalogue, /id="tag-filter"/);
-  assert.equal([...trainsecCatalogue.matchAll(/data-filter="author"/g)].length, 84);
-  assert.equal([...trainsecCatalogue.matchAll(/data-filter="(?:search|tag)"/g)].length, 168);
+  assert.equal([...trainsecCatalogue.matchAll(/data-filter="author"/g)].length, 87);
+  assert.equal([...trainsecCatalogue.matchAll(/data-filter="(?:search|tag)"/g)].length, 186);
   assert.match(trainsecCatalogue, /height:auto !important/);
   assert.match(trainsecCatalogue, /id="trainsec-card-layout-fix"/);
   assert.match(trainsecCatalogue, /grid-auto-rows:auto/);
