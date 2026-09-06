@@ -10,6 +10,8 @@ const site = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
 const check = args.includes('--check');
 const model = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge.json'), 'utf8'));
 const crosslinkModel = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge-crosslinks.json'), 'utf8'));
+const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
+const knowledgeSourceCount = knowledgeSources.sources.length;
 const { domains, collection, entry_paths: entryPaths } = model;
 let moduleIndex = new Map();
 
@@ -733,6 +735,8 @@ function renderEcosystem() {
           <article class="domain-card"><span class="domain-index">Practice</span><h3 class="domain-title"><a href="/labs.html">Security labs</a></h3><p class="domain-desc">Controlled lab environments, validation walkthroughs, and reproducible evidence.</p></article>
           <article class="domain-card"><span class="domain-index">Writing</span><h3 class="domain-title"><a href="/articles/">Article archive</a></h3><p class="domain-desc">Local, searchable versions of published long-form research and technical articles.</p></article>
           <article class="domain-card"><span class="domain-index">Evidence</span><h3 class="domain-title"><a href="/external-validation.html">External validation</a></h3><p class="domain-desc">Source-backed external contributions, references, and acceptance evidence.</p></article>
+          <article class="domain-card"><span class="domain-index">Curated sources</span><h3 class="domain-title"><a href="/cyber-knowledge/knowledge-sources/">Knowledge Sources</a></h3><p class="domain-desc">Search ${knowledgeSourceCount} assessed standards, research portals, tools, datasets, and learning resources by category, tag, audience, access, and quality.</p></article>
+          <article class="domain-card"><span class="domain-index">Site-wide citations</span><h3 class="domain-title"><a href="/references/">References</a></h3><p class="domain-desc">Search the deduplicated external sources cited across maintained 1200km articles, guides, research, documentation, and labs.</p></article>
           <article class="domain-card"><span class="domain-index">Reference</span><h3 class="domain-title"><a href="/cyber-knowledge/glossary/">Glossary</a></h3><p class="domain-desc">Source-linked terminology with direct routes back to the guide context.</p></article>
           <article class="domain-card"><span class="domain-index">Provenance</span><h3 class="domain-title"><a href="/cyber-knowledge/sources/">Source index</a></h3><p class="domain-desc">External sources grouped by class and the guides where each is used.</p></article>
           <article class="domain-card"><span class="domain-index">Governance</span><h3 class="domain-title"><a href="/cyber-knowledge/editorial-policy/">Editorial policy</a></h3><p class="domain-desc">Source selection, review, correction, versioning, and AI-assistance boundaries.</p></article>

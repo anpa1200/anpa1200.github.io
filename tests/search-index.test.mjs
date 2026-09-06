@@ -5,12 +5,14 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   canonicalFromHtml,
+  buildKnowledgeSourceSearchRecords,
   classifyContentType,
   classifyTopics,
   classifyUrl,
   discoveryWeight,
   LOCAL_SEARCH_MINIMUM_PAGES,
   normalizeCanonical,
+  KNOWLEDGE_SOURCES_URL,
   parseSitemap,
   prepareHtmlForSearch,
   REMOTE_SEARCH_MINIMUM_PAGES,
@@ -198,6 +200,154 @@ test('search sections classify entities and documentation', () => {
   assert.equal(classifyUrl('https://1200km.com/ai-security-course.html'), 'Courses & learning');
   assert.equal(classifyUrl('https://1200km.com/ai-security-course/module-00/chapter-03.html'), 'Courses & learning');
   assert.equal(classifyUrl('https://1200km.com/ai-security-course/module-00/chapter-04.html'), 'Courses & learning');
+  assert.equal(classifyUrl(KNOWLEDGE_SOURCES_URL), 'Cyber Knowledge');
+  assert.equal(classifyContentType(KNOWLEDGE_SOURCES_URL), 'Knowledge source collection');
+});
+
+test('knowledge sources become independently searchable records with controlled and rich facets', () => {
+  const dataset = {
+    schema_version: 1,
+    generated_on: '2026-09-06',
+    controlled_tag_vocabulary: ['cloud-security', 'free', 'intermediate'],
+    sources: [{
+      id: 'cloud-native-security-reference',
+      name: 'Cloud Native Security Reference',
+      url: 'https://example.org/cloud-security',
+      category: 'cloud-security',
+      provenance: ['openai'],
+      source_kind: 'open-source-project',
+      access: 'free',
+      organization: 'Example Foundation',
+      summary: 'A source-backed cloud and Kubernetes security reference.',
+      description: 'Operational guidance for cloud defenders and platform teams working with Kubernetes.',
+      quality: { tier: 'A', rationale: 'Primary guidance with a documented maintenance process.' },
+      validation: { status: 'reachable' },
+      assessment: {
+        strengths: ['Primary technical guidance'],
+        limitations: ['Scope is limited to cloud-native systems'],
+        best_for: ['Cloud architecture reviews'],
+        evidence_use: 'primary-authoritative',
+        maintenance: 'active',
+      },
+      audience: ['cloud security engineers', 'platform operators'],
+      skill_levels: ['intermediate'],
+      content_formats: ['technical documentation'],
+      tags: ['cloud-security', 'free', 'intermediate'],
+      keywords: ['kubernetes', 'cloud-native'],
+      related_source_ids: [],
+    }],
+  };
+  const html = '<html><head><title>Knowledge Sources</title></head><body><article id="source-cloud-native-security-reference"></article></body></html>';
+  const [record] = buildKnowledgeSourceSearchRecords(dataset, html, {
+    primary_domain: 'site-governance',
+    audience: ['general'],
+  });
+
+  assert.equal(record.url, '/cyber-knowledge/knowledge-sources/#source-cloud-native-security-reference');
+  assert.equal(record.meta.title, 'Cloud Native Security Reference');
+  assert.equal(record.meta.content_type, 'Knowledge source');
+  assert.equal(record.meta.primary_type, 'reference-entity');
+  assert.equal(record.meta.primary_domain, 'cloud-security');
+  assert.deepEqual(record.filters.section, ['Cyber Knowledge']);
+  assert.deepEqual(record.filters.content_type, ['Knowledge source']);
+  assert.deepEqual(record.filters.collection_tier, ['reference']);
+  assert.deepEqual(record.filters.knowledge_tag, ['cloud-security', 'free', 'intermediate']);
+  assert.deepEqual(record.filters.knowledge_access, ['free']);
+  assert.deepEqual(record.filters.knowledge_quality_tier, ['A']);
+  assert.deepEqual(record.filters.knowledge_source_kind, ['open-source-project']);
+  assert.deepEqual(record.filters.knowledge_evidence_use, ['primary-authoritative']);
+  assert.deepEqual(record.filters.knowledge_maintenance, ['active']);
+  assert.deepEqual(record.filters.knowledge_skill_level, ['intermediate']);
+  assert.ok(record.filters.topic.includes('Cloud security'));
+  assert.match(record.content, /Cloud architecture reviews/);
+  assert.match(record.content, /kubernetes/);
+});
+
+test('all knowledge-source categories map to stable, semantically consistent primary domains', () => {
+  const dataset = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
+  const html = readFileSync(join(ROOT, 'cyber-knowledge', 'knowledge-sources', 'index.html'), 'utf8');
+  const records = buildKnowledgeSourceSearchRecords(dataset, html, {
+    primary_domain: 'site-governance',
+    audience: ['general'],
+  });
+  const expectedDomains = {
+    academic: 'threat-intelligence',
+    'adversary-emulation': 'offensive-research',
+    'ai-security': 'ai-security',
+    'api-security': 'application-security',
+    'application-security': 'application-security',
+    'cloud-security': 'cloud-security',
+    'container-security': 'cloud-security',
+    cti: 'threat-intelligence',
+    datasets: 'threat-intelligence',
+    'detection-engineering': 'detection-engineering',
+    dfir: 'incident-response',
+    'exploit-development': 'vulnerability-research',
+    framework: 'security-governance',
+    government: 'security-governance',
+    'identity-security': 'identity-security',
+    'incident-response': 'incident-response',
+    kubernetes: 'cloud-security',
+    'malware-analysis': 'malware-analysis',
+    'mobile-security': 'application-security',
+    'network-security': 'network-security',
+    'penetration-testing': 'offensive-research',
+    'reverse-engineering': 'malware-analysis',
+    soc: 'detection-engineering',
+    'threat-informed-defense': 'detection-engineering',
+    'threat-reports': 'threat-intelligence',
+    'threat-research': 'threat-intelligence',
+    training: 'platform-documentation',
+    vulnerability: 'vulnerability-research',
+    'web-security': 'application-security',
+  };
+  const categoryDomains = new Map();
+
+  for (const [index, source] of dataset.sources.entries()) {
+    const domain = records[index].meta.primary_domain;
+    assert.equal(records[index].filters.primary_domain[0], domain, source.id);
+    assert.equal(domain, expectedDomains[source.category], source.id);
+    assert.equal(categoryDomains.get(source.category) ?? domain, domain, source.category);
+    categoryDomains.set(source.category, domain);
+  }
+
+  assert.deepEqual([...categoryDomains.keys()].sort(), Object.keys(expectedDomains).sort());
+  for (const id of [
+    'nist-cybersecurity-framework',
+    'nist-sp-800-53',
+    'nist-sp-800-207-zero-trust-architecture',
+    'cis-critical-security-controls',
+    'ncsc-cyber-assessment-framework',
+    'asd-essential-eight',
+  ]) {
+    assert.equal(records.find((record) => record.meta.identifier === id)?.meta.primary_domain, 'security-governance', id);
+  }
+  assert.equal(
+    records.find((record) => record.meta.identifier === 'oasis-open-cti-documentation')?.meta.primary_domain,
+    'threat-intelligence',
+  );
+});
+
+test('knowledge-source search records require rendered anchors and controlled tags', () => {
+  const dataset = {
+    schema_version: 1,
+    controlled_tag_vocabulary: ['free'],
+    sources: [{
+      id: 'example-source', name: 'Example', url: 'https://example.org/', category: 'training',
+      source_kind: 'open-source', access: 'free', organization: 'Example', summary: 'Summary', description: 'Description',
+      tags: ['free'], related_source_ids: [],
+    }],
+  };
+  assert.throws(
+    () => buildKnowledgeSourceSearchRecords(dataset, '<html><body></body></html>'),
+    /anchor is missing/,
+  );
+  const invalid = structuredClone(dataset);
+  invalid.sources[0].tags.push('uncontrolled');
+  assert.throws(
+    () => buildKnowledgeSourceSearchRecords(invalid, '<html><body><div id="source-example-source"></div></body></html>'),
+    /uncontrolled tag/,
+  );
 });
 
 test('search facets use deterministic content types and controlled topics', () => {
@@ -246,6 +396,11 @@ test('post-ranking governance applies only to broad discovery phrases', () => {
   };
   assert.deepEqual(rerankSearchResults(results, 'cloud security', records).map((item) => item.id), ['core', 'reference', 'archive']);
   assert.deepEqual(rerankSearchResults(results, 'T1059.003', records).map((item) => item.id), ['archive', 'reference', 'core']);
+  const exactTitleRecords = {
+    ...records,
+    archive: { ...records.archive, boost: 0.1, custom_record: true, title: 'Cloud Security' },
+  };
+  assert.equal(rerankSearchResults(results, 'cloud security', exactTitleRecords)[0].id, 'archive');
 });
 
 test('search loader versions stay synchronized and the live index is not pinned to stale metadata', () => {

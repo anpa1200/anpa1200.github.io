@@ -6,8 +6,18 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const model = JSON.parse(readFileSync(join(ROOT, 'data', 'reference-library.json'), 'utf8'));
+const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
 const html = readFileSync(join(ROOT, 'references', 'index.html'), 'utf8');
 const client = readFileSync(join(ROOT, 'assets', 'reference-library.js'), 'utf8');
+
+function normalizeUrl(value) {
+  const url = new URL(value);
+  url.hash = '';
+  for (const key of [...url.searchParams.keys()]) {
+    if (/^(utm_|fbclid|gclid)/i.test(key)) url.searchParams.delete(key);
+  }
+  return url.toString().replace(/\/$/, '');
+}
 
 test('reference library contains the complete deduplicated site citation corpus', () => {
   assert.ok(model.record_count > 108);
@@ -71,6 +81,29 @@ test('generated module exposes every reference and every tag without inline exec
     assert.match(decodedHtml, new RegExp(`href="${record.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`), record.id);
   }
   assert.equal((html.match(/class="reference-used-in"/g) || []).length, model.records.filter((record) => record.used_in.length).length);
+});
+
+test('references link every overlapping source to exactly one assessed knowledge profile', () => {
+  const knowledgeByUrl = new Map(knowledgeSources.sources.map((source) => [normalizeUrl(source.url), source]));
+  const expected = model.records
+    .map((record) => knowledgeByUrl.get(normalizeUrl(record.url)))
+    .filter(Boolean)
+    .map((source) => source.id)
+    .sort();
+  const rendered = [...html.matchAll(/<a\b[^>]*\bdata-knowledge-source-id="([^"]+)"[^>]*>/g)]
+    .map((match) => match[1])
+    .sort();
+
+  assert.ok(expected.length > 0, 'reference and knowledge-source datasets must overlap');
+  assert.deepEqual(rendered, expected);
+  assert.equal(new Set(rendered).size, rendered.length, 'each assessed-profile backlink must be unique');
+  for (const id of expected) {
+    assert.match(
+      html,
+      new RegExp(`href="/cyber-knowledge/knowledge-sources/#source-${id}"[^>]*>Read assessed profile`),
+      id,
+    );
+  }
 });
 
 test('client supports query state, facets, tag pivots, co-occurrences, and related references', () => {

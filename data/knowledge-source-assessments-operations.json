@@ -1,0 +1,988 @@
+{
+  "nist-sp-800-61-rev-3": {
+    "organization": "National Institute of Standards and Technology",
+    "summary": "NIST SP 800-61 Revision 3 is the April 2025 incident-response community profile for the NIST Cybersecurity Framework 2.0. It explains how organizations can integrate preparation, detection, response, recovery, and improvement into enterprise cybersecurity risk management. The publication is a strong governance and program-design reference for incident-response leaders, assessors, and security architects. It intentionally provides outcome-oriented recommendations rather than product instructions, forensic procedures, or ready-to-run playbooks, so teams must translate it into environment-specific roles and workflows.",
+    "description": "NIST SP 800-61 Revision 3 is the National Institute of Standards and Technology's April 2025 incident-response community profile for the NIST Cybersecurity Framework 2.0. It organizes incident preparation, detection, response, recovery, and continual improvement as enterprise risk-management outcomes rather than a stand-alone technical function. Security leaders can use it to define responsibilities, align incident plans with CSF Govern through Recover activities, evaluate readiness, structure exercises, and communicate expectations to executives, legal teams, suppliers, and operational responders. It works best alongside NIST CSF for program outcomes, SP 800-53 for control selection, and organization-specific forensic procedures, escalation matrices, communications plans, and playbooks. The publication is authoritative federal guidance and provides stable terminology for policies, audits, and assessments, but it is intentionally technology-neutral. It does not prescribe evidence-collection commands, SIEM queries, containment steps, staffing models, or regulatory decisions. Teams must translate its recommendations into tested workflows that reflect their systems, threat model, jurisdiction, contractual duties, and tolerance for operational disruption.",
+    "assessment": {
+      "strengths": [
+        "Authoritative federal guidance aligned directly to NIST CSF 2.0 outcomes",
+        "Treats incident response as an organization-wide risk-management capability",
+        "Stable terminology and recommendations suitable for policies and assessments"
+      ],
+      "limitations": [
+        "Does not provide tool-specific investigation procedures or executable playbooks",
+        "Requires local tailoring for legal, regulatory, staffing, and technology contexts"
+      ],
+      "best_for": [
+        "incident-response program design",
+        "policy and governance reviews",
+        "tabletop planning",
+        "control assessment criteria"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "periodic"
+    },
+    "audience": ["incident-response leaders", "security architects", "risk managers", "auditors"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["standard", "pdf", "implementation guidance"],
+    "tags": ["incident-response", "nist-csf", "risk-management", "governance", "preparation", "recovery", "standards"],
+    "related_source_ids": ["nist-cybersecurity-framework", "nist-sp-800-53", "cis-critical-security-controls", "mitre-att-and-ck"]
+  },
+  "atomic-red-team": {
+    "organization": "Red Canary",
+    "summary": "Atomic Red Team is an open-source library of small, portable tests mapped to MITRE ATT&CK techniques. Defenders use the tests to generate controlled endpoint, cloud, container, or command-line activity, confirm telemetry, exercise analytics, and document detection gaps. Each atomic defines execution metadata and commands and may also define inputs, prerequisites, and cleanup steps. Coverage and safety vary by test; an ATT&CK mapping does not prove realistic adversary behavior, and every atomic requires review before execution because some actions can alter systems or trigger security controls.",
+    "description": "Atomic Red Team, maintained by Red Canary and community contributors, is an open-source catalog of small security tests mapped to MITRE ATT&CK techniques. Individual atomics describe supported platforms, inputs, prerequisites, execution commands, and, where available, cleanup actions. Detection engineers and purple teams commonly select a behavior, run the corresponding test on an authorized lab or representative endpoint, confirm that expected telemetry reaches the SIEM or EDR, evaluate an analytic, and record gaps for remediation. The library pairs naturally with ATT&CK for behavioral context, Sigma or vendor rule repositories for candidate detections, and orchestration platforms such as Caldera when a team later needs chained scenarios. Its strength is repeatability at the level of one technique or observable action, not realism across a complete intrusion. Mappings, commands, prerequisites, and cleanup quality vary between contributions, and successful execution does not prove that a control detected or prevented the behavior. Every test is dual-use: review the source, scope affected systems, obtain authorization, protect credentials, monitor side effects, and restore the environment before treating results as evidence.",
+    "assessment": {
+      "strengths": [
+        "Portable tests with explicit ATT&CK mappings and repeatable inputs",
+        "Useful for validating telemetry and individual analytic assumptions",
+        "Large community-maintained library with transparent test definitions"
+      ],
+      "limitations": [
+        "Atomic actions do not reproduce full intrusion context or chained tradecraft",
+        "Tests are dual-use and may disrupt systems without review, isolation, and authorization"
+      ],
+      "best_for": [
+        "detection validation",
+        "purple-team exercises",
+        "telemetry verification",
+        "analyst training labs"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "continuous"
+    },
+    "audience": ["detection engineers", "purple teams", "SOC analysts", "security testers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["github repository", "yaml tests", "command examples", "wiki documentation"],
+    "tags": ["adversary-emulation", "mitre-attack", "detection-validation", "purple-team", "endpoint-telemetry", "security-testing", "dual-use", "cloud-security", "container-security"],
+    "related_source_ids": ["mitre-att-and-ck", "apache-caldera", "sigma", "elastic-detection-rules", "stratus-red-team"]
+  },
+  "apache-caldera": {
+    "organization": "Apache Software Foundation",
+    "summary": "Apache Caldera is an open-source platform for automated adversary emulation, security assessment, and red-versus-blue research. Operators define adversary profiles and abilities, deploy agents, execute ATT&CK-aligned operations, and collect results through an extensible plugin architecture. It supports chained exercises that can test sensors, analytics, alerting, and response systems more realistically than isolated commands. Caldera is an Apache Incubator project, and safe use requires a controlled network, explicit authorization, reviewed abilities, credential protection, and careful cleanup; it is a platform, not a guarantee of representative threat emulation.",
+    "description": "Apache Caldera (incubating), originally developed by MITRE, is an open-source adversary-emulation and security-assessment project in the Apache Software Foundation Incubator. Its server, agents, plugins, abilities, adversary profiles, planners, and fact model let authorized teams assemble multi-step operations, execute ATT&CK-aligned behaviors, collect results, and adapt later actions to discovered information. Purple teams can use it to test whether telemetry survives from endpoint to SIEM, whether correlated analytics detect a sequence, and whether analysts follow investigation and response procedures. Atomic Red Team is better for isolated checks; Caldera becomes useful when scenarios need sequencing, state, automated collection, or repeatable campaign execution. ATT&CK and D3FEND can supply behavioral and defensive context, while detection repositories provide analytics to evaluate. The platform does not make an operation representative merely because abilities carry ATT&CK mappings, and automated results do not establish control effectiveness without reviewing logs and alerts. Agents, credentials, remote commands, and plugins are materially dual-use. Deploy only within an explicitly authorized scope, inspect every ability, segment infrastructure, protect keys, constrain privileges, capture evidence, and plan cleanup before execution.",
+    "assessment": {
+      "strengths": [
+        "Automates multi-step adversary-emulation operations and evidence collection",
+        "Extensible plugin, agent, and ability model supports custom scenarios",
+        "Useful for testing end-to-end detection and response workflows"
+      ],
+      "limitations": [
+        "Deployment and scenario design require substantial operational expertise",
+        "Dual-use agents and abilities create material safety and authorization risks"
+      ],
+      "best_for": [
+        "adversary-emulation programs",
+        "purple-team campaigns",
+        "control validation",
+        "cyber-range research"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["red teams", "purple teams", "detection engineers", "security researchers"],
+    "skill_levels": ["advanced"],
+    "content_formats": ["software platform", "documentation", "github repository", "plugins"],
+    "tags": ["adversary-emulation", "automated-testing", "mitre-attack", "purple-team", "detection-validation", "red-team", "agents", "dual-use"],
+    "related_source_ids": ["atomic-red-team", "mitre-att-and-ck", "mitre-d3fend", "center-for-threat-informed-defense"]
+  },
+  "sigma": {
+    "organization": "SigmaHQ",
+    "summary": "Sigma defines an open, structured format for describing log-based detections independently of a specific SIEM query language. Its specification, documentation, command-line conversion tooling, and community rule repository let teams exchange detection logic and translate rules into supported back ends. The format is especially valuable for expressing log sources, selections, filters, conditions, false positives, and severity in reviewable files. A converted rule is only a starting point: field mappings, log availability, back-end behavior, performance, and local false positives must be tested before production use.",
+    "description": "Sigma, maintained by SigmaHQ, is an open specification and ecosystem for expressing log-based detection logic without binding the rule author to one SIEM query language. YAML rules document the relevant log source, field selections, filters, Boolean condition, status, severity, references, false positives, and often ATT&CK mappings. Detection teams use the format to review analytics in version control, exchange ideas across organizations, convert supported rules through command-line tooling, and build detections-as-code pipelines with linting and tests. The community repository supplies a large body of examples; Elastic, Splunk, Sentinel, and other content collections help analysts compare platform-native implementations. Sigma captures detection intent, however, not a universal executable query. Back ends differ in operators, correlation features, case handling, aggregation, and field semantics, while local telemetry may not match the declared taxonomy. Community rules also vary in evidence, maturity, and performance. Before production, engineers must confirm data collection, map fields, inspect conversion output, tune exclusions, test against known benign and controlled malicious activity, measure cost, and preserve provenance rather than treating a successful conversion as validated coverage.",
+    "assessment": {
+      "strengths": [
+        "Vendor-neutral rule format improves portability and peer review",
+        "Open specification and tooling support detections-as-code workflows",
+        "Community rules provide broad examples mapped to common behaviors"
+      ],
+      "limitations": [
+        "Back-end conversion cannot resolve missing telemetry or semantic field mismatches",
+        "Community rules vary in maturity and require local tuning and validation"
+      ],
+      "best_for": [
+        "portable detection authoring",
+        "rule migration",
+        "detections-as-code pipelines",
+        "detection engineering education"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "continuous"
+    },
+    "audience": ["detection engineers", "SOC content teams", "threat hunters", "SIEM engineers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["specification", "documentation", "yaml rules", "command-line tooling", "github repositories"],
+    "tags": ["detection-engineering", "sigma", "siem", "log-analysis", "detections-as-code", "rule-conversion", "threat-hunting", "mitre-attack"],
+    "related_source_ids": ["mitre-att-and-ck", "elastic-detection-rules", "splunk-security-content", "timesketch"]
+  },
+  "elastic-detection-rules": {
+    "organization": "Elastic",
+    "summary": "Elastic Detection Rules is the public development repository for rules used by the Elastic Security detection engine. It contains production and building-block rules, hunting content, schemas, tests, and Python tooling for creation, validation, packaging, import, and export. The repository is a concrete example of detections-as-code with unit-tested content and release workflows. Its rules assume Elastic Common Schema, Elastic query languages, and Elastic Security behavior; licensing is Elastic License 2.0, and new repository changes may precede released product content, so deployment compatibility and tuning must be checked.",
+    "description": "Elastic Detection Rules is Elastic's public development repository for detection content used by the Elastic Security detection engine. It exposes production rules, building-block rules, hunting queries, schemas, tests, release metadata, and Python tooling for authoring, validating, packaging, importing, and exporting content. Elastic users can trace an analytic from source-controlled definition through review and test workflows, study EQL and KQL patterns, evaluate required integrations and fields, and adapt content to their own telemetry. More broadly, detection engineers can use the repository as a concrete detections-as-code reference and compare its implementations with Sigma, Atomic Red Team tests, ATT&CK behaviors, and case evidence from The DFIR Report. The content is not portable without translation: rules assume Elastic Common Schema, Elastic query semantics, product features, integration versions, and specific data quality. Repository changes may precede released product packages, and Elastic License 2.0 obligations matter for reuse. A rule's presence or passing repository tests does not establish local coverage. Validate compatible versions, required indices and fields, execution cost, expected alerts, exceptions, and false positives before enabling it in production.",
+    "assessment": {
+      "strengths": [
+        "Transparent production rule lifecycle with validation and test tooling",
+        "Rich detections-as-code implementation beyond static rule files",
+        "Includes hunting queries and building-block analytics"
+      ],
+      "limitations": [
+        "Strongly coupled to Elastic Security, ECS, KQL, EQL, and product versions",
+        "Elastic License 2.0 and unreleased changes require deployment review"
+      ],
+      "best_for": [
+        "Elastic Security content engineering",
+        "detections-as-code design",
+        "rule-testing patterns",
+        "threat-hunting content"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "continuous"
+    },
+    "audience": ["Elastic detection engineers", "SOC content developers", "threat hunters", "security automation engineers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["github repository", "toml rules", "python tooling", "tests", "technical documentation"],
+    "tags": ["detection-engineering", "elastic-security", "detections-as-code", "ecs", "kql", "eql", "threat-hunting", "rule-testing"],
+    "related_source_ids": ["sigma", "mitre-att-and-ck", "atomic-red-team", "the-dfir-report"]
+  },
+  "splunk-security-content": {
+    "organization": "Splunk",
+    "summary": "Splunk Security Content publishes first-party detections, Analytic Stories, response playbooks, data-source guidance, and ATT&CK coverage views for Splunk security products. Analytic Stories connect threat context with searches, investigations, and available Splunk SOAR actions, making the portal useful for tracing a use case from behavior to operational response. Content is inspectable and frequently updated, but most analytics depend on Splunk search semantics, specific data models, macros, or product applications. Counts and ATT&CK coverage describe available content, not validated coverage in a reader's environment.",
+    "description": "Splunk Security Content is Splunk's public catalog of first-party detections, Analytic Stories, threat-hunting searches, response playbooks, data-source guidance, and ATT&CK coverage for its security products. An Analytic Story groups behavior context with concrete searches, required data, investigation guidance, and sometimes Splunk SOAR actions, allowing a content team to follow a use case from hypothesis through triage and response. Splunk practitioners use the catalog to plan onboarding, inspect SPL, identify macros and data-model dependencies, import supported content, and tune analytics with local baselines. Sigma offers a vendor-neutral comparison point, while Atomic Red Team and incident case studies can provide controlled or observed evidence for validation. Most content assumes Splunk search semantics, the Common Information Model, named macros, specific applications, or product capabilities; copying a query into an unrelated deployment may fail silently or produce misleading results. Published ATT&CK mappings and catalog counts show intended content coverage, not effective detection coverage. Teams must verify ingestion, normalization, permissions, scheduling, performance, alert thresholds, suppression, and playbook safety in their own environment before operational use.",
+    "assessment": {
+      "strengths": [
+        "Connects detections, threat context, data sources, and response playbooks",
+        "First-party content exposes concrete Splunk searches and ATT&CK mappings",
+        "Searchable catalog supports investigation and content-development workflows"
+      ],
+      "limitations": [
+        "Analytics often depend on Splunk-specific schemas, macros, and applications",
+        "Catalog coverage does not demonstrate effective local detection coverage"
+      ],
+      "best_for": [
+        "Splunk detection engineering",
+        "SOC use-case development",
+        "SOAR playbook research",
+        "ATT&CK coverage reviews"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "continuous"
+    },
+    "audience": ["Splunk security analysts", "detection engineers", "SOC architects", "SOAR engineers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["detection catalog", "search queries", "analytic stories", "playbooks", "coverage maps"],
+    "tags": ["detection-engineering", "splunk", "siem", "soar", "analytic-stories", "mitre-attack", "incident-response", "threat-hunting"],
+    "related_source_ids": ["sigma", "mitre-att-and-ck", "the-dfir-report", "atomic-red-team"]
+  },
+  "microsoft-sentinel-content-hub": {
+    "organization": "Microsoft",
+    "summary": "Microsoft Sentinel Content Hub is the supported catalog and deployment path for Sentinel solutions and out-of-the-box content. It centralizes packaged data connectors, analytics-rule templates, hunting queries, workbooks, automation rules, and playbooks from Microsoft, partners, and the community, while exposing each item's provider and support model. The documentation is authoritative for discovery, installation, updates, dependencies, and activation. Content Hub is not a vendor-neutral rule library: using it requires a Sentinel workspace, appropriate Azure roles, configured data ingestion, cost planning, and environment-specific tuning after deployment.",
+    "description": "Microsoft Sentinel Content Hub is Microsoft's supported discovery and deployment catalog for packaged Sentinel solutions and security content. Depending on the solution, a package can include data connectors, analytics-rule templates, hunting queries, workbooks, parsers, watchlists, automation rules, and Logic Apps playbooks supplied by Microsoft, partners, or the community. Sentinel administrators use the hub to evaluate providers and support models, review dependencies, install a solution, track available updates, configure ingestion, and then activate selected templates. The surrounding Azure security documentation explains service architecture and permissions; ATT&CK and Sigma can help compare behavioral coverage and detection intent across platforms. Content Hub is a lifecycle mechanism, not a vendor-neutral rule archive or automatic source of operational coverage. Installation alone does not connect every data source, enable analytics, establish retention, or make a playbook safe. Packages can introduce Azure resource costs, role requirements, API permissions, schemas, and version dependencies. Teams should inventory those effects, inspect templates and automation actions, minimize privileges, validate data quality, tune thresholds and entity mappings, test incident creation and response, and document provider-specific support boundaries.",
+    "assessment": {
+      "strengths": [
+        "Authoritative deployment guidance for supported Sentinel content",
+        "Packages connectors, analytics, hunting, visualization, and automation components",
+        "Exposes provider, support model, dependencies, and update status"
+      ],
+      "limitations": [
+        "Requires Microsoft Sentinel, Azure permissions, and associated ingestion resources",
+        "Installed templates still require data onboarding, activation, validation, and tuning"
+      ],
+      "best_for": [
+        "Microsoft Sentinel deployments",
+        "SOC solution onboarding",
+        "content lifecycle management",
+        "SIEM integration planning"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "continuous"
+    },
+    "audience": ["Sentinel administrators", "SOC architects", "detection engineers", "cloud security teams"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["product documentation", "solution catalog", "deployment guides", "templates"],
+    "tags": ["detection-engineering", "microsoft-sentinel", "siem", "content-hub", "analytics-rules", "threat-hunting", "soar", "cloud-security"],
+    "related_source_ids": ["microsoft-azure-security-documentation", "sigma", "mitre-att-and-ck", "splunk-security-content"]
+  },
+  "google-secops-community-rules": {
+    "organization": "Google Cloud",
+    "summary": "Google Security Operations Community Rules is an official public repository of example YARA-L detection rules and dashboard templates for Google SecOps. It includes community and Google SecOps team contributions, a style guide, and a content-management tool that can support rule deployment through the product API. The repository explicitly distinguishes these examples from licensed Google Curated Detections and recommends testing and tuning before alerting. Its value is therefore as transparent implementation material and a starting point, not as guaranteed production coverage; use depends on Google SecOps and its Unified Data Model.",
+    "description": "Google Security Operations Community Rules is Google Cloud's official public repository of example YARA-L detections and dashboard templates for Google SecOps. It combines community and Google SecOps team contributions with authoring conventions, metadata, sample content, and a management utility that can synchronize rules through product APIs. Detection engineers use it to learn YARA-L, study Unified Data Model fields, version rules, prototype dashboards, and seed a review-and-test pipeline before enabling alerts. Sigma and other SIEM repositories offer useful comparisons of detection intent, while YARA itself serves a different role in matching file or memory patterns rather than normalized event streams. Google explicitly separates these examples from licensed Google Curated Detections, so their public availability must not be read as equivalent support, testing, or coverage. Rules depend on correctly normalized UDM data and Google SecOps behavior; missing parsers, entity mappings, or context can change results. Contributors and deployers should inspect provenance, validate syntax, replay representative data, measure alert volume and latency, tune suppressions, restrict API credentials, and stage deployment before treating a rule as operationally reliable.",
+    "assessment": {
+      "strengths": [
+        "Inspectable YARA-L examples with authoring guidance and dashboard templates",
+        "Includes tooling for detections-as-code management through Google SecOps APIs",
+        "Clearly documents the distinction between community examples and curated detections"
+      ],
+      "limitations": [
+        "Rules require Google SecOps, UDM-normalized data, testing, and local tuning",
+        "Example content does not carry the same support or assurance as curated detections"
+      ],
+      "best_for": [
+        "YARA-L rule development",
+        "Google SecOps content engineering",
+        "detections-as-code pipelines",
+        "dashboard prototyping"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "continuous"
+    },
+    "audience": ["Google SecOps engineers", "detection engineers", "SOC content teams", "security automation engineers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["github repository", "yara-l rules", "yaml dashboards", "style guide", "command-line tooling"],
+    "tags": ["detection-engineering", "google-secops", "yara-l", "siem", "unified-data-model", "detections-as-code", "dashboards", "rule-testing"],
+    "related_source_ids": ["sigma", "mitre-att-and-ck", "yara", "splunk-security-content"]
+  },
+  "the-dfir-report": {
+    "organization": "The DFIR Report",
+    "summary": "The DFIR Report publishes detailed case studies derived from observed intrusions, reconstructing initial access, execution, persistence, lateral movement, command and control, and impact through host and network evidence. Public reports commonly include timelines, ATT&CK mappings, indicators, detection ideas, and referenced tooling, making them useful bridges between incident evidence and defensive engineering. The publisher also offers commercial reports, labs, artifacts, and feeds. Each case remains a selected observation rather than a prevalence study, and indicators age quickly, so readers should prioritize behaviors and corroborate conclusions before generalizing.",
+    "description": "The DFIR Report is an independent publisher of evidence-rich intrusion case studies assembled from real incident investigations and controlled observations. Public reports reconstruct activity from initial access through execution, persistence, discovery, lateral movement, command and control, exfiltration, or impact using endpoint and network artifacts. Timelines, ATT&CK mappings, indicators, screenshots, tooling references, and detection ideas let incident responders practice chronology building while detection engineers trace behaviors to observable data. A realistic workflow starts with the narrative, follows cited evidence and external reporting, maps relevant techniques, then compares proposed analytics with Sigma or vendor content and validates them against local telemetry. Commercial reports, labs, artifacts, and feeds extend the public material but have separate access conditions. Each publication describes a selected case, not the frequency of a technique across the threat landscape, and the available evidence may not reveal every attacker action. Indicators decay or may be shared by unrelated activity. Readers should prioritize behavioral patterns, distinguish observed facts from analytical inference, verify attribution separately, and test any detection before production use.",
+    "assessment": {
+      "strengths": [
+        "Evidence-rich intrusion narratives connect telemetry to attacker behavior",
+        "Timelines and ATT&CK mappings support detection and investigation learning",
+        "Public cases frequently expose actionable host and network artifacts"
+      ],
+      "limitations": [
+        "Selected incidents cannot establish ecosystem-wide frequency or attribution",
+        "Indicators and tool-specific detections may become stale or environment dependent"
+      ],
+      "best_for": [
+        "incident reconstruction",
+        "detection hypothesis development",
+        "DFIR analyst training",
+        "threat-informed tabletop exercises"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "periodic"
+    },
+    "audience": ["incident responders", "threat hunters", "detection engineers", "SOC analysts"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["case reports", "timelines", "pcap artifacts", "indicators", "training labs"],
+    "tags": ["dfir", "incident-response", "intrusion-analysis", "ransomware", "threat-hunting", "detection-engineering", "mitre-attack", "network-forensics"],
+    "related_source_ids": ["mitre-att-and-ck", "sigma", "velociraptor", "zeek", "malware-traffic-analysis-net"]
+  },
+  "volatility-foundation": {
+    "organization": "The Volatility Foundation",
+    "summary": "The Volatility Foundation maintains and promotes the open-source Volatility Framework for extracting forensic artifacts from volatile memory images. Volatility 3 and its plugin ecosystem support analysis of processes, modules, handles, network artifacts, operating-system structures, and other memory-resident evidence across investigations and malware research. The foundation also provides project information, training, community events, and a plugin contest. Effective use requires a properly acquired memory image, operating-system knowledge, and careful interpretation; plugin output is evidence to validate in context, not an automatic conclusion about compromise or attribution.",
+    "description": "The Volatility Foundation stewards the open-source Volatility Framework and supports education and research around memory forensics. Volatility 3 interprets operating-system structures in acquired memory images through plugins that enumerate processes, modules, handles, sockets, registry material, kernel objects, injected regions, and other volatile artifacts. Incident responders use it after sound acquisition to test investigative hypotheses, compare suspicious processes with network and disk evidence, extract candidate material for deeper analysis, and document reproducible commands and outputs. Malware analysts can combine its process and memory views with YARA scanning, disassembly in Ghidra, and contextual intelligence from trusted repositories. The foundation also publishes project information, training, community events, and plugin-development resources. Volatility does not acquire memory by itself, and results depend on image integrity, supported operating-system details, symbols, plugin assumptions, and analyst knowledge. Normal software can resemble malicious patterns, terminated activity may leave partial artifacts, and absence of output is not proof of absence. Examiners should preserve hashes and chain of custody, record versions and parameters, validate important findings against raw structures or independent evidence, and avoid inferring compromise or attribution from one plugin result.",
+    "assessment": {
+      "strengths": [
+        "Primary home of a widely used open-source memory-forensics framework",
+        "Extensible plugins expose low-level volatile artifacts for repeatable analysis",
+        "Foundation sustains documentation, training, and community development"
+      ],
+      "limitations": [
+        "Analysis quality depends on memory acquisition, supported structures, and examiner expertise",
+        "Artifact presence or absence must be corroborated with other forensic evidence"
+      ],
+      "best_for": [
+        "memory forensics",
+        "malware process investigation",
+        "incident-response evidence analysis",
+        "forensic plugin development"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["digital forensic examiners", "incident responders", "malware analysts", "forensic researchers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["open-source software", "documentation", "plugins", "training", "community events"],
+    "tags": ["dfir", "memory-forensics", "volatile-memory", "malware-analysis", "incident-response", "forensic-artifacts", "open-source"],
+    "related_source_ids": ["remnux", "velociraptor", "the-sleuth-kit", "ghidra"]
+  },
+  "velociraptor": {
+    "organization": "Rapid7 and the Velociraptor project",
+    "summary": "Velociraptor is an open-source digital-forensics and incident-response platform for collecting, monitoring, and hunting across endpoints. Its client-server architecture and Velociraptor Query Language use reusable artifacts to acquire targeted evidence, query endpoint state, watch events, and centralize results at scale. The official documentation covers deployment, artifacts, notebooks, hunts, security, and administration. Its flexibility also creates risk: broad queries can consume resources or collect sensitive data, servers and client credentials require protection, and community artifacts should be reviewed and tested before use on production fleets.",
+    "description": "Velociraptor is an open-source digital-forensics and incident-response platform maintained by Rapid7 and the wider project community. A client-server architecture, Velociraptor Query Language, reusable artifacts, hunts, event monitoring, notebooks, and centralized result handling allow responders to ask targeted questions across one endpoint or a large fleet. Teams commonly deploy clients in advance, scope a hunt to relevant systems, collect process, file-system, registry, event-log, browser, or other artifacts, review results in notebooks, and export selected evidence for timeline or specialist analysis. Plaso and Timesketch can extend chronology work, while YARA and memory-forensics tooling can examine material collected through carefully designed workflows. The official documentation covers deployment, artifact authoring, administration, security, and scaling. Velociraptor's power also makes poor queries consequential: broad collection can overload endpoints, consume storage, cross privacy boundaries, or expose credentials and personal data. Community artifacts are executable collection logic, not inherently trusted content. Administrators should review and pin artifacts, test resource limits, apply least privilege, secure server and client keys, restrict operator access, maintain audit trails and retention rules, and validate collected findings against their original context.",
+    "assessment": {
+      "strengths": [
+        "Scalable targeted collection and live hunting across endpoint fleets",
+        "Reusable artifact model makes acquisition logic transparent and customizable",
+        "Combines endpoint monitoring, investigation notebooks, and evidence collection"
+      ],
+      "limitations": [
+        "Secure deployment and efficient VQL require experienced administration",
+        "Poorly scoped hunts or unreviewed artifacts can affect endpoints or expose sensitive data"
+      ],
+      "best_for": [
+        "enterprise DFIR collection",
+        "endpoint threat hunting",
+        "rapid incident scoping",
+        "custom forensic artifact development"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["incident responders", "threat hunters", "DFIR platform engineers", "SOC analysts"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["software platform", "documentation", "artifact repository", "query examples", "training videos"],
+    "tags": ["dfir", "incident-response", "endpoint-forensics", "threat-hunting", "vql", "evidence-collection", "fleet-management", "forensic-artifacts"],
+    "related_source_ids": ["volatility-foundation", "timesketch", "the-dfir-report", "sigma"]
+  },
+  "plaso": {
+    "organization": "Plaso project",
+    "summary": "Plaso, also known through its log2timeline tooling, is a Python-based processing engine for extracting timestamped events from many disk-image, file-system, registry, database, browser, and log formats. Investigators use it to build broad super timelines or focused timelines that correlate activity across heterogeneous artifacts. Its documentation covers ingestion, filters, parsers, analysis plugins, output modules, supported formats, development, and troubleshooting. Plaso accelerates normalization and chronology building, but parsers can omit or misinterpret data, timestamps carry different semantics, and resulting events still require source-level validation and contextual analysis.",
+    "description": "Plaso is an open-source, Python-based event extraction and processing framework best known through the log2timeline command-line workflow. Its parsers read many disk-image, file-system, registry, browser, database, application, and log formats and normalize timestamped records into a storage file for filtering, analysis, and export. Investigators use it to generate a broad super timeline during triage, narrow processing to relevant sources or periods, correlate otherwise separated artifacts, and pass results into Timesketch for collaborative exploration. The project documentation covers supported formats, parser behavior, filters, analysis plugins, output modules, development, and troubleshooting; The Sleuth Kit and other libraries may provide underlying access to storage evidence. Normalization saves substantial manual work but does not make all timestamps equivalent. Creation, modification, access, execution, ingestion, and application-generated times have different semantics, can reflect clock drift, and may be manipulated. A parser may omit unsupported records, misread damaged data, or change behavior between versions. Examiners should preserve the source image, record tool and parser versions, review warnings, retain provenance fields, confirm critical events in the original artifact, and treat an apparent chronology as an analytical model rather than a complete ground truth.",
+    "assessment": {
+      "strengths": [
+        "Normalizes events from a broad range of forensic formats",
+        "Supports both comprehensive and targeted forensic timelines",
+        "Extensible parser, analysis-plugin, and output architecture"
+      ],
+      "limitations": [
+        "Large timelines can be resource intensive and analytically noisy",
+        "Timestamp meaning and parser results require validation against original artifacts"
+      ],
+      "best_for": [
+        "forensic timeline creation",
+        "multi-artifact event correlation",
+        "incident chronology",
+        "forensic parser development"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["digital forensic examiners", "incident responders", "forensic tool developers", "threat hunters"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["python software", "documentation", "command-line tools", "parser reference", "api documentation"],
+    "tags": ["dfir", "forensic-timeline", "log2timeline", "event-correlation", "artifact-parsing", "incident-response"],
+    "related_source_ids": ["timesketch", "the-sleuth-kit", "autopsy", "velociraptor"]
+  },
+  "timesketch": {
+    "organization": "Timesketch project",
+    "summary": "Timesketch is an open-source collaborative platform for importing, searching, annotating, and analyzing forensic timelines. Investigators organize data into sketches, collaborate through views and comments, run analyzers, apply tags, use intelligence features, and query timelines through the web interface, command-line client, notebooks, or API. It integrates naturally with Plaso output and includes Sigma-based analysis capabilities. Timesketch improves team exploration of large event sets, but it is not an acquisition tool; administrators must manage indexing, access control, scaling, and data sensitivity, while analysts must verify findings against underlying evidence.",
+    "description": "Timesketch is an open-source platform for collaborative exploration and analysis of forensic timelines. It imports structured events, including Plaso output, into sketches where investigators can search, save views, tag and annotate records, run analyzers, add intelligence, and coordinate findings through a web interface. Command-line, notebook, and API access support repeatable queries and automation, while Sigma-based capabilities can apply detection ideas to normalized timeline data. A typical incident workflow acquires evidence with separate tools, parses it through Plaso or another pipeline, imports selected datasets, scopes access to the case team, and records analytical conclusions with links back to events. Timesketch improves navigation across large event sets but does not perform acquisition, prove evidence integrity, or eliminate parser uncertainty. Imported timestamps retain the semantic and quality limitations of their sources, and analyzer matches remain hypotheses requiring review. Indexing sensitive histories also creates privacy, retention, access-control, and scaling obligations. Administrators should separate cases appropriately, secure authentication and storage, monitor resource use, and preserve source provenance. Analysts should verify decisive events against original artifacts rather than treating a tag, saved view, or automated analyzer result as conclusive evidence.",
+    "assessment": {
+      "strengths": [
+        "Collaborative interface for searching and organizing forensic timelines",
+        "Supports analyzers, notebooks, APIs, and Sigma-assisted workflows",
+        "Separates shared investigation workspaces from raw timeline generation"
+      ],
+      "limitations": [
+        "Requires separate collection and timeline-generation workflows",
+        "Scaling, index design, permissions, and sensitive evidence need careful administration"
+      ],
+      "best_for": [
+        "collaborative timeline analysis",
+        "incident chronology review",
+        "large-event-set exploration",
+        "forensic investigation workspaces"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["digital forensic examiners", "incident-response teams", "threat hunters", "DFIR platform administrators"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["web platform", "documentation", "analyzers", "api", "command-line client", "notebook integration"],
+    "tags": ["dfir", "forensic-timeline", "collaboration", "event-analysis", "incident-response", "sigma", "threat-hunting", "case-management"],
+    "related_source_ids": ["plaso", "sigma", "velociraptor", "the-dfir-report"]
+  },
+  "autopsy": {
+    "organization": "Sleuth Kit Labs",
+    "summary": "Autopsy is a free, open-source desktop platform for end-to-end analysis of disk images, local drives, and supported mobile evidence. Built on The Sleuth Kit, it adds a graphical case workflow, ingest modules, keyword search, timeline and file views, hash-set support, reporting, and an extension architecture for Java or Python modules. It lowers the barrier to structured forensic examination and is widely used in law-enforcement and corporate work. Some advanced training, support, and custom modules are commercial, and examiners must still validate tool output and maintain proper evidence-handling procedures.",
+    "description": "Autopsy is a free, open-source forensic analysis application produced by Sleuth Kit Labs and built on The Sleuth Kit's storage and file-system capabilities. Its graphical case workflow supports disk images, local drives, and supported mobile evidence through ingest modules, file and timeline views, keyword search, hash-set comparison, deleted-file recovery, artifact extraction, tagging, and report generation. Examiners can create a case, attach a verified image, select appropriate ingest modules, triage results, bookmark significant artifacts, and generate a reviewable report while retaining links to source locations. Java and Python extension mechanisms support additional modules, and command-line Sleuth Kit tools can independently inspect important structures. Autopsy makes structured examination accessible, but its interface does not remove the need to understand storage formats, acquisition quality, timestamps, and evidentiary procedure. Module support and interpretation vary by data type; damaged, encrypted, or novel formats may require other tools. Some training, support, and custom capabilities are commercial. Investigators should work from forensic copies, verify hashes, document versions and settings, review module errors, validate critical findings at the source level, protect sensitive case data, and avoid presenting generated reports as conclusions without analyst interpretation.",
+    "assessment": {
+      "strengths": [
+        "Accessible GUI integrates many disk-forensics tasks into a case workflow",
+        "Extensible ingest and reporting modules build on The Sleuth Kit",
+        "Free core platform supports practical forensic education and investigations"
+      ],
+      "limitations": [
+        "Large cases and intensive ingest modules can demand significant time and resources",
+        "GUI findings do not replace source validation, chain of custody, or examiner judgment"
+      ],
+      "best_for": [
+        "disk-image examination",
+        "file-system investigations",
+        "forensic case management",
+        "entry-level DFIR labs"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["digital forensic examiners", "law-enforcement analysts", "incident responders", "DFIR students"],
+    "skill_levels": ["beginner", "intermediate", "advanced"],
+    "content_formats": ["desktop software", "documentation", "training", "plugins", "report generation"],
+    "tags": ["dfir", "disk-forensics", "file-system-analysis", "forensic-casework", "sleuth-kit", "evidence-analysis", "incident-response"],
+    "related_source_ids": ["the-sleuth-kit", "plaso", "timesketch", "volatility-foundation"]
+  },
+  "the-sleuth-kit": {
+    "organization": "Sleuth Kit Labs",
+    "summary": "The Sleuth Kit is an open-source collection of command-line utilities and a C library for examining disk images, volume systems, file systems, metadata, and recoverable file content. It supplies the low-level forensic engine used by Autopsy and other open-source or commercial tools, while remaining useful directly in scripted and repeatable investigations. The official site provides downloads, file-system documentation, release information, and community support. Its command-oriented workflow assumes knowledge of storage structures and evidence handling; unsupported formats or damaged media may require additional tools and manual validation.",
+    "description": "The Sleuth Kit, maintained by Sleuth Kit Labs and contributors, is an open-source collection of command-line forensic utilities plus a C library for examining storage evidence. Its tools expose image, volume-system, file-system, inode or metadata, allocation, and recoverable-content views, allowing investigators to inspect disk images without relying solely on a graphical abstraction. It also provides the low-level engine used by Autopsy and several other forensic products. Experienced examiners use its focused commands to enumerate partitions, resolve file-system structures, recover content, verify a GUI finding, or script repeatable extraction across evidence sets. The official site documents supported formats, releases, utilities, and file-system concepts. This direct access is powerful but assumes knowledge of offsets, allocation state, storage structures, shell handling, and chain-of-custody requirements. Incorrect parameters can produce incomplete or misleading output, while encryption, unsupported formats, damaged media, modern storage behavior, or proprietary containers may require additional tooling. Analysts should operate on verified forensic copies, record commands and versions, preserve offsets and source identifiers, compare consequential findings with raw structures or another implementation, and keep interpretation separate from what the utility directly reports.",
+    "assessment": {
+      "strengths": [
+        "Low-level, scriptable access to disk and file-system evidence",
+        "Mature library underpins Autopsy and other forensic applications",
+        "Command-line tools support repeatable and automatable examinations"
+      ],
+      "limitations": [
+        "Requires file-system expertise and careful interpretation of recovered artifacts",
+        "Does not provide Autopsy's integrated GUI and broader case workflow"
+      ],
+      "best_for": [
+        "disk-image analysis",
+        "file recovery",
+        "forensic automation",
+        "tool and plugin development"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["digital forensic examiners", "forensic developers", "incident responders", "advanced students"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["command-line tools", "c library", "documentation", "source code", "release notes"],
+    "tags": ["dfir", "disk-forensics", "file-system-analysis", "file-recovery", "forensic-automation", "command-line", "evidence-analysis"],
+    "related_source_ids": ["autopsy", "plaso", "timesketch", "volatility-foundation"]
+  },
+  "remnux": {
+    "organization": "REMnux project",
+    "summary": "REMnux is a Linux distribution and curated toolkit for reverse engineering and analyzing malicious software. It packages community tools for static inspection, document analysis, network-behavior examination, memory work, code analysis, and controlled service simulation, reducing the setup burden for a malware-analysis workstation. Official documentation explains installation as a virtual appliance or on compatible Ubuntu systems and provides usage guidance for included tools. REMnux does not make malware safe: analysts should use isolated virtual machines, snapshots, restricted networking, and disciplined sample-transfer procedures before opening or executing untrusted content.",
+    "description": "REMnux is a Linux distribution and curated malware-analysis toolkit maintained by its project community. Distributed as a virtual appliance or installable on compatible Ubuntu systems, it assembles utilities for static file inspection, malicious-document analysis, code and string examination, memory work, packet and network-behavior review, data decoding, and controlled simulation of common services. Analysts use REMnux to establish a reproducible workstation, triage an unknown sample, extract indicators and configuration, observe network requests under controlled conditions, and move selected binaries into Ghidra or another specialist tool for deeper reverse engineering. YARA supports repeatable pattern matching, while VirusTotal, MalwareBazaar, and Malpedia can add context when data-sharing rules permit. REMnux curates tools and documentation; it does not validate every tool result or make malicious content safe. Packages evolve independently, and outputs can conflict or be fooled by packing, obfuscation, malformed files, and anti-analysis behavior. Use a dedicated virtual machine with snapshots, minimal shared resources, restricted or simulated networking, and disciplined sample transfer. Never expose live malware to production networks or upload confidential samples without authorization, and preserve hashes, versions, commands, and raw observations for later review.",
+    "assessment": {
+      "strengths": [
+        "Curated Linux environment reduces malware-analysis tool setup time",
+        "Covers complementary static, document, network, and reverse-engineering workflows",
+        "Documentation and update tooling support repeatable lab maintenance"
+      ],
+      "limitations": [
+        "A large toolkit still requires analysts to understand each tool and artifact",
+        "Handling live samples demands isolation, snapshots, and controlled networking"
+      ],
+      "best_for": [
+        "malware-analysis labs",
+        "malicious document triage",
+        "network behavior analysis",
+        "reverse-engineering workstation setup"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["malware analysts", "incident responders", "reverse engineers", "DFIR students"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["linux distribution", "virtual appliance", "documentation", "tool collection", "training material"],
+    "tags": ["malware-analysis", "reverse-engineering", "dfir", "malicious-documents", "network-analysis", "analysis-lab", "sample-handling", "linux"],
+    "related_source_ids": ["flare-vm", "yara", "ghidra", "volatility-foundation", "malwarebazaar"]
+  },
+  "yara": {
+    "organization": "VirusTotal",
+    "summary": "YARA is an open-source pattern-matching engine for identifying and classifying files, memory, or other byte sequences through readable rules. Rules combine text strings, hexadecimal patterns, regular expressions, metadata, modules, and Boolean conditions, making YARA a common language for malware-family signatures and hunting logic. Official documentation covers syntax, modules, command-line use, and Python integration, while YARA-CI can test rule repositories. Rules are hypotheses rather than verdicts: brittle patterns create misses, generic strings create false positives, and scanning untrusted samples still requires safe evidence-handling controls.",
+    "description": "YARA is an open-source pattern-matching engine maintained within the VirusTotal ecosystem for identifying and classifying files, process memory, or other byte sequences. Rules combine literal strings, hexadecimal patterns, regular expressions, metadata, external variables, modules, and Boolean conditions in a readable format that supports review and reuse. Malware analysts derive stable traits from related samples, test candidate rules against known malicious and benign corpora, document family and confidence metadata, and deploy validated logic in scanners, sandboxes, repositories, or incident-response workflows. Official documentation covers syntax, modules, command-line operation, performance considerations, and Python integration, while YARA-CI can help test shared rule repositories. Malpedia can provide curated family context and selected rules; REMnux and Ghidra help analysts understand the artifacts behind a pattern. A match is evidence of selected bytes or structure, not proof of malware, identity, intent, or attribution. Overly generic strings generate false positives, tightly coupled patterns miss variants, and adversaries can alter matched features. Rule authors should preserve provenance, avoid confidential indicators, constrain expensive expressions, test representative corpora, assign version and confidence metadata, and review both misses and unexpected matches before operational deployment.",
+    "assessment": {
+      "strengths": [
+        "Expressive, reviewable rule language for textual and binary patterns",
+        "Cross-platform command-line and Python integrations support automation",
+        "Broad ecosystem adoption enables exchange of malware-classification logic"
+      ],
+      "limitations": [
+        "Rule accuracy depends on representative samples and careful pattern selection",
+        "Matches alone do not establish malware identity, behavior, or attribution"
+      ],
+      "best_for": [
+        "malware-family classification",
+        "file and memory hunting",
+        "signature research",
+        "automated triage pipelines"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["malware analysts", "threat hunters", "detection engineers", "incident responders"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["open-source software", "rule language", "documentation", "command-line tool", "python library"],
+    "tags": ["malware-analysis", "yara", "pattern-matching", "file-scanning", "memory-scanning", "threat-hunting", "signature-development", "automation"],
+    "related_source_ids": ["malpedia", "malwarebazaar", "virustotal", "remnux", "google-secops-community-rules"]
+  },
+  "malwarebazaar": {
+    "organization": "abuse.ch and Spamhaus",
+    "summary": "MalwareBazaar is a community malware-sample exchange operated by abuse.ch with Spamhaus. Researchers can browse metadata, query hashes and families, submit samples, configure alerts, and use APIs for automated intelligence workflows. The service is valuable for obtaining recent specimens and correlating sample-level signals with wider abuse.ch data. It is not a benign download catalog or a complete prevalence dataset: labels and community submissions need corroboration, access may be governed by terms and authentication, and downloaded files are live malware that must remain inside an authorized, isolated analysis environment.",
+    "description": "MalwareBazaar is a community malware-sample exchange operated by abuse.ch with Spamhaus support. Its web interface and APIs expose hashes, file metadata, signatures, family labels, tags, submission information, related analysis signals, alerts, and controlled sample access. Malware researchers use it to locate recent specimens, enrich a hash from an incident, assemble carefully governed research corpora, and correlate a sample with other abuse.ch datasets or independent intelligence. A defensible workflow records the sample hash and provenance, corroborates labels through Malpedia or cited reporting, performs static triage in an isolated REMnux or FLARE-VM environment, and develops narrowly tested YARA logic if appropriate. MalwareBazaar is neither a clean software repository nor a representative census of malware prevalence. Community labels can be incomplete, inconsistent, or wrong; submission volume reflects contributor behavior; APIs and downloads have authentication and usage conditions; and a missing hash proves nothing about safety. Every downloaded object must be treated as live malicious code. Access only for legitimate, authorized work, isolate storage and analysis systems, disable unsafe sharing paths, control retention, never execute samples on production assets, and do not redistribute material contrary to law or service terms.",
+    "assessment": {
+      "strengths": [
+        "Timely community-contributed malware samples with searchable metadata",
+        "API and alerting capabilities support repeatable enrichment workflows",
+        "Connects sample sharing with broader abuse.ch and Spamhaus intelligence"
+      ],
+      "limitations": [
+        "Community labels and sample context can be incomplete or incorrect",
+        "Live malware downloads present substantial handling, legal, and operational risk"
+      ],
+      "best_for": [
+        "authorized malware acquisition",
+        "sample enrichment",
+        "malware-family tracking",
+        "threat-intelligence automation"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "continuous"
+    },
+    "audience": ["malware researchers", "threat-intelligence analysts", "antivirus researchers", "incident responders"],
+    "skill_levels": ["advanced"],
+    "content_formats": ["sample database", "api", "alerts", "hash metadata", "malware downloads"],
+    "tags": ["malware-analysis", "malware-samples", "cti", "hash-lookup", "api", "sample-sharing", "sample-handling", "dual-use"],
+    "related_source_ids": ["malpedia", "virustotal", "yara", "threatfox", "urlhaus"]
+  },
+  "malpedia": {
+    "organization": "Fraunhofer FKIE",
+    "summary": "Malpedia is a curated malware knowledge base operated by Fraunhofer FKIE for rapid identification and contextual research. It organizes families across Windows, Linux, Android, macOS, and other platforms, recording aliases, references, taxonomy, YARA rules, and selected samples where access permits. Curated contributions and synonym mapping make it particularly useful for reconciling vendor naming. Public visibility is incomplete: full data, non-public rules, and samples may require membership in its invite-only trust group. Family assertions and aliases should still be traced to cited reports and corroborated before attribution.",
+    "description": "Malpedia is a curated malware knowledge base operated by Fraunhofer FKIE to support identification, family research, and naming reconciliation. Entries organize malware across Windows, Linux, Android, macOS, and other platforms and may include family descriptions, aliases, taxonomy, references, YARA rules, and selected samples under controlled access. Analysts often begin with a suspected family or vendor label, compare synonyms, follow primary reports, examine public rules, and use the resulting context to guide deeper static or dynamic analysis. It complements MalwareBazaar as a sample source, VirusTotal as a multi-engine and relationship service, and YARA as the underlying matching language for many published rules. Curation improves consistency, but an entry is not a definitive attribution record and visibility differs between anonymous users and members of the invite-only trust group. Samples, complete data, or non-public rules may be restricted; family names can remain contested; inherited aliases may collapse distinct clusters; and references vary in evidentiary depth. Researchers should cite the underlying reports, record access date and rule provenance, validate matches against code and behavior, separate family classification from actor attribution, and follow membership, licensing, handling, and redistribution requirements.",
+    "assessment": {
+      "strengths": [
+        "Curated family taxonomy and alias mapping reduce naming ambiguity",
+        "Links malware entries to references, YARA rules, and available samples",
+        "Accountable contribution model supports reproducible malware research"
+      ],
+      "limitations": [
+        "Some samples, rules, and contextual data are restricted to trusted members",
+        "Family membership and vendor aliases still require case-specific corroboration"
+      ],
+      "best_for": [
+        "malware-family identification",
+        "vendor-name reconciliation",
+        "reference discovery",
+        "YARA research"
+      ],
+      "evidence_use": "mixed",
+      "maintenance": "continuous"
+    },
+    "audience": ["malware analysts", "reverse engineers", "threat-intelligence analysts", "detection researchers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["knowledge base", "family profiles", "yara rules", "references", "restricted samples"],
+    "tags": ["malware-analysis", "malware-families", "malware-taxonomy", "yara", "cti", "sample-catalog", "alias-mapping"],
+    "related_source_ids": ["yara", "malwarebazaar", "virustotal", "check-point-research", "sentinelone-labs"]
+  },
+  "virustotal": {
+    "organization": "VirusTotal",
+    "summary": "VirusTotal aggregates antivirus, sandbox, reputation, metadata, relationship, and community signals for files, URLs, domains, and IP addresses through a web interface and APIs. Analysts use hash lookups and relationship graphs to enrich incidents, compare vendor detections, pivot across infrastructure, and prioritize deeper analysis. Results are multi-source observations, not a consensus verdict: detection names conflict, benign items can be flagged, and absence of detections does not establish safety. Uploading also shares submitted content with VirusTotal partners, so confidential files, internal URLs, or regulated data must not be submitted casually.",
+    "description": "VirusTotal, operated by Google, aggregates antivirus, sandbox, reputation, metadata, relationship, and community observations for files, URLs, domains, and IP addresses through web and API access. Responders commonly look up an existing hash, inspect first-seen and analysis metadata, compare vendor labels, review contacted infrastructure, pivot through relationships, and use those leads to prioritize internal evidence collection. Malware analysts may combine its context with Malpedia family references, MalwareBazaar provenance, local YARA results, and independent static or dynamic examination. The service is valuable because it collocates many observations; it does not turn their count into a reliable verdict. Engines share lineage, labels conflict, harmless software can trigger detections, targeted or new malware may produce none, and relationship data can reflect shared infrastructure without shared ownership. Results also vary by access tier, freshness, and submitted artifact. Uploading a file or URL distributes information to VirusTotal and participating partners, which can disclose confidential documents, internal hostnames, customer data, or an active investigation. Prefer hash-only lookup when policy requires it, confirm sharing rules before submission, preserve timestamps and identifiers, corroborate important conclusions locally, and never equate no detections with safety or vendor labels with attribution.",
+    "assessment": {
+      "strengths": [
+        "Broad aggregation of scanner, reputation, metadata, and relationship signals",
+        "Fast hash and infrastructure enrichment through web and API workflows",
+        "Historical observations and pivots support malware and incident investigations"
+      ],
+      "limitations": [
+        "Aggregated detections are signals rather than proof of maliciousness or safety",
+        "Uploads may expose sensitive content to partners; premium capabilities and quotas vary"
+      ],
+      "best_for": [
+        "file and URL triage",
+        "indicator enrichment",
+        "malware relationship analysis",
+        "threat-intelligence pivots"
+      ],
+      "evidence_use": "mixed",
+      "maintenance": "continuous"
+    },
+    "audience": ["malware analysts", "SOC analysts", "incident responders", "threat-intelligence analysts"],
+    "skill_levels": ["beginner", "intermediate", "advanced"],
+    "content_formats": ["web application", "api", "analysis reports", "relationship graph", "community comments"],
+    "tags": ["malware-analysis", "file-reputation", "url-analysis", "indicator-enrichment", "cti", "sandboxing", "api", "data-handling"],
+    "related_source_ids": ["malwarebazaar", "malpedia", "yara", "threatfox", "urlhaus"]
+  },
+  "flare-vm": {
+    "organization": "Mandiant",
+    "summary": "FLARE-VM is Mandiant's open-source set of PowerShell and package-management scripts for building and maintaining a Windows reverse-engineering virtual machine. Its configurable installer assembles debuggers, disassemblers, unpacking utilities, document tools, scripting environments, and other analyst software into a repeatable workstation. The project solves tool curation rather than analysis itself, and package updates are best effort. Official guidance requires installation only in a virtual machine, recommends snapshots and host-only networking, and notes that endpoint protections may be disabled, making isolation and safe sample handling essential.",
+    "description": "FLARE-VM is Mandiant's open-source collection of PowerShell and package-management scripts for constructing a Windows reverse-engineering and malware-analysis virtual machine. Its configurable installer assembles debuggers, disassemblers, decompilers, unpacking and document-analysis utilities, scripting runtimes, network tools, and supporting packages into a repeatable analyst workstation. Teams use it to standardize lab builds, take a clean snapshot, perform Windows-focused static and dynamic triage, and move significant code into tools such as Ghidra, IDA, or Binary Ninja. REMnux provides a complementary Linux-oriented environment, while YARA and vetted intelligence services support classification and enrichment. FLARE-VM solves installation and tool curation rather than determining which tool or conclusion is correct. Packages have independent maintainers and licenses, upgrades are best effort, and a large toolset increases supply-chain and configuration surface. Official guidance confines installation to a virtual machine and warns that security controls may be disabled. Analysts should isolate networking, remove shared folders and clipboard paths where necessary, protect the host and hypervisor, verify snapshots, restrict sample movement, and record tool versions. A prebuilt analysis environment still requires authorization, disciplined evidence handling, and expert validation of outputs.",
+    "assessment": {
+      "strengths": [
+        "Automates a repeatable Windows reverse-engineering workstation build",
+        "Curates complementary tools while permitting custom package configurations",
+        "Open installation scripts make environment changes inspectable"
+      ],
+      "limitations": [
+        "Third-party package updates can fail or introduce version inconsistency",
+        "Reduced host protections and live samples demand strict VM and network isolation"
+      ],
+      "best_for": [
+        "Windows malware-analysis labs",
+        "reverse-engineering workstation setup",
+        "analyst onboarding",
+        "repeatable training environments"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["malware analysts", "reverse engineers", "incident responders", "security researchers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["github repository", "powershell installer", "package configuration", "documentation"],
+    "tags": ["malware-analysis", "reverse-engineering", "windows", "analysis-lab", "virtual-machine", "tool-curation", "sample-handling", "powershell"],
+    "related_source_ids": ["remnux", "ghidra", "ida-free", "cutter", "yara"]
+  },
+  "ghidra": {
+    "organization": "National Security Agency",
+    "summary": "Ghidra is the National Security Agency's open-source software reverse-engineering framework for disassembly, decompilation, program analysis, scripting, and collaborative work. It supports many processor architectures and executable formats, exposes Java and Python-compatible scripting interfaces, and permits extensions for loaders, analyzers, data types, and processors. Its decompiler and analysis database make it useful for malware, vulnerability, and firmware research. Automated analysis can infer incorrect functions, types, or control flow, especially for optimized, obfuscated, or unsupported code, so conclusions require manual verification and often dynamic analysis.",
+    "description": "Ghidra is the National Security Agency's open-source software reverse-engineering framework for disassembly, decompilation, program analysis, scripting, and team collaboration. It supports many processors and executable formats, maintains a navigable analysis database, and provides cross-references, symbols, data types, function graphs, patching support, and extensible loaders and analyzers. Java and Python-compatible scripting interfaces let researchers automate repetitive classification or extraction tasks. Malware analysts typically import a preserved sample, configure language and loader options, run selected analyzers, rename functions and structures as evidence develops, and correlate static findings with debugger, memory, or network observations. Vulnerability and firmware researchers use similar workflows to understand input handling and unfamiliar architectures. REMnux or FLARE-VM can host surrounding analysis utilities, while YARA captures sufficiently stable traits discovered during review. Decompiled C-like output is an approximation, not recovered source code. Optimized, obfuscated, packed, self-modifying, or unsupported binaries can produce incorrect boundaries, types, call graphs, and control flow. Analysts should verify critical logic in disassembly, inspect raw bytes and runtime behavior, document manual assumptions, treat untrusted extensions and project files cautiously, and conduct dual-use research only on software and systems they are authorized to examine.",
+    "assessment": {
+      "strengths": [
+        "Free, open-source framework with broad architecture and format support",
+        "Integrated disassembly, decompilation, scripting, and extension mechanisms",
+        "Supports collaborative projects and repeatable analysis automation"
+      ],
+      "limitations": [
+        "Automated analysis and decompilation can produce plausible but incorrect interpretations",
+        "Large or heavily obfuscated binaries require significant expertise and tuning"
+      ],
+      "best_for": [
+        "static binary analysis",
+        "malware reverse engineering",
+        "firmware research",
+        "custom analysis scripting"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["reverse engineers", "malware analysts", "vulnerability researchers", "firmware analysts"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["desktop software", "source code", "documentation", "training material", "extension api"],
+    "tags": ["reverse-engineering", "disassembly", "decompilation", "static-analysis", "malware-analysis", "binary-analysis", "firmware", "scripting"],
+    "related_source_ids": ["ida-free", "binary-ninja", "cutter", "flare-vm", "opensecuritytraining2"]
+  },
+  "ida-free": {
+    "organization": "Hex-Rays",
+    "summary": "IDA Free is Hex-Rays' no-cost, non-commercial edition of the IDA disassembler and decompiler. It supports x86 and x86-64 applications, saving analysis databases, local x86/x64 debugging, and cloud-based decompilation, giving learners access to core IDA workflows and a widely recognized interface. It is deliberately constrained relative to paid editions: processor coverage is narrow, commercial use is prohibited, the decompiler requires cloud access, and IDAPython and C++ development kits are unavailable. Analysts working with other architectures, offline requirements, automation, or professional cases need another edition or tool.",
+    "description": "IDA Free is Hex-Rays' no-cost, non-commercial edition of the IDA disassembler and decompiler, intended for learning and limited research workflows. It supports analysis of x86 and x86-64 applications, saved databases, local debugging for those architectures, navigation through functions and cross-references, and cloud-backed decompilation. Students and independent researchers can use it to learn the interface common to professional IDA deployments: import a binary, inspect auto-analysis, label functions and data, compare graph and linear views, debug selected behavior, and record hypotheses. Ghidra and Cutter provide open-source alternatives, while paid IDA editions extend the familiar workflow to broader processors, local decompilers, automation, and development kits. The free edition's boundaries are operationally important: its license prohibits commercial use, architecture coverage is narrow, decompilation requires sending relevant material to a cloud service, and IDAPython plus C++ SDK support is unavailable. Sensitive or proprietary binaries may therefore be unsuitable even when technically supported. Like every decompiler, it can infer incorrect types, functions, and control flow. Review current license and privacy terms, preserve original hashes, verify conclusions in assembly or runtime evidence, and analyze only binaries you may lawfully examine.",
+    "assessment": {
+      "strengths": [
+        "No-cost access to core IDA disassembly and x86 cloud decompilation",
+        "Supports saved analysis databases and local x86/x64 debugging",
+        "Useful preparation for workflows common in commercial IDA deployments"
+      ],
+      "limitations": [
+        "Restricted to non-commercial use with limited processor and decompiler support",
+        "No IDAPython or C++ SDK, and decompilation depends on a cloud service"
+      ],
+      "best_for": [
+        "x86 reverse-engineering practice",
+        "malware-analysis education",
+        "IDA workflow evaluation",
+        "CTF binary analysis"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["reverse-engineering students", "malware-analysis learners", "CTF participants", "tool evaluators"],
+    "skill_levels": ["beginner", "intermediate"],
+    "content_formats": ["desktop software", "cloud decompiler", "documentation", "community forum"],
+    "tags": ["reverse-engineering", "ida", "disassembly", "decompilation", "x86", "debugging", "malware-analysis", "non-commercial"],
+    "related_source_ids": ["ghidra", "binary-ninja", "cutter", "flare-vm", "rop-emporium"]
+  },
+  "binary-ninja": {
+    "organization": "Vector 35",
+    "summary": "Binary Ninja is a commercial interactive platform for disassembly, decompilation, debugging, and programmable binary analysis. Its Binary Ninja Intermediate Language family provides several abstraction levels for program semantics, while Python and C++ APIs and experimental Rust bindings support automation. Vector 35 also provides a no-cost local Free edition and Binary Ninja Cloud; the local edition is restricted to non-commercial use and omits APIs and plugins, while the cloud edition requires uploading binaries. Paid editions add broader architecture support, APIs, plugins, and enterprise options. Automated analysis remains fallible, and sensitive binaries require careful handling.",
+    "description": "Binary Ninja is Vector 35's interactive platform for disassembly, decompilation, debugging, and programmable binary analysis. Its Binary Ninja Intermediate Language family represents program behavior at several abstraction levels, giving researchers a consistent basis for inspecting data flow, control flow, variables, and lifted instructions. Paid editions expose Python and C++ APIs, plugins, broader architecture support, and enterprise deployment options; experimental Rust bindings extend automation choices. Analysts use the platform to triage a binary, refine function signatures and types, navigate cross-references, debug behavior, and encode repeatable analysis in scripts. Ghidra, IDA, and Cutter provide useful comparison points because their loaders, intermediate representations, and decompilers may resolve ambiguous code differently. Vector 35 also offers a restricted local Free edition for non-commercial use and a browser-based cloud option. The local edition omits APIs and plugins, while cloud analysis requires uploading binaries, which may be inappropriate for confidential, licensed, export-controlled, or incident-sensitive material. Automated lifting and decompilation remain fallible for optimized, obfuscated, malformed, or unsupported code. Confirm current edition terms, protect sample provenance, vet plugins, validate decisive conclusions against instructions and runtime evidence, and restrict analysis to authorized targets.",
+    "assessment": {
+      "strengths": [
+        "Consistent intermediate-language architecture supports analysis and automation",
+        "Strong Python and C++ APIs, with experimental Rust bindings, for custom workflows",
+        "Integrated decompilation, debugging, visualization, and optional collaboration"
+      ],
+      "limitations": [
+        "Most sustained professional use requires a paid license",
+        "Architecture support and automated semantic recovery require manual verification; cloud use also requires authorization and review of confidentiality and data-use terms"
+      ],
+      "best_for": [
+        "interactive binary analysis",
+        "reverse-engineering automation",
+        "vulnerability research",
+        "collaborative analysis teams"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "continuous"
+    },
+    "audience": ["reverse engineers", "vulnerability researchers", "malware analysts", "binary-tool developers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["desktop software", "cloud application", "api documentation", "plugins", "debugger"],
+    "tags": ["reverse-engineering", "binary-ninja", "disassembly", "decompilation", "intermediate-language", "debugging", "automation", "vulnerability-research", "data-handling"],
+    "related_source_ids": ["ghidra", "ida-free", "cutter", "pwntools", "opensecuritytraining2"]
+  },
+  "cutter": {
+    "organization": "Cutter and Rizin projects",
+    "summary": "Cutter is a free, GPLv3-licensed, cross-platform reverse-engineering application built on the Rizin analysis engine. It combines graph and linear disassembly views, hexadecimal editing, binary patching, Python and native plugins, an integrated Ghidra decompiler, emulation, and beta local or remote debugging in a modern graphical interface. It is an approachable open-source alternative for exploring binaries while retaining access to Rizin commands. Some advanced components remain experimental, and analysis accuracy depends on the underlying engine, architecture support, binary quality, and manual validation of inferred code and data.",
+    "description": "Cutter is a free, GPLv3-licensed, cross-platform reverse-engineering application built on the open-source Rizin analysis engine. Its graphical workspace combines linear and graph disassembly, cross-references, strings, hexadecimal editing, binary patching, emulation, an integrated Ghidra decompiler, plugins, and beta local or remote debugging. Researchers can open an unfamiliar binary, review analysis settings, navigate functions and data, rename discoveries, inspect decompiler output, and drop into Rizin commands when the interface does not expose enough detail. Python and native plugin support allow workflow extensions, while Ghidra, IDA, and Binary Ninja provide independent comparisons for difficult code. Cutter is approachable, but the graphical layer inherits the capabilities and limitations of Rizin, architecture support, loaders, and connected components. Experimental debugging or emulation may behave differently across targets, plugin quality varies, and inferred functions, types, and references can be wrong for packed, optimized, obfuscated, or malformed binaries. Patching modifies evidence unless performed on a working copy. Analysts should preserve original hashes, use isolated environments for hostile files, vet plugins and project inputs, document versions and settings, verify important conclusions in raw instructions or runtime traces, and examine only software they are authorized to analyze.",
+    "assessment": {
+      "strengths": [
+        "Free graphical interface exposes extensive Rizin analysis capabilities",
+        "Integrates Ghidra decompilation, graphing, patching, scripting, and plugins",
+        "Cross-platform design supports accessible reverse-engineering labs"
+      ],
+      "limitations": [
+        "Debugger and some advanced features may be less mature or platform dependent",
+        "Automated disassembly and decompilation require manual validation"
+      ],
+      "best_for": [
+        "open-source binary analysis",
+        "malware-analysis labs",
+        "binary patching practice",
+        "Rizin-assisted reverse engineering"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["reverse engineers", "malware analysts", "students", "CTF participants"],
+    "skill_levels": ["beginner", "intermediate", "advanced"],
+    "content_formats": ["desktop software", "documentation", "plugins", "python scripting", "blog"],
+    "tags": ["reverse-engineering", "cutter", "rizin", "disassembly", "decompilation", "binary-patching", "debugging", "open-source"],
+    "related_source_ids": ["ghidra", "ida-free", "binary-ninja", "flare-vm", "rop-emporium"]
+  },
+  "exploit-database": {
+    "organization": "OffSec",
+    "summary": "Exploit Database is OffSec's public archive of exploits, proof-of-concept code, shellcode, vulnerability-research papers, and Google Hacking Database queries. Entries can be searched by CVE, platform, type, author, port, and verification status, and the downloadable archive is available locally through SearchSploit. It is useful for studying how disclosed vulnerabilities are exercised and for authorized validation against known vulnerable software. It is not an advisory or patch-prioritization service: code quality, safety, applicability, and claimed impact vary, and execution requires isolated targets, source review, and explicit permission.",
+    "description": "Exploit Database is OffSec's public archive of vulnerability proof-of-concept code, exploits, shellcode, research papers, and Google Hacking Database queries. Search filters cover CVE identifiers, platform, type, author, port, and verification status, while SearchSploit provides a locally searchable copy for offline research. Defenders use the archive to understand technical prerequisites and observable behavior after first consulting an authoritative advisory, affected-version statement, and vendor remediation. Authorized testers may review an entry, compare the target build and configuration, inspect every code path, and validate exposure only in an isolated lab or explicitly scoped system. Metasploit documentation can illustrate a more structured module lifecycle, and Nmap can help confirm service inventory without proving vulnerability. Exploit Database is not a canonical vulnerability record, patch-prioritization system, safety review, or guarantee that code works as claimed. Entries differ in age, quality, provenance, reliability, side effects, and applicability; verification status has a limited meaning and does not establish harmlessness. Never run downloaded code blindly. Preserve its hash and source, remove embedded callbacks or destructive actions where appropriate, use disposable targets, obtain written permission, avoid real data, monitor effects, and base remediation decisions on vendor and authoritative vulnerability guidance.",
+    "assessment": {
+      "strengths": [
+        "Searchable archive connects public exploit code with vulnerable platforms and CVEs",
+        "SearchSploit enables offline research and reproducible local queries",
+        "Includes proof-of-concepts, shellcode, papers, and curated search queries"
+      ],
+      "limitations": [
+        "Entries vary in reliability, documentation, safety, and applicability",
+        "Public exploit code is dual-use and must not be run without review and authorization"
+      ],
+      "best_for": [
+        "exploit research",
+        "authorized vulnerability validation",
+        "historical proof-of-concept study",
+        "defensive reproduction labs"
+      ],
+      "evidence_use": "mixed",
+      "maintenance": "continuous"
+    },
+    "audience": ["vulnerability researchers", "penetration testers", "exploit developers", "defensive researchers"],
+    "skill_levels": ["advanced"],
+    "content_formats": ["exploit archive", "proof-of-concept code", "shellcode", "technical papers", "search database"],
+    "tags": ["exploit-development", "vulnerability-research", "proof-of-concept", "cve", "searchsploit", "shellcode", "penetration-testing", "dual-use"],
+    "related_source_ids": ["cve-program", "national-vulnerability-database", "cisa-known-exploited-vulnerabilities-catalog", "metasploit-documentation", "pwntools"]
+  },
+  "rop-emporium": {
+    "organization": "ROP Emporium",
+    "summary": "ROP Emporium is a focused set of downloadable binary challenges for learning return-oriented programming. Its ordered exercises progress from redirecting control flow through calling functions, writing data, handling bad characters, stack pivots, and sparse-gadget techniques, with variants for common architectures and links to a beginner guide. The narrow, repeatable challenge design isolates ROP concepts better than a broad capture-the-flag platform. It assumes familiarity with assembly, calling conventions, debugging, and basic memory corruption, and it does not teach vulnerability discovery, modern mitigations, kernel exploitation, or production exploit reliability comprehensively.",
+    "description": "ROP Emporium is a focused educational collection of downloadable binary challenges for learning return-oriented programming in a deliberately controlled setting. The sequence begins with basic control-flow redirection and progresses through calling functions, passing arguments, writing data, handling bad characters, stack pivots, ret2csu-style constraints, and sparse gadget sets. Variants for common architectures let learners compare calling conventions and instruction behavior, while the linked beginner material supplies initial orientation. A productive workflow solves challenges in order, records the crash and offset, studies available gadgets and binary protections, constructs a minimal chain, and explains why each transition works. Ghidra, Cutter, or IDA can support static review, and pwntools can make interaction and packing reproducible. The narrow design isolates ROP mechanics more clearly than a broad capture-the-flag event, but it assumes prior assembly, debugging, memory-corruption, and calling-convention knowledge. It does not comprehensively teach vulnerability discovery, heap or kernel exploitation, contemporary exploit mitigations, target-specific reliability, or ethical scoping. Challenge success should not be generalized to production software. Run binaries in a disposable lab, use only provided or authorized targets, and focus documentation on concepts rather than repurposing chains against real systems.",
+    "assessment": {
+      "strengths": [
+        "Progressive challenges isolate specific return-oriented programming concepts",
+        "Downloadable binaries enable repeatable debugger and scripting practice",
+        "Architecture variants expose calling-convention and gadget differences"
+      ],
+      "limitations": [
+        "Deliberately artificial challenges cover only one part of exploit development",
+        "Requires prior assembly, debugging, and memory-corruption foundations"
+      ],
+      "best_for": [
+        "ROP fundamentals",
+        "binary-exploitation practice",
+        "debugger exercises",
+        "exploit-script development"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "periodic"
+    },
+    "audience": ["exploit-development students", "CTF participants", "vulnerability researchers", "reverse engineers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["binary challenges", "beginner guide", "downloadable exercises", "challenge notes"],
+    "tags": ["exploit-development", "return-oriented-programming", "binary-exploitation", "memory-corruption", "calling-conventions", "stack-pivot", "ctf", "hands-on-labs"],
+    "related_source_ids": ["pwntools", "opensecuritytraining2", "liveoverflow", "ghidra", "exploit-database"]
+  },
+  "pwntools": {
+    "organization": "Gallopsled and pwntools contributors",
+    "summary": "pwntools is a Python framework and library for rapid exploit-development and capture-the-flag workflows. Its modules simplify process and socket interaction, binary parsing, assembly, shellcode generation, packing, cyclic patterns, return-oriented programming, debugging integration, and protocol scripting. The official documentation offers stable, beta, and development references with examples and API details. It reduces repetitive plumbing but does not replace understanding of architectures, mitigations, calling conventions, or network behavior. Scripts and generated payloads are dual-use and should be exercised only against authorized challenges, research targets, or isolated vulnerable systems.",
+    "description": "pwntools is an open-source Python framework maintained by Gallopsled and contributors for exploit-development education, capture-the-flag challenges, and authorized vulnerability research. Its modules standardize local process and remote socket interaction, ELF inspection, assembly and disassembly, byte packing, cyclic-pattern generation, return-oriented programming, debugger integration, shellcode handling, logging, and protocol scripting. Learners commonly use it to turn a manual laboratory proof of concept into a repeatable script: identify an offset, inspect the supplied binary, construct inputs with explicit architecture and endianness, launch locally under a debugger, and then test against an authorized challenge endpoint. ROP Emporium supplies suitable exercises, while Ghidra or another reverse-engineering tool explains the code being manipulated. Stable, beta, and development documentation provide API references and examples, but version choice matters because interfaces and behavior can change. pwntools removes repetitive transport and encoding work; it does not explain root cause, defeat mitigations automatically, or make generated payloads reliable or safe. Scripts are materially dual-use. Keep them in isolated labs, pin dependencies, inspect helper behavior, avoid embedding real credentials, preserve scope evidence, and never connect to or test a system without explicit permission.",
+    "assessment": {
+      "strengths": [
+        "High-level Python APIs accelerate exploit prototyping and interaction",
+        "Integrates binary, assembly, ROP, shellcode, transport, and debugging utilities",
+        "Well suited to reproducible challenge solutions and research harnesses"
+      ],
+      "limitations": [
+        "Convenient abstractions can hide architectural or protocol mistakes",
+        "Payload and exploitation features require explicit authorization and isolated testing"
+      ],
+      "best_for": [
+        "exploit prototyping",
+        "CTF automation",
+        "binary interaction scripts",
+        "vulnerability research harnesses"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["exploit developers", "CTF participants", "vulnerability researchers", "security students"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["python library", "api documentation", "code examples", "command-line utilities"],
+    "tags": ["exploit-development", "pwntools", "python", "binary-exploitation", "rop", "shellcode", "ctf", "automation", "dual-use"],
+    "related_source_ids": ["rop-emporium", "exploit-database", "metasploit-documentation", "ghidra", "liveoverflow"]
+  },
+  "metasploit-documentation": {
+    "organization": "Rapid7 and the Metasploit community",
+    "summary": "Metasploit Documentation is the official technical guide for using and contributing to the open-source Metasploit Framework. It covers installation, console workflows, modules, payloads, Meterpreter, development environments, module quality rules, exploit reliability, side effects, testing, reporting, and contribution practices. The material is valuable both for authorized penetration testing and for understanding how repeatable exploit modules are engineered. It is not a substitute for target-specific validation or rules of engagement: modules and payloads can alter systems, evade controls, or expose data, so testing belongs in isolated or explicitly authorized environments.",
+    "description": "Metasploit Documentation is the official technical reference for using and contributing to the open-source Metasploit Framework maintained by Rapid7 and its community. It covers installation, console concepts, workspaces, modules, payloads, sessions, Meterpreter, development environments, module quality expectations, exploit reliability, side effects, testing, reporting, and contribution workflows. Authorized penetration testers use the documentation to understand module options and check behavior, reproduce a finding in a controlled target, record evidence, and select the least disruptive validation method permitted by the rules of engagement. Defenders can study module structure and observable behavior to improve laboratory detections, while Exploit Database and vendor advisories provide separate provenance and affected-version context. The documentation explains the framework; it does not guarantee that a module is safe, applicable, current, or representative of real adversaries. Payloads and post-exploitation functions can execute commands, alter systems, collect data, disable controls, or create persistence. Users must confirm target ownership, exact scope, maintenance windows, data-handling rules, and cleanup requirements before use. Prefer disposable replicas, review module source and references, avoid production exploitation when non-invasive evidence suffices, and never treat an automated session as permission to expand testing beyond the agreed boundary.",
+    "assessment": {
+      "strengths": [
+        "Primary guidance for framework operation, module development, and contribution",
+        "Documents reliability, side effects, cleanup, and module-quality expectations",
+        "Covers exploitation, auxiliary testing, payloads, and post-exploitation architecture"
+      ],
+      "limitations": [
+        "Assumes substantial networking, vulnerability, and operating-system knowledge",
+        "Framework capabilities are dual-use and can cause compromise or disruption"
+      ],
+      "best_for": [
+        "authorized penetration testing",
+        "Metasploit module development",
+        "exploit validation labs",
+        "framework internals study"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "continuous"
+    },
+    "audience": ["penetration testers", "exploit developers", "red teams", "security researchers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["technical documentation", "development guides", "module examples", "github repository links"],
+    "tags": ["penetration-testing", "metasploit", "exploit-development", "payloads", "post-exploitation", "module-development", "red-team", "dual-use"],
+    "related_source_ids": ["exploit-database", "pwntools", "nmap-documentation", "cisa-known-exploited-vulnerabilities-catalog", "atomic-red-team"]
+  },
+  "nmap-documentation": {
+    "organization": "Nmap Project",
+    "summary": "Nmap's official documentation covers installation and nearly every command-line option for network discovery, port scanning, service and version detection, operating-system fingerprinting, timing, output, and the Lua-based Nmap Scripting Engine. The reference guide is updated with releases, complemented by an official book, NSE portal, protocol papers, examples, and translations. It is useful for both asset discovery and authorized security assessment, but scan results are observations from a particular path and time. Aggressive probes or scripts can disrupt services, trigger defenses, or exceed permission boundaries.",
+    "description": "Nmap's official documentation is the primary reference for the Nmap Project's network-discovery and security-auditing tools. It explains host discovery, TCP and UDP port scanning, service and version detection, operating-system fingerprinting, timing, target and port selection, output formats, and the Lua-based Nmap Scripting Engine. The continuously maintained reference guide is complemented by an official book, NSE documentation, protocol papers, examples, and translations. Administrators use it to inventory assets from an approved vantage point, export structured results, compare changes over time, and investigate unexpected services; authorized assessors use carefully selected probes to validate exposure. Wireshark can inspect resulting traffic, while Zeek or Suricata can show how monitoring systems observe the activity. A scan reports responses seen from one network path and moment, not definitive ownership, reachability from every zone, vulnerability, or operating-system identity. Firewalls, rate limiting, proxies, load balancers, packet loss, and service emulation alter conclusions. NSE scripts vary from passive enrichment to intrusive checks. Define written scope, exclude fragile systems when required, review each script category and source, control rate and retries, coordinate monitoring, preserve commands and timestamps, and corroborate consequential findings through configuration or asset records.",
+    "assessment": {
+      "strengths": [
+        "Comprehensive first-party reference for Nmap options and behavior",
+        "Documents discovery, fingerprinting, performance, output, and NSE extensibility",
+        "Examples and protocol papers explain how scan techniques work on the wire"
+      ],
+      "limitations": [
+        "Results can be incomplete or misleading through firewalls, rate limits, and network paths",
+        "Intrusive scripts and aggressive scans require scope control and authorization"
+      ],
+      "best_for": [
+        "network asset discovery",
+        "service enumeration",
+        "authorized security audits",
+        "NSE script development"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["network administrators", "penetration testers", "SOC analysts", "security engineers"],
+    "skill_levels": ["beginner", "intermediate", "advanced"],
+    "content_formats": ["reference guide", "online book", "script documentation", "technical papers", "translations"],
+    "tags": ["network-security", "nmap", "network-discovery", "port-scanning", "service-detection", "asset-inventory", "nse", "dual-use"],
+    "related_source_ids": ["wireshark", "zeek", "suricata", "metasploit-documentation", "security-onion"]
+  },
+  "security-onion": {
+    "organization": "Security Onion Solutions",
+    "summary": "Security Onion is a free, open platform that integrates network visibility, host telemetry, intrusion detection, log management, hunting, dashboards, cases, and selected analysis tools into a defender-focused distribution. Its stack combines components such as Suricata, Zeek, Elastic Agent, osquery, Strelka, and OpenCanary with Security Onion interfaces for alerts and investigations. It is valuable for SOC labs and operational monitoring, but it is a platform to engineer rather than an appliance that creates coverage automatically. Sensor placement, storage, tuning, access control, updates, and analyst workflows determine its effectiveness.",
+    "description": "Security Onion is a defender-focused security-monitoring platform from Security Onion Solutions that integrates network visibility, host telemetry, intrusion detection, log management, hunting, dashboards, cases, and investigation interfaces. Its distribution orchestrates components such as Suricata, Zeek, Elastic Agent, osquery, Strelka, and OpenCanary into a deployable sensor and analysis stack. Teams use it to build labs, place network sensors, ingest endpoint data, triage alerts, pivot into protocol and session records, preserve cases, and develop SOC workflows. The native Zeek and Suricata documentation remains essential for understanding their distinct logs and rule behavior; Wireshark supports packet-level verification when captures are available. Security Onion reduces integration work but is not an appliance that produces complete coverage after installation. Visibility depends on network topology, taps or span ports, encrypted traffic, endpoint enrollment, data retention, rule selection, parsing, and analyst staffing. A poorly sized or exposed deployment can lose packets, exhaust storage, leak sensitive traffic, or overwhelm analysts. Architects should model throughput and retention, secure management access, separate roles, tune detections, monitor sensor health, document upgrades, and test evidence paths. Alert counts and dashboards must be interpreted against actual collection quality and local threat hypotheses.",
+    "assessment": {
+      "strengths": [
+        "Integrates network, endpoint, alert, hunting, and case workflows",
+        "Supports packet, protocol, file, event-log, and honeypot evidence",
+        "Scales from analyst labs to distributed monitoring grids"
+      ],
+      "limitations": [
+        "Deployment, retention, sensor placement, and tuning require sustained engineering",
+        "Bundled tools and default detections do not guarantee complete visibility or coverage"
+      ],
+      "best_for": [
+        "SOC analyst labs",
+        "network security monitoring",
+        "threat-hunting platforms",
+        "integrated incident investigation"
+      ],
+      "evidence_use": "primary-operational",
+      "maintenance": "active"
+    },
+    "audience": ["SOC analysts", "network defenders", "threat hunters", "security platform engineers"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["security distribution", "web interfaces", "documentation", "detections", "case-management platform"],
+    "tags": ["soc", "network-security-monitoring", "intrusion-detection", "threat-hunting", "case-management", "packet-capture", "endpoint-telemetry", "siem"],
+    "related_source_ids": ["zeek", "suricata", "wireshark", "sigma", "the-dfir-report"]
+  },
+  "zeek": {
+    "organization": "Zeek Project",
+    "summary": "Zeek is an open-source passive network monitor that converts observed traffic into rich, structured protocol and transaction logs, file events, notices, and customizable outputs. Its event-driven scripting language and community package ecosystem let defenders add protocol analysis, policy logic, enrichment, and behavioral detections without placing Zeek inline as a blocking control. The project provides current and long-term-support documentation, packages, a browser playground, webinars, and community resources. Encrypted traffic, asymmetric visibility, packet loss, and local network architecture constrain conclusions, while custom scripts require testing for correctness and performance.",
+    "description": "Zeek is an open-source passive network-security monitor that interprets observed traffic and emits structured protocol, connection, transaction, file, certificate, and notice records. Rather than acting primarily as an inline blocker, its event engine and scripting language let defenders express protocol-aware policy, enrichment, behavioral observations, and site-specific analytics. SOC teams place sensors at meaningful network boundaries, forward logs to a search platform, pivot from an alert into DNS, HTTP, TLS, or connection histories, and use scripts or community packages to add context. Security Onion integrates Zeek operationally; Wireshark provides packet-level inspection, while Suricata adds signature-driven IDS or IPS decisions. The project maintains current and long-term-support documentation, package tooling, a browser playground, webinars, and community resources. Zeek records what its sensor could parse, not everything that occurred. Encryption hides application content, asymmetric routing separates conversations, packet loss degrades state, capture offloading can distort packets, and unsupported or evasive protocols reduce visibility. Custom scripts and packages can introduce logic, privacy, or performance problems. Validate sensor placement and packet health, test code on representative traffic, pin trusted dependencies, protect sensitive logs, and corroborate high-impact findings with endpoint, identity, or packet evidence.",
+    "assessment": {
+      "strengths": [
+        "Produces high-fidelity structured metadata across many application protocols",
+        "Event-driven scripting and packages support deep customization",
+        "Passive design enables visibility without becoming an inline enforcement point"
+      ],
+      "limitations": [
+        "Encryption, packet loss, asymmetric routing, and poor sensor placement reduce visibility",
+        "Operational scaling and custom script performance require engineering expertise"
+      ],
+      "best_for": [
+        "network security monitoring",
+        "protocol analytics",
+        "network forensics",
+        "custom behavioral detection"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["network defenders", "SOC analysts", "detection engineers", "network forensic analysts"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["network monitor", "structured logs", "documentation", "scripts", "packages", "webinars"],
+    "tags": ["network-security", "zeek", "network-security-monitoring", "protocol-analysis", "network-forensics", "structured-logs", "threat-hunting", "scripting"],
+    "related_source_ids": ["suricata", "wireshark", "security-onion", "the-dfir-report", "sigma"]
+  },
+  "suricata": {
+    "organization": "Open Information Security Foundation",
+    "summary": "Suricata is the Open Information Security Foundation's high-performance, open-source engine for network intrusion detection, inline prevention, network security monitoring, and packet processing. It performs signature inspection, application-layer protocol parsing, file extraction, flow tracking, and structured EVE JSON logging, with rules commonly managed through the wider Suricata ecosystem. It supports sensors, gateways, and embedded integrations, but effective operation depends on representative traffic, correct capture architecture, suitable rules, and continuous tuning. Encryption, packet loss, noisy signatures, and inline performance constraints can create blind spots or operational impact.",
+    "description": "Suricata is the Open Information Security Foundation's high-performance, open-source engine for network intrusion detection, inline prevention, network security monitoring, and packet processing. It combines signature evaluation with flow tracking, application-layer protocol parsing, file inspection or extraction, metadata generation, and structured EVE JSON output. Defenders deploy it on passive sensors to alert and enrich investigations or inline where reviewed rules can block traffic. A practical workflow validates capture quality, selects and manages rules, tests representative traffic, forwards EVE records to a SIEM, and tunes thresholds or suppressions with rationale. Security Onion can integrate the engine, Wireshark helps verify packet interpretation, and Zeek supplies complementary transaction-oriented telemetry. Suricata's alert is a rule match in observed traffic, not proof of compromise or attacker identity. Encryption limits content inspection, packet loss and asymmetric paths break context, stale or generic signatures create misses and noise, and protocol evasion can challenge parsing. Inline use adds latency and outage risk when rules or capacity are wrong. Operators should review provenance and licensing, stage updates, monitor drops and resource saturation, protect extracted files, restrict rule-writing privileges, maintain rollback procedures, and correlate alerts with endpoint and identity evidence.",
+    "assessment": {
+      "strengths": [
+        "Combines signature detection, protocol parsing, file extraction, and structured logging",
+        "Supports passive IDS and inline IPS deployment models",
+        "Open rule and integration ecosystem fits broader monitoring pipelines"
+      ],
+      "limitations": [
+        "Rule quality and tuning strongly affect false-positive and false-negative rates",
+        "Encryption, capture loss, and inline capacity can limit visibility or availability"
+      ],
+      "best_for": [
+        "network intrusion detection",
+        "inline threat prevention",
+        "network telemetry pipelines",
+        "packet and file inspection"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "active"
+    },
+    "audience": ["network security engineers", "SOC analysts", "detection engineers", "security platform teams"],
+    "skill_levels": ["intermediate", "advanced"],
+    "content_formats": ["network engine", "documentation", "rules", "eve-json telemetry", "training"],
+    "tags": ["network-security", "suricata", "ids", "ips", "network-security-monitoring", "protocol-analysis", "packet-inspection", "detection-engineering"],
+    "related_source_ids": ["zeek", "wireshark", "security-onion", "sigma", "malware-traffic-analysis-net"]
+  },
+  "wireshark": {
+    "organization": "Wireshark Foundation",
+    "summary": "Wireshark is a free, open-source network protocol analyzer for capturing traffic and interactively inspecting packets across hundreds of protocols. Its display filters, protocol dissectors, stream reconstruction, statistics, expert information, and command-line companion tools support troubleshooting, incident investigation, protocol research, and forensic review of packet captures. The project supplies user and developer guides, release notes, sample captures, community support, and training resources. Captures reflect only the monitored vantage point; encryption, offloading, packet loss, and asymmetric paths limit interpretation, while packet files can contain credentials or sensitive communications requiring controlled handling.",
+    "description": "Wireshark is a free, open-source network protocol analyzer maintained by the Wireshark Foundation and project contributors. It captures or opens packet data and decodes hundreds of protocols through dissectors, display filters, stream reconstruction, conversation and endpoint statistics, expert information, graphs, and export functions. Command-line companions such as TShark support scripted processing. Network engineers use it to diagnose protocol and performance problems; incident responders inspect a bounded packet capture, filter on known hosts or sessions, reconstruct exchanges, and preserve packet numbers that support a finding. Zeek turns similar traffic into transaction logs, while Suricata evaluates signatures; Wireshark is especially useful for validating what the sensor received and how a protocol was interpreted. A capture represents one vantage point and time, not the complete network. Encryption hides payloads, asymmetric routing splits flows, packet loss removes evidence, checksum or segmentation offloading can create misleading artifacts, and dissectors may contain bugs or assumptions. Packet files contain credentials, tokens, personal information, or proprietary communications and may themselves exercise parser vulnerabilities. Capture only with authority, minimize scope, protect files and keys, use supported versions, preserve hashes and timestamps, and corroborate conclusions with endpoint and infrastructure evidence.",
+    "assessment": {
+      "strengths": [
+        "Deep interactive decoding across a very broad protocol set",
+        "Powerful filtering, reconstruction, statistics, and command-line workflows",
+        "Extensible dissector ecosystem supports protocol and forensic research"
+      ],
+      "limitations": [
+        "Packet visibility is constrained by capture position, encryption, and collection quality",
+        "Large captures are resource intensive and may contain highly sensitive data"
+      ],
+      "best_for": [
+        "packet-level troubleshooting",
+        "network forensics",
+        "protocol analysis",
+        "malware traffic examination"
+      ],
+      "evidence_use": "primary-authoritative",
+      "maintenance": "continuous"
+    },
+    "audience": ["network engineers", "SOC analysts", "incident responders", "protocol researchers"],
+    "skill_levels": ["beginner", "intermediate", "advanced"],
+    "content_formats": ["desktop software", "command-line tools", "documentation", "sample captures", "developer guides"],
+    "tags": ["network-security", "wireshark", "packet-analysis", "network-forensics", "protocol-analysis", "pcap", "traffic-analysis", "incident-response"],
+    "related_source_ids": ["zeek", "suricata", "security-onion", "nmap-documentation", "malware-traffic-analysis-net"]
+  }
+}

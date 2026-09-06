@@ -13,8 +13,10 @@ function option(name, fallback) { const index = args.indexOf(name); return index
 const SITE_ROOT = option('--site', ROOT);
 const check = process.argv.slice(2).includes('--check');
 const modelPath = join(SITE_ROOT, 'data', 'reference-library.json');
+const knowledgeSourcesPath = join(SITE_ROOT, 'data', 'knowledge-sources.json');
 const outputPath = join(SITE_ROOT, 'references', 'index.html');
 const model = JSON.parse(await readFile(modelPath, 'utf8'));
+const knowledgeSources = JSON.parse(await readFile(knowledgeSourcesPath, 'utf8'));
 const base = await readFile(
   existsSync(outputPath) ? outputPath : join(SITE_ROOT, 'cyber-knowledge', 'index.html'),
   'utf8',
@@ -36,6 +38,28 @@ function safeJson(value) {
   return JSON.stringify(value, null, 2).replace(/</g, '\\u003c');
 }
 
+function normalizeUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:') return null;
+    url.hash = '';
+    for (const key of [...url.searchParams.keys()]) {
+      if (/^(utm_|fbclid|gclid)/i.test(key)) url.searchParams.delete(key);
+    }
+    return url.toString().replace(/\/$/, '');
+  } catch {
+    return null;
+  }
+}
+
+const knowledgeSourceByUrl = new Map();
+for (const source of knowledgeSources.sources || []) {
+  const url = normalizeUrl(source.url);
+  if (!url) throw new Error(`Knowledge source ${source.id || '(unknown)'} has an invalid canonical URL.`);
+  if (knowledgeSourceByUrl.has(url)) throw new Error(`Duplicate normalized knowledge-source URL: ${url}`);
+  knowledgeSourceByUrl.set(url, source);
+}
+
 function tagButton(tag) {
   return `<button class="reference-tag" type="button" data-reference-tag data-tag-key="${escapeHtml(tag.key)}" data-tag-type="${escapeHtml(tag.type)}" data-tag-facet="${escapeHtml(tag.facet)}" data-tag-value="${escapeHtml(tag.value)}" title="Filter by ${escapeHtml(tag.facet)}: ${escapeHtml(tag.value)}"><span>${escapeHtml(tag.facet)}</span>${escapeHtml(tag.value)}</button>`;
 }
@@ -46,13 +70,15 @@ function referenceCard(record) {
   const tagKeys = record.tags.map((tag) => tag.key).join('|');
   const search = [record.title, record.description, record.publisher, ...record.tags.flatMap((tag) => [tag.facet, tag.value, tag.key])].join(' ').toLowerCase();
   const usedIn = record.used_in.slice(0, 8);
+  const assessedSource = knowledgeSourceByUrl.get(normalizeUrl(record.url));
   return `          <article class="reference-card" data-reference-card data-reference-id="${escapeHtml(record.id)}" data-reference-title="${escapeHtml(record.title.toLowerCase())}" data-reference-publisher="${escapeHtml(record.publisher)}" data-reference-year="${escapeHtml(record.published_at?.slice(0, 4) || 'Unknown')}" data-reference-inclusion="${escapeHtml(record.inclusion)}" data-tag-keys="${escapeHtml(tagKeys)}" data-search="${escapeHtml(search)}">
             <div class="reference-card-heading">
               <span class="reference-context">${escapeHtml(record.inclusion === 'core' ? 'Core research' : 'Context')}</span>
               <button type="button" class="reference-related" data-find-related>Find related</button>
             </div>
             <h3><a href="${escapeHtml(record.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(record.title)}<span class="visually-hidden"> (opens the publisher resource in a new tab)</span><span aria-hidden="true"> ↗</span></a></h3>
-            <p>${escapeHtml(record.description)}</p>
+            <p>${escapeHtml(record.description)}</p>${assessedSource ? `
+            <p class="reference-assessed-source"><a data-knowledge-source-id="${escapeHtml(assessedSource.id)}" href="/cyber-knowledge/knowledge-sources/#source-${escapeHtml(assessedSource.id)}">Read assessed profile<span class="visually-hidden"> for ${escapeHtml(assessedSource.name)}</span> →</a></p>` : ''}
             <div class="reference-tags" aria-label="Reference tags">${visible.map(tagButton).join('')}</div>
 ${remaining.length ? `            <details class="reference-more-tags"><summary>Show ${remaining.length} more tags</summary><div class="reference-tags">${remaining.map(tagButton).join('')}</div></details>` : ''}
 ${usedIn.length ? `            <details class="reference-used-in"><summary>Used in ${record.used_in.length} ${record.used_in.length === 1 ? 'page' : 'pages'}</summary><ul>${usedIn.map((source) => `<li><a href="${escapeHtml(new URL(source.url).pathname)}">${escapeHtml(source.title)}</a> <span>${escapeHtml(source.type)}</span></li>`).join('')}</ul>${record.used_in.length > usedIn.length ? `<p>Showing 8 of ${record.used_in.length} internal crosslinks.</p>` : ''}</details>` : ''}
@@ -70,7 +96,7 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
           <p class="page-eyebrow">1200km research ecosystem · Source reference module</p>
           <h1 id="reference-library-title">Articles and Guides — References</h1>
           <p class="page-lead">${escapeHtml(model.description)} Search titles and descriptions, filter every normalized tag, pivot across facets, and find references connected by shared evidence metadata.</p>
-          <div class="page-hero-links"><a class="button primary" href="/articles/">Browse articles</a><a class="button" href="/guides.html">Browse guides</a><a class="button" href="/ai-attack-statistics/">AI cyberattack study</a><a class="button" href="/ai-attack-statistics/dashboard/">AI study dashboard</a></div>
+          <div class="page-hero-links"><a class="button primary" href="/articles/">Browse articles</a><a class="button" href="/guides.html">Browse guides</a><a class="button" href="/cyber-knowledge/knowledge-sources/">Curated Knowledge Sources</a><a class="button" href="/cyber-knowledge/sources/">Cyber Knowledge citations</a><a class="button" href="/ai-attack-statistics/">AI cyberattack study</a><a class="button" href="/ai-attack-statistics/dashboard/">AI study dashboard</a></div>
         </div>
         <aside class="reference-boundary" aria-label="Evidence boundary"><strong>Evidence boundary</strong><p>${escapeHtml(model.evidence_boundary)}</p></aside>
       </section>

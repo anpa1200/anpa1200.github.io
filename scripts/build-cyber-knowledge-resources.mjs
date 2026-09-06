@@ -7,6 +7,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const check = args.includes('--check');
 const model = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge.json'), 'utf8'));
+const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
+const knowledgeSourceCount = knowledgeSources.sources.length;
 const hub = readFileSync(join(ROOT, 'cyber-knowledge', 'index.html'), 'utf8');
 
 function escapeHtml(value) {
@@ -175,7 +177,11 @@ const sourceRecords = [...sources.values()].sort((left, right) => {
 const sourceGroups = [...new Set(sourceRecords.map((record) => sourceClass(record.url)))].sort();
 const sourcesBody = `<section aria-labelledby="source-index-title">
         <h2 id="source-index-title">Referenced sources</h2>
-        <p class="section-intro">${sourceRecords.length} unique external destinations cited by the ten guides. Classification is descriptive; normative authority depends on the exact document and claim.</p>
+        <p class="section-intro">${sourceRecords.length} unique external destinations cited by the eleven guides. Classification is descriptive; normative authority depends on the exact document and claim.</p>
+        <aside class="notice" aria-label="Related source directories">
+          <span aria-hidden="true">↗</span>
+          <div><strong>Choose the right source index</strong><p>This page records citations used by the Cyber Knowledge guides. Use <a href="/references/">References</a> for citations across the whole 1200km site, or the <a href="/cyber-knowledge/knowledge-sources/">Knowledge Sources module</a> for ${knowledgeSourceCount} independently described and assessed standards, research portals, tools, datasets, and learning resources.</p></div>
+        </aside>
 ${sourceGroups.map((group) => `        <section id="source-${group.toLowerCase().replace(/[^a-z0-9]+/g, '-')}" aria-labelledby="source-${group.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-title">
           <h3 id="source-${group.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-title">${escapeHtml(group)}</h3>
           <div class="domain-grid">
@@ -205,7 +211,7 @@ const sourcesGraph = {
 const policyBody = `<section aria-labelledby="policy-title">
         <h2 id="policy-title">Evidence and editorial policy</h2>
         <div class="domain-grid">
-          <article class="domain-card"><h3 class="domain-title">Source selection</h3><p class="domain-desc">Prefer official standards, government publications, framework owners, first-party documentation, peer-reviewed research, and technically credible primary research. Internal 1200km material is labelled as research, a lab, a tool, or a workflow—not as an external standard.</p></article>
+          <article class="domain-card"><h3 class="domain-title">Source selection</h3><p class="domain-desc">Prefer official standards, government publications, framework owners, first-party documentation, peer-reviewed research, and technically credible primary research. Internal 1200km material is labelled as research, a lab, a tool, or a workflow—not as an external standard. The <a href="/cyber-knowledge/knowledge-sources/">Knowledge Sources module</a> records scope, strengths, limitations, quality dimensions, and intended use for its curated entries.</p></article>
           <article class="domain-card"><h3 class="domain-title">Review and versioning</h3><p class="domain-desc">Guide metadata records publication and last-review dates. Version-sensitive claims should name the document or framework revision. “Reviewed” describes an editorial source review; it does not claim independent certification.</p></article>
           <article class="domain-card"><h3 class="domain-title">Corrections</h3><p class="domain-desc">Report a factual issue, broken link, or outdated reference through the public <a href="https://github.com/anpa1200/anpa1200.github.io/issues/new">GitHub issue form</a>. Include the affected URL, quoted claim, proposed source, and reason for correction.</p></article>
           <article class="domain-card"><h3 class="domain-title">AI assistance</h3><p class="domain-desc">AI may assist drafting, classification, comparison, or navigation. It is not treated as evidence. Technical claims, mappings, citations, and operational recommendations require human review against the cited source and relevant environment.</p></article>
