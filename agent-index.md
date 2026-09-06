@@ -55,7 +55,10 @@ administration requires `manage_intel`, and index administration requires
 - `/adversarygraph-docs/capabilities/` - Capability overview
 - `https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/docs/unified-rag-and-mcp.md` - v7.0 RAG/MCP source guide
 - `/threat-matrix/` - Threat Matrix, the public read-only ATT&CK workspace associated with AdversaryGraph
-- `/cyber-knowledge/` - Cybersecurity Knowledge Base: ten source-reviewed, maintained practitioner field guides with explicit scope and learning pathways
+- `/cyber-knowledge/` - Cybersecurity Knowledge Base: eleven source-reviewed, maintained practitioner field guides with explicit scope and learning pathways
+- `/cyber-knowledge/knowledge-sources/` - Searchable directory of 125 assessed cybersecurity standards, research portals, tools, datasets, and learning resources with quality, scope, tags, limitations, and stable source anchors
+- `/cyber-knowledge/sources/` - Citation inventory for the eleven Cyber Knowledge field guides
+- `/references/` - Site-wide external citation library for maintained articles, guides, research, documentation, and labs
 - `/cyber-knowledge/cti.html` - Cyber Threat Intelligence field guide: requirements, collection, analysis, ATT&CK, actor research, sharing, hunting, and detection
 - `/cyber-knowledge/red-team.html` - Red Team and Offensive Security field guide
 - `/cyber-knowledge/blue-team.html` - Blue Team and Defensive Security field guide
@@ -79,6 +82,8 @@ administration requires `manage_intel`, and index administration requires
 - Medium: https://medium.com/@1200km
 - Authoritative fact model: https://1200km.com/data/site-facts.json
 - Controlled content identities and taxonomy: https://1200km.com/data/content-catalog.json
+- Knowledge Sources assessments: https://1200km.com/data/knowledge-sources.json
+- Knowledge Sources lookup index: https://1200km.com/data/knowledge-sources-index.json
 
 ## Public vs Restricted Capabilities
 

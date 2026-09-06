@@ -9,8 +9,8 @@ This report is generated from deployable source HTML. External URLs are inventor
 | Measure | Result |
 |---|---:|
 | Pages | 15 |
-| Words | 130,867 |
-| Internal links | 4,748 |
+| Words | 130,968 |
+| Internal links | 4,753 |
 | External links | 586 |
 | Broken internal links | 0 |
 | Missing anchors | 0 |
@@ -20,7 +20,7 @@ This report is generated from deployable source HTML. External URLs are inventor
 
 | Page | Type | Words | Headings | Internal | External | Indexability |
 |---|---|---:|---:|---:|---:|---|
-| [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3056 | 44 | 324 | 1 | indexable |
+| [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3096 | 46 | 326 | 1 | indexable |
 | [Cyber Threat Intelligence (CTI)](https://1200km.com/cyber-knowledge/cti.html) | field guide | 12713 | 25 | 408 | 174 | indexable |
 | [Red Team & Offensive Security](https://1200km.com/cyber-knowledge/red-team.html) | field guide | 25633 | 289 | 587 | 17 | indexable |
 | [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13239 | 159 | 460 | 13 | indexable |
@@ -33,8 +33,8 @@ This report is generated from deployable source HTML. External URLs are inventor
 | [OSINT & Reconnaissance](https://1200km.com/cyber-knowledge/osint.html) | field guide | 10145 | 114 | 304 | 29 | indexable |
 | [AI Security](https://1200km.com/cyber-knowledge/ai-security.html) | field guide | 5483 | 65 | 361 | 15 | indexable |
 | [Cyber Knowledge Glossary](https://1200km.com/cyber-knowledge/glossary/index.html) | glossary | 4939 | 144 | 165 | 1 | indexable |
-| [Cyber Knowledge Source Index](https://1200km.com/cyber-knowledge/sources/index.html) | source index | 4149 | 186 | 23 | 179 | indexable |
-| [Editorial and Source Policy](https://1200km.com/cyber-knowledge/editorial-policy/index.html) | supporting page | 213 | 8 | 25 | 2 | indexable |
+| [Cyber Knowledge Source Index](https://1200km.com/cyber-knowledge/sources/index.html) | source index | 4193 | 186 | 25 | 179 | indexable |
+| [Editorial and Source Policy](https://1200km.com/cyber-knowledge/editorial-policy/index.html) | supporting page | 230 | 8 | 26 | 2 | indexable |
 
 ## Validation interpretation
 

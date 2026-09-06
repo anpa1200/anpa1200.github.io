@@ -33,10 +33,16 @@ export function shouldApplyDiscoveryGovernance(term) {
 
 export function rerankSearchResults(results, term, records) {
   if (!Array.isArray(results) || !shouldApplyDiscoveryGovernance(term)) return results;
+  const normalizedTerm = String(term || '').trim().toLowerCase().replace(/\s+/g, ' ');
   return results.map((result, index) => ({
     result,
     index,
-    governedScore: (Number(result.score) || 0) * (records?.[result.id]?.boost || 1),
+    governedScore: (Number(result.score) || 0) * (
+      records?.[result.id]?.custom_record
+        && String(records?.[result.id]?.title || '').trim().toLowerCase().replace(/\s+/g, ' ') === normalizedTerm
+        ? Math.max(records?.[result.id]?.boost || 1, 100)
+        : records?.[result.id]?.boost || 1
+    ),
   })).sort((left, right) =>
     right.governedScore - left.governedScore
     || (Number(right.result.score) || 0) - (Number(left.result.score) || 0)

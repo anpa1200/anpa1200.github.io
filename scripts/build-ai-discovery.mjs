@@ -11,6 +11,7 @@ const check = args.includes('--check');
 const facts = JSON.parse(readFileSync(join(ROOT, 'data', 'site-facts.json'), 'utf8')).facts;
 const references = JSON.parse(readFileSync(join(ROOT, 'data', 'reference-library.json'), 'utf8'));
 const courses = JSON.parse(readFileSync(join(ROOT, 'data', 'course-library.json'), 'utf8'));
+const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
 
 function value(key) {
   if (!facts[key] || !Object.hasOwn(facts[key], 'value')) throw new Error(`Missing site fact ${key}`);
@@ -58,7 +59,11 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 - [AI in Cyberattacks statistical CTI study](https://1200km.com/ai-attack-statistics/) — 111 deduplicated publications with 103 in the evidence-bounded primary denominator
 - [AI in Cyberattacks interactive dashboard](https://1200km.com/ai-attack-statistics/dashboard/) — 30+ publication-level widgets, five heatmaps, and a filterable source explorer
 - [AI in Cyberattacks dataset and downloads](https://1200km.com/ai-attack-statistics/data/) — governed CSV, JSON, SQLite, XLSX, methodology, and uniqueness artifacts
-- [Cybersecurity Knowledge Base](https://1200km.com/cyber-knowledge/) — ten source-reviewed practitioner field guides
+- [Cybersecurity Knowledge Base](https://1200km.com/cyber-knowledge/) — eleven source-reviewed practitioner field guides
+- [Cybersecurity Knowledge Sources](https://1200km.com/cyber-knowledge/knowledge-sources/) — ${knowledgeSources.sources.length} assessed standards, research portals, tools, datasets, and learning resources with controlled tags and internal crosslinks
+- [Knowledge Sources dataset](https://1200km.com/data/knowledge-sources.json) — complete machine-readable assessments
+- [Knowledge Sources lookup index](https://1200km.com/data/knowledge-sources-index.json) — category, tag, audience, skill, access, quality, maintenance, and evidence-use indexes
+- [Cyber Knowledge citation inventory](https://1200km.com/cyber-knowledge/sources/) — external destinations cited by the eleven field guides
 - [Cyber Threat Intelligence field guide](https://1200km.com/cyber-knowledge/cti.html)
 - [Red Team and Offensive Security field guide](https://1200km.com/cyber-knowledge/red-team.html)
 - [Blue Team and Defensive Security field guide](https://1200km.com/cyber-knowledge/blue-team.html)

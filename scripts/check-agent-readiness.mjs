@@ -10,6 +10,9 @@ const requiredFiles = [
   'auth.md',
   'data/site-facts.json',
   'data/site-facts.schema.json',
+  'data/knowledge-sources.json',
+  'data/knowledge-sources-index.json',
+  'cyber-knowledge/knowledge-sources/index.html',
   '_headers',
   '.well-known/api-catalog',
   '.well-known/openapi.json',
@@ -127,6 +130,14 @@ if (!wrangler.includes('1200km.com/*')) failures.push('wrangler.toml missing 120
 
 const auth = read('auth.md');
 if (!auth.startsWith('# Auth.md')) failures.push('auth.md missing expected Auth.md heading');
+
+const apiCatalog = read('.well-known/api-catalog');
+for (const expected of [
+  'https://1200km.com/cyber-knowledge/knowledge-sources/',
+  'https://1200km.com/data/knowledge-sources.json',
+]) {
+  if (!apiCatalog.includes(expected)) failures.push(`API catalogue missing ${expected}`);
+}
 
 if (failures.length) {
   console.error(failures.join('\n'));

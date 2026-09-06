@@ -13,6 +13,8 @@ export const LOCAL_SEARCH_MINIMUM_PAGES = 1000;
 // Externally canonical TrainSec mirrors are intentionally excluded. Keep a
 // meaningful regression floor without treating syndicated copies as coverage.
 export const REMOTE_SEARCH_MINIMUM_PAGES = 1500;
+export const KNOWLEDGE_SOURCES_PATHNAME = '/cyber-knowledge/knowledge-sources/';
+export const KNOWLEDGE_SOURCES_URL = `${SITE_ORIGIN}${KNOWLEDGE_SOURCES_PATHNAME}`;
 
 const LEGACY_PREFIXES = ['/threatmapper/', '/threatmapper-docs/'];
 const ENTITY_PATH = /^\/threat-matrix\/(actors|techniques)\/([^/]+)\/$/i;
@@ -255,6 +257,7 @@ function extractAliases(html) {
 
 export function classifyUrl(urlValue) {
   const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
+  if (pathname === KNOWLEDGE_SOURCES_PATHNAME) return 'Cyber Knowledge';
   if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actors';
   if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK techniques';
   if (/^\/courses\//i.test(pathname) || /^\/ai-security-course(?:\.html|\/)/i.test(pathname)) return 'Courses & learning';
@@ -269,6 +272,7 @@ export function classifyUrl(urlValue) {
 
 export function classifyContentType(urlValue) {
   const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
+  if (pathname === KNOWLEDGE_SOURCES_PATHNAME) return 'Knowledge source collection';
   if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actor profile';
   if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK technique';
   if (pathname === '/courses/') return 'Collection';
@@ -401,6 +405,248 @@ export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
   prepared = prepared.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${metadata}`);
   prepared = markPagefindContent(prepared, discoveryWeight(catalogItem));
   return prepared;
+}
+
+function uniqueStrings(values) {
+  return [...new Set((values || []).map((value) => String(value).trim()).filter(Boolean))];
+}
+
+function assertKnowledgeSourceField(source, field) {
+  if (!String(source?.[field] || '').trim()) {
+    throw new Error(`Knowledge source ${source?.id || '(unknown)'} is missing ${field}.`);
+  }
+}
+
+const KNOWLEDGE_CATEGORY_DOMAINS = Object.freeze({
+  academic: 'threat-intelligence',
+  'adversary-emulation': 'offensive-research',
+  'ai-security': 'ai-security',
+  'api-security': 'application-security',
+  'application-security': 'application-security',
+  'cloud-security': 'cloud-security',
+  'container-security': 'cloud-security',
+  cti: 'threat-intelligence',
+  datasets: 'threat-intelligence',
+  'detection-engineering': 'detection-engineering',
+  dfir: 'incident-response',
+  'exploit-development': 'vulnerability-research',
+  framework: 'security-governance',
+  government: 'security-governance',
+  'identity-security': 'identity-security',
+  'incident-response': 'incident-response',
+  kubernetes: 'cloud-security',
+  'malware-analysis': 'malware-analysis',
+  'mobile-security': 'application-security',
+  'network-security': 'network-security',
+  'penetration-testing': 'offensive-research',
+  'reverse-engineering': 'malware-analysis',
+  soc: 'detection-engineering',
+  'threat-informed-defense': 'detection-engineering',
+  'threat-reports': 'threat-intelligence',
+  'threat-research': 'threat-intelligence',
+  training: 'platform-documentation',
+  vulnerability: 'vulnerability-research',
+  'web-security': 'application-security',
+});
+
+function knowledgeSourceAudience(source, fallback = []) {
+  const haystack = uniqueStrings(source.audience).join(' ').toLowerCase();
+  const mapped = [];
+  const add = (value, pattern) => { if (pattern.test(haystack)) mapped.push(value); };
+  add('cti-analyst', /\bcti\b|threat intelligence|threat research|intelligence analyst/);
+  add('detection-engineer', /detection|threat hunt|soc|security operations|blue team/);
+  add('threat-hunter', /threat hunt|hunter/);
+  add('security-engineer', /security|incident|forensic|malware|reverse engineer|vulnerab|penetration|red team|defender/);
+  add('security-leader', /leader|ciso|manager|risk|governance|audit|policy|executive|decision-maker|architect/);
+  add('platform-operator', /operator|administrator|platform|infrastructure|devops|cloud|system|network engineer/);
+  add('developer', /developer|software|application|api|code|devsecops/);
+  add('general', /general|student|learner|beginner|educator|trainer/);
+  return uniqueStrings(mapped.length ? mapped : fallback);
+}
+
+export function knowledgeSourceAnchor(id) {
+  const normalized = String(id || '').trim();
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalized)) {
+    throw new Error(`Invalid knowledge source id: ${id || '(empty)'}.`);
+  }
+  return `source-${normalized}`;
+}
+
+/**
+ * Convert the curated knowledge-source dataset into one Pagefind custom record
+ * per source. These records preserve the canonical collection page while
+ * making exact source names, organizations, tags, and use cases independently
+ * discoverable at stable in-page anchors.
+ */
+export function buildKnowledgeSourceSearchRecords(dataset, moduleHtml, catalogItem = null) {
+  if (!dataset || !Number.isInteger(dataset.schema_version)) {
+    throw new Error('Knowledge sources search integration requires a versioned dataset.');
+  }
+  if (!Array.isArray(dataset.sources) || !dataset.sources.length) {
+    throw new Error('Knowledge sources search integration requires at least one source.');
+  }
+  if (typeof moduleHtml !== 'string' || !moduleHtml.includes('<html')) {
+    throw new Error('Knowledge sources search integration requires the rendered module HTML.');
+  }
+
+  const controlledTags = new Set(uniqueStrings(dataset.controlled_tag_vocabulary));
+  const ids = new Set();
+  const urls = new Set();
+  const htmlIds = new Set(
+    [...moduleHtml.matchAll(/<[^>]+\bid\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/gi)]
+      .map((match) => decodeEntities(match[1] ?? match[2] ?? match[3] ?? ''))
+      .filter(Boolean),
+  );
+
+  for (const source of dataset.sources) {
+    for (const field of ['id', 'name', 'url', 'category', 'source_kind', 'access', 'organization', 'summary', 'description']) {
+      assertKnowledgeSourceField(source, field);
+    }
+    knowledgeSourceAnchor(source.id);
+    if (ids.has(source.id)) throw new Error(`Duplicate knowledge source id: ${source.id}.`);
+    if (urls.has(source.url)) throw new Error(`Duplicate knowledge source URL: ${source.url}.`);
+    ids.add(source.id);
+    urls.add(source.url);
+    if (!htmlIds.has(knowledgeSourceAnchor(source.id))) {
+      throw new Error(`Knowledge source anchor is missing from the rendered module: #${knowledgeSourceAnchor(source.id)}.`);
+    }
+    for (const tag of uniqueStrings(source.tags)) {
+      if (!controlledTags.has(tag)) throw new Error(`Knowledge source ${source.id} uses uncontrolled tag: ${tag}.`);
+    }
+  }
+
+  const sourceById = new Map(dataset.sources.map((source) => [source.id, source]));
+  const generatedDate = String(dataset.generated_on || '').match(/^\d{4}-\d{2}-\d{2}/)?.[0] || '';
+  const updatedYear = generatedDate.slice(0, 4) || 'Unknown';
+  const catalogAudience = uniqueStrings(catalogItem?.audience);
+  const records = dataset.sources.map((source) => {
+    const tags = uniqueStrings(source.tags);
+    const keywords = uniqueStrings(source.keywords);
+    const audiences = uniqueStrings(source.audience);
+    const skillLevels = uniqueStrings(source.skill_levels);
+    const formats = uniqueStrings(source.content_formats);
+    const related = uniqueStrings(source.related_source_ids).map((id) => {
+      const match = sourceById.get(id);
+      if (!match) throw new Error(`Knowledge source ${source.id} links to unknown source id: ${id}.`);
+      if (id === source.id) throw new Error(`Knowledge source ${source.id} links to itself.`);
+      return match.name;
+    });
+    const strengths = uniqueStrings(source.assessment?.strengths);
+    const limitations = uniqueStrings(source.assessment?.limitations);
+    const bestFor = uniqueStrings(source.assessment?.best_for);
+    const topics = topicsFromText([
+      source.name,
+      source.category,
+      source.organization,
+      source.summary,
+      source.description,
+      tags.join(' '),
+      keywords.join(' '),
+      bestFor.join(' '),
+    ].join(' '));
+    const target = `${KNOWLEDGE_SOURCES_PATHNAME}#${knowledgeSourceAnchor(source.id)}`;
+    const primaryType = 'reference-entity';
+    const primaryDomain = KNOWLEDGE_CATEGORY_DOMAINS[source.category] || catalogItem?.primary_domain || 'site-governance';
+    const searchAudience = knowledgeSourceAudience(source, catalogAudience);
+    const status = 'maintained';
+    const lifecycle = 'stable-reference';
+    const evidenceLevel = 'source-backed';
+    const collectionTier = 'reference';
+    const version = `Dataset schema ${dataset.schema_version}`;
+    const sourceLabel = '1200km Knowledge Sources';
+    const evidenceUse = String(source.assessment?.evidence_use || '').trim();
+    const maintenance = String(source.assessment?.maintenance || '').trim();
+    const qualityTier = String(source.quality?.tier || '').trim();
+    const validationStatus = String(source.validation?.status || '').trim();
+    const provenance = uniqueStrings(source.provenance);
+    const aliases = uniqueStrings([source.id, source.organization, ...keywords]).join(', ').slice(0, 700);
+
+    return {
+      url: target,
+      language: 'en',
+      content: [
+        source.name,
+        source.organization,
+        source.summary,
+        source.description,
+        source.quality?.rationale,
+        source.caution,
+        `Category: ${source.category}`,
+        `Source kind: ${source.source_kind}`,
+        `Access: ${source.access}`,
+        qualityTier && `Quality tier: ${qualityTier}`,
+        `Tags: ${tags.join(', ')}`,
+        `Keywords: ${keywords.join(', ')}`,
+        `Audience: ${audiences.join(', ')}`,
+        `Skill levels: ${skillLevels.join(', ')}`,
+        `Formats: ${formats.join(', ')}`,
+        `Strengths: ${strengths.join(' ')}`,
+        `Limitations: ${limitations.join(' ')}`,
+        `Best for: ${bestFor.join(' ')}`,
+        `Related sources: ${related.join(', ')}`,
+        `External source: ${source.url}`,
+      ].filter(Boolean).join('\n'),
+      meta: {
+        title: source.name,
+        description: source.summary,
+        identifier: source.id,
+        aliases,
+        collection: 'Cyber Knowledge',
+        content_type: 'Knowledge source',
+        primary_type: primaryType,
+        primary_domain: primaryDomain,
+        audience: searchAudience.join(', '),
+        status,
+        lifecycle,
+        evidence_level: evidenceLevel,
+        collection_tier: collectionTier,
+        version,
+        source: sourceLabel,
+        updated_year: updatedYear,
+        topics: topics.join(', '),
+        date: generatedDate,
+        knowledge_source_id: source.id,
+        knowledge_category: source.category,
+        knowledge_organization: source.organization,
+        knowledge_source_kind: source.source_kind,
+        knowledge_access: source.access,
+        knowledge_quality_tier: qualityTier,
+        knowledge_tags: tags.join(', '),
+        knowledge_keywords: keywords.join(', '),
+        external_url: source.url,
+      },
+      filters: {
+        section: ['Cyber Knowledge'],
+        content_type: ['Knowledge source'],
+        primary_type: [primaryType],
+        primary_domain: [primaryDomain],
+        ...(searchAudience.length ? { audience: searchAudience } : {}),
+        status: [status],
+        lifecycle: [lifecycle],
+        evidence_level: [evidenceLevel],
+        collection_tier: [collectionTier],
+        version: [version],
+        source: [sourceLabel],
+        updated_year: [updatedYear],
+        ...(topics.length ? { topic: topics } : {}),
+        knowledge_category: [source.category],
+        knowledge_tag: tags,
+        knowledge_access: [source.access],
+        knowledge_source_kind: [source.source_kind],
+        ...(qualityTier ? { knowledge_quality_tier: [qualityTier] } : {}),
+        ...(maintenance ? { knowledge_maintenance: [maintenance] } : {}),
+        ...(evidenceUse ? { knowledge_evidence_use: [evidenceUse] } : {}),
+        ...(skillLevels.length ? { knowledge_skill_level: skillLevels } : {}),
+        ...(validationStatus ? { knowledge_validation_status: [validationStatus] } : {}),
+        ...(provenance.length ? { knowledge_provenance: provenance } : {}),
+        ...(audiences.length ? { knowledge_audience: audiences } : {}),
+        ...(formats.length ? { knowledge_format: formats } : {}),
+        knowledge_organization: [source.organization],
+      },
+    };
+  });
+
+  return records;
 }
 
 export async function collectLocalSitemapUrls(root, entry = join(root, 'sitemap.xml')) {

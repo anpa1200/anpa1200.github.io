@@ -37,6 +37,18 @@ try {
   build = JSON.parse(readFileSync(join(bundle, 'search-build.json'), 'utf8'));
   if (build.pagefindVersion !== '1.5.2') failures.push(`expected Pagefind 1.5.2, found ${build.pagefindVersion}`);
   if (build.indexedPages < minimumPages) failures.push(`expected at least ${minimumPages} indexed pages, found ${build.indexedPages}`);
+  if (build.indexedCustomRecords < 125 || build.knowledgeSourceRecords !== build.indexedCustomRecords) {
+    failures.push(`expected at least 125 consistently reported knowledge-source records, found ${build.indexedCustomRecords || 0}`);
+  }
+  if (build.indexedPageRecords < Math.floor(build.indexedPages * 0.95) || build.indexedPageRecords > build.indexedPages) {
+    failures.push(`searchable page-record coverage disagrees with accepted pages: ${build.indexedPageRecords}/${build.indexedPages}`);
+  }
+  if (build.indexedRecords !== build.indexedPageRecords + build.indexedCustomRecords) {
+    failures.push('indexed record total disagrees with searchable page and custom-record counts');
+  }
+  if (build.knowledgeSourceModuleUrl !== 'https://1200km.com/cyber-knowledge/knowledge-sources/') {
+    failures.push(`unexpected knowledge-source module URL: ${build.knowledgeSourceModuleUrl || '(missing)'}`);
+  }
   if (build.failedPages > (remote ? 12 : 0)) failures.push(`too many failed pages: ${build.failedPages}`);
   if ((build.skipped?.['stale-sitemap-url'] || 0) !== 0) failures.push(`stale sitemap URLs were indexed: ${build.skipped['stale-sitemap-url']}`);
   if (remote && build.canonicalSitemapPages !== build.indexedPages) failures.push('canonical sitemap coverage does not match the Pagefind index');
@@ -50,8 +62,11 @@ try {
 try {
   governance = JSON.parse(readFileSync(join(bundle, 'search-governance.json'), 'utf8'));
   if (governance.schema_version !== 1) failures.push(`unsupported search-governance schema ${governance.schema_version}`);
-  if (governance.indexed_page_count !== build?.indexedPages) failures.push(`search governance targets ${governance.indexed_page_count} of ${build?.indexedPages} indexed pages`);
-  if (governance.record_count < Math.floor((build?.indexedPages || 0) * 0.95)) failures.push(`search governance has too few Pagefind fragment records: ${governance.record_count}`);
+  if (governance.accepted_page_count !== build?.indexedPages) failures.push(`search governance targets ${governance.accepted_page_count} of ${build?.indexedPages} accepted pages`);
+  if (governance.indexed_page_count !== build?.indexedPageRecords) failures.push(`search governance targets ${governance.indexed_page_count} of ${build?.indexedPageRecords} searchable page records`);
+  if (governance.indexed_custom_record_count !== build?.indexedCustomRecords) failures.push(`search governance targets ${governance.indexed_custom_record_count} of ${build?.indexedCustomRecords} custom records`);
+  if (governance.indexed_record_count !== build?.indexedRecords) failures.push(`search governance targets ${governance.indexed_record_count} of ${build?.indexedRecords} total records`);
+  if (governance.record_count < Math.floor((build?.indexedRecords || 0) * 0.95)) failures.push(`search governance has too few Pagefind fragment records: ${governance.record_count}`);
   if (Object.keys(governance.records || {}).length !== governance.record_count) failures.push('search governance record_count disagrees with its records');
 } catch (error) {
   failures.push(`invalid search-governance.json: ${error.message}`);
@@ -106,6 +121,9 @@ async function checkQueries() {
       const minimumValues = filter === 'updated_year' ? 1 : 2;
       if (!filters[filter] || Object.keys(filters[filter]).length < minimumValues) failures.push(`search filter ${filter} is missing or incomplete`);
     }
+    for (const filter of ['knowledge_category', 'knowledge_tag', 'knowledge_access', 'knowledge_source_kind', 'knowledge_quality_tier', 'knowledge_maintenance', 'knowledge_evidence_use', 'knowledge_skill_level', 'knowledge_validation_status', 'knowledge_provenance', 'knowledge_audience', 'knowledge_format', 'knowledge_organization']) {
+      if (!filters[filter] || Object.keys(filters[filter]).length < 2) failures.push(`knowledge-source search filter ${filter} is missing or incomplete`);
+    }
     const checks = [
       { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK', matchedType: 'generated-reference', matchedLifecycle: 'stable-reference' },
       { query: 'T1059.00', expectedPrefixes: ['/threat-matrix/techniques/T1059.0'], first: true, matchedTier: 'reference' },
@@ -129,6 +147,30 @@ async function checkQueries() {
       { query: 'AI Security Course Module 00 Chapter 4 Transformers and LLM Generation', expectedPrefixes: ['/ai-security-course/module-00/chapter-04.html'], maxRank: 2, matchedTier: 'reference', matchedSource: 'Medium', matchedType: 'guide', matchedLifecycle: 'maintained' },
       { query: 'detection validation', expectedPrefixes: ['/adversarygraph', '/labs.html', '/newest-detection-engineering-techniques/'] },
       { query: 'IOC enrichment', expectedPrefixes: ['/adversarygraph'], requiredTier: 'core' },
+      {
+        query: 'CISA Known Exploited Vulnerabilities Catalog',
+        expectedUrls: ['/cyber-knowledge/knowledge-sources/#source-cisa-known-exploited-vulnerabilities-catalog'],
+        expectedPrefixes: [],
+        first: true,
+        matchedTier: 'reference',
+        matchedSource: '1200km Knowledge Sources',
+        matchedType: 'reference-entity',
+        matchedLifecycle: 'stable-reference',
+        matchedContentType: 'Knowledge source',
+        matchedSection: 'Cyber Knowledge',
+        matchedKnowledgeCategory: 'vulnerability',
+        matchedKnowledgeTag: 'vulnerability-management',
+      },
+      {
+        query: 'PortSwigger Web Security Academy',
+        expectedUrls: ['/cyber-knowledge/knowledge-sources/#source-portswigger-web-security-academy'],
+        expectedPrefixes: [],
+        first: true,
+        matchedContentType: 'Knowledge source',
+        matchedSection: 'Cyber Knowledge',
+        matchedKnowledgeCategory: 'training',
+        matchedKnowledgeTag: 'web-security',
+      },
       // Generic ecosystem terms may legitimately rank the homepage or flagship
       // platform ahead of the domain guide. Require the guide in the result set,
       // while reserving strict first-place assertions for identifiers and
@@ -146,7 +188,23 @@ async function checkQueries() {
       { query: 'malware analysis', expectedPrefixes: ['/cyber-knowledge/malware-analysis.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'Historical AdversaryGraph v4 Capability Map', expectedPrefixes: ['/articles/adversarygraph-v2-self-hosted-ai-cti-platform.html'], requiredTier: 'archive', matchedLifecycle: 'superseded' },
     ];
-    for (const { query, expectedPrefixes, expectedUrls = [], first = false, maxRank = null, matchedTier, matchedSource, matchedType, matchedLifecycle, requiredTier, broad = false } of checks) {
+    for (const {
+      query,
+      expectedPrefixes,
+      expectedUrls = [],
+      first = false,
+      maxRank = null,
+      matchedTier,
+      matchedSource,
+      matchedType,
+      matchedLifecycle,
+      matchedContentType,
+      matchedSection,
+      matchedKnowledgeCategory,
+      matchedKnowledgeTag,
+      requiredTier,
+      broad = false,
+    } of checks) {
       const result = await search.search(query);
       const ranked = rerankSearchResults(result.results, query, governance.records);
       const top = await Promise.all(ranked.slice(0, 10).map((item) => item.data()));
@@ -178,6 +236,18 @@ async function checkQueries() {
       if (matchedLifecycle && matched?.meta?.lifecycle !== matchedLifecycle) {
         failures.push(`query "${query}" expected matched lifecycle ${matchedLifecycle}, found ${matched?.meta?.lifecycle || '(missing)'}`);
       }
+      if (matchedContentType && matched?.meta?.content_type !== matchedContentType) {
+        failures.push(`query "${query}" expected matched content type ${matchedContentType}, found ${matched?.meta?.content_type || '(missing)'}`);
+      }
+      if (matchedSection && matched?.meta?.collection !== matchedSection) {
+        failures.push(`query "${query}" expected matched section ${matchedSection}, found ${matched?.meta?.collection || '(missing)'}`);
+      }
+      if (matchedKnowledgeCategory && matched?.meta?.knowledge_category !== matchedKnowledgeCategory) {
+        failures.push(`query "${query}" expected knowledge category ${matchedKnowledgeCategory}, found ${matched?.meta?.knowledge_category || '(missing)'}`);
+      }
+      if (matchedKnowledgeTag && !(matched?.meta?.knowledge_tags || '').split(/,\s*/).includes(matchedKnowledgeTag)) {
+        failures.push(`query "${query}" expected knowledge tag ${matchedKnowledgeTag}, found ${matched?.meta?.knowledge_tags || '(missing)'}`);
+      }
       if (requiredTier && !top.some((item) => item.meta?.collection_tier === requiredTier)) {
         failures.push(`query "${query}" did not return required ${requiredTier} content in the top ten`);
       }
@@ -187,6 +257,13 @@ async function checkQueries() {
       if (broad && !top.slice(0, 5).some((item) => item.meta?.collection_tier === 'core')) {
         failures.push(`broad query "${query}" did not surface curated core content in the top five`);
       }
+    }
+    const knowledgeFilterResult = await search.search('PortSwigger', {
+      filters: { knowledge_category: ['training'], knowledge_access: ['free'], knowledge_tag: ['web-security'] },
+    });
+    const filteredKnowledgeSources = await Promise.all(knowledgeFilterResult.results.slice(0, 10).map((item) => item.data()));
+    if (!filteredKnowledgeSources.some((item) => item.url === '/cyber-knowledge/knowledge-sources/#source-portswigger-web-security-academy')) {
+      failures.push('knowledge-source category, access, and tag filters did not return the expected anchored record');
     }
     const sectionResult = await search.search('Detection logic T1059.003');
     const sectionPages = await Promise.all(sectionResult.results.slice(0, 5).map((item) => item.data()));
