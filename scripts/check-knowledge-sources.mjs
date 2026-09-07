@@ -10,7 +10,7 @@ const seenIds = new Set();
 const seenDescriptions = new Map();
 const seenSummaries = new Map();
 const allowedEvidence = new Set(['primary-authoritative', 'primary-operational', 'secondary-corroborating', 'mixed', 'preprint', 'peer-reviewed-primary']);
-const allowedMaintenance = new Set(['active', 'periodic', 'continuous', 'unclear']);
+const allowedMaintenance = new Set(['active', 'periodic', 'continuous', 'unclear', 'stale']);
 const allowedSkills = new Set(['beginner', 'intermediate', 'advanced']);
 const allowedSourceKinds = new Set([
   'government', 'standards-body', 'academic', 'nonprofit-technical',

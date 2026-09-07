@@ -34,12 +34,16 @@ const ACRONYMS = new Map([
   ['csirt', 'CSIRT'],
   ['cti', 'CTI'],
   ['dfir', 'DFIR'],
+  ['ics', 'ICS'],
   ['llm', 'LLM'],
   ['mitre', 'MITRE'],
+  ['osint', 'OSINT'],
+  ['ot', 'OT'],
   ['soc', 'SOC'],
 ]);
 
 function label(value) {
+  if (value === 'ot-ics-security') return 'OT/ICS Security';
   return String(value)
     .split('-')
     .map((word) => ACRONYMS.get(word) || `${word.charAt(0).toUpperCase()}${word.slice(1)}`)

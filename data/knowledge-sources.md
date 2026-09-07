@@ -2,13 +2,13 @@
 
 A reviewed and deduplicated inventory of authoritative cybersecurity references, operational resources, research portals, tools, datasets, and learning platforms. Use the assessment on each entry to understand what the source can support—and what it cannot.
 
-- Assessment date: 2026-09-06
-- Unique sources: 125
-- Unique canonical URLs: 125
-- Directly reachable: 122
-- Automated-access restricted: 3
-- Categories: 29
-- Tags: 51
+- Assessment date: 2026-09-07
+- Unique sources: 165
+- Unique canonical URLs: 165
+- Directly reachable: 160
+- Automated-access restricted: 5
+- Categories: 32
+- Tags: 54
 
 > Quality note: URL availability is not the same as factual authority. Scores combine authority, originality, maintenance, practical value, and transparency. Tier A covers 90–100, Tier B covers 80–89, and Tier C covers 70–79. Every rating applies only within the source’s stated scope.
 
@@ -16,97 +16,103 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 | Category | Sources |
 |---|---:|
-| [Academic](#category-academic) | 2 |
+| [Academic](#category-academic) | 3 |
 | [Adversary Emulation](#category-adversary-emulation) | 2 |
 | [AI Security](#category-ai-security) | 9 |
 | [API Security](#category-api-security) | 1 |
 | [Application Security](#category-application-security) | 6 |
 | [Cloud Security](#category-cloud-security) | 6 |
-| [Container Security](#category-container-security) | 1 |
-| [CTI](#category-cti) | 6 |
+| [Container Security](#category-container-security) | 2 |
+| [CTI](#category-cti) | 7 |
 | [Datasets](#category-datasets) | 2 |
-| [Detection Engineering](#category-detection-engineering) | 5 |
-| [DFIR](#category-dfir) | 7 |
+| [Detection Engineering](#category-detection-engineering) | 6 |
+| [DFIR](#category-dfir) | 8 |
 | [Exploit Development](#category-exploit-development) | 3 |
 | [Framework](#category-framework) | 6 |
-| [Government](#category-government) | 5 |
+| [Government](#category-government) | 8 |
 | [Identity Security](#category-identity-security) | 6 |
 | [Incident Response](#category-incident-response) | 3 |
 | [Kubernetes](#category-kubernetes) | 3 |
-| [Malware Analysis](#category-malware-analysis) | 6 |
+| [Malware Analysis](#category-malware-analysis) | 10 |
 | [Mobile Security](#category-mobile-security) | 6 |
-| [Network Security](#category-network-security) | 4 |
-| [Penetration Testing](#category-penetration-testing) | 1 |
-| [Reverse Engineering](#category-reverse-engineering) | 4 |
-| [SOC](#category-soc) | 1 |
+| [Network Security](#category-network-security) | 8 |
+| [OSINT](#category-osint) | 6 |
+| [OT/ICS Security](#category-ot-ics-security) | 2 |
+| [Penetration Testing](#category-penetration-testing) | 3 |
+| [Reverse Engineering](#category-reverse-engineering) | 5 |
+| [SOC](#category-soc) | 2 |
+| [Supply Chain Security](#category-supply-chain-security) | 3 |
 | [Threat Informed Defense](#category-threat-informed-defense) | 3 |
-| [Threat Reports](#category-threat-reports) | 2 |
-| [Threat Research](#category-threat-research) | 4 |
+| [Threat Reports](#category-threat-reports) | 6 |
+| [Threat Research](#category-threat-research) | 5 |
 | [Training](#category-training) | 10 |
-| [Vulnerability](#category-vulnerability) | 9 |
-| [Web Security](#category-web-security) | 2 |
+| [Vulnerability](#category-vulnerability) | 12 |
+| [Web Security](#category-web-security) | 3 |
 
 ## Tag index
 
 | Tag | Sources |
 |---|---:|
-| [academic](#tag-academic) | 2 |
-| [active-directory](#tag-active-directory) | 6 |
-| [advanced](#tag-advanced) | 122 |
+| [academic](#tag-academic) | 3 |
+| [active-directory](#tag-active-directory) | 7 |
+| [advanced](#tag-advanced) | 162 |
 | [ai-security](#tag-ai-security) | 12 |
-| [api-security](#tag-api-security) | 2 |
-| [application-security](#tag-application-security) | 18 |
-| [beginner](#tag-beginner) | 45 |
-| [blue-team](#tag-blue-team) | 8 |
+| [api-security](#tag-api-security) | 3 |
+| [application-security](#tag-application-security) | 23 |
+| [beginner](#tag-beginner) | 64 |
+| [blue-team](#tag-blue-team) | 16 |
 | [books](#tag-books) | 1 |
-| [cloud-security](#tag-cloud-security) | 13 |
-| [community](#tag-community) | 42 |
-| [container-security](#tag-container-security) | 5 |
+| [cloud-security](#tag-cloud-security) | 16 |
+| [community](#tag-community) | 57 |
+| [container-security](#tag-container-security) | 6 |
 | [csirt](#tag-csirt) | 3 |
-| [cti](#tag-cti) | 15 |
-| [datasets](#tag-datasets) | 6 |
-| [detection-engineering](#tag-detection-engineering) | 10 |
-| [dfir](#tag-dfir) | 10 |
-| [exploit-development](#tag-exploit-development) | 7 |
-| [feeds](#tag-feeds) | 5 |
-| [free](#tag-free) | 110 |
-| [freemium](#tag-freemium) | 14 |
-| [government](#tag-government) | 9 |
-| [identity-security](#tag-identity-security) | 10 |
-| [incident-response](#tag-incident-response) | 22 |
-| [intermediate](#tag-intermediate) | 117 |
-| [kubernetes](#tag-kubernetes) | 4 |
-| [labs](#tag-labs) | 10 |
+| [cti](#tag-cti) | 22 |
+| [datasets](#tag-datasets) | 11 |
+| [detection-engineering](#tag-detection-engineering) | 15 |
+| [dfir](#tag-dfir) | 12 |
+| [exploit-development](#tag-exploit-development) | 9 |
+| [feeds](#tag-feeds) | 7 |
+| [free](#tag-free) | 140 |
+| [freemium](#tag-freemium) | 24 |
+| [government](#tag-government) | 14 |
+| [identity-security](#tag-identity-security) | 11 |
+| [incident-response](#tag-incident-response) | 30 |
+| [intermediate](#tag-intermediate) | 155 |
+| [kubernetes](#tag-kubernetes) | 5 |
+| [labs](#tag-labs) | 11 |
 | [llm-security](#tag-llm-security) | 4 |
-| [malware-analysis](#tag-malware-analysis) | 16 |
-| [mitre-attack](#tag-mitre-attack) | 9 |
+| [malware-analysis](#tag-malware-analysis) | 21 |
+| [mitre-attack](#tag-mitre-attack) | 14 |
 | [mobile-security](#tag-mobile-security) | 6 |
-| [network-security](#tag-network-security) | 9 |
+| [network-security](#tag-network-security) | 17 |
+| [osint](#tag-osint) | 6 |
+| [ot-ics-security](#tag-ot-ics-security) | 3 |
 | [paid](#tag-paid) | 1 |
-| [penetration-testing](#tag-penetration-testing) | 9 |
-| [red-team](#tag-red-team) | 11 |
-| [repositories](#tag-repositories) | 35 |
-| [reverse-engineering](#tag-reverse-engineering) | 12 |
+| [penetration-testing](#tag-penetration-testing) | 13 |
+| [red-team](#tag-red-team) | 15 |
+| [repositories](#tag-repositories) | 50 |
+| [reverse-engineering](#tag-reverse-engineering) | 15 |
 | [security-architecture](#tag-security-architecture) | 12 |
 | [sigma](#tag-sigma) | 2 |
-| [soc](#tag-soc) | 1 |
-| [standards](#tag-standards) | 11 |
+| [soc](#tag-soc) | 7 |
+| [standards](#tag-standards) | 13 |
+| [supply-chain-security](#tag-supply-chain-security) | 7 |
 | [suricata](#tag-suricata) | 1 |
-| [threat-reports](#tag-threat-reports) | 9 |
-| [threat-research](#tag-threat-research) | 7 |
-| [tools](#tag-tools) | 44 |
-| [training](#tag-training) | 10 |
-| [video](#tag-video) | 5 |
-| [vulnerability-management](#tag-vulnerability-management) | 9 |
-| [vulnerability-research](#tag-vulnerability-research) | 10 |
-| [web-security](#tag-web-security) | 9 |
+| [threat-reports](#tag-threat-reports) | 15 |
+| [threat-research](#tag-threat-research) | 14 |
+| [tools](#tag-tools) | 61 |
+| [training](#tag-training) | 13 |
+| [video](#tag-video) | 7 |
+| [vulnerability-management](#tag-vulnerability-management) | 15 |
+| [vulnerability-research](#tag-vulnerability-research) | 15 |
+| [web-security](#tag-web-security) | 11 |
 | [yara](#tag-yara) | 2 |
 
 ## Source index
 
 ### Academic
 
-[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [USENIX Security Symposium](#usenix-security-symposium)
+[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [NDSS Symposium](#ndss-symposium) · [USENIX Security Symposium](#usenix-security-symposium)
 
 ### Adversary Emulation
 
@@ -130,11 +136,11 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 ### Container Security
 
-[Trivy](#trivy)
+[Falco](#falco) · [Trivy](#trivy)
 
 ### CTI
 
-[Google Threat Intelligence](#google-threat-intelligence) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus)
+[Google Threat Intelligence](#google-threat-intelligence) · [GreyNoise](#greynoise) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus)
 
 ### Datasets
 
@@ -142,11 +148,11 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 ### Detection Engineering
 
-[Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content)
+[Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [LOLBAS](#lolbas) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content)
 
 ### DFIR
 
-[Autopsy](#autopsy) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation)
+[Autopsy](#autopsy) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation)
 
 ### Exploit Development
 
@@ -158,7 +164,7 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 ### Government
 
-[Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance)
+[ANSSI France](#anssi-france) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance)
 
 ### Identity Security
 
@@ -174,7 +180,7 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 ### Malware Analysis
 
-[FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [YARA](#yara)
+[ANY.RUN](#any-run) · [capa](#capa) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [Recorded Future Triage](#recorded-future-triage) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [VX-Underground](#vx-underground) · [YARA](#yara)
 
 ### Mobile Security
 
@@ -182,19 +188,31 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 ### Network Security
 
-[Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek)
+[Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Shodan](#shodan) · [Snort](#snort) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek)
+
+### OSINT
+
+[Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [Maltego](#maltego) · [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [Trace Labs](#trace-labs)
+
+### OT/ICS Security
+
+[CISA ICS Advisories](#cisa-ics-advisories) · [Dragos](#dragos)
 
 ### Penetration Testing
 
-[Metasploit Documentation](#metasploit-documentation)
+[GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Metasploit Documentation](#metasploit-documentation)
 
 ### Reverse Engineering
 
-[Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free)
+[Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [x64dbg](#x64dbg)
 
 ### SOC
 
-[Security Onion](#security-onion)
+[Security Onion](#security-onion) · [Wazuh](#wazuh)
+
+### Supply Chain Security
+
+[OpenSSF](#openssf) · [Sigstore](#sigstore) · [SLSA](#slsa)
 
 ### Threat Informed Defense
 
@@ -202,11 +220,11 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 ### Threat Reports
 
-[CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report)
+[CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report)
 
 ### Threat Research
 
-[Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42)
+[Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Microsoft Threat Intelligence blog](#microsoft-threat-intelligence-blog) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42)
 
 ### Training
 
@@ -214,11 +232,11 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 
 ### Vulnerability
 
-[CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Zero Day Initiative](#zero-day-initiative)
+[CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [Google Project Zero](#google-project-zero) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database) · [VulnCheck KEV](#vulncheck-kev) · [Zero Day Initiative](#zero-day-initiative)
 
 ### Web Security
 
-[OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Research](#portswigger-research)
+[OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PayloadsAllTheThings](#payloadsallthethings) · [PortSwigger Research](#portswigger-research)
 
 ## Quick source index
 
@@ -226,21 +244,29 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 |---|---|---|
 | [ADSecurity.org](#adsecurity-org) | Identity Security | ADSecurity.org is Sean Metcalf's specialist knowledge archive on Microsoft Active Directory and Entra identity attack methods, security architecture, PowerShell, privileged access, credential theft, Kerberos, and defensive hardening. Long-form articles and presentation material are valued for explaining how enterprise identity abuse works and translating red-team observations into administrative controls. The site is an expert-authored secondary and original-practice resource, not official Microsoft documentation or a maintained benchmark. Publication dates matter because Windows defaults, cloud identity features, attack tooling, and recommended mitigations evolve. |
 | [Android Security](#android-security) | Mobile Security | Android's official security documentation explains the platform security model and the controls implemented in the Android Open Source Project. Topics include the application sandbox, permissions, signing, verified boot, encryption, authentication, hardware-backed security, updates, exploit mitigations, privacy, and guidance for platform implementers and application developers. It is the primary reference for intended Android behavior and supported security APIs. Actual protections vary with Android version, device hardware, vendor modifications, patch level, and application configuration, so deployed-device testing and app-specific review remain essential. |
+| [ANSSI France](#anssi-france) | Government | ANSSI is France's national authority for cybersecurity and cyberdefence. Its official portal publishes security guides and recommendations, threat-landscape reports, risk methods, certification and qualification information, technical tools, scientific work, and access to CERT-FR incident and vulnerability reporting. The material is especially valuable for French public services, critical operators, regulated entities, and comparative government guidance. Much operational content is French-first, service eligibility varies, and official assessments do not by themselves prove attribution or local compromise. Check publication dates, scope, and applicable French or European requirements before implementation. |
+| [ANY.RUN](#any-run) | Malware Analysis | ANY.RUN is a commercial cloud sandbox with a free Community plan for interactively detonating suspicious files and URLs and observing processes, network activity, indicators, and ATT&CK-aligned behavior. Its public analysis corpus is useful for malware triage and training. Community analyses are public, use a personal license, and have restricted environments, duration, file size, reports, and export features. Automated verdicts and extracted indicators require validation through static analysis and other evidence. |
 | [Apache Caldera](#apache-caldera) | Adversary Emulation | Apache Caldera is an open-source platform for automated adversary emulation, security assessment, and red-versus-blue research. Operators define adversary profiles and abilities, deploy agents, execute ATT&CK-aligned operations, and collect results through an extensible plugin architecture. It supports chained exercises that can test sensors, analytics, alerting, and response systems more realistically than isolated commands. Caldera is an Apache Incubator project, and safe use requires a controlled network, explicit authorization, reviewed abilities, credential protection, and careful cleanup; it is a platform, not a guarantee of representative threat emulation. |
 | [Apple Platform Security](#apple-platform-security) | Mobile Security | Apple Platform Security is Apple's official guide to the security architecture of its hardware, operating systems, applications, and services. It documents the hardware root of trust, secure boot, system integrity, encryption and Data Protection, biometrics, app code signing and sandboxing, keychain services, network protections, account security, and device management across supported Apple platforms. The guide is authoritative for intended platform mechanisms but is not an independent assessment or mobile-app testing manual. Behavior and available controls depend on hardware generation, operating-system version, deployment mode, and configuration. |
+| [Arkime](#arkime) | Network Security | Arkime is an actively maintained Apache-2.0 platform for large-scale full-packet capture, session metadata extraction, indexing, search, and packet retrieval. Sensors retain PCAP while the viewer and OpenSearch or Elasticsearch-backed metadata enable analysts to pivot across network sessions; companion components add intelligence workflows and cluster management. Arkime provides powerful retrospective evidence but demands substantial storage, database, access-control, and lifecycle engineering. Packet capture is sensitive, visibility is placement-dependent, and metadata or search results do not by themselves establish malicious activity. |
 | [arXiv Cryptography and Security](#arxiv-cryptography-and-security) | Academic | The arXiv Cryptography and Security category is an open-access preprint stream covering applied and theoretical cryptography, systems and network security, privacy, software security, and adjacent research. It offers rapid access to new methods and results, often before conference or journal publication, with downloadable papers and revision histories. This speed makes it valuable for horizon scanning and literature discovery. arXiv moderation is not peer review, however; readers must assess methods, datasets, conflicts, revisions, and later publication status before treating any paper’s claims as established evidence. |
 | [ASD Essential Eight](#asd-essential-eight) | Framework | The Australian Signals Directorate’s Essential Eight is a prioritized baseline of eight mitigation strategies for internet-connected enterprise IT, covering application control, patching, macro restrictions, application hardening, administrative privileges, operating-system patching, multifactor authentication, and backups. Its maturity model defines levels zero through three based on increasing adversary tradecraft and recommends balanced implementation across all eight strategies. It is practical for baseline planning and assessment, but it is not a complete security program and was not designed specifically for operational technology or enterprise mobility environments. |
 | [Atomic Red Team](#atomic-red-team) | Adversary Emulation | Atomic Red Team is an open-source library of small, portable tests mapped to MITRE ATT&CK techniques. Defenders use the tests to generate controlled endpoint, cloud, container, or command-line activity, confirm telemetry, exercise analytics, and document detection gaps. Each atomic defines execution metadata and commands and may also define inputs, prerequisites, and cleanup steps. Coverage and safety vary by test; an ATT&CK mapping does not prove realistic adversary behavior, and every atomic requires review before execution because some actions can alter systems or trigger security controls. |
 | [Autopsy](#autopsy) | DFIR | Autopsy is a free, open-source desktop platform for end-to-end analysis of disk images, local drives, and supported mobile evidence. Built on The Sleuth Kit, it adds a graphical case workflow, ingest modules, keyword search, timeline and file views, hash-set support, reporting, and an extension architecture for Java or Python modules. It lowers the barrier to structured forensic examination and is widely used in law-enforcement and corporate work. Some advanced training, support, and custom modules are commercial, and examiners must still validate tool output and maintain proper evidence-handling procedures. |
 | [AWS Security Best Practices](#aws-security-best-practices) | Cloud Security | The AWS Well-Architected Security Pillar presents first-party design principles and best practices for protecting workloads on AWS. It organizes guidance around security foundations, identity and access management, detection, infrastructure and data protection, incident response, and application security while applying the shared-responsibility model. The guide helps teams review architecture decisions and locate deeper service documentation. It is not a configuration benchmark or proof of secure implementation; recommendations require workload-specific threat modeling, service-level procedures, technical verification, and independent requirements appropriate to the organization’s risk and compliance context. |
+| [Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) | OSINT | Bellingcat’s Online Investigation Toolkit is a free, collaborative directory for open-source researchers. It organizes tools for maps and satellite imagery, geolocation, image and video verification, social media, people, websites, corporate records, transport, conflict research, archiving, and data analysis. Individual entries can describe cost, requirements, limitations, ethical considerations, and practical guides, while Bellingcat staff review community contributions. The toolkit supports discovery and method selection; third-party tools and their outputs still require current access checks, independent verification, proportionate use, and privacy review. |
 | [Binary Ninja](#binary-ninja) | Reverse Engineering | Binary Ninja is a commercial interactive platform for disassembly, decompilation, debugging, and programmable binary analysis. Its Binary Ninja Intermediate Language family provides several abstraction levels for program semantics, while Python and C++ APIs and experimental Rust bindings support automation. Vector 35 also provides a no-cost local Free edition and Binary Ninja Cloud; the local edition is restricted to non-commercial use and omits APIs and plugins, while the cloud edition requires uploading binaries. Paid editions add broader architecture support, APIs, plugins, and enterprise options. Automated analysis remains fallible, and sensitive binaries require careful handling. |
 | [BloodHound](#bloodhound) | Identity Security | BloodHound is an identity attack-path management platform that collects and models relationships in Active Directory and supported cloud identity environments as a graph. Analysts query paths connecting users, groups, computers, sessions, permissions, and control relationships to identify how an attacker could reach high-value assets. Community Edition provides an open operational foundation, while commercial capabilities extend management and remediation workflows. Graph edges represent modeled possibilities based on collected data, not proof of compromise; collection scope, privileges, freshness, and sensitive graph storage require careful governance. |
+| [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) | Government | BSI IT-Grundschutz is Germany's modular methodology and compendium for establishing, assessing, and improving an information security management system. It organizes requirements around common processes, applications, systems, networks, facilities, and organizational conditions and connects them to baseline, standard, and elevated protection approaches. It is detailed and implementation-oriented, especially for German public-sector and regulated contexts. Users must select the current edition, model their own information domain, justify tailoring, and add individual risk analysis where protection needs or technologies exceed the compendium's assumptions; much current material is German-first. |
+| [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) | Government | The Canadian Centre for Cyber Security is Canada's technical authority and unified public source for cybersecurity advice, guidance, services, alerts, advisories, incident reporting, and national cyber-threat assessments. Its publications serve individuals, businesses, critical infrastructure, academia, and government and provide strong Canadian operational and policy context. Some services and notifications have eligibility or asset-location requirements, while threat assessments can incorporate classified insight that readers cannot independently inspect. Apply guidance to the relevant audience and date, corroborate attribution and vulnerability facts, and do not treat an alert or notification alone as confirmation of compromise. |
+| [capa](#capa) | Malware Analysis | capa is the FLARE team's open-source capability-identification tool for executable files and supported sandbox reports. Its explainable YAML rules describe behaviors such as persistence, communication, encryption, and process manipulation and can map findings to MITRE ATT&CK and the Malware Behavior Catalog. It accelerates malware triage and guides reverse engineering, but a rule match is evidence of recognized features, not proof that a capability executed or that a file is malicious. Packed, obfuscated, unsupported, or novel code can produce incomplete results and requires analyst validation. |
 | [Center for Threat-Informed Defense](#center-for-threat-informed-defense) | Threat Informed Defense | The Center for Threat-Informed Defense is a collaborative research and development consortium operated by MITRE with participation from government and industry members. It publishes openly available projects that make threat-informed defense more actionable, including adversary-emulation resources, ATT&CK mappings, Attack Flow, sensor and security-stack mappings, and analytic methodologies. Its outputs can bridge intelligence, defensive engineering, and validation. Projects are scoped research deliverables rather than a continuously comprehensive knowledge base, and users should examine each project’s assumptions, versions, contributors, and validation before operational adoption. |
 | [CERT-EU Publications](#cert-eu-publications) | Incident Response | CERT-EU’s publications portal exposes selected security advisories, pragmatic guidance, cyber briefs, and threat-landscape reporting from the cybersecurity service for European Union institutions, bodies, offices, and agencies. Advisories prioritize major vulnerabilities and include actionable patching or mitigation recommendations; intelligence products focus on activity affecting Union entities and their ecosystem. This makes the source valuable for EU institutional and policy context. Public material is only part of CERT-EU’s constituency service, and its prioritization and victimology should not be assumed to represent every European organization or sector. |
 | [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) | Vulnerability | The CERT/CC Vulnerability Notes Database publishes coordinated disclosures and analysis for vulnerabilities, especially complex cases involving multiple vendors, protocols, supply chains, or uncertain ownership. Notes can document affected products, technical impact, vendor status, remediation, references, disclosure history, and a CERT vulnerability identifier, supported by CERT/CC’s coordination guidance and VINCE workflow. The database is valuable when a CVE record is too terse or coordination itself matters. It is selective rather than exhaustive, and older notes may describe obsolete products or mitigations that require fresh vendor verification. |
 | [Check Point Research](#check-point-research) | Threat Research | Check Point Research publishes original technical analysis drawn from ThreatCloud telemetry, malware and vulnerability research, open sources, and investigations by Check Point researchers. Its portal includes campaign reports, malware reverse engineering, vulnerability disclosures, cybercrime analysis, AI-security work, and recurring threat-intelligence summaries. The articles can supply useful indicators and implementation detail for defenders and researchers. Because the publisher is a security vendor and visibility reflects its sensors and research priorities, quantitative and attribution claims should be compared with independent reporting and primary advisories. |
 | [CIS Critical Security Controls](#cis-critical-security-controls) | Framework | The CIS Critical Security Controls are 18 prioritized control areas supported by specific Safeguards and three Implementation Groups. The current v8 series emphasizes practical, measurable actions across enterprise assets, software, data, identity, logging, vulnerability management, incident response, application security, and service providers. Implementation Group 1 supplies an accessible essential-cyber-hygiene baseline, while higher groups add depth for greater risk and resources. The Controls simplify prioritization but still require asset context, documented exceptions, effectiveness testing, and mappings to any legal or sector-specific requirements. |
 | [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) | Kubernetes | The CIS Kubernetes Benchmark provides prescriptive hardening recommendations and assessment procedures for Kubernetes components and selected distributions. Recommendations address API server, controller manager, scheduler, etcd, worker nodes, policies, logging, authentication, authorization, and related configuration, with profiles and rationale that support repeatable reviews. It is valuable for baseline audits and compliance evidence when matched to the correct benchmark version. It is not a complete Kubernetes threat model, and some controls may be inapplicable or provider-managed in hosted services, requiring documented scoping and compensating controls. |
+| [CISA ICS Advisories](#cisa-ics-advisories) | OT/ICS Security | CISA ICS Advisories are official U.S. government bulletins covering vulnerabilities in industrial-control, operational-technology, and related products. Advisories identify affected products and versions, describe impact, assign severity information, credit researchers, and relay vendor mitigations or workarounds. They are a primary starting point for OT vulnerability triage, but they often depend on vendor-supplied facts and cannot determine whether a device is exposed or safely patchable in a specific plant. Validate inventory, process risk, compensating controls, and current vendor guidance before changing production systems. |
 | [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) | Vulnerability | CISA’s Known Exploited Vulnerabilities Catalog records CVEs for which there is reliable evidence of exploitation in the wild and supplies a required remediation action and due date. It is a high-value prioritization input because it identifies confirmed attacker use rather than theoretical severity alone. The catalog is machine-readable and continuously updated. Inclusion is binary and evidence-driven, but absence does not mean a vulnerability is safe; organizations should combine KEV with asset exposure, business impact, vendor guidance, CVSS, and predictive signals such as EPSS. |
 | [Cisco Talos Intelligence](#cisco-talos-intelligence) | Threat Research | Cisco Talos publishes threat intelligence, malware and campaign research, vulnerability disclosures, reputation data, and defensive content informed by Cisco telemetry and open-source projects such as Snort and ClamAV. Its vulnerability reports document coordinated disclosures, while research articles connect attacker behavior to technical artifacts and protections. The portal is useful for analysts who need both narrative context and operational indicators. Cisco’s product ecosystem influences visibility and remediation framing, so global prevalence, attribution, and product-protection claims should be corroborated with vendor advisories and independent research. |
 | [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) | Cloud Security | The Cloud Security Alliance Cloud Controls Matrix is a cloud-focused cybersecurity control framework paired with the Consensus Assessments Initiative Questionnaire. Its control objectives span governance, identity, data, infrastructure, logging, incident management, supply chain, and other cloud domains, with mappings to widely used standards and guidance on provider-versus-customer responsibility. Machine-readable releases support automation, while implementation and auditing guides support assurance work. CCM is not a cloud scanner or certification by itself; organizations must scope applicable controls, define evidence, and respect licensing terms for customization or commercial use. |
@@ -251,9 +277,12 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [CVE Program](#cve-program) | Vulnerability | The CVE Program coordinates a global network of CVE Numbering Authorities that assign stable identifiers and publish CVE Records for publicly disclosed vulnerabilities. A record gives people and tools a common reference for the same vulnerability and may include affected products, descriptions, problem types, references, and structured CNA or enrichment data. CVE is foundational interoperability infrastructure, not a severity score, exploitability prediction, patch database, or guarantee of completeness. Record detail and timeliness vary by assigning authority, and users should follow vendor advisories and downstream enrichment. |
 | [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) | Government | The Cyber Security Agency of Singapore’s publications library provides official national threat landscapes, technical and governance guidance, education material, and sector-focused resources. Recent coverage includes AI and agentic systems, software bills of materials, private 5G, smart buildings, quantum-safe migration, and Singapore’s annual cyber landscape. The source is valuable for Asia-Pacific regional context and practical policy-to-engineering guidance in English. Publication-level depth varies, and Singapore-specific regulatory, sector, and threat assumptions must be separated from generally reusable technical recommendations. |
 | [CyberDefenders](#cyberdefenders) | Training | CyberDefenders is a blue-team training platform offering investigation labs and role-oriented learning across digital forensics, incident response, threat hunting, malware analysis, network traffic, endpoint artifacts, cloud, and SOC operations. Challenges commonly provide realistic files such as packet captures, memory images, logs, disk artifacts, or malware-related evidence for analysis with standard tools, while structured paths and certifications add progression. The datasets and questions are curated and access varies by plan; solving a lab demonstrates specific analytical skills but not full incident command, evidence governance, or production-scale monitoring competence. |
+| [Dragos](#dragos) | OT/ICS Security | Dragos publishes operational-technology and industrial-control-system threat research grounded in its platform telemetry, incident response, vulnerability analysis, and field engagements. Its resource library includes annual Year in Review reports, adversary and malware research, defensive guidance, webinars, and selected community resources; its WorldView intelligence and platform are commercial. The material is highly valuable within OT, but vendor-defined threat groups, prevalence statistics, and vulnerability priorities reflect Dragos visibility and methodology and require corroboration before attribution or operational change. |
 | [Elastic Detection Rules](#elastic-detection-rules) | Detection Engineering | Elastic Detection Rules is the public development repository for rules used by the Elastic Security detection engine. It contains production and building-block rules, hunting content, schemas, tests, and Python tooling for creation, validation, packaging, import, and export. The repository is a concrete example of detections-as-code with unit-tested content and release workflows. Its rules assume Elastic Common Schema, Elastic query languages, and Elastic Security behavior; licensing is Elastic License 2.0, and new repository changes may precede released product content, so deployment compatibility and tuning must be checked. |
 | [ENISA Publications](#enisa-publications) | Government | ENISA’s publications portal is the European Union Agency for Cybersecurity’s library of reports, methodologies, implementation guidance, sector assessments, threat landscapes, certification work, and policy-oriented studies. It provides a vendor-neutral institutional view of EU cyber resilience, NIS2, product security, critical sectors, incident response, skills, and emerging technology. The portal is strong for strategic analysis and European governance context, with some technically actionable reports. Scope and depth vary by publication, and many conclusions synthesize public reporting rather than expose raw operational telemetry. |
+| [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) | DFIR | Eric Zimmerman's forensic utilities and Kroll Artifact Parser and Extractor form a widely used Windows DFIR collection and parsing workflow. EZ Tools parse artifacts such as event logs, Registry data, prefetch, Amcache, and file-system metadata; KAPE rapidly collects targeted evidence and runs modules against it. They support fast triage and timeline creation, but parser output still requires artifact-specific interpretation and cross-validation. KAPE is governed by Kroll's current license, whose permitted uses and restrictions should be reviewed before deployment or paid third-party work. |
 | [Exploit Database](#exploit-database) | Exploit Development | Exploit Database is OffSec's public archive of exploits, proof-of-concept code, shellcode, vulnerability-research papers, and Google Hacking Database queries. Entries can be searched by CVE, platform, type, author, port, and verification status, and the downloadable archive is available locally through SearchSploit. It is useful for studying how disclosed vulnerabilities are exercised and for authorized validation against known vulnerable software. It is not an advisory or patch-prioritization service: code quality, safety, applicability, and claimed impact vary, and execution requires isolated targets, source review, and explicit permission. |
+| [Falco](#falco) | Container Security | Falco is an Apache-2.0, CNCF graduated project for cloud-native runtime detection across Linux hosts, containers, Kubernetes, and plugin-provided event sources. Its privileged agent observes kernel events, enriches them with workload context, evaluates YAML rules, and emits alerts for downstream response or analysis. A maintained rules ecosystem and transparent release process support customization. Falco detects and notifies rather than enforcing controls, and production value depends on safe driver deployment, event visibility, version-compatible rules, environment profiling, tuning, and alert routing. |
 | [FIRST CVSS v4.0](#first-cvss-v4-0) | Vulnerability | FIRST’s CVSS v4.0 site is the canonical specification, user guide, examples, calculator, and supporting material for the Common Vulnerability Scoring System. Version 4.0 separates base, threat, environmental, and supplemental metrics and improves representation of downstream and operational-technology impacts. It gives vendors and defenders a consistent vocabulary for communicating technical severity. CVSS does not measure exploitation probability, asset exposure, business value, or complete risk; scores should be interpreted with environmental context and combined with KEV, EPSS, and vendor remediation information. |
 | [FIRST EPSS](#first-epss) | Vulnerability | The Exploit Prediction Scoring System publishes a daily, data-driven probability that exploitation activity for a CVE will be observed within the next 30 days, together with a percentile ranking. FIRST provides methodology, calibration and performance material, usage guidance, research, historical data, CSV downloads, and an API. EPSS helps concentrate remediation effort when direct exploitation evidence is absent. It is neither severity nor complete risk: it omits local exposure and business impact, can miss newly changing conditions, and should be combined with KEV, CVSS, asset context, and compensating controls. |
 | [FLARE-VM](#flare-vm) | Malware Analysis | FLARE-VM is Mandiant's open-source set of PowerShell and package-management scripts for building and maintaining a Windows reverse-engineering virtual machine. Its configurable installer assembles debuggers, disassemblers, unpacking utilities, document tools, scripting environments, and other analyst software into a repeatable workstation. The project solves tool curation rather than analysis itself, and package updates are best effort. Official guidance requires installation only in a virtual machine, recommends snapshots and host-only networking, and notes that endpoint protections may be disabled, making isolation and safe sample handling essential. |
@@ -262,10 +291,15 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [Ghidra](#ghidra) | Reverse Engineering | Ghidra is the National Security Agency's open-source software reverse-engineering framework for disassembly, decompilation, program analysis, scripting, and collaborative work. It supports many processor architectures and executable formats, exposes Java and Python-compatible scripting interfaces, and permits extensions for loaders, analyzers, data types, and processors. Its decompiler and analysis database make it useful for malware, vulnerability, and firmware research. Automated analysis can infer incorrect functions, types, or control flow, especially for optimized, obfuscated, or unsupported code, so conclusions require manual verification and often dynamic analysis. |
 | [GitHub Advisory Database](#github-advisory-database) | Vulnerability | The GitHub Advisory Database aggregates CVEs, GitHub Security Advisories, ecosystem databases, community contributions, and malware advisories for open-source packages. GitHub-reviewed records are curated for validity and mapped to supported ecosystems and packages; unreviewed records are imported automatically and explicitly carry a lower assurance level. Advisories are published in OSV format through an open repository and can feed Dependabot and API workflows. It is strong for dependency remediation, but review status matters, ecosystem coverage is uneven, and package presence does not prove vulnerable code is reachable in an application. |
 | [Google Cloud Security Best Practices](#google-cloud-security-best-practices) | Cloud Security | The Google Cloud Security Best Practices Center curates first-party guidance for designing, deploying, and operating protected Google Cloud environments. Its material spans enterprise foundations, identity, organization policies, networking, data protection, secrets, logging, threat detection, software supply chain, containers, and workload-specific architecture. It is useful both as an implementation reference and as a map to deeper product documentation and blueprints. Recommendations can assume particular Google Cloud services and organizational patterns, so teams should confirm applicability, cost, regional constraints, and actual enforcement in their own projects. |
+| [Google Project Zero](#google-project-zero) | Vulnerability | Google Project Zero publishes original vulnerability research, root-cause analyses, exploit-development case studies, a public issue tracker, and recurring analysis of zero-days exploited in the wild. Its work is unusually detailed about exploitation primitives, patch gaps, mitigations, and disclosure timelines, making it valuable to vulnerability researchers and product-security teams. Coverage is deliberately selective rather than a comprehensive vulnerability feed, and exploit-relevant material is dual-use. Use each publication as a technical case study, verify current vendor patches, and keep reproduction inside an authorized laboratory. |
 | [Google SecOps Community Rules](#google-secops-community-rules) | Detection Engineering | Google Security Operations Community Rules is an official public repository of example YARA-L detection rules and dashboard templates for Google SecOps. It includes community and Google SecOps team contributions, a style guide, and a content-management tool that can support rule deployment through the product API. The repository explicitly distinguishes these examples from licensed Google Curated Detections and recommends testing and tuning before alerting. Its value is therefore as transparent implementation material and a starting point, not as guaranteed production coverage; use depends on Google SecOps and its Unified Data Model. |
 | [Google Secure AI Framework](#google-secure-ai-framework) | AI Security | Google's Secure AI Framework, or SAIF, presents a conceptual framework and implementation resources for protecting AI systems using security foundations adapted to AI-specific risks. The site covers model and data protection, detection and response, automated defenses, risk contextualization, agent security, and a self-assessment workflow. It is useful for architecture discussions and program planning, particularly in organizations already applying secure-by-design practices. SAIF remains vendor-authored guidance rather than an independent standard, and teams must translate its principles into product-specific requirements and measurable controls. |
 | [Google Threat Intelligence](#google-threat-intelligence) | CTI | Google Threat Intelligence is a commercial intelligence platform combining Google security telemetry, Mandiant’s incident-response and analyst research, and VirusTotal’s contributed files, URLs, and community context. It supports indicator enrichment, actor and campaign research, malware analysis, hunting, collections, graph pivoting, APIs, and intelligence-assisted prioritization. The combination can provide unusually broad context, but detailed capabilities and API access depend on paid subscription tiers. Coverage and verdicts remain proprietary and visibility-biased; AI-generated summaries, attribution, prevalence, and unified scores should be checked against underlying evidence and independent sources. |
+| [GreyNoise](#greynoise) | CTI | GreyNoise collects internet-wide scan and exploitation traffic through a distributed sensor network and exposes context through its Visualizer and APIs. Analysts use its IP classifications, behavioral tags, CVE context, and business-service data to separate widespread background activity from events that merit investigation. The free tier supports limited lookups, while deeper history, exports, integrations, and automation are commercial. Its observations are valuable enrichment, not proof that an address targeted or compromised a particular organization. |
+| [GTFOBins](#gtfobins) | Penetration Testing | GTFOBins is a GPL-3.0 community catalog of legitimate Unix-like executables whose normal functions can bypass local restrictions in misconfigured environments. Entries organize shell execution, file access, transfer, library loading, privilege escalation, and related behavior by execution context, with source history and machine-readable exports. It supports both authorized testing and defensive hardening. The catalog documents capabilities rather than software vulnerabilities, and every technique must be validated against the exact executable version, privileges, policy, and operating system. |
 | [Hack The Box Academy](#hack-the-box-academy) | Training | Hack The Box Academy is a structured cybersecurity education platform that combines written modules, knowledge checks, interactive targets, exercises, skill paths, and job-role paths. Its catalog spans networking, Linux and Windows, penetration testing, Active Directory, web applications, defensive operations, incident response, cloud, and specialized techniques, with subscription and organizational plans plus certification-oriented paths. Academy offers more guided instruction than standalone challenge machines, but modules vary in depth and cost, lab targets remain controlled, and completion should be supplemented with independent documentation, reporting practice, and real operational experience. |
+| [HackTricks](#hacktricks) | Penetration Testing | HackTricks is a broad, frequently updated community knowledge base covering penetration-testing methodology, privilege escalation, Active Directory, cloud platforms, web applications, containers, mobile systems, and related offensive techniques. It is valuable as a working checklist and discovery layer during authorized labs and assessments. Its pages aggregate community experience of uneven depth and freshness, contain commands with real operational impact, and are not authoritative vendor guidance. The public repository currently declares no top-level machine-readable license, so verify reuse terms. |
+| [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) | Threat Reports | The IBM X-Force Threat Intelligence Index is an annual report on incidents, initial-access patterns, vulnerabilities, ransomware and extortion, industries, regions, and adversary techniques observed through IBM's incident response, managed security, research, and partner visibility. It provides useful cross-industry context and practical themes for security planning. Its percentages describe the report's underlying case and telemetry population, not every attack worldwide, and edition methods can change. Record definitions and periods, distinguish observed events from forecasts, and corroborate trend or attribution claims with independent sources and local evidence. |
 | [IDA Free](#ida-free) | Reverse Engineering | IDA Free is Hex-Rays' no-cost, non-commercial edition of the IDA disassembler and decompiler. It supports x86 and x86-64 applications, saving analysis databases, local x86/x64 debugging, and cloud-based decompilation, giving learners access to core IDA workflows and a widely recognized interface. It is deliberately constrained relative to paid editions: processor coverage is narrow, commercial use is prohibited, the decompiler requires cloud access, and IDAPython and C++ development kits are unavailable. Analysts working with other architectures, offline requirements, automation, or professional cases need another edition or tool. |
 | [Israel National Cyber Directorate](#israel-national-cyber-directorate) | Government | The Israel National Cyber Directorate is the government body responsible for cyber defense of Israel’s civilian sphere. Its official portal combines national policy, public and organizational guidance, CVE advisories, incident-reporting services, and reports on threats affecting Israeli organizations and critical infrastructure. The material is especially valuable for regional situational awareness and Israeli cyber-resilience practice. It is a government operational perspective, however, so users should corroborate campaign attribution and apply guidance in the context of their own jurisdiction and environment. |
 | [JPCERT/CC](#jpcert-cc) | Incident Response | JPCERT/CC is an independent Japanese nonprofit CSIRT that serves as Japan’s point of contact for incident coordination and performs early warning, vulnerability coordination, artifact analysis, and industrial-control-system security work. Its English portal provides alerts, quarterly incident reports, technical analyses, tools, and selected translations of Japanese research. JPCERT/CC also works with IPA on Japan Vulnerability Notes and coordinates disclosures with vendors and international partners. It is a primary source for Japanese threat activity and response practice, although English material may be less complete or timely than Japanese-language material. |
@@ -273,13 +307,18 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [Kubescape](#kubescape) | Kubernetes | Kubescape is an open-source Kubernetes security platform created by ARMO and maintained as a CNCF incubating project. It scans manifests, Helm charts, images, and live clusters for misconfigurations and vulnerabilities; applies built-in or custom policy controls; checks network-policy and seccomp posture; and can add runtime detection. Output supports console, JSON, JUnit XML, HTML, and PDF workflows. Its breadth is useful for continuous cluster posture management, but enabled components, permissions, control frameworks, and underlying scanners determine coverage, and automated compliance mappings still require human scoping and validation. |
 | [LetsDefend](#letsdefend) | Training | LetsDefend is a blue-team training platform built around a simulated security operations center where learners triage alerts, inspect endpoint and network evidence, investigate phishing and malware, and follow incident-handling workflows. Guided paths and challenge material cover SOC fundamentals, SIEM use, threat intelligence, detection, and digital forensics, with free and paid access tiers. The simulation helps develop investigation habits and case documentation, but its interface, telemetry, and expected answers are curated; learners should supplement it with raw-tool practice, primary incident-response guidance, and experience handling incomplete real-world evidence. |
 | [LiveOverflow](#liveoverflow) | Training | LiveOverflow publishes free, explanation-driven security videos and companion pages on capture-the-flag challenges, web hacking, memory corruption, browser exploitation, game hacking, reverse engineering, fuzzing, and real vulnerability case studies. The strongest material walks through the research process and underlying technical concepts rather than presenting commands without context, making difficult topics approachable to motivated learners. It is an expert educational publication rather than a formal, versioned curriculum; topic coverage is selective, series may be episodic, and viewers still need independent labs and primary documentation to develop operational competence. |
+| [LOLBAS](#lolbas) | Detection Engineering | LOLBAS is a GPL-3.0 community project cataloging Microsoft-signed Windows binaries, scripts, and libraries with unexpected functionality useful to an attacker or red team. Entries document paths, command examples, privileges, operating-system applicability, ATT&CK mappings, references, and available detection ideas. It is a strong bridge between living-off-the-land research and defensive analytics. Inclusion does not prove malicious use or exploitable configuration, and commands must be validated against exact Windows builds, products, controls, and telemetry. |
 | [Malpedia](#malpedia) | Malware Analysis | Malpedia is a curated malware knowledge base operated by Fraunhofer FKIE for rapid identification and contextual research. It organizes families across Windows, Linux, Android, macOS, and other platforms, recording aliases, references, taxonomy, YARA rules, and selected samples where access permits. Curated contributions and synonym mapping make it particularly useful for reconciling vendor naming. Public visibility is incomplete: full data, non-public rules, and samples may require membership in its invite-only trust group. Family assertions and aliases should still be traced to cited reports and corroborated before attribution. |
+| [Maltego](#maltego) | OSINT | Maltego is a commercial digital-investigation platform from Maltego Technologies GmbH, owned by Charlesbank funds since 2023. Maltego Graph represents domains, addresses, people, accounts, and other entities as linked nodes, while Transforms retrieve related data from public, commercial, or investigator-controlled sources. Its free Basic plan includes Graph Community Edition after Maltego ID registration, with usage and data limits. Graphs organize hypotheses, not facts: analysts must verify every relationship and govern personal data, provider terms, query exposure, retention, and lawful authority. |
 | [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) | Training | Malware-Traffic-Analysis.net is Brad Duncan's practical archive of malicious network-traffic exercises, packet captures, incident artifacts, tutorials, and answer write-ups. Scenarios let analysts inspect infection chains, web requests, DNS, TLS, command-and-control behavior, alerts, and host details using Wireshark and related tools, making it valuable for repeatable SOC and network-forensics practice. Some exercises include live-malware-derived artifacts or password-protected samples and require an isolated lab. The curated cases emphasize particular Windows infections and known outcomes, so they do not represent prevalence, unbiased telemetry, or a complete incident-response process. |
 | [MalwareBazaar](#malwarebazaar) | Malware Analysis | MalwareBazaar is a community malware-sample exchange operated by abuse.ch with Spamhaus. Researchers can browse metadata, query hashes and families, submit samples, configure alerts, and use APIs for automated intelligence workflows. The service is valuable for obtaining recent specimens and correlating sample-level signals with wider abuse.ch data. It is not a benign download catalog or a complete prevalence dataset: labels and community submissions need corroboration, access may be governed by terms and authentication, and downloaded files are live malware that must remain inside an authorized, isolated analysis environment. |
+| [Mandiant M-Trends](#mandiant-m-trends) | Threat Reports | M-Trends is Mandiant's annual report on patterns observed during frontline incident-response and investigation engagements. It examines intrusion lifecycles, initial access, dwell time, detection sources, ransomware and extortion, targeted industries, and changes in attacker behavior, often adding practical defensive recommendations. The report is valuable for benchmarking response assumptions and identifying visibility gaps, but its population consists of Mandiant cases rather than all incidents. Compare editions only with their methods and observation periods, and corroborate prevalence, attribution, and global-trend claims with independent reporting and local evidence. |
 | [Metasploit Documentation](#metasploit-documentation) | Penetration Testing | Metasploit Documentation is the official technical guide for using and contributing to the open-source Metasploit Framework. It covers installation, console workflows, modules, payloads, Meterpreter, development environments, module quality rules, exploit reliability, side effects, testing, reporting, and contribution practices. The material is valuable both for authorized penetration testing and for understanding how repeatable exploit modules are engineered. It is not a substitute for target-specific validation or rules of engagement: modules and payloads can alter systems, evade controls, or expose data, so testing belongs in isolated or explicitly authorized environments. |
 | [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) | Cloud Security | Microsoft's Azure security documentation is the first-party hub for securing Azure and hybrid or multicloud workloads. It routes readers to shared responsibility, Zero Trust, identity, networking, encryption, ransomware protection, Defender for Cloud, Sentinel, architecture, migration, and service-specific guidance. The collection is valuable for configuration details and understanding how Microsoft security services fit together throughout adoption and operations. Its breadth can make navigation difficult, product names and interfaces change frequently, and vendor documentation should be paired with independent benchmarks, threat models, and validation in the exact tenant configuration. |
+| [Microsoft Digital Defense Report](#microsoft-digital-defense-report) | Threat Reports | The Microsoft Digital Defense Report is an annual strategic overview of cybercrime, nation-state activity, identity threats, vulnerabilities, influence operations, and defensive priorities derived from Microsoft's global products, services, investigations, and partnerships. It offers broad visibility and accessible leadership context, with supporting recommendations for defenders and governments. The report reflects Microsoft's customer base, telemetry, taxonomy, and policy perspective rather than the whole threat landscape. Preserve the edition and methodology, avoid comparing headline numbers without consistent definitions, and corroborate attribution or prevalence claims with independent evidence and local risk analysis. |
 | [Microsoft Entra Documentation](#microsoft-entra-documentation) | Identity Security | Microsoft Entra documentation is the first-party technical reference for the Entra identity product family, including identity and access management, authentication, Conditional Access, identity protection, governance, workload identities, application integration, external identities, permissions, hybrid identity, and monitoring. It is the authoritative source for supported features, configuration procedures, APIs, limitations, and licensing notes. The collection changes with the service and can be difficult to navigate; administrators must confirm tenant licensing and rollout state, test policy interactions, preserve break-glass access, and supplement vendor guidance with independent threat and posture assessment. |
 | [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) | Detection Engineering | Microsoft Sentinel Content Hub is the supported catalog and deployment path for Sentinel solutions and out-of-the-box content. It centralizes packaged data connectors, analytics-rule templates, hunting queries, workbooks, automation rules, and playbooks from Microsoft, partners, and the community, while exposing each item's provider and support model. The documentation is authoritative for discovery, installation, updates, dependencies, and activation. Content Hub is not a vendor-neutral rule library: using it requires a Sentinel workspace, appropriate Azure roles, configured data ingestion, cost planning, and environment-specific tuning after deployment. |
+| [Microsoft Threat Intelligence blog](#microsoft-threat-intelligence-blog) | Threat Research | The Microsoft Security Blog's Threat Intelligence channel publishes timely research on active campaigns, malware, vulnerabilities, nation-state and cybercrime actors, identity abuse, cloud attacks, and defensive guidance. Posts often combine Microsoft's telemetry and investigations with indicators, behavior descriptions, detection queries, and mitigations that can support incident triage and hunting. Evidence depth varies, indicators decay, and Microsoft actor names and visibility are vendor-specific. Preserve publication and update dates, follow claims to primary evidence, and corroborate attribution, prevalence, and remediation with independent sources and local telemetry. |
 | [MISP](#misp) | CTI | MISP is an open-source platform and data-model ecosystem for collecting, correlating, analyzing, and sharing threat intelligence within organizations and trust communities. It supports granular distribution rules, taxonomies, galaxies, sightings, synchronization, REST automation, and exports to formats including STIX and network-detection rules. MISP is especially useful for collaborative indicator and event workflows while retaining context and handling controls. The software is not itself a guarantee of good intelligence: value depends on source quality, analyst curation, taxonomy discipline, access governance, and lawful sharing of sensitive data. |
 | [MITRE ATLAS](#mitre-atlas) | AI Security | MITRE ATLAS is a public knowledge base of adversary tactics and techniques for artificial-intelligence systems, modeled in a form familiar to ATT&CK users. It connects technique definitions with real-world case studies, mitigations, and relationships that support AI threat modeling and security testing. ATLAS is especially useful when teams need a shared vocabulary for attacks against machine-learning and generative-AI workflows. It is not a compliance standard or proof that a listed technique applies to every model, deployment, or agent architecture. |
 | [MITRE ATT&CK](#mitre-att-and-ck) | Threat Informed Defense | MITRE ATT&CK is a curated knowledge base and taxonomy of adversary behavior grounded in publicly reported real-world observations. It organizes tactics, techniques, sub-techniques, procedures, groups, software, mitigations, and data sources across enterprise, mobile, and industrial-control domains. Defenders use it as a common language for intelligence, detection coverage, hunting, assessment, and adversary emulation. ATT&CK is not a threat feed, a prescriptive control checklist, or proof of complete coverage; technique selection must be driven by relevant threats, platforms, and telemetry. |
@@ -290,6 +329,7 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) | Framework | The NCSC Cyber Assessment Framework provides an outcome-focused method for assessing cyber risk to essential functions. Its four objectives cover managing security risk, protecting against attacks, detecting events, and minimizing incident impact; fourteen principles are evaluated through contributing outcomes and Indicators of Good Practice. It supports self-assessment and regulatory or independent assessment while allowing sector-specific profiles and target levels. The indicators inform expert judgment rather than mechanical scoring, and the NCSC explicitly leaves proportionality and regulatory targets to the relevant oversight body and organizational context. |
 | [NCSC Ireland Guidance](#ncsc-ireland-guidance) | Government | Ireland’s National Cyber Security Centre publishes official guidance for organizations operating within Ireland and the European regulatory environment. The collection covers incident preparation, cyber governance, NIS2 risk-management measures, Cyber Resilience Act reporting, cloud and remote work, and newer subjects such as public-sector AI deployment. It is particularly useful for translating EU obligations into practical security actions. The collection is smaller than some national guidance libraries, and draft or consultation material must be distinguished from final requirements and checked against applicable legislation and regulator instructions. |
 | [NCSC UK Guidance](#ncsc-uk-guidance) | Government | The UK National Cyber Security Centre’s guidance library provides official, audience-specific advice for individuals, small organizations, large enterprises, public bodies, boards, and cybersecurity professionals. It spans foundational hygiene, secure design, identity, cloud, supply chains, incident management, ransomware, AI, and critical services, and links to practical programs and assessment material. The guidance is concise and operationally oriented, making it a strong starting point for policy and architecture. It reflects UK threat, legal, and government contexts and is not a detailed implementation standard for every technology. |
+| [NDSS Symposium](#ndss-symposium) | Academic | The Network and Distributed System Security Symposium is a leading peer-reviewed venue for original systems and network security research. Its public archive provides accepted papers and proceedings across software, networks, privacy, authentication, measurement, hardware, mobile, usable security, and emerging AI-related topics. The source is valuable for literature review, technical methods, and finding research artifacts, but publication does not guarantee reproducibility or production readiness. Read each paper's threat model, methods, datasets, ethics, and limitations, check follow-up work, and validate proposed attacks or defenses against current systems before operational use. |
 | [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) | AI Security | The NIST AI Risk Management Framework is a voluntary, technology-neutral framework for managing risks to people, organizations, and society across the AI lifecycle. AI RMF 1.0 organizes work around Govern, Map, Measure, and Manage, with a Playbook, crosswalks, resource center, and a generative-AI profile extending implementation guidance. It is strong for governance and risk-program design, but it is not a technical attack catalog, certification scheme, or step-by-step penetration-testing guide. Organizations must tailor outcomes, metrics, and controls to context. |
 | [NIST Cybersecurity Framework](#nist-cybersecurity-framework) | Framework | NIST Cybersecurity Framework 2.0 is a voluntary, outcome-based structure for managing cybersecurity risk across organizations of any size or sector. Its Core organizes outcomes under Govern, Identify, Protect, Detect, Respond, and Recover, supported by organizational profiles, implementation tiers, quick-start guides, and mappings. It provides a common language for aligning leadership, risk, and technical teams without prescribing products or exact controls. Organizations must tailor outcomes to their mission, threats, obligations, and resources; using the framework alone does not establish compliance or effective implementation. |
 | [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) | Framework | NIST SP 800-207 defines zero trust as an architectural approach that removes implicit trust based on network location or ownership and focuses protection on users, devices, assets, services, and workflows. It describes logical components, policy decision and enforcement, deployment models, use cases, and migration considerations for enterprise environments. The publication is a strong vendor-neutral conceptual baseline for zero-trust programs. It is not a product blueprint, certification, or step-by-step implementation plan, and its 2020 examples should be supplemented with current cloud-native and identity-specific guidance. |
@@ -300,6 +340,8 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [Open Source Vulnerabilities](#open-source-vulnerabilities) | Vulnerability | OSV is an open, distributed vulnerability database and schema designed to map vulnerabilities precisely to open-source package versions or commit hashes. OSV.dev aggregates records from participating ecosystem databases, enriches version and alias information, exposes query and batch APIs, publishes downloadable data, and supports the first-party OSV-Scanner. It is especially effective for software-composition and dependency workflows where generic CPE matching is imprecise. Coverage and correctness inherit upstream database quality, ecosystem participation, and version metadata; missing results do not prove a dependency is secure, and source advisories remain authoritative. |
 | [OpenCTI](#opencti) | CTI | OpenCTI is an open-source platform for structuring, storing, visualizing, and operationalizing technical and non-technical threat intelligence as a knowledge graph. Its data model is based on STIX 2.1, with extensions, connectors, feeds, streams, TAXII collections, enrichment, dashboards, and role-based administration. It is strong for linking actors, campaigns, malware, vulnerabilities, observables, reports, and organizational context. OpenCTI is infrastructure rather than an authoritative feed: accuracy depends on connector behavior, source licensing, deduplication, confidence handling, analyst review, and secure deployment of a complex service stack. |
 | [OpenSecurityTraining2](#opensecuritytraining2) | Training | OpenSecurityTraining2 is a free technical course platform emphasizing foundational knowledge needed for advanced security engineering and research. Its catalog includes x86-64 and RISC-V architecture, operating-system internals, WinDbg, GDB, Ghidra, IDA, Binary Ninja, software vulnerabilities, exploitation, fuzzing, firmware, trusted computing, and reverse engineering. Courses commonly combine lectures with supporting material and exercises, offering depth rarely available without paid training. Many tracks assume programming, assembly, debugging, and systems prerequisites, and course completeness or instructional style varies by volunteer-led offering. |
+| [OpenSSF](#openssf) | Supply Chain Security | The Open Source Security Foundation coordinates cross-industry work to improve open-source software security. Its project and guidance portfolio includes Scorecard, Best Practices Badge, SLSA, Sigstore, GUAC, OSPS Baseline, vulnerability-disclosure work, secure-development education, and other technical initiatives. It is a valuable map of community standards, tools, and implementation resources for maintainers and consumers. Project maturity and scope vary, automated scores are risk signals rather than guarantees, and foundation guidance must be translated into a threat-informed program with evidence from the software and environment being assessed. |
+| [OSINT Framework](#osint-framework) | OSINT | OSINT Framework is Justin Nordine’s free, MIT-licensed discovery tree for locating open-source research tools and resources by input or investigative task. Its maintained catalog labels entries that require local installation, registration, query editing, or Google dorks, and newer metadata records status, pricing, inputs, outputs, and operational-security mode. It is most useful at the start of an investigation. Because it aggregates third-party services, every link, access condition, result, and collection method must be independently verified before use. |
 | [OSS-Fuzz](#oss-fuzz) | Application Security | OSS-Fuzz is Google's continuous fuzzing service for eligible open-source projects, with documentation for project integration, build scripts, sanitizer use, fuzz-target design, coverage reporting, and vulnerability disclosure. It combines automated large-scale fuzzing infrastructure with ClusterFuzz tooling to find reliability and security defects over time. The resource is most authoritative for onboarding and operating within OSS-Fuzz, while its examples also teach practical fuzzing engineering. Eligibility, reproducible builds, supported toolchains, and maintainer effort constrain adoption; enrollment does not guarantee complete path coverage or absence of vulnerabilities. |
 | [OverTheWire](#overthewire) | Training | OverTheWire hosts free security wargames that teach Linux command-line use, networking, web security, cryptography, and exploitation through progressively unlocked challenge levels. Bandit is a widely used introduction to shell fundamentals, while later games demand deeper analysis and independent problem solving. Each level gives a constrained objective and access details rather than a full lesson, encouraging experimentation and documentation reading. The platform is intentionally sparse, can be frustrating without prerequisites, and does not provide a complete modern security curriculum, formal assessment, or production-like defensive workflow. |
 | [OWASP API Security Project](#owasp-api-security-project) | API Security | The OWASP API Security Project publishes community guidance focused on risks that arise in modern APIs, including its API Security Top 10 and supporting documentation. It highlights authorization failures, authentication weaknesses, resource consumption, unsafe business flows, server-side request forgery, inventory problems, and insecure integration with third-party services. The project is a strong awareness and design-review entry point for REST and related interfaces. Its risk list is not a full verification standard, protocol specification, or substitute for endpoint-specific threat modeling and business-logic testing. |
@@ -310,6 +352,7 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [OWASP MASVS](#owasp-masvs) | Mobile Security | The OWASP Mobile Application Security Verification Standard defines security requirements for native mobile applications across storage, cryptography, authentication and authorization, network communication, platform interaction, code quality, resistance to reverse engineering, and privacy. Stable identifiers make MASVS useful for development requirements, assessment scope, procurement, and traceable assurance, while linked weakness entries add context. It is a verification standard rather than a testing recipe or certification result; teams must select applicable controls, account for Android and iOS architecture, and document how each requirement was tested. |
 | [OWASP Top 10](#owasp-top-10) | Application Security | The OWASP Top 10 is a periodically updated awareness document that summarizes broad-consensus categories of critical web-application security risk. Each release explains the category, associated weakness patterns, example attack scenarios, and general prevention approaches, making it effective for executive communication, developer onboarding, and program prioritization. It is deliberately a compact awareness baseline, not a complete application-security standard, testing checklist, or statement of the ten vulnerabilities most likely in a particular system. Use ASVS and WSTG when measurable requirements or test procedures are needed. |
 | [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) | Web Security | The OWASP Web Security Testing Guide is a community-maintained methodology and reference for testing web applications and web services. It organizes checks across information gathering, configuration, identity, authentication, authorization, sessions, input validation, cryptography, business logic, client-side behavior, and APIs, with objectives and testing approaches for each topic. The guide is valuable for building repeatable assessment coverage and teaching testing concepts. It is not an automated scanner or proof of complete coverage; testers must adapt procedures to technology, threat model, authorization, and application context. |
+| [PayloadsAllTheThings](#payloadsallthethings) | Web Security | PayloadsAllTheThings is an MIT-licensed repository and rendered knowledge base of payloads, bypasses, methodology notes, and references for web-application security, penetration testing, CTFs, and selected post-exploitation topics. Its breadth makes it a useful working companion during authorized testing and defensive reproduction. Community examples vary in age, safety, encoding, prerequisites, and target assumptions; copying a payload does not demonstrate a vulnerability. Validate every technique against primary documentation, source code, and an isolated representative environment. |
 | [PentesterLab](#pentesterlab) | Training | PentesterLab provides hands-on web application security exercises that emphasize understanding vulnerabilities in code and reproducing exploitation against purpose-built targets. Its badges and learning tracks cover foundations through advanced authentication, authorization, injection, deserialization, cryptography, APIs, and code review, with both free exercises and paid platform access. The compact labs are effective for focused repetition and developer-oriented analysis. They remain deliberately vulnerable teaching environments, so successful completion does not establish broad penetration-testing methodology, production judgment, reporting ability, or authorization to apply techniques elsewhere. |
 | [PingCastle](#pingcastle) | Identity Security | PingCastle is an Active Directory security assessment tool centered on a health-check report that identifies risky configurations and relationships, groups findings into established risk themes, and provides prioritized remediation context. Additional analysis can map trusts and support broader domain review, making the tool useful for rapid baselining across mature or inherited estates. It is a vendor-maintained scanner with community and commercial usage considerations, not proof that an issue is exploitable. Collection privileges, rule transparency, version, environmental exceptions, and independent validation affect the reliability of conclusions. |
 | [Plaso](#plaso) | DFIR | Plaso, also known through its log2timeline tooling, is a Python-based processing engine for extracting timestamped events from many disk-image, file-system, registry, database, browser, and log formats. Investigators use it to build broad super timelines or focused timelines that correlate activity across heterogeneous artifacts. Its documentation covers ingestion, filters, parsers, analysis plugins, output modules, supported formats, development, and troubleshooting. Plaso accelerates normalization and chronology building, but parsers can omit or misinterpret data, timestamps carry different semantics, and resulting events still require source-level validation and contextual analysis. |
@@ -320,21 +363,32 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [Purple Knight](#purple-knight) | Identity Security | Purple Knight is Semperis's free assessment tool for Active Directory and Microsoft Entra ID security posture. It checks indicators of exposure and compromise across identity configuration, privileged access, account hygiene, Kerberos, delegation, policies, and hybrid identity, then presents a score and remediation guidance. The tool can accelerate an initial review and provide a repeatable snapshot without deploying a permanent platform. It remains vendor-produced, requires registration and suitable directory access, and its scores or findings must be validated against business context rather than treated as certification or evidence of breach. |
 | [pwntools](#pwntools) | Exploit Development | pwntools is a Python framework and library for rapid exploit-development and capture-the-flag workflows. Its modules simplify process and socket interaction, binary parsing, assembly, shellcode generation, packing, cyclic patterns, return-oriented programming, debugging integration, and protocol scripting. The official documentation offers stable, beta, and development references with examples and API details. It reduces repetitive plumbing but does not replace understanding of architectures, mitigations, calling conventions, or network behavior. Scripts and generated payloads are dual-use and should be exercised only against authorized challenges, research targets, or isolated vulnerable systems. |
 | [PyRIT](#pyrit) | AI Security | PyRIT, the Python Risk Identification Tool for generative AI, is Microsoft's open-source framework for orchestrating repeatable red-team and risk-identification workflows against generative-AI systems. It supports reusable datasets, prompt transformations, target connectors, scoring components, memory, and multi-turn attack orchestration rather than offering a single vulnerability scan. The project helps specialists build documented evaluation pipelines and compare defenses. It requires Python, model-access configuration, careful scoping, and human interpretation; successful prompts demonstrate observed behavior in a tested target, not universal model weakness or production impact. |
+| [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database) | Vulnerability | The Rapid7 Vulnerability & Exploit Database is a free, continuously updated search portal for CVE records, Rapid7 analysis, exploitation context, CVSS v3 and v4 scores, EPSS, exploited-in-the-wild indicators, and related Metasploit modules. It is the current destination for former AttackerKB URLs. The database is useful for triage and exploit-context discovery, but much of its breadth is aggregated rather than individually researched by Rapid7; every consequential claim still needs vendor, CVE, CISA KEV, and local-exposure validation. |
+| [Recorded Future Triage](#recorded-future-triage) | Malware Analysis | Recorded Future Triage, available publicly at tria.ge, is a cloud malware sandbox that combines static processing, configurable behavioral runs, family scoring, configuration extraction, indicators, and a stable API. Researchers use the free public service for repeatable automated analysis and corpus search. Every public tria.ge submission is visible to other account holders and cannot normally be deleted; private analysis belongs to the commercial enterprise service. Verdicts remain hypotheses that require corroboration. |
+| [Red Canary Threat Detection Report](#red-canary-threat-detection-report) | Threat Reports | Red Canary's annual Threat Detection Report analyzes confirmed threats, prevalent adversary behaviors, and MITRE ATT&CK techniques observed through its managed detection and response work. Its online field guide connects ranked trends to detection, testing, and mitigation guidance, making the report unusually useful to detection engineers and SOC teams. Results reflect Red Canary's customers, data sources, analytics, and counting method rather than universal prevalence. Preserve the report year and methodology, validate suggested analytics against local telemetry, and corroborate actor or trend claims with independent evidence. |
 | [REMnux](#remnux) | Malware Analysis | REMnux is a Linux distribution and curated toolkit for reverse engineering and analyzing malicious software. It packages community tools for static inspection, document analysis, network-behavior examination, memory work, code analysis, and controlled service simulation, reducing the setup burden for a malware-analysis workstation. Official documentation explains installation as a virtual appliance or on compatible Ubuntu systems and provides usage guidance for included tools. REMnux does not make malware safe: analysts should use isolated virtual machines, snapshots, restricted networking, and disciplined sample-transfer procedures before opening or executing untrusted content. |
 | [ROP Emporium](#rop-emporium) | Exploit Development | ROP Emporium is a focused set of downloadable binary challenges for learning return-oriented programming. Its ordered exercises progress from redirecting control flow through calling functions, writing data, handling bad characters, stack pivots, and sparse-gadget techniques, with variants for common architectures and links to a beginner guide. The narrow, repeatable challenge design isolates ROP concepts better than a broad capture-the-flag platform. It assumes familiarity with assembly, calling conventions, debugging, and basic memory corruption, and it does not teach vulnerability discovery, modern mitigations, kernel exploitation, or production exploit reliability comprehensively. |
+| [SANS Internet Storm Center](#sans-internet-storm-center) | Network Security | The SANS Internet Storm Center combines practitioner-written handler diaries, podcasts, DShield sensor data, port and scanning trends, threat-feed views, and a public API. Volunteer handlers interpret current malicious traffic and emerging operational problems, giving defenders a useful field perspective between formal advisories and long-form research. Individual diary entries vary in depth and are not peer reviewed, while DShield represents sampled contributed telemetry rather than the entire internet. Corroborate observations before turning them into attribution, prevalence claims, or permanent blocking policy. |
 | [Security Onion](#security-onion) | SOC | Security Onion is a free, open platform that integrates network visibility, host telemetry, intrusion detection, log management, hunting, dashboards, cases, and selected analysis tools into a defender-focused distribution. Its stack combines components such as Suricata, Zeek, Elastic Agent, osquery, Strelka, and OpenCanary with Security Onion interfaces for alerts and investigations. It is valuable for SOC labs and operational monitoring, but it is a platform to engineer rather than an appliance that creates coverage automatically. Sensor placement, storage, tuning, access control, updates, and analyst workflows determine its effectiveness. |
 | [Semgrep](#semgrep) | Application Security | Semgrep is a static-analysis platform whose documentation covers an open-source rule engine, rule syntax, supported languages, CI integration, code scanning, secrets detection, and supply-chain analysis. Its pattern-oriented rules are comparatively approachable, making it useful for encoding organization-specific insecure constructs and delivering feedback in developer workflows. The documentation is the authoritative source for operating the tool, not a neutral comparison of static analyzers. Findings depend on language support, rule quality, data-flow capabilities, and build context, so triage and complementary testing remain necessary. |
 | [SentinelOne Labs](#sentinelone-labs) | Threat Research | SentinelLabs is SentinelOne’s public research operation, publishing investigations into malware, exploits, cybercrime, advanced persistent threats, and emerging AI-related security issues. Its strongest work combines reverse engineering with campaign context, making it useful for translating observed behavior into hunting hypotheses and detections across endpoint and cloud environments. Research articles are openly readable and frequently name authors and evidence. As with any vendor lab, collection is shaped by available telemetry and researcher access, so broad prevalence figures and attribution judgments should be independently corroborated. |
+| [Shodan](#shodan) | Network Security | Shodan is a proprietary search and intelligence platform for services directly reachable from the internet. It continuously collects protocol banners and related metadata and exposes them through search, maps, command-line tools, APIs, monitoring, and commercial datasets. Defenders use it to find external exposure and enrich IP investigations. Basic search is available broadly, while accounts, a paid membership, subscriptions, credits, or enterprise licensing unlock additional filters, downloads, monitoring, scans, and bulk data. Results are observations, not verified asset inventories or vulnerability proof. |
 | [Sigma](#sigma) | Detection Engineering | Sigma defines an open, structured format for describing log-based detections independently of a specific SIEM query language. Its specification, documentation, command-line conversion tooling, and community rule repository let teams exchange detection logic and translate rules into supported back ends. The format is especially valuable for expressing log sources, selections, filters, conditions, false positives, and severity in reviewable files. A converted rule is only a starting point: field mappings, log availability, back-end behavior, performance, and local false positives must be tested before production use. |
+| [Sigstore](#sigstore) | Supply Chain Security | Sigstore is an open-source framework for signing and verifying software artifacts with tools and services including Cosign, Fulcio, Rekor, and a distributed trust root. Its identity-based workflow can bind a short-lived certificate to an OIDC identity and record signing evidence in a transparency log, reducing long-lived key-management burden. It supports containers, binaries, release files, SBOMs, and attestations. A valid signature proves only the defined identity and artifact relationship; consumers still need trusted identity expectations, log and certificate verification, policy enforcement, and independent security evaluation. |
+| [SLSA](#slsa) | Supply Chain Security | SLSA is an OpenSSF specification for incrementally improving software supply-chain integrity through defined tracks, assurance levels, and machine-verifiable attestations such as build provenance. It gives producers, build platforms, and consumers a shared way to describe how source and artifacts were created and protected. SLSA is valuable for CI/CD architecture and supplier assurance, but conformance does not prove that source code is benign, vulnerability-free, or fit for purpose. Record the specification version and verify attestations against an explicit trust policy rather than treating a badge as sufficient evidence. |
+| [Snort](#snort) | Network Security | Snort is Cisco's actively maintained open-source network intrusion detection and prevention engine for real-time packet analysis, logging, and inline inspection. Snort 3 adds multithreaded processing, a modular plugin architecture, service identification, and an updated rule language. Access and licensing differ by artifact: the engine and Community Rules are open source, registered rules are delayed and restricted, and current Talos subscriber rules are paid. Effective deployment depends on validated traffic visibility, tuning, performance, and ruleset provenance. |
 | [SpecterOps Research](#specterops-research) | Identity Security | The SpecterOps Resource Center collects original and practitioner-oriented material on identity attack paths, Active Directory, Microsoft cloud identity, Kerberos, tradecraft, BloodHound, detection, and adversary simulation. Publications, white papers, webinars, and conference-style material often explain the underlying mechanics behind tools and exposure models, making the archive valuable for advanced identity defenders and red teams. It is vendor-produced and selective rather than a neutral standards library; readers should separate durable protocol research from product guidance and corroborate high-impact defensive decisions with Microsoft documentation and testing. |
+| [SpiderFoot](#spiderfoot) | OSINT | SpiderFoot is an MIT-licensed OSINT automation platform for threat intelligence, digital investigations, and external attack-surface mapping. Its open-source edition supplies a web interface, command line, correlation rules, exports, and more than 200 modules that pivot among technical, identity, breach, social, registry, and threat-data sources. Intel 471 acquired SpiderFoot in 2022 and commercialized related capabilities, while the public edition’s latest tag remains version 4.0 and its default branch has not merged substantive updates since November 2023. Pin, isolate, and validate it before operational use. |
 | [Splunk Security Content](#splunk-security-content) | Detection Engineering | Splunk Security Content publishes first-party detections, Analytic Stories, response playbooks, data-source guidance, and ATT&CK coverage views for Splunk security products. Analytic Stories connect threat context with searches, investigations, and available Splunk SOAR actions, making the portal useful for tracing a use case from behavior to operational response. Content is inspectable and frequently updated, but most analytics depend on Splunk search semantics, specific data models, macros, or product applications. Counts and ATT&CK coverage describe available content, not validated coverage in a reader's environment. |
 | [Stratosphere IPS Datasets](#stratosphere-ips-datasets) | Datasets | The Stratosphere Laboratory publishes network-security datasets derived from controlled captures and research projects, including botnet, malware, normal, Internet-of-Things, and mixed traffic. Dataset pages commonly provide scenario descriptions, labels, capture files or flows, timing, and citation or licensing information, enabling reproducible intrusion-detection, traffic-analysis, and machine-learning experiments. The collection is valuable because provenance and malicious scenarios are documented by the producing laboratory. Researchers must still inspect each dataset's labeling method, balance, age, privacy treatment, license, and environment before claiming that experimental performance generalizes to production networks. |
 | [Stratus Red Team](#stratus-red-team) | Cloud Security | Stratus Red Team is Datadog's open-source command-line tool for emulating documented adversary techniques in cloud and identity environments. Its catalog includes AWS, Azure, Google Cloud, Microsoft Entra ID, and Kubernetes scenarios mapped to MITRE ATT&CK, with commands to prepare, detonate, inspect, revert, and clean up resources. It helps detection engineers produce known telemetry and validate alerts without building every simulation manually. Techniques perform real actions, may create costs or destructive effects, and must run only in authorized, isolated environments with reviewed permissions and cleanup plans. |
 | [Suricata](#suricata) | Network Security | Suricata is the Open Information Security Foundation's high-performance, open-source engine for network intrusion detection, inline prevention, network security monitoring, and packet processing. It performs signature inspection, application-layer protocol parsing, file extraction, flow tracking, and structured EVE JSON logging, with rules commonly managed through the wider Suricata ecosystem. It supports sensors, gateways, and embedded integrations, but effective operation depends on representative traffic, correct capture architecture, suitable rules, and continuous tuning. Encryption, packet loss, noisy signatures, and inline performance constraints can create blind spots or operational impact. |
 | [The DFIR Report](#the-dfir-report) | DFIR | The DFIR Report publishes detailed case studies derived from observed intrusions, reconstructing initial access, execution, persistence, lateral movement, command and control, and impact through host and network evidence. Public reports commonly include timelines, ATT&CK mappings, indicators, detection ideas, and referenced tooling, making them useful bridges between incident evidence and defensive engineering. The publisher also offers commercial reports, labs, artifacts, and feeds. Each case remains a selected observation rather than a prevalence study, and indicators age quickly, so readers should prioritize behaviors and corroborate conclusions before generalizing. |
 | [The Sleuth Kit](#the-sleuth-kit) | DFIR | The Sleuth Kit is an open-source collection of command-line utilities and a C library for examining disk images, volume systems, file systems, metadata, and recoverable file content. It supplies the low-level forensic engine used by Autopsy and other open-source or commercial tools, while remaining useful directly in scripted and repeatable investigations. The official site provides downloads, file-system documentation, release information, and community support. Its command-oriented workflow assumes knowledge of storage structures and evidence handling; unsupported formats or damaged media may require additional tools and manual validation. |
+| [theHarvester](#theharvester) | OSINT | theHarvester is a GPL-2.0-only open-source tool for gathering domain and organization intelligence from search engines, certificate-transparency logs, DNS datasets, code repositories, and threat-intelligence providers. Its command line, local HarvestView interface, REST API, and structured exports can normalize hostnames, emails, IPs, URLs, ASNs, people, and breach names with source provenance. Passive providers and selected DNS or direct actions have different traffic and authorization implications. Results are time-bound observations, not proof of ownership, reachability, vulnerability, or permission to expand scope. |
 | [ThreatFox](#threatfox) | CTI | ThreatFox is a community platform operated by abuse.ch and Spamhaus for sharing indicators associated with malware and botnet activity. Analysts can search submissions and consume recent indicators through downloadable exports and an API, with malware-family, confidence, reporter, and time context where available. It is useful for enrichment, hunting, research, and feed prototyping because the data is openly accessible and operationally current. Indicators are observations, not verdicts: domains, IP addresses, and URLs can change ownership or host mixed content, so age, confidence, context, and local evidence must be checked before blocking. |
 | [Timesketch](#timesketch) | DFIR | Timesketch is an open-source collaborative platform for importing, searching, annotating, and analyzing forensic timelines. Investigators organize data into sketches, collaborate through views and comments, run analyzers, apply tags, use intelligence features, and query timelines through the web interface, command-line client, notebooks, or API. It integrates naturally with Plaso output and includes Sigma-based analysis capabilities. Timesketch improves team exploration of large event sets, but it is not an acquisition tool; administrators must manage indexing, access control, scaling, and data sensitivity, while analysts must verify findings against underlying evidence. |
+| [Trace Labs](#trace-labs) | OSINT | Trace Labs is a nonprofit that crowdsources open-source intelligence to support law-enforcement work on missing-person cases while training investigators. Its Search Party events, ongoing operations, field manual, participant documentation, write-ups, and maintained OSINT virtual machine provide unusually concrete, people-centered practice. The program is not a general-purpose intelligence feed: cases involve real and potentially vulnerable people. Participants must follow the current rules of engagement, use passive zero-touch research, avoid contact or account interference, protect case data, and submit only relevant, verifiable findings through authorized channels. |
 | [Trivy](#trivy) | Container Security | Trivy is an open-source security scanner for container images, filesystems, repositories, infrastructure-as-code, Kubernetes, and software artifacts. It can identify known package vulnerabilities, configuration problems, exposed secrets, license concerns, and generate software bills of materials through command-line and CI workflows. Its documentation makes it a practical general-purpose scanner for development and container pipelines. Results depend on vulnerability databases, package identification, configuration checks, and scan settings; findings require triage, while absence of findings does not cover runtime behavior, business logic, or unknown vulnerabilities. |
 | [TryHackMe](#tryhackme) | Training | TryHackMe is a browser-based cybersecurity learning platform offering guided lessons, isolated machines, challenges, role-oriented paths, and competitions across fundamentals, penetration testing, SOC analysis, security engineering, cloud, web, and AI security. Its integrated attack environment and beginner-friendly sequencing reduce setup friction, while free and subscription content support individual and organizational learning. The platform is effective for structured practice but uses simplified scenarios and its own progression model; completion does not replace production experience, independent reading, or authorization to test systems outside provided labs. |
 | [UNB CIC Datasets](#unb-cic-datasets) | Datasets | The Canadian Institute for Cybersecurity at the University of New Brunswick publishes academic datasets for intrusion detection, network traffic, malware, botnets, Android, Internet-of-Things, VPN and Tor analysis, and related security research. Well-known collections such as CICIDS and CSE-CIC-IDS provide labeled traffic or derived features used in teaching and comparative machine-learning studies. They are convenient benchmarks, not faithful samples of every production environment. Users must examine generation methodology, known labeling or feature issues, class leakage, licensing, dates, and existing critiques before treating model accuracy as operational evidence. |
@@ -345,7 +399,11 @@ A reviewed and deduplicated inventory of authoritative cybersecurity references,
 | [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) | Threat Reports | The Verizon Data Breach Investigations Report is an annual analysis of security incidents and confirmed data breaches contributed by law enforcement, forensic firms, insurers, sharing groups, Verizon cases, and other partners. Records are normalized into the VERIS framework, anonymized, aggregated, and analyzed by industry, region, actor, action, asset, and pattern. Its transparent methodology makes it valuable for benchmarking and risk communication. The DBIR explicitly describes a sample, not every breach; contributor composition, missing data, classification decisions, and small subsets limit generalization to a specific organization. |
 | [VirusTotal](#virustotal) | Malware Analysis | VirusTotal aggregates antivirus, sandbox, reputation, metadata, relationship, and community signals for files, URLs, domains, and IP addresses through a web interface and APIs. Analysts use hash lookups and relationship graphs to enrich incidents, compare vendor detections, pivot across infrastructure, and prioritize deeper analysis. Results are multi-source observations, not a consensus verdict: detection names conflict, benign items can be flagged, and absence of detections does not establish safety. Uploading also shares submitted content with VirusTotal partners, so confidential files, internal URLs, or regulated data must not be submitted casually. |
 | [Volatility Foundation](#volatility-foundation) | DFIR | The Volatility Foundation maintains and promotes the open-source Volatility Framework for extracting forensic artifacts from volatile memory images. Volatility 3 and its plugin ecosystem support analysis of processes, modules, handles, network artifacts, operating-system structures, and other memory-resident evidence across investigations and malware research. The foundation also provides project information, training, community events, and a plugin contest. Effective use requires a properly acquired memory image, operating-system knowledge, and careful interpretation; plugin output is evidence to validate in context, not an automatic conclusion about compromise or attribution. |
+| [VulnCheck KEV](#vulncheck-kev) | Vulnerability | VulnCheck KEV is a vendor-maintained catalog of vulnerabilities assessed as exploited in the wild, with evidence references and additional exploit context. It can broaden and accelerate prioritization beyond CISA KEV and supports enrichment through VulnCheck's community and product interfaces. Community access currently requires registration, and comparative coverage claims come from the vendor. Treat each record as an evidence-backed prioritization signal rather than proof that an asset is exposed or compromised, and verify the cited evidence, affected versions, remediation, and local business impact before action. |
+| [VX-Underground](#vx-underground) | Malware Analysis | vx-underground is an independent, donation-supported archive of malware samples, source code, technical papers, historical material, and community publications. It provides rare primary artifacts for qualified malware researchers and detection engineers without requiring registration. The same openness creates severe handling, legal, licensing, and provenance risks: files may be live malware or offensive code, hosted material does not share one blanket reuse license, and metadata may be incomplete. Access belongs only in a controlled, authorized research environment. |
+| [Wazuh](#wazuh) | SOC | Wazuh is an open-source security platform that combines endpoint agents, log analysis, file-integrity monitoring, configuration assessment, vulnerability detection, dashboards, and active-response capabilities. Its documentation provides deployable guidance for building a self-managed SIEM and XDR-style environment across endpoints, cloud workloads, and containers. Wazuh can centralize useful telemetry and compliance evidence, but installation alone does not create complete detection coverage. Asset inventory, parsing, rule quality, privileges, retention, tuning, upgrades, and response safeguards determine whether findings are reliable and operationally safe. |
 | [Wireshark](#wireshark) | Network Security | Wireshark is a free, open-source network protocol analyzer for capturing traffic and interactively inspecting packets across hundreds of protocols. Its display filters, protocol dissectors, stream reconstruction, statistics, expert information, and command-line companion tools support troubleshooting, incident investigation, protocol research, and forensic review of packet captures. The project supplies user and developer guides, release notes, sample captures, community support, and training resources. Captures reflect only the monitored vantage point; encryption, offloading, packet loss, and asymmetric paths limit interpretation, while packet files can contain credentials or sensitive communications requiring controlled handling. |
+| [x64dbg](#x64dbg) | Reverse Engineering | x64dbg is an actively maintained, open-source user-mode debugger for 32-bit and 64-bit Windows, optimized for reverse engineering and malware analysis. Its GUI, disassembly, memory and module views, breakpoints, tracing, graphing, scripting, patching, and plugin interfaces support dynamic analysis of native executables and DLLs. The core is GPL-licensed with an explicit plugin exception. Debugging untrusted binaries remains hazardous, Windows-focused, and vulnerable to anti-debugging, environmental, and analyst-interpretation errors. |
 | [YARA](#yara) | Malware Analysis | YARA is an open-source pattern-matching engine for identifying and classifying files, memory, or other byte sequences through readable rules. Rules combine text strings, hexadecimal patterns, regular expressions, metadata, modules, and Boolean conditions, making YARA a common language for malware-family signatures and hunting logic. Official documentation covers syntax, modules, command-line use, and Python integration, while YARA-CI can test rule repositories. Rules are hypotheses rather than verdicts: brittle patterns create misses, generic strings create false positives, and scanning untrusted samples still requires safe evidence-handling controls. |
 | [Zeek](#zeek) | Network Security | Zeek is an open-source passive network monitor that converts observed traffic into rich, structured protocol and transaction logs, file events, notices, and customizable outputs. Its event-driven scripting language and community package ecosystem let defenders add protocol analysis, policy logic, enrichment, and behavioral detections without placing Zeek inline as a blocking control. The project provides current and long-term-support documentation, packages, a browser playground, webinars, and community resources. Encrypted traffic, asymmetric visibility, packet loss, and local network architecture constrain conclusions, while custom scripts require testing for correctness and performance. |
 | [Zero Day Initiative](#zero-day-initiative) | Vulnerability | The Zero Day Initiative is a vulnerability acquisition and coordinated-disclosure program operated by Trend Micro. Its published advisory archive documents vulnerabilities reported through the program, typically including affected products, technical impact, CVSS information, discovery credit, identifiers, disclosure timelines, and vendor coordination status. It offers useful primary context for browser, document, enterprise, and industrial-product flaws. The archive is not a complete vulnerability database, and technical details can be dual-use or intentionally limited before remediation. Testing must remain confined to systems you own or are explicitly authorized to assess. |
@@ -393,7 +451,47 @@ The arXiv Cryptography and Security category is an open-access preprint stream c
 - Related sources: [USENIX Security Symposium](#usenix-security-symposium) · [OpenSecurityTraining2](#opensecuritytraining2) · [UNB CIC Datasets](#unb-cic-datasets)
 - Research provenance: Gemini
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="ndss-symposium"></a>
+### NDSS Symposium
+
+**Detailed description**
+
+The Network and Distributed System Security Symposium is an annual, peer-reviewed security research venue organized by the Internet Society. Its site publishes accepted-paper lists, programs, proceedings, and individual papers covering network and distributed-system security as well as adjacent software, web, privacy, authentication, hardware, mobile, measurement, usable-security, and machine-learning topics. Researchers and graduate students can use the archive for structured literature review, compare methods and threat models, and follow citations into prior and subsequent work. Advanced practitioners can translate an attack, measurement, or defense into a controlled replication plan and evaluate whether its assumptions match current products and their environment. Begin with the exact paper and edition, then inspect methodology, datasets, experimental setup, ethics, disclosed artifacts, limitations, and later corrections or follow-up studies. Peer review is a strong quality filter, not proof that every result reproduces, generalizes, or remains current. Academic prototypes may omit deployment, maintenance, performance, privacy, or adversarial adaptation concerns. Do not convert a paper directly into production guidance or offensive testing; reproduce only within legal authorization, preserve versions and parameters, compare with independent research, and evaluate the defense against realistic local threats and operational constraints.
+
+**Assessment:** Leading peer-reviewed venue for original network, systems, software, and privacy security research; principal limitation: Peer review does not guarantee reproducibility, generalizability, or continued relevance to current systems.
+
+**Strengths**
+
+- Leading peer-reviewed venue for original network, systems, software, and privacy security research
+- Provides durable public access to proceedings, accepted papers, programs, and bibliographic context
+- Offers advanced methods and empirical results that support literature review and controlled replication
+
+**Limitations**
+
+- Peer review does not guarantee reproducibility, generalizability, or continued relevance to current systems
+- Academic prototypes and evaluations may omit production operations, maintenance, cost, or deployment constraints
+
+**Best for:** Advanced security literature review; Finding peer-reviewed methods and measurements; Research replication planning; Tracking emerging security research.
+
+- Organization: Internet Society
+- Canonical source: [https://www.ndss-symposium.org/](https://www.ndss-symposium.org/)
+- Quality: Tier A (96/100)
+- Quality dimensions: authority 5/5; originality 5/5; maintenance 4/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Peer Reviewed Primary
+- Maintenance: Periodic
+- Source type: Academic
+- Access: Free
+- Audience: Security researchers, Graduate students, Advanced practitioners, Security engineers, Educators
+- Skill levels: Advanced
+- Formats: peer-reviewed papers, conference proceedings, research artifacts, conference presentations, bibliographic records
+- Tags: [`academic`](#tag-academic) [`threat-research`](#tag-threat-research) [`community`](#tag-community) [`network-security`](#tag-network-security) [`free`](#tag-free) [`advanced`](#tag-advanced)
+- Keywords: `academic` `peer-reviewed-research` `security-research` `network-security` `systems-security` `privacy` `open-access` `conference`
+- Related sources: [USENIX Security Symposium](#usenix-security-symposium) · [arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [OpenSecurityTraining2](#opensecuritytraining2) · [OSS-Fuzz](#oss-fuzz) · [CodeQL](#codeql) · [Google Project Zero](#google-project-zero)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="usenix-security-symposium"></a>
 ### USENIX Security Symposium
@@ -433,7 +531,7 @@ The USENIX Security Symposium is an annual research venue for security and priva
 - Related sources: [arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [OpenSecurityTraining2](#opensecuritytraining2) · [OSS-Fuzz](#oss-fuzz) · [CodeQL](#codeql)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-adversary-emulation"></a>
 ## Adversary Emulation
@@ -476,7 +574,7 @@ Apache Caldera (incubating), originally developed by MITRE, is an open-source ad
 - Related sources: [Atomic Red Team](#atomic-red-team) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: May involve live malware, offensive techniques, or dual-use tooling; use only in an authorized isolated environment.
 
 <a id="atomic-red-team"></a>
@@ -517,7 +615,7 @@ Atomic Red Team, maintained by Red Canary and community contributors, is an open
 - Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [Apache Caldera](#apache-caldera) · [Sigma](#sigma) · [Elastic Detection Rules](#elastic-detection-rules) · [Stratus Red Team](#stratus-red-team)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: May involve live malware, offensive techniques, or dual-use tooling; use only in an authorized isolated environment.
 
 <a id="category-ai-security"></a>
@@ -561,7 +659,7 @@ The Cloud Security Alliance AI Controls Matrix is a control framework for assess
 - Related sources: [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [Google Secure AI Framework](#google-secure-ai-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="garak"></a>
 ### garak
@@ -601,7 +699,7 @@ garak is NVIDIA's open-source vulnerability scanner for large language models an
 - Related sources: [PyRIT](#pyrit) · [Promptfoo](#promptfoo) · [MITRE ATLAS](#mitre-atlas) · [OWASP GenAI Security Project](#owasp-genai-security-project)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Probe only authorized AI targets; review plugins and payloads, limit cost and sensitive data exposure, and validate automated detector results.
 
 <a id="google-secure-ai-framework"></a>
@@ -642,7 +740,7 @@ Google's Secure AI Framework, or SAIF, presents a conceptual framework and imple
 - Related sources: [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [CSA AI Controls Matrix](#csa-ai-controls-matrix)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="mitre-atlas"></a>
 ### MITRE ATLAS
@@ -682,7 +780,7 @@ MITRE ATLAS is a public knowledge base of adversary tactics and techniques for a
 - Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [PyRIT](#pyrit)
 - Research provenance: Gemini, Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="ncsc-ai-security-guidance"></a>
 ### NCSC AI Security Guidance
@@ -717,12 +815,12 @@ The NCSC Guidelines for Secure AI System Development provide government-backed r
 - Audience: Ai system providers, Security architects, Engineering leaders, Procurement teams
 - Skill levels: Beginner, Intermediate, Advanced
 - Formats: government guidance, lifecycle checklist, principles, implementation recommendations
-- Tags: [`ai-security`](#tag-ai-security) [`incident-response`](#tag-incident-response) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Tags: [`ai-security`](#tag-ai-security) [`supply-chain-security`](#tag-supply-chain-security) [`incident-response`](#tag-incident-response) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
 - Keywords: `ai-security` `secure-by-design` `ai-lifecycle` `supply-chain-security` `threat-modeling` `incident-response` `government-guidance`
 - Related sources: [NCSC UK Guidance](#ncsc-uk-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [Google Secure AI Framework](#google-secure-ai-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="nist-ai-risk-management-framework"></a>
 ### NIST AI Risk Management Framework
@@ -762,7 +860,7 @@ The NIST AI Risk Management Framework is a voluntary, technology-neutral framewo
 - Related sources: [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Google Secure AI Framework](#google-secure-ai-framework) · [CSA AI Controls Matrix](#csa-ai-controls-matrix)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="owasp-genai-security-project"></a>
 ### OWASP GenAI Security Project
@@ -802,7 +900,7 @@ The OWASP GenAI Security Project is a community-led program publishing open guid
 - Related sources: [MITRE ATLAS](#mitre-atlas) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [Google Secure AI Framework](#google-secure-ai-framework) · [Promptfoo](#promptfoo) · [CSA AI Controls Matrix](#csa-ai-controls-matrix)
 - Research provenance: Gemini, Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="promptfoo"></a>
 ### Promptfoo
@@ -842,7 +940,7 @@ Promptfoo is an evaluation and red-team framework for testing prompts, models, a
 - Related sources: [PyRIT](#pyrit) · [garak](#garak) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Google Secure AI Framework](#google-secure-ai-framework)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Run tests only against authorized targets and control provider credentials, request cost, test data, generated outputs, and CI exposure.
 
 <a id="pyrit"></a>
@@ -883,7 +981,7 @@ PyRIT, the Python Risk Identification Tool for generative AI, is Microsoft's ope
 - Related sources: [MITRE ATLAS](#mitre-atlas) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [garak](#garak) · [Promptfoo](#promptfoo)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Run adversarial evaluations only against authorized targets; constrain credentials, stored prompts, model costs, and sensitive response data, and manually validate findings.
 
 <a id="category-api-security"></a>
@@ -927,7 +1025,7 @@ The OWASP API Security Project publishes community guidance focused on risks tha
 - Related sources: [OWASP Top 10](#owasp-top-10) · [OWASP ASVS](#owasp-asvs) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Web Security Academy](#portswigger-web-security-academy)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-application-security"></a>
 ## Application Security
@@ -970,7 +1068,7 @@ CodeQL treats source code as a queryable database and provides language librarie
 - Related sources: [Semgrep](#semgrep) · [OSS-Fuzz](#oss-fuzz) · [GitHub Advisory Database](#github-advisory-database) · [OWASP ASVS](#owasp-asvs)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="oss-fuzz"></a>
 ### OSS-Fuzz
@@ -1010,7 +1108,7 @@ OSS-Fuzz is Google's continuous fuzzing service for eligible open-source project
 - Related sources: [CodeQL](#codeql) · [Semgrep](#semgrep) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [GitHub Advisory Database](#github-advisory-database)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="owasp-asvs"></a>
 ### OWASP ASVS
@@ -1050,7 +1148,7 @@ The OWASP Application Security Verification Standard provides numbered, testable
 - Related sources: [OWASP Top 10](#owasp-top-10) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP API Security Project](#owasp-api-security-project)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="owasp-cheat-sheet-series"></a>
 ### OWASP Cheat Sheet Series
@@ -1090,7 +1188,7 @@ The OWASP Cheat Sheet Series is a large collection of concise, task-oriented gui
 - Related sources: [OWASP ASVS](#owasp-asvs) · [OWASP Top 10](#owasp-top-10) · [OWASP API Security Project](#owasp-api-security-project) · [Semgrep](#semgrep)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="owasp-top-10"></a>
 ### OWASP Top 10
@@ -1130,7 +1228,7 @@ The OWASP Top 10 is a periodically updated awareness document that summarizes br
 - Related sources: [OWASP ASVS](#owasp-asvs) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [PortSwigger Web Security Academy](#portswigger-web-security-academy)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="semgrep"></a>
 ### Semgrep
@@ -1170,7 +1268,7 @@ Semgrep is a static-analysis platform whose documentation covers an open-source 
 - Related sources: [CodeQL](#codeql) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OSS-Fuzz](#oss-fuzz)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-cloud-security"></a>
 ## Cloud Security
@@ -1213,7 +1311,7 @@ The AWS Well-Architected Security Pillar presents first-party design principles 
 - Related sources: [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="cloud-security-alliance-cloud-controls-matrix"></a>
 ### Cloud Security Alliance Cloud Controls Matrix
@@ -1253,7 +1351,7 @@ The Cloud Security Alliance Cloud Controls Matrix is a cloud-focused cybersecuri
 - Related sources: [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [CIS Critical Security Controls](#cis-critical-security-controls) · [Prowler](#prowler)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="google-cloud-security-best-practices"></a>
 ### Google Cloud Security Best Practices
@@ -1293,7 +1391,7 @@ The Google Cloud Security Best Practices Center curates first-party guidance for
 - Related sources: [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Kubernetes Security Documentation](#kubernetes-security-documentation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="microsoft-azure-security-documentation"></a>
 ### Microsoft Azure Security Documentation
@@ -1333,7 +1431,7 @@ Microsoft's Azure security documentation is the first-party hub for securing Azu
 - Related sources: [Microsoft Entra Documentation](#microsoft-entra-documentation) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="prowler"></a>
 ### Prowler
@@ -1373,7 +1471,7 @@ Prowler is an open-source cloud security assessment platform with a command-line
 - Related sources: [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [AWS Security Best Practices](#aws-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Kubescape](#kubescape)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="stratus-red-team"></a>
 ### Stratus Red Team
@@ -1413,11 +1511,52 @@ Stratus Red Team is Datadog's open-source command-line tool for emulating docume
 - Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [Atomic Red Team](#atomic-red-team) · [Prowler](#prowler) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [Kubernetes Security Documentation](#kubernetes-security-documentation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: May involve live malware, offensive techniques, or dual-use tooling; use only in an authorized isolated environment.
 
 <a id="category-container-security"></a>
 ## Container Security
+
+<a id="falco"></a>
+### Falco
+
+**Detailed description**
+
+Falco is an Apache-2.0 open-source runtime-security project originally created by Sysdig and now governed as a graduated Cloud Native Computing Foundation project. Its agent observes Linux kernel activity through supported drivers, enriches events with container and Kubernetes context, evaluates a rule engine, and sends alerts to downstream systems. Plugins extend collection beyond system calls, while versioned stable, incubating, and sandbox rule artifacts let teams adopt content at different maturity levels. The project publishes source, packages, container images, drivers, rules, documentation, and a defined release process; official releases remained active in 2026. Falco is a detection and notification component, not an enforcement, isolation, or incident-response product. It runs with sensitive host and kernel visibility, so driver choice, privileges, package provenance, configuration access, and output protection matter. Default rules intentionally surface behaviors that may be normal in a given workload and require profiling, exceptions, severity design, and performance testing. Conversely, unsupported kernels, missing event sources, disabled rules, container abstractions, or attacker evasion can create blind spots. Pin compatible engine, driver, plugin, and rules versions; test controlled behaviors; monitor dropped events; and validate alerts with orchestration, cloud, network, and application evidence.
+
+**Assessment:** Transparent CNCF governance and Apache-2.0 source support independent inspection and adoption; principal limitation: Falco detects and alerts but does not itself block, isolate, or remediate activity.
+
+**Strengths**
+
+- Transparent CNCF governance and Apache-2.0 source support independent inspection and adoption
+- Kernel-event rules enriched with container and Kubernetes context enable practical runtime detection
+- Versioned rules, plugins, packages, and release processes form a mature operational ecosystem
+
+**Limitations**
+
+- Falco detects and alerts but does not itself block, isolate, or remediate activity
+- Privileged kernel visibility creates deployment, compatibility, performance, and security considerations
+- Default rules require environment profiling and tuning, while missing or dropped events can create blind spots
+
+**Best for:** Kubernetes runtime detection; container behavior monitoring; Linux syscall threat detection; cloud-native detection engineering.
+
+- Organization: Cloud Native Computing Foundation
+- Canonical source: [https://falco.org/](https://falco.org/)
+- Quality: Tier A (95/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.779999999999999/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Cloud Security engineers, Kubernetes platform teams, Detection engineers, SOC analysts
+- Skill levels: Intermediate, Advanced
+- Formats: software agent, YAML rules, github repositories, plugins, documentation, release packages
+- Tags: [`container-security`](#tag-container-security) [`kubernetes`](#tag-kubernetes) [`cloud-security`](#tag-cloud-security) [`detection-engineering`](#tag-detection-engineering) [`soc`](#tag-soc) [`blue-team`](#tag-blue-team) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`community`](#tag-community)
+- Keywords: `container-security` `kubernetes` `cloud-security` `detection-engineering` `soc` `blue-team` `tools` `repositories` `runtime-security` `linux` `rules`
+- Related sources: [Kubescape](#kubescape) · [Trivy](#trivy) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Sigma](#sigma) · [Elastic Detection Rules](#elastic-detection-rules) · [Wazuh](#wazuh)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="trivy"></a>
 ### Trivy
@@ -1457,7 +1596,7 @@ Trivy is an open-source security scanner for container images, filesystems, repo
 - Related sources: [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [GitHub Advisory Database](#github-advisory-database)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-cti"></a>
 ## CTI
@@ -1500,7 +1639,49 @@ Google Threat Intelligence is a commercial intelligence platform combining Googl
 - Related sources: [VirusTotal](#virustotal) · [OpenCTI](#opencti) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Unit 42](#unit-42) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="greynoise"></a>
+### GreyNoise
+
+**Detailed description**
+
+GreyNoise Intelligence operates a distributed sensor network that observes systems scanning, probing, and attacking internet-facing infrastructure. Its Visualizer, Community API, GNQL searches, behavioral tags, CVE views, and business-service context help SOC analysts distinguish widespread background activity from potentially targeted traffic, investigate scanning infrastructure, and monitor mass-exploitation trends. Current official plans provide a free community tier for basic IP lookups; authenticated community use is rate-limited, API-key access requires an eligible account, and richer history, exports, feeds, integrations, and automation require paid modules. GreyNoise is a proprietary service whose conclusions reflect its sensor placement, collection window, signatures, and classification logic. An absent observation does not make an address safe, a malicious label does not establish compromise, and IP ownership can change. Preserve the observation time and underlying behavior, corroborate important decisions with local telemetry and independent sources, and review the service's account and privacy terms before submitting internal asset lists. Use blocklist or alert outputs only after testing scope, age, shared infrastructure, and false-positive impact.
+
+**Assessment:** Distinctive first-party telemetry about internet-wide scanning and mass-exploitation behavior; principal limitation: Coverage and classifications are proprietary, sensor-dependent observations rather than proof of targeting or compromise.
+
+**Strengths**
+
+- Distinctive first-party telemetry about internet-wide scanning and mass-exploitation behavior
+- Queryable IP, CVE, tag, and business-service context supports rapid SOC enrichment
+- Free community access permits limited lookups before an organization licenses broader coverage
+
+**Limitations**
+
+- Coverage and classifications are proprietary, sensor-dependent observations rather than proof of targeting or compromise
+- Free and community access is rate-limited, while deeper history, exports, and automation require paid access
+- IP ownership, shared hosting, and observation age can make unreviewed blocking decisions unsafe
+
+**Best for:** internet-scan alert enrichment; mass-exploitation trend monitoring; background-noise reduction; IP reputation triage.
+
+- Organization: GreyNoise Intelligence, Inc.
+- Canonical source: [https://www.greynoise.io/](https://www.greynoise.io/)
+- Quality: Tier A (92/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.68/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Freemium
+- Audience: SOC analysts, Threat Intelligence analysts, Incident responders, Vulnerability teams
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: web visualizer, API, behavioral tags, feeds, research reports
+- Tags: [`cti`](#tag-cti) [`threat-research`](#tag-threat-research) [`network-security`](#tag-network-security) [`soc`](#tag-soc) [`feeds`](#tag-feeds) [`vulnerability-research`](#tag-vulnerability-research) [`freemium`](#tag-freemium) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `cti` `threat-research` `network-security` `soc` `feeds` `internet-scanning` `ip-enrichment` `mass-exploitation` `vulnerability-research` `freemium`
+- Related sources: [Shodan](#shodan) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [ThreatFox](#threatfox) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Suricata](#suricata) · [SANS Internet Storm Center](#sans-internet-storm-center)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Internet-wide observation does not prove targeted compromise; confirm asset ownership, local telemetry, timing, classification context, and collateral risk before suppressing or blocking activity.
 
 <a id="misp"></a>
 ### MISP
@@ -1540,7 +1721,7 @@ MISP is an open-source platform and data-model ecosystem for collecting, correla
 - Related sources: [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="oasis-open-cti-documentation"></a>
 ### OASIS Open CTI Documentation
@@ -1580,7 +1761,7 @@ The OASIS Open CTI documentation is the official learning and reference entry po
 - Related sources: [MISP](#misp) · [OpenCTI](#opencti) · [MITRE ATT&CK](#mitre-att-and-ck) · [ThreatFox](#threatfox)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="opencti"></a>
 ### OpenCTI
@@ -1620,7 +1801,7 @@ OpenCTI is an open-source platform for structuring, storing, visualizing, and op
 - Related sources: [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [MISP](#misp) · [MITRE ATT&CK](#mitre-att-and-ck) · [ThreatFox](#threatfox) · [Google Threat Intelligence](#google-threat-intelligence)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="threatfox"></a>
 ### ThreatFox
@@ -1660,7 +1841,7 @@ ThreatFox is a community platform operated by abuse.ch and Spamhaus for sharing 
 - Related sources: [URLhaus](#urlhaus) · [MalwareBazaar](#malwarebazaar) · [MISP](#misp) · [OpenCTI](#opencti) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Indicators can reference active malicious infrastructure; do not visit them directly or block shared infrastructure without age, confidence, ownership, and local-evidence checks.
 
 <a id="urlhaus"></a>
@@ -1701,7 +1882,7 @@ URLhaus is operated by abuse.ch and Spamhaus to collect and share URLs used to d
 - Related sources: [ThreatFox](#threatfox) · [MalwareBazaar](#malwarebazaar) · [MISP](#misp) · [OpenCTI](#opencti) · [Suricata](#suricata)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Records can contain active malware-delivery URLs; inspect only through controlled tooling and do not treat every export as a production blocklist.
 
 <a id="category-datasets"></a>
@@ -1745,7 +1926,7 @@ The Stratosphere Laboratory publishes network-security datasets derived from con
 - Related sources: [UNB CIC Datasets](#unb-cic-datasets) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [Zeek](#zeek) · [Suricata](#suricata)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Some datasets contain malware-derived traffic or full-payload packet captures; use isolated analysis systems and follow each dataset’s handling and licensing terms.
 
 <a id="unb-cic-datasets"></a>
@@ -1786,7 +1967,7 @@ The Canadian Institute for Cybersecurity at the University of New Brunswick publ
 - Related sources: [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [Zeek](#zeek) · [Suricata](#suricata)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Some downloads can contain malware or trigger harmful-software warnings; isolate analysis and follow each dataset’s stated handling, attribution, and licensing requirements.
 
 <a id="category-detection-engineering"></a>
@@ -1830,7 +2011,7 @@ Elastic Detection Rules is Elastic's public development repository for detection
 - Related sources: [Sigma](#sigma) · [MITRE ATT&CK](#mitre-att-and-ck) · [Atomic Red Team](#atomic-red-team) · [The DFIR Report](#the-dfir-report)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="google-secops-community-rules"></a>
 ### Google SecOps Community Rules
@@ -1870,7 +2051,49 @@ Google Security Operations Community Rules is Google Cloud's official public rep
 - Related sources: [Sigma](#sigma) · [MITRE ATT&CK](#mitre-att-and-ck) · [YARA](#yara) · [Splunk Security Content](#splunk-security-content)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="lolbas"></a>
+### LOLBAS
+
+**Detailed description**
+
+LOLBAS, the Living Off The Land Binaries, Scripts and Libraries project, maintains structured records for Microsoft-signed Windows components with unexpected functionality relevant to adversaries and authorized security testers. Entries can describe execution, compilation, download, upload, file operations, persistence, application-control bypass, UAC bypass, credential access, or process-memory dumping, along with known paths, prerequisites, supported Windows versions, ATT&CK techniques, references, acknowledgements, and detection ideas. The community project publishes its source data and site under GPL-3.0 and provides programmatic access, making it useful for threat hunting, analytic development, allow-list review, and purple-team validation. LOLBAS is not proof that a binary invocation is malicious: legitimate administrative workflows may use the same component, and behavior can change across Windows releases or installed products. Validate command lines, parent-child context, user and integrity level, file or network effects, signing information, and local prevalence before deploying detections. Treat ATT&CK mappings and contributed detection links as starting points rather than guaranteed coverage. The documented commands are materially dual-use; test only within an explicitly authorized scope, protect sensitive outputs, monitor side effects, and restore the environment afterward.
+
+**Assessment:** Structured Windows living-off-the-land records connect commands, context, references, and ATT&CK mappings; principal limitation: An entry does not prove malicious execution because many cataloged binaries have legitimate administrative uses.
+
+**Strengths**
+
+- Structured Windows living-off-the-land records connect commands, context, references, and ATT&CK mappings
+- GPL-3.0 source data supports inspection, programmatic use, and community contribution
+- Entries often link concrete detection ideas for defenders as well as validation steps for testers
+
+**Limitations**
+
+- An entry does not prove malicious execution because many cataloged binaries have legitimate administrative uses
+- Commands and detection assumptions can vary by Windows version, installed product, privilege, and control policy
+- Dual-use techniques require explicit authorization, telemetry capture, and safe cleanup
+
+**Best for:** Windows living-off-the-land detection; application-control reviews; threat hunting; purple-team validation.
+
+- Organization: LOLBAS Project
+- Canonical source: [https://lolbas-project.github.io/](https://lolbas-project.github.io/)
+- Quality: Tier A (94/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.68/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Windows defenders, Detection engineers, Penetration testers, Purple teams
+- Skill levels: Intermediate, Advanced
+- Formats: web catalog, github repository, YAML data, command examples, ATT&CK mappings
+- Tags: [`detection-engineering`](#tag-detection-engineering) [`penetration-testing`](#tag-penetration-testing) [`red-team`](#tag-red-team) [`blue-team`](#tag-blue-team) [`mitre-attack`](#tag-mitre-attack) [`repositories`](#tag-repositories) [`tools`](#tag-tools) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`community`](#tag-community)
+- Keywords: `detection-engineering` `penetration-testing` `red-team` `blue-team` `mitre-attack` `repositories` `tools` `windows` `living-off-the-land` `application-control` `dual-use`
+- Related sources: [GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Sigma](#sigma) · [MITRE ATT&CK](#mitre-att-and-ck) · [Atomic Red Team](#atomic-red-team)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Living-off-the-land procedures are dual-use; test only in authorized environments and do not treat the presence of a listed binary as evidence of compromise.
 
 <a id="microsoft-sentinel-content-hub"></a>
 ### Microsoft Sentinel Content Hub
@@ -1910,7 +2133,7 @@ Microsoft Sentinel Content Hub is Microsoft's supported discovery and deployment
 - Related sources: [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Sigma](#sigma) · [MITRE ATT&CK](#mitre-att-and-ck) · [Splunk Security Content](#splunk-security-content)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="sigma"></a>
 ### Sigma
@@ -1950,7 +2173,7 @@ Sigma, maintained by SigmaHQ, is an open specification and ecosystem for express
 - Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [Elastic Detection Rules](#elastic-detection-rules) · [Splunk Security Content](#splunk-security-content) · [Timesketch](#timesketch)
 - Research provenance: Gemini, Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="splunk-security-content"></a>
 ### Splunk Security Content
@@ -1990,7 +2213,7 @@ Splunk Security Content is Splunk's public catalog of first-party detections, An
 - Related sources: [Sigma](#sigma) · [MITRE ATT&CK](#mitre-att-and-ck) · [The DFIR Report](#the-dfir-report) · [Atomic Red Team](#atomic-red-team)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-dfir"></a>
 ## DFIR
@@ -2033,7 +2256,48 @@ Autopsy is a free, open-source forensic analysis application produced by Sleuth 
 - Related sources: [The Sleuth Kit](#the-sleuth-kit) · [Plaso](#plaso) · [Timesketch](#timesketch) · [Volatility Foundation](#volatility-foundation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="eric-zimmerman-tools-kape"></a>
+### Eric Zimmerman Tools / KAPE
+
+**Detailed description**
+
+Eric Zimmerman's portable Windows forensic utilities and Kroll Artifact Parser and Extractor support rapid collection, parsing, and review of high-value endpoint artifacts. The EZ Tools family includes focused parsers for event logs, Registry hives, prefetch, Amcache, LNK and Jump List data, Master File Table records, and other Windows evidence. KAPE uses configurable Targets to collect selected artifacts and Modules to process them, allowing responders to acquire useful evidence before a full disk image is available. Analysts can preserve a source, run versioned tools, export structured results, and correlate multiple artifact families into a defensible timeline. Speed does not remove forensic interpretation: timestamps have different meanings, artifacts can be absent or cleaned, collection choices can omit context, and parser versions can change output. Validate high-impact conclusions against the original evidence and a second artifact or tool, record hashes and time-zone handling, and protect collected data as sensitive case material. EZ Tools and KAPE do not share one license. Review each tool's terms, and consult Kroll's current KAPE agreement before organizational use, redistribution, or any paid engagement involving a third-party environment.
+
+**Assessment:** Provides focused, widely used parsers for high-value Windows forensic artifacts; principal limitation: Collection targets and parser output can omit context and require artifact-specific validation.
+
+**Strengths**
+
+- Provides focused, widely used parsers for high-value Windows forensic artifacts
+- KAPE enables fast, configurable evidence collection and automated processing at scale
+- Structured exports support repeatable triage, timelines, and cross-artifact correlation
+
+**Limitations**
+
+- Collection targets and parser output can omit context and require artifact-specific validation
+- Licensing differs across the tool collection, and KAPE restrictions must be reviewed for the intended use
+
+**Best for:** Windows endpoint triage; Forensic artifact parsing; Rapid evidence collection; Incident timeline development.
+
+- Organization: Eric Zimmerman and Kroll
+- Canonical source: [https://ericzimmerman.github.io/](https://ericzimmerman.github.io/)
+- Quality: Tier A (92/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.8/5; transparency 4/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Mixed License Tool
+- Access: Freemium
+- Audience: DFIR analysts, Incident responders, Forensic examiners, Threat hunters, Security consultants
+- Skill levels: Intermediate, Advanced
+- Formats: command-line tools, tool collection, documentation, reference material, training videos
+- Tags: [`dfir`](#tag-dfir) [`incident-response`](#tag-incident-response) [`freemium`](#tag-freemium) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`video`](#tag-video)
+- Keywords: `dfir` `windows` `artifact-parsing` `forensic-artifacts` `evidence-collection` `forensic-timeline` `incident-response` `forensic-automation`
+- Related sources: [Autopsy](#autopsy) · [The Sleuth Kit](#the-sleuth-kit) · [Plaso](#plaso) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Forensic collections can contain credentials and personal or regulated data; protect evidence and outputs, preserve chain of custody, and confirm that the intended KAPE use complies with Kroll’s current licensing terms.
 
 <a id="plaso"></a>
 ### Plaso
@@ -2073,7 +2337,7 @@ Plaso is an open-source, Python-based event extraction and processing framework 
 - Related sources: [Timesketch](#timesketch) · [The Sleuth Kit](#the-sleuth-kit) · [Autopsy](#autopsy) · [Velociraptor](#velociraptor)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="the-dfir-report"></a>
 ### The DFIR Report
@@ -2113,7 +2377,7 @@ The DFIR Report is an independent publisher of evidence-rich intrusion case stud
 - Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [Sigma](#sigma) · [Velociraptor](#velociraptor) · [Zeek](#zeek) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="the-sleuth-kit"></a>
 ### The Sleuth Kit
@@ -2153,7 +2417,7 @@ The Sleuth Kit, maintained by Sleuth Kit Labs and contributors, is an open-sourc
 - Related sources: [Autopsy](#autopsy) · [Plaso](#plaso) · [Timesketch](#timesketch) · [Volatility Foundation](#volatility-foundation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="timesketch"></a>
 ### Timesketch
@@ -2193,7 +2457,7 @@ Timesketch is an open-source platform for collaborative exploration and analysis
 - Related sources: [Plaso](#plaso) · [Sigma](#sigma) · [Velociraptor](#velociraptor) · [The DFIR Report](#the-dfir-report)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="velociraptor"></a>
 ### Velociraptor
@@ -2233,7 +2497,7 @@ Velociraptor is an open-source digital-forensics and incident-response platform 
 - Related sources: [Volatility Foundation](#volatility-foundation) · [Timesketch](#timesketch) · [The DFIR Report](#the-dfir-report) · [Sigma](#sigma)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="volatility-foundation"></a>
 ### Volatility Foundation
@@ -2273,7 +2537,7 @@ The Volatility Foundation stewards the open-source Volatility Framework and supp
 - Related sources: [REMnux](#remnux) · [Velociraptor](#velociraptor) · [The Sleuth Kit](#the-sleuth-kit) · [Ghidra](#ghidra)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-exploit-development"></a>
 ## Exploit Development
@@ -2316,7 +2580,7 @@ Exploit Database is OffSec's public archive of vulnerability proof-of-concept co
 - Related sources: [CVE Program](#cve-program) · [National Vulnerability Database](#national-vulnerability-database) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [Metasploit Documentation](#metasploit-documentation) · [pwntools](#pwntools)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: May involve live malware, offensive techniques, or dual-use tooling; use only in an authorized isolated environment.
 
 <a id="pwntools"></a>
@@ -2357,7 +2621,7 @@ pwntools is an open-source Python framework maintained by Gallopsled and contrib
 - Related sources: [ROP Emporium](#rop-emporium) · [Exploit Database](#exploit-database) · [Metasploit Documentation](#metasploit-documentation) · [Ghidra](#ghidra) · [LiveOverflow](#liveoverflow)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="rop-emporium"></a>
 ### ROP Emporium
@@ -2397,7 +2661,7 @@ ROP Emporium is a focused educational collection of downloadable binary challeng
 - Related sources: [pwntools](#pwntools) · [OpenSecurityTraining2](#opensecuritytraining2) · [LiveOverflow](#liveoverflow) · [Ghidra](#ghidra) · [Exploit Database](#exploit-database)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-framework"></a>
 ## Framework
@@ -2440,7 +2704,7 @@ The Australian Signals Directorate’s Essential Eight is a prioritized baseline
 - Related sources: [CIS Critical Security Controls](#cis-critical-security-controls) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NCSC UK Guidance](#ncsc-uk-guidance)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="cis-critical-security-controls"></a>
 ### CIS Critical Security Controls
@@ -2480,7 +2744,7 @@ The CIS Critical Security Controls are 18 prioritized control areas supported by
 - Related sources: [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-53](#nist-sp-800-53) · [ASD Essential Eight](#asd-essential-eight) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="ncsc-cyber-assessment-framework"></a>
 ### NCSC Cyber Assessment Framework
@@ -2520,7 +2784,7 @@ The NCSC Cyber Assessment Framework provides an outcome-focused method for asses
 - Related sources: [NCSC UK Guidance](#ncsc-uk-guidance) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-53](#nist-sp-800-53) · [ASD Essential Eight](#asd-essential-eight)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="nist-cybersecurity-framework"></a>
 ### NIST Cybersecurity Framework
@@ -2560,7 +2824,7 @@ NIST Cybersecurity Framework 2.0 is a voluntary, outcome-based structure for man
 - Related sources: [NIST SP 800-53](#nist-sp-800-53) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [ASD Essential Eight](#asd-essential-eight)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="nist-sp-800-207-zero-trust-architecture"></a>
 ### NIST SP 800-207 Zero Trust Architecture
@@ -2600,7 +2864,7 @@ NIST SP 800-207 defines zero trust as an architectural approach that removes imp
 - Related sources: [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-53](#nist-sp-800-53) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="nist-sp-800-53"></a>
 ### NIST SP 800-53
@@ -2635,15 +2899,135 @@ NIST SP 800-53 Revision 5 is a comprehensive catalog of security and privacy con
 - Audience: Security architects, Risk and compliance teams, System owners, Auditors, Privacy professionals
 - Skill levels: Intermediate, Advanced
 - Formats: control catalog, pdf standard, oscal data, spreadsheets, supporting guidance
-- Tags: [`standards`](#tag-standards) [`security-architecture`](#tag-security-architecture) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Tags: [`standards`](#tag-standards) [`security-architecture`](#tag-security-architecture) [`supply-chain-security`](#tag-supply-chain-security) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
 - Keywords: `standards` `security-controls` `privacy-controls` `risk-management` `governance` `supply-chain-security` `compliance` `oscal`
 - Related sources: [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-government"></a>
 ## Government
+
+<a id="anssi-france"></a>
+### ANSSI France
+
+**Detailed description**
+
+ANSSI, the French National Cybersecurity Agency, is France's national authority for cybersecurity and cyberdefence and an authoritative source for government security guidance. Its portal brings together practical technical recommendations, organizational and risk-management methods, threat panoramas, scientific publications, certification and qualification schemes, training resources, open tools, and links to CERT-FR alerts and incident-response services. French government bodies, operators of vital or essential services, regulated organizations, architects, and service providers can use the material to establish baselines, compare architectures, prepare crises, evaluate products, and follow nationally relevant threats. Start with the exact guide or alert rather than the portal summary, record its publication and revision date, and identify whether language expresses regulation, qualification criteria, or non-binding advice. French and English coverage differs, and some digital services are restricted to eligible public or regulated beneficiaries. Recommendations reflect French legal, institutional, and threat contexts and may need adaptation elsewhere. A CERT-FR or ANSSI warning establishes official concern but does not prove that a named actor compromised a particular organization. Corroborate campaign and vulnerability claims with technical evidence and vendor advisories, map requirements to the governing jurisdiction, test changes, and document local risk acceptance and operational constraints.
+
+**Assessment:** Authoritative French source for cybersecurity guidance, national policy, certification, and incident support; principal limitation: Much material is French-first, and English coverage may be narrower or delayed.
+
+**Strengths**
+
+- Authoritative French source for cybersecurity guidance, national policy, certification, and incident support
+- Publishes detailed technical recommendations, risk methods, threat reports, and practical tools
+- Connects strategic government policy with CERT-FR operational alerts and response services
+
+**Limitations**
+
+- Much material is French-first, and English coverage may be narrower or delayed
+- Legal applicability, service eligibility, and threat priorities are centered on the French context
+
+**Best for:** French cybersecurity compliance and architecture; Government security guidance comparison; Critical-infrastructure resilience; National threat and incident awareness.
+
+- Organization: Agence nationale de la sécurité des systèmes d'information
+- Canonical source: [https://cyber.gouv.fr/en/](https://cyber.gouv.fr/en/)
+- Quality: Tier A (99/100)
+- Quality dimensions: authority 5/5; originality 5/5; maintenance 5/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Primary Authoritative
+- Maintenance: Continuous
+- Source type: Government
+- Access: Free
+- Audience: Public Sector organizations, Critical Infrastructure operators, Security architects, Incident responders, Risk managers
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: government guidance, security advisories, threat reports, technical guides, research publications
+- Tags: [`government`](#tag-government) [`incident-response`](#tag-incident-response) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `government` `national-cert` `government-guidance` `critical-infrastructure` `incident-response` `risk-management` `cyber-resilience` `european-union`
+- Related sources: [NCSC UK Guidance](#ncsc-uk-guidance) · [ENISA Publications](#enisa-publications) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="bsi-germany-it-grundschutz"></a>
+### BSI Germany IT-Grundschutz
+
+**Detailed description**
+
+IT-Grundschutz is the German Federal Office for Information Security's structured methodology for building and maintaining an information security management system. BSI standards define the process, while the regularly revised Compendium supplies modular requirements for organizational processes, applications, IT systems, communication links, physical infrastructure, and operational environments. Security managers can inventory and model an information domain, select applicable modules, compare implemented safeguards with baseline and standard requirements, document gaps, and perform additional risk analysis where protection needs are higher or no suitable module exists. Auditors and public-sector teams can also use the associated profiles, implementation guidance, tools, and certification framework. The material is authoritative within its stated German context, but applying modules mechanically can create paperwork without effective risk reduction. Editions and supporting documents change, German and English availability differ, and legal or certification relevance depends on jurisdiction and scope. Use the current edition, record every selected module and justified deviation, map requirements to accountable owners and evidence, and validate technical safeguards against actual architecture and threats. IT-Grundschutz complements rather than replaces business-impact analysis, sector obligations, engineering judgment, penetration testing, incident learning, or an individualized assessment of unusual systems.
+
+**Assessment:** Provides a comprehensive modular methodology for building and assessing an ISMS; principal limitation: The framework is detailed and can become documentation-heavy without careful scoping and ownership.
+
+**Strengths**
+
+- Provides a comprehensive modular methodology for building and assessing an ISMS
+- Connects organizational, personnel, physical, process, and technical security requirements
+- Offers supporting profiles, implementation guidance, audit methods, tools, and certification paths
+
+**Limitations**
+
+- The framework is detailed and can become documentation-heavy without careful scoping and ownership
+- Current editions and supporting material are often German-first and require jurisdiction-specific interpretation
+
+**Best for:** ISMS design and improvement; German public-sector security programs; Baseline control and gap assessment; Structured security audits.
+
+- Organization: German Federal Office for Information Security
+- Canonical source: [https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/IT-Grundschutz/it-grundschutz_node.html](https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/IT-Grundschutz/it-grundschutz_node.html)
+- Quality: Tier A (97/100)
+- Quality dimensions: authority 5/5; originality 5/5; maintenance 4.5/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Primary Authoritative
+- Maintenance: Active
+- Source type: Government
+- Access: Free
+- Audience: Security leaders, Risk managers, Security architects, Auditors, Public Sector organizations
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: framework, control catalog, implementation guidance, audit guide, government publications
+- Tags: [`government`](#tag-government) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `government` `security-framework` `risk-management` `control-framework` `secure-configuration` `compliance` `government-guidance` `cyber-resilience`
+- Related sources: [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NCSC UK Guidance](#ncsc-uk-guidance) · [ENISA Publications](#enisa-publications) · [CIS Critical Security Controls](#cis-critical-security-controls) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [ANSSI France](#anssi-france) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="canadian-centre-for-cyber-security"></a>
+### Canadian Centre for Cyber Security
+
+**Detailed description**
+
+The Canadian Centre for Cyber Security is part of the Communications Security Establishment Canada and acts as Canada's technical authority and unified public source for cybersecurity guidance, services, and support. Its portal publishes vulnerability advisories and alerts, technical and executive guidance, national cyber-threat assessments, critical-infrastructure resources, public-awareness material, incident-reporting routes, and selected defensive tools and services. Canadian organizations can use it to follow nationally relevant threats, improve baseline controls and resilience, prepare incident plans, and locate official support. The wider public and smaller organizations benefit from audience-specific advice, while threat assessments help leaders frame strategic risks. Read the exact publication and retain its modification date, audience, confidence language, and scope. Some services, including organization-specific notifications, have enrollment, ownership, or Canadian asset requirements. National assessments may combine public and classified information, so the complete evidence base is not always reproducible. Government attribution and forecasts carry authority within their remit but do not prove local targeting or compromise. Corroborate vulnerability details with vendors, validate alerts against asset inventory and telemetry, and adapt general recommendations to business impact, sector obligations, architecture, and available resources before treating them as completed controls.
+
+**Assessment:** Authoritative Canadian source for guidance, alerts, incident reporting, and national threat assessments; principal limitation: Some services and notifications have Canadian eligibility, enrollment, or asset-ownership requirements.
+
+**Strengths**
+
+- Authoritative Canadian source for guidance, alerts, incident reporting, and national threat assessments
+- Provides audience-specific material for individuals, businesses, critical infrastructure, academia, and government
+- Connects strategic assessments with practical readiness, mitigation, and response resources
+
+**Limitations**
+
+- Some services and notifications have Canadian eligibility, enrollment, or asset-ownership requirements
+- Threat assessments may rely partly on classified evidence and require local validation before action
+
+**Best for:** Canadian cyber-resilience planning; Government alert and advisory monitoring; Critical-infrastructure guidance; National threat-landscape assessment.
+
+- Organization: Canadian Centre for Cyber Security, Communications Security Establishment Canada
+- Canonical source: [https://www.cyber.gc.ca/en/](https://www.cyber.gc.ca/en/)
+- Quality: Tier A (99/100)
+- Quality dimensions: authority 5/5; originality 5/5; maintenance 5/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Primary Authoritative
+- Maintenance: Continuous
+- Source type: Government
+- Access: Free
+- Audience: Canadian organizations, Critical Infrastructure operators, Security leaders, Incident responders, General public
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: government guidance, security advisories, threat reports, incident-reporting services, training resources
+- Tags: [`government`](#tag-government) [`incident-response`](#tag-incident-response) [`threat-reports`](#tag-threat-reports) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `government` `national-cert` `government-guidance` `critical-infrastructure` `incident-response` `threat-reports` `cyber-resilience` `public-sector`
+- Related sources: [NCSC UK Guidance](#ncsc-uk-guidance) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [ASD Essential Eight](#asd-essential-eight) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [ANSSI France](#anssi-france)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="cyber-security-agency-of-singapore"></a>
 ### Cyber Security Agency of Singapore
@@ -2683,7 +3067,7 @@ The Cyber Security Agency of Singapore’s publications library provides officia
 - Related sources: [JPCERT/CC](#jpcert-cc) · [ENISA Publications](#enisa-publications) · [NCSC UK Guidance](#ncsc-uk-guidance) · [Google Secure AI Framework](#google-secure-ai-framework)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="enisa-publications"></a>
 ### ENISA Publications
@@ -2723,7 +3107,7 @@ ENISA’s publications portal is the European Union Agency for Cybersecurity’s
 - Related sources: [CERT-EU Publications](#cert-eu-publications) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report)
 - Research provenance: Gemini
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="israel-national-cyber-directorate"></a>
 ### Israel National Cyber Directorate
@@ -2763,7 +3147,7 @@ The Israel National Cyber Directorate is the government body responsible for cyb
 - Related sources: [NCSC UK Guidance](#ncsc-uk-guidance) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore)
 - Research provenance: Gemini
 - URL validation: Canonical URL; automated access restricted (HTTP 403)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="ncsc-ireland-guidance"></a>
 ### NCSC Ireland Guidance
@@ -2803,7 +3187,7 @@ Ireland’s National Cyber Security Centre publishes official guidance for organ
 - Related sources: [NCSC UK Guidance](#ncsc-uk-guidance) · [ENISA Publications](#enisa-publications) · [CERT-EU Publications](#cert-eu-publications) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework)
 - Research provenance: Gemini
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="ncsc-uk-guidance"></a>
 ### NCSC UK Guidance
@@ -2843,7 +3227,7 @@ The UK National Cyber Security Centre’s guidance library provides official, au
 - Related sources: [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [ASD Essential Eight](#asd-essential-eight) · [NCSC Ireland Guidance](#ncsc-ireland-guidance)
 - Research provenance: Gemini
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-identity-security"></a>
 ## Identity Security
@@ -2886,7 +3270,7 @@ ADSecurity.org is Sean Metcalf's specialist knowledge archive on Microsoft Activ
 - Related sources: [SpecterOps Research](#specterops-research) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [Microsoft Entra Documentation](#microsoft-entra-documentation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="bloodhound"></a>
 ### BloodHound
@@ -2926,7 +3310,7 @@ BloodHound is an identity attack-path management platform that collects and mode
 - Related sources: [SpecterOps Research](#specterops-research) · [ADSecurity.org](#adsecurity-org) · [PingCastle](#pingcastle) · [Microsoft Entra Documentation](#microsoft-entra-documentation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Collected identity graphs contain sensitive privilege and relationship data; protect collectors, exports, credentials, and the BloodHound service as security-sensitive assets.
 
 <a id="microsoft-entra-documentation"></a>
@@ -2967,7 +3351,7 @@ Microsoft Entra documentation is the first-party technical reference for the Ent
 - Related sources: [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [BloodHound](#bloodhound) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="pingcastle"></a>
 ### PingCastle
@@ -3007,7 +3391,7 @@ PingCastle is an Active Directory security assessment tool centered on a health-
 - Related sources: [BloodHound](#bloodhound) · [Purple Knight](#purple-knight) · [ADSecurity.org](#adsecurity-org) · [Microsoft Entra Documentation](#microsoft-entra-documentation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="purple-knight"></a>
 ### Purple Knight
@@ -3047,7 +3431,7 @@ Purple Knight is Semperis's free assessment tool for Active Directory and Micros
 - Related sources: [PingCastle](#pingcastle) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [BloodHound](#bloodhound) · [SpecterOps Research](#specterops-research)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="specterops-research"></a>
 ### SpecterOps Research
@@ -3087,7 +3471,7 @@ The SpecterOps Resource Center collects original and practitioner-oriented mater
 - Related sources: [BloodHound](#bloodhound) · [ADSecurity.org](#adsecurity-org) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-incident-response"></a>
 ## Incident Response
@@ -3130,7 +3514,7 @@ CERT-EU’s publications portal exposes selected security advisories, pragmatic 
 - Related sources: [ENISA Publications](#enisa-publications) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [JPCERT/CC](#jpcert-cc)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="jpcert-cc"></a>
 ### JPCERT/CC
@@ -3170,7 +3554,7 @@ JPCERT/CC is an independent Japanese nonprofit CSIRT that serves as Japan’s po
 - Related sources: [CERT-EU Publications](#cert-eu-publications) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [MISP](#misp)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="nist-sp-800-61-rev-3"></a>
 ### NIST SP 800-61 Rev. 3
@@ -3210,7 +3594,7 @@ NIST SP 800-61 Revision 3 is the National Institute of Standards and Technology'
 - Related sources: [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-53](#nist-sp-800-53) · [CIS Critical Security Controls](#cis-critical-security-controls) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-kubernetes"></a>
 ## Kubernetes
@@ -3253,7 +3637,7 @@ The CIS Kubernetes Benchmark provides prescriptive hardening recommendations and
 - Related sources: [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [Prowler](#prowler) · [CIS Critical Security Controls](#cis-critical-security-controls)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="kubernetes-security-documentation"></a>
 ### Kubernetes Security Documentation
@@ -3293,7 +3677,7 @@ The official Kubernetes security documentation explains security concepts and co
 - Related sources: [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubescape](#kubescape) · [Trivy](#trivy) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="kubescape"></a>
 ### Kubescape
@@ -3333,10 +3717,92 @@ Kubescape is an open-source Kubernetes security platform created by ARMO and mai
 - Related sources: [Kubernetes Security Documentation](#kubernetes-security-documentation) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Trivy](#trivy) · [Prowler](#prowler)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-malware-analysis"></a>
 ## Malware Analysis
+
+<a id="any-run"></a>
+### ANY.RUN
+
+**Detailed description**
+
+ANY.RUN is a cloud malware-analysis service that lets an analyst execute a suspicious file or URL in a disposable virtual machine and interact with the environment while processes, files, registry activity, network connections, and detection events are recorded. Reports can support rapid alert triage, IOC extraction, behavioral comparison, ATT&CK-oriented review, and analyst training; the public corpus also supplies searchable examples. The proprietary service is maintained by ANYRUN FZCO. Its current free Community plan requires an account, carries a personal license, allows public analyses, and restricts available operating systems, runtime, file size, reporting, exports, and advanced inspection relative to paid plans. Public submissions and reports are available to other users and may be used for research and intelligence, so never upload customer data, internal URLs, credentials, unreleased software, or confidential samples in public mode. Sandbox-aware malware, environment differences, failed detonation, and automated signatures can produce incomplete or misleading results. Validate consequential findings with hashes, static analysis, controlled reproduction, packet evidence, and another source. Handle downloaded samples as live malware and use the service only for authorized defensive work.
+
+**Assessment:** Interactive detonation exposes behavior that a purely automated sandbox can miss; principal limitation: Free Community analyses are public and can expose submitted files, URLs, reports, and sensitive context.
+
+**Strengths**
+
+- Interactive detonation exposes behavior that a purely automated sandbox can miss
+- Public analysis corpus provides searchable malware examples and indicators
+- Reports combine process, network, file, and ATT&CK-oriented context for fast triage
+
+**Limitations**
+
+- Free Community analyses are public and can expose submitted files, URLs, reports, and sensitive context
+- The free personal plan limits runtime, environments, file size, exports, and advanced inspection
+- Sandbox evasion and automated classification errors require corroborating static and behavioral evidence
+
+**Best for:** interactive malware triage; phishing attachment analysis; IOC extraction; malware-analysis training.
+
+- Organization: ANYRUN FZCO
+- Canonical source: [https://any.run/](https://any.run/)
+- Quality: Tier A (92/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.68/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Freemium
+- Audience: Malware analysts, SOC analysts, Incident responders, Security students
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: cloud sandbox, behavioral reports, public sample dataset, threat-intelligence search, API
+- Tags: [`malware-analysis`](#tag-malware-analysis) [`tools`](#tag-tools) [`cti`](#tag-cti) [`datasets`](#tag-datasets) [`labs`](#tag-labs) [`mitre-attack`](#tag-mitre-attack) [`freemium`](#tag-freemium) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `malware-analysis` `cti` `datasets` `tools` `labs` `dynamic-analysis` `interactive-sandbox` `ioc-enrichment` `mitre-attack` `public-submissions` `dual-use` `freemium`
+- Related sources: [Recorded Future Triage](#recorded-future-triage) · [VirusTotal](#virustotal) · [MalwareBazaar](#malwarebazaar) · [YARA](#yara) · [MITRE ATT&CK](#mitre-att-and-ck) · [capa](#capa)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Free-tier submissions may be public and can contain live malware; never upload confidential artifacts, and analyze only in an authorized isolated workflow.
+
+<a id="capa"></a>
+### capa
+
+**Detailed description**
+
+capa is an open-source FLARE-team tool maintained under Mandiant and Google that identifies program capabilities using a transparent, community-maintained rule set. It analyzes supported PE, ELF, .NET, shellcode, and selected dynamic-analysis report formats, then reports behaviors such as service installation, process creation, cryptography, communication, or anti-analysis. Rule metadata can connect results to MITRE ATT&CK and the Malware Behavior Catalog, and verbose output shows the features and locations that caused a match. Analysts can use capa early in triage to prioritize functions, compare samples, guide work in Ghidra or IDA, and develop reusable rules; the browser-based capa Explorer can inspect result documents interactively. Treat every result as an analytical hypothesis. Static extraction can miss packed, obfuscated, dynamically resolved, or unsupported behavior, while generic library code can create context that looks more important than it is. Dynamic reports inherit the sandbox's visibility and execution path. Preserve the tool and rule versions, review match evidence, combine results with strings, disassembly, telemetry, and sandbox observations, and handle unknown samples only in an authorized isolated analysis environment.
+
+**Assessment:** Uses transparent rules and explainable feature matches to identify program capabilities; principal limitation: Packed, obfuscated, unsupported, or novel code can cause incomplete or misleading results.
+
+**Strengths**
+
+- Uses transparent rules and explainable feature matches to identify program capabilities
+- Supports static binaries and selected dynamic-analysis reports with ATT&CK and MBC mappings
+- Accelerates triage while directing analysts to relevant functions and behaviors
+
+**Limitations**
+
+- Packed, obfuscated, unsupported, or novel code can cause incomplete or misleading results
+- A capability match does not prove malicious intent, execution, or case relevance
+
+**Best for:** Malware capability triage; Reverse-engineering prioritization; Capability-rule development; Comparing related executable samples.
+
+- Organization: Mandiant FLARE team, Google
+- Canonical source: [https://github.com/mandiant/capa](https://github.com/mandiant/capa)
+- Quality: Tier A (95/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Malware analysts, Reverse engineers, Incident responders, Detection engineers, Security researchers
+- Skill levels: Intermediate, Advanced
+- Formats: command-line tool, rules, json data, web interfaces, technical documentation
+- Tags: [`malware-analysis`](#tag-malware-analysis) [`tools`](#tag-tools) [`reverse-engineering`](#tag-reverse-engineering) [`mitre-attack`](#tag-mitre-attack) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`repositories`](#tag-repositories) [`community`](#tag-community)
+- Keywords: `malware-analysis` `reverse-engineering` `binary-analysis` `static-analysis` `dynamic-analysis` `mitre-attack` `malware-taxonomy` `rule-authoring`
+- Related sources: [YARA](#yara) · [Ghidra](#ghidra) · [FLARE-VM](#flare-vm) · [REMnux](#remnux) · [Malpedia](#malpedia) · [x64dbg](#x64dbg) · [ANY.RUN](#any-run)
+- Research provenance: Gemini, Openai, Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="flare-vm"></a>
 ### FLARE-VM
@@ -3376,7 +3842,7 @@ FLARE-VM is Mandiant's open-source collection of PowerShell and package-manageme
 - Related sources: [REMnux](#remnux) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [Cutter](#cutter) · [YARA](#yara)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="malpedia"></a>
 ### Malpedia
@@ -3416,7 +3882,7 @@ Malpedia is a curated malware knowledge base operated by Fraunhofer FKIE to supp
 - Related sources: [YARA](#yara) · [MalwareBazaar](#malwarebazaar) · [VirusTotal](#virustotal) · [Check Point Research](#check-point-research) · [SentinelOne Labs](#sentinelone-labs)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="malwarebazaar"></a>
 ### MalwareBazaar
@@ -3456,8 +3922,50 @@ MalwareBazaar is a community malware-sample exchange operated by abuse.ch with S
 - Related sources: [Malpedia](#malpedia) · [VirusTotal](#virustotal) · [YARA](#yara) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: May involve live malware, offensive techniques, or dual-use tooling; use only in an authorized isolated environment.
+
+<a id="recorded-future-triage"></a>
+### Recorded Future Triage
+
+**Detailed description**
+
+Recorded Future Triage is the public cloud entry point for Recorded Future's Sandbox technology. It accepts files and URLs, performs static processing, runs one or more configurable behavioral tasks, and produces machine-readable reports containing process activity, network connections, extracted configuration, indicators, family assessments, and tactics or techniques. A documented REST-like API supports submission, event streams, search, and report retrieval, making the service useful for repeatable malware triage and enrichment pipelines. The free tria.ge service requires an account and is explicitly public: all submissions are visible to other account holders, public users cannot delete them themselves, and private-by-default workflows are provided through the commercial Recorded Future Enterprise Sandbox. Never submit internal documents, credentials, private URLs, customer samples, or material whose disclosure would create legal or operational harm. Family scores, configuration extraction, and behavior depend on the chosen profile, runtime, network path, anti-analysis behavior, and current signatures. Treat results as analytical leads, preserve sample hashes and profile details, and corroborate them with static reverse engineering, packet evidence, and independent intelligence. Downloaded samples are hazardous and belong only in an authorized isolated lab.
+
+**Assessment:** Documented API supports repeatable submission, search, event, and report workflows; principal limitation: All free public tria.ge submissions are visible to other account holders and cannot normally be self-deleted.
+
+**Strengths**
+
+- Documented API supports repeatable submission, search, event, and report workflows
+- Combines static analysis, behavioral execution, configuration extraction, and family-oriented scoring
+- Public corpus helps analysts compare samples and pivot across observable relationships
+
+**Limitations**
+
+- All free public tria.ge submissions are visible to other account holders and cannot normally be self-deleted
+- Private analysis and organization controls require the commercial enterprise service
+- Profile selection, sandbox evasion, and signature quality can make automated verdicts incomplete or wrong
+
+**Best for:** automated malware detonation; malware-family and configuration triage; sandbox API integration; public sample research.
+
+- Organization: Recorded Future
+- Canonical source: [https://tria.ge/](https://tria.ge/)
+- Quality: Tier A (92/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.68/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Freemium
+- Audience: Malware analysts, Incident responders, Threat Intelligence analysts, Security automation engineers
+- Skill levels: Intermediate, Advanced
+- Formats: cloud sandbox, static reports, behavioral reports, public sample dataset, API
+- Tags: [`malware-analysis`](#tag-malware-analysis) [`tools`](#tag-tools) [`cti`](#tag-cti) [`datasets`](#tag-datasets) [`freemium`](#tag-freemium) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `malware-analysis` `cti` `datasets` `tools` `dynamic-analysis` `sandbox` `malware-config` `ioc-enrichment` `public-submissions` `automation` `dual-use` `freemium`
+- Related sources: [ANY.RUN](#any-run) · [VirusTotal](#virustotal) · [MalwareBazaar](#malwarebazaar) · [YARA](#yara) · [Malpedia](#malpedia) · [capa](#capa)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Public submissions may expose uploaded samples and can contain live malware; never upload confidential artifacts, and validate automated verdicts in an authorized isolated workflow.
 
 <a id="remnux"></a>
 ### REMnux
@@ -3497,7 +4005,7 @@ REMnux is a Linux distribution and curated malware-analysis toolkit maintained b
 - Related sources: [FLARE-VM](#flare-vm) · [YARA](#yara) · [Ghidra](#ghidra) · [Volatility Foundation](#volatility-foundation) · [MalwareBazaar](#malwarebazaar)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="virustotal"></a>
 ### VirusTotal
@@ -3537,8 +4045,50 @@ VirusTotal, operated by Google, aggregates antivirus, sandbox, reputation, metad
 - Related sources: [MalwareBazaar](#malwarebazaar) · [Malpedia](#malpedia) · [YARA](#yara) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: May involve live malware, offensive techniques, or dual-use tooling; use only in an authorized isolated environment.
+
+<a id="vx-underground"></a>
+### VX-Underground
+
+**Detailed description**
+
+vx-underground is an independent public archive focused on malware history and contemporary malicious code. Its infrastructure hosts malware samples, malware source code, papers, zines, threat-research collections, and other artifacts that can support reverse engineering, family comparison, detection development, and preservation of material that may disappear elsewhere. The project describes itself as community- and donation-supported and makes much of the collection available without registration. That accessibility is also its central limitation: files and code can be immediately harmful, collections may contain offensive capabilities, artifact provenance and labeling can be incomplete, and individual papers or samples retain differing copyrights and licenses. Public hosting does not grant blanket permission to redistribute or operationalize content. Researchers should establish a legitimate purpose, applicable legal authority, retention policy, and sample-handling procedure before access. Use a segmented, disposable analysis environment with no production credentials or shared storage; verify hashes, preserve source paths and timestamps, and cross-check family or attribution claims with independent analysis. Do not browse or download casually from a managed workstation. Never execute, compile, or deploy hosted code outside an explicitly authorized defensive research scope.
+
+**Assessment:** Unusually broad archive of malware samples, source code, papers, and historical artifacts; principal limitation: The archive contains live malware and offensive source code with severe handling risk.
+
+**Strengths**
+
+- Unusually broad archive of malware samples, source code, papers, and historical artifacts
+- Provides rare primary material for reverse engineering and detection research
+- Open access and continued community activity help preserve otherwise ephemeral research material
+
+**Limitations**
+
+- The archive contains live malware and offensive source code with severe handling risk
+- Artifact provenance, labels, and family or attribution context may be incomplete or unverified
+- Hosted items have differing copyrights and licenses, so public availability is not blanket reuse permission
+
+**Best for:** advanced malware reverse engineering; malware-history research; detection corpus development; preservation of technical papers.
+
+- Organization: vx-underground
+- Canonical source: [https://vx-underground.org/](https://vx-underground.org/)
+- Quality: Tier B (85/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 4.5/5; practical value 4.68/5; transparency 4/5
+- Evidence use: Mixed
+- Maintenance: Active
+- Source type: Independent Technical
+- Access: Free
+- Audience: Experienced malware researchers, Reverse engineers, Detection engineers, Digital archivists
+- Skill levels: Advanced
+- Formats: malware sample datasets, source-code archives, technical papers, zines, research collections
+- Tags: [`malware-analysis`](#tag-malware-analysis) [`tools`](#tag-tools) [`reverse-engineering`](#tag-reverse-engineering) [`datasets`](#tag-datasets) [`repositories`](#tag-repositories) [`threat-research`](#tag-threat-research) [`advanced`](#tag-advanced) [`free`](#tag-free)
+- Keywords: `malware-analysis` `reverse-engineering` `datasets` `repositories` `threat-research` `malware-samples` `source-code` `digital-preservation` `advanced` `dual-use`
+- Related sources: [MalwareBazaar](#malwarebazaar) · [Malpedia](#malpedia) · [VirusTotal](#virustotal) · [ANY.RUN](#any-run) · [Recorded Future Triage](#recorded-future-triage)
+- Research provenance: Expansion Research
+- URL validation: Canonical URL; automated access restricted (HTTP 403)
+- Checked: 2026-09-07
+- Safety note: This collection can include live malware and offensive source code; use a legally authorized isolated lab, follow handling terms, and never execute samples on production systems.
 
 <a id="yara"></a>
 ### YARA
@@ -3578,7 +4128,7 @@ YARA is an open-source pattern-matching engine maintained within the VirusTotal 
 - Related sources: [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [VirusTotal](#virustotal) · [REMnux](#remnux) · [Google SecOps Community Rules](#google-secops-community-rules)
 - Research provenance: Gemini, Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-mobile-security"></a>
 ## Mobile Security
@@ -3621,7 +4171,7 @@ Android's official security documentation explains the platform security model a
 - Related sources: [OWASP MASVS](#owasp-masvs) · [OWASP MASTG](#owasp-mastg) · [MobSF](#mobsf) · [Frida](#frida)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="apple-platform-security"></a>
 ### Apple Platform Security
@@ -3661,7 +4211,7 @@ Apple Platform Security is Apple's official guide to the security architecture o
 - Related sources: [OWASP MASVS](#owasp-masvs) · [OWASP MASTG](#owasp-mastg) · [Frida](#frida) · [MobSF](#mobsf)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="frida"></a>
 ### Frida
@@ -3701,7 +4251,7 @@ Frida is an open-source dynamic instrumentation toolkit that lets analysts injec
 - Related sources: [OWASP MASTG](#owasp-mastg) · [MobSF](#mobsf) · [Ghidra](#ghidra) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Dynamic instrumentation is dual-use; test only software and devices you are authorized to assess.
 
 <a id="mobsf"></a>
@@ -3742,7 +4292,7 @@ Mobile Security Framework, or MobSF, is an open-source platform for automated st
 - Related sources: [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [Frida](#frida) · [Android Security](#android-security)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="owasp-mastg"></a>
 ### OWASP MASTG
@@ -3782,7 +4332,7 @@ The OWASP Mobile Application Security Testing Guide is a detailed knowledge base
 - Related sources: [OWASP MASVS](#owasp-masvs) · [MobSF](#mobsf) · [Frida](#frida) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="owasp-masvs"></a>
 ### OWASP MASVS
@@ -3822,10 +4372,52 @@ The OWASP Mobile Application Security Verification Standard defines security req
 - Related sources: [OWASP MASTG](#owasp-mastg) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [MobSF](#mobsf)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-network-security"></a>
 ## Network Security
+
+<a id="arkime"></a>
+### Arkime
+
+**Detailed description**
+
+Arkime is an Apache-2.0 open-source platform for capturing, indexing, searching, and retrieving network traffic at scale. Its sensors write full packet capture to local or managed storage while extracting session metadata into a supported OpenSearch or Elasticsearch cluster; the viewer lets analysts pivot from fields and timelines back to packets. The project also includes components for intelligence investigation and multi-cluster management. Arkime's public repository and current documentation are actively maintained, with official packages, containers, upgrade guidance, compatibility matrices, and 2026 releases. It is especially useful when incident responders need retrospective protocol evidence beyond alerts, but it is not a turnkey appliance. Production sizing requires sustained packet throughput, retention calculations, database capacity, separate storage planning, encryption, authentication, role design, clock accuracy, and monitored capture loss. Sensor placement, asymmetric routing, encrypted sessions, tunneling, sampling, and retention gaps can leave material blind spots. PCAP may contain credentials, personal data, regulated content, and proprietary traffic; minimize collection, restrict access, define lawful retention, and audit exports. Treat metadata and intelligence enrichment as leads, validate conclusions against packets and endpoint evidence, and follow sequential upgrade requirements rather than skipping major versions.
+
+**Assessment:** Links indexed session metadata to retained full packets for retrospective investigation; principal limitation: Large deployments require substantial packet storage, search-cluster capacity, and operational engineering.
+
+**Strengths**
+
+- Links indexed session metadata to retained full packets for retrospective investigation
+- Open-source architecture gives operators control over capture, storage, search, and integrations
+- Active documentation and releases cover deployment, scaling, compatibility, security, and upgrades
+
+**Limitations**
+
+- Large deployments require substantial packet storage, search-cluster capacity, and operational engineering
+- Capture placement, packet loss, encryption, retention, and asymmetric routing create visibility gaps
+- Full packet data can expose credentials, personal information, and regulated content requiring strict governance
+
+**Best for:** network forensic investigation; full-packet capture operations; retrospective threat hunting; session metadata analysis.
+
+- Organization: Arkime Project
+- Canonical source: [https://arkime.com/](https://arkime.com/)
+- Quality: Tier A (94/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.68/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Network Security analysts, Incident responders, Threat hunters, Security platform engineers
+- Skill levels: Intermediate, Advanced
+- Formats: software platform, documentation, github repository, release packages, APIs
+- Tags: [`network-security`](#tag-network-security) [`blue-team`](#tag-blue-team) [`dfir`](#tag-dfir) [`incident-response`](#tag-incident-response) [`soc`](#tag-soc) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`community`](#tag-community)
+- Keywords: `network-security` `dfir` `incident-response` `soc` `blue-team` `tools` `repositories` `full-packet-capture` `network-forensics` `threat-hunting` `privacy`
+- Related sources: [Zeek](#zeek) · [Wireshark](#wireshark) · [Suricata](#suricata) · [Security Onion](#security-onion) · [Snort](#snort)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Packet captures and session metadata can expose credentials, content, and personal data; collect only with authorization and apply retention, access-control, and legal requirements.
 
 <a id="nmap-documentation"></a>
 ### Nmap Documentation
@@ -3865,7 +4457,130 @@ Nmap's official documentation is the primary reference for the Nmap Project's ne
 - Related sources: [Wireshark](#wireshark) · [Zeek](#zeek) · [Suricata](#suricata) · [Metasploit Documentation](#metasploit-documentation) · [Security Onion](#security-onion)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="sans-internet-storm-center"></a>
+### SANS Internet Storm Center
+
+**Detailed description**
+
+The SANS Internet Storm Center is a free, community-driven operational-security service within the SANS Technology Institute. It publishes daily handler diaries and podcasts and uses the DShield distributed sensor and log-sharing system to summarize unwanted internet traffic, port activity, scanning behavior, and emerging attack trends. SOC analysts can use diaries for rapid orientation, then follow cited samples, commands, packet details, or external advisories to build time-bounded hunting and detection hypotheses. Network defenders can compare a local spike with DShield trends or use the API and public summaries as supporting context during triage. The source is especially effective for understanding what experienced practitioners are seeing now, but each diary reflects an individual handler's evidence and interpretation rather than a uniform editorial or peer-review process. DShield is based on voluntary, unevenly distributed observations and cannot establish global prevalence or whether a specific organization was targeted or compromised. Preserve the diary date, distinguish observed traffic from inference, and corroborate important claims with vendor advisories, national CERT reporting, packet evidence, and local telemetry before blocking infrastructure or escalating attribution.
+
+**Assessment:** Provides frequent practitioner analysis of current malicious traffic and operational security events; principal limitation: Handler diaries vary in depth and are not a consistently peer-reviewed research series.
+
+**Strengths**
+
+- Provides frequent practitioner analysis of current malicious traffic and operational security events
+- Combines human interpretation with DShield sensor data, trend views, feeds, and API access
+- Maintains a long-running public archive useful for historical and contemporary comparison
+
+**Limitations**
+
+- Handler diaries vary in depth and are not a consistently peer-reviewed research series
+- DShield telemetry is a contributed sample and cannot establish global prevalence or local compromise
+
+**Best for:** Daily SOC awareness; Internet scanning and port-trend context; Network threat hunting; Rapid corroboration during incident triage.
+
+- Organization: SANS Technology Institute
+- Canonical source: [https://isc.sans.edu/](https://isc.sans.edu/)
+- Quality: Tier A (93/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Free
+- Audience: SOC analysts, Network defenders, Incident responders, Threat hunters, Security students
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: technical articles, podcasts, web interfaces, indicator data, api
+- Tags: [`network-security`](#tag-network-security) [`blue-team`](#tag-blue-team) [`threat-research`](#tag-threat-research) [`community`](#tag-community) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `network-security` `threat-research` `threat-feeds` `network-security-monitoring` `intrusion-analysis` `alert-triage` `community` `api`
+- Related sources: [Cisco Talos Intelligence](#cisco-talos-intelligence) · [The DFIR Report](#the-dfir-report) · [Zeek](#zeek) · [Suricata](#suricata) · [Wireshark](#wireshark) · [GreyNoise](#greynoise)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="shodan"></a>
+### Shodan
+
+**Detailed description**
+
+Shodan is a proprietary internet-intelligence platform operated by Shodan, LLC. Its scanners collect publicly available service banners and related metadata from internet-connected systems, which users can explore through the main search engine, specialized websites, command-line tooling, developer APIs, monitoring, data downloads, and enterprise feeds. Defenders use it to discover externally visible services, compare an organization's inventory with observed exposure, estimate technology prevalence, and enrich an IP during incident or vulnerability triage. Access is tiered: some search is available without an account, free accounts provide limited capabilities, a paid lifetime membership expands individual access, and subscriptions or enterprise licenses govern higher-volume APIs, monitoring, scans, history, and bulk data. Current limits and prices can change, and Shodan's terms require appropriate attribution for derived materials. A banner is a time-stamped remote observation; it may be stale, incomplete, misleading, associated with shared infrastructure, or collected from a different network perspective. A product string or vulnerability tag does not prove ownership, reachability, or exploitability. Confirm findings with asset owners and authorized local evidence. On-demand scanning and follow-on interaction are dual-use and must be limited to systems you are permitted to assess.
+
+**Assessment:** Large continuously refreshed corpus of internet-facing service banners and metadata; principal limitation: Banners and tags can be stale, incomplete, shared, misidentified, or collected from a different network perspective.
+
+**Strengths**
+
+- Large continuously refreshed corpus of internet-facing service banners and metadata
+- Search, API, monitoring, and data products support exposure discovery and IP enrichment
+- Useful independent observation for comparing declared inventory with externally visible services
+
+**Limitations**
+
+- Banners and tags can be stale, incomplete, shared, misidentified, or collected from a different network perspective
+- Useful filters, credits, downloads, monitoring, scanning, history, and bulk access vary substantially by paid tier
+- Search results do not prove asset ownership, current reachability, vulnerability, exploitation, or compromise
+
+**Best for:** external attack-surface discovery; internet-service research; IP and vulnerability triage; asset-inventory comparison.
+
+- Organization: Shodan, LLC
+- Canonical source: [https://www.shodan.io/](https://www.shodan.io/)
+- Quality: Tier A (92/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.68/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Freemium
+- Audience: Attack Surface analysts, Network defenders, Vulnerability teams, Threat Intelligence analysts
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: search engine, API, command-line tools, monitoring service, internet scan datasets
+- Tags: [`network-security`](#tag-network-security) [`blue-team`](#tag-blue-team) [`cti`](#tag-cti) [`datasets`](#tag-datasets) [`tools`](#tag-tools) [`vulnerability-management`](#tag-vulnerability-management) [`freemium`](#tag-freemium) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `network-security` `cti` `datasets` `tools` `vulnerability-management` `internet-scanning` `attack-surface-management` `asset-discovery` `ip-enrichment` `freemium` `dual-use`
+- Related sources: [GreyNoise](#greynoise) · [Nmap Documentation](#nmap-documentation) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [FIRST EPSS](#first-epss)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Exposure search and active scanning are dual-use; query and test only within legal and organizational authorization, and verify service ownership before drawing conclusions.
+
+<a id="snort"></a>
+### Snort
+
+**Detailed description**
+
+Snort is an open-source network intrusion detection and prevention engine maintained by Cisco with community participation. Snort 3 processes live or recorded traffic, applies protocol-aware inspection and a flexible rule language, and can operate as a packet sniffer, logger, passive IDS, or inline IPS. Its multithreaded architecture, service identification, Lua configuration, plugin system, reference documentation, and rule-writing guidance make it useful for network detection engineering and controlled packet analysis. Licensing and access must be evaluated per component. Cisco documents a dual-license strategy for the engine; the Community Ruleset is GPLv2 and freely available, the free Registered Ruleset requires an account and receives detections after a delay with additional restrictions, and the current Cisco Talos Subscriber Ruleset is paid. Do not present those rule channels as equivalent. Rules are signatures, not proof of compromise, and defaults cannot account for local protocols, encrypted traffic, asymmetric routing, packet loss, address translation, or accepted risk. Before inline deployment, test supported versions, DAQ mode, throughput, evasion cases, rule provenance, update timing, suppressions, and failure behavior. Inspect alerts against packet and endpoint evidence, and stage blocking changes to avoid operational disruption.
+
+**Assessment:** Mature open-source IDS and IPS engine with protocol-aware real-time packet inspection; principal limitation: Engine, Community, Registered, and Subscriber artifacts have materially different licenses, delays, and access terms.
+
+**Strengths**
+
+- Mature open-source IDS and IPS engine with protocol-aware real-time packet inspection
+- Snort 3 provides multithreading, modular plugins, service identification, and extensive rule documentation
+- Cisco Talos and community rule channels support current detection development at different access levels
+
+**Limitations**
+
+- Engine, Community, Registered, and Subscriber artifacts have materially different licenses, delays, and access terms
+- Encrypted or incomplete traffic, local topology, and evasive behavior constrain network visibility
+- Rules require performance testing and local tuning, especially before any inline blocking action
+
+**Best for:** network intrusion detection; packet-oriented detection engineering; IDS and IPS rule research; controlled PCAP analysis.
+
+- Organization: Cisco and the Snort community
+- Canonical source: [https://www.snort.org/](https://www.snort.org/)
+- Quality: Tier A (93/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.68/5; transparency 4/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Mixed License Tool
+- Access: Freemium
+- Audience: Network defenders, Detection engineers, SOC analysts, Security researchers
+- Skill levels: Intermediate, Advanced
+- Formats: software engine, rule feeds, reference manuals, github repository, release packages
+- Tags: [`network-security`](#tag-network-security) [`blue-team`](#tag-blue-team) [`detection-engineering`](#tag-detection-engineering) [`soc`](#tag-soc) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`feeds`](#tag-feeds) [`freemium`](#tag-freemium) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `network-security` `detection-engineering` `soc` `blue-team` `tools` `repositories` `feeds` `ids` `ips` `packet-analysis` `rule-authoring` `rulesets`
+- Related sources: [Suricata](#suricata) · [Zeek](#zeek) · [Wireshark](#wireshark) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Security Onion](#security-onion) · [Wazuh](#wazuh)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="suricata"></a>
 ### Suricata
@@ -3905,7 +4620,7 @@ Suricata is the Open Information Security Foundation's high-performance, open-so
 - Related sources: [Zeek](#zeek) · [Wireshark](#wireshark) · [Security Onion](#security-onion) · [Sigma](#sigma) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="wireshark"></a>
 ### Wireshark
@@ -3945,7 +4660,7 @@ Wireshark is a free, open-source network protocol analyzer maintained by the Wir
 - Related sources: [Zeek](#zeek) · [Suricata](#suricata) · [Security Onion](#security-onion) · [Nmap Documentation](#nmap-documentation) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="zeek"></a>
 ### Zeek
@@ -3985,10 +4700,427 @@ Zeek is an open-source passive network-security monitor that interprets observed
 - Related sources: [Suricata](#suricata) · [Wireshark](#wireshark) · [Security Onion](#security-onion) · [The DFIR Report](#the-dfir-report) · [Sigma](#sigma)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="category-osint"></a>
+## OSINT
+
+<a id="bellingcat-online-investigation-toolkit"></a>
+### Bellingcat Online Investigation Toolkit
+
+**Detailed description**
+
+Bellingcat’s Online Investigation Toolkit is a curated catalog designed to help researchers choose tools for digital investigations. Its categories span mapping and satellite imagery, geolocation, image and video verification, social platforms, people and company research, transport, conflict monitoring, environmental investigations, web archiving, and data organization. Entries can record what a tool does, whether it is free, its difficulty and requirements, known limitations, relevant ethical considerations, and links to demonstrations or investigations; the catalog can also be downloaded by category as CSV. The current edition is maintained collaboratively by Bellingcat staff and identified volunteers, with staff checking entries before publication and contributors expected to revisit descriptions regularly. That editorial layer is valuable, but it does not make every external tool authoritative or continuously available. Platform APIs, prices, accounts, geographic coverage, and collection behavior change, while automated search or recognition can produce false matches. Use the toolkit to select a method, then validate the tool against its current first-party documentation, preserve original material and provenance, and corroborate conclusions. Public availability is not blanket consent: minimize collection, assess possible harm, protect vulnerable people, and publish only information necessary for a legitimate public-interest or authorized purpose.
+
+**Assessment:** Broad, clearly categorized coverage of practical open-source investigation tasks; principal limitation: Third-party tool access, pricing, platform compatibility, and collection behavior can change between reviews.
+
+**Strengths**
+
+- Broad, clearly categorized coverage of practical open-source investigation tasks
+- Entries combine tool discovery with cost, requirements, limitations, ethics, and guide context
+- Bellingcat staff review a transparent community-maintenance process
+
+**Limitations**
+
+- Third-party tool access, pricing, platform compatibility, and collection behavior can change between reviews
+- Catalog inclusion and automated outputs do not replace independent verification, provenance, consent, or harm assessment
+
+**Best for:** selecting tools for open-source investigations; image, video, and geolocation verification planning; web and social-media research workflows; investigator safety and ethics orientation.
+
+- Organization: Bellingcat
+- Canonical source: [https://bellingcat.gitbook.io/toolkit](https://bellingcat.gitbook.io/toolkit)
+- Quality: Tier B (80/100)
+- Quality dimensions: authority 3.5/5; originality 3/5; maintenance 4.5/5; practical value 4.8/5; transparency 4.5/5
+- Evidence use: Secondary Corroborating
+- Maintenance: Active
+- Source type: Nonprofit Technical
+- Access: Free
+- Audience: Open Source investigators, Journalists, Fact Checkers, Human Rights researchers, CTI analysts
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: curated tool directory, tool assessments, investigation guides, csv exports, safety resources
+- Tags: [`osint`](#tag-osint) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `osint` `digital-investigations` `geolocation` `media-verification` `social-media-research` `web-archiving` `investigative-methods` `privacy` `verification`
+- Related sources: [OSINT Framework](#osint-framework) · [Trace Labs](#trace-labs) · [Maltego](#maltego) · [VirusTotal](#virustotal)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Open-source investigation can affect real people; follow source-specific safety guidance, minimize personal data, preserve provenance, and corroborate findings before publication.
+
+<a id="maltego"></a>
+### Maltego
+
+**Detailed description**
+
+Maltego is a visual link-analysis platform for organizing entities and exploring relationships through Transforms. An analyst can begin with a domain, IP address, email, alias, telephone number, person, company, cryptocurrency address, or an internal record, then query compatible public, commercial, or custom data sources and inspect the returned entities as a graph. The platform supports infrastructure research, person-of-interest work, cyber-threat intelligence, fraud analysis, and collaborative case development. Maltego’s current free Basic plan includes Graph Community Edition after creation of a Maltego ID; the documented Community Edition limits include 10,000 entities per graph, 24 results per Transform, limited connectors, and a monthly data-credit allowance, so current plan terms should be checked before adoption. Transforms may send the selected identifier to Maltego or a third-party provider, and a visually persuasive edge may reflect name similarity, reused infrastructure, stale data, or an inferred association rather than ownership or wrongdoing. Define an authorized purpose, minimize personal data, review each provider’s terms and query behavior, protect case files and credentials, document provenance and timestamps, and corroborate decisive relationships with independent primary evidence.
+
+**Assessment:** Combines visual entity-link analysis with a large Transform and connector ecosystem; principal limitation: The free plan requires registration and imposes credit, result, connector, and data-access limits that can change.
+
+**Strengths**
+
+- Combines visual entity-link analysis with a large Transform and connector ecosystem
+- Supports public, commercial, and investigator-controlled data in one graph workflow
+- Useful export, collaboration, and custom-Transform options support repeatable investigations
+
+**Limitations**
+
+- The free plan requires registration and imposes credit, result, connector, and data-access limits that can change
+- Graph edges and aggregated records can be stale, ambiguous, or sensitive and require source-level verification and privacy governance
+
+**Best for:** infrastructure relationship mapping; person-of-interest link analysis; cyber-threat intelligence enrichment; collaborative investigation visualization.
+
+- Organization: Maltego Technologies GmbH
+- Canonical source: [https://www.maltego.com/](https://www.maltego.com/)
+- Quality: Tier A (91/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.9/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Commercial Technical
+- Access: Freemium
+- Audience: OSINT investigators, CTI analysts, Fraud investigators, Law Enforcement analysts, Security consultants
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: desktop application, graph workspace, data connectors, transforms, technical documentation, training materials
+- Tags: [`osint`](#tag-osint) [`freemium`](#tag-freemium) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `osint` `link-analysis` `graph-analysis` `digital-investigations` `infrastructure-reconnaissance` `identity-research` `data-enrichment` `privacy` `dual-use`
+- Related sources: [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [OpenCTI](#opencti) · [VirusTotal](#virustotal)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Link analysis can expose or infer sensitive relationships about real people and infrastructure; use lawful data, minimize collection, and validate transform results before reporting.
+
+<a id="osint-framework"></a>
+### OSINT Framework
+
+**Detailed description**
+
+OSINT Framework, created by Justin Nordine and maintained in lockFALE’s public repository, presents a browsable tree of open-source intelligence resources. Researchers can begin with an identifier or task—such as a username, email address, domain, IP address, social platform, document, image, map, or archive—and follow the relevant branch to candidate tools and data sources. The project’s markers distinguish local tools, registration-gated services, editable query URLs, and Google dorks; its newer structured metadata can also describe pricing, input, output, status, and whether a technique is passive or active. This makes the framework a useful discovery and planning aid, not an evidentiary authority. Each listing points to a separately operated service whose ownership, terms, coverage, accuracy, availability, and data-handling practices can change. Before using a resource, confirm its current status and lawful purpose, determine whether it contacts a subject or third party, avoid submitting unnecessary personal or confidential identifiers, and record the exact service and collection time. Corroborate all returned associations with primary records and preserve provenance before relying on them in an investigation.
+
+**Assessment:** Broad, task-oriented discovery tree for free and partly free OSINT resources; principal limitation: Aggregates third-party links whose ownership, access model, availability, and quality can change independently.
+
+**Strengths**
+
+- Broad, task-oriented discovery tree for free and partly free OSINT resources
+- Transparent MIT-licensed source repository with community contribution paths
+- Operational metadata helps distinguish registration, installation, pricing, and active-versus-passive considerations
+
+**Limitations**
+
+- Aggregates third-party links whose ownership, access model, availability, and quality can change independently
+- A listing or tool result is not verified evidence and does not establish that a collection method is lawful, proportionate, or passive
+
+**Best for:** discovering candidate OSINT tools; planning identifier-based research; comparing free and freemium collection options; teaching the breadth of OSINT workflows.
+
+- Organization: Justin Nordine / lockFALE
+- Canonical source: [https://osintframework.com/](https://osintframework.com/)
+- Quality: Tier C (78/100)
+- Quality dimensions: authority 3.5/5; originality 3/5; maintenance 4.5/5; practical value 4.7/5; transparency 4/5
+- Evidence use: Secondary Corroborating
+- Maintenance: Active
+- Source type: Independent Technical
+- Access: Free
+- Audience: OSINT investigators, CTI analysts, Security researchers, Journalists, Students
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: interactive resource tree, tool directory, github repository, structured tool metadata
+- Tags: [`osint`](#tag-osint) [`community`](#tag-community) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`repositories`](#tag-repositories)
+- Keywords: `osint` `source-discovery` `reconnaissance` `investigative-tools` `resource-directory` `opsec` `privacy` `community` `dual-use`
+- Related sources: [Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [theHarvester](#theharvester) · [SpiderFoot](#spiderfoot) · [Maltego](#maltego)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Linked third-party tools have differing privacy, access, and active-collection behavior; review each tool before use and investigate only within lawful authorization.
+
+<a id="spiderfoot"></a>
+### SpiderFoot
+
+**Detailed description**
+
+SpiderFoot automates collection and correlation across more than 200 OSINT modules from a domain, IP address, network, ASN, email address, username, person, phone number, or cryptocurrency address. The MIT-licensed open-source edition provides browser and command-line interfaces, SQLite storage, CSV, JSON, and GEXF exports, and configurable correlation rules. Its use-case selectors include passive research, footprinting, and investigation, and individual modules can query remote APIs, scrape services, resolve or transfer DNS data, scan ports, grab banners, or enumerate storage. That breadth supports attack-surface discovery and investigative triage, but also makes execution behavior and data quality highly module-dependent. Intel 471 acquired SpiderFoot in November 2022 and later described its technology as a foundation for commercial Attack Surface Protection. The public repository remains available, but its latest tagged release is 4.0 from 2022 and the default branch’s latest merged commits are from November 2023; recent pull-request activity does not equal a maintained release. Treat the edition as maintenance-stale: pin dependencies, isolate deployment, audit modules and API destinations, test outputs, and review security exposure. Use only authorized targets, prefer reviewed passive modules when non-contact is required, protect keys and sensitive scan data, and corroborate every automated relationship.
+
+**Assessment:** Automates broad multi-source OSINT collection and correlation from many seed types; principal limitation: The open-source edition is maintenance-stale, with no tagged release since 2022 and no substantive default-branch merge since November 2023.
+
+**Strengths**
+
+- Automates broad multi-source OSINT collection and correlation from many seed types
+- Open-source web, CLI, storage, visualization, and export capabilities support flexible analysis
+- Module and use-case controls can support both threat-intelligence and attack-surface workflows
+
+**Limitations**
+
+- The open-source edition is maintenance-stale, with no tagged release since 2022 and no substantive default-branch merge since November 2023
+- Modules vary in activity, credential requirements, external dependencies, freshness, and accuracy, while correlations are not proof of ownership or maliciousness
+
+**Best for:** external attack-surface discovery; multi-source OSINT enrichment; relationship and correlation triage; controlled reconnaissance labs.
+
+- Organization: Steve Micallef / Intel 471
+- Canonical source: [https://github.com/smicallef/spiderfoot](https://github.com/smicallef/spiderfoot)
+- Quality: Tier C (77/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 2/5; practical value 4.9/5; transparency 4/5
+- Evidence use: Mixed
+- Maintenance: Stale
+- Source type: Open Core
+- Access: Freemium
+- Audience: OSINT investigators, Attack Surface analysts, CTI analysts, Penetration testers, Security researchers
+- Skill levels: Intermediate, Advanced
+- Formats: software platform, web interface, command-line tool, github repository, correlation rules, technical documentation
+- Tags: [`osint`](#tag-osint) [`cti`](#tag-cti) [`freemium`](#tag-freemium) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`community`](#tag-community) [`repositories`](#tag-repositories)
+- Keywords: `osint` `reconnaissance` `attack-surface` `data-enrichment` `correlation` `cti` `privacy` `dual-use` `maintenance-stale`
+- Related sources: [theHarvester](#theharvester) · [Maltego](#maltego) · [OSINT Framework](#osint-framework) · [Nmap Documentation](#nmap-documentation) · [OpenCTI](#opencti)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Modules can perform active scanning and collect sensitive relationship data; select modules deliberately, use only authorized targets, and validate results before escalation.
+
+<a id="theharvester"></a>
+### theHarvester
+
+**Detailed description**
+
+theHarvester supports the early reconnaissance stage of an authorized security assessment by querying many public or account-backed providers for information associated with a domain or organization. Current documentation separates passive provider lookups from DNS activity and direct target interaction, and can return normalized hostnames, email addresses, IP addresses, URLs, ASNs, people, and breach names. Operators can run one-off command-line collections or use the local HarvestView application and authenticated REST API; JSONL and SQLite preserve source outcomes and provenance more completely than the legacy JSON and XML reports. This structure is useful for repeatable attack-surface inventory, scoping review, enrichment, and comparison of provider yield. It does not make provider assertions authoritative. APIs change, quotas and credentials constrain coverage, search results can be stale, shared infrastructure can create misleading associations, and a discovered hostname or network relationship does not prove ownership, control, or authorization. Select only approved targets and source classes, review whether an option performs passive, DNS, or direct activity, and never promote a discovered relationship into scope automatically. Protect API keys and exports, minimize personal data, timestamp observations, resolve and validate findings separately, and corroborate material conclusions before reporting or acting on them.
+
+**Assessment:** Aggregates many public providers while normalizing multiple result types and preserving provenance; principal limitation: Coverage and reliability depend on changing third-party APIs, credentials, quotas, schemas, and search indexes.
+
+**Strengths**
+
+- Aggregates many public providers while normalizing multiple result types and preserving provenance
+- Explicit activity classes distinguish passive lookups, DNS actions, and direct target interaction
+- CLI, local web workflow, REST API, and structured exports support repeatable collection
+
+**Limitations**
+
+- Coverage and reliability depend on changing third-party APIs, credentials, quotas, schemas, and search indexes
+- Returned identifiers and relationships can be stale or ambiguous and never establish ownership, compromise, or authorization to expand scope
+
+**Best for:** authorized domain footprinting; attack-surface inventory enrichment; certificate and DNS discovery; repeatable reconnaissance evidence collection.
+
+- Organization: theHarvester maintainers and contributors
+- Canonical source: [https://github.com/laramies/theHarvester](https://github.com/laramies/theHarvester)
+- Quality: Tier A (95/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.9/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Penetration testers, Attack Surface analysts, Red teams, CTI analysts, Security researchers
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: command-line tool, local web application, REST API, github repository, technical documentation, structured data exports
+- Tags: [`osint`](#tag-osint) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`community`](#tag-community)
+- Keywords: `osint` `reconnaissance` `attack-surface` `subdomain-enumeration` `email-discovery` `certificate-transparency` `data-provenance` `privacy` `dual-use`
+- Related sources: [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [Maltego](#maltego) · [Nmap Documentation](#nmap-documentation) · [VirusTotal](#virustotal)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Active discovery features generate target traffic; use them only against authorized assets, control third-party API data, and treat discovered identifiers as sensitive.
+
+<a id="trace-labs"></a>
+### Trace Labs
+
+**Detailed description**
+
+Trace Labs applies OSINT to real missing-person investigations through nonprofit-led Search Party events and ongoing operations. Participants work from a defined case, collect relevant public information, document direct source links and context, and submit potential leads for coaching and review before Trace Labs compiles intelligence for its law-enforcement partners. The organization also publishes participant guidance, a people-focused OSINT field manual, training material, historical write-ups, and an actively maintained OSINT virtual machine, making it valuable for learning research discipline, evidence handling, and the human consequences of investigative work. Its rules are much narrower than ordinary capture-the-flag exercises. Research must remain passive and zero-touch: participants may view but may not contact, tag, follow, like, reset passwords for, attempt logins to, or otherwise interact with a missing person, their contacts, media, or law enforcement. Investigators must use only the case and channels Trace Labs authorizes, follow the current event rules rather than treating this profile as permission, and avoid speculation or vigilantism. Because the subjects are real and vulnerable, minimize collection, separate facts from inference, mask personal information in public write-ups, retain verifiable provenance, restrict case-data access, and report findings only through the designated workflow.
+
+**Assessment:** Ethically governed, real-world people-centered OSINT practice with a public-interest mission; principal limitation: The program is purpose-specific to authorized missing-person cases and is not a general CTI source or independent investigative mandate.
+
+**Strengths**
+
+- Ethically governed, real-world people-centered OSINT practice with a public-interest mission
+- Explicit passive-reconnaissance rules and coached review emphasize verifiability and non-interference
+- Free field manual, guidance, write-ups, training, and maintained OSINT VM support skill development
+
+**Limitations**
+
+- The program is purpose-specific to authorized missing-person cases and is not a general CTI source or independent investigative mandate
+- Work concerns real vulnerable people, so a rule breach, speculative claim, or data leak can harm subjects, families, and active investigations
+
+**Best for:** ethical people-centered OSINT training; passive-reconnaissance discipline; verifiable lead documentation; investigator evidence-handling practice.
+
+- Organization: Trace Labs
+- Canonical source: [https://tracelabs.org/](https://tracelabs.org/)
+- Quality: Tier A (94/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.9/5; transparency 4.5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Nonprofit Technical
+- Access: Free
+- Audience: OSINT investigators, Volunteer analysts, Law Enforcement partners, Students, Investigation coaches
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: search-party events, participant guides, field manual, training videos, case-workflow platform, OSINT virtual machine
+- Tags: [`osint`](#tag-osint) [`training`](#tag-training) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`video`](#tag-video)
+- Keywords: `osint` `missing-persons` `passive-reconnaissance` `digital-investigations` `training` `ctf` `evidence-handling` `privacy` `ethics`
+- Related sources: [Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [OSINT Framework](#osint-framework) · [TryHackMe](#tryhackme) · [CyberDefenders](#cyberdefenders)
+- Research provenance: Expansion Research
+- URL validation: Canonical URL; automated access restricted (HTTP 403)
+- Checked: 2026-09-07
+- Safety note: Work concerns real missing-person cases; follow the program’s passive-only rules, avoid contact or active intrusion, protect personal data, and submit leads only through approved channels.
+
+<a id="category-ot-ics-security"></a>
+## OT/ICS Security
+
+<a id="cisa-ics-advisories"></a>
+### CISA ICS Advisories
+
+**Detailed description**
+
+CISA's Industrial Control Systems Advisories provide a continuously updated government channel for vulnerabilities affecting industrial-control systems, operational technology, building automation, medical or embedded devices, and other cyber-physical products. Individual advisories normally identify vendors, affected products and versions, vulnerability identifiers, reported impact, severity information, researcher credit, and recommended mitigations or vendor references. Asset owners can match advisories to an authoritative inventory, confirm the vulnerable component and deployment mode, and open an engineering-led risk decision that considers safety, availability, remote access, network segmentation, and recovery options. Incident responders can also use advisory details to frame evidence collection when exploitation is suspected. The bulletin establishes that CISA and the vendor recognize a reported issue; it does not prove internet exposure, exploitation, compromise, or that a generic patch can be applied without operational consequences. Advisory content may originate with vendors and can change as fixes or affected-version ranges are revised. Follow the current vendor bulletin, CISA KEV when exploitation evidence exists, and site-specific change procedures. Test mitigations in a representative environment and coordinate with operations, safety, and equipment owners before modifying fragile production systems.
+
+**Assessment:** Authoritative central stream of vulnerability advisories for industrial and cyber-physical products; principal limitation: Advisories may rely on vendor-reported scope and do not establish exploitation or local exposure.
+
+**Strengths**
+
+- Authoritative central stream of vulnerability advisories for industrial and cyber-physical products
+- Links affected versions, severity, researcher credit, and vendor remediation guidance
+- Supports structured OT asset review and coordinated vulnerability response
+
+**Limitations**
+
+- Advisories may rely on vendor-reported scope and do not establish exploitation or local exposure
+- Recommended changes require environment-specific safety, availability, and process validation
+
+**Best for:** OT vulnerability triage; Industrial asset exposure review; Control-system remediation planning; Coordinated vulnerability monitoring.
+
+- Organization: Cybersecurity and Infrastructure Security Agency
+- Canonical source: [https://www.cisa.gov/news-events/ics-advisories](https://www.cisa.gov/news-events/ics-advisories)
+- Quality: Tier A (99/100)
+- Quality dimensions: authority 5/5; originality 5/5; maintenance 5/5; practical value 4.7/5; transparency 5/5
+- Evidence use: Primary Authoritative
+- Maintenance: Continuous
+- Source type: Government
+- Access: Free
+- Audience: Critical Infrastructure operators, OT security teams, Vulnerability managers, Incident responders, Control System engineers
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: vulnerability advisories, security alerts, remediation guidance, vendor statements
+- Tags: [`ot-ics-security`](#tag-ot-ics-security) [`network-security`](#tag-network-security) [`government`](#tag-government) [`incident-response`](#tag-incident-response) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `ics-security` `critical-infrastructure` `vulnerability-advisories` `government` `cve` `patch-management` `incident-response` `risk-analysis`
+- Related sources: [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [MITRE ATT&CK](#mitre-att-and-ck) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [National Vulnerability Database](#national-vulnerability-database) · [NCSC UK Guidance](#ncsc-uk-guidance) · [Dragos](#dragos)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="dragos"></a>
+### Dragos
+
+**Detailed description**
+
+Dragos is a commercial operational-technology security company whose public resource library combines annual OT/ICS Cybersecurity Year in Review reports, threat-group and malware research, vulnerability analysis, incident-response lessons, webinars, and practical guidance for industrial defenders. Its research draws on first-party platform telemetry, incident response, penetration tests, assessments, and analyst investigations, giving readers unusually detailed context about adversary behavior and defensive gaps in industrial environments. Some public materials are directly readable, while reports, OT-CERT or community programs, and other resources may require registration or eligibility; continuous WorldView intelligence and the Dragos Platform are paid offerings. Treat access conditions and permitted reuse separately for each asset. Dragos threat-group names, activity counts, prevalence figures, and vulnerability priorities are vendor assessments shaped by customer sectors, collection visibility, and analytic thresholds. Cross-check important attribution with government advisories and independent reporting, and validate vulnerability or mitigation advice against the affected vendor and local engineering constraints. OT changes can affect safety and availability: asset owners, operators, and control engineers must review proposed monitoring, segmentation, patching, or response actions before implementation rather than applying enterprise-IT guidance directly.
+
+**Assessment:** Deep first-party OT and ICS research informed by incident response, assessments, and platform telemetry; principal limitation: Threat-group, prevalence, and prioritization claims reflect proprietary visibility and vendor methodology.
+
+**Strengths**
+
+- Deep first-party OT and ICS research informed by incident response, assessments, and platform telemetry
+- Annual reports and technical publications connect threat activity, vulnerabilities, and defensive practice
+- Specialist focus supplies context often absent from enterprise-IT intelligence sources
+
+**Limitations**
+
+- Threat-group, prevalence, and prioritization claims reflect proprietary visibility and vendor methodology
+- Some resources require registration or eligibility, while continuous intelligence and platform capabilities are paid
+- Recommendations require engineering and safety review before any change to fragile industrial environments
+
+**Best for:** OT threat-landscape research; industrial incident-response planning; ICS vulnerability prioritization; critical-infrastructure defensive strategy.
+
+- Organization: Dragos, Inc.
+- Canonical source: [https://www.dragos.com/resources](https://www.dragos.com/resources)
+- Quality: Tier A (90/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.68/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Commercial Technical
+- Access: Freemium
+- Audience: OT security analysts, Industrial incident responders, Control engineers, Critical Infrastructure leaders
+- Skill levels: Intermediate, Advanced
+- Formats: threat reports, technical articles, vulnerability research, webinars, community guidance
+- Tags: [`ot-ics-security`](#tag-ot-ics-security) [`network-security`](#tag-network-security) [`threat-research`](#tag-threat-research) [`threat-reports`](#tag-threat-reports) [`cti`](#tag-cti) [`incident-response`](#tag-incident-response) [`vulnerability-research`](#tag-vulnerability-research) [`freemium`](#tag-freemium) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `threat-research` `threat-reports` `cti` `incident-response` `vulnerability-research` `network-security` `ot-security` `ics-security` `critical-infrastructure` `freemium`
+- Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [The DFIR Report](#the-dfir-report) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [GreyNoise](#greynoise) · [CISA ICS Advisories](#cisa-ics-advisories)
+- Research provenance: Gemini, Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="category-penetration-testing"></a>
 ## Penetration Testing
+
+<a id="gtfobins"></a>
+### GTFOBins
+
+**Detailed description**
+
+GTFOBins is a community-curated catalog of legitimate Unix-like executables that can be abused when local permissions, sudo policy, SUID bits, capabilities, restricted shells, or application controls are misconfigured. The project, created by Emilio Pinna and Andrea Cardaci with many contributors, documents functions such as command or shell execution, file read and write, upload and download, library loading, bind or reverse shells, and privilege escalation. Its current canonical site is gtfobins.org; the former gtfobins.github.io address redirects there, while the public source repository and content are GPL-3.0 licensed. Red and purple teams can use entries to validate a scoped path, and defenders can review installed binaries, execution context, sudoers rules, telemetry, and compensating controls. GTFOBins explicitly states that listed programs are not inherently vulnerable and that the collection is not an exploit database. A command may depend on a specific implementation, version, compile option, environment variable, permission, or interactive context. Reproduce it safely before drawing conclusions, and translate successful tests into prevention and detection evidence. All commands are dual-use; run them only in an authorized isolated environment and plan cleanup.
+
+**Assessment:** Canonical, structured catalog of Unix living-off-the-land capabilities and execution contexts; principal limitation: Entries describe potentially abusable capabilities rather than proving a vulnerability or exploitable configuration.
+
+**Strengths**
+
+- Canonical, structured catalog of Unix living-off-the-land capabilities and execution contexts
+- Transparent GPL-3.0 source repository exposes history, contributions, and machine-readable data
+- Useful to both offensive validation and defensive sudo, SUID, capability, and telemetry reviews
+
+**Limitations**
+
+- Entries describe potentially abusable capabilities rather than proving a vulnerability or exploitable configuration
+- Behavior varies by executable implementation, version, privileges, policy, and environment
+- Commands are dual-use and can expose data or elevate privileges if run outside an authorized lab
+
+**Best for:** Unix privilege-escalation validation; living-off-the-land detection research; sudo and SUID hardening reviews; authorized security labs.
+
+- Organization: GTFOBins Project
+- Canonical source: [https://gtfobins.org/](https://gtfobins.org/)
+- Quality: Tier A (94/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.68/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Penetration testers, Linux defenders, Purple teams, Security students
+- Skill levels: Intermediate, Advanced
+- Formats: web catalog, github repository, command examples, JSON API, ATT&CK Navigator data
+- Tags: [`penetration-testing`](#tag-penetration-testing) [`red-team`](#tag-red-team) [`blue-team`](#tag-blue-team) [`mitre-attack`](#tag-mitre-attack) [`repositories`](#tag-repositories) [`tools`](#tag-tools) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`community`](#tag-community)
+- Keywords: `penetration-testing` `red-team` `blue-team` `mitre-attack` `repositories` `tools` `unix` `linux` `living-off-the-land` `privilege-escalation` `dual-use`
+- Related sources: [LOLBAS](#lolbas) · [HackTricks](#hacktricks) · [PayloadsAllTheThings](#payloadsallthethings) · [MITRE ATT&CK](#mitre-att-and-ck) · [Sigma](#sigma)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Living-off-the-land procedures are dual-use; validate them only in authorized environments and translate individual entries into defensible local telemetry rather than assuming abuse.
+
+<a id="hacktricks"></a>
+### HackTricks
+
+**Detailed description**
+
+HackTricks is a public, community-maintained offensive-security knowledge base led by Carlos Polop. Its multilingual material spans reconnaissance, web and API testing, Linux and Windows privilege escalation, Active Directory, cloud services, containers, macOS, mobile platforms, persistence, forensics, and numerous protocol or product notes. Practitioners use it to build engagement checklists, discover likely attack paths, recall commands, and locate references that should then be followed to their original source. The repository and site are updated frequently, but breadth creates uneven editorial quality: pages can mix verified techniques, historical notes, copied commands, third-party research, advertisements, and environment-specific assumptions. Check dates, prerequisites, cited sources, target versions, and defensive consequences before relying on a procedure. The official public repository currently exposes no top-level license through its repository metadata, so public readability must not be treated as permission to republish; review the current project and page terms before reuse. Commands and techniques are materially dual-use. Execute them only on systems explicitly included in an authorized scope, prefer an isolated lab, protect secrets and evidence, and record cleanup and observed effects.
+
+**Assessment:** Exceptionally broad practitioner coverage across host, identity, application, cloud, and platform security; principal limitation: Community material varies in accuracy, sourcing, freshness, and environment applicability.
+
+**Strengths**
+
+- Exceptionally broad practitioner coverage across host, identity, application, cloud, and platform security
+- Frequently updated pages provide useful checklists, commands, and links for technique discovery
+- Public source repository makes content history and contributions inspectable
+
+**Limitations**
+
+- Community material varies in accuracy, sourcing, freshness, and environment applicability
+- The official repository currently declares no top-level machine-readable license, so redistribution rights must be checked
+- Offensive commands can disrupt systems or expose data if used without authorization and review
+
+**Best for:** authorized penetration-testing checklists; privilege-escalation research; cloud and Active Directory technique discovery; security lab reference.
+
+- Organization: HackTricks-wiki and Carlos Polop
+- Canonical source: [https://hacktricks.wiki/en/index.html](https://hacktricks.wiki/en/index.html)
+- Quality: Tier B (87/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 5/5; practical value 4.68/5; transparency 4/5
+- Evidence use: Mixed
+- Maintenance: Continuous
+- Source type: Independent Technical
+- Access: Free
+- Audience: Penetration testers, Red teams, Security students, Defenders researching adversary techniques
+- Skill levels: Intermediate, Advanced
+- Formats: web knowledge base, github repository, command examples, technical references, multilingual documentation
+- Tags: [`penetration-testing`](#tag-penetration-testing) [`red-team`](#tag-red-team) [`cloud-security`](#tag-cloud-security) [`active-directory`](#tag-active-directory) [`web-security`](#tag-web-security) [`application-security`](#tag-application-security) [`repositories`](#tag-repositories) [`training`](#tag-training) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `penetration-testing` `red-team` `cloud-security` `active-directory` `web-security` `application-security` `repositories` `training` `privilege-escalation` `offensive-security` `dual-use`
+- Related sources: [PayloadsAllTheThings](#payloadsallthethings) · [GTFOBins](#gtfobins) · [LOLBAS](#lolbas) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [Metasploit Documentation](#metasploit-documentation)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Offensive procedures are dual-use and community-authored; apply them only to systems you are authorized to test, preferably in an isolated lab, and verify commands before use.
 
 <a id="metasploit-documentation"></a>
 ### Metasploit Documentation
@@ -4028,7 +5160,7 @@ Metasploit Documentation is the official technical reference for using and contr
 - Related sources: [Exploit Database](#exploit-database) · [pwntools](#pwntools) · [Nmap Documentation](#nmap-documentation) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [Atomic Red Team](#atomic-red-team)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: May involve live malware, offensive techniques, or dual-use tooling; use only in an authorized isolated environment.
 
 <a id="category-reverse-engineering"></a>
@@ -4072,7 +5204,7 @@ Binary Ninja is Vector 35's interactive platform for disassembly, decompilation,
 - Related sources: [Ghidra](#ghidra) · [IDA Free](#ida-free) · [Cutter](#cutter) · [pwntools](#pwntools) · [OpenSecurityTraining2](#opensecuritytraining2)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="cutter"></a>
 ### Cutter
@@ -4112,7 +5244,7 @@ Cutter is a free, GPLv3-licensed, cross-platform reverse-engineering application
 - Related sources: [Ghidra](#ghidra) · [IDA Free](#ida-free) · [Binary Ninja](#binary-ninja) · [FLARE-VM](#flare-vm) · [ROP Emporium](#rop-emporium)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="ghidra"></a>
 ### Ghidra
@@ -4152,7 +5284,7 @@ Ghidra is the National Security Agency's open-source software reverse-engineerin
 - Related sources: [IDA Free](#ida-free) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [FLARE-VM](#flare-vm) · [OpenSecurityTraining2](#opensecuritytraining2)
 - Research provenance: Openai
 - URL validation: Canonical URL; automated access restricted (HTTP 403)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="ida-free"></a>
 ### IDA Free
@@ -4192,7 +5324,49 @@ IDA Free is Hex-Rays' no-cost, non-commercial edition of the IDA disassembler an
 - Related sources: [Ghidra](#ghidra) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [FLARE-VM](#flare-vm) · [ROP Emporium](#rop-emporium)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="x64dbg"></a>
+### x64dbg
+
+**Detailed description**
+
+x64dbg is a free, open-source user-mode debugger for 32-bit and 64-bit Windows executables and DLLs. The community project provides a graphical interface with disassembly, registers, memory maps and dumps, modules, symbols, threads, call stacks, control-flow graphs, conditional breakpoints, tracing, executable patching, scripting, and an extensible plugin API. Malware analysts use it to observe unpacking, API calls, configuration handling, memory changes, and control flow; vulnerability researchers use it to reproduce crashes and inspect native application behavior. Official documentation identifies the x64dbg core as GPL licensed, with differing licenses for bundled components and an explicit exception allowing independently licensed plugins through the provided interface, so redistribution should follow the license inventory rather than treating the bundle as one artifact. The project remains active and published an official release in May 2026. x64dbg is Windows-centric and user-mode observations do not cover every kernel, firmware, managed-code, or anti-analysis scenario. Debugger presence can change program behavior, and executable patching changes evidence. Use snapshots in a segmented lab, hash inputs and outputs, record architecture and build details, and corroborate observations with static analysis, packet capture, and operating-system telemetry.
+
+**Assessment:** Rich Windows-native debugging interface designed for reverse engineering and malware analysis; principal limitation: Focuses on Windows user-mode native code and does not replace kernel, managed-code, or firmware tooling.
+
+**Strengths**
+
+- Rich Windows-native debugging interface designed for reverse engineering and malware analysis
+- Transparent source, documentation, scripting, and plugin interfaces support reproducible workflows
+- Active community maintenance includes current packaged releases
+
+**Limitations**
+
+- Focuses on Windows user-mode native code and does not replace kernel, managed-code, or firmware tooling
+- Anti-debugging and environment-sensitive behavior can hide or alter malicious execution
+- Untrusted programs, plugins, scripts, and executable patching require strict isolation and evidence discipline
+
+**Best for:** Windows malware dynamic analysis; native executable reverse engineering; crash reproduction; unpacking and control-flow investigation.
+
+- Organization: x64dbg Project
+- Canonical source: [https://x64dbg.com/](https://x64dbg.com/)
+- Quality: Tier A (94/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.68/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Malware analysts, Reverse engineers, Vulnerability researchers, Exploit developers
+- Skill levels: Intermediate, Advanced
+- Formats: desktop software, documentation, github repository, release binaries, plugin API
+- Tags: [`reverse-engineering`](#tag-reverse-engineering) [`malware-analysis`](#tag-malware-analysis) [`exploit-development`](#tag-exploit-development) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`community`](#tag-community)
+- Keywords: `reverse-engineering` `malware-analysis` `exploit-development` `tools` `repositories` `windows` `debugging` `dynamic-analysis` `binary-analysis` `dual-use`
+- Related sources: [Ghidra](#ghidra) · [Cutter](#cutter) · [IDA Free](#ida-free) · [YARA](#yara) · [MalwareBazaar](#malwarebazaar) · [capa](#capa)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Dynamic analysis can execute untrusted or malicious code and alter evidence; use snapshots in an authorized isolated Windows lab with no production credentials or shared storage.
 
 <a id="category-soc"></a>
 ## SOC
@@ -4235,7 +5409,170 @@ Security Onion is a defender-focused security-monitoring platform from Security 
 - Related sources: [Zeek](#zeek) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Sigma](#sigma) · [The DFIR Report](#the-dfir-report)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="wazuh"></a>
+### Wazuh
+
+**Detailed description**
+
+Wazuh is an open-source security platform for collecting endpoint and workload telemetry and applying log analysis, file-integrity monitoring, security-configuration assessment, vulnerability detection, threat-detection rules, dashboards, and optional active response. Its agents inventory installed software and system state, while server components correlate events and vulnerability intelligence and expose findings through indexed search and visual interfaces. Security teams can use the official documentation to deploy a lab or production cluster, onboard endpoints, tune decoders and rules, map alerts to MITRE ATT&CK, and integrate external intelligence or automation. It is useful for organizations seeking a self-managed monitoring stack, but its broad feature set creates operational responsibility. Vulnerability matches depend on inventory and version correlation; file changes are not inherently malicious; and default rules can create both noise and blind spots. Engineers must secure agents, enrollment keys, management services, indices, credentials, and response actions, while monitoring ingestion health, storage, and upgrade compatibility. Establish local detection hypotheses, validate alerts against raw events and endpoint evidence, test active-response logic safely, and measure collection and rule coverage rather than equating deployment with effective SIEM, endpoint detection, or compliance.
+
+**Assessment:** Integrates endpoint inventory, log analysis, file integrity, vulnerability detection, and dashboards; principal limitation: Requires sustained engineering for sizing, ingestion, tuning, upgrades, access control, and retention.
+
+**Strengths**
+
+- Integrates endpoint inventory, log analysis, file integrity, vulnerability detection, and dashboards
+- Offers extensive open documentation and configurable rules for self-managed security operations
+- Supports heterogeneous endpoints, cloud workloads, containers, and compliance-oriented monitoring
+
+**Limitations**
+
+- Requires sustained engineering for sizing, ingestion, tuning, upgrades, access control, and retention
+- Default correlations and vulnerability matches require local validation and do not guarantee detection coverage
+
+**Best for:** Self-managed security monitoring; Endpoint log and integrity analysis; Vulnerability and configuration visibility; SOC platform engineering.
+
+- Organization: Wazuh, Inc.
+- Canonical source: [https://wazuh.com/](https://wazuh.com/)
+- Quality: Tier A (95/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: SOC analysts, Security platform engineers, System administrators, Detection engineers, Compliance teams
+- Skill levels: Intermediate, Advanced
+- Formats: open-source software, technical documentation, rules, web interfaces, api documentation
+- Tags: [`soc`](#tag-soc) [`blue-team`](#tag-blue-team) [`vulnerability-management`](#tag-vulnerability-management) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`community`](#tag-community)
+- Keywords: `soc` `siem` `endpoint-telemetry` `log-analysis` `file-system-analysis` `vulnerability-management` `configuration-audit` `security-automation`
+- Related sources: [Security Onion](#security-onion) · [Sigma](#sigma) · [Elastic Detection Rules](#elastic-detection-rules) · [Suricata](#suricata) · [MISP](#misp) · [Snort](#snort) · [Falco](#falco)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="category-supply-chain-security"></a>
+## Supply Chain Security
+
+<a id="openssf"></a>
+### OpenSSF
+
+**Detailed description**
+
+The Open Source Security Foundation is a Linux Foundation community that coordinates developers, security engineers, vendors, researchers, and public-sector stakeholders around securing open-source software. Its technical initiatives and working groups cover developer best practices, repository security, vulnerability disclosure, fuzzing, software bills of materials, supply-chain integrity, education, and policy. The project directory provides first-party entry points to resources such as Scorecard, Best Practices Badge, SLSA, Sigstore, GUAC, OSPS Baseline, and OSV Schema. Maintainers can use the guidance to improve repository controls and disclosure processes; platform teams can evaluate supply-chain tools; and consumers can use project metadata and automated checks as inputs to dependency governance. Treat OpenSSF as a coordination and implementation ecosystem, not a single certification authority. Hosted initiatives have different lifecycle stages, maintainers, release cadences, threat models, and adoption requirements. Scorecard checks and badges reveal documented practices or observable signals but do not prove that a dependency is safe. Verify the maturity and current documentation of each project, preserve tool versions and evidence, and combine foundation resources with code review, vulnerability intelligence, operational testing, supplier context, and accountable risk decisions.
+
+**Assessment:** Coordinates a broad, vendor-neutral portfolio of open-source security projects and guidance; principal limitation: Hosted projects differ in maturity, scope, maintenance, and operational adoption.
+
+**Strengths**
+
+- Coordinates a broad, vendor-neutral portfolio of open-source security projects and guidance
+- Connects maintainers and consumers to practical tools, standards, education, and policy work
+- Publishes transparent project governance and lifecycle information through an open community
+
+**Limitations**
+
+- Hosted projects differ in maturity, scope, maintenance, and operational adoption
+- Automated scores, badges, and guidance are inputs to assurance rather than guarantees of software safety
+
+**Best for:** Open-source security program design; Repository and dependency governance; Supply-chain tool discovery; Maintainer security improvement.
+
+- Organization: Open Source Security Foundation, Linux Foundation
+- Canonical source: [https://openssf.org/](https://openssf.org/)
+- Quality: Tier A (98/100)
+- Quality dimensions: authority 5/5; originality 5/5; maintenance 5/5; practical value 4.8/5; transparency 4.5/5
+- Evidence use: Primary Authoritative
+- Maintenance: Continuous
+- Source type: Nonprofit Technical
+- Access: Free
+- Audience: Open Source maintainers, Software security teams, DevSecOps engineers, Security architects, Policy professionals
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: project documentation, best-practice guides, standards, training materials, open-source tools
+- Tags: [`supply-chain-security`](#tag-supply-chain-security) [`application-security`](#tag-application-security) [`community`](#tag-community) [`standards`](#tag-standards) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `open-source-security` `supply-chain-security` `secure-development` `dependency-security` `governance` `devsecops` `community` `standards`
+- Related sources: [Open Source Vulnerabilities](#open-source-vulnerabilities) · [GitHub Advisory Database](#github-advisory-database) · [OSS-Fuzz](#oss-fuzz) · [Trivy](#trivy) · [Semgrep](#semgrep) · [SLSA](#slsa) · [Sigstore](#sigstore)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="sigstore"></a>
+### Sigstore
+
+**Detailed description**
+
+Sigstore is an OpenSSF-hosted open-source ecosystem for signing, recording, and verifying software artifacts. Cosign signs containers, files, and attestations; Fulcio issues short-lived certificates tied to supported OpenID Connect identities; Rekor records signing metadata in an append-only transparency log; and the Sigstore trust root distributes material needed to validate the services. Maintainers can integrate identity-based signing into CI, publish verification bundles alongside releases, and record provenance or SBOM attestations. Consumers can require expected issuer and identity values, verify artifact digests and signatures, and check transparency-log inclusion before accepting a release. The workflow reduces long-lived private-key handling, but it introduces a trust model that must be understood and monitored. A compromised identity or workflow may still produce a cryptographically valid signature, public logs expose signing metadata, and private or offline environments may require custom deployment choices. Signing does not establish code quality, benign behavior, vulnerability status, or authorization to deploy. Pin and review verification policy, protect CI identities and permissions, monitor unexpected signing events, retain verifiable bundles, plan trust-root updates, and test failure behavior at the actual artifact-consumption point.
+
+**Assessment:** Provides integrated open tooling for artifact signing, identity binding, transparency, and verification; principal limitation: A valid signature does not prove that software is safe, reviewed, or authorized for deployment.
+
+**Strengths**
+
+- Provides integrated open tooling for artifact signing, identity binding, transparency, and verification
+- Short-lived certificates reduce dependence on long-lived developer signing keys
+- Supports automated CI workflows and multiple artifact and attestation formats
+
+**Limitations**
+
+- A valid signature does not prove that software is safe, reviewed, or authorized for deployment
+- OIDC identity, transparency, trust-root, privacy, and consumer-policy assumptions require explicit management
+
+**Best for:** Software release signing; Container and artifact verification; CI/CD identity-based signing; Attestation transparency.
+
+- Organization: Open Source Security Foundation
+- Canonical source: [https://www.sigstore.dev/](https://www.sigstore.dev/)
+- Quality: Tier A (95/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Software maintainers, DevSecOps engineers, Platform engineers, Software consumers, Security architects
+- Skill levels: Intermediate, Advanced
+- Formats: open-source tooling, command-line tool, technical documentation, api documentation, structured data
+- Tags: [`supply-chain-security`](#tag-supply-chain-security) [`application-security`](#tag-application-security) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`community`](#tag-community)
+- Keywords: `supply-chain-security` `open-source-security` `ci-cd` `devsecops` `authentication` `trust-analysis` `software-composition-analysis` `machine-readable-data`
+- Related sources: [GitHub Advisory Database](#github-advisory-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Trivy](#trivy) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [CodeQL](#codeql) · [SLSA](#slsa) · [OpenSSF](#openssf)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="slsa"></a>
+### SLSA
+
+**Detailed description**
+
+SLSA is an industry-consensus specification maintained by the Open Source Security Foundation for describing and incrementally improving software supply-chain security. The specification organizes requirements into tracks and levels and defines recommended attestation formats, including build provenance, so producers can make verifiable claims about how an artifact was built and consumers can evaluate those claims. Platform and DevSecOps teams can use SLSA to threat-model source and build workflows, select an attainable assurance level, configure hosted or isolated builders, emit provenance, and enforce verification before release or deployment. Procurement and risk teams can also use it as a structured language for supplier questions. Always record the exact SLSA version and track because requirements evolve between revisions. A valid attestation only supports the claims it contains and remains dependent on builder identity, trust roots, policy, and verifier behavior. SLSA does not establish that reviewed source is safe, that dependencies lack vulnerabilities, or that the resulting program behaves securely. Combine it with code review, dependency and vulnerability controls, protected identities, reproducible evidence where appropriate, and tested consumer-side verification rather than relying on provenance generation alone.
+
+**Assessment:** Provides a vendor-neutral vocabulary of tracks and levels for software supply-chain assurance; principal limitation: Conformance and provenance do not prove that source code or dependencies are secure.
+
+**Strengths**
+
+- Provides a vendor-neutral vocabulary of tracks and levels for software supply-chain assurance
+- Defines machine-verifiable provenance and other attestations for producers and consumers
+- Supports incremental adoption across build platforms, CI/CD pipelines, and supplier requirements
+
+**Limitations**
+
+- Conformance and provenance do not prove that source code or dependencies are secure
+- Requirements vary by specification version, track, trust model, and consumer verification policy
+
+**Best for:** Build-pipeline threat modeling; Software provenance requirements; CI/CD assurance roadmaps; Supplier security assessment.
+
+- Organization: Open Source Security Foundation
+- Canonical source: [https://slsa.dev/](https://slsa.dev/)
+- Quality: Tier A (97/100)
+- Quality dimensions: authority 5/5; originality 5/5; maintenance 4.5/5; practical value 4.8/5; transparency 5/5
+- Evidence use: Primary Authoritative
+- Maintenance: Active
+- Source type: Standards Body
+- Access: Free
+- Audience: DevSecOps engineers, Software maintainers, Platform engineers, Security architects, Supplier assurance teams
+- Skill levels: Intermediate, Advanced
+- Formats: standard specification, framework, implementation guidance, schemas, technical documentation
+- Tags: [`supply-chain-security`](#tag-supply-chain-security) [`application-security`](#tag-application-security) [`standards`](#tag-standards) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `supply-chain-security` `ci-cd` `devsecops` `assurance` `supplier-assurance` `standards` `machine-readable-data` `trust-analysis`
+- Related sources: [GitHub Advisory Database](#github-advisory-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [OSS-Fuzz](#oss-fuzz) · [CodeQL](#codeql) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Sigstore](#sigstore) · [OpenSSF](#openssf)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="category-threat-informed-defense"></a>
 ## Threat Informed Defense
@@ -4278,7 +5615,7 @@ The Center for Threat-Informed Defense is a collaborative research and developme
 - Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [Atomic Red Team](#atomic-red-team) · [Apache Caldera](#apache-caldera) · [Sigma](#sigma)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="mitre-att-and-ck"></a>
 ### MITRE ATT&CK
@@ -4313,12 +5650,12 @@ MITRE ATT&CK is a curated knowledge base and taxonomy of adversary behavior grou
 - Audience: Cti analysts, Detection engineers, Threat hunters, Red teams, Security architects
 - Skill levels: Beginner, Intermediate, Advanced
 - Formats: knowledge base, matrices, stix data, spreadsheets, training materials, technical documentation
-- Tags: [`mitre-attack`](#tag-mitre-attack) [`detection-engineering`](#tag-detection-engineering) [`cti`](#tag-cti) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Tags: [`mitre-attack`](#tag-mitre-attack) [`ot-ics-security`](#tag-ot-ics-security) [`detection-engineering`](#tag-detection-engineering) [`cti`](#tag-cti) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
 - Keywords: `mitre-attack` `threat-informed-defense` `adversary-behavior` `ttps` `detection-engineering` `threat-hunting` `adversary-emulation` `cti`
 - Related sources: [MITRE D3FEND](#mitre-d3fend) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [Atomic Red Team](#atomic-red-team) · [Apache Caldera](#apache-caldera) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation)
 - Research provenance: Gemini, Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="mitre-d3fend"></a>
 ### MITRE D3FEND
@@ -4358,7 +5695,7 @@ MITRE D3FEND is a knowledge graph and ontology of cybersecurity countermeasure t
 - Related sources: [MITRE ATT&CK](#mitre-att-and-ck) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [NIST SP 800-53](#nist-sp-800-53) · [Sigma](#sigma)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-threat-reports"></a>
 ## Threat Reports
@@ -4401,7 +5738,167 @@ CrowdStrike’s Global Threat Report is an annual synthesis of adversary activit
 - Related sources: [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Unit 42](#unit-42) · [ENISA Publications](#enisa-publications) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="ibm-x-force-threat-intelligence-index"></a>
+### IBM X-Force Threat Intelligence Index
+
+**Detailed description**
+
+The IBM X-Force Threat Intelligence Index is an annual assessment of the threat landscape based on IBM X-Force incident-response engagements, managed-security observations, vulnerability and malware research, dark-web analysis, and partner or public reporting. Editions organize findings around initial-access vectors, exploitation, identity abuse, ransomware and extortion, affected sectors and regions, and defensive priorities. Security leaders can use the report as one comparative input for annual planning, while CTI and operations teams can translate relevant behaviors into hypotheses about exposed applications, credentials, detection coverage, and response readiness. Preserve the report year, data period, population, definitions, and methodology before comparing metrics across editions or with other reports. IBM's cases and telemetry reflect its customers, products, geography, service mix, and analytical taxonomy; they do not provide a representative census of global attacks. Percentage changes may be sensitive to small samples or classification changes, and strategic recommendations can overlap with IBM services. Follow important claims to technical research and primary advisories, cross-map actor names carefully, and corroborate prevalence and attribution with independent vendor and government sources. Validate every proposed priority against the organization's assets, threats, controls, incident history, and business consequences.
+
+**Assessment:** Combines incident response, managed-security telemetry, vulnerability research, and threat analysis; principal limitation: The data population reflects IBM customers, engagements, services, geography, and classification methods.
+
+**Strengths**
+
+- Combines incident response, managed-security telemetry, vulnerability research, and threat analysis
+- Provides annual sector, region, initial-access, ransomware, and adversary-behavior perspectives
+- Translates observed patterns into accessible defensive and risk-management themes
+
+**Limitations**
+
+- The data population reflects IBM customers, engagements, services, geography, and classification methods
+- Annual percentages and forecasts require careful methodological comparison and independent corroboration
+
+**Best for:** Annual threat-landscape review; Sector and regional risk context; Initial-access trend analysis; Executive security planning.
+
+- Organization: IBM X-Force
+- Canonical source: [https://www.ibm.com/reports/threat-intelligence](https://www.ibm.com/reports/threat-intelligence)
+- Quality: Tier B (82/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 4/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Mixed
+- Maintenance: Periodic
+- Source type: Commercial Technical
+- Access: Free
+- Audience: Security leaders, Cti analysts, Risk managers, Incident Response leaders, Security architects
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: annual report, executive summary, charts, industry snapshots, webinars
+- Tags: [`threat-reports`](#tag-threat-reports) [`incident-response`](#tag-incident-response) [`vulnerability-management`](#tag-vulnerability-management) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `threat-reports` `threat-landscape` `incident-response` `ransomware` `cybercrime` `vulnerability-management` `vendor-research` `risk-communication`
+- Related sources: [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Unit 42](#unit-42) · [Google Threat Intelligence](#google-threat-intelligence) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="mandiant-m-trends"></a>
+### Mandiant M-Trends
+
+**Detailed description**
+
+M-Trends is Mandiant's recurring annual synthesis of evidence from frontline incident-response and investigation work, now published through Google Cloud. It focuses on how intrusions begin and progress, how long adversaries remain undetected, who discovers them, which industries and regions appear in the engagement set, and how ransomware, identity, cloud, edge infrastructure, and other attacker practices change. Incident-response leaders can compare their retention, escalation, containment, and recovery assumptions with reported case patterns. CTI and detection teams can extract relevant behaviors and turn them into collection questions or validation exercises, while executives can use the methodology and findings to frame resilience priorities. Record the report year, underlying observation period, definitions, geography, and case population before comparing metrics across editions. Mandiant engagements are selected through its customers and services, so the data is neither a random sample nor a measure of all global compromises. Some attribution and prevalence statements depend on Mandiant and Google visibility. Follow important claims to detailed supporting research where available, map vendor actor names cautiously, and corroborate strategic conclusions with independent incident reports, advisories, and the organization's own telemetry and business context.
+
+**Assessment:** Synthesizes original evidence from substantial frontline incident-response and investigation work; principal limitation: The engagement population reflects Mandiant customers, services, geographies, and visibility rather than all incidents.
+
+**Strengths**
+
+- Synthesizes original evidence from substantial frontline incident-response and investigation work
+- Connects intrusion metrics and attacker behavior to practical detection, response, and resilience lessons
+- Publishes recurring methodology and trend data that can support cautious year-over-year comparison
+
+**Limitations**
+
+- The engagement population reflects Mandiant customers, services, geographies, and visibility rather than all incidents
+- Aggregated metrics and vendor attribution require methodological context and independent corroboration
+
+**Best for:** Incident-response program benchmarking; Annual threat-model refreshes; Detection and telemetry gap analysis; Executive resilience planning.
+
+- Organization: Mandiant, Google Cloud
+- Canonical source: [https://cloud.google.com/security/resources/m-trends](https://cloud.google.com/security/resources/m-trends)
+- Quality: Tier B (82/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 4/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Mixed
+- Maintenance: Periodic
+- Source type: Commercial Technical
+- Access: Free
+- Audience: Incident Response leaders, Security leaders, Cti analysts, Detection engineers, Risk managers
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: annual report, executive summary, charts, technical reports, webinars
+- Tags: [`threat-reports`](#tag-threat-reports) [`incident-response`](#tag-incident-response) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `threat-reports` `incident-response` `threat-landscape` `intrusion-analysis` `ransomware` `adversary-tracking` `vendor-research` `risk-communication`
+- Related sources: [Google Threat Intelligence](#google-threat-intelligence) · [Unit 42](#unit-42) · [The DFIR Report](#the-dfir-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="microsoft-digital-defense-report"></a>
+### Microsoft Digital Defense Report
+
+**Detailed description**
+
+The Microsoft Digital Defense Report is Microsoft's annual synthesis of threat activity and defensive lessons drawn from its cloud, identity, endpoint, email, consumer, vulnerability, and incident-response visibility. Editions address cybercrime, ransomware, nation-state operations, influence activity, identity abuse, vulnerabilities, artificial intelligence, and priorities for organizations and governments. Security leaders can use the report to update strategic threat assumptions and communicate broad shifts; CTI teams can follow named actors and campaign references into more detailed Microsoft Threat Intelligence reporting; and architects can compare recommended controls with locally observed attack paths. Record the edition, reporting period, metrics, definitions, and named-actor taxonomy because these change over time and can differ from other vendors. Microsoft's very large telemetry base is valuable but is shaped by product deployment, customer geography, detection logic, commercial priorities, and what the company can publicly disclose. Aggregate signal counts are not incident counts, and a global pattern does not prove local risk or compromise. Corroborate material attribution, prevalence, and policy conclusions with other vendor reports, government advisories, primary incident evidence, and organization-specific exposure. Translate recommendations into owned, measurable controls rather than adopting headline statistics as priorities by themselves.
+
+**Assessment:** Combines broad cloud, identity, endpoint, email, vulnerability, and investigation visibility; principal limitation: Telemetry and conclusions reflect Microsoft's products, customers, taxonomy, and disclosure choices.
+
+**Strengths**
+
+- Combines broad cloud, identity, endpoint, email, vulnerability, and investigation visibility
+- Covers cybercrime, nation-state, influence, technology, and policy trends in one annual synthesis
+- Provides accessible strategic context and defensive recommendations for leaders and practitioners
+
+**Limitations**
+
+- Telemetry and conclusions reflect Microsoft's products, customers, taxonomy, and disclosure choices
+- Large signal counts and annual aggregates do not directly measure incidents, prevalence, or local exposure
+
+**Best for:** Executive threat briefings; Annual security strategy reviews; Nation-state and cybercrime context; Threat-model assumption updates.
+
+- Organization: Microsoft
+- Canonical source: [https://www.microsoft.com/en-us/corporate-responsibility/topics/cybersecurity/reports/microsoft-digital-defense-report-2025/](https://www.microsoft.com/en-us/corporate-responsibility/topics/cybersecurity/reports/microsoft-digital-defense-report-2025/)
+- Quality: Tier B (82/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 4/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Mixed
+- Maintenance: Periodic
+- Source type: Commercial Technical
+- Access: Free
+- Audience: Security leaders, Cti analysts, Risk managers, Policy professionals, Security architects
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: annual report, executive summary, charts, threat reports, web presentation
+- Tags: [`threat-reports`](#tag-threat-reports) [`identity-security`](#tag-identity-security) [`cloud-security`](#tag-cloud-security) [`government`](#tag-government) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `threat-reports` `threat-landscape` `nation-state` `cybercrime` `identity-security` `cloud-security` `government` `risk-communication`
+- Related sources: [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Google Threat Intelligence](#google-threat-intelligence) · [Mandiant M-Trends](#mandiant-m-trends) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+
+<a id="red-canary-threat-detection-report"></a>
+### Red Canary Threat Detection Report
+
+**Detailed description**
+
+Red Canary's Threat Detection Report is an annual, web-based analysis of confirmed threats and adversary behaviors observed through the company's managed detection and response operations. It ranks significant threats and MITRE ATT&CK techniques, explains changes in tradecraft, and often pairs findings with detection opportunities, testing ideas, and defensive actions. Detection engineers can use a relevant technique page to identify required telemetry, build or adapt an analytic, reproduce behavior safely with validated test content, and measure results against expected evidence. SOC leaders can compare the report's themes with alert and incident history to prioritize investigation playbooks and collection gaps. Record the edition, observation period, protected population, data-source mix, and counting method: endpoint, identity, network, cloud, and SaaS adoption can materially change what appears prevalent. Confirmed MDR threats are stronger evidence than raw alerts, but the customer population is not a representative sample of all organizations, and vendor detection logic shapes visibility. A ranked technique is not automatically the highest local risk. Validate every recommendation against local logs and adversaries, distinguish ATT&CK mapping from proven coverage, and corroborate attribution and broad trend claims with primary reports and independent research.
+
+**Assessment:** Links confirmed MDR observations to ATT&CK techniques and practical detection guidance; principal limitation: Rankings reflect Red Canary customers, deployed data sources, analytics, and counting methodology.
+
+**Strengths**
+
+- Links confirmed MDR observations to ATT&CK techniques and practical detection guidance
+- Provides an accessible online field guide for threats, trends, testing, and response actions
+- Helps teams translate annual telemetry into concrete detection and collection hypotheses
+
+**Limitations**
+
+- Rankings reflect Red Canary customers, deployed data sources, analytics, and counting methodology
+- Technique prevalence and mappings do not demonstrate local risk or effective detection coverage
+
+**Best for:** Detection engineering prioritization; SOC threat and technique reviews; ATT&CK-informed validation planning; Telemetry gap analysis.
+
+- Organization: Red Canary
+- Canonical source: [https://redcanary.com/threat-detection-report/](https://redcanary.com/threat-detection-report/)
+- Quality: Tier B (82/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 4/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Mixed
+- Maintenance: Periodic
+- Source type: Commercial Technical
+- Access: Free
+- Audience: Detection engineers, SOC analysts, Threat hunters, Security leaders, Purple teams
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: annual report, technique pages, detection references, charts, webinars
+- Tags: [`threat-reports`](#tag-threat-reports) [`detection-engineering`](#tag-detection-engineering) [`mitre-attack`](#tag-mitre-attack) [`soc`](#tag-soc) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `threat-reports` `detection-engineering` `mitre-attack` `threat-hunting` `detection-validation` `adversary-behavior` `soc` `vendor-research`
+- Related sources: [Atomic Red Team](#atomic-red-team) · [Sigma](#sigma) · [MITRE ATT&CK](#mitre-att-and-ck) · [Elastic Detection Rules](#elastic-detection-rules) · [Splunk Security Content](#splunk-security-content) · [Mandiant M-Trends](#mandiant-m-trends)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="verizon-data-breach-investigations-report"></a>
 ### Verizon Data Breach Investigations Report
@@ -4441,7 +5938,7 @@ The Verizon Data Breach Investigations Report is an annual analysis of security 
 - Related sources: [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [ENISA Publications](#enisa-publications) · [The DFIR Report](#the-dfir-report) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-threat-research"></a>
 ## Threat Research
@@ -4484,7 +5981,7 @@ Check Point Research publishes original technical analysis drawn from ThreatClou
 - Related sources: [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Gemini
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="cisco-talos-intelligence"></a>
 ### Cisco Talos Intelligence
@@ -4524,7 +6021,47 @@ Cisco Talos publishes threat intelligence, malware and campaign research, vulner
 - Related sources: [Suricata](#suricata) · [Unit 42](#unit-42) · [Check Point Research](#check-point-research) · [SentinelOne Labs](#sentinelone-labs) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="microsoft-threat-intelligence-blog"></a>
+### Microsoft Threat Intelligence blog
+
+**Detailed description**
+
+Microsoft Threat Intelligence's channel on the Microsoft Security Blog is a continuously updated source of research on active campaigns, threat actors, malware, vulnerability exploitation, identity attacks, cloud and software-supply-chain activity, and defensive response. Articles can include observed intrusion sequences, actor and campaign naming, indicators, MITRE ATT&CK behaviors, hunting queries, product detections, and mitigations. CTI analysts can extract dated claims and cross-map Microsoft names with other taxonomies; responders can turn reported behaviors and infrastructure into scoped searches; and detection engineers can adapt queries only after confirming schemas and data sources. Preserve the original publication date and later update notes because campaign scope, affected products, indicators, and attribution may change. Microsoft's findings reflect its products, customers, partners, and investigations, while posts vary from rapid operational reporting to deeper technical analysis. Indicators can be shared, reassigned, or obsolete, and absence from Microsoft telemetry has no negative evidentiary meaning. Do not deploy permanent blocks or claim compromise from a single match. Corroborate important actor and prevalence assertions with other primary reporting, validate remediation against current vendor advisories, and require local event, asset, and timeline evidence before reaching case conclusions.
+
+**Assessment:** Publishes frequent original research from broad identity, endpoint, cloud, email, and incident visibility; principal limitation: Coverage and actor taxonomy reflect Microsoft telemetry, products, customers, and analytical decisions.
+
+**Strengths**
+
+- Publishes frequent original research from broad identity, endpoint, cloud, email, and incident visibility
+- Often includes behaviors, indicators, hunting guidance, detections, and mitigation context
+- Provides timely updates on nation-state, cybercrime, vulnerability, and campaign activity
+
+**Limitations**
+
+- Coverage and actor taxonomy reflect Microsoft telemetry, products, customers, and analytical decisions
+- Article depth varies, indicators decay, and attribution or prevalence claims require corroboration
+
+**Best for:** Current campaign monitoring; Threat hunting and incident triage; Microsoft ecosystem detection guidance; Actor and malware research.
+
+- Organization: Microsoft Threat Intelligence
+- Canonical source: [https://www.microsoft.com/en-us/security/blog/topic/threat-intelligence/](https://www.microsoft.com/en-us/security/blog/topic/threat-intelligence/)
+- Quality: Tier A (93/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Free
+- Audience: Cti analysts, Incident responders, Detection engineers, Threat hunters, Security administrators
+- Skill levels: Intermediate, Advanced
+- Formats: technical articles, campaign reports, indicator lists, query examples, remediation guidance
+- Tags: [`threat-research`](#tag-threat-research) [`detection-engineering`](#tag-detection-engineering) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `threat-research` `threat-intelligence-platform` `nation-state` `cybercrime` `indicators-of-compromise` `threat-hunting` `detection-engineering` `vendor-research`
+- Related sources: [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [Unit 42](#unit-42) · [Google Threat Intelligence](#google-threat-intelligence) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="sentinelone-labs"></a>
 ### SentinelOne Labs
@@ -4564,7 +6101,7 @@ SentinelLabs is SentinelOne’s public research operation, publishing investigat
 - Related sources: [Check Point Research](#check-point-research) · [Unit 42](#unit-42) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [YARA](#yara) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Gemini
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="unit-42"></a>
 ### Unit 42
@@ -4604,7 +6141,7 @@ Unit 42 is Palo Alto Networks’ threat-intelligence and incident-response resea
 - Related sources: [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Check Point Research](#check-point-research) · [The DFIR Report](#the-dfir-report) · [MITRE ATT&CK](#mitre-att-and-ck)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-training"></a>
 ## Training
@@ -4647,7 +6184,7 @@ CyberDefenders is a blue-team training platform offering investigation labs and 
 - Related sources: [LetsDefend](#letsdefend) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [The DFIR Report](#the-dfir-report) · [Volatility Foundation](#volatility-foundation)
 - Research provenance: Openai
 - URL validation: Canonical URL; automated access restricted (HTTP 403)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="hack-the-box-academy"></a>
 ### Hack The Box Academy
@@ -4687,7 +6224,7 @@ Hack The Box Academy is a structured cybersecurity education platform that combi
 - Related sources: [TryHackMe](#tryhackme) · [PentesterLab](#pentesterlab) · [OverTheWire](#overthewire) · [Metasploit Documentation](#metasploit-documentation)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="letsdefend"></a>
 ### LetsDefend
@@ -4727,7 +6264,7 @@ LetsDefend is a blue-team training platform built around a simulated security op
 - Related sources: [CyberDefenders](#cyberdefenders) · [TryHackMe](#tryhackme) · [The DFIR Report](#the-dfir-report) · [Security Onion](#security-onion)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="liveoverflow"></a>
 ### LiveOverflow
@@ -4767,7 +6304,7 @@ LiveOverflow publishes free, explanation-driven security videos and companion pa
 - Related sources: [OpenSecurityTraining2](#opensecuritytraining2) · [ROP Emporium](#rop-emporium) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [Ghidra](#ghidra)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="malware-traffic-analysis-net"></a>
 ### Malware-Traffic-Analysis.net
@@ -4807,7 +6344,7 @@ Malware-Traffic-Analysis.net is Brad Duncan's practical archive of malicious net
 - Related sources: [Wireshark](#wireshark) · [Zeek](#zeek) · [Suricata](#suricata) · [CyberDefenders](#cyberdefenders) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Some exercises contain live-malware-derived artifacts or password-protected samples; use an authorized isolated lab and never execute them on production systems.
 
 <a id="opensecuritytraining2"></a>
@@ -4848,7 +6385,7 @@ OpenSecurityTraining2 is a free technical course platform emphasizing foundation
 - Related sources: [LiveOverflow](#liveoverflow) · [Ghidra](#ghidra) · [ROP Emporium](#rop-emporium) · [pwntools](#pwntools)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="overthewire"></a>
 ### OverTheWire
@@ -4888,7 +6425,7 @@ OverTheWire hosts free security wargames that teach Linux command-line use, netw
 - Related sources: [TryHackMe](#tryhackme) · [Hack The Box Academy](#hack-the-box-academy) · [ROP Emporium](#rop-emporium) · [LiveOverflow](#liveoverflow)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="pentesterlab"></a>
 ### PentesterLab
@@ -4928,7 +6465,7 @@ PentesterLab provides hands-on web application security exercises that emphasize
 - Related sources: [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [OWASP ASVS](#owasp-asvs) · [Hack The Box Academy](#hack-the-box-academy)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="portswigger-web-security-academy"></a>
 ### PortSwigger Web Security Academy
@@ -4968,7 +6505,7 @@ PortSwigger Web Security Academy is a free learning platform combining structure
 - Related sources: [PortSwigger Research](#portswigger-research) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [OWASP Top 10](#owasp-top-10) · [PentesterLab](#pentesterlab)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="tryhackme"></a>
 ### TryHackMe
@@ -5008,7 +6545,7 @@ TryHackMe is a browser-based cybersecurity learning platform offering guided les
 - Related sources: [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [CyberDefenders](#cyberdefenders) · [PortSwigger Web Security Academy](#portswigger-web-security-academy)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="category-vulnerability"></a>
 ## Vulnerability
@@ -5051,7 +6588,7 @@ The CERT/CC Vulnerability Notes Database publishes coordinated disclosures and a
 - Related sources: [CVE Program](#cve-program) · [National Vulnerability Database](#national-vulnerability-database) · [Zero Day Initiative](#zero-day-initiative) · [JPCERT/CC](#jpcert-cc)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="cisa-known-exploited-vulnerabilities-catalog"></a>
 ### CISA Known Exploited Vulnerabilities Catalog
@@ -5091,7 +6628,7 @@ CISA’s Known Exploited Vulnerabilities Catalog records CVEs for which there is
 - Related sources: [CVE Program](#cve-program) · [National Vulnerability Database](#national-vulnerability-database) · [FIRST EPSS](#first-epss) · [FIRST CVSS v4.0](#first-cvss-v4-0)
 - Research provenance: Gemini, Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="cve-program"></a>
 ### CVE Program
@@ -5131,7 +6668,7 @@ The CVE Program coordinates a global network of CVE Numbering Authorities that a
 - Related sources: [National Vulnerability Database](#national-vulnerability-database) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [GitHub Advisory Database](#github-advisory-database) · [FIRST CVSS v4.0](#first-cvss-v4-0)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="first-cvss-v4-0"></a>
 ### FIRST CVSS v4.0
@@ -5171,7 +6708,7 @@ FIRST’s CVSS v4.0 site is the canonical specification, user guide, examples, c
 - Related sources: [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [FIRST EPSS](#first-epss) · [National Vulnerability Database](#national-vulnerability-database) · [CVE Program](#cve-program)
 - Research provenance: Gemini
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="first-epss"></a>
 ### FIRST EPSS
@@ -5211,7 +6748,7 @@ The Exploit Prediction Scoring System publishes a daily, data-driven probability
 - Related sources: [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [National Vulnerability Database](#national-vulnerability-database) · [CVE Program](#cve-program)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="github-advisory-database"></a>
 ### GitHub Advisory Database
@@ -5246,12 +6783,53 @@ The GitHub Advisory Database aggregates CVEs, GitHub Security Advisories, ecosys
 - Audience: Software developers, Application security teams, Open Source maintainers, Product security teams, Security tool developers
 - Skill levels: Beginner, Intermediate, Advanced
 - Formats: advisory database, osv json, git repository, graphql api, search interface, malware advisories
-- Tags: [`vulnerability-management`](#tag-vulnerability-management) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`repositories`](#tag-repositories)
+- Tags: [`vulnerability-management`](#tag-vulnerability-management) [`supply-chain-security`](#tag-supply-chain-security) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`repositories`](#tag-repositories)
 - Keywords: `vulnerability-management` `open-source-security` `dependency-security` `security-advisories` `malicious-packages` `osv` `github` `machine-readable-data`
 - Related sources: [Open Source Vulnerabilities](#open-source-vulnerabilities) · [CVE Program](#cve-program) · [National Vulnerability Database](#national-vulnerability-database) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="google-project-zero"></a>
+### Google Project Zero
+
+**Detailed description**
+
+Google Project Zero is Google's specialist vulnerability-research team and a primary source for deeply technical work on high-impact software flaws. Its public material includes root-cause analyses, exploitation case studies, a searchable issue tracker, disclosure-policy documentation, and recurring reviews of zero-days observed in the wild. Researchers can follow a report from vulnerable code and exploitation primitive through vendor response, patch analysis, and systemic mitigation, which makes the archive especially useful for learning modern browser, operating-system, mobile, and kernel exploitation. Product-security teams can convert recurring bug classes and variant-analysis methods into review and testing hypotheses, while defenders can use patch-gap discussions to improve exposure decisions. Always record the article, issue, and patch dates because disclosure status and affected versions change. Project Zero selects targets according to its research priorities, so the archive is not a vulnerability catalog, prevalence measure, or complete view of exploitation. Technical details and proof-of-concept material are dual-use; reproduce them only on systems you own or are explicitly authorized to assess, and confirm remediation through current vendor advisories before taking operational action.
+
+**Assessment:** Publishes original, technically deep vulnerability and exploitation research with clear evidence chains; principal limitation: Coverage is intentionally selective and does not represent the full vulnerability or exploitation landscape.
+
+**Strengths**
+
+- Publishes original, technically deep vulnerability and exploitation research with clear evidence chains
+- Connects root causes, disclosure timelines, patch analysis, and broader mitigation lessons
+- Maintains a public issue tracker that preserves vulnerability provenance and coordination context
+
+**Limitations**
+
+- Coverage is intentionally selective and does not represent the full vulnerability or exploitation landscape
+- Exploit-development detail is dual-use, and older articles may describe superseded versions or mitigations
+
+**Best for:** Advanced vulnerability research; Root-cause and patch analysis; Exploit-mitigation study; Product-security variant analysis.
+
+- Organization: Google Project Zero
+- Canonical source: [https://projectzero.google/](https://projectzero.google/)
+- Quality: Tier A (91/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 4.5/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Active
+- Source type: Commercial Technical
+- Access: Free
+- Audience: Vulnerability researchers, Product security teams, Exploit mitigations researchers, Security engineers, Advanced defenders
+- Skill levels: Intermediate, Advanced
+- Formats: research articles, vulnerability reports, disclosure timelines, proof-of-concept code, datasets
+- Tags: [`vulnerability-management`](#tag-vulnerability-management) [`vulnerability-research`](#tag-vulnerability-research) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`datasets`](#tag-datasets)
+- Keywords: `vulnerability-research` `zero-day` `exploit-research` `coordinated-disclosure` `variant-analysis` `memory-safety` `security-research` `dual-use`
+- Related sources: [Zero Day Initiative](#zero-day-initiative) · [CVE Program](#cve-program) · [National Vulnerability Database](#national-vulnerability-database) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [OSS-Fuzz](#oss-fuzz)
+- Research provenance: Openai, Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Exploit-development and vulnerability details are dual-use; reproduce them only in an authorized isolated environment and follow current disclosure and remediation guidance.
 
 <a id="national-vulnerability-database"></a>
 ### National Vulnerability Database
@@ -5291,7 +6869,7 @@ The National Vulnerability Database is the U.S. government repository of standar
 - Related sources: [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 <a id="open-source-vulnerabilities"></a>
 ### Open Source Vulnerabilities
@@ -5326,12 +6904,94 @@ OSV is an open, distributed vulnerability database and schema designed to map vu
 - Audience: Application security teams, Software developers, Product security teams, Security tool developers, Open Source maintainers
 - Skill levels: Beginner, Intermediate, Advanced
 - Formats: vulnerability database, json schema, api, bulk data, scanner, technical documentation
-- Tags: [`vulnerability-management`](#tag-vulnerability-management) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`community`](#tag-community)
+- Tags: [`vulnerability-management`](#tag-vulnerability-management) [`supply-chain-security`](#tag-supply-chain-security) [`free`](#tag-free) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`repositories`](#tag-repositories) [`community`](#tag-community)
 - Keywords: `vulnerability-management` `open-source-security` `dependency-security` `software-composition-analysis` `sbom` `api` `machine-readable-data` `osv`
 - Related sources: [GitHub Advisory Database](#github-advisory-database) · [CVE Program](#cve-program) · [OSS-Fuzz](#oss-fuzz) · [Semgrep](#semgrep) · [CodeQL](#codeql)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="rapid7-vulnerability-and-exploit-database"></a>
+### Rapid7 Vulnerability & Exploit Database
+
+**Detailed description**
+
+The Rapid7 Vulnerability & Exploit Database is Rapid7's current public portal for searching CVEs and connecting vulnerability records to exploit and threat context. Search results expose publication dates, CVSS v3 and v4 scores, EPSS values, exploited-in-the-wild indicators, and the presence of related Metasploit modules; selected records link to Rapid7 analyses, emergent-threat guidance, remediation context, or module documentation. The free, continuously refreshed catalog is useful for investigating a new identifier, discovering available exploit research, comparing prioritization signals, and tracing Rapid7's first-party work. It is also the maintained destination to which former AttackerKB URLs now redirect, but it is not the same community-assessment product and should not inherit descriptions of AttackerKB ratings, contributors, or API access. Database scale reflects aggregation: not every record has been independently validated or analyzed by Rapid7. Scores, exploitation flags, module mappings, and imported descriptions can change or lag upstream sources. Confirm affected products and versions with the vendor and CVE record, check CISA KEV and primary exploitation evidence, and evaluate local reachability and controls before prioritizing remediation. Exploit and Metasploit links are dual-use; use them only in an authorized isolated environment.
+
+**Assessment:** Connects a broad CVE catalog with CVSS, EPSS, exploitation status, and Metasploit module context; principal limitation: Most catalog records aggregate external vulnerability data rather than representing independent Rapid7 analysis.
+
+**Strengths**
+
+- Connects a broad CVE catalog with CVSS, EPSS, exploitation status, and Metasploit module context
+- Selected records link directly to Rapid7's original vulnerability and emergent-threat research
+- Free search supports rapid discovery without requiring a commercial Rapid7 product
+
+**Limitations**
+
+- Most catalog records aggregate external vulnerability data rather than representing independent Rapid7 analysis
+- Scores, exploitation flags, mappings, and upstream descriptions can change or lag primary sources
+- The former AttackerKB community model and API should not be inferred from the replacement portal
+
+**Best for:** CVE and exploit-context discovery; emerging-vulnerability triage; Metasploit module correlation; prioritization-signal comparison.
+
+- Organization: Rapid7
+- Canonical source: [https://www.rapid7.com/db/](https://www.rapid7.com/db/)
+- Quality: Tier B (85/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 5/5; practical value 4.68/5; transparency 3.5/5
+- Evidence use: Mixed
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Free
+- Audience: Vulnerability analysts, Incident responders, Penetration testers, Risk Based remediation teams
+- Skill levels: Intermediate, Advanced
+- Formats: vulnerability database, CVE records, search filters, technical analyses, exploit-module links
+- Tags: [`vulnerability-management`](#tag-vulnerability-management) [`vulnerability-research`](#tag-vulnerability-research) [`exploit-development`](#tag-exploit-development) [`threat-research`](#tag-threat-research) [`cti`](#tag-cti) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `vulnerability-management` `vulnerability-research` `exploit-development` `threat-research` `cti` `risk-prioritization` `cvss` `epss` `exploited-in-the-wild` `metasploit` `dual-use`
+- Related sources: [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [National Vulnerability Database](#national-vulnerability-database) · [CVE Program](#cve-program) · [Metasploit Documentation](#metasploit-documentation) · [FIRST EPSS](#first-epss) · [VulnCheck KEV](#vulncheck-kev)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Exploit and module details are dual-use; use them only for authorized validation, and corroborate vulnerability scope and remediation against vendor advisories and primary records.
+
+<a id="vulncheck-kev"></a>
+### VulnCheck KEV
+
+**Detailed description**
+
+VulnCheck KEV is a continuously maintained commercial-provider catalog of CVEs for which VulnCheck has identified evidence of exploitation in the wild. The service adds citations, external exploit references, and links to publicly available proof-of-concept context, and VulnCheck positions it as broader and earlier than other public known-exploitation catalogs. Vulnerability teams can use it as a second exploitation signal alongside CISA KEV, enrich asset records, find evidence that supports escalation, and identify issues that deserve rapid vendor-advisory review. Registered Community members currently receive no-cost access, while additional delivery and intelligence capabilities are part of VulnCheck's commercial offering; confirm the current access and attribution terms before automating use. The catalog's inclusion methodology, measurements, and coverage comparisons are vendor-defined, and referenced evidence or code can change or disappear. A listed CVE does not establish that a particular version is deployed, reachable, exploitable under local conditions, or compromised. Follow every high-priority item to its evidence and current vendor bulletin, match it to reliable inventory, and combine exploitation status with exposure, controls, business criticality, patch feasibility, and incident evidence. Do not equate absence from VulnCheck KEV with absence of exploitation.
+
+**Assessment:** Adds evidence-linked known-exploitation coverage beyond a single government catalog; principal limitation: Community access requires registration, and advanced delivery or intelligence capabilities may be commercial.
+
+**Strengths**
+
+- Adds evidence-linked known-exploitation coverage beyond a single government catalog
+- Provides exploit references and operational context for vulnerability prioritization
+- Supports rapid enrichment of asset, ticketing, and vulnerability-management workflows
+
+**Limitations**
+
+- Community access requires registration, and advanced delivery or intelligence capabilities may be commercial
+- Inclusion criteria and comparative coverage claims are vendor-defined and require evidence review
+
+**Best for:** Risk-based vulnerability prioritization; Known-exploitation cross-checking; Vulnerability intelligence enrichment; Early-warning patch triage.
+
+- Organization: VulnCheck
+- Canonical source: [https://www.vulncheck.com/kev](https://www.vulncheck.com/kev)
+- Quality: Tier A (93/100)
+- Quality dimensions: authority 4.5/5; originality 5/5; maintenance 5/5; practical value 4.8/5; transparency 3.5/5
+- Evidence use: Primary Operational
+- Maintenance: Continuous
+- Source type: Commercial Technical
+- Access: Freemium
+- Audience: Vulnerability managers, Security operations teams, Incident responders, Risk owners, Security engineers
+- Skill levels: Beginner, Intermediate, Advanced
+- Formats: searchable catalog, api, json data, vulnerability records, reference links
+- Tags: [`vulnerability-management`](#tag-vulnerability-management) [`freemium`](#tag-freemium) [`beginner`](#tag-beginner) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced)
+- Keywords: `known-exploited-vulnerabilities` `vulnerability-management` `active-exploitation` `patch-prioritization` `indicator-enrichment` `proof-of-concept` `cve` `commercial`
+- Related sources: [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [FIRST EPSS](#first-epss) · [National Vulnerability Database](#national-vulnerability-database) · [Zero Day Initiative](#zero-day-initiative) · [Exploit Database](#exploit-database) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
 
 <a id="zero-day-initiative"></a>
 ### Zero Day Initiative
@@ -5371,7 +7031,7 @@ The Zero Day Initiative is a vulnerability acquisition and coordinated-disclosur
 - Related sources: [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CVE Program](#cve-program) · [National Vulnerability Database](#national-vulnerability-database) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 - Safety note: Vulnerability and exploitation details are dual-use; apply them only to authorized defensive research, validation, and remediation.
 
 <a id="category-web-security"></a>
@@ -5415,7 +7075,49 @@ The OWASP Web Security Testing Guide is a community-maintained methodology and r
 - Related sources: [OWASP ASVS](#owasp-asvs) · [OWASP Top 10](#owasp-top-10) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP API Security Project](#owasp-api-security-project)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
+
+<a id="payloadsallthethings"></a>
+### PayloadsAllTheThings
+
+**Detailed description**
+
+PayloadsAllTheThings is a large community-maintained collection of payloads, bypass techniques, vulnerability notes, and methodology references led by Swissky. The MIT-licensed GitHub repository and its rendered documentation cover topics including injection classes, deserialization, request smuggling, authentication and authorization weaknesses, file handling, token formats, API behavior, cloud or internal assessment, and selected privilege-escalation paths. Testers use it to recall syntax variants and build hypotheses; developers and defenders can use the same examples to reproduce a reported issue, design negative tests, and understand bypass patterns. The collection is a practitioner reference rather than a normative testing standard. Examples may be version-specific, incomplete, destructive, encoded for a particular tool, or copied from third-party research whose context has changed. A successful response must still be tied to a clear security boundary and impact, while a failed payload does not establish safety. Review citations, source code, content type, encoding, authentication state, rate limits, and cleanup before testing. Techniques are dual-use and can modify data or disrupt services; use only against explicitly authorized targets, prefer a lab or staging system, and never turn raw examples into unsupervised production scanning.
+
+**Assessment:** Broad, searchable collection of concrete payload variants and bypass patterns; principal limitation: Community examples vary in currency, provenance, safety, and applicability to specific versions.
+
+**Strengths**
+
+- Broad, searchable collection of concrete payload variants and bypass patterns
+- MIT-licensed public repository supports transparent review and contribution
+- Useful bridge between vulnerability descriptions, manual reproduction, and defensive test cases
+
+**Limitations**
+
+- Community examples vary in currency, provenance, safety, and applicability to specific versions
+- Payload success or failure alone does not establish vulnerability impact or application safety
+- Some techniques can alter data, evade controls, or disrupt services without careful authorization and isolation
+
+**Best for:** authorized web-application testing; payload and bypass research; defensive vulnerability reproduction; CTF and lab reference.
+
+- Organization: Swissky and community contributors
+- Canonical source: [https://swisskyrepo.github.io/PayloadsAllTheThings/](https://swisskyrepo.github.io/PayloadsAllTheThings/)
+- Quality: Tier B (87/100)
+- Quality dimensions: authority 4/5; originality 4/5; maintenance 4.5/5; practical value 4.68/5; transparency 5/5
+- Evidence use: Mixed
+- Maintenance: Active
+- Source type: Open Source Project
+- Access: Free
+- Audience: Application Security testers, Penetration testers, Developers, Security students
+- Skill levels: Intermediate, Advanced
+- Formats: github repository, web knowledge base, payload examples, methodology notes, technical references
+- Tags: [`web-security`](#tag-web-security) [`application-security`](#tag-application-security) [`penetration-testing`](#tag-penetration-testing) [`api-security`](#tag-api-security) [`red-team`](#tag-red-team) [`repositories`](#tag-repositories) [`training`](#tag-training) [`vulnerability-research`](#tag-vulnerability-research) [`free`](#tag-free) [`intermediate`](#tag-intermediate) [`advanced`](#tag-advanced) [`tools`](#tag-tools) [`community`](#tag-community)
+- Keywords: `penetration-testing` `web-security` `application-security` `api-security` `red-team` `repositories` `training` `payloads` `bypass-techniques` `vulnerability-research` `dual-use`
+- Related sources: [HackTricks](#hacktricks) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [GTFOBins](#gtfobins) · [Metasploit Documentation](#metasploit-documentation)
+- Research provenance: Expansion Research
+- URL validation: Reachable (HTTP 200)
+- Checked: 2026-09-07
+- Safety note: Payloads and bypass techniques are dual-use and vary in quality; use only against authorized targets in controlled environments and review each example before execution.
 
 <a id="portswigger-research"></a>
 ### PortSwigger Research
@@ -5455,24 +7157,24 @@ PortSwigger Research publishes original web-security research with detailed meth
 - Related sources: [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [OWASP API Security Project](#owasp-api-security-project) · [LiveOverflow](#liveoverflow)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-06
+- Checked: 2026-09-07
 
 ## Tags
 
 <a id="tag-academic"></a>
 ### academic
 
-[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [USENIX Security Symposium](#usenix-security-symposium)
+[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [NDSS Symposium](#ndss-symposium) · [USENIX Security Symposium](#usenix-security-symposium)
 
 <a id="tag-active-directory"></a>
 ### active-directory
 
-[ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [Hack The Box Academy](#hack-the-box-academy)
+[ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [HackTricks](#hacktricks) · [Hack The Box Academy](#hack-the-box-academy)
 
 <a id="tag-advanced"></a>
 ### advanced
 
-[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [USENIX Security Symposium](#usenix-security-symposium) · [Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [garak](#garak) · [Google Secure AI Framework](#google-secure-ai-framework) · [MITRE ATLAS](#mitre-atlas) · [NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [OWASP API Security Project](#owasp-api-security-project) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [Semgrep](#semgrep) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Trivy](#trivy) · [Google Threat Intelligence](#google-threat-intelligence) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [YARA](#yara) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [Frida](#frida) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Metasploit Documentation](#metasploit-documentation) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [Security Onion](#security-onion) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Zero Day Initiative](#zero-day-initiative) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Research](#portswigger-research)
+[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [NDSS Symposium](#ndss-symposium) · [USENIX Security Symposium](#usenix-security-symposium) · [Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [garak](#garak) · [Google Secure AI Framework](#google-secure-ai-framework) · [MITRE ATLAS](#mitre-atlas) · [NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [OWASP API Security Project](#owasp-api-security-project) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [Semgrep](#semgrep) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Falco](#falco) · [Trivy](#trivy) · [Google Threat Intelligence](#google-threat-intelligence) · [GreyNoise](#greynoise) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [LOLBAS](#lolbas) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [ANSSI France](#anssi-france) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [ANY.RUN](#any-run) · [capa](#capa) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [Recorded Future Triage](#recorded-future-triage) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [VX-Underground](#vx-underground) · [YARA](#yara) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [Frida](#frida) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Shodan](#shodan) · [Snort](#snort) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [Maltego](#maltego) · [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [Trace Labs](#trace-labs) · [CISA ICS Advisories](#cisa-ics-advisories) · [Dragos](#dragos) · [GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Metasploit Documentation](#metasploit-documentation) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [x64dbg](#x64dbg) · [Security Onion](#security-onion) · [Wazuh](#wazuh) · [OpenSSF](#openssf) · [Sigstore](#sigstore) · [SLSA](#slsa) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Microsoft Threat Intelligence blog](#microsoft-threat-intelligence-blog) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [Google Project Zero](#google-project-zero) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database) · [VulnCheck KEV](#vulncheck-kev) · [Zero Day Initiative](#zero-day-initiative) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PayloadsAllTheThings](#payloadsallthethings) · [PortSwigger Research](#portswigger-research)
 
 <a id="tag-ai-security"></a>
 ### ai-security
@@ -5482,22 +7184,22 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-api-security"></a>
 ### api-security
 
-[OWASP API Security Project](#owasp-api-security-project) · [PortSwigger Web Security Academy](#portswigger-web-security-academy)
+[OWASP API Security Project](#owasp-api-security-project) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [PayloadsAllTheThings](#payloadsallthethings)
 
 <a id="tag-application-security"></a>
 ### application-security
 
-[OWASP GenAI Security Project](#owasp-genai-security-project) · [OWASP API Security Project](#owasp-api-security-project) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [Semgrep](#semgrep) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [Frida](#frida) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Research](#portswigger-research)
+[OWASP GenAI Security Project](#owasp-genai-security-project) · [OWASP API Security Project](#owasp-api-security-project) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [Semgrep](#semgrep) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [Frida](#frida) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [HackTricks](#hacktricks) · [OpenSSF](#openssf) · [Sigstore](#sigstore) · [SLSA](#slsa) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PayloadsAllTheThings](#payloadsallthethings) · [PortSwigger Research](#portswigger-research)
 
 <a id="tag-beginner"></a>
 ### beginner
 
-[NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [OWASP API Security Project](#owasp-api-security-project) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [AWS Security Best Practices](#aws-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Trivy](#trivy) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [Autopsy](#autopsy) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [CERT-EU Publications](#cert-eu-publications) · [VirusTotal](#virustotal) · [MobSF](#mobsf) · [Nmap Documentation](#nmap-documentation) · [Wireshark](#wireshark) · [Cutter](#cutter) · [IDA Free](#ida-free) · [MITRE ATT&CK](#mitre-att-and-ck) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [GitHub Advisory Database](#github-advisory-database) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities)
+[NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [OWASP API Security Project](#owasp-api-security-project) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [AWS Security Best Practices](#aws-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Trivy](#trivy) · [GreyNoise](#greynoise) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [Autopsy](#autopsy) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [ANSSI France](#anssi-france) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [CERT-EU Publications](#cert-eu-publications) · [ANY.RUN](#any-run) · [VirusTotal](#virustotal) · [MobSF](#mobsf) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Shodan](#shodan) · [Wireshark](#wireshark) · [Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [Maltego](#maltego) · [OSINT Framework](#osint-framework) · [theHarvester](#theharvester) · [Trace Labs](#trace-labs) · [CISA ICS Advisories](#cisa-ics-advisories) · [Cutter](#cutter) · [IDA Free](#ida-free) · [OpenSSF](#openssf) · [MITRE ATT&CK](#mitre-att-and-ck) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [GitHub Advisory Database](#github-advisory-database) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [VulnCheck KEV](#vulncheck-kev)
 
 <a id="tag-blue-team"></a>
 ### blue-team
 
-[Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Security Onion](#security-onion) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend)
+[Falco](#falco) · [LOLBAS](#lolbas) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Shodan](#shodan) · [Snort](#snort) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [GTFOBins](#gtfobins) · [Security Onion](#security-onion) · [Wazuh](#wazuh) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend)
 
 <a id="tag-books"></a>
 ### books
@@ -5507,17 +7209,17 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-cloud-security"></a>
 ### cloud-security
 
-[Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [AWS Security Best Practices](#aws-security-best-practices) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Unit 42](#unit-42) · [TryHackMe](#tryhackme)
+[Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [AWS Security Best Practices](#aws-security-best-practices) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Falco](#falco) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [HackTricks](#hacktricks) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Unit 42](#unit-42) · [TryHackMe](#tryhackme)
 
 <a id="tag-community"></a>
 ### community
 
-[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [USENIX Security Symposium](#usenix-security-symposium) · [Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [OSS-Fuzz](#oss-fuzz) · [Semgrep](#semgrep) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Trivy](#trivy) · [MISP](#misp) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Sigma](#sigma) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [pwntools](#pwntools) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [FLARE-VM](#flare-vm) · [REMnux](#remnux) · [YARA](#yara) · [Android Security](#android-security) · [Frida](#frida) · [MobSF](#mobsf) · [Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [Security Onion](#security-onion) · [Open Source Vulnerabilities](#open-source-vulnerabilities)
+[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [NDSS Symposium](#ndss-symposium) · [USENIX Security Symposium](#usenix-security-symposium) · [Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [OSS-Fuzz](#oss-fuzz) · [Semgrep](#semgrep) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Falco](#falco) · [Trivy](#trivy) · [MISP](#misp) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [LOLBAS](#lolbas) · [Sigma](#sigma) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [pwntools](#pwntools) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [capa](#capa) · [FLARE-VM](#flare-vm) · [REMnux](#remnux) · [YARA](#yara) · [Android Security](#android-security) · [Frida](#frida) · [MobSF](#mobsf) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [GTFOBins](#gtfobins) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [x64dbg](#x64dbg) · [Security Onion](#security-onion) · [Wazuh](#wazuh) · [OpenSSF](#openssf) · [Sigstore](#sigstore) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [PayloadsAllTheThings](#payloadsallthethings)
 
 <a id="tag-container-security"></a>
 ### container-security
 
-[Atomic Red Team](#atomic-red-team) · [Trivy](#trivy) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape)
+[Atomic Red Team](#atomic-red-team) · [Falco](#falco) · [Trivy](#trivy) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape)
 
 <a id="tag-csirt"></a>
 ### csirt
@@ -5527,72 +7229,72 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-cti"></a>
 ### cti
 
-[Google Threat Intelligence](#google-threat-intelligence) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [CERT-EU Publications](#cert-eu-publications) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [VirusTotal](#virustotal) · [MITRE ATT&CK](#mitre-att-and-ck) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Unit 42](#unit-42) · [LetsDefend](#letsdefend)
+[Google Threat Intelligence](#google-threat-intelligence) · [GreyNoise](#greynoise) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [CERT-EU Publications](#cert-eu-publications) · [ANY.RUN](#any-run) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [Recorded Future Triage](#recorded-future-triage) · [VirusTotal](#virustotal) · [Shodan](#shodan) · [SpiderFoot](#spiderfoot) · [Dragos](#dragos) · [MITRE ATT&CK](#mitre-att-and-ck) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Unit 42](#unit-42) · [LetsDefend](#letsdefend) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database)
 
 <a id="tag-datasets"></a>
 ### datasets
 
-[Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [CyberDefenders](#cyberdefenders)
+[Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [ANY.RUN](#any-run) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [Recorded Future Triage](#recorded-future-triage) · [VX-Underground](#vx-underground) · [Shodan](#shodan) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [CyberDefenders](#cyberdefenders) · [Google Project Zero](#google-project-zero)
 
 <a id="tag-detection-engineering"></a>
 ### detection-engineering
 
-[Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [The DFIR Report](#the-dfir-report) · [SpecterOps Research](#specterops-research) · [Suricata](#suricata) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck)
+[Falco](#falco) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [LOLBAS](#lolbas) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [The DFIR Report](#the-dfir-report) · [SpecterOps Research](#specterops-research) · [Snort](#snort) · [Suricata](#suricata) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report) · [Microsoft Threat Intelligence blog](#microsoft-threat-intelligence-blog)
 
 <a id="tag-dfir"></a>
 ### dfir
 
-[Autopsy](#autopsy) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [REMnux](#remnux) · [CyberDefenders](#cyberdefenders) · [LetsDefend](#letsdefend)
+[Autopsy](#autopsy) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [REMnux](#remnux) · [Arkime](#arkime) · [CyberDefenders](#cyberdefenders) · [LetsDefend](#letsdefend)
 
 <a id="tag-exploit-development"></a>
 ### exploit-development
 
-[Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [Metasploit Documentation](#metasploit-documentation) · [LiveOverflow](#liveoverflow) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire)
+[Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [Metasploit Documentation](#metasploit-documentation) · [x64dbg](#x64dbg) · [LiveOverflow](#liveoverflow) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database)
 
 <a id="tag-feeds"></a>
 ### feeds
 
-[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [FIRST EPSS](#first-epss) · [National Vulnerability Database](#national-vulnerability-database)
+[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [GreyNoise](#greynoise) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Snort](#snort) · [FIRST EPSS](#first-epss) · [National Vulnerability Database](#national-vulnerability-database)
 
 <a id="tag-free"></a>
 ### free
 
-[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [USENIX Security Symposium](#usenix-security-symposium) · [Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [garak](#garak) · [Google Secure AI Framework](#google-secure-ai-framework) · [MITRE ATLAS](#mitre-atlas) · [NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [PyRIT](#pyrit) · [OWASP API Security Project](#owasp-api-security-project) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [AWS Security Best Practices](#aws-security-best-practices) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Stratus Red Team](#stratus-red-team) · [Trivy](#trivy) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [ADSecurity.org](#adsecurity-org) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [REMnux](#remnux) · [YARA](#yara) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [Frida](#frida) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [Security Onion](#security-onion) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Zero Day Initiative](#zero-day-initiative) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Research](#portswigger-research)
+[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [NDSS Symposium](#ndss-symposium) · [USENIX Security Symposium](#usenix-security-symposium) · [Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [garak](#garak) · [Google Secure AI Framework](#google-secure-ai-framework) · [MITRE ATLAS](#mitre-atlas) · [NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [PyRIT](#pyrit) · [OWASP API Security Project](#owasp-api-security-project) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [AWS Security Best Practices](#aws-security-best-practices) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Stratus Red Team](#stratus-red-team) · [Falco](#falco) · [Trivy](#trivy) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [LOLBAS](#lolbas) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [ANSSI France](#anssi-france) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [ADSecurity.org](#adsecurity-org) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [capa](#capa) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [REMnux](#remnux) · [VX-Underground](#vx-underground) · [YARA](#yara) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [Frida](#frida) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [OSINT Framework](#osint-framework) · [theHarvester](#theharvester) · [Trace Labs](#trace-labs) · [CISA ICS Advisories](#cisa-ics-advisories) · [GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [x64dbg](#x64dbg) · [Security Onion](#security-onion) · [Wazuh](#wazuh) · [OpenSSF](#openssf) · [Sigstore](#sigstore) · [SLSA](#slsa) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Microsoft Threat Intelligence blog](#microsoft-threat-intelligence-blog) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [Google Project Zero](#google-project-zero) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database) · [Zero Day Initiative](#zero-day-initiative) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PayloadsAllTheThings](#payloadsallthethings) · [PortSwigger Research](#portswigger-research)
 
 <a id="tag-freemium"></a>
 ### freemium
 
-[Promptfoo](#promptfoo) · [CodeQL](#codeql) · [Semgrep](#semgrep) · [Prowler](#prowler) · [OpenCTI](#opencti) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [VirusTotal](#virustotal) · [Binary Ninja](#binary-ninja) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [PentesterLab](#pentesterlab) · [TryHackMe](#tryhackme)
+[Promptfoo](#promptfoo) · [CodeQL](#codeql) · [Semgrep](#semgrep) · [Prowler](#prowler) · [GreyNoise](#greynoise) · [OpenCTI](#opencti) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [ANY.RUN](#any-run) · [Recorded Future Triage](#recorded-future-triage) · [VirusTotal](#virustotal) · [Shodan](#shodan) · [Snort](#snort) · [Maltego](#maltego) · [SpiderFoot](#spiderfoot) · [Dragos](#dragos) · [Binary Ninja](#binary-ninja) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [PentesterLab](#pentesterlab) · [TryHackMe](#tryhackme) · [VulnCheck KEV](#vulncheck-kev)
 
 <a id="tag-government"></a>
 ### government
 
-[ASD Essential Eight](#asd-essential-eight) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [National Vulnerability Database](#national-vulnerability-database)
+[ASD Essential Eight](#asd-essential-eight) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [ANSSI France](#anssi-france) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [CISA ICS Advisories](#cisa-ics-advisories) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [National Vulnerability Database](#national-vulnerability-database)
 
 <a id="tag-identity-security"></a>
 ### identity-security
 
-[Stratus Red Team](#stratus-red-team) · [ASD Essential Eight](#asd-essential-eight) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report)
+[Stratus Red Team](#stratus-red-team) · [ASD Essential Eight](#asd-essential-eight) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report)
 
 <a id="tag-incident-response"></a>
 ### incident-response
 
-[NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [Google Threat Intelligence](#google-threat-intelligence) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [Wireshark](#wireshark) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders) · [LetsDefend](#letsdefend) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes)
+[NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [Google Threat Intelligence](#google-threat-intelligence) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [ANSSI France](#anssi-france) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [Arkime](#arkime) · [Wireshark](#wireshark) · [CISA ICS Advisories](#cisa-ics-advisories) · [Dragos](#dragos) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [Mandiant M-Trends](#mandiant-m-trends) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders) · [LetsDefend](#letsdefend) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes)
 
 <a id="tag-intermediate"></a>
 ### intermediate
 
-[Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [garak](#garak) · [Google Secure AI Framework](#google-secure-ai-framework) · [MITRE ATLAS](#mitre-atlas) · [NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [OWASP API Security Project](#owasp-api-security-project) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [Semgrep](#semgrep) · [AWS Security Best Practices](#aws-security-best-practices) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Prowler](#prowler) · [Trivy](#trivy) · [Google Threat Intelligence](#google-threat-intelligence) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [YARA](#yara) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Metasploit Documentation](#metasploit-documentation) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [Security Onion](#security-onion) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Zero Day Initiative](#zero-day-initiative) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide)
+[Atomic Red Team](#atomic-red-team) · [CSA AI Controls Matrix](#csa-ai-controls-matrix) · [garak](#garak) · [Google Secure AI Framework](#google-secure-ai-framework) · [MITRE ATLAS](#mitre-atlas) · [NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST AI Risk Management Framework](#nist-ai-risk-management-framework) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [OWASP API Security Project](#owasp-api-security-project) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [OWASP ASVS](#owasp-asvs) · [OWASP Cheat Sheet Series](#owasp-cheat-sheet-series) · [OWASP Top 10](#owasp-top-10) · [Semgrep](#semgrep) · [AWS Security Best Practices](#aws-security-best-practices) · [Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [Google Cloud Security Best Practices](#google-cloud-security-best-practices) · [Microsoft Azure Security Documentation](#microsoft-azure-security-documentation) · [Prowler](#prowler) · [Falco](#falco) · [Trivy](#trivy) · [Google Threat Intelligence](#google-threat-intelligence) · [GreyNoise](#greynoise) · [MISP](#misp) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [OpenCTI](#opencti) · [ThreatFox](#threatfox) · [URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [LOLBAS](#lolbas) · [Microsoft Sentinel Content Hub](#microsoft-sentinel-content-hub) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [Autopsy](#autopsy) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [Plaso](#plaso) · [The DFIR Report](#the-dfir-report) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Volatility Foundation](#volatility-foundation) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [ANSSI France](#anssi-france) · [BSI Germany IT-Grundschutz](#bsi-germany-it-grundschutz) · [Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [NCSC Ireland Guidance](#ncsc-ireland-guidance) · [NCSC UK Guidance](#ncsc-uk-guidance) · [ADSecurity.org](#adsecurity-org) · [BloodHound](#bloodhound) · [Microsoft Entra Documentation](#microsoft-entra-documentation) · [PingCastle](#pingcastle) · [Purple Knight](#purple-knight) · [SpecterOps Research](#specterops-research) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [ANY.RUN](#any-run) · [capa](#capa) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [Recorded Future Triage](#recorded-future-triage) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [YARA](#yara) · [Android Security](#android-security) · [Apple Platform Security](#apple-platform-security) · [MobSF](#mobsf) · [OWASP MASTG](#owasp-mastg) · [OWASP MASVS](#owasp-masvs) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Shodan](#shodan) · [Snort](#snort) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [Maltego](#maltego) · [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [Trace Labs](#trace-labs) · [CISA ICS Advisories](#cisa-ics-advisories) · [Dragos](#dragos) · [GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Metasploit Documentation](#metasploit-documentation) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [x64dbg](#x64dbg) · [Security Onion](#security-onion) · [Wazuh](#wazuh) · [OpenSSF](#openssf) · [Sigstore](#sigstore) · [SLSA](#slsa) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Microsoft Threat Intelligence blog](#microsoft-threat-intelligence-blog) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [Google Project Zero](#google-project-zero) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database) · [VulnCheck KEV](#vulncheck-kev) · [Zero Day Initiative](#zero-day-initiative) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PayloadsAllTheThings](#payloadsallthethings)
 
 <a id="tag-kubernetes"></a>
 ### kubernetes
 
-[Stratus Red Team](#stratus-red-team) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape)
+[Stratus Red Team](#stratus-red-team) · [Falco](#falco) · [CIS Kubernetes Benchmark](#cis-kubernetes-benchmark) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape)
 
 <a id="tag-labs"></a>
 ### labs
 
-[The DFIR Report](#the-dfir-report) · [ROP Emporium](#rop-emporium) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme)
+[The DFIR Report](#the-dfir-report) · [ROP Emporium](#rop-emporium) · [ANY.RUN](#any-run) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme)
 
 <a id="tag-llm-security"></a>
 ### llm-security
@@ -5602,12 +7304,12 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-malware-analysis"></a>
 ### malware-analysis
 
-[Google Threat Intelligence](#google-threat-intelligence) · [Volatility Foundation](#volatility-foundation) · [JPCERT/CC](#jpcert-cc) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [YARA](#yara) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders)
+[Google Threat Intelligence](#google-threat-intelligence) · [Volatility Foundation](#volatility-foundation) · [JPCERT/CC](#jpcert-cc) · [ANY.RUN](#any-run) · [capa](#capa) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [Recorded Future Triage](#recorded-future-triage) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [VX-Underground](#vx-underground) · [YARA](#yara) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [x64dbg](#x64dbg) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [CyberDefenders](#cyberdefenders)
 
 <a id="tag-mitre-attack"></a>
 ### mitre-attack
 
-[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [Stratus Red Team](#stratus-red-team) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [The DFIR Report](#the-dfir-report) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend)
+[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [Stratus Red Team](#stratus-red-team) · [LOLBAS](#lolbas) · [Sigma](#sigma) · [Splunk Security Content](#splunk-security-content) · [The DFIR Report](#the-dfir-report) · [ANY.RUN](#any-run) · [capa](#capa) · [GTFOBins](#gtfobins) · [Center for Threat-Informed Defense](#center-for-threat-informed-defense) · [MITRE ATT&CK](#mitre-att-and-ck) · [MITRE D3FEND](#mitre-d3fend) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report)
 
 <a id="tag-mobile-security"></a>
 ### mobile-security
@@ -5617,7 +7319,17 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-network-security"></a>
 ### network-security
 
-[URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Cisco Talos Intelligence](#cisco-talos-intelligence)
+[NDSS Symposium](#ndss-symposium) · [GreyNoise](#greynoise) · [URLhaus](#urlhaus) · [Stratosphere IPS Datasets](#stratosphere-ips-datasets) · [UNB CIC Datasets](#unb-cic-datasets) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Shodan](#shodan) · [Snort](#snort) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [CISA ICS Advisories](#cisa-ics-advisories) · [Dragos](#dragos) · [Cisco Talos Intelligence](#cisco-talos-intelligence)
+
+<a id="tag-osint"></a>
+### osint
+
+[Bellingcat Online Investigation Toolkit](#bellingcat-online-investigation-toolkit) · [Maltego](#maltego) · [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [Trace Labs](#trace-labs)
+
+<a id="tag-ot-ics-security"></a>
+### ot-ics-security
+
+[CISA ICS Advisories](#cisa-ics-advisories) · [Dragos](#dragos) · [MITRE ATT&CK](#mitre-att-and-ck)
 
 <a id="tag-paid"></a>
 ### paid
@@ -5627,22 +7339,22 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-penetration-testing"></a>
 ### penetration-testing
 
-[Exploit Database](#exploit-database) · [OWASP MASTG](#owasp-mastg) · [Metasploit Documentation](#metasploit-documentation) · [Hack The Box Academy](#hack-the-box-academy) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Research](#portswigger-research)
+[LOLBAS](#lolbas) · [Exploit Database](#exploit-database) · [OWASP MASTG](#owasp-mastg) · [GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Metasploit Documentation](#metasploit-documentation) · [Hack The Box Academy](#hack-the-box-academy) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PayloadsAllTheThings](#payloadsallthethings) · [PortSwigger Research](#portswigger-research)
 
 <a id="tag-red-team"></a>
 ### red-team
 
-[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [MITRE ATLAS](#mitre-atlas) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [BloodHound](#bloodhound) · [SpecterOps Research](#specterops-research) · [Metasploit Documentation](#metasploit-documentation) · [Hack The Box Academy](#hack-the-box-academy)
+[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [MITRE ATLAS](#mitre-atlas) · [OWASP GenAI Security Project](#owasp-genai-security-project) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [LOLBAS](#lolbas) · [BloodHound](#bloodhound) · [SpecterOps Research](#specterops-research) · [GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Metasploit Documentation](#metasploit-documentation) · [Hack The Box Academy](#hack-the-box-academy) · [PayloadsAllTheThings](#payloadsallthethings)
 
 <a id="tag-repositories"></a>
 ### repositories
 
-[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [PyRIT](#pyrit) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [Stratus Red Team](#stratus-red-team) · [Trivy](#trivy) · [MISP](#misp) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [Sigma](#sigma) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [pwntools](#pwntools) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [FLARE-VM](#flare-vm) · [REMnux](#remnux) · [YARA](#yara) · [Android Security](#android-security) · [Frida](#frida) · [MobSF](#mobsf) · [Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [GitHub Advisory Database](#github-advisory-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities)
+[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [PyRIT](#pyrit) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [Stratus Red Team](#stratus-red-team) · [Falco](#falco) · [Trivy](#trivy) · [MISP](#misp) · [Elastic Detection Rules](#elastic-detection-rules) · [Google SecOps Community Rules](#google-secops-community-rules) · [LOLBAS](#lolbas) · [Sigma](#sigma) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [pwntools](#pwntools) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [capa](#capa) · [FLARE-VM](#flare-vm) · [REMnux](#remnux) · [VX-Underground](#vx-underground) · [YARA](#yara) · [Android Security](#android-security) · [Frida](#frida) · [MobSF](#mobsf) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [Snort](#snort) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [OSINT Framework](#osint-framework) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [GTFOBins](#gtfobins) · [HackTricks](#hacktricks) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [x64dbg](#x64dbg) · [Wazuh](#wazuh) · [Sigstore](#sigstore) · [GitHub Advisory Database](#github-advisory-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [PayloadsAllTheThings](#payloadsallthethings)
 
 <a id="tag-reverse-engineering"></a>
 ### reverse-engineering
 
-[FLARE-VM](#flare-vm) · [REMnux](#remnux) · [Frida](#frida) · [OWASP MASTG](#owasp-mastg) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [Check Point Research](#check-point-research) · [SentinelOne Labs](#sentinelone-labs) · [LiveOverflow](#liveoverflow) · [OpenSecurityTraining2](#opensecuritytraining2)
+[capa](#capa) · [FLARE-VM](#flare-vm) · [REMnux](#remnux) · [VX-Underground](#vx-underground) · [Frida](#frida) · [OWASP MASTG](#owasp-mastg) · [Binary Ninja](#binary-ninja) · [Cutter](#cutter) · [Ghidra](#ghidra) · [IDA Free](#ida-free) · [x64dbg](#x64dbg) · [Check Point Research](#check-point-research) · [SentinelOne Labs](#sentinelone-labs) · [LiveOverflow](#liveoverflow) · [OpenSecurityTraining2](#opensecuritytraining2)
 
 <a id="tag-security-architecture"></a>
 ### security-architecture
@@ -5657,12 +7369,17 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-soc"></a>
 ### soc
 
-[Security Onion](#security-onion)
+[Falco](#falco) · [GreyNoise](#greynoise) · [Arkime](#arkime) · [Snort](#snort) · [Security Onion](#security-onion) · [Wazuh](#wazuh) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report)
 
 <a id="tag-standards"></a>
 ### standards
 
-[Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0)
+[Cloud Security Alliance Cloud Controls Matrix](#cloud-security-alliance-cloud-controls-matrix) · [OASIS Open CTI Documentation](#oasis-open-cti-documentation) · [ASD Essential Eight](#asd-essential-eight) · [CIS Critical Security Controls](#cis-critical-security-controls) · [NCSC Cyber Assessment Framework](#ncsc-cyber-assessment-framework) · [NIST Cybersecurity Framework](#nist-cybersecurity-framework) · [NIST SP 800-207 Zero Trust Architecture](#nist-sp-800-207-zero-trust-architecture) · [NIST SP 800-53](#nist-sp-800-53) · [NIST SP 800-61 Rev. 3](#nist-sp-800-61-rev-3) · [OpenSSF](#openssf) · [SLSA](#slsa) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0)
+
+<a id="tag-supply-chain-security"></a>
+### supply-chain-security
+
+[NCSC AI Security Guidance](#ncsc-ai-security-guidance) · [NIST SP 800-53](#nist-sp-800-53) · [OpenSSF](#openssf) · [Sigstore](#sigstore) · [SLSA](#slsa) · [GitHub Advisory Database](#github-advisory-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities)
 
 <a id="tag-suricata"></a>
 ### suricata
@@ -5672,42 +7389,42 @@ PortSwigger Research publishes original web-security research with detailed meth
 <a id="tag-threat-reports"></a>
 ### threat-reports
 
-[Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence)
+[Canadian Centre for Cyber Security](#canadian-centre-for-cyber-security) · [Cyber Security Agency of Singapore](#cyber-security-agency-of-singapore) · [ENISA Publications](#enisa-publications) · [Israel National Cyber Directorate](#israel-national-cyber-directorate) · [CERT-EU Publications](#cert-eu-publications) · [JPCERT/CC](#jpcert-cc) · [Dragos](#dragos) · [CrowdStrike Global Threat Report](#crowdstrike-global-threat-report) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [Mandiant M-Trends](#mandiant-m-trends) · [Microsoft Digital Defense Report](#microsoft-digital-defense-report) · [Red Canary Threat Detection Report](#red-canary-threat-detection-report) · [Verizon Data Breach Investigations Report](#verizon-data-breach-investigations-report) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence)
 
 <a id="tag-threat-research"></a>
 ### threat-research
 
-[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [USENIX Security Symposium](#usenix-security-symposium) · [MITRE ATLAS](#mitre-atlas) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42)
+[arXiv Cryptography and Security](#arxiv-cryptography-and-security) · [NDSS Symposium](#ndss-symposium) · [USENIX Security Symposium](#usenix-security-symposium) · [MITRE ATLAS](#mitre-atlas) · [GreyNoise](#greynoise) · [VX-Underground](#vx-underground) · [SANS Internet Storm Center](#sans-internet-storm-center) · [Dragos](#dragos) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Microsoft Threat Intelligence blog](#microsoft-threat-intelligence-blog) · [SentinelOne Labs](#sentinelone-labs) · [Unit 42](#unit-42) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database)
 
 <a id="tag-tools"></a>
 ### tools
 
-[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [Semgrep](#semgrep) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Trivy](#trivy) · [MISP](#misp) · [OpenCTI](#opencti) · [Sigma](#sigma) · [Autopsy](#autopsy) · [Plaso](#plaso) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [YARA](#yara) · [Android Security](#android-security) · [Frida](#frida) · [MobSF](#mobsf) · [Nmap Documentation](#nmap-documentation) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [Security Onion](#security-onion) · [Open Source Vulnerabilities](#open-source-vulnerabilities)
+[Apache Caldera](#apache-caldera) · [Atomic Red Team](#atomic-red-team) · [garak](#garak) · [Promptfoo](#promptfoo) · [PyRIT](#pyrit) · [CodeQL](#codeql) · [OSS-Fuzz](#oss-fuzz) · [Semgrep](#semgrep) · [Prowler](#prowler) · [Stratus Red Team](#stratus-red-team) · [Falco](#falco) · [Trivy](#trivy) · [MISP](#misp) · [OpenCTI](#opencti) · [LOLBAS](#lolbas) · [Sigma](#sigma) · [Autopsy](#autopsy) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [Plaso](#plaso) · [The Sleuth Kit](#the-sleuth-kit) · [Timesketch](#timesketch) · [Velociraptor](#velociraptor) · [Exploit Database](#exploit-database) · [pwntools](#pwntools) · [ROP Emporium](#rop-emporium) · [BloodHound](#bloodhound) · [PingCastle](#pingcastle) · [Kubernetes Security Documentation](#kubernetes-security-documentation) · [Kubescape](#kubescape) · [ANY.RUN](#any-run) · [capa](#capa) · [FLARE-VM](#flare-vm) · [Malpedia](#malpedia) · [MalwareBazaar](#malwarebazaar) · [Recorded Future Triage](#recorded-future-triage) · [REMnux](#remnux) · [VirusTotal](#virustotal) · [VX-Underground](#vx-underground) · [YARA](#yara) · [Android Security](#android-security) · [Frida](#frida) · [MobSF](#mobsf) · [Arkime](#arkime) · [Nmap Documentation](#nmap-documentation) · [Shodan](#shodan) · [Snort](#snort) · [Suricata](#suricata) · [Wireshark](#wireshark) · [Zeek](#zeek) · [SpiderFoot](#spiderfoot) · [theHarvester](#theharvester) · [GTFOBins](#gtfobins) · [Metasploit Documentation](#metasploit-documentation) · [Cutter](#cutter) · [Ghidra](#ghidra) · [x64dbg](#x64dbg) · [Security Onion](#security-onion) · [Wazuh](#wazuh) · [Sigstore](#sigstore) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [PayloadsAllTheThings](#payloadsallthethings)
 
 <a id="tag-training"></a>
 ### training
 
-[CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme)
+[Trace Labs](#trace-labs) · [HackTricks](#hacktricks) · [CyberDefenders](#cyberdefenders) · [Hack The Box Academy](#hack-the-box-academy) · [LetsDefend](#letsdefend) · [LiveOverflow](#liveoverflow) · [Malware-Traffic-Analysis.net](#malware-traffic-analysis-net) · [OpenSecurityTraining2](#opensecuritytraining2) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [TryHackMe](#tryhackme) · [PayloadsAllTheThings](#payloadsallthethings)
 
 <a id="tag-video"></a>
 ### video
 
-[USENIX Security Symposium](#usenix-security-symposium) · [Velociraptor](#velociraptor) · [LiveOverflow](#liveoverflow) · [OpenSecurityTraining2](#opensecuritytraining2) · [PortSwigger Web Security Academy](#portswigger-web-security-academy)
+[USENIX Security Symposium](#usenix-security-symposium) · [Eric Zimmerman Tools / KAPE](#eric-zimmerman-tools-kape) · [Velociraptor](#velociraptor) · [Trace Labs](#trace-labs) · [LiveOverflow](#liveoverflow) · [OpenSecurityTraining2](#opensecuritytraining2) · [PortSwigger Web Security Academy](#portswigger-web-security-academy)
 
 <a id="tag-vulnerability-management"></a>
 ### vulnerability-management
 
-[CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Zero Day Initiative](#zero-day-initiative)
+[Shodan](#shodan) · [Wazuh](#wazuh) · [IBM X-Force Threat Intelligence Index](#ibm-x-force-threat-intelligence-index) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [CISA Known Exploited Vulnerabilities Catalog](#cisa-known-exploited-vulnerabilities-catalog) · [CVE Program](#cve-program) · [FIRST CVSS v4.0](#first-cvss-v4-0) · [FIRST EPSS](#first-epss) · [GitHub Advisory Database](#github-advisory-database) · [Google Project Zero](#google-project-zero) · [National Vulnerability Database](#national-vulnerability-database) · [Open Source Vulnerabilities](#open-source-vulnerabilities) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database) · [VulnCheck KEV](#vulncheck-kev) · [Zero Day Initiative](#zero-day-initiative)
 
 <a id="tag-vulnerability-research"></a>
 ### vulnerability-research
 
-[Exploit Database](#exploit-database) · [Binary Ninja](#binary-ninja) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Unit 42](#unit-42) · [LiveOverflow](#liveoverflow) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [Zero Day Initiative](#zero-day-initiative) · [PortSwigger Research](#portswigger-research)
+[GreyNoise](#greynoise) · [Exploit Database](#exploit-database) · [Dragos](#dragos) · [Binary Ninja](#binary-ninja) · [Check Point Research](#check-point-research) · [Cisco Talos Intelligence](#cisco-talos-intelligence) · [Unit 42](#unit-42) · [LiveOverflow](#liveoverflow) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [CERT/CC Vulnerability Notes](#cert-cc-vulnerability-notes) · [Google Project Zero](#google-project-zero) · [Rapid7 Vulnerability & Exploit Database](#rapid7-vulnerability-and-exploit-database) · [Zero Day Initiative](#zero-day-initiative) · [PayloadsAllTheThings](#payloadsallthethings) · [PortSwigger Research](#portswigger-research)
 
 <a id="tag-web-security"></a>
 ### web-security
 
-[OWASP ASVS](#owasp-asvs) · [OWASP Top 10](#owasp-top-10) · [Hack The Box Academy](#hack-the-box-academy) · [LiveOverflow](#liveoverflow) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Research](#portswigger-research)
+[OWASP ASVS](#owasp-asvs) · [OWASP Top 10](#owasp-top-10) · [HackTricks](#hacktricks) · [Hack The Box Academy](#hack-the-box-academy) · [LiveOverflow](#liveoverflow) · [OverTheWire](#overthewire) · [PentesterLab](#pentesterlab) · [PortSwigger Web Security Academy](#portswigger-web-security-academy) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PayloadsAllTheThings](#payloadsallthethings) · [PortSwigger Research](#portswigger-research)
 
 <a id="tag-yara"></a>
 ### yara
@@ -5716,6 +7433,6 @@ PortSwigger Research publishes original web-security research with detailed meth
 
 ## Scope limitation
 
-Consolidates sources explicitly named in the two supplied research reports. The separate 130-record OpenAI artifacts referenced by the pasted summary were not supplied.
+Consolidates the selected records from the supplied Gemini and OpenAI research plus 40 validated expansion records. Shodan is included with a current freemium caveat; the retired standalone AttackerKB entry is represented by Rapid7’s maintained Vulnerability & Exploit Database successor; and the separately assessed AI Incident Database remains outside the staged expansion scope.
 
 The machine-readable source of truth is [`knowledge-sources.json`](./knowledge-sources.json), with lookup indexes in [`knowledge-sources-index.json`](./knowledge-sources-index.json).

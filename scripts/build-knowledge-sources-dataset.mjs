@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const checkedOn = '2026-09-06';
+const checkedOn = '2026-09-07';
 const outputPath = 'data/knowledge-sources.json';
 const checkMode = process.argv.includes('--check');
 // URL health is a separately refreshed observation. Preserve its last reviewed
@@ -15,8 +15,8 @@ const validationById = new Map(
   (existingDataset?.sources || []).map((source) => [source.id, source.validation]),
 );
 
-// Consolidated from source names actually present in gemini_links_research.md and
-// openai_links_research.md. URLs are canonical first-party entry points.
+// Consolidated from source names actually present in the three supplied research
+// reports. URLs are canonical first-party entry points.
 const rows = [
   ['Israel National Cyber Directorate','https://www.gov.il/en/departments/israel_national_cyber_directorate','government'],
   ['CISA Known Exploited Vulnerabilities Catalog','https://www.cisa.gov/known-exploited-vulnerabilities-catalog','vulnerability'],
@@ -143,6 +143,47 @@ const rows = [
   ['Stratosphere IPS Datasets','https://www.stratosphereips.org/datasets-overview','datasets'],
   ['UNB CIC Datasets','https://www.unb.ca/cic/datasets/','datasets'],
   ['Malware-Traffic-Analysis.net','https://www.malware-traffic-analysis.net/','training'],
+  ['Google Project Zero','https://projectzero.google/','vulnerability'],
+  ['SANS Internet Storm Center','https://isc.sans.edu/','network-security'],
+  ['CISA ICS Advisories','https://www.cisa.gov/news-events/ics-advisories','ot-ics-security'],
+  ['capa','https://github.com/mandiant/capa','malware-analysis'],
+  ['Eric Zimmerman Tools / KAPE','https://ericzimmerman.github.io/','dfir'],
+  ['Wazuh','https://wazuh.com/','soc'],
+  ['SLSA','https://slsa.dev/','supply-chain-security'],
+  ['Sigstore','https://www.sigstore.dev/','supply-chain-security'],
+  ['OpenSSF','https://openssf.org/','supply-chain-security'],
+  ['VulnCheck KEV','https://www.vulncheck.com/kev','vulnerability'],
+  ['Mandiant M-Trends','https://cloud.google.com/security/resources/m-trends','threat-reports'],
+  ['Microsoft Digital Defense Report','https://www.microsoft.com/en-us/corporate-responsibility/topics/cybersecurity/reports/microsoft-digital-defense-report-2025/','threat-reports'],
+  ['IBM X-Force Threat Intelligence Index','https://www.ibm.com/reports/threat-intelligence','threat-reports'],
+  ['Red Canary Threat Detection Report','https://redcanary.com/threat-detection-report/','threat-reports'],
+  ['Microsoft Threat Intelligence blog','https://www.microsoft.com/en-us/security/blog/topic/threat-intelligence/','threat-research'],
+  ['BSI Germany IT-Grundschutz','https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/IT-Grundschutz/it-grundschutz_node.html','government'],
+  ['ANSSI France','https://cyber.gouv.fr/en/','government'],
+  ['Canadian Centre for Cyber Security','https://www.cyber.gc.ca/en/','government'],
+  ['NDSS Symposium','https://www.ndss-symposium.org/','academic'],
+  ['GreyNoise','https://www.greynoise.io/','cti'],
+  ['ANY.RUN','https://any.run/','malware-analysis'],
+  ['Recorded Future Triage','https://tria.ge/','malware-analysis'],
+  ['HackTricks','https://hacktricks.wiki/en/index.html','penetration-testing'],
+  ['GTFOBins','https://gtfobins.org/','penetration-testing'],
+  ['LOLBAS','https://lolbas-project.github.io/','detection-engineering'],
+  ['PayloadsAllTheThings','https://swisskyrepo.github.io/PayloadsAllTheThings/','web-security'],
+  ['VX-Underground','https://vx-underground.org/','malware-analysis'],
+  ['Dragos','https://www.dragos.com/resources','ot-ics-security'],
+  // AttackerKB now redirects to Rapid7's maintained successor directory.
+  ['Rapid7 Vulnerability & Exploit Database','https://www.rapid7.com/db/','vulnerability'],
+  ['x64dbg','https://x64dbg.com/','reverse-engineering'],
+  ['Snort','https://www.snort.org/','network-security'],
+  ['Arkime','https://arkime.com/','network-security'],
+  ['Falco','https://falco.org/','container-security'],
+  ['Shodan','https://www.shodan.io/','network-security'],
+  ['OSINT Framework','https://osintframework.com/','osint'],
+  ['Maltego','https://www.maltego.com/','osint'],
+  ['Bellingcat Online Investigation Toolkit','https://bellingcat.gitbook.io/toolkit','osint'],
+  ['Trace Labs','https://tracelabs.org/','osint'],
+  ['theHarvester','https://github.com/laramies/theHarvester','osint'],
+  ['SpiderFoot','https://github.com/smicallef/spiderfoot','osint'],
 ];
 
 const slug = (value) => value.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -156,14 +197,15 @@ const sourceKindGroups = new Map([
     'NIST SP 800-61 Rev. 3', 'NIST AI Risk Management Framework',
     'NCSC Cyber Assessment Framework', 'ASD Essential Eight', 'CERT-EU Publications',
     'Cyber Security Agency of Singapore', 'National Vulnerability Database',
-    'NCSC AI Security Guidance'
+    'NCSC AI Security Guidance', 'CISA ICS Advisories', 'BSI Germany IT-Grundschutz',
+    'ANSSI France', 'Canadian Centre for Cyber Security'
   ])],
   ['standards-body', new Set([
-    'FIRST CVSS v4.0', 'OASIS Open CTI Documentation', 'FIRST EPSS'
+    'FIRST CVSS v4.0', 'OASIS Open CTI Documentation', 'FIRST EPSS', 'SLSA'
   ])],
   ['academic', new Set([
     'arXiv Cryptography and Security', 'USENIX Security Symposium',
-    'Stratosphere IPS Datasets', 'UNB CIC Datasets'
+    'Stratosphere IPS Datasets', 'UNB CIC Datasets', 'NDSS Symposium'
   ])],
   ['nonprofit-technical', new Set([
     'MITRE ATT&CK', 'MITRE ATLAS', 'OWASP GenAI Security Project',
@@ -172,18 +214,21 @@ const sourceKindGroups = new Map([
     'Malpedia', 'OpenSecurityTraining2', 'OWASP Top 10', 'OWASP ASVS',
     'OWASP Web Security Testing Guide', 'OWASP API Security Project',
     'OWASP Cheat Sheet Series', 'Cloud Security Alliance Cloud Controls Matrix',
-    'CIS Kubernetes Benchmark', 'OWASP MASVS', 'OWASP MASTG', 'CSA AI Controls Matrix'
+    'CIS Kubernetes Benchmark', 'OWASP MASVS', 'OWASP MASTG', 'CSA AI Controls Matrix',
+    'OpenSSF', 'Bellingcat Online Investigation Toolkit', 'Trace Labs'
   ])],
   ['open-source-project', new Set([
     'Atomic Red Team', 'Apache Caldera', 'MISP', 'Open Source Vulnerabilities', 'Sigma',
     'Velociraptor', 'Plaso', 'Timesketch', 'Autopsy', 'The Sleuth Kit', 'REMnux', 'YARA',
     'Ghidra', 'FLARE-VM', 'Cutter', 'pwntools', 'Nmap Documentation', 'OSS-Fuzz',
     'Kubernetes Security Documentation', 'Trivy', 'Kubescape', 'Stratus Red Team',
-    'Android Security', 'MobSF', 'Frida', 'PyRIT', 'garak', 'Zeek', 'Suricata', 'Wireshark'
+    'Android Security', 'MobSF', 'Frida', 'PyRIT', 'garak', 'Zeek', 'Suricata', 'Wireshark',
+    'capa', 'Wazuh', 'Sigstore', 'GTFOBins', 'LOLBAS', 'PayloadsAllTheThings',
+    'x64dbg', 'Arkime', 'Falco', 'theHarvester'
   ])],
   ['open-core', new Set([
     'OpenCTI', 'Metasploit Documentation', 'Semgrep', 'Prowler', 'PingCastle',
-    'BloodHound', 'Promptfoo', 'Security Onion'
+    'BloodHound', 'Promptfoo', 'Security Onion', 'SpiderFoot'
   ])],
   ['commercial-technical', new Set([
     'Check Point Research', 'SentinelOne Labs', 'Google Threat Intelligence',
@@ -196,13 +241,19 @@ const sourceKindGroups = new Map([
     'Microsoft Azure Security Documentation', 'Google Cloud Security Best Practices',
     'Apple Platform Security', 'SpecterOps Research', 'Purple Knight',
     'Microsoft Entra Documentation', 'Google Secure AI Framework', 'TryHackMe', 'LetsDefend',
-    'CyberDefenders', 'PentesterLab', 'Hack The Box Academy'
+    'CyberDefenders', 'PentesterLab', 'Hack The Box Academy', 'Google Project Zero',
+    'SANS Internet Storm Center', 'VulnCheck KEV', 'Mandiant M-Trends',
+    'Microsoft Digital Defense Report', 'IBM X-Force Threat Intelligence Index',
+    'Red Canary Threat Detection Report', 'Microsoft Threat Intelligence blog',
+    'GreyNoise', 'ANY.RUN', 'Recorded Future Triage', 'Dragos',
+    'Rapid7 Vulnerability & Exploit Database', 'Shodan', 'Maltego'
   ])],
   ['independent-technical', new Set([
     'ThreatFox', 'URLhaus', 'MalwareBazaar', 'LiveOverflow', 'ROP Emporium',
-    'ADSecurity.org', 'OverTheWire', 'Malware-Traffic-Analysis.net'
+    'ADSecurity.org', 'OverTheWire', 'Malware-Traffic-Analysis.net', 'HackTricks',
+    'VX-Underground', 'OSINT Framework'
   ])],
-  ['mixed-license-tool', new Set(['CodeQL'])]
+  ['mixed-license-tool', new Set(['CodeQL', 'Eric Zimmerman Tools / KAPE', 'Snort'])]
 ]);
 const sourceKindByName = new Map();
 for (const [kind, names] of sourceKindGroups) {
@@ -230,13 +281,56 @@ const safetyCautions = new Map([
   ,['PyRIT', 'Run adversarial evaluations only against authorized targets; constrain credentials, stored prompts, model costs, and sensitive response data, and manually validate findings.']
   ,['garak', 'Probe only authorized AI targets; review plugins and payloads, limit cost and sensitive data exposure, and validate automated detector results.']
   ,['Promptfoo', 'Run tests only against authorized targets and control provider credentials, request cost, test data, generated outputs, and CI exposure.']
+  ,['Google Project Zero', 'Exploit-development and vulnerability details are dual-use; reproduce them only in an authorized isolated environment and follow current disclosure and remediation guidance.']
+  ,['Eric Zimmerman Tools / KAPE', 'Forensic collections can contain credentials and personal or regulated data; protect evidence and outputs, preserve chain of custody, and confirm that the intended KAPE use complies with Kroll’s current licensing terms.']
+  ,['GreyNoise', 'Internet-wide observation does not prove targeted compromise; confirm asset ownership, local telemetry, timing, classification context, and collateral risk before suppressing or blocking activity.']
+  ,['ANY.RUN', 'Free-tier submissions may be public and can contain live malware; never upload confidential artifacts, and analyze only in an authorized isolated workflow.']
+  ,['Recorded Future Triage', 'Public submissions may expose uploaded samples and can contain live malware; never upload confidential artifacts, and validate automated verdicts in an authorized isolated workflow.']
+  ,['HackTricks', 'Offensive procedures are dual-use and community-authored; apply them only to systems you are authorized to test, preferably in an isolated lab, and verify commands before use.']
+  ,['GTFOBins', 'Living-off-the-land procedures are dual-use; validate them only in authorized environments and translate individual entries into defensible local telemetry rather than assuming abuse.']
+  ,['LOLBAS', 'Living-off-the-land procedures are dual-use; test only in authorized environments and do not treat the presence of a listed binary as evidence of compromise.']
+  ,['PayloadsAllTheThings', 'Payloads and bypass techniques are dual-use and vary in quality; use only against authorized targets in controlled environments and review each example before execution.']
+  ,['VX-Underground', 'This collection can include live malware and offensive source code; use a legally authorized isolated lab, follow handling terms, and never execute samples on production systems.']
+  ,['Rapid7 Vulnerability & Exploit Database', 'Exploit and module details are dual-use; use them only for authorized validation, and corroborate vulnerability scope and remediation against vendor advisories and primary records.']
+  ,['x64dbg', 'Dynamic analysis can execute untrusted or malicious code and alter evidence; use snapshots in an authorized isolated Windows lab with no production credentials or shared storage.']
+  ,['Arkime', 'Packet captures and session metadata can expose credentials, content, and personal data; collect only with authorization and apply retention, access-control, and legal requirements.']
+  ,['Shodan', 'Exposure search and active scanning are dual-use; query and test only within legal and organizational authorization, and verify service ownership before drawing conclusions.']
+  ,['OSINT Framework', 'Linked third-party tools have differing privacy, access, and active-collection behavior; review each tool before use and investigate only within lawful authorization.']
+  ,['Maltego', 'Link analysis can expose or infer sensitive relationships about real people and infrastructure; use lawful data, minimize collection, and validate transform results before reporting.']
+  ,['Bellingcat Online Investigation Toolkit', 'Open-source investigation can affect real people; follow source-specific safety guidance, minimize personal data, preserve provenance, and corroborate findings before publication.']
+  ,['Trace Labs', 'Work concerns real missing-person cases; follow the program’s passive-only rules, avoid contact or active intrusion, protect personal data, and submit leads only through approved channels.']
+  ,['theHarvester', 'Active discovery features generate target traffic; use them only against authorized assets, control third-party API data, and treat discovered identifiers as sensitive.']
+  ,['SpiderFoot', 'Modules can perform active scanning and collect sensitive relationship data; select modules deliberately, use only authorized targets, and validate results before escalation.']
 ]);
 
 const geminiText = fs.readFileSync(path.resolve('gemini_links_research.md'), 'utf8');
 const openaiText = fs.readFileSync(path.resolve('openai_links_research.md'), 'utf8');
+const expansionText = fs.readFileSync(path.resolve('knowledge_sources_expansion_research.md'), 'utf8');
+const expansionSourceNames = new Set([
+  'Google Project Zero', 'SANS Internet Storm Center', 'CISA ICS Advisories', 'capa',
+  'Eric Zimmerman Tools / KAPE', 'Wazuh', 'SLSA', 'Sigstore', 'OpenSSF', 'VulnCheck KEV',
+  'Mandiant M-Trends', 'Microsoft Digital Defense Report', 'IBM X-Force Threat Intelligence Index',
+  'Red Canary Threat Detection Report', 'Microsoft Threat Intelligence blog',
+  'BSI Germany IT-Grundschutz', 'ANSSI France', 'Canadian Centre for Cyber Security', 'NDSS Symposium',
+  'GreyNoise', 'ANY.RUN', 'Recorded Future Triage', 'HackTricks', 'GTFOBins', 'LOLBAS',
+  'PayloadsAllTheThings', 'VX-Underground', 'Dragos', 'Rapid7 Vulnerability & Exploit Database',
+  'x64dbg', 'Snort', 'Arkime', 'Falco', 'Shodan', 'OSINT Framework', 'Maltego',
+  'Bellingcat Online Investigation Toolkit', 'Trace Labs', 'theHarvester', 'SpiderFoot',
+]);
+if (expansionSourceNames.size !== 40) {
+  throw new Error(`Expansion registry must contain exactly 40 sources; found ${expansionSourceNames.size}`);
+}
+const missingExpansionRows = [...expansionSourceNames].filter((name) => !registryNames.has(name));
+if (missingExpansionRows.length) {
+  throw new Error(`Expansion sources missing from registry: ${missingExpansionRows.join(', ')}`);
+}
+if (!expansionText.includes('# Expanding the 1200km Cyber Knowledge Directory')) {
+  throw new Error('Unexpected Knowledge Sources expansion research artifact.');
+}
 const sources = rows.map(([name, url, category]) => {
   const inGemini = geminiText.toLowerCase().includes(name.toLowerCase()) || (name === 'CISA Known Exploited Vulnerabilities Catalog' && geminiText.includes('Known Exploited Vulnerabilities'));
   const inOpenAI = openaiText.toLowerCase().includes(name.toLowerCase()) || (name === 'OASIS Open CTI Documentation' && openaiText.includes('OASIS'));
+  const inExpansion = expansionSourceNames.has(name);
   const kind = sourceKindByName.get(name);
   const score = ['government', 'standards-body'].includes(kind)
     ? 95
@@ -245,11 +339,15 @@ const sources = rows.map(([name, url, category]) => {
       : 82;
   return {
     id: slug(name), name, url, category,
-    // Every registry row was selected from a name or abbreviated name in the
-    // OpenAI summary; exact text matching is retained only as an audit aid.
-    provenance: [inGemini && 'gemini', (inOpenAI || !inGemini) && 'openai'].filter(Boolean),
+    // Legacy rows were selected from the first two reports; exact matching is
+    // retained as an audit aid while new rows cite the expansion report directly.
+    provenance: [
+      inGemini && 'gemini',
+      (inOpenAI || (!inGemini && !inExpansion)) && 'openai',
+      inExpansion && 'expansion-research',
+    ].filter(Boolean),
     source_kind: kind,
-    access: name === 'Google Threat Intelligence' ? 'paid' : ['TryHackMe','LetsDefend','PentesterLab','Hack The Box Academy','VirusTotal','Binary Ninja','CyberDefenders','PingCastle','CodeQL','Semgrep','Prowler','BloodHound','Promptfoo','OpenCTI'].includes(name) ? 'freemium' : 'free',
+    access: name === 'Google Threat Intelligence' ? 'paid' : ['TryHackMe','LetsDefend','PentesterLab','Hack The Box Academy','VirusTotal','Binary Ninja','CyberDefenders','PingCastle','CodeQL','Semgrep','Prowler','BloodHound','Promptfoo','OpenCTI','Eric Zimmerman Tools / KAPE','VulnCheck KEV','GreyNoise','ANY.RUN','Recorded Future Triage','Dragos','Snort','Shodan','Maltego','SpiderFoot'].includes(name) ? 'freemium' : 'free',
     quality: {
       score,
       tier: score >= 90 ? 'A' : 'B',
@@ -279,9 +377,12 @@ for (const source of sources) {
 const assessmentFiles = [
   'data/knowledge-source-assessments-foundations.json',
   'data/knowledge-source-assessments-operations.json',
-  'data/knowledge-source-assessments-app-cloud.json'
+  'data/knowledge-source-assessments-app-cloud.json',
+  'data/knowledge-source-assessments-expansion-stage1.json',
+  'data/knowledge-source-assessments-expansion-stage2.json',
+  'data/knowledge-source-assessments-expansion-stage3.json'
 ];
-const controlledTags = new Set('cti threat-research threat-reports mitre-attack detection-engineering sigma yara suricata dfir incident-response malware-analysis reverse-engineering vulnerability-management vulnerability-research exploit-development penetration-testing red-team blue-team soc network-security cloud-security application-security api-security web-security active-directory identity-security mobile-security kubernetes container-security ai-security llm-security security-architecture standards government csirt academic tools datasets feeds repositories training labs books video community beginner intermediate advanced free paid freemium'.split(' '));
+const controlledTags = new Set('cti threat-research threat-reports mitre-attack detection-engineering sigma yara suricata dfir incident-response malware-analysis reverse-engineering vulnerability-management vulnerability-research exploit-development penetration-testing red-team blue-team soc network-security ot-ics-security cloud-security application-security supply-chain-security api-security web-security active-directory identity-security mobile-security kubernetes container-security ai-security llm-security osint security-architecture standards government csirt academic tools datasets feeds repositories training labs books video community beginner intermediate advanced free paid freemium'.split(' '));
 const repositoryHosts = new Set(['github.com', 'codeql.github.com']);
 const categoryTags = {
   academic: ['academic', 'threat-research', 'community'],
@@ -304,9 +405,12 @@ const categoryTags = {
   'malware-analysis': ['malware-analysis', 'tools'],
   'mobile-security': ['mobile-security', 'application-security'],
   'network-security': ['network-security', 'blue-team'],
+  'ot-ics-security': ['ot-ics-security', 'network-security'],
+  osint: ['osint'],
   'penetration-testing': ['penetration-testing'],
   'reverse-engineering': ['reverse-engineering'],
   soc: ['soc', 'blue-team'],
+  'supply-chain-security': ['supply-chain-security', 'application-security'],
   'threat-informed-defense': ['mitre-attack'],
   'threat-reports': ['threat-reports'],
   'threat-research': ['threat-research'],
@@ -316,7 +420,10 @@ const categoryTags = {
 };
 const controlledTagOverrides = new Map([
   ['MITRE ATLAS', ['threat-research', 'red-team']],
+  ['MITRE ATT&CK', ['ot-ics-security']],
   ['FIRST EPSS', ['feeds']],
+  ['Open Source Vulnerabilities', ['supply-chain-security']],
+  ['GitHub Advisory Database', ['supply-chain-security']],
   ['OSS-Fuzz', ['tools']],
   ['Cloud Security Alliance Cloud Controls Matrix', ['security-architecture', 'standards']]
 ]);
@@ -335,7 +442,7 @@ for (const source of unique.values()) {
     Object.assign(source, assessments[source.id]);
     const authority = { 'primary-authoritative': 5, 'peer-reviewed-primary': 5, 'primary-operational': 4.5, mixed: 4, 'secondary-corroborating': 3.5, preprint: 3.5 }[source.assessment.evidence_use];
     const originality = { 'primary-authoritative': 5, 'peer-reviewed-primary': 5, 'primary-operational': 5, mixed: 4, 'secondary-corroborating': 3, preprint: 4 }[source.assessment.evidence_use];
-    const maintenance = { continuous: 5, active: 4.5, periodic: 4, unclear: 2.5 }[source.assessment.maintenance];
+    const maintenance = { continuous: 5, active: 4.5, periodic: 4, unclear: 2.5, stale: 2 }[source.assessment.maintenance];
     const practicalValue = Math.min(5, 2.5 + source.assessment.best_for.length * 0.3 + source.audience.length * 0.12 + source.content_formats.length * 0.1);
     const transparency = {
       government: 5,
@@ -400,7 +507,7 @@ if (assessmentFiles.every(file => fs.existsSync(file))) {
 const output = {
   schema_version: 1,
   generated_on: checkedOn,
-  scope_note: 'Consolidates sources explicitly named in the two supplied research reports. The separate 130-record OpenAI artifacts referenced by the pasted summary were not supplied.',
+  scope_note: 'Consolidates the selected records from the supplied Gemini and OpenAI research plus 40 validated expansion records. Shodan is included with a current freemium caveat; the retired standalone AttackerKB entry is represented by Rapid7’s maintained Vulnerability & Exploit Database successor; and the separately assessed AI Incident Database remains outside the staged expansion scope.',
   quality_scale: {
     A: '90-100: high-confidence, high-value source within its stated scope',
     B: '80-89: valuable source with material scope, access, evidence, or corroboration caveats',
@@ -408,7 +515,7 @@ const output = {
     dimensions: {
       authority: 'Institutional or evidentiary authority for the claims it can support',
       originality: 'Amount of first-party standards, research, data, tooling, or instruction',
-      maintenance: 'Observed update model from continuous through unclear',
+      maintenance: 'Observed update model from continuous through stale or unclear',
       practical_value: 'Breadth of concrete, defensible use cases',
       transparency: 'Visibility into methods, code, data provenance, or governance'
     }

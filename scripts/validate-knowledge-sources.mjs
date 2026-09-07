@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 
 const file = 'data/knowledge-sources.json';
 const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+const checkedOn = data.generated_on;
 const queue = [...data.sources];
 const results = [];
 
@@ -23,11 +24,11 @@ async function check(source) {
       status: reachable ? 'reachable' : status === 401 || status === 403 || status === 429 ? 'access-restricted' : 'failed',
       http_status: status,
       final_url: response.url,
-      checked_on: '2026-09-06'
+      checked_on: checkedOn
     };
     results.push(source.validation.status);
   } catch (error) {
-    source.validation = { ...source.validation, status: 'failed', error: error.name === 'AbortError' ? 'timeout' : String(error.message), checked_on: '2026-09-06' };
+    source.validation = { ...source.validation, status: 'failed', error: error.name === 'AbortError' ? 'timeout' : String(error.message), checked_on: checkedOn };
     results.push('failed');
   } finally {
     clearTimeout(timer);
@@ -72,7 +73,7 @@ Validated on: ${data.generated_on}
 - ${data.validation_summary['access-restricted'] || 0} URLs protected against automated access
 - ${data.validation_summary.failed || 0} failed URLs
 
-The dataset consolidates all usable structured records from the Gemini report and the knowledge sources explicitly named in the supplied OpenAI summary. The OpenAI summary refers to separate 380 KB Markdown and 341 KB JSON artifacts, but those artifacts were not supplied; therefore, claims or records found only in those missing files are not represented.
+The dataset consolidates all usable structured records from the supplied Gemini and OpenAI research plus 40 validated expansion records. One current-state correction replaces the retired standalone AttackerKB entry with Rapid7's maintained Vulnerability & Exploit Database successor. Shodan is included with a current freemium caveat, while the separately assessed AI Incident Database remains outside this staged expansion.
 
 ## Quality method
 

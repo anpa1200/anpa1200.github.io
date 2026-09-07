@@ -82,6 +82,73 @@ test('module statically renders every source at its stable anchor', () => {
   }
 });
 
+test('validated expansion contributes exactly 40 assessed sources and three governed domains', () => {
+  const expansionIds = [
+    'google-project-zero', 'sans-internet-storm-center', 'cisa-ics-advisories', 'capa',
+    'eric-zimmerman-tools-kape', 'wazuh', 'slsa', 'sigstore', 'openssf', 'vulncheck-kev',
+    'mandiant-m-trends', 'microsoft-digital-defense-report', 'ibm-x-force-threat-intelligence-index',
+    'red-canary-threat-detection-report', 'microsoft-threat-intelligence-blog',
+    'bsi-germany-it-grundschutz', 'anssi-france', 'canadian-centre-for-cyber-security',
+    'ndss-symposium', 'greynoise', 'any-run', 'recorded-future-triage', 'hacktricks',
+    'gtfobins', 'lolbas', 'payloadsallthethings', 'vx-underground', 'dragos',
+    'rapid7-vulnerability-and-exploit-database', 'x64dbg', 'snort', 'arkime', 'falco',
+    'shodan', 'osint-framework', 'maltego', 'bellingcat-online-investigation-toolkit',
+    'trace-labs', 'theharvester', 'spiderfoot',
+  ];
+  const byId = new Map(dataset.sources.map((source) => [source.id, source]));
+  const expanded = dataset.sources.filter((source) => source.provenance.includes('expansion-research'));
+
+  assert.ok(dataset.sources.length >= 165);
+  assert.equal(expanded.length, 40);
+  assert.deepEqual(expanded.map((source) => source.id).sort(), expansionIds.sort());
+  for (const id of expansionIds) assert.ok(byId.has(id), id);
+
+  assert.deepEqual(
+    expansionIds.filter((id) => byId.get(id).category === 'ot-ics-security').sort(),
+    ['cisa-ics-advisories', 'dragos'],
+  );
+  assert.deepEqual(
+    expansionIds.filter((id) => byId.get(id).category === 'supply-chain-security').sort(),
+    ['openssf', 'sigstore', 'slsa'],
+  );
+  assert.deepEqual(
+    expansionIds.filter((id) => byId.get(id).category === 'osint').sort(),
+    ['bellingcat-online-investigation-toolkit', 'maltego', 'osint-framework', 'spiderfoot', 'theharvester', 'trace-labs'],
+  );
+  for (const tag of ['ot-ics-security', 'osint', 'supply-chain-security']) {
+    assert.ok(dataset.controlled_tag_vocabulary.includes(tag), tag);
+  }
+  for (const [left, right] of [
+    ['slsa', 'sigstore'],
+    ['slsa', 'openssf'],
+    ['sigstore', 'openssf'],
+    ['cisa-ics-advisories', 'dragos'],
+    ['sans-internet-storm-center', 'greynoise'],
+    ['vulncheck-kev', 'rapid7-vulnerability-and-exploit-database'],
+    ['capa', 'x64dbg'],
+    ['wazuh', 'snort'],
+  ]) {
+    assert.ok(byId.get(left).related_source_ids.includes(right), `${left} must link to ${right}`);
+    assert.ok(byId.get(right).related_source_ids.includes(left), `${right} must link to ${left}`);
+  }
+
+  assert.equal(byId.get('rapid7-vulnerability-and-exploit-database').url, 'https://www.rapid7.com/db/');
+  assert.equal(byId.get('shodan').access, 'freemium');
+  assert.equal(byId.get('snort').source_kind, 'mixed-license-tool');
+  assert.equal(byId.get('snort').access, 'freemium');
+  assert.equal(byId.get('spiderfoot').assessment.maintenance, 'stale');
+  assert.equal(byId.get('spiderfoot').quality.tier, 'C');
+  for (const id of ['any-run', 'recorded-future-triage', 'vx-underground', 'shodan', 'trace-labs', 'theharvester', 'spiderfoot']) {
+    assert.ok(byId.get(id).caution, `${id} needs an explicit safety or privacy caution`);
+  }
+  for (const source of expanded.filter((source) => source.keywords.includes('dual-use'))) {
+    assert.ok(source.caution, `${source.id} labels dual-use material without a handling caution`);
+  }
+  for (const rejected of ['ai-incident-database', 'mitre-car', 'mitre-engage', 'rapid7-attackerkb', 'recon-ng']) {
+    assert.equal(byId.has(rejected), false, rejected);
+  }
+});
+
 test('module has unique ids and resolved local accessibility references', () => {
   const ids = new Map();
   for (const match of html.matchAll(/\bid="([^"]+)"/g)) {

@@ -37,8 +37,8 @@ try {
   build = JSON.parse(readFileSync(join(bundle, 'search-build.json'), 'utf8'));
   if (build.pagefindVersion !== '1.5.2') failures.push(`expected Pagefind 1.5.2, found ${build.pagefindVersion}`);
   if (build.indexedPages < minimumPages) failures.push(`expected at least ${minimumPages} indexed pages, found ${build.indexedPages}`);
-  if (build.indexedCustomRecords < 125 || build.knowledgeSourceRecords !== build.indexedCustomRecords) {
-    failures.push(`expected at least 125 consistently reported knowledge-source records, found ${build.indexedCustomRecords || 0}`);
+  if (build.indexedCustomRecords < 165 || build.knowledgeSourceRecords !== build.indexedCustomRecords) {
+    failures.push(`expected at least 165 consistently reported knowledge-source records, found ${build.indexedCustomRecords || 0}`);
   }
   if (build.indexedPageRecords < Math.floor(build.indexedPages * 0.95) || build.indexedPageRecords > build.indexedPages) {
     failures.push(`searchable page-record coverage disagrees with accepted pages: ${build.indexedPageRecords}/${build.indexedPages}`);
@@ -94,8 +94,13 @@ async function checkQueries() {
       response.writeHead(404).end('Not found');
       return;
     }
+    const body = readFileSync(file);
     response.setHeader('Content-Type', mime[extname(file)] || 'application/octet-stream');
-    response.end(readFileSync(file));
+    // Pagefind lazily fetches many compressed binary chunks. Explicit response
+    // framing keeps Node's test client from reusing an ambiguously ended socket.
+    response.setHeader('Content-Length', String(body.length));
+    response.setHeader('Connection', 'close');
+    response.end(body);
   });
   await new Promise((resolvePromise) => server.listen(0, '127.0.0.1', resolvePromise));
   const address = server.address();

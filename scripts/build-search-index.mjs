@@ -45,7 +45,7 @@ const rootSitemap = option('--sitemap', remote ? `${SITE_ORIGIN}/sitemap.xml` : 
 const canonicalSitemapOutput = option('--canonical-sitemap-output');
 const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-catalog.json')));
 const knowledgeSourcesPath = resolve(option('--knowledge-sources', join(siteRoot, 'data', 'knowledge-sources.json')));
-const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledge-sources', '125'), 10);
+const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledge-sources', '165'), 10);
 const requiredIndexUrls = [
   `${SITE_ORIGIN}/`,
   `${SITE_ORIGIN}/search.html`,

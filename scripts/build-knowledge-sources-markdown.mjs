@@ -14,10 +14,13 @@ const groupBy = (items, selector) => items.reduce((map, item) => {
 }, new Map());
 const groups = groupBy(sources, source => source.category);
 const titleOverrides = new Map([
-  ['ai', 'AI'], ['api', 'API'], ['cti', 'CTI'], ['dfir', 'DFIR'], ['soc', 'SOC'],
+  ['ai', 'AI'], ['api', 'API'], ['cti', 'CTI'], ['dfir', 'DFIR'], ['ics', 'ICS'],
+  ['osint', 'OSINT'], ['ot', 'OT'], ['soc', 'SOC'],
   ['nist', 'NIST'], ['mitre', 'MITRE'], ['owasp', 'OWASP']
 ]);
-const display = value => String(value || 'not-specified').split('-').map(word => titleOverrides.get(word.toLowerCase()) || `${word[0].toUpperCase()}${word.slice(1)}`).join(' ');
+const display = value => value === 'ot-ics-security'
+  ? 'OT/ICS Security'
+  : String(value || 'not-specified').split('-').map(word => titleOverrides.get(word.toLowerCase()) || `${word[0].toUpperCase()}${word.slice(1)}`).join(' ');
 const list = values => values.map(value => display(value)).join(', ');
 const linkToSource = id => byId.has(id) ? `[${byId.get(id).name}](#${id})` : id;
 const escapeTableCell = value => String(value)
