@@ -84,9 +84,9 @@ deployed v6.0.0 documentation from commit
 `29574898051`. The project Pages route and the root-site mirror therefore came
 from different build inputs and disagreed.
 
-Unified RAG/MCP is part of the v6.5.0 source release. A static documentation
+Unified RAG/MCP is part of the current v7.0.0 release. A static documentation
 route is included in this root-site deployable output; links to the
-authoritative source guide are pinned to the reviewed v6.5.0 source commit.
+authoritative source guide are pinned to the reviewed v7.0.0 release commit.
 
 GitHub's Pages API reports the main 1200km site as a workflow build sourced
 from `main` at repository root; the last inspected successful deployment was

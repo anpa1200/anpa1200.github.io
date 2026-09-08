@@ -193,6 +193,10 @@ const requiredSurfaces = [
   'labs.html',
   'external-validation.html',
   'adversarygraph/index.html',
+  'adversarygraph/full-version-feature-guides.html',
+  'adversarygraph-docs/index.html',
+  'adversarygraph-docs/intro/index.html',
+  'adversarygraph-docs/roadmap/index.html',
   'threat-matrix/index.html',
 ];
 const currentTexts = [];
@@ -200,8 +204,10 @@ for (const relativePath of requiredSurfaces) {
   const html = read(relativePath);
   const text = visibleText(html);
   currentTexts.push([relativePath, html, text]);
-  if (/\b(?:current|latest|stable)\s+(?:release|version)[^.!?]{0,80}\bv(?:2|4|5)(?:\.\d+){0,2}\b/i.test(text)) {
-    fail(`${relativePath}: current release/version statement contains an unauthorized historical value.`);
+  for (const match of text.matchAll(/\b(?:current(?: merged, CI-validated)? source release|latest published immutable(?: GitHub)? release|latest published tag|stable release|current release|current version)\b[^.!?]{0,40}\b(v\d+(?:\.\d+){0,2})\b/gi)) {
+    if (![sourceRelease, stableTag].includes(match[1])) {
+      fail(`${relativePath}: current release/version statement contains unauthorized historical value ${match[1]}.`);
+    }
   }
   if (relativePath === 'adversarygraph/index.html' && /\bAdversaryGraph AI\b(?!\s+Analysis)/i.test(html)) {
     fail(`${relativePath}: use the canonical product name AdversaryGraph.`);
@@ -308,9 +314,26 @@ for (const absolute of walk(docsOutputRoot, file => /\.(?:html|md|js)$/i.test(fi
     || /Current v5\.x releases/i.test(content)
     || /AdversaryGraph v6\.0\.0 is the current stable release/i.test(content)
     || /Current release:\s*(?:<strong>)?v6\.0\.0/i.test(content)
+    || /\bCurrent v5 (?:platform|Visual)|\bavailable in current v5\.0|\bcurrent v5 (?:platform|Malware Analysis)/i.test(content)
     || /\bAdversaryGraph AI\b(?!\s+Analysis)/i.test(content)) {
     fail(`${path.relative(siteRoot, absolute)}: stale current-version or product-name content remains in documentation output.`);
   }
+  for (const pattern of [
+    /Current source release:[^"'\\<]{0,100}\b(v\d+\.\d+\.\d+)\b/gi,
+    /latest published (?:immutable GitHub release|tag)[^"'\\<]{0,100}\b(v\d+\.\d+\.\d+)\b/gi,
+    /AdversaryGraph\s+(v\d+\.\d+\.\d+)\s+is the current merged/gi,
+    /current source(?: release)? is\s+(v\d+\.\d+\.\d+)/gi,
+  ]) {
+    for (const match of content.matchAll(pattern)) {
+      if (![sourceRelease, stableTag].includes(match[1])) {
+        fail(`${path.relative(siteRoot, absolute)}: release claim ${match[1]} disagrees with data/site-facts.json.`);
+      }
+    }
+  }
+}
+const fullGuide = read('adversarygraph/full-version-feature-guides.html');
+if (/\bv6\.5 source(?: release)?\b|Publication pending/i.test(fullGuide)) {
+  fail('adversarygraph/full-version-feature-guides.html: stale module-release or publication status remains.');
 }
 const threatMatrixOutputRoot = path.join(siteRoot, 'threat-matrix');
 for (const absolute of walk(threatMatrixOutputRoot, file => /\.(?:html|js)$/i.test(file))) {
@@ -353,6 +376,8 @@ const textSurfaceRequirements = new Map([
   ['agent-index.md', [sourceRelease, stableTag, 'data/site-facts.json']],
   ['adversarygraph-docs/index.md', [`Current source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
   ['adversarygraph-docs/capabilities.md', [`Current source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
+  ['adversarygraph-docs/unified-rag-mcp.md', [sourceRelease, stableTag, sourceCommit]],
+  ['agent-skills/explain-adversarygraph.md', [sourceRelease]],
 ]);
 for (const [relativePath, values] of textSurfaceRequirements) {
   const content = read(relativePath);

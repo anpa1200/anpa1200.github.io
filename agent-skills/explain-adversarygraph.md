@@ -55,9 +55,9 @@ Explain these controls:
 - RAG analysis uses `run_analysis`; profile administration uses `manage_intel`;
   index administration uses `manage_feeds`.
 
-Label Unified RAG and MCP as included in the merged, CI-validated v6.5.0 source
-release. Do not claim that these features shipped in the older immutable v6.0.0
-release, and do not claim a v6.5.0 tag exists until it is published.
+Label Unified RAG and MCP as included in the merged, CI-validated and published
+v7.0.0 release. Do not claim that these features shipped in the older immutable
+v6.0.0 release.
 
 ## Safety Boundary
 

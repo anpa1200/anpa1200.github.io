@@ -92,8 +92,9 @@ function pageChecks(path, body, articleCount) {
   const common = [{ label: 'current build ID', pass: buildMetaPresent(body) }];
   const checks = {
     '/': [...common,
-      { label: 'Explore research', pass: body.includes('Explore research') },
-      { label: 'AdversaryGraph hero action', pass: /class=["'][^"']*button[^"']*["'][^>]*href=["'][^"']*adversarygraph/i.test(body) },
+      { label: 'Hiring-manager CV action', pass: body.includes('Download CV (PDF)') && /href=["'](?:\/)?cv\.pdf["']/i.test(body) },
+      { label: 'Security-team AdversaryGraph action', pass: body.includes('Deploy AdversaryGraph') && body.includes('adversarygraph-docs/full-flow/') },
+      { label: 'Reader study action', pass: body.includes('Read the latest study') && body.includes('ai-attack-statistics/') },
     ],
     '/about.html': [...common,
       { label: 'fact attributes', pass: body.includes('data-site-fact=') && body.includes('data-fact-value=') },
