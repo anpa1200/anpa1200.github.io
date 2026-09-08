@@ -11,8 +11,9 @@
     card.dataset.title = title;
     card.dataset.tags = tags.join(' ');
     card.dataset.tagList = tags.map((tag) => tag.toLowerCase()).join('|');
-    card.dataset.guideCover = coverFor(group.id);
-    card.style.setProperty('--guide-cover', `url("${card.dataset.guideCover}")`);
+    const guideCover = card.dataset.guideCover || coverFor(group.id);
+    card.dataset.guideCover = guideCover;
+    card.style.setProperty('--guide-cover', `url("${guideCover}")`);
     return card;
   }));
 

@@ -94,10 +94,17 @@ test('guides catalogue keeps panels aligned and excludes full-article discovery 
   assert.match(guides, /#guides-catalogue-controls/);
   assert.match(guides, /guides-catalogue\.js/);
   assert.match(guides, /guide-item::before/);
+  assert.match(guides, /background-size:\s*contain/);
+  assert.match(guides, /aspect-ratio:\s*16\s*\/\s*9/);
+  assert.match(guides, /#main-content \.guide-item[\s\S]*background:\s*var\(--panel\)\s*!important/);
+  assert.match(guides, /data-guide-cover="\/assets\/cti\/ai-in-cyberattacks-statistical-study\/cover\.webp"/);
+  assert.match(guides, /#guides-filter-search[\s\S]*background:\s*var\(--accent\)\s*!important/);
+  assert.doesNotMatch(guides, /#0759d9/);
   assert.match(catalogueScript, /id="guides-search"/);
   assert.match(catalogueScript, /id="guides-category"/);
   assert.match(catalogueScript, /id="guides-tag"/);
   assert.match(catalogueScript, /history\.replaceState/);
   assert.match(catalogueScript, /guideCover/);
+  assert.match(catalogueScript, /card\.dataset\.guideCover\s*\|\|\s*coverFor/);
   assert.match(catalogueScript, /cyber-knowledge-og\/cti\.svg/);
 });
