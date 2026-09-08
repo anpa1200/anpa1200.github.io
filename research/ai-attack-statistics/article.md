@@ -1,6 +1,6 @@
 ---
 title: "AI in Cyberattacks: A Statistical CTI Study of 111 Publications"
-description: "Evidence-bounded analysis of 111 publications uses 103 eligible CTI records to map attacker AI use, evidence strength, and limitations."
+description: "Analyze 111 publications and 103 eligible CTI records mapping attacker use of AI, evidence strength, research limits, datasets, and reproducible methods."
 author: "Andrey Pautov"
 status: "Published research snapshot"
 published: "2026-08-29"

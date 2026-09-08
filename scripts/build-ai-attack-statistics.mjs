@@ -4,6 +4,7 @@ import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applyPlatformSidebar } from './platform-sidebar-lib.mjs';
+import { curatedMetaDescription } from './release-html-lib.mjs';
 import { applySiteShell, loadSiteShell } from './site-shell-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -191,7 +192,7 @@ function page(articleBody, sourceHash) {
   const datasetCanonical = 'https://1200km.com/ai-attack-statistics/data/';
   const title = 'AI in Cyberattacks: Statistical CTI Study | 1200km';
   const headline = `AI in Cyberattacks: A Statistical CTI Study of ${summary.unique_publications} Publications`;
-  const description = `Evidence-bounded analysis of ${summary.unique_publications} publications uses ${summary.analysis_eligible_publications} eligible CTI records to map attacker AI use, evidence strength, and limitations.`;
+  const description = curatedMetaDescription(canonical);
   const cover = 'https://1200km.com/assets/cti/ai-in-cyberattacks-statistical-study/cover.png';
   const structured = {
     '@context': 'https://schema.org',

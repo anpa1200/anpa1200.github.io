@@ -150,7 +150,7 @@ The security boundary includes the model file, serialization format, loader, reg
 
 JFrog’s research, [Data Scientists Targeted by Malicious Hugging Face ML Models](https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/), documented a public model whose loading could execute embedded code through an unsafe serialization path. This was security research, not proof that every public model is malicious. Its evidence-based lesson is precise: a model download is a software-supply-chain event, not merely the transfer of inert data.
 
-MITRE ATLAS also records [Poison Training Data (AML.T0020)](https://atlas.mitre.org/techniques/AML.T0020) and related model-supply-chain techniques. Use the technique as a vocabulary and mapping aid; use the underlying report, artifact, or telemetry to establish what actually happened.
+MITRE ATLAS also records [Training Data Poisoning (AML.T0020)](https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L1764-L1791) and related model-supply-chain techniques. Use the technique as a vocabulary and mapping aid; use the underlying report, artifact, or telemetry to establish what actually happened.
 
 ### Minimum model-artifact record
 

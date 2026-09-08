@@ -14,6 +14,7 @@ import {
   PERSON_ID,
   SOFTWARE_ID,
   WEBSITE_ID,
+  curatedMetaDescription,
   editorialArticleDocument,
   parseJsonLd,
   stripHtml,
@@ -336,6 +337,10 @@ for (const page of pages) {
       metadataReport.descriptions_over_160.push({ page: page.rel, length: description.length });
       failures.push(`${page.rel}: meta description exceeds 160 characters (${description.length})`);
     }
+  }
+  const curatedDescription = curatedMetaDescription(page.canonical);
+  if (curatedDescription && description !== curatedDescription) {
+    failures.push(`${page.rel}: priority-page meta description differs from data/seo-descriptions.json`);
   }
   for (const key of ['og:image', 'twitter:image']) {
     const imageUrl = findMetaContent(releaseHtml, key);

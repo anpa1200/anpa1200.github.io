@@ -1,14 +1,13 @@
 # AdversaryGraph Unified Intelligence RAG and MCP
 
-Status: included in the merged, CI-validated AdversaryGraph v6.5.0 source
-release. This capability is not part of the older immutable v6.0.0 release.
+Status: included in the merged, CI-validated AdversaryGraph v7.0.0 release.
+This capability is not part of the older immutable v6.0.0 release.
 
 Canonical, authoritative source:
-https://github.com/anpa1200/adversarygraph/blob/aeee13dcaec1e2993b9f0969290c9ee414bb4cf6/docs/unified-rag-and-mcp.md
+https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/docs/unified-rag-and-mcp.md
 
-Publication note: the v6.5.0 source release is merged and CI-validated, while
-the latest published immutable GitHub release remains v6.0.0 until the
-protected tag workflow completes.
+Publication note: the merged source and latest published immutable GitHub
+release are aligned at v7.0.0.
 
 ## Direct answer
 

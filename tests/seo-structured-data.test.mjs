@@ -139,6 +139,13 @@ test('metadata descriptions are unique-page prose rather than generic level labe
   assert.doesNotMatch(output, /content="Level: Intermediate"/);
 });
 
+test('priority pages use governed hand-authored descriptions', () => {
+  const input = '<html><head><title>1200km</title><link rel="canonical" href="https://1200km.com/"><meta name="description" content="Generated fallback."></head><body><main><h1>1200km</h1></main></body></html>';
+  const output = normalizeMetaDescriptions(input);
+  assert.match(output, /content="Threat-intelligence research by Andrey Pautov: adversary behavior, ATT&amp;CK mapping, malware analysis, detection engineering, and validated security tools\."/);
+  assert.doesNotMatch(output, /Generated fallback/);
+});
+
 test('metadata description normalization is idempotent on an already-normalized page', () => {
   const input = '<html><head><title>External Validation</title><h1>Public evidence for the 1200km security research ecosystem.</h1><meta name="description" content="Evidence-backed validation for 1200km."><meta property="og:description" content="Evidence-backed validation for 1200km."></head><body><main><h1>Public evidence for the 1200km security research ecosystem.</h1></main></body></html>';
   const oncePassed = normalizeMetaDescriptions(input);

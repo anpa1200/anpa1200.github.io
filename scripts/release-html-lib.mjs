@@ -10,6 +10,9 @@ export const SOFTWARE_ID = 'https://1200km.com/#software';
 const SITE_FACTS = JSON.parse(
   readFileSync(new URL('../data/site-facts.json', import.meta.url), 'utf8'),
 ).facts;
+const CURATED_META_DESCRIPTIONS = JSON.parse(
+  readFileSync(new URL('../data/seo-descriptions.json', import.meta.url), 'utf8'),
+).descriptions;
 
 function factValue(key) {
   const fact = SITE_FACTS[key];
@@ -145,6 +148,7 @@ export function normalizeMetaDescriptions(html) {
     ?.href;
   const current = metaContent(html, 'description');
   if (!current) return html;
+  const curated = canonical ? CURATED_META_DESCRIPTIONS[canonical] : '';
   const decodedCurrent = decodeEntities(current);
   // Preserve complete authored descriptions, but make generated fallbacks
   // uniquely page-specific. Earlier release passes could prepend the title
@@ -153,7 +157,7 @@ export function normalizeMetaDescriptions(html) {
   const guidance = 'Practical security guidance with scope, evidence, and validation boundaries.';
   const generatedFallback = /Practical security guidance with scope, evidence/i.test(decodedCurrent)
     || /^(?:level:\s*|scaffold page\b|content in progress\b)/i.test(decodedCurrent);
-  const base = generatedFallback ? `${title}. ${guidance}` : decodedCurrent;
+  const base = curated || (generatedFallback ? `${title}. ${guidance}` : decodedCurrent);
   const alreadyPrefixed = base === title || base.startsWith(`${title}. `);
   // Archive series often share an authored summary across multiple parts.
   // Include the page-specific title so every canonical article retains a
@@ -174,6 +178,10 @@ export function normalizeMetaDescriptions(html) {
     transformed = upsertMeta(transformed, attribute, key, description);
   }
   return transformed;
+}
+
+export function curatedMetaDescription(canonical = '') {
+  return CURATED_META_DESCRIPTIONS[canonical] || '';
 }
 
 export function normalizeSocialImages(html) {
