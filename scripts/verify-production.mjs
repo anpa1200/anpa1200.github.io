@@ -92,9 +92,11 @@ function pageChecks(path, body, articleCount) {
   const common = [{ label: 'current build ID', pass: buildMetaPresent(body) }];
   const checks = {
     '/': [...common,
-      { label: 'Hiring-manager CV action', pass: body.includes('Download CV (PDF)') && /href=["'](?:\/)?cv\.pdf["']/i.test(body) },
-      { label: 'Security-team AdversaryGraph action', pass: body.includes('Deploy AdversaryGraph') && body.includes('adversarygraph-docs/full-flow/') },
-      { label: 'Reader study action', pass: body.includes('Read the latest study') && body.includes('ai-attack-statistics/') },
+      { label: 'Technique investigation action', pass: body.includes('Look up a technique or actor') && body.includes('/threat-matrix/#/techniques/T1059.003') },
+      { label: 'Detection validation action', pass: body.includes('Build and validate a detection') && body.includes('/learning-paths/#cti-to-detection') },
+      { label: 'Malware triage action', pass: body.includes('Follow malware triage steps') && body.includes('/learning-paths/#malware-triage') },
+      { label: 'Research and reusable fixture', pass: body.includes('/ai-attack-statistics/data/') && body.includes('/learning-paths/command-shell-validation/') },
+      { label: 'CV remains discoverable', pass: /href=["'](?:\/)?cv\.html["']/i.test(body) },
     ],
     '/about.html': [...common,
       { label: 'fact attributes', pass: body.includes('data-site-fact=') && body.includes('data-fact-value=') },
