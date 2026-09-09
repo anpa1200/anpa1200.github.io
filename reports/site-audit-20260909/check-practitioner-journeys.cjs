@@ -90,7 +90,7 @@ const fs = require('node:fs'), path = require('node:path'), http = require('node
     const readme = await page.request.get(base + '/ai-attack-statistics/data/README.md');
     assert.ok((await readme.text()).match(/cit|111|103/i));
     const feed = await page.request.get(base + '/feed.xml');
-    assert.ok((await feed.text()).includes('https://1200km.com/ai-attack-statistics/'));
+    assert.ok(await page.evaluate(xml => Array.from(new DOMParser().parseFromString(xml, 'application/xml').querySelectorAll('item > link')).some(node => node.textContent === 'https://1200km.com/ai-attack-statistics/'), await feed.text()));
     assert.equal((await page.request.get(base + '/this-audit-route-does-not-exist-20260909/')).status(), 404);
   });
   await browser.close(); await new Promise(resolve => server.close(resolve));

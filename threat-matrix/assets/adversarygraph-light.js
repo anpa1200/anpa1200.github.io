@@ -350,20 +350,26 @@ function render() {
   document.querySelector('#page-title').textContent = active?.name || 'Threat Matrix';
   document.querySelector('#page-subtitle').textContent = active?.meta || 'AdversaryGraph Light';
   const main = document.querySelector('#workspace');
-  const html = {
-    discover: renderDiscover,
-    navigator: renderNavigator,
-    apt: renderAptLibrary,
-    compare: renderCompare,
-    coverage: renderCoverage,
-    export: renderExport,
-    'ioc-library': renderIocLibrary,
-    cve: renderCveLibrary,
-    knowledge: renderKnowledgeLibrary,
-  }[state.active]?.() || renderDiscover();
+  const html = renderActiveModule(state.active);
   main.innerHTML = state.routeError ? `<section role="alert" class="card"><h1>Entity unavailable</h1><p>${escapeHtml(state.routeError)}</p><a href="#/discover">Return to public search</a></section>` : html;
   requestAnimationFrame(restoreActiveView);
   if (state.active === 'navigator' && state.selectedTechniqueId) ensureDefense(state.selectedTechniqueId);
+}
+
+// Explicit dispatch keeps route-derived names away from object properties.
+function renderActiveModule(moduleId) {
+  switch (moduleId) {
+    case 'navigator': return renderNavigator();
+    case 'apt': return renderAptLibrary();
+    case 'compare': return renderCompare();
+    case 'coverage': return renderCoverage();
+    case 'export': return renderExport();
+    case 'ioc-library': return renderIocLibrary();
+    case 'cve': return renderCveLibrary();
+    case 'knowledge': return renderKnowledgeLibrary();
+    case 'discover':
+    default: return renderDiscover();
+  }
 }
 
 function renderDiscover() {
