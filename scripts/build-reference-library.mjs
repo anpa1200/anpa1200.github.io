@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { existsSync } from 'node:fs';
+import { inertReferenceKinds, bibliographicReferenceKinds } from './reference-metadata-lib.mjs';
 import { mkdir, readFile, writeFile, readdir, unlink } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -65,6 +66,7 @@ function tagButton(tag) {
 }
 
 function referenceCard(record) {
+  const inert = inertReferenceKinds.has(record.kind);
   const visible = record.tags.slice(0, 12);
   const remaining = record.tags.slice(12);
   const tagKeys = record.tags.map((tag) => tag.key).join('|');
@@ -76,7 +78,8 @@ function referenceCard(record) {
               <span class="reference-context">${escapeHtml(record.inclusion === 'core' ? 'Core research' : 'Context')}</span>
               <button type="button" class="reference-related" data-find-related>Find related</button>
             </div>
-            <h3><a href="${escapeHtml(record.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(record.title)}<span class="visually-hidden"> (opens the publisher resource in a new tab)</span><span aria-hidden="true"> ↗</span></a></h3>
+            <h3>${inert ? escapeHtml(record.title) : `<a href="${escapeHtml(record.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(record.title)}<span class="visually-hidden"> (opens the source resource in a new tab)</span><span aria-hidden="true"> ↗</span></a>`}</h3>
+            <p class="reference-context">${escapeHtml(record.kind || 'bibliographic')} · ${escapeHtml(record.metadata_status || 'authored-metadata')}${inert ? ` · <code>${escapeHtml(record.url.replace(/^https/, 'hxxps').replaceAll('.', '[.]'))}</code>` : ''}</p>
             <p>${escapeHtml(record.description)}</p>${assessedSource ? `
             <p class="reference-assessed-source"><a data-knowledge-source-id="${escapeHtml(assessedSource.id)}" href="/cyber-knowledge/knowledge-sources/#source-${escapeHtml(assessedSource.id)}">Read assessed profile<span class="visually-hidden"> for ${escapeHtml(assessedSource.name)}</span> →</a></p>` : ''}
             <div class="reference-tags" aria-label="Reference tags">${visible.map(tagButton).join('')}</div>
@@ -94,7 +97,7 @@ const pageCount = Math.ceil(model.records.length / pageSize);
 const pagesRoot = join(SITE_ROOT, 'references/page');
 if (!check && existsSync(pagesRoot)) for (const name of await readdir(pagesRoot)) {
   const stale = join(pagesRoot, name, 'index.html');
-  if (/^\d+$/.test(name) && Number(name) > pageCount && existsSync(stale) && (await readFile(stale,'utf8')).includes('reference-library-structured-data')) await unlink(stale);
+  if (/^\d+$/.test(name) && Number(name) > pageCount && existsSync(stale) && (await readFile(stale,'utf8')).includes('data-reference-grid')) await unlink(stale);
 }
 for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
 const canonical = baseCanonical + (pageNumber === 1 ? '' : `page/${pageNumber}/`);
@@ -107,13 +110,14 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
         <div>
           <p class="page-eyebrow">Sources cited across 1200km · Directory updated 2026-09-09</p>
           <h1 id="reference-library-title">Articles and Guides — References</h1>
-          <p class="page-lead">${escapeHtml(model.description)} Search titles and descriptions, filter every normalized tag, pivot across facets, and find references connected by shared evidence metadata.</p>
+          <p class="page-lead">${escapeHtml(model.description)} Search direct titles, descriptions and tags (shared relationships are explored with Find related), filter every normalized tag, pivot across facets, and find references connected by shared evidence metadata.</p>
           <div class="page-hero-links"><a class="button primary" href="/articles/">Browse articles</a><a class="button" href="/guides.html">Browse guides</a><a class="button" href="/cyber-knowledge/knowledge-sources/">Curated Knowledge Sources</a><a class="button" href="/cyber-knowledge/sources/">Cyber Knowledge citations</a><a class="button" href="/ai-attack-statistics/">AI cyberattack study</a><a class="button" href="/ai-attack-statistics/dashboard/">AI study dashboard</a></div>
         </div>
         <aside class="reference-boundary" aria-label="Evidence boundary"><strong>Evidence boundary</strong><p>${escapeHtml(model.evidence_boundary)}</p></aside>
       </section>
       <section class="reference-metrics" aria-label="Reference library summary">
-        <article><strong>${model.record_count}</strong><span>unique references</span></article>
+        <article><strong>${model.record_count}</strong><span>preserved records (all classifications)</span></article>
+        <article><strong>${model.bibliographic_count ?? model.record_count}</strong><span>bibliographic, tool and dataset references</span></article>
         <article><strong>${model.core_count}</strong><span>core research</span></article>
         <article><strong>${model.context_count}</strong><span>context references</span></article>
         <article><strong>${model.site_count}</strong><span>site-wide citations</span></article>
@@ -176,8 +180,8 @@ const itemList = {
       '@type': 'ItemList',
       '@id': `${canonical}#references`,
       name: model.title,
-      numberOfItems: pageRecords.length,
-      itemListElement: pageRecords.map((record, index) => ({
+      numberOfItems: pageRecords.filter(r => bibliographicReferenceKinds.has(r.kind)).length,
+      itemListElement: pageRecords.filter(record => bibliographicReferenceKinds.has(record.kind)).map((record, index) => ({
         '@type': 'ListItem',
         position: index + 1,
         item: {
@@ -254,7 +258,7 @@ if (check) {
 
 }
 const projection = model.records.map((record, i) => ({
-  id: 'reference-' + record.id, name: record.title, url: record.url,
+  id: 'reference-' + record.id, name: record.title, url: record.url, kind: record.kind, metadata_status: record.metadata_status,
   page: '/references/' + (i < 24 ? '' : `page/${Math.floor(i / 24) + 1}/`),
   description: record.description, inclusion: record.inclusion, used_in: record.used_in.slice(0,8),
   assessed_source_id: knowledgeSourceByUrl.get(normalizeUrl(record.url))?.id || '',

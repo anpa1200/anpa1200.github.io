@@ -61,6 +61,17 @@ init().catch(error => {
   root.innerHTML = `<main class="noscript"><h1>Threat Matrix failed to load</h1><p>${escapeHtml(error.message || String(error))}</p></main>`;
 });
 
+function defensiveSummary(technique, domainFile) {
+  if (domainFile === 'mitre-data-atlas.json') return 'ATLAS context; ATT&CK strategies not applicable';
+  const summary = technique.defense_summary || (Array.isArray(technique.detection_strategies) ? {
+    strategies: technique.detection_strategies.length,
+    analytics: technique.detection_strategies.reduce((n, s) => n + (s.analytics || []).length, 0),
+  } : null);
+  if (!summary) return 'Defensive relationships not imported';
+  if (!summary.strategies) return 'No published strategy relationships in this imported release';
+  return `${summary.strategies} detection ${summary.strategies === 1 ? 'strategy' : 'strategies'} · ${summary.analytics} ${summary.analytics === 1 ? 'analytic' : 'analytics'}`;
+}
+
 async function init() {
   renderShell();
   bindGlobalEvents();
@@ -693,7 +704,7 @@ function techniqueDetail(technique) {
       ${mitreReference ? `<a class="detail-source-link" href="${escapeHtml(mitreReference.url)}" rel="noopener">Open MITRE ATT&amp;CK reference ↗</a>` : ''}
     </div>
     <div class="detail-section"><h3>Description</h3><p>${citedText(technique.description, technique.references)}</p></div>
-    <p>Dataset: ${escapeHtml(state.data.domain)} ${state.domainFile === 'mitre-data-atlas.json' ? 'ATLAS' : 'ATT&amp;CK'} ${escapeHtml(state.data.version)} · <a href="${escapeHtml(state.data.source.url)}">Pinned source</a></p>
+    <p>Dataset: ${escapeHtml(state.data.domain)} ${state.domainFile === 'mitre-data-atlas.json' ? 'ATLAS' : 'ATT&amp;CK'} ${escapeHtml(state.data.version)} · <a href="${escapeHtml(state.data.source.url)}">Version-named source (mutable upstream URL)</a>${state.data.source.bundle_sha256 ? `<br>Bundle SHA-256: <code>${escapeHtml(state.data.source.bundle_sha256)}</code><br><small>${escapeHtml(state.data.source.hash_method)}</small>` : ' · No content hash recorded in this import'}</p>
     ${entityLink('techniques', technique.id)}
     ${defenseDetail(technique)}
     <div class="detail-section"><h3>Mapped groups</h3><div class="tag-list">${actors.map(g => `<button class="tag" type="button" data-group-id="${g.id}">${escapeHtml(g.name)}</button>`).join('') || tag('No local group mappings')}</div></div>
@@ -718,7 +729,7 @@ function techniqueCard(technique) {
   if (!technique) return '';
   return `<button class="list-item" type="button" data-technique-id="${technique.id}">
     <span class="item-title"><span>${escapeHtml(technique.name)}</span><span>${escapeHtml(technique.id)}</span></span>
-    <span class="item-meta">${escapeHtml((technique.tactic_ids || []).join(', ') || 'No tactic')} · ${technique.defense_summary ? technique.defense_summary.strategies + ' detection strategies' : (technique.data_sources || []).length + ' legacy data sources'}</span>
+    <span class="item-meta">${escapeHtml((technique.tactic_ids || []).join(', ') || 'No tactic')} · ${escapeHtml(defensiveSummary(technique, state.domainFile))}</span>
   </button>`;
 }
 

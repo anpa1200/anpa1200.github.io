@@ -16,7 +16,7 @@ cpSync(root, site, {
   recursive: true,
   filter: p => {
     const r = relative(root, p);
-    return !r.split('/').some(n => ['.git', 'node_modules', '.cache', 'pagefind', '_site', '.1200km-pagefind'].includes(n)) && !r.startsWith('reports/site-audit-20260909') && !r.startsWith('.1200km-pagefind-');
+    return !r.split('/').some(n => ['.git', 'node_modules', '.cache', 'pagefind', '_site', '.1200km-pagefind'].includes(n)) && !r.startsWith('reports/site-audit-20260909') && !r.startsWith('reports/second-remediation-20260909') && !r.startsWith('.1200km-pagefind-');
   }
 });
 cpSync(archive + '/build', site + '/articles', {

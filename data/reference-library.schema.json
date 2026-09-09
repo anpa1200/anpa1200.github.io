@@ -22,49 +22,141 @@
     "records"
   ],
   "properties": {
-    "$schema": { "const": "./reference-library.schema.json" },
-    "schema_version": { "const": 2 },
-    "generated_at": { "type": "string", "format": "date" },
-    "title": { "type": "string", "minLength": 1 },
-    "description": { "type": "string", "minLength": 1 },
-    "evidence_boundary": { "type": "string", "minLength": 1 },
-    "source_dataset": { "type": "string", "minLength": 1 },
-    "record_count": { "type": "integer", "minimum": 108 },
-    "core_count": { "const": 103 },
-    "context_count": { "const": 5 },
-    "site_count": { "type": "integer", "minimum": 1 },
-    "usage_link_count": { "type": "integer", "minimum": 1 },
-    "unique_tag_count": { "type": "integer", "minimum": 1 },
-    "tag_assignment_count": { "type": "integer", "minimum": 108 },
+    "$schema": {
+      "const": "./reference-library.schema.json"
+    },
+    "schema_version": {
+      "const": 2
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_boundary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_dataset": {
+      "type": "string",
+      "minLength": 1
+    },
+    "record_count": {
+      "type": "integer",
+      "minimum": 108
+    },
+    "core_count": {
+      "const": 103
+    },
+    "context_count": {
+      "const": 5
+    },
+    "site_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "usage_link_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "unique_tag_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tag_assignment_count": {
+      "type": "integer",
+      "minimum": 108
+    },
     "records": {
       "type": "array",
       "minItems": 108,
-      "items": { "$ref": "#/$defs/reference" }
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "bibliographic_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "classification_counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
     }
   },
   "$defs": {
     "reference": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "title", "description", "url", "publisher", "published_at", "inclusion", "tags", "used_in"],
+      "required": [
+        "id",
+        "title",
+        "description",
+        "url",
+        "publisher",
+        "published_at",
+        "inclusion",
+        "tags",
+        "used_in"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^(?:ai-attack-reference:pub-[0-9]{3}|site-reference:[a-z0-9.+/-]+:[a-z0-9.+/-]+)$" },
-        "title": { "type": "string", "minLength": 1, "maxLength": 500 },
-        "description": { "type": "string", "minLength": 20, "maxLength": 300 },
-        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
-        "publisher": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "pattern": "^(?:ai-attack-reference:pub-[0-9]{3}|site-reference:[a-z0-9.+/-]+:[a-z0-9.+/-]+)$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 300
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
         "published_at": {
           "oneOf": [
-            { "type": "string", "pattern": "^[0-9]{4}(?:-[0-9]{2})?(?:-[0-9]{2})?$" },
-            { "type": "null" }
+            {
+              "type": "string",
+              "pattern": "^[0-9]{4}(?:-[0-9]{2})?(?:-[0-9]{2})?$"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
-        "inclusion": { "enum": ["core", "context", "site"] },
+        "inclusion": {
+          "enum": [
+            "core",
+            "context",
+            "site"
+          ]
+        },
         "tags": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/tag" }
+          "items": {
+            "$ref": "#/$defs/tag"
+          }
         },
         "used_in": {
           "type": "array",
@@ -72,26 +164,83 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["title", "url", "type", "domain"],
+            "required": [
+              "title",
+              "url",
+              "type",
+              "domain"
+            ],
             "properties": {
-              "title": { "type": "string", "minLength": 1 },
-              "url": { "type": "string", "format": "uri", "pattern": "^https://1200km.com/" },
-              "type": { "type": "string", "minLength": 1 },
-              "domain": { "type": "string", "minLength": 1 }
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://1200km.com/"
+              },
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "domain": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
+        },
+        "kind": {
+          "enum": [
+            "bibliographic",
+            "tool",
+            "dataset",
+            "navigation",
+            "contact",
+            "indicator",
+            "example",
+            "address-review"
+          ]
+        },
+        "metadata_status": {
+          "enum": [
+            "metadata-recovered",
+            "authored-metadata",
+            "review-needed"
+          ]
+        },
+        "provenance": {
+          "type": "object"
         }
       }
     },
     "tag": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["facet", "type", "value", "key"],
+      "required": [
+        "facet",
+        "type",
+        "value",
+        "key"
+      ],
       "properties": {
-        "facet": { "type": "string", "minLength": 1 },
-        "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
-        "value": { "type": "string", "minLength": 1 },
-        "key": { "type": "string", "pattern": "^[a-z0-9-]+:[a-z0-9.+/-]+$" }
+        "facet": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+:[a-z0-9.+/-]+$"
+        }
       }
     }
   }

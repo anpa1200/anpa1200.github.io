@@ -8,7 +8,8 @@
   ]);
 
   function loadAnalytics() {
-    if (!analyticsId || window.__1200kmAnalyticsLoaded) return;
+    // Search URLs contain visitor-authored queries; do not load automatic URL/history analytics here.
+    if (window.location.pathname === '/search.html' || !analyticsId || window.__1200kmAnalyticsLoaded) return;
     window.__1200kmAnalyticsLoaded = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };

@@ -869,7 +869,9 @@ export function hardenStandaloneHead(html) {
     : STANDALONE_CSP;
   const securityMeta = [
     `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(standaloneCsp)}">`,
-    '<meta name="referrer" content="strict-origin-when-cross-origin">',
+    /<meta\b[^>]*name=["']referrer["'][^>]*content=["']no-referrer["']/i.test(html)
+      ? '<meta name="referrer" content="no-referrer">'
+      : '<meta name="referrer" content="strict-origin-when-cross-origin">',
     '<script src="/assets/theme-bootstrap.js"></script>',
   ].join('\n    ');
   const charset = /<meta\b[^>]*charset=["'][^"']+["'][^>]*>/i;

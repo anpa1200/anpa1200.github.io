@@ -1,11 +1,11 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { loadSiteShell, renderHeader, renderFooter, applySiteShell } from './site-shell-lib.mjs';
 const shell = loadSiteShell(process.cwd());
-for (const [slug, title, description] of [['', 'Practical security learning paths', 'Ordered CTI, detection, AI security, and malware-triage tasks with prerequisites and expected outputs.'], ['command-shell-validation/', 'Validate a command-shell detection candidate', 'Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls.']]) {
+for (const [slug, title, description] of [['', 'Practical security learning paths', 'Ordered CTI, detection, AI security, and malware-triage tasks with prerequisites and expected outputs.'], ['command-shell-validation/', 'Validate a command-shell detection candidate', 'Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls.'], ['agent-permission-validation/', 'Validate a simulated agent permission boundary', 'Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls.'], ['safe-artifact-triage/', 'Triage a reproducible benign artifact', 'Inspect a deterministic benign ZIP with hashes, structured observations, corroboration, and negative controls.']]) {
   const path = 'learning-paths/' + slug + 'index.html',
     url = 'https://1200km.com/' + path.replace('index.html', '');
   const page = shell.pages.find(p => p.path === path);
-  const body = readFileSync('content/learning-paths/' + (slug ? 'command-shell-validation' : 'index') + '.html.inc', 'utf8');
+  const body = readFileSync('content/learning-paths/' + (slug ? slug.replace(/\/$/, '') : 'index') + '.html.inc', 'utf8');
   const schema = {
     '@context': 'https://schema.org',
     '@type': slug ? 'TechArticle' : 'CollectionPage',

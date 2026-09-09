@@ -35,6 +35,66 @@
   let searchPageLimit = SEARCH_PAGE_BATCH_SIZE;
   let searchPageTotal = 0;
   let pagefindInstance = null;
+  let queryEdited = false;
+  let restoringSearch = false;
+  let typingEntry = false;
+  let urlTimer = 0;
+  let hydrated = false;
+  let knownFilters = '';
+
+  function readSearchAddress() {
+    const params = new URL(location.href).searchParams;
+    const filters = {};
+    SEARCH_FILTERS.forEach(({ key }) => {
+      const values = params.getAll('f.' + key).filter(Boolean);
+      if (values.length) filters[key] = values;
+    });
+    const limit = Number(params.get('limit'));
+    return { query: (params.get('q') || '').slice(0, 300), filters,
+      limit: Number.isFinite(limit) ? Math.min(500, Math.max(20, Math.floor(limit / 20) * 20)) : 20 };
+  }
+
+  function writeSearchAddress(mode = 'replace') {
+    if (!searchPage || restoringSearch || !hydrated) return;
+    clearTimeout(urlTimer);
+    const url = new URL(location.href);
+    const query = (document.querySelector('pagefind-input input')?.value ?? pendingSearchValue).slice(0, 300);
+    if (query) url.searchParams.set('q', query); else url.searchParams.delete('q');
+    SEARCH_FILTERS.forEach(({ key }) => {
+      url.searchParams.delete('f.' + key);
+      (pagefindInstance?.searchFilters?.[key] || []).forEach(value => url.searchParams.append('f.' + key, value));
+    });
+    if (searchPageLimit > 20) url.searchParams.set('limit', searchPageLimit); else url.searchParams.delete('limit');
+    if (url.href !== location.href) history[mode === 'push' ? 'pushState' : 'replaceState'](null, '', url);
+  }
+
+  function restoreSearchAddress() {
+    clearTimeout(urlTimer);
+    typingEntry = false;
+    const state = readSearchAddress();
+    pendingSearchValue = state.query;
+    if (!pagefindInstance) return;
+    restoringSearch = true;
+    const input = document.querySelector('pagefind-input input');
+    if (input) input.value = state.query;
+    setSearchPageLimit(state.limit);
+    knownFilters = JSON.stringify(state.filters);
+    pagefindInstance.triggerSearchWithFilters(state.query, state.filters);
+    restoringSearch = false;
+  }
+
+  function resultLabels(root) {
+    root.querySelectorAll?.('.site-search-result-meta span').forEach((badge, index) => {
+      if (badge.dataset.labelled) return;
+      const raw = badge.textContent.trim();
+      const href = badge.closest('article')?.querySelector('.pf-result-link')?.getAttribute('href') || '';
+      badge.textContent = raw === 'generated-reference' && /^\/threat-matrix\/techniques\//.test(href) ? 'ATT&CK reference'
+        : raw === 'reference-entity' && /^\/threat-matrix\/actors\//.test(href) ? 'Actor profile'
+        : formatFilterValue(raw);
+      badge.dataset.labelled = 'true';
+    });
+  }
+
 
   function shouldGovernDiscovery(term) {
     if (term === null || term === undefined || !String(term).trim()) return true;
@@ -283,14 +343,18 @@
     const searchPage = document.querySelector('[data-site-search-page]');
     if (!searchPage) return;
     setSearchPageStatus('Search is ready. Results update as you type.', 'ready');
-    const query = new URLSearchParams(window.location.search).get('q')?.trim() || pendingSearchValue.trim();
-    const inputComponent = searchPage.querySelector('pagefind-input, pagefind-searchbox');
-    const input = inputComponent && (inputComponent.inputEl || inputComponent.querySelector('input'));
+    const state = readSearchAddress();
+    if (queryEdited) state.query = pendingSearchValue;
+    const input = searchPage.querySelector('pagefind-input input');
     if (!input) return;
-    if (query) {
-      input.value = query.slice(0, 300);
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+    restoringSearch = true;
+    input.value = state.query;
+    setSearchPageLimit(queryEdited ? 20 : state.limit);
+    knownFilters = JSON.stringify(state.filters);
+    pagefindInstance.triggerSearchWithFilters(state.query, state.filters);
+    restoringSearch = false;
+    hydrated = true;
+    writeSearchAddress();
     if (searchPageActivationRequested) input.focus();
   }
 
@@ -300,6 +364,13 @@
       const button = dropdown.querySelector('.pf-dropdown-trigger');
       const label = dropdown.getAttribute('label');
       if (button && label) button.setAttribute('aria-label', label);
+      dropdown.querySelectorAll('[role=option]').forEach(option => {
+        const text = option.querySelector('.pf-dropdown-option-label');
+        const value = option.dataset.value;
+        if (text && value && text.textContent !== formatFilterValue(value)) text.textContent = formatFilterValue(value);
+        const count = option.querySelector('.pf-dropdown-option-count')?.textContent || '';
+        if (value) option.setAttribute('aria-label', formatFilterValue(value) + (count ? ', ' + count + ' results' : ''));
+      });
     });
   }
 
@@ -395,7 +466,8 @@
 
     const inputHost = searchPage.querySelector('[data-site-search-input]');
     if (inputHost) {
-      pendingSearchValue = inputHost.querySelector('input')?.value || pendingSearchValue;
+      const earlyValue = inputHost.querySelector('input')?.value;
+      if (earlyValue) { pendingSearchValue = earlyValue.slice(0, 300); queryEdited = true; }
       const input = document.createElement('pagefind-input');
       input.setAttribute('placeholder', 'Try T1059.003, MuddyWater, Kerberoasting, RAG MCP…');
       if (!window.matchMedia('(max-width: 760px)').matches) input.setAttribute('autofocus', 'true');
@@ -479,6 +551,8 @@
     loadMore?.addEventListener('click', function () {
       setSearchPageLimit(Math.min(searchPageTotal, searchPageLimit + SEARCH_PAGE_BATCH_SIZE));
       pagefindInstance?.triggerSearch(pagefindInstance.searchTerm || '');
+      typingEntry = false;
+      writeSearchAddress('push');
     });
 
     const workspace = searchPage.querySelector('.site-search-workspace');
@@ -515,6 +589,13 @@
         instance.faceted = true;
         mountSearchPageComponents();
         instance.on('search', function () {
+          const filters = JSON.stringify(instance.searchFilters || {});
+          if (hydrated && !restoringSearch && filters !== knownFilters) {
+            typingEntry = false;
+            setSearchPageLimit(20);
+            writeSearchAddress('push');
+          }
+          knownFilters = filters;
           renderActiveFilters();
         }, searchPage);
         instance.on('results', function (result) {
@@ -583,11 +664,36 @@
   function initialize() {
     addStylesheet('site-search-styles', `/assets/site-search.css?v=${ASSET_VERSION}`);
     mount();
+    if (searchPage) {
+      const workspace = document.querySelector('.site-search-workspace');
+      workspace.addEventListener('input', event => {
+        if (!event.target.matches('input[type=search], .pf-input') || restoringSearch) return;
+        queryEdited = true;
+        pendingSearchValue = event.target.value.slice(0, 300);
+        if (hydrated && !typingEntry) {
+          history.pushState(null, '', location.href);
+          typingEntry = true;
+        }
+        clearTimeout(urlTimer);
+        urlTimer = setTimeout(() => writeSearchAddress(), 250);
+      }, true);
+      workspace.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && event.target.matches('input[type=search], .pf-input')) {
+          writeSearchAddress();
+          typingEntry = false;
+        }
+      });
+      workspace.addEventListener('focusout', event => {
+        if (event.target.matches('input[type=search], .pf-input')) { writeSearchAddress(); typingEntry = false; }
+      });
+      window.addEventListener('popstate', restoreSearchAddress);
+    }
     document.addEventListener('pagefind-error', handleComponentError);
     new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         mutation.addedNodes.forEach(function (node) {
           repairResultAccessibility(node);
+          if (node.nodeType === Node.ELEMENT_NODE) resultLabels(node.closest('article') || node);
         });
       });
       repairFilterAccessibility(document.querySelector('[data-site-search-filters]'));
@@ -601,7 +707,7 @@
     }
     if (searchPage) {
       const query = new URLSearchParams(window.location.search).get('q')?.trim();
-      if (query) beginSearchLoad();
+      if (query || [...new URLSearchParams(location.search).keys()].some(key => key.startsWith('f.'))) beginSearchLoad();
       else {
         const workspace = document.querySelector('.site-search-workspace');
         const activateSearchPage = function (event) {

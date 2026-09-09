@@ -1,0 +1,95 @@
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Triage a reproducible benign artifact | 1200km</title><meta name="description" content="Inspect a deterministic benign ZIP with hashes, structured observations, corroboration, and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/safe-artifact-triage/"><meta property="og:url" content="https://1200km.com/learning-paths/safe-artifact-triage/"><meta property="og:title" content="Triage a reproducible benign artifact"><meta property="og:description" content="Inspect a deterministic benign ZIP with hashes, structured observations, corroboration, and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Triage a reproducible benign artifact","name":"Triage a reproducible benign artifact","url":"https://1200km.com/learning-paths/safe-artifact-triage/","description":"Inspect a deterministic benign ZIP with hashes, structured observations, corroboration, and negative controls.","dateModified":"2026-09-09","datePublished":"2026-09-09","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"}}</script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style></head><body id="top"><!-- site-shell:header:start -->
+    <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
+          <span class="brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <details class="nav-links" open data-mobile-navigation>
+          <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
+            <span class="nav-menu-text">Menu</span>
+          </summary>
+          <div class="nav-list" id="primary-nav-list">
+            <!-- site-shell:primary-navigation:start -->
+            <a href="/cti.html">Research</a>
+            <a class="active" aria-current="location" href="/guides.html">Library</a>
+            <a href="/projects.html">Products &amp; Labs</a>
+            <a class="nav-flagship" href="/adversarygraph/">AdversaryGraph</a>
+            <details class="nav-more">
+              <summary>More</summary>
+              <div class="nav-more-list">
+                <a href="/cyber-knowledge/">Cyber Knowledge</a>
+                <a href="/courses/">Courses</a>
+                <a href="/references/">References</a>
+                <a href="/about.html">About</a>
+                <a href="/cv.html">CV</a>
+                <a href="/external-validation.html">External validation</a>
+              </div>
+            </details>
+            <!-- site-shell:primary-navigation:end -->
+          </div>
+        </details>
+        <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">
+            <span aria-hidden="true" class="site-search-fallback-icon"></span>
+            <span class="site-search-fallback-text">Search research</span>
+          </a>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1>Triage a reproducible benign artifact</h1>
+<p><strong>Produce a structured observation record without extracting or executing the contents.</strong></p>
+<p>Audience: beginning malware-analysis and DFIR learners. Prerequisites: a terminal, JSON familiarity, and Python 3.9 or later; no third-party packages. Planning time: 15–20 minutes. Executed with Python 3.13.12 on Linux; fixture and validator version 1.0, reviewed 2026-09-09.</p>
+<p>The artifact is an authored ZIP containing one plain-text note. The source fixes the entry name, timestamp, permissions, storage mode, and bytes so it can be regenerated. A URL and the word <code>powershell</code> are text observations; their presence does not demonstrate a network connection or interpreter execution.</p>
+<nav aria-label="On this page"><a href="#provenance">Provenance</a> · <a href="#workflow">Workflow</a> · <a href="#observations">Observations</a> · <a href="#controls">Controls</a> · <a href="#limits">Limitations</a> · <a href="#references">References</a></nav>
+<h2 id="provenance">Inputs and provenance</h2>
+<p>Download <a href="triage.py" download>triage.py</a>, <a href="fixture.zip" download>the benign fixture.zip</a>, and <a href="expected.json" download>expected.json</a>. No live sample or external upload is part of this exercise. The distributed ZIP is 245 bytes; its SHA-256 is:</p>
+<pre tabindex="0"><code>77c380a3c4ab35efe50964b9c97db8bbbe27c49f96a65ee92b63c7c24f676cbb</code></pre>
+<p>A matching digest checks byte identity against this published fixture. It does not prove that an arbitrary file is safe or that a publisher is trustworthy.</p>
+<h2 id="workflow">Workflow and corroboration</h2>
+<ol><li>Inspect the script. It accepts only the expected stored entry, bounds file and entry sizes, and reads into memory. It never extracts entries or evaluates their text.</li><li>Run the inspection and controls below.</li><li>Regenerate into a new filename. Generation refuses to overwrite an existing file. Compare both observation records and hashes.</li><li>On Linux, independently run <code>sha256sum fixture.zip</code> and <code>unzip -l fixture.zip</code>; the archive listing should show one <code>notes.txt</code> entry, 129 bytes, dated 2026-01-01. These commands inspect this supplied benign fixture.</li></ol>
+<pre tabindex="0"><code>python3 triage.py fixture.zip
+python3 triage.py --self-test
+python3 triage.py --generate regenerated.zip
+python3 triage.py regenerated.zip</code></pre>
+<h2 id="observations">Expected structured observation</h2>
+<pre tabindex="0"><code>{"bytes": 245, "entries": ["notes.txt"], "execution_observed": false, "format": "ZIP (stored)", "sha256": "77c380a3c4ab35efe50964b9c97db8bbbe27c49f96a65ee92b63c7c24f676cbb", "strings": ["example.invalid", "powershell"], "text_bytes": 129}</code></pre>
+<p>The format, length, archive entry, and exact content are checked. <code>execution_observed: false</code> describes this static workflow's visibility, not proof of the absence of behavior in another environment.</p>
+<h2 id="controls">Failure and negative cases</h2>
+<pre tabindex="0"><code>{"negative_controls_rejected": 3, "positive_fixture_passed": true}</code></pre>
+<p>The self-test rejects a traversal entry name, changed content with an invalid CRC, and non-ZIP bytes. It creates those controls in memory and extracts none. Unexpected compression, oversized entries, wrong content, missing files, and malformed archives stop validation with an error; an error is not a malware verdict. An identical hash with a different observation record indicates a tool or environment discrepancy that requires investigation.</p>
+<h2 id="limits">Limitations and next step</h2>
+<p>This deliberately narrow validator recognizes one known fixture. It is not a general archive scanner, sandbox, malware classifier, or a safe parser for arbitrary hostile samples. Static strings suggest questions; they do not demonstrate execution, persistence, or attribution. Keep this provenance and observation record with a separate hypothesis and a safe corroboration step.</p>
+<p>Continue the <a href="/learning-paths/#malware-triage">malware-triage path</a> and the <a href="/cyber-knowledge/malware-analysis.html">analysis guide</a>. Adapt the observation schema to another approved benign artifact before considering any separately authorized dynamic analysis.</p>
+<h2 id="references">References</h2>
+<ul><li><a href="https://docs.python.org/3/library/zipfile.html">Python: ZIP archive inspection and CRC checking</a>.</li><li><a href="https://docs.python.org/3/library/hashlib.html">Python: SHA-256 and other digest algorithms</a>.</li></ul>
+<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="/about.html">About the author</a> · <a href="https://github.com/anpa1200">GitHub</a>.</p>
+</main><!-- site-shell:footer:start -->
+    <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <div class="shared-footer-inner">
+        <a class="shared-footer-brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="32" height="32" />
+          <span><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <nav class="shared-footer-links" aria-label="Footer navigation">
+          <a href="/cti.html">Research</a>
+          <a href="/guides.html">Library</a>
+          <a href="/projects.html">Products &amp; Labs</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/about.html">About</a>
+        </nav>
+        <nav class="shared-footer-meta" aria-label="Site information">
+          <a href="/privacy.html">Privacy / Data Handling</a>
+          <a href="/about.html#contact">Contact</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></a>
+        </nav>
+      </div>
+      <div class="shared-footer-bottom">
+        <span>© 2026 Andrey Pautov · Original research and tooling</span>
+        <a href="#top" data-back-to-top>Back to top ↑</a>
+      </div>
+    </footer>
+    <!-- site-shell:footer:end --></body></html>

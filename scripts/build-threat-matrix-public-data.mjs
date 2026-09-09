@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -228,6 +229,8 @@ function transformAttackBundle(bundle, metadata) {
     retrieved_at: metadata.retrieved_at,
     source: {
       name: 'MITRE ATT&CK STIX data',
+      bundle_sha256: createHash('sha256').update(JSON.stringify(bundle)).digest('hex'),
+      hash_method: 'SHA-256 of UTF-8 JSON.stringify(parsed upstream STIX bundle); preserves upstream property order',
       url: metadata.source_url,
       index_url: ATTACK_INDEX_URL,
       modified: metadata.source_modified,

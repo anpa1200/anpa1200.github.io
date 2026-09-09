@@ -30,11 +30,14 @@ test('reference library contains the complete deduplicated site citation corpus'
   assert.equal(model.records.filter((record) => record.inclusion === 'context').length, 5);
   assert.equal(model.records.filter((record) => record.inclusion === 'site').length, model.site_count);
   assert.equal(model.records.reduce((sum, record) => sum + record.used_in.length, 0), model.usage_link_count);
-  assert.deepEqual(model.records, [...model.records].sort((a, b) => a.title.localeCompare(b.title) || a.url.localeCompare(b.url)));
+  const reviewed = model.records.filter(r => r.metadata_status !== 'review-needed');
+  const unresolved = model.records.filter(r => r.metadata_status === 'review-needed');
+  if (reviewed.length && unresolved.length) assert.ok(model.records.indexOf(reviewed.at(-1)) < model.records.indexOf(unresolved[0]));
+  assert.equal(model.bibliographic_count, model.records.filter(r => ['bibliographic', 'tool', 'dataset'].includes(r.kind)).length);
 });
 
 test('every record is limited to title, description, correct resource metadata, and tags', () => {
-  const allowed = ['description', 'id', 'inclusion', 'published_at', 'publisher', 'tags', 'title', 'url', 'used_in'];
+  const allowed = ['description', 'id', 'inclusion', 'kind', 'metadata_status', 'provenance', 'published_at', 'publisher', 'tags', 'title', 'url', 'used_in'];
   for (const record of model.records) {
     assert.deepEqual(Object.keys(record).sort(), allowed, record.id);
     assert.match(record.url, /^https:\/\//, record.id);

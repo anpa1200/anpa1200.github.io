@@ -12,6 +12,9 @@ const legacy = JSON.parse(readFileSync('data/editorial-artifact-baseline.json', 
 let existing = 0;
 const failures = [];
 for (const file of walk()) {
+ const source = readFileSync(file, 'utf8');
+ if (/\[unverified source\b/i.test(source) && /^(?:evidence_level|evidence_status|verification_status|status):\s*["']?(?:verified|source-backed)\b/im.test(source)) failures.push(file + ': unresolved intake cannot have verified/source-backed overall status');
+
   const artifacts = citationArtifacts(readFileSync(file, 'utf8'));
   if (!artifacts.length) continue;
   const baseline = legacy[file] || [];
@@ -26,3 +29,10 @@ for (const file of walk()) {
 }
 if (failures.length) throw Error(failures.join('\n'));
 console.log(`Editorial artifact check passed; ${existing} unchanged legacy artifacts remain outside the scoped repair. Intentional fenced/inline code examples are excluded.`);
+// The catalogue must not promote the mixed actor intake while its explicit boundary remains unresolved.
+const catalogueOverrides = JSON.parse(readFileSync('data/content-catalog.config.json', 'utf8')).overrides || {};
+for (const [url, record] of Object.entries(catalogueOverrides)) {
+  if (/preserved intake remains unverified/i.test(record.applies_to || '') && record.evidence_level !== 'unverified') {
+    throw Error(url + ': unresolved intake cannot receive verified/source-backed catalogue status');
+  }
+}

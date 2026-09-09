@@ -217,7 +217,7 @@ function feedCandidate(rel, types, html) {
     || rel === 'ai-attack-statistics/index.html'
     || rel.startsWith('newest-detection-engineering-techniques/')
     || rel.startsWith('embedded-systems-hardware-firmware/')
-    || rel === 'learning-paths/command-shell-validation/index.html';
+    || /^learning-paths\/(?:command-shell-validation|agent-permission-validation|safe-artifact-triage)\/index\.html$/.test(rel);
 }
 
 function rssDate(value) {
