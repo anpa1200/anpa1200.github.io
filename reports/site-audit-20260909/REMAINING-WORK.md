@@ -1,0 +1,12 @@
+# Remaining work and exact dependencies
+
+| Dependency | What remains and safest next action |
+| --- | --- |
+| Original OilRig/Magic Hound research provenance | Recover the numbered source-to-document mapping and supporting passages for 180 unresolved references. Have a qualified reviewer assess actor identities, attribution, IOCs, claimed procedures and detection assertions. Keep the current unverified intake labels until each claim is supported; no guessed URL substitutions. This is the unresolved semantic part of F03. |
+| Human editorial review of other research imports | The explicit artifact baseline retains 29 occurrences in one main-site file and 724 in four actor-source files outside the scoped repair. Review original sources before removing markers or upgrading labels. Their presence is disclosed, not treated as evidence that all publication content is clean. |
+| Product scope for other actor pages | Experimental combined staging found pre-existing multiple-H1 pages and an overlong title outside the repaired report. Actor-native build/SEO passes; the main site's stricter whole-stage semantics do not certify these other pages. A broader actor-template/content cleanup should preserve their headings/anchors and get a separate scoped review. |
+| Analytics/Search Console account access and privacy decision | Verify actual property ownership/linkage and consent configuration; collect an authorized 28-day baseline before enabling the proposed event specification. No traffic, ranking, field-CWV or audience-demand figures are available. |
+| Safari/WebKit and assistive-technology test environment | Chrome and available Firefox were exercised; Safari/WebKit and manual NVDA/VoiceOver were unavailable. Run representative keyboard/screen-reader journeys and native 200%/400% browser zoom before claiming that coverage. Responsive widths approximate reflow, not a manual native-zoom test. |
+| Publication authorization and CI/hosting | The work is local. When publication is requested, release both source repositories, run the configured CI/CodeQL/Pages gates, regenerate main remote catalogue/search, and verify live aliases, HTTP/www normalization, real 404s, canonicals, feed, data chunks, navigation and caching. Do not infer headers from `_headers` or label the local preview production. |
+
+No missing access was used to defer the independent implementation, local fixture, build, directory, search, routing or accessibility work delivered here.

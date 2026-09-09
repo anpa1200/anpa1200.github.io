@@ -38,6 +38,8 @@ const state = {
   active: 'discover',
   data: null,
   query: '',
+  routeError: '',
+  defenseStatus: 'idle',
   selectedTechniqueId: '',
   selectedGroupId: '',
   compareA: '',
@@ -52,6 +54,7 @@ const state = {
   libraryStatus: { ioc: 'idle', cve: 'idle' },
 };
 
+let domainRequest = 0, routeRequest = 0;
 const root = document.querySelector('#root');
 
 init().catch(error => {
@@ -60,9 +63,9 @@ init().catch(error => {
 
 async function init() {
   renderShell();
-  await loadDomain('mitre-data.json');
   bindGlobalEvents();
-  render();
+  await restoreRoute();
+  window.addEventListener('hashchange', restoreRoute);
 }
 
 function renderShell() {
@@ -149,9 +152,10 @@ function renderShell() {
 
 function renderModuleNav() {
   const nav = document.querySelector('#module-nav');
-  const groups = groupBy(modules, item => item.group);
+  const groups = { 'Public workspace': modules.filter(m => m.live), 'Self-hosted platform': modules.filter(m => !m.live) };
   nav.innerHTML = Object.entries(groups).map(([group, items]) => `
     <div class="module-group-title">${escapeHtml(group)}</div>
+    ${items.some(module => !module.live) ? '<details><summary>Self-hosted capabilities (backend required)</summary>' : ''}
     ${items.map(module => `
       <button class="module-button ${state.active === module.id ? 'is-active' : ''}" type="button" data-module="${module.id}" aria-current="${state.active === module.id ? 'page' : 'false'}">
         <span class="module-icon">${module.icon}</span>
@@ -162,14 +166,19 @@ function renderModuleNav() {
         <span class="module-badge ${module.live ? 'live' : 'full'}">${module.live ? 'live' : 'full'}</span>
       </button>
     `).join('')}
+    ${items.some(module => !module.live) ? '</details>' : ''}
   `).join('');
 }
 
 async function loadDomain(file) {
+  const request = ++domainRequest;
   const response = await fetch(`./${file}`, { cache: 'force-cache' });
   if (!response.ok) throw new Error(`Cannot load ${file}: HTTP ${response.status}`);
-  state.data = await response.json();
+  const data = await response.json();
+  if (request !== domainRequest) return;
+  state.data = data;
   state.domainFile = file;
+  state.defenseStatus = file === 'mitre-data.json' ? 'idle' : 'ready';
   if (!state.data.techniques.some(t => t.id === state.selectedTechniqueId)) state.selectedTechniqueId = '';
   if (!state.data.groups.some(g => g.id === state.selectedGroupId)) state.selectedGroupId = state.data.groups[0]?.id || '';
   if (!state.data.groups.some(g => g.id === state.compareA)) state.compareA = state.data.groups[0]?.id || '';
@@ -205,7 +214,9 @@ function bindGlobalEvents() {
         return;
       }
       captureActiveView();
+      state.routeError = '';
       state.active = id;
+      writeRoute(id);
       closeSidebar();
       render();
       const libraryKind = id === 'ioc-library' ? 'ioc' : id === 'cve' ? 'cve' : '';
@@ -239,14 +250,21 @@ function bindGlobalEvents() {
     const closeTechniqueDetail = event.target.closest('[data-close-technique-detail]');
     if (closeTechniqueDetail) {
       captureActiveView();
+      const previous = state.selectedTechniqueId;
       state.selectedTechniqueId = '';
+      writeRoute('navigator');
       render();
+      document.querySelector(`[data-technique-id="${CSS.escape(previous)}"]`)?.focus();
       return;
     }
     const techniqueButton = event.target.closest('[data-technique-id]');
     if (techniqueButton) {
       captureActiveView();
+      state.routeError = '';
       state.selectedTechniqueId = techniqueButton.dataset.techniqueId;
+      const parent = techniqueById(state.selectedTechniqueId)?.parent_id;
+      if (parent) state.expandedTechniqueIds.add(parent);
+      writeRoute('techniques', state.selectedTechniqueId);
       if (state.active !== 'navigator') state.active = 'navigator';
       render();
       return;
@@ -254,7 +272,9 @@ function bindGlobalEvents() {
     const groupButton = event.target.closest('[data-group-id]');
     if (groupButton) {
       captureActiveView();
+      state.routeError = '';
       state.selectedGroupId = groupButton.dataset.groupId;
+      writeRoute('actors', state.selectedGroupId);
       if (state.active !== 'apt') state.active = 'apt';
       render();
       return;
@@ -273,7 +293,8 @@ function bindGlobalEvents() {
   });
   document.addEventListener('change', async event => {
     if (event.target.id === 'domain-select') {
-      await loadDomain(event.target.value);
+      state.routeError = '';
+      try { await loadDomain(event.target.value); writeRoute(state.active); } catch { state.routeError = 'Dataset failed to load. Choose another domain or reload.'; }
       render();
     }
     if (event.target.id === 'compare-a') {
@@ -287,11 +308,17 @@ function bindGlobalEvents() {
   });
   document.addEventListener('input', event => {
     if (event.target.id === 'global-search') {
-      state.query = event.target.value.trim();
+      state.query = event.target.value.trim().slice(0,300);
+      const parts=location.hash.split('?'), params=new URLSearchParams(parts[1] || '');
+      if(state.query)params.set('q',state.query);else params.delete('q');
+      history.replaceState(null,'',(parts[0] || '#/discover') + (params.size ? '?' + params : ''));
       render();
     }
     if (event.target.id === 'workspace-dialog-input') {
-      state.query = event.target.value.trim();
+      state.query = event.target.value.trim().slice(0,300);
+      const parts=location.hash.split('?'), params=new URLSearchParams(parts[1] || '');
+      if(state.query)params.set('q',state.query);else params.delete('q');
+      history.replaceState(null,'',(parts[0] || '#/discover') + (params.size ? '?' + params : ''));
       const headerInput = document.querySelector('#global-search');
       if (headerInput) headerInput.value = event.target.value;
       render();
@@ -334,8 +361,9 @@ function render() {
     cve: renderCveLibrary,
     knowledge: renderKnowledgeLibrary,
   }[state.active]?.() || renderDiscover();
-  main.innerHTML = html;
+  main.innerHTML = state.routeError ? `<section role="alert" class="card"><h1>Entity unavailable</h1><p>${escapeHtml(state.routeError)}</p><a href="#/discover">Return to public search</a></section>` : html;
   requestAnimationFrame(restoreActiveView);
+  if (state.active === 'navigator' && state.selectedTechniqueId) ensureDefense(state.selectedTechniqueId);
 }
 
 function renderDiscover() {
@@ -346,11 +374,11 @@ function renderDiscover() {
     <section class="hero">
       <div class="panel hero-copy">
         <div class="eyebrow">AdversaryGraph Light · public browser workspace</div>
-        <h1>ATT&amp;CK exploration with the Adversary<wbr>Graph product shape.</h1>
+        <h1>Investigate an actor or technique.</h1>
         <p>Threat Matrix is the public light web version of AdversaryGraph. It uses the same dark analyst workbench layout and exposes real browser-only functions: matrix navigation, actor pivots, TTP search, overlap comparison, coverage leads, and Navigator-style layer export.</p>
-        <p>Backend modules are shown as product-real buttons. When a feature requires local storage, API keys, AI providers, enrichment workers, MalwareGraph, attack-lab containers, or SIEM forwarding, the button opens a clear full-version disclaimer.</p>
+        <p>Start with Windows Command Shell: inspect its behavior, follow MITRE defensive evidence, then copy the entity link. Search stays in your browser; no report uploads or account are required. Self-hosted features require your own backend and configured providers.</p>
         <div class="cta-row">
-          <button class="button primary" type="button" data-module="navigator">Open Navigator</button>
+          <a class="button primary" href="#/techniques/T1059.003">Open sample investigation</a>
           <button class="button" type="button" data-module="apt">Browse APT Library</button>
           <a class="button" href="${FULL_VERSION_URL}">Full AdversaryGraph</a>
           <a class="button" href="${GITHUB_URL}">GitHub</a>
@@ -377,7 +405,7 @@ function renderDiscover() {
       </div>
       <div class="panel card span-12">
         <div class="card-head"><div><h2>Full platform modules</h2><p>Buttons mirror AdversaryGraph modules; backend-required modules open an availability disclaimer.</p></div></div>
-        <div class="module-grid">${modules.filter(item => !item.live).map(moduleCard).join('')}</div>
+        <details><summary>Explore self-hosted capabilities (backend required)</summary><div class="module-grid">${modules.filter(item => !item.live).map(moduleCard).join('')}</div></details>
       </div>
     </section>
   `;
@@ -387,6 +415,15 @@ function renderNavigator() {
   const selected = techniqueById(state.selectedTechniqueId);
   return `
     <section class="navigator-workspace ${selected ? 'has-detail' : ''}">
+      ${selected ? `
+        <aside class="panel card navigator-detail" aria-label="Selected technique detail">
+          <div class="card-head">
+            <div><strong>Selected technique</strong><p>Bundled public ATT&amp;CK context.</p></div>
+            <button class="close-button" type="button" data-close-technique-detail aria-label="Close technique detail">Close</button>
+          </div>
+          ${techniqueDetail(selected)}
+        </aside>
+      ` : ''}
       <div class="panel card matrix-panel">
         <div class="card-head">
           <div><h2>Navigator</h2><p>Compact ATT&amp;CK matrix. Use the mouse wheel to zoom, drag to pan, and expand sub-techniques when needed.</p></div>
@@ -410,15 +447,7 @@ function renderNavigator() {
           <div class="matrix-track">${renderMatrix()}</div>
         </div>
       </div>
-      ${selected ? `
-        <aside class="panel card navigator-detail" aria-label="Selected technique detail">
-          <div class="card-head">
-            <div><h2>Technique detail</h2><p>Static ATT&amp;CK context from bundled public data.</p></div>
-            <button class="close-button" type="button" data-close-technique-detail aria-label="Close technique detail">Close</button>
-          </div>
-          ${techniqueDetail(selected)}
-        </aside>
-      ` : ''}
+
     </section>
   `;
 }
@@ -468,13 +497,13 @@ function renderCompare() {
 function renderCoverage() {
   const counts = state.data.tactics.map(tactic => {
     const total = state.data.techniques.filter(t => techniqueInTactic(t, tactic)).length;
-    const withDetection = state.data.techniques.filter(t => techniqueInTactic(t, tactic) && String(t.detection || '').trim()).length;
+    const withDetection = state.data.techniques.filter(t => techniqueInTactic(t, tactic) && (t.defense_summary?.strategies || String(t.detection || '').trim())).length;
     return { tactic, total, withDetection, percent: total ? Math.round((withDetection / total) * 100) : 0 };
   });
   return `
     <section class="grid">
       <div class="panel card span-7">
-        <div class="card-head"><div><h2>Coverage leads</h2><p>Static ATT&amp;CK detection-text coverage. Use as triage, not validation proof.</p></div>${domainPicker()}</div>
+        <div class="card-head"><div><h2>Coverage leads</h2><p>Bundled ATT&amp;CK detection-strategy or legacy-text coverage. Use as triage, not validation proof.</p></div>${domainPicker()}</div>
         <div class="coverage-bars">${counts.map(row => `
           <div class="bar-row">
             <span>${escapeHtml(row.tactic.name)}</span>
@@ -654,12 +683,13 @@ function techniqueDetail(technique) {
   return `<article class="detail">
     <div>
       <div class="eyebrow">${escapeHtml(technique.id)}</div>
-      <h2>${escapeHtml(technique.name)}</h2>
+      <h1 id="selected-entity-title" tabindex="-1">${escapeHtml(technique.name)}</h1>
       ${mitreReference ? `<a class="detail-source-link" href="${escapeHtml(mitreReference.url)}" rel="noopener">Open MITRE ATT&amp;CK reference ↗</a>` : ''}
     </div>
-    <div class="detail-section"><h3>Description</h3><p>${escapeHtml(shortText(technique.description, 900))}</p></div>
-    <div class="detail-section"><h3>Detection guidance</h3><p>${escapeHtml(shortText(technique.detection || 'No public detection text in this bundled ATT&CK record.', 700))}</p></div>
-    <div class="detail-section"><h3>Data sources</h3><div class="tag-list">${(technique.data_sources || []).slice(0, 16).map(tag).join('') || tag('Not specified')}</div></div>
+    <div class="detail-section"><h3>Description</h3><p>${citedText(technique.description, technique.references)}</p></div>
+    <p>Dataset: ${escapeHtml(state.data.domain)} ${state.domainFile === 'mitre-data-atlas.json' ? 'ATLAS' : 'ATT&amp;CK'} ${escapeHtml(state.data.version)} · <a href="${escapeHtml(state.data.source.url)}">Pinned source</a></p>
+    ${entityLink('techniques', technique.id)}
+    ${defenseDetail(technique)}
     <div class="detail-section"><h3>Mapped groups</h3><div class="tag-list">${actors.map(g => `<button class="tag" type="button" data-group-id="${g.id}">${escapeHtml(g.name)}</button>`).join('') || tag('No local group mappings')}</div></div>
   </article>`;
 }
@@ -669,9 +699,10 @@ function groupDetail(group) {
   const mitreReference = (group.references || []).find(reference => reference.source === 'mitre-attack' || /attack\.mitre\.org/.test(reference.url || ''));
   return `<article class="card">
     <div class="eyebrow">${escapeHtml(group.id)}</div>
-    <h2>${escapeHtml(group.name)}</h2>
+    <h1 id="selected-entity-title" tabindex="-1">${escapeHtml(group.name)}</h1>
+    ${entityLink('actors', group.id)}
     ${mitreReference ? `<a class="detail-source-link" href="${escapeHtml(mitreReference.url)}" rel="noopener">Open MITRE ATT&amp;CK group reference ↗</a>` : ''}
-    <p>${escapeHtml(shortText(group.description, 850))}</p>
+    <p>${citedText(group.description, group.references)}</p>
     <div class="detail-section"><h3>Aliases</h3><div class="tag-list">${(group.aliases || []).slice(0, 24).map(tag).join('') || tag('No aliases')}</div></div>
     <div class="detail-section"><h3>Mapped techniques (${techniques.length})</h3><div class="list">${techniques.slice(0, 80).map(techniqueCard).join('')}</div></div>
   </article>`;
@@ -681,7 +712,7 @@ function techniqueCard(technique) {
   if (!technique) return '';
   return `<button class="list-item" type="button" data-technique-id="${technique.id}">
     <span class="item-title"><span>${escapeHtml(technique.name)}</span><span>${escapeHtml(technique.id)}</span></span>
-    <span class="item-meta">${escapeHtml((technique.tactic_ids || []).join(', ') || 'No tactic')} · ${(technique.data_sources || []).length} data source(s)</span>
+    <span class="item-meta">${escapeHtml((technique.tactic_ids || []).join(', ') || 'No tactic')} · ${technique.defense_summary ? technique.defense_summary.strategies + ' detection strategies' : (technique.data_sources || []).length + ' legacy data sources'}</span>
   </button>`;
 }
 
@@ -1042,4 +1073,117 @@ function escapeHtml(value) {
     '"': '&quot;',
     "'": '&#39;',
   }[char]));
+}
+
+function routeHash(kind, id = '') {
+  const params = new URLSearchParams();
+  if (state.domainFile !== 'mitre-data.json') params.set('domain', state.domainFile);
+  if (state.query) params.set('q', state.query.slice(0, 300));
+  return `#/${kind}${id ? '/' + encodeURIComponent(id) : ''}${params.size ? '?' + params : ''}`;
+}
+function writeRoute(kind, id = '') {
+  history.pushState(null, '', routeHash(kind, id));
+}
+async function restoreRoute() {
+  const request = ++routeRequest;
+  const route = location.hash.slice(1) || '/discover';
+  const [path, query = ''] = route.split('?');
+  const [, kind, rawId] = path.split('/');
+  const params = new URLSearchParams(query);
+  const file = params.get('domain') || 'mitre-data.json';
+  state.query = (params.get('q') || '').slice(0, 300);
+  const search = document.querySelector('#global-search');
+  if (search) search.value = state.query;
+  state.routeError = '';
+  try {
+    if (!['mitre-data.json', 'mitre-data-mobile.json', 'mitre-data-ics.json', 'mitre-data-atlas.json'].includes(file)) throw new Error('Unsupported domain. Choose Enterprise, Mobile, ICS, or ATLAS from the workspace.');
+    document.querySelector('#workspace').innerHTML = '<p role="status">Loading requested entity and defensive evidence…</p>';
+    if (!state.data || state.domainFile !== file) await loadDomain(file);
+    if (request !== routeRequest) return;
+    const id = decodeURIComponent(rawId || '');
+    if (['techniques', 'actors', 'groups'].includes(kind)) {
+      const entity = (kind === 'techniques' ? state.data.techniques : state.data.groups).find(t => t.id === id);
+      if (!entity) {
+        const retired = state.data.revoked_techniques?.find(t => t.id === id);
+        throw new Error(retired ? `${id} is ${retired.status}.${retired.successor ? ' Successor: ' + retired.successor.id + '. Search that identifier to continue.' : ' No active successor is provided.'}` : `${id || 'Missing identifier'} was not found in ${state.data.domain} ATT&CK ${state.data.version}. Check the identifier or choose its domain.`);
+      }
+      if (kind === 'techniques') {
+        state.selectedTechniqueId = id;
+        if (entity.parent_id) state.expandedTechniqueIds.add(entity.parent_id);
+        state.active = 'navigator';
+      } else {
+        state.selectedGroupId = id;
+        state.active = 'apt';
+      }
+    } else {
+      if (!modules.some(m => m.id === kind && m.live)) throw new Error('Unsupported workspace route. Return to public search.');
+      state.active = kind;
+      state.selectedTechniqueId = '';
+    }
+  } catch (error) {
+    if (request !== routeRequest) return;
+    state.routeError = error.message;
+  }
+  if (state.data) {
+    render();
+    document.querySelector('#selected-entity-title')?.focus({
+      preventScroll: true
+    });
+  } else document.querySelector('#workspace').innerHTML = `<section role="alert"><h1>Dataset unavailable</h1><p>${escapeHtml(state.routeError)}</p><a href="./">Retry workspace</a></section>`;
+}
+function entityLink(kind, id) {
+  return `<p><a class="button" href="${routeHash(kind, id)}" data-copy-entity>Copy entity link</a> <span data-copy-status role="status"></span></p>`;
+}
+document.addEventListener('click', async event => {
+  const link = event.target.closest('[data-copy-entity]');
+  if (!link) return;
+  event.preventDefault();
+  try {
+    await navigator.clipboard.writeText(link.href);
+    link.nextElementSibling.textContent = 'Link copied';
+  } catch {
+    link.nextElementSibling.textContent = 'Copy this address: ' + link.href;
+  }
+});
+function citedText(value, references = []) {
+  return escapeHtml(value || '').replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2">$1</a>').replace(/\(Citation: ([^)]+)\)/g, (_, label) => {
+    const ref = references.find(r => escapeHtml(r.source) === label || escapeHtml(r.label) === label);
+    return ref && /^https?:\/\//.test(ref.url) ? ` <a href="${escapeHtml(ref.url)}">[${label}]</a>` : `[Source reference: ${label}; see MITRE record]`;
+  });
+}
+function defenseDetail(t) {
+  if (state.domainFile === 'mitre-data-atlas.json') return '<section><h3>ATLAS defensive context</h3><p>This ATLAS bundle has its own framework semantics. ATT&amp;CK Detection Strategies and Analytics do not apply here; use the linked ATLAS record and its published mitigations.</p></section>';
+  if (state.domainFile !== 'mitre-data.json' && !('detection_strategies' in t)) return '<p>Detection-strategy relationships were not imported for this bundled domain. This is an import limitation, not evidence that no defensive mapping exists. Use the authoritative record above.</p>';
+  if (t._defenseStatus === 'error') return '<section role="alert"><h3>Defensive data failed to load</h3><p>Reload to retry, or use the MITRE reference above. This does not mean no detection mapping exists.</p></section>';
+  if (state.domainFile === 'mitre-data.json' && !t.detection_strategies) return '<p role="status">Loading defensive relationships…</p>';
+  const strategies = t.detection_strategies || [];
+  const legacy = t.detection ? `<h3>Legacy detection text</h3><p>${citedText(t.detection, t.references)}</p>` : '';
+  return `<section class="detail-section"><h3>Detection strategies and analytics</h3>${strategies.map(s => `<h4><a href="${escapeHtml(s.references?.[0]?.url || '#')}">${escapeHtml(s.id + ' · ' + s.name)}</a></h4>${s.analytics.map(a => `<p><strong>${escapeHtml(a.id)}</strong> ${citedText(a.description, a.references)}</p><ul>${(a.log_sources || []).map(l => `<li>${escapeHtml(l.name)}: ${escapeHtml(l.channel)}${l.data_component ? ' · ' + escapeHtml(l.data_component.id + ' ' + l.data_component.name) : ''}</li>`).join('')}</ul>`).join('')}`).join('') || '<p>No detection-strategy relationship is published in this bundled domain/release.</p>'}${legacy}<h3>Legacy data sources</h3><p>${escapeHtml((t.data_sources || []).join(', ') || 'No legacy data-source field; use the analytic log sources above.')}</p></section>`;
+}
+const defenseCache = new Map();
+async function ensureDefense(id) {
+  if (state.domainFile !== 'mitre-data.json') return;
+  const t = techniqueById(id),
+    data = state.data;
+  if (!t || t.detection_strategies || t._defenseStatus) return;
+  t._defenseStatus = 'loading';
+  const bucket = [...id].reduce((n, c) => n + c.charCodeAt(0), 0) % 32;
+  try {
+    if (!defenseCache.has(bucket)) defenseCache.set(bucket, fetch(`./defense/${bucket}.json`).then(r => {
+      if (!r.ok) throw Error('Defensive data unavailable');
+      return r.json();
+    }).catch(e => {
+      defenseCache.delete(bucket);
+      throw e;
+    }));
+    const defense = await defenseCache.get(bucket);
+    if (defense.version !== data.version || defense.domain !== data.domain) throw Error('Defensive dataset mismatch');
+    const row = defense.techniques.find(r => r.id === id);
+    if (!row) throw Error('Defensive import incomplete');
+    Object.assign(t, row);
+    t._defenseStatus = 'ready';
+  } catch {
+    t._defenseStatus = 'error';
+  }
+  if (state.data === data && state.selectedTechniqueId === id) render();
 }

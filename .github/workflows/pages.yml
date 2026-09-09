@@ -61,7 +61,9 @@ jobs:
             --exclude='package.json' \
             --exclude='package-lock.json' \
             --exclude='scripts' \
-            --exclude='tests'
+            --exclude='tests' \
+            --exclude='content' \
+            --exclude='reports/site-audit-20260909'
           npm run build-shell -- --site "${RUNNER_TEMP}/site"
           npm run build-ai-discovery -- --site "${RUNNER_TEMP}/site"
           node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
@@ -71,6 +73,8 @@ jobs:
           repository: anpa1200/medium-blog-navigation
           ref: ${{ env.ARTICLE_ARCHIVE_COMMIT }}
           path: .article-archive-source
+      - name: Align archive source URL policy
+        run: node scripts/prepare-article-archive.mjs --archive .article-archive-source
       - name: Build and stage canonical article archive
         working-directory: .article-archive-source
         run: |

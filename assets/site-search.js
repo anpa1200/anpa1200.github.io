@@ -9,7 +9,7 @@
   const SEARCH_PAGE_BATCH_SIZE = 20;
   const SEARCH_FILTERS = [
     { key: 'primary_type', label: 'Content type' },
-    { key: 'primary_domain', label: 'Domain' },
+    { key: 'primary_domain', label: 'Security topic' },
     { key: 'audience', label: 'Audience' },
     { key: 'status', label: 'Status' },
     { key: 'lifecycle', label: 'Lifecycle' },
@@ -405,14 +405,20 @@
     const filtersHost = searchPage.querySelector('[data-site-search-filters]');
     if (filtersHost) {
       const fragment = document.createDocumentFragment();
+      const advanced = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = 'Advanced filters';
+      advanced.append(summary);
       SEARCH_FILTERS.forEach(function (filter) {
         const dropdown = document.createElement('pagefind-filter-dropdown');
         dropdown.setAttribute('filter', filter.key);
         dropdown.setAttribute('label', filter.label);
         dropdown.setAttribute('single-select', 'true');
         dropdown.setAttribute('sort', 'count-desc');
-        fragment.appendChild(dropdown);
+        if (['primary_type', 'primary_domain', 'audience'].includes(filter.key)) fragment.appendChild(dropdown);
+        else advanced.appendChild(dropdown);
       });
+      fragment.appendChild(advanced);
       filtersHost.replaceChildren(fragment);
       const observer = new MutationObserver(function () {
         repairFilterAccessibility(filtersHost);
@@ -443,15 +449,11 @@
       template.dataset.template = 'result';
       template.textContent = `
         <li class="pf-result">
-          <article class="site-search-result-card">
+          <article class="site-search-result-card" data-collection-tier="{{ meta.collection_tier }}">
             <p class="site-search-result-meta">
               <span>{{ meta.primary_type }}</span>
               <span>{{ meta.primary_domain }}</span>
-              <span>{{ meta.status }}</span>
-              <span>{{ meta.lifecycle }}</span>
               <span>{{ meta.evidence_level }}</span>
-              <span>{{ meta.collection_tier }}</span>
-              <span>{{ meta.source }}</span>
               <span>{{ meta.updated_year }}</span>
             </p>
             <h2 class="pf-result-title"><a class="pf-result-link" href="{{ meta.url | default(url) | safeUrl }}">{{ meta.title }}</a></h2>

@@ -19,6 +19,9 @@ const chrome = process.env.CHROME_PATH || 'google-chrome';
 if (!existsSync(join(site, 'index.html'))) throw new Error(`Site root not found at ${site}`);
 
 const pages = [
+  ['references', '/references/'],
+  ['knowledge-sources', '/cyber-knowledge/knowledge-sources/'],
+  ['learning-example', '/learning-paths/command-shell-validation/'],
   ['home', '/'],
   ['about', '/about.html'],
   ['cv', '/cv.html'],

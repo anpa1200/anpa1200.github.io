@@ -162,7 +162,7 @@ function renderSourceCard(source, sourceById) {
   return `          <article class="ks-source-card" id="source-${escapeHtml(source.id)}" data-ks-source-card data-category="${escapeHtml(source.category)}" data-tags="${escapeHtml(tags)}" data-access="${escapeHtml(source.access)}" data-skills="${escapeHtml(skills)}" data-tier="${escapeHtml(source.quality.tier)}" data-evidence="${escapeHtml(source.assessment.evidence_use)}" data-maintenance="${escapeHtml(source.assessment.maintenance)}" data-source-kind="${escapeHtml(source.source_kind)}" data-index-terms="${escapeHtml([...keywords, ...formats, ...audiences, ...bestFor].join(' '))}">
             <header class="ks-card-header">
               <div>
-                <p class="ks-card-kicker"><span>${escapeHtml(label(source.category))}</span><span>${escapeHtml(source.quality.score)}/100 · Tier ${escapeHtml(source.quality.tier)}</span></p>
+                <p class="ks-card-kicker"><span>${escapeHtml(label(source.category))}</span><span>Assessment tier ${escapeHtml(source.quality.tier)}</span></p>
                 <h3 data-pagefind-weight="8"><a class="ks-heading-anchor" href="#source-${escapeHtml(source.id)}">${escapeHtml(source.name)}</a></h3>
                 <p class="ks-organization">${escapeHtml(source.organization)}</p>
               </div>
@@ -227,12 +227,17 @@ function renderIndexLink(source) {
   return `              <li><a href="#source-${escapeHtml(source.id)}">${escapeHtml(source.name)}</a><span>${escapeHtml(label(source.category))}</span></li>`;
 }
 
-function renderPage(dataset) {
+function renderPage(dataset, pageNumber = 1) {
+  const pageSize = 8;
+  const pageCount = Math.ceil(dataset.sources.length / pageSize);
+  const CANONICAL = 'https://1200km.com/cyber-knowledge/knowledge-sources/' + (pageNumber === 1 ? '' : `page/${pageNumber}/`);
   validateDataset(dataset);
   const shell = loadSiteShell(ROOT);
   const page = shell.pages.find((candidate) => candidate.path === PAGE_PATH);
   if (!page) throw new Error(`Knowledge Sources module is not registered in data/site-shell.json: ${PAGE_PATH}`);
   const sources = dataset.sources.slice();
+  const pageSources = sources.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+  const pageIds = new Set(pageSources.map(s => s.id));
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const categories = countValues(sources, (source) => [source.category]);
   const tags = countValues(sources, (source) => source.tags);
@@ -259,7 +264,7 @@ function renderPage(dataset) {
         isPartOf: { '@id': 'https://1200km.com/#website' },
         breadcrumb: { '@id': `${CANONICAL}#breadcrumb` },
         mainEntity: { '@id': `${CANONICAL}#collection` },
-        dateModified: dataset.generated_on,
+        dateModified: '2026-09-09',
         author: { '@id': 'https://1200km.com/#person' },
       },
       {
@@ -275,9 +280,9 @@ function renderPage(dataset) {
         '@type': 'ItemList',
         '@id': `${CANONICAL}#collection`,
         name: 'Cybersecurity Knowledge Sources',
-        numberOfItems: sources.length,
+        numberOfItems: pageSources.length,
         itemListOrder: 'https://schema.org/ItemListUnordered',
-        itemListElement: alphabeticSources.map((source, index) => ({
+        itemListElement: pageSources.map((source, index) => ({
           '@type': 'ListItem',
           position: index + 1,
           url: `${CANONICAL}#source-${source.id}`,
@@ -296,8 +301,9 @@ function renderPage(dataset) {
 
   const categorySections = sortedCategories.map((category) => {
     const categorySources = sources
-      .filter((source) => source.category === category)
+      .filter((source) => source.category === category && pageIds.has(source.id))
       .sort((left, right) => right.quality.score - left.quality.score || left.name.localeCompare(right.name));
+    if (!categorySources.length) return '';
     return `        <section class="ks-category-section" id="category-${escapeHtml(category)}" data-ks-category-section data-category="${escapeHtml(category)}" aria-labelledby="category-${escapeHtml(category)}-title">
           <header class="ks-category-header">
             <div><p>Category</p><h2 id="category-${escapeHtml(category)}-title">${escapeHtml(label(category))}</h2></div>
@@ -309,9 +315,19 @@ ${categorySources.map((source) => renderSourceCard(source, sourceById)).join('\n
         </section>`;
   }).join('\n');
 
-  const categoryIndex = sortedCategories.map((category) => `            <li><a href="#category-${escapeHtml(category)}"><span>${escapeHtml(label(category))}</span><strong>${categories.get(category)}</strong></a></li>`).join('\n');
+  const categoryIndex = sortedCategories.map(category => {
+    const first = sources.findIndex(source => source.category === category), n = Math.floor(first / pageSize) + 1;
+    const here = pageSources.some(source => source.category === category);
+    const href = here ? '#category-' + category : '/cyber-knowledge/knowledge-sources/' + (n === 1 ? '' : `page/${n}/`) + '#category-' + category;
+    return `<li${here ? '' : ` id="category-${escapeHtml(category)}"`}><a href="${href}"><span>${escapeHtml(label(category))}</span><strong>${categories.get(category)}</strong></a></li>`;
+  }).join('\n');
   const tagIndex = sortedTags.map((tag) => `            <li id="tag-${escapeHtml(tag)}"><a href="?tag=${encodeURIComponent(tag)}#source-results" data-ks-tag-link="${escapeHtml(tag)}"><span>${escapeHtml(label(tag))}</span><strong>${tags.get(tag) || 0}</strong></a></li>`).join('\n');
-  const quickIndex = alphabeticSources.map(renderIndexLink).join('\n');
+  const quickIndex = alphabeticSources.map(source => {
+    const i = sources.indexOf(source), n = Math.floor(i / pageSize) + 1;
+    const href = '/cyber-knowledge/knowledge-sources/' + (n === 1 ? '' : `page/${n}/`) + '#source-' + source.id;
+    return `<li${pageIds.has(source.id) ? '' : ` id="source-${source.id}"`}><a href="${href}">${escapeHtml(source.name)} — read assessment</a></li>`;
+  }).join('\n');
+  const pagination = `<nav class="directory-pagination" aria-label="Source directory pages">${Array.from({length:pageCount}, (_, i) => `<a href="/cyber-knowledge/knowledge-sources/${i ? `page/${i + 1}/` : ''}" ${i + 1 === pageNumber ? 'aria-current="page"' : ''}>Page ${i + 1}</a>`).join(' ')}</nav>`;
 
   return `<!doctype html>
 <html lang="en" data-theme="light">
@@ -321,14 +337,14 @@ ${categorySources.map((source) => renderSourceCard(source, sourceById)).join('\n
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <script src="/assets/theme-bootstrap.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cybersecurity Knowledge Sources — Assessed Directory | 1200km</title>
-    <meta name="description" content="Search and compare ${sources.length} assessed cybersecurity knowledge sources across government guidance, frameworks, threat research, DFIR, cloud, application security, training, and more." />
+    <title>Cybersecurity Knowledge Sources${pageNumber > 1 ? ` — Page ${pageNumber}` : ''} — Assessed Directory | 1200km</title>
+    <meta name="description" content="${pageNumber > 1 ? `Page ${pageNumber} of ${pageCount}: ` : ''}Search and compare ${sources.length} assessed cybersecurity knowledge sources across government guidance, frameworks, threat research, DFIR, cloud, application security, training, and more." />
     <meta name="author" content="Andrey Pautov" />
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <meta name="theme-color" content="#f5f5f4" />
     <meta content="Cyber Knowledge" data-pagefind-filter="section[content]" data-pagefind-meta="collection[content]" />
     <meta content="Knowledge Sources" data-pagefind-filter="content_type[content]" data-pagefind-meta="content_type[content]" />
-    <meta property="og:title" content="Cybersecurity Knowledge Sources — Assessed Directory | 1200km" />
+    <meta property="og:title" content="Cybersecurity Knowledge Sources${pageNumber > 1 ? ` — Page ${pageNumber}` : ''} — Assessed Directory | 1200km" />
     <meta property="og:description" content="A searchable, assessed directory of cybersecurity frameworks, government guidance, tools, research, training, and operational references." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_US" />
@@ -339,8 +355,8 @@ ${categorySources.map((source) => renderSourceCard(source, sourceById)).join('\n
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Cyber Knowledge — eleven practitioner domains at 1200km" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Cybersecurity Knowledge Sources — Assessed Directory | 1200km" />
-    <meta name="twitter:description" content="Search and compare ${sources.length} assessed cybersecurity knowledge sources with quality, access, audience, and evidence-use context." />
+    <meta name="twitter:title" content="Cybersecurity Knowledge Sources${pageNumber > 1 ? ` — Page ${pageNumber}` : ''} — Assessed Directory | 1200km" />
+    <meta name="twitter:description" content="${pageNumber > 1 ? `Page ${pageNumber} of ${pageCount}: ` : ''}Search and compare ${sources.length} assessed cybersecurity knowledge sources with quality, access, audience, and evidence-use context." />
     <meta name="twitter:image" content="https://1200km.com/assets/cyber-knowledge-og/hub.png" />
     <meta name="twitter:image:alt" content="Cyber Knowledge — eleven practitioner domains at 1200km" />
     <link rel="canonical" href="${CANONICAL}" />
@@ -351,7 +367,7 @@ ${categorySources.map((source) => renderSourceCard(source, sourceById)).join('\n
     <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />
     <link rel="stylesheet" href="/assets/knowledge-sources.css?v=20260906-1" />
     <script src="/assets/site-theme.js?v=20260904-light-default" defer></script>
-    <script src="/assets/knowledge-sources.js?v=20260906-1" defer></script>
+    <script src="/assets/directory-browser.js" data-directory="knowledge" defer></script>
     <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
     <script type="application/ld+json" id="knowledge-sources-structured-data">
 ${escapeJsonForHtml(structuredData).split('\n').map((line) => `      ${line}`).join('\n')}
@@ -439,7 +455,7 @@ ${sortedTags.map((value) => option(value, tags.get(value) || 0)).join('\n')}
                 <button class="ks-button" type="reset">Clear filters</button>
               </div>
             </form>
-            <noscript><p class="ks-noscript">Filtering needs JavaScript. All source assessments remain available below and can be reached from the indexes.</p></noscript>
+            <noscript><p class="ks-noscript">Filtering needs JavaScript. All assessments remain available through the page links and A–Z index below.</p></noscript>
           </section>
 
           <section class="ks-index-section" id="category-index" aria-labelledby="category-index-title">
@@ -470,13 +486,15 @@ ${quickIndex}
             <div class="ks-active-filter" data-ks-active-filter hidden><span>Active filter</span><strong data-ks-active-filter-label></strong></div>
             <p class="ks-empty-state" data-ks-empty hidden><strong>No sources match these filters.</strong><span>Try fewer terms, another category, or clear the filters.</span></p>
 ${categorySections}
+            ${pagination}
           </section>
 
           <section class="ks-methodology" id="methodology" aria-labelledby="methodology-title">
             <p class="ks-section-label">Assessment boundary</p>
             <h2 id="methodology-title">How to interpret this directory</h2>
+            <p>Directory presentation updated 2026-09-09. This does not refresh the individual source assessments or their link-check dates.</p>
             <div class="ks-method-grid">
-              <article><h3>Five quality dimensions</h3><p>Authority, originality, maintenance, practical value, and transparency are each scored from 1 to 5. The 100-point score and A–C tier summarize those dimensions; the source-specific rationale and limitations explain what the number cannot.</p></article>
+              <article><h3>Five quality dimensions</h3><p>Authority, originality, maintenance, practical value, and transparency are each scored from 1 to 5. The A–C tiers are editorial judgments, not measured accuracy or independent certification. Historical numeric scores remain in the export for traceability; small score differences should not be interpreted as meaningful ranking. Read the rationale and limitations for each source. Audience levels overlap: a provider may offer both introductory and advanced material. Imported research provenance records how a source was discovered, not independent validation of its claims.</p></article>
               <article><h3>Evidence before reputation</h3><p>A well-known source can still be secondary evidence for a particular claim. “Primary authoritative,” “primary operational,” “mixed,” and related labels describe how a source can support analysis—not a guarantee that every publication is correct.</p></article>
               <article><h3>Links are not endorsements</h3><p>Tool, training, malware, and offensive-security resources may require authorization, isolation, licensing review, or extra safety controls. Read each caution and the destination’s current terms before use.</p></article>
               <article><h3>Validation is time-bounded</h3><p>URLs were checked on ${escapeHtml(dataset.generated_on)}. A reachable page can change, and an automated-access restriction is not the same as a broken link. Check current versions, supersession notices, and publication dates before a consequential decision.</p></article>
@@ -494,7 +512,9 @@ ${categorySections}
 }
 
 const dataset = JSON.parse(readFileSync(DATA_PATH, 'utf8'));
-const generated = renderPage(dataset);
+for (let pageNumber = 1; pageNumber <= Math.ceil(dataset.sources.length / 8); pageNumber++) {
+const OUTPUT_PATH = pageNumber === 1 ? join(ROOT, PAGE_PATH) : join(ROOT, 'cyber-knowledge/knowledge-sources/page', String(pageNumber), 'index.html');
+const generated = renderPage(dataset, pageNumber);
 
 if (CHECK) {
   if (!existsSync(OUTPUT_PATH) || readFileSync(OUTPUT_PATH, 'utf8') !== generated) {
@@ -506,3 +526,16 @@ if (CHECK) {
   writeFileSync(OUTPUT_PATH, generated);
   console.log(`Generated Knowledge Sources module with ${dataset.sources.length} source anchors.`);
 }
+
+}
+const projection = dataset.sources.map((s,i) => ({ id: 'source-' + s.id, name: s.name, url: s.url,
+  summary: s.summary.slice(0,320) + (s.summary.length > 320 ? '…' : ''),
+  page: '/cyber-knowledge/knowledge-sources/' + (i < 8 ? '' : `page/${Math.floor(i / 8) + 1}/`),
+  search: [s.name, s.description, s.organization, ...(s.keywords || []), ...s.tags, ...s.audience, ...s.content_formats, ...s.assessment.best_for].join(' ').toLowerCase(),
+  category: s.category, tag: s.tags, access: s.access, level: s.skill_levels, tier: s.quality.tier,
+  evidence: s.assessment.evidence_use, maintenance: s.assessment.maintenance, kind: s.source_kind
+}));
+const indexPath = join(ROOT, 'data', 'knowledge-browser-index.json');
+const indexJson = JSON.stringify(projection) + '\n';
+if (CHECK) { if (readFileSync(indexPath, 'utf8') !== indexJson) throw new Error('Knowledge browser index stale'); }
+else writeFileSync(indexPath, indexJson);

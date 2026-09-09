@@ -342,7 +342,7 @@ try {
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `/\\bcore\\b/i.test(document.querySelector('[data-site-search-results] .pf-result:first-child .site-search-result-meta')?.textContent || '')`,
+    `document.querySelector('[data-site-search-results] .pf-result:first-child .site-search-result-card')?.dataset.collectionTier === 'core'`,
     'broad search prefers governed core content'
   );
   await evaluate(devtools, searchPage.sessionId, `(() => {
@@ -365,6 +365,8 @@ try {
   if (JSON.stringify(searchFilters) !== JSON.stringify(expectedFilters)) {
     failures.push(`expected controlled search facets ${expectedFilters.join(', ')}, found ${searchFilters.join(', ')}`);
   }
+  const initialFacetState = await evaluate(devtools, searchPage.sessionId, `({ visible: Array.from(document.querySelectorAll('[data-site-search-filters] pagefind-filter-dropdown')).filter(n => n.checkVisibility()).length, advancedClosed: !document.querySelector('[data-site-search-filters] details')?.open })`);
+  if (initialFacetState.visible !== 3 || !initialFacetState.advancedClosed) failures.push(`Expected three initial facets and closed advanced controls: ${JSON.stringify(initialFacetState)}`);
   const filterSemantics = await evaluate(devtools, searchPage.sessionId, `Array.from(document.querySelectorAll('[data-site-search-filters] .pf-dropdown-trigger')).map((button) => ({ role: button.getAttribute('role'), expanded: button.getAttribute('aria-expanded'), controls: button.getAttribute('aria-controls'), label: button.getAttribute('aria-label') }))`);
   if (filterSemantics.length !== expectedFilters.length || filterSemantics.some((filter) => filter.role !== 'combobox' || filter.expanded !== 'false' || !filter.controls || !filter.label)) {
     failures.push(`search facet semantics are incomplete: ${JSON.stringify(filterSemantics)}`);
@@ -377,7 +379,7 @@ try {
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `Boolean(document.querySelector('[data-site-search-active]:not([hidden]) .site-search-filter-chip')) && /Domain: Threat Intelligence/.test(document.querySelector('.site-search-filter-chip')?.textContent || '')`,
+    `Boolean(document.querySelector('[data-site-search-active]:not([hidden]) .site-search-filter-chip')) && /Security topic: Threat Intelligence/.test(document.querySelector('.site-search-filter-chip')?.textContent || '')`,
     'visible removable active filter'
   );
   await evaluate(devtools, searchPage.sessionId, `document.querySelector('[data-site-search-clear-all]').click()`);
@@ -475,6 +477,7 @@ try {
       privacy: Boolean(document.querySelector('.site-footer a[href="/privacy.html"]')),
       search: new URL(document.querySelector('.site-search-fallback')?.href || location.href).pathname,
       menuVisible: Boolean(rect && rect.width >= 44 && rect.height >= 44),
+      menuOpen: Boolean(document.querySelector('details.nav-links')?.open),
       center: rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null,
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
@@ -495,8 +498,8 @@ try {
   await waitForExpression(
     devtools,
     staticMobile.sessionId,
-    `document.querySelector('details.nav-links')?.open && getComputedStyle(document.querySelector('.site-header .nav-list')).display !== 'none'`,
-    'no-JavaScript native mobile navigation disclosure'
+    `document.querySelector('details.nav-links')?.open === ${!staticMobileState.menuOpen}`,
+    'no-JavaScript native mobile navigation disclosure toggles'
   );
   await devtools.send('Target.closeTarget', { targetId: staticMobile.targetId });
 

@@ -69,7 +69,7 @@ export function renderHeader(shell, page) {
           <img src="${escapeHtml(brand.logo)}" alt="" width="36" height="36" />
           <span class="brand-copy"><strong>${escapeHtml(brand.name)}</strong><small>${escapeHtml(brand.descriptor)}</small></span>
         </a>
-        <details class="nav-links" data-mobile-navigation>
+        <details class="nav-links" open data-mobile-navigation>
           <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
             <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
             <span class="nav-menu-text">Menu</span>

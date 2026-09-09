@@ -310,6 +310,7 @@ function governedItem(item, config) {
 
 function inferType(url, title, html, collection) {
   const path = new URL(url).pathname;
+  if (/^\/(?:references|cyber-knowledge\/knowledge-sources)\/(?:page\/\d+\/)?$/.test(path) || path === '/learning-paths/') return 'index';
   if (path === '/articles/trainsec-library.html'
     || /^\/articles\/trainsec\/(?:authors|domains)\.html$/i.test(path)) return 'index';
   if (collection) {

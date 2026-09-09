@@ -209,6 +209,7 @@ const sourcesGraph = {
 };
 
 const policyBody = `<section aria-labelledby="policy-title">
+        <p>Editorial correction review: 2026-09-09. Imported research with unrecovered citations remains unverified. A checked ATT&amp;CK identifier confirms taxonomy, not procedure attribution. Use <code>npm run check-editorial</code> before publication; intentional artifact examples must be inside code blocks. Preserve publication, substantive modification, dataset release, and editorial-review dates separately. Rebuilding output does not constitute a new review.</p>
         <h2 id="policy-title">Evidence and editorial policy</h2>
         <div class="domain-grid">
           <article class="domain-card"><h3 class="domain-title">Source selection</h3><p class="domain-desc">Prefer official standards, government publications, framework owners, first-party documentation, peer-reviewed research, and technically credible primary research. Internal 1200km material is labelled as research, a lab, a tool, or a workflow—not as an external standard. The <a href="/cyber-knowledge/knowledge-sources/">Knowledge Sources module</a> records scope, strengths, limitations, quality dimensions, and intended use for its curated entries.</p></article>

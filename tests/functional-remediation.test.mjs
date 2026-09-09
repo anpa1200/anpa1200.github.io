@@ -45,9 +45,10 @@ test('homepage gives each primary audience one clear action', () => {
   const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
   const actions = html.match(/<div class="actions audience-actions"[\s\S]*?<\/div>/i)?.[0] || '';
   assert.equal((actions.match(/class="button[^"']*audience-cta"/g) || []).length, 3);
-  assert.match(actions, /href="cv\.pdf"[^>]*download="Andrey_Pautov_CV\.pdf"[\s\S]*?Download CV \(PDF\)/);
-  assert.match(actions, /href="adversarygraph-docs\/full-flow\/"[\s\S]*?Deploy AdversaryGraph/);
-  assert.match(actions, /href="ai-attack-statistics\/"[\s\S]*?Read the latest study/);
+  assert.match(actions, /href="\/threat-matrix\/#\/techniques\/T1059.003"/);
+  assert.match(actions, /href="\/learning-paths\/#cti-to-detection"/);
+  assert.match(actions, /href="\/learning-paths\/#malware-triage"/);
+  assert.match(html, /href="cv.html"/);
 });
 
 test('nested 404 recovery links are root-relative and resolve locally', async (context) => {

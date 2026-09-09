@@ -131,6 +131,8 @@ async function checkQueries() {
     }
     const checks = [
       { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK', matchedType: 'generated-reference', matchedLifecycle: 'stable-reference' },
+      { query: 'T1059.001', expectedPrefixes: ['/threat-matrix/techniques/T1059.001/'], first: true, matchedTier: 'reference' },
+      { query: 'YARA', expectedPrefixes: ['/cyber-knowledge/malware-analysis.html', '/cyber-knowledge/knowledge-sources/#source-yara', '/articles/'] },
       { query: 'T1059.00', expectedPrefixes: ['/threat-matrix/techniques/T1059.0'], first: true, matchedTier: 'reference' },
       { query: 'G0034', expectedPrefixes: ['/threat-matrix/actors/G0034/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK', matchedType: 'reference-entity', matchedLifecycle: 'stable-reference' },
       { query: 'G0069', expectedPrefixes: ['/threat-matrix/actors/G0069/'], first: true, matchedTier: 'reference' },

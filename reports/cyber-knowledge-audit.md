@@ -9,7 +9,7 @@ This report is generated from deployable source HTML. External URLs are inventor
 | Measure | Result |
 |---|---:|
 | Pages | 15 |
-| Words | 130,968 |
+| Words | 131,020 |
 | Internal links | 4,753 |
 | External links | 586 |
 | Broken internal links | 0 |
@@ -34,7 +34,7 @@ This report is generated from deployable source HTML. External URLs are inventor
 | [AI Security](https://1200km.com/cyber-knowledge/ai-security.html) | field guide | 5483 | 65 | 361 | 15 | indexable |
 | [Cyber Knowledge Glossary](https://1200km.com/cyber-knowledge/glossary/index.html) | glossary | 4939 | 144 | 165 | 1 | indexable |
 | [Cyber Knowledge Source Index](https://1200km.com/cyber-knowledge/sources/index.html) | source index | 4193 | 186 | 25 | 179 | indexable |
-| [Editorial and Source Policy](https://1200km.com/cyber-knowledge/editorial-policy/index.html) | supporting page | 230 | 8 | 26 | 2 | indexable |
+| [Editorial and Source Policy](https://1200km.com/cyber-knowledge/editorial-policy/index.html) | supporting page | 282 | 8 | 26 | 2 | indexable |
 
 ## Validation interpretation
 

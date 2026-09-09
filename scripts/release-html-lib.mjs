@@ -894,6 +894,10 @@ export function normalizeDocusaurusBrandLogoAlts(html) {
 
 export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
+  if (options.canonical) {
+    transformed = transformed.replace(/(<link\b[^>]*rel=["']canonical["'][^>]*href=["'])[^"']+(["'])/gi, (_,start,end)=>start+escapeAttribute(options.canonical)+end)
+      .replace(/(<meta\b[^>]*property=["']og:url["'][^>]*content=["'])[^"']+(["'])/gi,(_,start,end)=>start+escapeAttribute(options.canonical)+end);
+  }
   transformed = removeMetaKeywords(transformed);
   transformed = normalizeDocumentTitles(transformed);
   transformed = normalizeMetaDescriptions(transformed);

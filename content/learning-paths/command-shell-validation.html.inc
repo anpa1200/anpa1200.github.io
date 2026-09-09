@@ -1,0 +1,22 @@
+<h1>Validate a command-shell detection candidate with benign events</h1>
+<p><strong>Turn a documented behavior into a small, inspectable rule and test its positive and negative boundaries without executing a sample.</strong></p>
+<p>For analysts learning CTI-to-detection work, the useful output is a candidate plus evidence of what it matches. This example uses synthetic JSON shaped around Windows Security event 4688. It is an illustrative rule, not a production-ready detection or a reproduction of an intrusion.</p>
+<p>Environment: Python 3.9 or later; no third-party packages, network connection, malware, or administrator access. Estimated time: 15 minutes. Review date: 2026-09-09; rule version: 1.0; taxonomy: Enterprise ATT&amp;CK 19.1.</p>
+<nav aria-label="On this page"><a href="#evidence">Evidence</a> · <a href="#workflow">Workflow</a> · <a href="#validation">Validation</a> · <a href="#limits">Limitations</a> · <a href="#references">References</a></nav>
+<h2 id="evidence">Evidence and candidate</h2>
+<p><a href="https://attack.mitre.org/techniques/T1059/003/">MITRE T1059.003</a> describes Windows Command Shell execution. Its DET0202/AN0578 defensive guidance discusses parent-child relationships. <a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688">Microsoft documents process creation event 4688</a>; field availability varies by event version and audit configuration.</p>
+<p>The rule below is an author's narrow inference from that guidance: flag a process-creation record whose parent basename is <code>winword.exe</code> and child basename is <code>cmd.exe</code>. It does not infer maliciousness or actor attribution.</p>
+<h2 id="workflow">Inputs and workflow</h2>
+<ol><li>Download <a href="events.json" download>events.json</a> and <a href="validate.py" download>validate.py</a> into the same directory.</li><li>Inspect both files. The events are synthetic; the command-line text is never executed.</li><li>Run the reader below from that directory.</li><li>Compare the reported IDs with the expected result and inspect the excluded events.</li></ol>
+<pre tabindex="0"><code>python3 validate.py events.json
+</code></pre>
+<h2 id="validation">Expected output and negative controls</h2>
+<pre tabindex="0"><code>{"candidate_ids": ["word-shell"], "events_read": 6}
+</code></pre>
+<p>The positive fixture uses uppercase WINWORD.EXE to exercise case normalization. Negative controls cover an ordinary Explorer parent, Word launching an editor, the wrong event type, missing parent telemetry, and a near-match executable name. Change one field at a time and explain why the decision changes.</p>
+<p>If the JSON is malformed or the file is missing, Python reports a parsing or file error: fix the input before drawing conclusions. Missing fields fail to match and represent a visibility limitation. The repository regression test also checks an empty event and case variants.</p>
+<h2 id="limits">Failure modes and limitations</h2>
+<p>Approved Office automation may launch a shell and produce a false positive. Other parents, renamed binaries, absent audit events, spoofed fields, or incomplete collection are outside this rule. Fixture success confirms only the implemented matching behavior. It does not validate Windows event generation, ingestion, SIEM translation, evasion resistance, or detection effectiveness in production.</p>
+<h2>Conclusion and next step</h2><p>Keep source evidence, rule intent, fixture results, and visibility gaps together. Continue the <a href="/learning-paths/#cti-to-detection">CTI-to-detection path</a> by checking your own telemetry schema and approved baseline before adapting the candidate.</p>
+<h2 id="references">References</h2><ul><li><a href="https://attack.mitre.org/techniques/T1059/003/">MITRE: Windows Command Shell</a></li><li><a href="https://attack.mitre.org/detectionstrategies/DET0202/">MITRE: DET0202</a></li><li><a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688">Microsoft: event 4688</a></li><li><a href="/newest-detection-engineering-techniques/">1200km detection engineering guide</a></li></ul>
+<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="https://medium.com/@1200km">Medium</a> · <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> · <a href="https://github.com/anpa1200">GitHub</a> · <a href="mailto:1200km@gmail.com">Contact</a></p>

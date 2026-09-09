@@ -29,7 +29,8 @@ async function main() {
     const target = DOMAIN_OUTPUTS[collection.name];
     if (!target) continue;
     if (selectedDomain && target.domain !== selectedDomain) continue;
-    const latest = collection.versions?.[0];
+    const pinned = args.includes('--version') ? args[args.indexOf('--version') + 1] : '19.1';
+    const latest = collection.versions?.find(v => v.version === pinned);
     if (!latest?.url) throw new Error(`Missing latest URL for ${collection.name}`);
     const bundle = await readJsonSource(latest.url, basenameFromUrl(latest.url));
     const generated = transformAttackBundle(bundle, {
@@ -41,6 +42,10 @@ async function main() {
     });
     if (target.domain === 'enterprise') {
       const { core, defense } = splitEnterpriseDefenseData(generated);
+      await mkdir(join(THREAT_MATRIX_ROOT, 'defense'), { recursive: true });
+      const buckets = Array.from({length:32}, () => []);
+      for (const t of defense.techniques) buckets[[...t.id].reduce((n,c)=>n+c.charCodeAt(0),0)%32].push(t);
+      for (let i=0;i<buckets.length;i++) await writeJson(join(THREAT_MATRIX_ROOT, 'defense', `${i}.json`), {...defense,techniques:buckets[i]});
       await Promise.all([
         writeJson(join(THREAT_MATRIX_ROOT, target.output), core),
         writeJson(join(THREAT_MATRIX_ROOT, 'mitre-defense-data.json'), defense),
@@ -156,13 +161,17 @@ function transformAttackBundle(bundle, metadata) {
                 log_sources: (analytic.x_mitre_log_source_references || []).map((source) => ({
                   name: source.name || '',
                   channel: source.channel || '',
+                  data_component: (() => {
+                    const component = allByStixId.get(source.x_mitre_data_component_ref);
+                    return component ? { id: externalId(component) || component.id, name: component.name, revoked: Boolean(component.revoked), deprecated: Boolean(component.x_mitre_deprecated), references: referencesFor(component) } : null;
+                  })(),
                 })),
                 references: primaryReferenceFor(analytic),
               })),
             references: primaryReferenceFor(strategy),
           }))
           .filter((strategy) => strategy.id?.startsWith('DET')),
-        references: primaryReferenceFor(object),
+        references: contextualReferences(object),
       };
     })
     .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
@@ -176,7 +185,7 @@ function transformAttackBundle(bundle, metadata) {
         name: object.name || id,
         aliases: [...new Set([...(object.aliases || []), ...(object.x_mitre_aliases || [])].filter(Boolean))].sort(),
         description: compactText(object.description, 1700),
-        references: primaryReferenceFor(object),
+        references: contextualReferences(object),
         technique_ids: [...(techniqueIdsByGroup.get(id) || new Set())].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
       };
     })
@@ -248,7 +257,7 @@ function splitEnterpriseDefenseData(generated) {
   const defensiveTechniques = [];
   for (const technique of generated.techniques) {
     const { mitigations, detection_strategies: detectionStrategies, ...core } = technique;
-    techniques.push(core);
+    techniques.push({...core, defense_summary: { strategies: (detectionStrategies || []).length, analytics: (detectionStrategies || []).reduce((n,s)=>n+s.analytics.length,0) }});
     defensiveTechniques.push({
       id: technique.id,
       mitigations: mitigations || [],
@@ -352,8 +361,13 @@ function referencesFor(object) {
       url: reference.url || '',
       source: reference.source_name || '',
     }))
-    .filter((reference) => reference.url)
-    .slice(0, 20);
+    .filter((reference) => reference.url);
+}
+
+function contextualReferences(object) {
+  const excerpt = compactText(object.description, object.type === 'intrusion-set' ? 1700 : 1600) + ' ' + compactText(object.x_mitre_detection, 1100);
+  const names = new Set([...excerpt.matchAll(/\(Citation: ([^)]+)\)/g)].map(m=>m[1]));
+  return referencesFor(object).filter(r=>r.source === 'mitre-attack' || names.has(r.source)).map(r=>({...r,label:r.source || r.label}));
 }
 
 function primaryReferenceFor(object) {
