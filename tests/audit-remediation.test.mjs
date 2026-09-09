@@ -17,7 +17,7 @@ test('every reference and assessment has an ordinary static page with its stable
       assert.ok(pages.get(p).includes(`id="${row.id}"`), row.id);
     }
     for (const [p, html] of pages) {
-      assert.ok(statSync(p).size < 250000, `${p} exceeds decoded HTML budget`);
+      assert.ok(statSync(p).size < (name === 'reference' ? 200000 : 250000), `${p} exceeds decoded HTML budget`);
       assert.ok(html.includes('aria-label="' + (name === 'reference' ? 'Reference pages' : 'Source directory pages') + '"'));
     }
   }

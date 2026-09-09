@@ -1,0 +1,88 @@
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Validate a simulated agent permission boundary | 1200km</title><meta name="description" content="Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/agent-permission-validation/"><meta property="og:url" content="https://1200km.com/learning-paths/agent-permission-validation/"><meta property="og:title" content="Validate a simulated agent permission boundary"><meta property="og:description" content="Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Validate a simulated agent permission boundary","name":"Validate a simulated agent permission boundary","url":"https://1200km.com/learning-paths/agent-permission-validation/","description":"Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls.","dateModified":"2026-09-09","datePublished":"2026-09-09","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"}}</script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style></head><body id="top"><!-- site-shell:header:start -->
+    <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
+          <span class="brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <details class="nav-links" open data-mobile-navigation>
+          <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
+            <span class="nav-menu-text">Menu</span>
+          </summary>
+          <div class="nav-list" id="primary-nav-list">
+            <!-- site-shell:primary-navigation:start -->
+            <a href="/cti.html">Research</a>
+            <a class="active" aria-current="location" href="/guides.html">Library</a>
+            <a href="/projects.html">Products &amp; Labs</a>
+            <a class="nav-flagship" href="/adversarygraph/">AdversaryGraph</a>
+            <details class="nav-more">
+              <summary>More</summary>
+              <div class="nav-more-list">
+                <a href="/cyber-knowledge/">Cyber Knowledge</a>
+                <a href="/courses/">Courses</a>
+                <a href="/references/">References</a>
+                <a href="/about.html">About</a>
+                <a href="/cv.html">CV</a>
+                <a href="/external-validation.html">External validation</a>
+              </div>
+            </details>
+            <!-- site-shell:primary-navigation:end -->
+          </div>
+        </details>
+        <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">
+            <span aria-hidden="true" class="site-search-fallback-icon"></span>
+            <span class="site-search-fallback-text">Search research</span>
+          </a>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1>Validate a simulated agent permission boundary</h1>
+<p><strong>Check a tool allowlist and observable decisions using benign local requests.</strong></p>
+<p>Audience: practitioners reviewing agent tools and application logs. Prerequisites: basic JSON and Python 3.9 or later, with no additional packages. Planning time: 15–20 minutes. Executed here with Python 3.13.12 on Linux; fixture and policy version 1.0, reviewed 2026-09-09.</p>
+<p>This simulator accepts only an exact read request for <code>reports/summary.txt</code>. Every other request is denied. It evaluates request objects without performing their operations; no network, secrets, paid service, or privileged action is involved. Retrieved document text cannot change the fixed policy.</p>
+<nav aria-label="On this page"><a href="#boundary">Boundary</a> · <a href="#workflow">Workflow</a> · <a href="#validation">Validation</a> · <a href="#limits">Limitations</a> · <a href="#references">References</a></nav>
+<h2 id="boundary">Permission and observation boundary</h2>
+<p>The authored fixture includes one permitted read, a secret-path read, traversal, a write, a proposed transfer to a reserved example domain, and a missing operation. The <code>expected</code> field is the test oracle; it never authorizes an operation. Events record request ID, decision, policy version, and <code>operation_executed: false</code>. Their ordered IDs must match the submitted requests exactly.</p>
+<h2 id="workflow">Download and run</h2>
+<ol><li>Save <a href="requests.json" download>requests.json</a> and <a href="validate.py" download>validate.py</a> in an empty working directory.</li><li>Read the allowlist, fixture expectations, and verifier before running. Confirm that no requested tool is invoked.</li><li>Run the commands below. The second prints the individual observable events after the summary.</li></ol>
+<pre tabindex="0"><code>python3 validate.py requests.json
+python3 validate.py requests.json --events</code></pre>
+<h2 id="validation">Expected output and negative controls</h2>
+<pre tabindex="0"><code>{"allowed_ids": ["read-report"], "denied": 5, "events_observed": 6, "negative_controls_rejected": 2}</code></pre>
+<p>The two additional controls deliberately remove the final event and change all decisions to allow. The verifier must reject both. The traversal and missing-operation fixtures separately exercise fail-closed decisions. Change a fixture's expected secret read to allow: validation must fail with <code>Permission or observation boundary mismatch</code>. Duplicate request IDs must also fail. Missing files and malformed JSON stop with a Python error.</p>
+<h2 id="limits">Visibility limits and conclusion</h2>
+<p>A passing run demonstrates only this exact policy function and event checker. It does not test an LLM, operating-system sandbox, credentials, approval service, tamper-resistant logging, or enforcement in a real agent. Since every event is generated locally by the same simulator, event completeness is a fixture invariant rather than independent proof that a production tool was blocked. Avoid prefix-based authorization without a separate canonical-resource design and threat review.</p>
+<p>Next step: follow the <a href="/learning-paths/#ai-agent-security">AI/agent security path</a>. In an authorized integration, record which component enforces permissions and which independent observation proves whether a tool actually ran. Include an event-loss test before relying on the log.</p>
+<h2 id="references">References</h2>
+<ul><li><a href="https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/">OWASP: Agentic AI threats and mitigations</a> — architecture context; this small simulator is an authored exercise, not an OWASP conformance test.</li><li><a href="https://docs.python.org/3/library/json.html">Python: JSON encoder and decoder</a>.</li><li><a href="/cyber-knowledge/ai-security.html">1200km: AI security</a>.</li></ul>
+<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="/about.html">About the author</a> · <a href="https://github.com/anpa1200">GitHub</a>.</p>
+</main><!-- site-shell:footer:start -->
+    <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <div class="shared-footer-inner">
+        <a class="shared-footer-brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="32" height="32" />
+          <span><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <nav class="shared-footer-links" aria-label="Footer navigation">
+          <a href="/cti.html">Research</a>
+          <a href="/guides.html">Library</a>
+          <a href="/projects.html">Products &amp; Labs</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/about.html">About</a>
+        </nav>
+        <nav class="shared-footer-meta" aria-label="Site information">
+          <a href="/privacy.html">Privacy / Data Handling</a>
+          <a href="/about.html#contact">Contact</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></a>
+        </nav>
+      </div>
+      <div class="shared-footer-bottom">
+        <span>© 2026 Andrey Pautov · Original research and tooling</span>
+        <a href="#top" data-back-to-top>Back to top ↑</a>
+      </div>
+    </footer>
+    <!-- site-shell:footer:end --></body></html>

@@ -51,12 +51,16 @@
     node.id = record.id;
     node.setAttribute(knowledge ? 'data-ks-source-card' : 'data-reference-card', '');
     const heading = element('h3');
-    heading.append(link(record.name, knowledge ? record.page + '#' + record.id : record.url));
+    const inert = ['indicator', 'example', 'address-review'].includes(record.kind);
+    if (inert) heading.textContent = record.name;
+    else heading.append(link(record.name, knowledge ? record.page + '#' + record.id : record.url));
     node.append(heading, element('p', knowledge ? record.summary : record.description));
     if (knowledge) {
       node.append(element('p', `Assessment tier ${record.tier} · ${record.access} · ${record.level.join(', ')}`), link('Read full assessment, limitations, and related sources', record.page + '#' + record.id));
       return node;
     }
+    node.append(element('p', `${record.kind || 'bibliographic'} · ${record.metadata_status || 'authored-metadata'}`));
+    if (inert) node.append(element('code', record.url.replace(/^https/, 'hxxps').replaceAll('.', '[.]')));
     const related = element('button', 'Find related', 'reference-related');
     related.type = 'button';
     related.setAttribute('data-find-related', '');
@@ -147,14 +151,15 @@
         pager.append(b);
       }
       status.textContent = `${rows.length} matching records · page ${pageNumber} of ${total}`;
-      const schema = document.getElementById(knowledge ? 'knowledge-sources-structured-data' : 'reference-library-structured-data');
+      const schema = document.getElementById(knowledge ? 'knowledge-sources-structured-data' : 'reference-library-structured-data') || document.querySelector('script[data-site-graph]');
       if (schema) {
         try {
           const data = JSON.parse(schema.textContent),
             list = data['@graph']?.find(v => v['@type'] === 'ItemList');
           if (list) {
-            list.numberOfItems = shown.length;
-            list.itemListElement = shown.map((r, i) => ({
+            const semanticRows = knowledge ? shown : shown.filter(r => !["indicator", "example", "address-review"].includes(r.kind));
+            list.numberOfItems = semanticRows.length;
+            list.itemListElement = semanticRows.map((r, i) => ({
               '@type': 'ListItem',
               position: i + 1,
               item: {
@@ -296,12 +301,12 @@
     }
   });
   async function reveal() {
-    if (!/^#(?:source|reference)-/.test(location.hash)) return;
+    if (!/^#(?:source-|reference-|site-reference:)/.test(location.hash)) return;
     index = await loadIndex();
-    const row = index.find(r => '#' + r.id === location.hash);
+    const row = index.find(r => '#' + r.id === location.hash || (!knowledge && '#reference-' + location.hash.slice(1) === '#' + r.id));
     if (!row) return;
     if (row.page !== location.pathname) {
-      location.replace(row.page + location.search + location.hash);
+      location.replace(row.page + location.search + '#' + row.id);
       return;
     }
     const node = document.getElementById(row.id);

@@ -403,6 +403,8 @@ export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
   // Docusaurus page. Docusaurus emits stable heading IDs at build time.
   let prepared = /\bid=["']__docusaurus["']/i.test(html) ? html : addHeadingIds(html);
   prepared = prepared.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${metadata}`);
+  // Adjacent cells/list items are separate text units, even without authored whitespace.
+  prepared = prepared.replace(/<\/(?:td|th|li|p|h[1-6])>/gi, tag => `${tag} `);
   prepared = markPagefindContent(prepared, discoveryWeight(catalogItem));
   return prepared;
 }

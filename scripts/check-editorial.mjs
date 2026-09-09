@@ -12,6 +12,9 @@ const legacy = JSON.parse(readFileSync('data/editorial-artifact-baseline.json', 
 let existing = 0;
 const failures = [];
 for (const file of walk()) {
+ const source = readFileSync(file, 'utf8');
+ if (/\[unverified source\b/i.test(source) && /^(?:evidence_level|evidence_status|verification_status|status):\s*["']?(?:verified|source-backed)\b/im.test(source)) failures.push(file + ': unresolved intake cannot have verified/source-backed overall status');
+
   const artifacts = citationArtifacts(readFileSync(file, 'utf8'));
   if (!artifacts.length) continue;
   const baseline = legacy[file] || [];

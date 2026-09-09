@@ -1,0 +1,20 @@
+<h1>Validate a simulated agent permission boundary</h1>
+<p><strong>Check a tool allowlist and observable decisions using benign local requests.</strong></p>
+<p>Audience: practitioners reviewing agent tools and application logs. Prerequisites: basic JSON and Python 3.9 or later, with no additional packages. Planning time: 15–20 minutes. Executed here with Python 3.13.12 on Linux; fixture and policy version 1.0, reviewed 2026-09-09.</p>
+<p>This simulator accepts only an exact read request for <code>reports/summary.txt</code>. Every other request is denied. It evaluates request objects without performing their operations; no network, secrets, paid service, or privileged action is involved. Retrieved document text cannot change the fixed policy.</p>
+<nav aria-label="On this page"><a href="#boundary">Boundary</a> · <a href="#workflow">Workflow</a> · <a href="#validation">Validation</a> · <a href="#limits">Limitations</a> · <a href="#references">References</a></nav>
+<h2 id="boundary">Permission and observation boundary</h2>
+<p>The authored fixture includes one permitted read, a secret-path read, traversal, a write, a proposed transfer to a reserved example domain, and a missing operation. The <code>expected</code> field is the test oracle; it never authorizes an operation. Events record request ID, decision, policy version, and <code>operation_executed: false</code>. Their ordered IDs must match the submitted requests exactly.</p>
+<h2 id="workflow">Download and run</h2>
+<ol><li>Save <a href="requests.json" download>requests.json</a> and <a href="validate.py" download>validate.py</a> in an empty working directory.</li><li>Read the allowlist, fixture expectations, and verifier before running. Confirm that no requested tool is invoked.</li><li>Run the commands below. The second prints the individual observable events after the summary.</li></ol>
+<pre tabindex="0"><code>python3 validate.py requests.json
+python3 validate.py requests.json --events</code></pre>
+<h2 id="validation">Expected output and negative controls</h2>
+<pre tabindex="0"><code>{"allowed_ids": ["read-report"], "denied": 5, "events_observed": 6, "negative_controls_rejected": 2}</code></pre>
+<p>The two additional controls deliberately remove the final event and change all decisions to allow. The verifier must reject both. The traversal and missing-operation fixtures separately exercise fail-closed decisions. Change a fixture's expected secret read to allow: validation must fail with <code>Permission or observation boundary mismatch</code>. Duplicate request IDs must also fail. Missing files and malformed JSON stop with a Python error.</p>
+<h2 id="limits">Visibility limits and conclusion</h2>
+<p>A passing run demonstrates only this exact policy function and event checker. It does not test an LLM, operating-system sandbox, credentials, approval service, tamper-resistant logging, or enforcement in a real agent. Since every event is generated locally by the same simulator, event completeness is a fixture invariant rather than independent proof that a production tool was blocked. Avoid prefix-based authorization without a separate canonical-resource design and threat review.</p>
+<p>Next step: follow the <a href="/learning-paths/#ai-agent-security">AI/agent security path</a>. In an authorized integration, record which component enforces permissions and which independent observation proves whether a tool actually ran. Include an event-loss test before relying on the log.</p>
+<h2 id="references">References</h2>
+<ul><li><a href="https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/">OWASP: Agentic AI threats and mitigations</a> — architecture context; this small simulator is an authored exercise, not an OWASP conformance test.</li><li><a href="https://docs.python.org/3/library/json.html">Python: JSON encoder and decoder</a>.</li><li><a href="/cyber-knowledge/ai-security.html">1200km: AI security</a>.</li></ul>
+<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="/about.html">About the author</a> · <a href="https://github.com/anpa1200">GitHub</a>.</p>

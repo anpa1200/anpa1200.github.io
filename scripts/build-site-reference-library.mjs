@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { enrichReference } from './reference-metadata-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -12,6 +13,7 @@ const SOURCE_ROOT = option('--source', ROOT);
 const check = process.argv.includes('--check');
 const baseline = JSON.parse(await readFile(join(SOURCE_ROOT, 'data', 'ai-attack-reference-library.json'), 'utf8'));
 const catalog = JSON.parse(await readFile(join(SITE_ROOT, 'data', 'content-catalog.json'), 'utf8'));
+const metadataConfig = JSON.parse(await readFile(join(SOURCE_ROOT, 'data/reference-metadata-overrides.json'), 'utf8'));
 const outputPath = join(SITE_ROOT, 'data', 'reference-library.json');
 const CONTENT_TYPES = new Set(['article', 'case-study', 'documentation', 'guide', 'lab', 'mirror', 'research']);
 const EXCLUDED_HOSTS = new Set(['1200km.com', 'www.1200km.com', 'linkedin.com', 'www.linkedin.com']);
@@ -99,7 +101,7 @@ const records = [...urls].map((url) => {
   ];
   const tags = [...new Map([...(original?.tags || []), ...siteTags].map((item) => [item.key, item])).values()]
     .sort((a, b) => a.facet.localeCompare(b.facet) || a.value.localeCompare(b.value));
-  return {
+  return enrichReference({
     id: original?.id || `site-reference:${slug(host)}:${createHash('sha256').update(url).digest('hex').slice(0, 16)}`,
     title,
     description: original?.description || `External source cited by ${usedIn.length} maintained 1200km ${usedIn.length === 1 ? 'page' : 'pages'}.`,
@@ -109,8 +111,8 @@ const records = [...urls].map((url) => {
     inclusion: original?.inclusion || 'site',
     tags,
     used_in: usedIn,
-  };
-}).sort((a, b) => a.title.localeCompare(b.title) || a.url.localeCompare(b.url));
+  }, { anchors: [...(found?.anchors.values() || [])], sources: usedIn }, metadataConfig);
+}).sort((a, b) => Number(a.metadata_status === 'review-needed') - Number(b.metadata_status === 'review-needed') || Number(['indicator','example','address-review','navigation'].includes(a.kind)) - Number(['indicator','example','address-review','navigation'].includes(b.kind)) || a.title.localeCompare(b.title) || a.url.localeCompare(b.url));
 
 const tagKeys = new Set(records.flatMap((record) => record.tags.map((item) => item.key)));
 const payload = {
@@ -120,6 +122,8 @@ const payload = {
   evidence_boundary:'Tags and usage links are discovery metadata derived from published 1200km pages. Citation does not imply endorsement, current validity, attribution, exploitation, causality, or control effectiveness.',
   source_dataset:'/data/content-catalog.json and /data/ai-attack-reference-library.json',
   record_count:records.length,
+  bibliographic_count:records.filter(r => ['bibliographic','tool','dataset'].includes(r.kind)).length,
+  classification_counts:Object.fromEntries([...new Set(records.map(r=>r.kind))].map(kind=>[kind,records.filter(r=>r.kind===kind).length])),
   core_count:records.filter((item) => item.inclusion === 'core').length,
   context_count:records.filter((item) => item.inclusion === 'context').length,
   site_count:records.filter((item) => item.inclusion === 'site').length,
