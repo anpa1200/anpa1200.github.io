@@ -10,6 +10,8 @@
 
 ## Accessibility and visual review
 
+The existing mobile typography/overflow gate also passed 35 pages across 10 viewport/zoom configurations after replacing a broad wrapping rule with explicit break opportunities in one compound phrase.
+
 36 scoped browser checks passed: Chrome 150.0.7871.46 and Firefox 144.0.2. Navigation tested at 320, 360, 390, 430, 640, 768, 900, 901, 1024, 1280, 1366, 1379, 1380 and 1440 CSS pixels. The 640/320 widths represent 200%/400% layout reflow from 1280 pixels; native browser zoom and physical mobile devices were unavailable. Essential navigation, More/Escape, skip-link followed by Tab, focus return, and example axe checks passed.
 
 Both-theme measurements cover actual engagement-map/lab-group instances in eight Cyber Knowledge guides. The measurement handles sRGB color() serialization and alpha compositing; opaque surfaces stop background traversal. The minimum measured ratio was 7.83:1 across 154 panel/theme instances; per-page results are in `accessibility.json`. The HTML analysis-loop diagram retains text reading order. Visually reviewed its light/dark presentation, 390px navigation/focus, and mobile example layout. The logo's empty alt accompanies the visible author name. This is representative meaning/reflow review, not an audit of every historical graphic or a WCAG certification.

@@ -157,7 +157,7 @@
           const data = JSON.parse(schema.textContent),
             list = data['@graph']?.find(v => v['@type'] === 'ItemList');
           if (list) {
-            const semanticRows = knowledge ? shown : shown.filter(r => !["indicator", "example", "address-review"].includes(r.kind));
+            const semanticRows = knowledge ? shown : shown.filter(r => ['bibliographic', 'tool', 'dataset'].includes(r.kind));
             list.numberOfItems = semanticRows.length;
             list.itemListElement = semanticRows.map((r, i) => ({
               '@type': 'ListItem',
@@ -301,7 +301,7 @@
     }
   });
   async function reveal() {
-    if (!/^#(?:source-|reference-|site-reference:)/.test(location.hash)) return;
+    if (!/^#(?:source-|reference-|site-reference:|ai-attack-reference:)/.test(location.hash)) return;
     index = await loadIndex();
     const row = index.find(r => '#' + r.id === location.hash || (!knowledge && '#reference-' + location.hash.slice(1) === '#' + r.id));
     if (!row) return;

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
-import { classifyReference, enrichReference, weakReferenceTitle } from '../scripts/reference-metadata-lib.mjs';
+import { classifyReference, enrichReference, weakReferenceTitle, bibliographicReferenceKinds } from '../scripts/reference-metadata-lib.mjs';
 import { hardenStandaloneHead } from '../scripts/release-html-lib.mjs';
 import { prepareHtmlForSearch } from '../scripts/search-index-lib.mjs';
 const json = p => JSON.parse(readFileSync(p, 'utf8'));
@@ -18,6 +18,9 @@ test('reference roles preserve bibliographic citations and conservatively classi
   assert.equal(classifyReference('https://91.211.251.245/ga.js', 'reported C2 indicator'), 'indicator');
   assert.equal(classifyReference('https://192.168.0.1/docs', 'Network appliance manual'), 'address-review');
   assert.equal(classifyReference('https://vendor.example.edu/login', 'Sign in'), 'navigation');
+  assert.equal(classifyReference('https://vendor.example.edu/contact', 'Contact us'), 'contact');
+  assert.equal(classifyReference('https://[2001:db8::1]/docs', 'Appliance manual'), 'address-review');
+  for (const role of ['contact', 'navigation', 'indicator', 'example', 'address-review']) assert.equal(bibliographicReferenceKinds.has(role), false);
   assert.equal(weakReferenceTitle('A legitimate numbered citation [1] in prose'), false);
   assert.equal(weakReferenceTitle('[19]'), true);
   assert.equal(weakReferenceTitle('(Link to this tool here)'), true);

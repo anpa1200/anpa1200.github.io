@@ -1,12 +1,13 @@
 import { isIP } from 'node:net';
 
 export const weakReferenceTitle = value => /^\s*(?:\[\d+\]|\(link to this tool(?: here)?\))\s*$/i.test(value || '');
+export const bibliographicReferenceKinds = new Set(['bibliographic', 'tool', 'dataset']);
 export const inertReferenceKinds = new Set(['indicator', 'example', 'address-review']);
 export function classifyReference(url, context = '', override = {}) {
   if (override.kind) return override.kind;
   const parsed = new URL(url);
   const host = parsed.hostname.replace(/^www\./, '');
-  if (isIP(host)) {
+  if (isIP(host.replace(/^\[|\]$/g, ''))) {
     if (/^(?:192\.0\.2\.|198\.51\.100\.|203\.0\.113\.)/.test(host)) return 'example';
     return /\b(?:indicator|ioc|command.and.control|c2|payload)\b/i.test(context) ? 'indicator' : 'address-review';
   }

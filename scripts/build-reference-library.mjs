@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync } from 'node:fs';
-import { inertReferenceKinds } from './reference-metadata-lib.mjs';
+import { inertReferenceKinds, bibliographicReferenceKinds } from './reference-metadata-lib.mjs';
 import { mkdir, readFile, writeFile, readdir, unlink } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -180,8 +180,8 @@ const itemList = {
       '@type': 'ItemList',
       '@id': `${canonical}#references`,
       name: model.title,
-      numberOfItems: pageRecords.filter(r => !inertReferenceKinds.has(r.kind)).length,
-      itemListElement: pageRecords.filter(record => !inertReferenceKinds.has(record.kind)).map((record, index) => ({
+      numberOfItems: pageRecords.filter(r => bibliographicReferenceKinds.has(r.kind)).length,
+      itemListElement: pageRecords.filter(record => bibliographicReferenceKinds.has(record.kind)).map((record, index) => ({
         '@type': 'ListItem',
         position: index + 1,
         item: {
