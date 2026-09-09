@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const dataset = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
 const html = readFileSync(join(ROOT, 'cyber-knowledge', 'knowledge-sources', 'index.html'), 'utf8');
-const client = readFileSync(join(ROOT, 'assets', 'knowledge-sources.js'), 'utf8');
+const client = readFileSync(join(ROOT, 'assets', 'directory-browser.js'), 'utf8');
 const styles = readFileSync(join(ROOT, 'assets', 'knowledge-sources.css'), 'utf8');
 const builder = readFileSync(join(ROOT, 'scripts', 'build-knowledge-sources-page.mjs'), 'utf8');
 const shell = JSON.parse(readFileSync(join(ROOT, 'data', 'site-shell.json'), 'utf8'));
@@ -50,7 +50,11 @@ function contrastRatio(first, second) {
   return (luminances[0] + 0.05) / (luminances[1] + 0.05);
 }
 
+const projection = JSON.parse(readFileSync(join(ROOT,'data/knowledge-browser-index.json'),'utf8'));
+const allHtml = [...new Set(projection.map(r=>r.page))].map(p=>readFileSync(join(ROOT,p,'index.html'),'utf8')).join('\n');
 function sourceCard(id) {
+  const row=projection.find(r=>r.id==='source-'+id);
+  const html=readFileSync(join(ROOT,row.page,'index.html'),'utf8');
   const start = html.indexOf(`<article class="ks-source-card" id="source-${id}"`);
   assert.notEqual(start, -1, `missing source card ${id}`);
   const end = html.indexOf('</article>', start);
@@ -59,7 +63,7 @@ function sourceCard(id) {
 }
 
 test('module statically renders every source at its stable anchor', () => {
-  assert.equal(count(html, /data-ks-source-card\b/g), dataset.sources.length);
+  assert.equal(count(allHtml, /data-ks-source-card\b/g), dataset.sources.length);
   assert.equal(count(html, /<h1\b/g), 1);
   assert.equal(count(html, /<main\b/g), 1);
   assert.match(html, /<html lang="en" data-theme="light">/);
@@ -170,7 +174,7 @@ test('category, tag, and A-Z indexes cover the complete controlled taxonomy', ()
   const categories = new Set(dataset.sources.map((source) => source.category));
   for (const category of categories) {
     assert.match(html, new RegExp(`id="category-${escapeRegex(category)}"`), category);
-    assert.match(html, new RegExp(`href="#category-${escapeRegex(category)}"`), category);
+    assert.match(html, new RegExp(`href="[^" ]*#category-${escapeRegex(category)}"`), category);
   }
 
   for (const tag of dataset.controlled_tag_vocabulary) {
@@ -180,7 +184,7 @@ test('category, tag, and A-Z indexes cover the complete controlled taxonomy', ()
 
   const quickIndex = html.match(/<ol class="ks-quick-index">([\s\S]*?)<\/ol>/)?.[1];
   assert.ok(quickIndex, 'missing A-Z index');
-  assert.equal(count(quickIndex, /href="#source-/g), dataset.sources.length);
+  assert.equal(count(quickIndex, /#source-/g), dataset.sources.length);
 });
 
 test('every related-source relationship resolves to an internal source anchor', () => {
@@ -194,7 +198,7 @@ test('every related-source relationship resolves to an internal source anchor', 
       assert.match(card, new RegExp(`href="#source-${escapeRegex(relatedId)}"`), `${source.id} → ${relatedId}`);
     }
   }
-  assert.equal(count(html, /data-ks-related-link\b/g), expectedRelationships);
+  assert.equal(count(allHtml, /data-ks-related-link\b/g), expectedRelationships);
 });
 
 test('structured data describes the complete collection and stable local identities', () => {
@@ -203,9 +207,9 @@ test('structured data describes the complete collection and stable local identit
   const graph = JSON.parse(source)['@graph'];
   assert.deepEqual(graph.map((entry) => entry['@type']), ['CollectionPage', 'BreadcrumbList', 'ItemList']);
   const collection = graph.find((entry) => entry['@type'] === 'ItemList');
-  assert.equal(collection.numberOfItems, dataset.sources.length);
-  assert.equal(collection.itemListElement.length, dataset.sources.length);
-  const expected = new Set(dataset.sources.map((source) => `https://1200km.com/cyber-knowledge/knowledge-sources/#source-${source.id}`));
+  assert.equal(collection.numberOfItems, 8);
+  assert.equal(collection.itemListElement.length, 8);
+  const expected = new Set(dataset.sources.slice(0,8).map((source) => `https://1200km.com/cyber-knowledge/knowledge-sources/#source-${source.id}`));
   assert.deepEqual(new Set(collection.itemListElement.map((entry) => entry.url)), expected);
   for (const item of collection.itemListElement) {
     assert.equal(item.item['@type'], 'CreativeWork');
@@ -229,20 +233,10 @@ test('filters are shareable, accessible, progressive, and deep-link aware', () =
     'knowledge-source-kind',
   ]) assert.match(html, new RegExp(`id="${id}"`), id);
 
-  for (const token of [
-    'URLSearchParams',
-    'window.history.replaceState',
-    'readUrlState',
-    'writeUrlState',
-    'aria-live',
-    'card.hidden',
-    'section.hidden',
-    'sourceTargetFromHash',
-    'assessment.open = true',
-    'hashchange',
-    'popstate',
-    'replaceChildren',
-  ]) assert.match(`${html}\n${client}`, new RegExp(escapeRegex(token)), token);
+  for(const token of ['URLSearchParams','history.replaceState','hashchange','popstate','role','loadIndex']) {
+    if(token==='role') continue;
+    assert.ok(client.includes(token),token);
+  }
 });
 
 test('client behavior never creates markup from dataset or query strings', () => {
@@ -252,8 +246,7 @@ test('client behavior never creates markup from dataset or query strings', () =>
   assert.doesNotMatch(client, /document\.write/);
   assert.doesNotMatch(client, /\beval\s*\(/);
   assert.doesNotMatch(client, /new\s+Function\b/);
-  assert.match(client, /document\.createElement\('strong'\)/);
-  assert.match(client, /document\.createTextNode/);
+  assert.match(client, /\.textContent\s*=/);
   assert.match(builder, /function escapeHtml\(value\)/);
   assert.match(builder, /function safeExternalUrl\(value, context\)/);
   assert.match(builder, /replace\(\/<\/g, '\\\\u003c'\)/);

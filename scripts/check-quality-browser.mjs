@@ -33,6 +33,9 @@ if (!existsSync(join(site, 'index.html'))) throw new Error(`Site root not found 
 
 let pages = [
   ['home', '/', 'default'],
+  ['references', '/references/', 'directory'],
+  ['knowledge-sources', '/cyber-knowledge/knowledge-sources/', 'directory'],
+  ['learning-example', '/learning-paths/command-shell-validation/', 'default'],
   ['about', '/about.html', 'default'],
   ['cv', '/cv.html', 'default'],
   ['selected-research', '/cti.html', 'default'],
@@ -254,7 +257,7 @@ try {
       await evaluate(devtools, sessionId, axeSource);
       const state = await evaluate(devtools, sessionId, `(async () => {
         const audit = await axe.run(document, { resultTypes: ['violations'] });
-        const resources = performance.getEntriesByType('resource');
+        const resources = [...performance.getEntriesByType('navigation'), ...performance.getEntriesByType('resource')];
         const platformSidebar = document.getElementById('platform-sidenav');
         const platformSidebarRect = platformSidebar?.getBoundingClientRect();
         return {
@@ -269,6 +272,8 @@ try {
             width: Math.round(platformSidebarRect?.width || 0),
             global_links: platformSidebar?.querySelectorAll('a[href^="/"]').length || 0,
           },
+          dom_nodes: document.querySelectorAll('*').length,
+          html_bytes: performance.getEntriesByType('navigation')[0]?.decodedBodySize || 0,
           cls: Number((window.__quality?.cls || 0).toFixed(4)),
           layout_shifts: window.__quality?.shifts || [],
           lcp_ms: Math.round(window.__quality?.lcp || 0),
@@ -303,6 +308,8 @@ try {
       if (viewport.width < 1380 && state.platform_sidebar.visible) {
         failures.push(`${name}@${viewport.label}: platform sidebar must defer to mobile/tablet navigation ${JSON.stringify(state.platform_sidebar)}`);
       }
+      if (budget.html_bytes && state.html_bytes > budget.html_bytes) failures.push(`${name}: initial HTML ${state.html_bytes} exceeds ${budget.html_bytes}`);
+      if (budget.dom_nodes && state.dom_nodes > budget.dom_nodes) failures.push(`${name}: DOM ${state.dom_nodes} exceeds ${budget.dom_nodes}`);
       if (state.cls > budget.cls) failures.push(`${name}@${viewport.label}: CLS ${state.cls} exceeds ${budget.cls} (${budgetClass})`);
       if (state.lcp_ms > budget.lcp_ms) failures.push(`${name}@${viewport.label}: local LCP ${state.lcp_ms}ms exceeds ${budget.lcp_ms}ms (${budgetClass})`);
       if (state.transfer_bytes > budget.transfer_bytes) failures.push(`${name}@${viewport.label}: transfer ${state.transfer_bytes} exceeds ${budget.transfer_bytes} (${budgetClass})`);

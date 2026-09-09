@@ -1,0 +1,90 @@
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Validate a command-shell detection candidate | 1200km</title><meta name="description" content="Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/command-shell-validation/"><meta property="og:url" content="https://1200km.com/learning-paths/command-shell-validation/"><meta property="og:title" content="Validate a command-shell detection candidate"><meta property="og:description" content="Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Validate a command-shell detection candidate","name":"Validate a command-shell detection candidate","url":"https://1200km.com/learning-paths/command-shell-validation/","description":"Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls.","dateModified":"2026-09-09","datePublished":"2026-09-09","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"}}</script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style></head><body id="top"><!-- site-shell:header:start -->
+    <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
+          <span class="brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <details class="nav-links" open data-mobile-navigation>
+          <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
+            <span class="nav-menu-text">Menu</span>
+          </summary>
+          <div class="nav-list" id="primary-nav-list">
+            <!-- site-shell:primary-navigation:start -->
+            <a href="/cti.html">Research</a>
+            <a class="active" aria-current="location" href="/guides.html">Library</a>
+            <a href="/projects.html">Products &amp; Labs</a>
+            <a class="nav-flagship" href="/adversarygraph/">AdversaryGraph</a>
+            <details class="nav-more">
+              <summary>More</summary>
+              <div class="nav-more-list">
+                <a href="/cyber-knowledge/">Cyber Knowledge</a>
+                <a href="/courses/">Courses</a>
+                <a href="/references/">References</a>
+                <a href="/about.html">About</a>
+                <a href="/cv.html">CV</a>
+                <a href="/external-validation.html">External validation</a>
+              </div>
+            </details>
+            <!-- site-shell:primary-navigation:end -->
+          </div>
+        </details>
+        <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">
+            <span aria-hidden="true" class="site-search-fallback-icon"></span>
+            <span class="site-search-fallback-text">Search research</span>
+          </a>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1>Validate a command-shell detection candidate with benign events</h1>
+<p><strong>Turn a documented behavior into a small, inspectable rule and test its positive and negative boundaries without executing a sample.</strong></p>
+<p>For analysts learning CTI-to-detection work, the useful output is a candidate plus evidence of what it matches. This example uses synthetic JSON shaped around Windows Security event 4688. It is an illustrative rule, not a production-ready detection or a reproduction of an intrusion.</p>
+<p>Environment: Python 3.9 or later; no third-party packages, network connection, malware, or administrator access. Estimated time: 15 minutes. Review date: 2026-09-09; rule version: 1.0; taxonomy: Enterprise ATT&amp;CK 19.1.</p>
+<nav aria-label="On this page"><a href="#evidence">Evidence</a> · <a href="#workflow">Workflow</a> · <a href="#validation">Validation</a> · <a href="#limits">Limitations</a> · <a href="#references">References</a></nav>
+<h2 id="evidence">Evidence and candidate</h2>
+<p><a href="https://attack.mitre.org/techniques/T1059/003/">MITRE T1059.003</a> describes Windows Command Shell execution. Its DET0202/AN0578 defensive guidance discusses parent-child relationships. <a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688">Microsoft documents process creation event 4688</a>; field availability varies by event version and audit configuration.</p>
+<p>The rule below is an author's narrow inference from that guidance: flag a process-creation record whose parent basename is <code>winword.exe</code> and child basename is <code>cmd.exe</code>. It does not infer maliciousness or actor attribution.</p>
+<h2 id="workflow">Inputs and workflow</h2>
+<ol><li>Download <a href="events.json" download>events.json</a> and <a href="validate.py" download>validate.py</a> into the same directory.</li><li>Inspect both files. The events are synthetic; the command-line text is never executed.</li><li>Run the reader below from that directory.</li><li>Compare the reported IDs with the expected result and inspect the excluded events.</li></ol>
+<pre tabindex="0"><code>python3 validate.py events.json
+</code></pre>
+<h2 id="validation">Expected output and negative controls</h2>
+<pre tabindex="0"><code>{"candidate_ids": ["word-shell"], "events_read": 6}
+</code></pre>
+<p>The positive fixture uses uppercase WINWORD.EXE to exercise case normalization. Negative controls cover an ordinary Explorer parent, Word launching an editor, the wrong event type, missing parent telemetry, and a near-match executable name. Change one field at a time and explain why the decision changes.</p>
+<p>If the JSON is malformed or the file is missing, Python reports a parsing or file error: fix the input before drawing conclusions. Missing fields fail to match and represent a visibility limitation. The repository regression test also checks an empty event and case variants.</p>
+<h2 id="limits">Failure modes and limitations</h2>
+<p>Approved Office automation may launch a shell and produce a false positive. Other parents, renamed binaries, absent audit events, spoofed fields, or incomplete collection are outside this rule. Fixture success confirms only the implemented matching behavior. It does not validate Windows event generation, ingestion, SIEM translation, evasion resistance, or detection effectiveness in production.</p>
+<h2>Conclusion and next step</h2><p>Keep source evidence, rule intent, fixture results, and visibility gaps together. Continue the <a href="/learning-paths/#cti-to-detection">CTI-to-detection path</a> by checking your own telemetry schema and approved baseline before adapting the candidate.</p>
+<h2 id="references">References</h2><ul><li><a href="https://attack.mitre.org/techniques/T1059/003/">MITRE: Windows Command Shell</a></li><li><a href="https://attack.mitre.org/detectionstrategies/DET0202/">MITRE: DET0202</a></li><li><a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688">Microsoft: event 4688</a></li><li><a href="/newest-detection-engineering-techniques/">1200km detection engineering guide</a></li></ul>
+<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="https://medium.com/@1200km">Medium</a> · <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> · <a href="https://github.com/anpa1200">GitHub</a> · <a href="mailto:1200km@gmail.com">Contact</a></p>
+</main><!-- site-shell:footer:start -->
+    <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <div class="shared-footer-inner">
+        <a class="shared-footer-brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="32" height="32" />
+          <span><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <nav class="shared-footer-links" aria-label="Footer navigation">
+          <a href="/cti.html">Research</a>
+          <a href="/guides.html">Library</a>
+          <a href="/projects.html">Products &amp; Labs</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/about.html">About</a>
+        </nav>
+        <nav class="shared-footer-meta" aria-label="Site information">
+          <a href="/privacy.html">Privacy / Data Handling</a>
+          <a href="/about.html#contact">Contact</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></a>
+        </nav>
+      </div>
+      <div class="shared-footer-bottom">
+        <span>© 2026 Andrey Pautov · Original research and tooling</span>
+        <a href="#top" data-back-to-top>Back to top ↑</a>
+      </div>
+    </footer>
+    <!-- site-shell:footer:end --></body></html>

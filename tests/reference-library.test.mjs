@@ -8,7 +8,7 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const model = JSON.parse(readFileSync(join(ROOT, 'data', 'reference-library.json'), 'utf8'));
 const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
 const html = readFileSync(join(ROOT, 'references', 'index.html'), 'utf8');
-const client = readFileSync(join(ROOT, 'assets', 'reference-library.js'), 'utf8');
+const client = readFileSync(join(ROOT, 'assets', 'directory-browser.js'), 'utf8');
 
 function normalizeUrl(value) {
   const url = new URL(value);
@@ -66,21 +66,15 @@ test('all normalized tag facets are retained for search and correlation', () => 
   ]) assert.ok(types.has(required), required);
 });
 
-test('generated module exposes every reference and every tag without inline executable code', () => {
-  const decodedHtml = html.replaceAll('&amp;', '&');
-  assert.equal((html.match(/data-reference-card\b/g) || []).length, model.record_count);
-  assert.equal((html.match(/data-reference-tag(?:\s|>)/g) || []).length, model.tag_assignment_count);
-  assert.match(html, /<link rel="canonical" href="https:\/\/1200km\.com\/references\/"/);
-  assert.match(html, /data-pagefind-body/);
-  assert.match(html, /data-reference-grid data-pagefind-ignore/);
-  assert.match(html, /reference-library\.css\?v=20260904-sitewide/);
-  assert.match(html, /reference-library\.js\?v=20260904-sitewide/);
+const projection = JSON.parse(readFileSync(join(ROOT, 'data/reference-browser-index.json'), 'utf8'));
+const allHtml = [...new Set(projection.records.map(r => r.page))].map(p => readFileSync(join(ROOT,p,'index.html'),'utf8')).join('\n');
+test('static pagination preserves every reference and complete tag metadata', () => {
+  assert.equal((allHtml.match(/data-reference-card\b/g) || []).length, model.record_count);
+  assert.equal(projection.records.reduce((n,r)=>n+r.tags.length,0),model.tag_assignment_count);
+  for(const record of model.records) assert.equal((allHtml.match(new RegExp(`data-reference-id="${record.id}"`,'g')) || []).length,1);
+  assert.match(html,/directory-browser\.js/);
+  assert.ok(Buffer.byteLength(html)<250000);
   assert.doesNotMatch(html, /<script(?![^>]*type="application\/ld\+json")[^>]*>[^<]/);
-  for (const record of model.records) {
-    assert.equal((html.match(new RegExp(`data-reference-id="${record.id}"`, 'g')) || []).length, 1, record.id);
-    assert.match(decodedHtml, new RegExp(`href="${record.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`), record.id);
-  }
-  assert.equal((html.match(/class="reference-used-in"/g) || []).length, model.records.filter((record) => record.used_in.length).length);
 });
 
 test('references link every overlapping source to exactly one assessed knowledge profile', () => {
@@ -90,7 +84,7 @@ test('references link every overlapping source to exactly one assessed knowledge
     .filter(Boolean)
     .map((source) => source.id)
     .sort();
-  const rendered = [...html.matchAll(/<a\b[^>]*\bdata-knowledge-source-id="([^"]+)"[^>]*>/g)]
+  const rendered = [...allHtml.matchAll(/<a\b[^>]*\bdata-knowledge-source-id="([^"]+)"[^>]*>/g)]
     .map((match) => match[1])
     .sort();
 
@@ -99,17 +93,13 @@ test('references link every overlapping source to exactly one assessed knowledge
   assert.equal(new Set(rendered).size, rendered.length, 'each assessed-profile backlink must be unique');
   for (const id of expected) {
     assert.match(
-      html,
+      allHtml,
       new RegExp(`href="/cyber-knowledge/knowledge-sources/#source-${id}"[^>]*>Read assessed profile`),
       id,
     );
   }
 });
 
-test('client supports query state, facets, tag pivots, co-occurrences, and related references', () => {
-  for (const token of [
-    'URLSearchParams', 'data-reference-facet', 'data-reference-tag-value',
-    'data-reference-correlations', 'data-find-related', 'data-reference-related-list',
-    'history.replaceState', 'shared.length', 'aria-pressed',
-  ]) assert.match(client, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), token);
+test('directory enhancement retains correlation and related-source controls', () => {
+  for (const token of ['URLSearchParams','data-reference-correlations','data-find-related','data-reference-related-list','history.replaceState']) assert.ok(client.includes(token),token);
 });

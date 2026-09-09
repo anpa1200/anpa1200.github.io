@@ -19,6 +19,9 @@ const chrome = process.env.CHROME_PATH || 'google-chrome';
 if (!existsSync(join(site, 'index.html'))) throw new Error(`Site root not found at ${site}`);
 
 const pages = [
+  ['references', '/references/'],
+  ['knowledge-sources', '/cyber-knowledge/knowledge-sources/'],
+  ['learning-example', '/learning-paths/command-shell-validation/'],
   ['home', '/'],
   ['about', '/about.html'],
   ['cv', '/cv.html'],
@@ -192,7 +195,7 @@ function layoutExpression(checkFixture) {
     const visible = (element) => {
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
-      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+      return element.checkVisibility() && style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
     };
     const round = (value) => Math.round(value * 10) / 10;
     const selector = 'main p, main li, article p, article li, .page-hero p, .profile-hero p, .cv-hero p';
@@ -215,7 +218,8 @@ function layoutExpression(checkFixture) {
     const narrowProse = window.innerWidth >= 390 && window.innerWidth <= 430 ? prose.filter((element) => {
       const parent = element.parentElement?.getBoundingClientRect();
       const rect = element.getBoundingClientRect();
-      if (!parent || parent.width < 340) return false;
+      // Tag-index links are compact navigation controls, not prose columns.
+      if (!parent || parent.width < 340 || element.closest('.ks-tag-index, .ks-card-tags, .ks-inline-list')) return false;
       return rect.width < parent.width * 0.72;
     }).slice(0, 5).map((element) => ({
       tag: element.tagName,
@@ -226,7 +230,7 @@ function layoutExpression(checkFixture) {
       maxWidth: getComputedStyle(element).maxWidth,
     })) : [];
     const controls = Array.from(document.querySelectorAll(
-      'header a, header button, header summary, .page-hero-links a, .profile-actions a, .cv-actions a, .cl-actions a, .hero-actions a, .button'
+      'header a, header button, header summary, .page-hero-links a, .profile-actions a, .cv-actions a, .cl-actions a, .hero-actions a, .button, .ks-tag-index a, .ks-card-tags a'
     )).filter(visible);
     const controlOverflow = controls.filter((element) => {
       const rect = element.getBoundingClientRect();
@@ -323,7 +327,7 @@ function layoutExpression(checkFixture) {
         headingLines: round(homeHeading.getBoundingClientRect().height / Number.parseFloat(homeHeadingStyle.lineHeight)),
         actionCount: homeActions?.querySelectorAll('.button').length || 0,
         actionsInFirstViewport: (homeActions?.getBoundingClientRect().bottom || Infinity) <= window.innerHeight,
-        actionsBeforeSearch: Boolean(homeActions?.compareDocumentPosition(document.querySelector('.site-search-hero')) & Node.DOCUMENT_POSITION_FOLLOWING),
+        searchBeforeActions: Boolean(document.querySelector('.site-search-hero')?.compareDocumentPosition(homeActions) & Node.DOCUMENT_POSITION_FOLLOWING),
       } : null,
       search: searchInput && searchHeading ? {
         inputGap: round(searchInput.getBoundingClientRect().top - searchHeading.getBoundingClientRect().bottom),
@@ -621,7 +625,7 @@ try {
         state.p2.home.headingLines > 4
         || state.p2.home.actionCount !== 3
         || !state.p2.home.actionsInFirstViewport
-        || !state.p2.home.actionsBeforeSearch
+        || !state.p2.home.searchBeforeActions
       )) {
         failures.push(`${name}@${viewport.label}: mobile hero hierarchy failed ${JSON.stringify(state.p2.home)}`);
       }

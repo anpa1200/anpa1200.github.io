@@ -206,6 +206,8 @@ async function collectRemoteSitemap(sourceUrl, entries, visited = new Set()) {
 }
 
 function feedCandidate(rel, types, html) {
+  if (rel === 'articles/trainsec-library.html' || /^articles\/trainsec\/(?:authors|domains|tags|categories)(?:\.html|\/)/.test(rel)) return false;
+  if (/^articles\/trainsec\/(?:authors|domains|tags|categories)\//.test(rel) || /(?:^|\/)(?:authors|domains|tags|categories)\/[^/]+\/index\.html$/.test(rel)) return false;
   const articleRoute = /^articles\/read\/\d{4}\/[^/]+\/index\.html$/i.test(rel)
     || /^articles\/[^/]+\.html$/i.test(rel);
   if (!articleRoute && !types.some((type) => ['Article', 'BlogPosting', 'TechArticle'].includes(type))
@@ -214,7 +216,8 @@ function feedCandidate(rel, types, html) {
     || rel.startsWith('articles/')
     || rel === 'ai-attack-statistics/index.html'
     || rel.startsWith('newest-detection-engineering-techniques/')
-    || rel.startsWith('embedded-systems-hardware-firmware/');
+    || rel.startsWith('embedded-systems-hardware-firmware/')
+    || rel === 'learning-paths/command-shell-validation/index.html';
 }
 
 function rssDate(value) {

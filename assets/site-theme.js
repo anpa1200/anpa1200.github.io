@@ -54,7 +54,8 @@
     const moreSummary = more && more.querySelector(':scope > summary');
     const mobileNavigation = window.matchMedia('(max-width: 900px)');
     const syncNavigationMode = function () {
-      if (!mobileNavigation.matches && links.open) links.open = false;
+      links.open = !mobileNavigation.matches;
+      summary.setAttribute('aria-expanded', String(links.open));
     };
     syncNavigationMode();
     if (!links.dataset.navigationMediaReady) {
@@ -65,6 +66,7 @@
     if (!links.dataset.navigationReady) {
       links.dataset.navigationReady = 'true';
       links.addEventListener('toggle', function () {
+        summary.setAttribute('aria-expanded', String(links.open));
         summary.setAttribute('aria-label', links.open ? 'Close navigation' : 'Open navigation');
         if (!links.open && more) more.open = false;
       });

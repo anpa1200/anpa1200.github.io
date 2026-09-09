@@ -67,6 +67,7 @@ function publisher(url) {
 
 const usage = new Map();
 for (const item of catalog.items.filter((entry) => entry.indexable && CONTENT_TYPES.has(entry.primary_type) && entry.canonical_url.startsWith('https://1200km.com/'))) {
+  if (/^https:\/\/1200km\.com\/(?:references|cyber-knowledge\/knowledge-sources)\//.test(item.canonical_url)) continue;
   let html;
   try { html = await readFile(localPath(item.canonical_url), 'utf8'); } catch { continue; }
   const links = html.matchAll(/<a\b[^>]*\bhref\s*=\s*["'](https:\/\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi);
@@ -113,7 +114,7 @@ const records = [...urls].map((url) => {
 
 const tagKeys = new Set(records.flatMap((record) => record.tags.map((item) => item.key)));
 const payload = {
-  $schema:'./reference-library.schema.json', schema_version:2, generated_at:'2026-09-04',
+  $schema:'./reference-library.schema.json', schema_version:2, generated_at:[baseline.generated_at, ...catalog.items.filter(item=>item.indexable && CONTENT_TYPES.has(item.primary_type)).map(item=>item.updated_at)].filter(date=>/^\d{4}-\d{2}-\d{2}$/.test(date || '')).sort().at(-1) || baseline.generated_at,
   title:'1200km Article and Guide Reference Library',
   description:'Deduplicated external sources cited across maintained 1200km articles, guides, research, case studies, documentation, and labs.',
   evidence_boundary:'Tags and usage links are discovery metadata derived from published 1200km pages. Citation does not imply endorsement, current validity, attribution, exploitation, causality, or control effectiveness.',
