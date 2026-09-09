@@ -1012,6 +1012,35 @@ try {
   );
   await devtools.send('Target.closeTarget', { targetId: threatMatrix.targetId });
 
+  // Exercise actual pointer hit testing after scrolling, not a synthetic DOM click.
+  for (const width of [390, 1366]) {
+    const pointerPage = await attachPage(devtools, `${origin}/search.html?q=T1059.003`, {
+      width, height: 844, deviceScaleFactor: 1, mobile: width === 390,
+    });
+    const linkSelector = '[data-site-search-results] .pf-result-link';
+    await waitForExpression(devtools, pointerPage.sessionId,
+      `document.querySelector(${JSON.stringify(linkSelector)})?.getAttribute('href') === '/threat-matrix/techniques/T1059.003/'`,
+      `exact search result at ${width}px`);
+    await evaluate(devtools, pointerPage.sessionId,
+      `document.querySelector(${JSON.stringify(linkSelector)}).scrollIntoView({ block: 'center', behavior: 'instant' })`);
+    const point = await waitForExpression(devtools, pointerPage.sessionId, `(() => {
+      const link = document.querySelector(${JSON.stringify(linkSelector)});
+      const rect = link.getBoundingClientRect();
+      const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+      return y > 68 && y < innerHeight && link.contains(document.elementFromPoint(x, y)) && { x, y };
+    })()`, `search result pointer hit area after scrolling at ${width}px`);
+    await devtools.send('Input.dispatchMouseEvent', {
+      type: 'mousePressed', ...point, button: 'left', clickCount: 1,
+    }, pointerPage.sessionId);
+    await devtools.send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased', ...point, button: 'left', clickCount: 1,
+    }, pointerPage.sessionId);
+    await waitForExpression(devtools, pointerPage.sessionId,
+      `location.pathname === '/threat-matrix/techniques/T1059.003/'`,
+      `pointer navigation from exact search at ${width}px`);
+    await devtools.send('Target.closeTarget', { targetId: pointerPage.targetId });
+  }
+
   const browserErrors = devtools.events.filter((event) =>
     event.method === 'Runtime.exceptionThrown'
     || (event.method === 'Log.entryAdded' && ['error', 'warning'].includes(event.params?.entry?.level))
