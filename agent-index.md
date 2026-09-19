@@ -72,6 +72,7 @@ administration requires `manage_intel`, and index administration requires
 - `/cyber-knowledge/ai-security.html` - AI Security field guide
 - `/newest-detection-engineering-techniques/` - Validated detection engineering article archive
 - `/guides.html#detection` - Detection and SOC guide cluster
+- `/articles/read/2026/2026-09-18-ai-agent-vs-human-with-wireshark-six-malware-pcaps-put-to-the-test-63ffeaed97de/` - Six-PCAP AI-versus-human malware-traffic experiment with reproducible evidence and explicit limitations
 - `/articles/` - Local article archive
 - `/cti-analyst-field-manual/` - CTI methodology
 - `/israel-government-threat-actors-cti/` - CTI research example

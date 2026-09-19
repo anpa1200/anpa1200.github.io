@@ -79,6 +79,7 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 - [CTI as Code](https://1200km.com/CTI_as_a_Code/)
 - [Operation Desert Hydra](https://1200km.com/operation-desert-hydra/)
 - [Newest Detection Engineering Techniques](https://1200km.com/newest-detection-engineering-techniques/)
+- [AI Agent vs. Human with Wireshark: Six Malware PCAPs Put to the Test](https://1200km.com/articles/read/2026/2026-09-18-ai-agent-vs-human-with-wireshark-six-malware-pcaps-put-to-the-test-63ffeaed97de/) — evidence-bounded AI-assisted malware-traffic experiment with accuracy, timing, correction, and human-review limits
 - [Local article archive](https://1200km.com/articles/)
 
 ## Courses and learning paths
