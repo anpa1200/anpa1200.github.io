@@ -81,6 +81,8 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 - [Newest Detection Engineering Techniques](https://1200km.com/newest-detection-engineering-techniques/)
 - [AI Agent vs. Human with Wireshark: Six Malware PCAPs Put to the Test](https://1200km.com/articles/read/2026/2026-09-18-ai-agent-vs-human-with-wireshark-six-malware-pcaps-put-to-the-test-63ffeaed97de/) — evidence-bounded AI-assisted malware-traffic experiment with accuracy, timing, correction, and human-review limits
 - [Local article archive](https://1200km.com/articles/)
+- [AdversaryGraph vs Ten Malware PCAPs](https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/) — separate ten-case deterministic-platform regression with original screenshots, full reports, enrichment and correlation audits; selected-indicator coverage is not detection accuracy
+- [Ten-PCAP public evidence supplement](https://1200km.com/research/adversarygraph-ten-pcaps/) — downloadable reports, native results, derived provider summaries, integrity checks and publication boundaries
 
 ## Courses and learning paths
 

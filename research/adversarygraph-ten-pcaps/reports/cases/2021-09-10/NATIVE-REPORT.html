@@ -1,0 +1,408 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AdversaryGraph Deterministic PCAP Analysis | 1200km</title><meta name="description" content="Public evidence supplement for ten AdversaryGraph malware-PCAP tests: reports, screenshots, audit records, provenance and limitations."><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2021-09-10/NATIVE-REPORT.html"><meta property="og:url" content="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2021-09-10/NATIVE-REPORT.html"><meta property="og:title" content="AdversaryGraph Deterministic PCAP Analysis"><meta property="og:description" content="Ten malware PCAPs, original screenshots, full case reports and qualified results."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/research/adversarygraph-ten-pcaps/screenshots/2024-11-26-packet-analysis.png"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{padding:20px;background:#11233c;color:#fff}header a{color:#b7e5ff}main{max-width:1160px;margin:28px auto;padding:32px 44px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2{margin-top:2em}a{color:#075c91}img{display:block;max-width:100%;height:auto;margin:24px auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #b8c9db;padding:10px;text-align:left}th{background:#edf4fc}pre{overflow:auto;padding:16px;background:#11233c;color:#fff}code{font-size:.85em}blockquote{margin:20px 0;padding:8px 20px;border-left:4px solid #167bb0;background:#eff6ff}.notice{padding:12px;background:#eef6fd;font-size:14px}@media(max-width:700px){main{margin:0;padding:22px 16px}body{font-size:16px}}@media print{header{display:none}main{padding:0;margin:0}pre{white-space:pre-wrap}img,tr{break-inside:avoid}}</style><meta property="article:published_time" content="2026-09-20"><meta property="article:modified_time" content="2026-09-20"></head><body><header>1200KM · ANDREY PAUTOV<br><a href="/">Home</a> · <a href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/">Article</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/REPORTS.html">Ten reports</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/SCREENSHOTS.html">Screenshot gallery</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/">Publication boundaries</a></header><main><p class="notice">Measured 19 September 2026 · Public derivative · Historical training evidence, not approved threat intelligence.</p><h1 id="adversarygraph-deterministic-pcap-analysis">AdversaryGraph Deterministic PCAP Analysis</h1>
+<p>Source: 2021-09-10-traffic-analysis-exercise.pcap
+Capture SHA-256: <code>a9576008f7fd634740253a52b2937a205cd214cdde09f6924f0921b8e266dd12</code>
+Semantic result SHA-256: <code>ce8b10a4ba7a6615d2c58f5895ecb69dca768d904402026068da26b4ef7db5ed</code>
+Analyzer manifest SHA-256: <code>ee952aeb7cdc6958f4ae5178c54c274a1e4f0aec4d42f3bdb95baaff063b3dde</code></p>
+<h2 id="executive-summary">Executive summary</h2>
+<p>Decoded 9221 packets across 66 IP endpoints and 263 transport flows. Observed 199 DNS events, 58 HTTP requests, 105 TLS ClientHello events, and 45 exported HTTP object(s). Deterministic rules produced 9 finding(s): 0 high, 2 medium, and 7 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.</p>
+<h2 id="capture-facts">Capture facts</h2>
+<ul>
+<li>Packets: 9221</li>
+<li>Duration: 4609.2884 seconds</li>
+<li>Captured bytes: 6032490</li>
+<li>Endpoints: 66</li>
+<li>Flows: 263</li>
+</ul>
+<h2 id="deterministic-findings">Deterministic findings</h2>
+<h3 id="medium-script-archive-or-executable-transfer-candidate">MEDIUM — Script, archive, or executable transfer candidate</h3>
+<p>HTTP metadata names a script, archive, or executable. This is a transfer candidate, not proof of file type, execution, or malicious intent; legitimate updates use the same formats.</p>
+<p>Rule: <code>script-or-executable-transfer@pcap-rules-v3</code>; confidence: 0.86; evidence: frame 4193 / TCP stream 100, frame 4198 / TCP stream 100, frame 4200 / TCP stream 100, frame 6404 / TCP stream 100.</p>
+<p>Metrics: <code>{&quot;content_type&quot;:&quot;application/octet-stream&quot;,&quot;declared_body_bytes&quot;:1048578,&quot;destination&quot;:&quot;10.9.10.102&quot;,&quot;response_count&quot;:2,&quot;source&quot;:&quot;23.1.237.216&quot;,&quot;uri&quot;:&quot;/d/msdownload/update/software/defu/2021/09/am_delta_patch_1.349.439.0_dcf977cccce1b58289d270f71f8151b3acc1566b.exe&quot;}</code></p>
+<h3 id="medium-script-archive-or-executable-transfer-candidate-1">MEDIUM — Script, archive, or executable transfer candidate</h3>
+<p>HTTP metadata names a script, archive, or executable. This is a transfer candidate, not proof of file type, execution, or malicious intent; legitimate updates use the same formats.</p>
+<p>Rule: <code>script-or-executable-transfer@pcap-rules-v3</code>; confidence: 0.86; evidence: frame 4195 / TCP stream 101, frame 4199 / TCP stream 101, frame 4201 / TCP stream 101, frame 6356 / TCP stream 101, frame 6371 / TCP stream 101.</p>
+<p>Metrics: <code>{&quot;content_type&quot;:&quot;application/octet-stream&quot;,&quot;declared_body_bytes&quot;:1970634,&quot;destination&quot;:&quot;10.9.10.102&quot;,&quot;response_count&quot;:3,&quot;source&quot;:&quot;23.1.237.225&quot;,&quot;uri&quot;:&quot;/d/msdownload/update/software/defu/2021/09/am_delta_patch_1.349.439.0_dcf977cccce1b58289d270f71f8151b3acc1566b.exe&quot;}</code></p>
+<h3 id="low-repeated-unsuccessful-dns-resolution">LOW — Repeated unsuccessful DNS resolution</h3>
+<p>Repeated NXDOMAIN responses may indicate a dead domain, misconfiguration, retrying software, or malicious fallback. They do not establish a domain-generation algorithm.</p>
+<p>Rule: <code>repeated-nxdomain@pcap-rules-v3</code>; confidence: 0.5; evidence: frame 19, frame 64, frame 134, frame 168, frame 7624.</p>
+<p>Metrics: <code>{&quot;domain&quot;:&quot;wpad.angrypoutine.com&quot;,&quot;response_count&quot;:12,&quot;source&quot;:&quot;10.9.10.102&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 389 / TCP stream 15, frame 398 / TCP stream 15, frame 404 / TCP stream 15, frame 417 / TCP stream 15, frame 2059 / TCP stream 67.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.9.10.9&quot;,&quot;event_count&quot;:25,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;10.9.10.102&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-1">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 80 / TCP stream 1, frame 83 / TCP stream 1, frame 478 / TCP stream 22, frame 483 / TCP stream 22, frame 486 / TCP stream 22.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.9.10.9&quot;,&quot;event_count&quot;:50,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;2&quot;,&quot;3&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;10.9.10.102&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-2">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 440 / TCP stream 19, frame 442 / TCP stream 19, frame 444 / TCP stream 19, frame 446 / TCP stream 19, frame 448 / TCP stream 19.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.9.10.9&quot;,&quot;event_count&quot;:57,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;18&quot;,&quot;19&quot;,&quot;20&quot;,&quot;25&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;10.9.10.102&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-3">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 391 / TCP stream 15, frame 401 / TCP stream 15, frame 406 / TCP stream 15, frame 418 / TCP stream 15, frame 2060 / TCP stream 67.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.9.10.102&quot;,&quot;event_count&quot;:25,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;10.9.10.9&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-4">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 82 / TCP stream 1, frame 480 / TCP stream 22, frame 485 / TCP stream 22, frame 487 / TCP stream 22, frame 495 / TCP stream 23.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.9.10.102&quot;,&quot;event_count&quot;:39,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;4,19,19,19,5&quot;,&quot;4,5&quot;,&quot;5&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;10.9.10.9&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-5">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 441 / TCP stream 19, frame 443 / TCP stream 19, frame 445 / TCP stream 19, frame 447 / TCP stream 19, frame 449 / TCP stream 19.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.9.10.102&quot;,&quot;event_count&quot;:57,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;18&quot;,&quot;19&quot;,&quot;20&quot;,&quot;25&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;10.9.10.9&quot;}</code></p>
+<h2 id="attck-candidates">ATT&amp;CK candidates</h2>
+<ul>
+<li>T1105 Ingress Tool Transfer (command-and-control), confidence=0.8, status=suggested; basis=versioned-deterministic-rule.</li>
+</ul>
+<h2 id="identities">Identities</h2>
+<ul>
+<li>account: <code>hobart.gunnarsson</code>; client IPs: 10.9.10.102; frames: 300, 311, 315, 332, 341</li>
+<li>full-name: <code>Hobart Gunnarsson</code>; client IPs: 10.9.10.102; frames: 455</li>
+<li>hostname: <code>DESKTOP-KKITB6Q</code>; client IPs: 10.9.10.102, 169.254.181.227; frames: 1, 3, 5, 6, 9</li>
+<li>netbios-group: <code>ANGRYPOUTINE</code>; client IPs: unbound subject; frames: 7, 8, 11, 35, 38</li>
+</ul>
+<h2 id="ioc-and-artifact-candidates">IOC and artifact candidates</h2>
+<ul>
+<li>domain: <code>68091d435f184f9c8d6273bdb538ff4b.clo.footprintdns.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>a-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>am2prdapp01-canary.cloudapp.net</code>; roles: dns-cname</li>
+<li>domain: <code>angrypoutine-dc.angrypoutine.com</code>; roles: dns-query</li>
+<li>domain: <code>angrypoutine.com</code>; roles: dns-query</li>
+<li>domain: <code>api.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>au.download.windowsupdate.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>bing.com</code>; roles: tls-sni</li>
+<li>domain: <code>cdn.onenote.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>client.wns.windows.com</code>; roles: tls-sni</li>
+<li>domain: <code>cp601.prod.do.dsp.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>ctldl.windowsupdate.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>desktop-kkitb6q.angrypoutine.com</code>; roles: dns-query</li>
+<li>domain: <code>desktop-muyeyv7.angrypoutine.com</code>; roles: dns-query</li>
+<li>domain: <code>dns.msftncsi.com</code>; roles: dns-query</li>
+<li>domain: <code>download.windowsupdate.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>evoke-windowsservices-tas.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>f005cab8a8840abf6ab35152a071b205.clo.footprintdns.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fe2cr.update.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fe2cr.update.microsoft.com.akadns.net</code>; roles: dns-cname</li>
+<li>domain: <code>fe3cr.delivery.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-afd.azureedge.us</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-afd.azurefd.us</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-vs-nocache.azureedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fs.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>gameplayapi.intel.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>geo.prod.do.dsp.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>k-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>kv601.prod.do.dsp.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>login.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>moiafdazure.clo.footprintdns.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>myexternalip.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>nexus.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>nexusrules.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>office15client.microsoft.com</code>; roles: dns-query</li>
+<li>domain: <code>prod-w.nexus.live.com.akadns.net</code>; roles: dns-cname</li>
+<li>domain: <code>prod.nexusrules.live.com.akadns.net</code>; roles: dns-cname</li>
+<li>domain: <code>q-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>s-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>settings-win.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>settingsfd-geo.trafficmanager.net</code>; roles: dns-cname</li>
+<li>domain: <code>simpsonsavingss.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>slscr.update.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>spo-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>store-images.s-microsoft.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>storeedgefd.dsx.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>t-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>teams-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>update.googleapis.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>v10.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>wpad.angrypoutine.com</code>; roles: dns-query</li>
+<li>domain: <code>www.bing.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>www.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>www.msftncsi.com</code>; roles: dns-query, http-host</li>
+<li>ipv4: <code>0.0.0.0</code>; roles: network-endpoint</li>
+<li>ipv4: <code>10.9.10.102</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>10.9.10.103</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>10.9.10.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>10.9.10.9</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.125.253.131</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.215.148.63</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.46.162.226</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.136.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.18.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.21.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.246.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.3.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.49.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.5.88</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.69.239.72</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.77.161.179</code>; roles: dns-answer</li>
+<li>ipv4: <code>131.107.255.255</code>; roles: dns-answer</li>
+<li>ipv4: <code>167.172.37.9</code>; roles: network-endpoint</li>
+<li>ipv4: <code>169.254.181.227</code>; roles: network-endpoint</li>
+<li>ipv4: <code>169.254.255.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>172.217.168.195</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>184.85.229.68</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>194.62.42.206</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.140.48.71</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.7</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.190.151.131</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.190.151.132</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.151.133</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.151.134</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.151.6</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.151.68</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.151.69</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.151.9</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.154.136</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.154.138</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.190.154.139</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.154.16</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.154.17</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.154.18</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.154.19</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.42.73.25</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.50.73.10</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.203</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.222</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>224.0.0.22</code>; roles: network-endpoint</li>
+<li>ipv4: <code>224.0.0.251</code>; roles: network-endpoint</li>
+<li>ipv4: <code>224.0.0.252</code>; roles: network-endpoint</li>
+<li>ipv4: <code>23.1.237.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.1.237.201</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.1.237.209</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.1.237.216</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.1.237.225</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.100.36.182</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.3.6.28</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.3.84.67</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.3.85.202</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.3.85.234</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.3.86.10</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>239.255.255.250</code>; roles: http-host, network-endpoint</li>
+<li>ipv4: <code>255.255.255.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>34.117.59.81</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.112.72.205</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.113.200.201</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.125.122.151</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.26.132</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.26.134</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.26.135</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.76.4.15</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.83.240.146</code>; roles: network-endpoint</li>
+<li>ipv4: <code>51.137.102.183</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.20.75</code>; roles: dns-answer</li>
+<li>ipv4: <code>52.109.76.32</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.76.36</code>; roles: network-endpoint</li>
+<li>ipv4: <code>52.109.8.19</code>; roles: network-endpoint</li>
+<li>ipv4: <code>52.109.8.22</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.8.25</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.113.196.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.137.106.217</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.182.143.208</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.184.217.20</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.238.248.6</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.242.101.226</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.242.97.97</code>; roles: dns-answer</li>
+<li>ipv4: <code>72.21.81.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>94.158.245.52</code>; roles: network-endpoint</li>
+<li>ipv4: <code>96.17.68.66</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>96.17.68.83</code>; roles: dns-answer</li>
+<li>ja3: <code>28a2c9bd18a11de089ef85a160da29e4</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>37f463bf4616ecd445d4a1937da06e19</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>3b5074b1b5d032e5620f69f9f700ff0e</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>51c64c77e60f3980eea90869b68c58a8</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>6271f898ce5be7dd52b0fc260d0662b3</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>a0e9f5d64349fb13191bc781f81f42e1</code>; roles: tls-client-fingerprint</li>
+<li>sha256: <code>0076eaec4990322f0ebf53a5a53997c1525f358dc28dd6b7e1cbffd9bd41a9a5</code>; roles: exported-object</li>
+<li>sha256: <code>01b57c485bc90409c12dfff1fcca905e8ee03a18958ebb8fb7f007d317c2e6fc</code>; roles: exported-object</li>
+<li>sha256: <code>0550952e70d2e4e5ca28a8160e31cab6418ecb152915ec5dbfe88248d39fc2c7</code>; roles: exported-object</li>
+<li>sha256: <code>07a1470ae3b863578779e025fc6009e6519e0f77325e7a94a426a58b7e408196</code>; roles: exported-object</li>
+<li>sha256: <code>0c58b13a7b5d78c8a9e35d5995b7352c3b38acee77d6af9886c3cf2d668bfd3c</code>; roles: exported-object</li>
+<li>sha256: <code>0f132c40ca33c057af0aed28534cd23b31ce36da1ad0cda3f2c2f1e03d646bca</code>; roles: exported-object</li>
+<li>sha256: <code>0fb4d47bcda9b77b0fbd8cb88b34ba180365991f6a376e00add1ac880b67fd8f</code>; roles: exported-object</li>
+<li>sha256: <code>1127774b7710ffa8c9bd5d3182517be848d9373e8f4382f28f801ba9e44f80fb</code>; roles: exported-object</li>
+<li>sha256: <code>153eec5b545f82f598d7728472073b1cdee325fc30cb7bc743c21d753610950d</code>; roles: exported-object</li>
+<li>sha256: <code>1d48d9166408d8b8bf39f9557e4f8a57133c353567c55966ec2831a7bc230431</code>; roles: exported-object</li>
+<li>sha256: <code>2972f477a28570de6c949fba237ace8c1bc2ea29b961b63aab3a57469e70cb51</code>; roles: exported-object</li>
+<li>sha256: <code>2ac413d79efa22e42a179f0450d7e8e4bb8202c881bf9e02a5a13a9a3626d792</code>; roles: exported-object</li>
+<li>sha256: <code>2cd96ea2a66b8bc4526b21c3744118b75f834d24739b04e2e7ceef21b8ad706f</code>; roles: exported-object</li>
+<li>sha256: <code>3197375f525ce4d0d339e56b343ecd510ffc72dcfa250b1352f8bd6a02d49864</code>; roles: exported-object</li>
+<li>sha256: <code>36d3e002691397fefd5287603499d03fd0d929ebc2d4b08ece3d9e8b74cb3219</code>; roles: exported-object</li>
+<li>sha256: <code>4839da5b25468809fbc7708652e77c4aa945e6735bf5c9119b3299653898ce34</code>; roles: exported-object</li>
+<li>sha256: <code>4a11107d730c5943885081bfc3e902af14e8e83f59d110979bb2af47e325c38e</code>; roles: exported-object</li>
+<li>sha256: <code>4b03bfd94c00eecc15b41ef45adb7196c1bcfc942383b2ace3fac4a0423bdef4</code>; roles: exported-object</li>
+<li>sha256: <code>6137f8db2192e638e13610f75e73b9247c05f4706f0afd1fdb132d86de6b4012</code>; roles: exported-object</li>
+<li>sha256: <code>6a115a372e460c1de12760689955740a891b6d1e3f97bbe7e667c93ee940150c</code>; roles: exported-object</li>
+<li>sha256: <code>6c1eac65b98a81cd11abeaffe3fcf7f268e8788f733a0a8598b900201f05fc6d</code>; roles: exported-object</li>
+<li>sha256: <code>6db9e2137a8e7ebe66680ad4b9deeb17f7fc9f3103d9a1d9cde353f898de1bee</code>; roles: exported-object</li>
+<li>sha256: <code>729388a4d1b0e06eb28c982bf4a2e9304937ad1a92932dfc76d822b441563b6d</code>; roles: exported-object</li>
+<li>sha256: <code>809e5e4344a517b4f713aa55e03e2dc0c0d21cfa77ac2963e2e6e937e7d1264a</code>; roles: exported-object</li>
+<li>sha256: <code>80a71674cf8a71eaaf73c661d43ca1b69c4f393ccd603b89436812913fffb0f1</code>; roles: exported-object</li>
+<li>sha256: <code>84520bc8bb4f129be41a7ab2a1ff1064efcd060d5521c2d5c23afd8710339411</code>; roles: exported-object</li>
+<li>sha256: <code>8529705a28a2cc8a6ac692e2f9a8cba5d6a3f44b81041270251389f1a017656c</code>; roles: exported-object</li>
+<li>sha256: <code>8eddb32e5ab1436d9cec5cbf730ad2a82d559730d69e35c534863d64d038d7c5</code>; roles: exported-object</li>
+<li>sha256: <code>9b8db510ef42b8ed54a3712636fda55a4f8cfcd5493e20b74ab00cd4f3979f2d</code>; roles: exported-object</li>
+<li>sha256: <code>9db86bb697c7b6a5f3ed228546c9cb8a7037901e61efe0b244ba38e7d9ad3886</code>; roles: exported-object</li>
+<li>sha256: <code>b4effa72b591f85bed1dd07d82d924b9423f5e58a26c62290d11a628768676e4</code>; roles: exported-object</li>
+<li>sha256: <code>b80ed4f18c472ca7a6dd8dad53acc51a77e0ee0dc1fbadcc2e5d8e42efaa37fe</code>; roles: exported-object</li>
+<li>sha256: <code>b96661475f79113a3685ff208a52c3dde1340f93a479011f027c7bd3859c5334</code>; roles: exported-object</li>
+<li>sha256: <code>c1c72144b320890b971bf8cd335438dd6c2e50783398965e7891ccb30b4e3652</code>; roles: exported-object</li>
+<li>sha256: <code>cb82f8b3153b5c172ae382d0cf92ca5373017dd09f98137bc3b06982115006d7</code>; roles: exported-object</li>
+<li>sha256: <code>d98626686f7c56a852f3d658d947d96137ecbcfed278bdc2bc6158239a7434a2</code>; roles: exported-object</li>
+<li>sha256: <code>dd3eb184a16f533fcce480c533d93846a6bb11138dc12468830115263490238d</code>; roles: exported-object</li>
+<li>sha256: <code>e008608c81024ed297a07321b7c9ba9a00adac7cea71f24491af04b5e88f2f21</code>; roles: exported-object</li>
+<li>sha256: <code>e65eaf9faa6e7f3f0ce49c052a35be7cd5fed3ffc70b3f1ff7c213bee79f83fe</code>; roles: exported-object</li>
+<li>sha256: <code>e9132eaa61c1d06d76b82c27cffa7b6ba171f5e31fcec6fa78b03a7523f0f40a</code>; roles: exported-object</li>
+<li>sha256: <code>ea203eb1b56387cac02308b5aca040993e2d1c7fbd06413d41c957a726e4898f</code>; roles: exported-object</li>
+<li>sha256: <code>eddbff1244adffc83452a0a77a9c25fb8eb31625f9d18203acde9fd85eaa7f74</code>; roles: exported-object</li>
+<li>sha256: <code>eed363fc4af7a9070d69340592dcab7c78db4f90710357de29e3b624aa957cf8</code>; roles: exported-object</li>
+<li>sha256: <code>f040d968ae5f0c4324a4e3fce10f7bfbc4370251aecb695f4a5f6c5af7a66aa7</code>; roles: exported-object</li>
+<li>sha256: <code>f7018b08490ebc04900ec28586710f3e93542ebe3ce390378e7f4e6665f28c43</code>; roles: exported-object</li>
+<li>url: <code>http://239.255.255.250:1900*</code>; roles: http-request</li>
+<li>url: <code>http://au.download.windowsupdate.com/d/msdownload/update/software/defu/2021/09/am_delta_patch_1.349.439.0_dcf977cccce1b58289d270f71f8151b3acc1566b.exe</code>; roles: http-request</li>
+<li>url: <code>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab?8afe60e61b27f828</code>; roles: http-request</li>
+<li>url: <code>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab?22c230ae05c29e0f</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35094710_046a1ec2fc584f3c2f6653542576b125ec45b91b.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35094711_e3993b23840c0d600179f647e9ac08158269c095.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35094827_769ef074432ee9d2982132709c97d7a039b1441d.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35095041_d6fbe7dcab58bad491f97a8fb16f67acdd9c5880.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35095042_571a24bf1c59b2fc66012aba76936bc63860b918.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35095158_9a369166024cd2046a41b3fcf5a7d5743d20b1f8.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35095401_461f0f3035a629e02f33b5439ab5d58c4e45c62f.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35095402_3a3af9d09b295d5cad27c058b669144408fd1987.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35095511_08bd8b8ea97b82600094601b9451b7fa9b028927.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35097431_5695ed6029065d034bdbaa6edef143ec73f43570.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35097432_b4cbace49a072b37958e15b9d3daadf28c89f361.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/c/msdownload/update/others/2021/09/35097541_59453a64ae1a0f59447d0c4e4bae68350827ad3f.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35095718_d6052d2a18efec5d0584f7d9db0c6df36c871e5e.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35095719_bb98167530418ae8aa387c077bca2d54e52a227b.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35095828_d42aac61fe6047b9b6b654db9d5c9ae957613125.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096071_6f89138c772d9cca2cda43656eecab96a5cd44fc.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096072_5331372f4a198d80f7a5602f73259ff77d004730.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096188_49a74f42962e10ef9cfa9492f2c1955c24967958.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096401_980e49644362fb40897606d01fddd1ef79c6702a.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096402_83d0bc9d8970cab311753b171496293c4e0588b8.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096518_246960552fd8974bcfe0af13e362f8d00f0c6046.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096747_f2ef0a3546df9b0fe01091e8cf6244c2b18ad27a.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096748_a533dd985a0175649c16855a9c628da8f21d78da.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35096864_51f3f34383a28a4d5d63528d9978515e66a6806e.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35097071_01580b64b700158e52507faa6223a4cb41c43f05.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35097072_9c18abaa0dd4f3355c05cb1e0ac0d0a1da10552a.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35097188_47bf5b9e41cf731eeaf7b93672b38948c413df0b.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35097759_f51781226900f2c3a24cac0d25d7e32ce4232b12.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35097760_94afc464b79c1922edc5d9f1aa46b8bbdafcac27.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35097869_11f02196bd92ebd3ff0745749654d98eb8ddd58c.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35098112_e6ce21ecdf7d899a6a8671574b68871ce853efe6.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35098113_ea9c1c8bf8003ad3b08ee004e09ae3bbf5fb1456.cab</code>; roles: http-request</li>
+<li>url: <code>http://download.windowsupdate.com/d/msdownload/update/others/2021/09/35098229_d9a668acd9af16621c688b823ada2c10de963ca4.cab</code>; roles: http-request</li>
+<li>url: <code>http://simpsonsavingss.com/bmdff/BhoHsCtZ/MLdmpfjaX/5uFG3Dz7yt/date1?BNLv65=pAAS</code>; roles: http-request</li>
+<li>url: <code>http://store-images.s-microsoft.com/image/apps.11608.14255546098955437.c2922c50-eb00-4f80-b393-4e513d9f81c7.4345eb8f-f893-40a2-aec5-20f4758af165?w=150&amp;h=150</code>; roles: http-request</li>
+<li>url: <code>http://store-images.s-microsoft.com/image/apps.16525.14618985536919905.4b30e4f3-f7a1-4421-840c-2cc97b10e8e0.13409c3f-0e0f-40dd-b458-b324f658c185?w=150&amp;h=150</code>; roles: http-request</li>
+<li>url: <code>http://store-images.s-microsoft.com/image/apps.16999.13510798885065391.a43a9782-6060-4560-b391-7f6f188559d0.dc15b6ee-644d-41e3-8d76-67c8c9dac9e9?w=150&amp;h=225</code>; roles: http-request</li>
+<li>url: <code>http://store-images.s-microsoft.com/image/apps.28261.13798539581762600.abe1643f-1704-4a4d-a61b-47ccc25da012.ada314ec-db8e-49bb-a756-60487526418e?w=150&amp;h=150</code>; roles: http-request</li>
+<li>url: <code>http://store-images.s-microsoft.com/image/apps.31617.13655054093851568.f2bf9430-60d7-4569-a50d-0f21c9ade6b3.c563d383-997d-4da1-9def-d7200e3547f8?w=150&amp;h=150</code>; roles: http-request</li>
+<li>url: <code>http://store-images.s-microsoft.com/image/apps.40518.14127333176902609.7be7b901-15fe-4c27-863c-7c0dbfc26c5c.5c278f58-912b-4af9-88f8-a65fff2da477?w=150&amp;h=150</code>; roles: http-request</li>
+<li>url: <code>http://www.msftncsi.com/ncsi.txt</code>; roles: http-request</li>
+<li>user_agent: <code>Microsoft NCSI</code>; roles: http-client</li>
+<li>user_agent: <code>Microsoft-CryptoAPI/10.0</code>; roles: http-client</li>
+<li>user_agent: <code>Microsoft-Delivery-Optimization/10.0</code>; roles: http-client</li>
+<li>user_agent: <code>Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729)</code>; roles: http-client</li>
+<li>user_agent: <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19043</code>; roles: http-client</li>
+<li>user_agent: <code>Windows-Update-Agent/10.0.10011.16384 Client-Protocol/2.32</code>; roles: http-client</li>
+<li>exported object <code>am_delta_patch_1.349.439.0_dcf977cccce1b58289d270f71f8151b3acc1566b(3).exe</code>; SHA-256 <code>1d48d9166408d8b8bf39f9557e4f8a57133c353567c55966ec2831a7bc230431</code>; size 1048576 bytes
+Static content: <code>{&quot;content_kind&quot;:&quot;pe&quot;,&quot;features&quot;:[],&quot;inspected_bytes&quot;:262144,&quot;inspection_truncated&quot;:true,&quot;interpretation&quot;:&quot;Static content only; not proof of execution, intent, or malware family&quot;}</code>. Not execution proof.</li>
+<li>exported object <code>am_delta_patch_1.349.439.0_dcf977cccce1b58289d270f71f8151b3acc1566b(2).exe</code>; SHA-256 <code>2ac413d79efa22e42a179f0450d7e8e4bb8202c881bf9e02a5a13a9a3626d792</code>; size 1048576 bytes
+Static content: <code>{&quot;content_kind&quot;:&quot;script-like-text&quot;,&quot;features&quot;:[{&quot;excerpt&quot;:&quot;iEx&quot;,&quot;feature&quot;:&quot;dynamic-evaluation&quot;,&quot;offset&quot;:207057}],&quot;inspected_bytes&quot;:262144,&quot;inspection_truncated&quot;:true,&quot;interpretation&quot;:&quot;Static content only; not proof of execution, intent, or malware family&quot;}</code>. Not execution proof.</li>
+<li>exported object <code>date1%3fBNLv65=pAAS</code>; SHA-256 <code>eed363fc4af7a9070d69340592dcab7c78db4f90710357de29e3b624aa957cf8</code>; size 284816 bytes
+Static content: <code>{&quot;content_kind&quot;:&quot;pe&quot;,&quot;features&quot;:[],&quot;inspected_bytes&quot;:262144,&quot;inspection_truncated&quot;:true,&quot;interpretation&quot;:&quot;Static content only; not proof of execution, intent, or malware family&quot;}</code>. Not execution proof.</li>
+<li>exported object <code>am_delta_patch_1.349.439.0_dcf977cccce1b58289d270f71f8151b3acc1566b(4).exe</code>; SHA-256 <code>0fb4d47bcda9b77b0fbd8cb88b34ba180365991f6a376e00add1ac880b67fd8f</code>; size 922056 bytes</li>
+<li>exported object <code>apps.40518.14127333176902609.7be7b901-15fe-4c27-863c-7c0dbfc26c5c.5c278f58-912b-4af9-88f8-a65fff2da477%3fw=150&amp;h=150</code>; SHA-256 <code>c1c72144b320890b971bf8cd335438dd6c2e50783398965e7891ccb30b4e3652</code>; size 24101 bytes</li>
+<li>exported object <code>apps.16525.14618985536919905.4b30e4f3-f7a1-4421-840c-2cc97b10e8e0.13409c3f-0e0f-40dd-b458-b324f658c185%3fw=150&amp;h=150</code>; SHA-256 <code>f7018b08490ebc04900ec28586710f3e93542ebe3ce390378e7f4e6665f28c43</code>; size 19230 bytes</li>
+<li>exported object <code>apps.31617.13655054093851568.f2bf9430-60d7-4569-a50d-0f21c9ade6b3.c563d383-997d-4da1-9def-d7200e3547f8%3fw=150&amp;h=150</code>; SHA-256 <code>0c58b13a7b5d78c8a9e35d5995b7352c3b38acee77d6af9886c3cf2d668bfd3c</code>; size 17906 bytes</li>
+<li>exported object <code>apps.16999.13510798885065391.a43a9782-6060-4560-b391-7f6f188559d0.dc15b6ee-644d-41e3-8d76-67c8c9dac9e9%3fw=150&amp;h=225</code>; SHA-256 <code>4a11107d730c5943885081bfc3e902af14e8e83f59d110979bb2af47e325c38e</code>; size 16870 bytes</li>
+<li>exported object <code>apps.11608.14255546098955437.c2922c50-eb00-4f80-b393-4e513d9f81c7.4345eb8f-f893-40a2-aec5-20f4758af165%3fw=150&amp;h=150</code>; SHA-256 <code>0f132c40ca33c057af0aed28534cd23b31ce36da1ad0cda3f2c2f1e03d646bca</code>; size 13972 bytes</li>
+<li>exported object <code>35098229_d9a668acd9af16621c688b823ada2c10de963ca4.cab</code>; SHA-256 <code>4b03bfd94c00eecc15b41ef45adb7196c1bcfc942383b2ace3fac4a0423bdef4</code>; size 10821 bytes</li>
+<li>exported object <code>35094827_769ef074432ee9d2982132709c97d7a039b1441d.cab</code>; SHA-256 <code>4839da5b25468809fbc7708652e77c4aa945e6735bf5c9119b3299653898ce34</code>; size 10791 bytes</li>
+<li>exported object <code>35096864_51f3f34383a28a4d5d63528d9978515e66a6806e.cab</code>; SHA-256 <code>cb82f8b3153b5c172ae382d0cf92ca5373017dd09f98137bc3b06982115006d7</code>; size 10789 bytes</li>
+<li>exported object <code>35096188_49a74f42962e10ef9cfa9492f2c1955c24967958.cab</code>; SHA-256 <code>2972f477a28570de6c949fba237ace8c1bc2ea29b961b63aab3a57469e70cb51</code>; size 10781 bytes</li>
+<li>exported object <code>35096518_246960552fd8974bcfe0af13e362f8d00f0c6046.cab</code>; SHA-256 <code>8529705a28a2cc8a6ac692e2f9a8cba5d6a3f44b81041270251389f1a017656c</code>; size 10767 bytes</li>
+<li>exported object <code>35095158_9a369166024cd2046a41b3fcf5a7d5743d20b1f8.cab</code>; SHA-256 <code>1127774b7710ffa8c9bd5d3182517be848d9373e8f4382f28f801ba9e44f80fb</code>; size 10765 bytes</li>
+<li>exported object <code>35097188_47bf5b9e41cf731eeaf7b93672b38948c413df0b.cab</code>; SHA-256 <code>80a71674cf8a71eaaf73c661d43ca1b69c4f393ccd603b89436812913fffb0f1</code>; size 10763 bytes</li>
+<li>exported object <code>35095511_08bd8b8ea97b82600094601b9451b7fa9b028927.cab</code>; SHA-256 <code>07a1470ae3b863578779e025fc6009e6519e0f77325e7a94a426a58b7e408196</code>; size 10623 bytes</li>
+<li>exported object <code>35097541_59453a64ae1a0f59447d0c4e4bae68350827ad3f.cab</code>; SHA-256 <code>e9132eaa61c1d06d76b82c27cffa7b6ba171f5e31fcec6fa78b03a7523f0f40a</code>; size 10621 bytes</li>
+<li>exported object <code>35095828_d42aac61fe6047b9b6b654db9d5c9ae957613125.cab</code>; SHA-256 <code>dd3eb184a16f533fcce480c533d93846a6bb11138dc12468830115263490238d</code>; size 10593 bytes</li>
+<li>exported object <code>35097869_11f02196bd92ebd3ff0745749654d98eb8ddd58c.cab</code>; SHA-256 <code>0076eaec4990322f0ebf53a5a53997c1525f358dc28dd6b7e1cbffd9bd41a9a5</code>; size 10589 bytes</li>
+<li>exported object <code>35096748_a533dd985a0175649c16855a9c628da8f21d78da.cab</code>; SHA-256 <code>9db86bb697c7b6a5f3ed228546c9cb8a7037901e61efe0b244ba38e7d9ad3886</code>; size 7287 bytes</li>
+<li>exported object <code>35098113_ea9c1c8bf8003ad3b08ee004e09ae3bbf5fb1456.cab</code>; SHA-256 <code>01b57c485bc90409c12dfff1fcca905e8ee03a18958ebb8fb7f007d317c2e6fc</code>; size 7285 bytes</li>
+<li>exported object <code>35096747_f2ef0a3546df9b0fe01091e8cf6244c2b18ad27a.cab</code>; SHA-256 <code>2cd96ea2a66b8bc4526b21c3744118b75f834d24739b04e2e7ceef21b8ad706f</code>; size 7285 bytes</li>
+<li>exported object <code>35096072_5331372f4a198d80f7a5602f73259ff77d004730.cab</code>; SHA-256 <code>6db9e2137a8e7ebe66680ad4b9deeb17f7fc9f3103d9a1d9cde353f898de1bee</code>; size 7283 bytes</li>
+<li>exported object <code>35098112_e6ce21ecdf7d899a6a8671574b68871ce853efe6.cab</code>; SHA-256 <code>d98626686f7c56a852f3d658d947d96137ecbcfed278bdc2bc6158239a7434a2</code>; size 7277 bytes</li>
+<li>exported object <code>35094710_046a1ec2fc584f3c2f6653542576b125ec45b91b.cab</code>; SHA-256 <code>ea203eb1b56387cac02308b5aca040993e2d1c7fbd06413d41c957a726e4898f</code>; size 7277 bytes</li>
+<li>exported object <code>35096071_6f89138c772d9cca2cda43656eecab96a5cd44fc.cab</code>; SHA-256 <code>153eec5b545f82f598d7728472073b1cdee325fc30cb7bc743c21d753610950d</code>; size 7275 bytes</li>
+<li>exported object <code>35097432_b4cbace49a072b37958e15b9d3daadf28c89f361.cab</code>; SHA-256 <code>729388a4d1b0e06eb28c982bf4a2e9304937ad1a92932dfc76d822b441563b6d</code>; size 7275 bytes</li>
+<li>exported object <code>35094711_e3993b23840c0d600179f647e9ac08158269c095.cab</code>; SHA-256 <code>e008608c81024ed297a07321b7c9ba9a00adac7cea71f24491af04b5e88f2f21</code>; size 7275 bytes</li>
+<li>exported object <code>35097431_5695ed6029065d034bdbaa6edef143ec73f43570.cab</code>; SHA-256 <code>8eddb32e5ab1436d9cec5cbf730ad2a82d559730d69e35c534863d64d038d7c5</code>; size 7273 bytes</li>
+<li>exported object <code>35095402_3a3af9d09b295d5cad27c058b669144408fd1987.cab</code>; SHA-256 <code>3197375f525ce4d0d339e56b343ecd510ffc72dcfa250b1352f8bd6a02d49864</code>; size 7267 bytes</li>
+<li>exported object <code>35095401_461f0f3035a629e02f33b5439ab5d58c4e45c62f.cab</code>; SHA-256 <code>f040d968ae5f0c4324a4e3fce10f7bfbc4370251aecb695f4a5f6c5af7a66aa7</code>; size 7261 bytes</li>
+<li>exported object <code>35097072_9c18abaa0dd4f3355c05cb1e0ac0d0a1da10552a.cab</code>; SHA-256 <code>6c1eac65b98a81cd11abeaffe3fcf7f268e8788f733a0a8598b900201f05fc6d</code>; size 7189 bytes</li>
+<li>exported object <code>35097071_01580b64b700158e52507faa6223a4cb41c43f05.cab</code>; SHA-256 <code>0550952e70d2e4e5ca28a8160e31cab6418ecb152915ec5dbfe88248d39fc2c7</code>; size 7185 bytes</li>
+<li>exported object <code>35096401_980e49644362fb40897606d01fddd1ef79c6702a.cab</code>; SHA-256 <code>b4effa72b591f85bed1dd07d82d924b9423f5e58a26c62290d11a628768676e4</code>; size 7183 bytes</li>
+<li>exported object <code>35096402_83d0bc9d8970cab311753b171496293c4e0588b8.cab</code>; SHA-256 <code>36d3e002691397fefd5287603499d03fd0d929ebc2d4b08ece3d9e8b74cb3219</code>; size 7181 bytes</li>
+<li>exported object <code>35095042_571a24bf1c59b2fc66012aba76936bc63860b918.cab</code>; SHA-256 <code>e65eaf9faa6e7f3f0ce49c052a35be7cd5fed3ffc70b3f1ff7c213bee79f83fe</code>; size 7181 bytes</li>
+<li>exported object <code>35097759_f51781226900f2c3a24cac0d25d7e32ce4232b12.cab</code>; SHA-256 <code>809e5e4344a517b4f713aa55e03e2dc0c0d21cfa77ac2963e2e6e937e7d1264a</code>; size 7175 bytes</li>
+<li>exported object <code>35097760_94afc464b79c1922edc5d9f1aa46b8bbdafcac27.cab</code>; SHA-256 <code>b96661475f79113a3685ff208a52c3dde1340f93a479011f027c7bd3859c5334</code>; size 7175 bytes</li>
+<li>exported object <code>35095719_bb98167530418ae8aa387c077bca2d54e52a227b.cab</code>; SHA-256 <code>6a115a372e460c1de12760689955740a891b6d1e3f97bbe7e667c93ee940150c</code>; size 7171 bytes</li>
+<li>exported object <code>35095718_d6052d2a18efec5d0584f7d9db0c6df36c871e5e.cab</code>; SHA-256 <code>b80ed4f18c472ca7a6dd8dad53acc51a77e0ee0dc1fbadcc2e5d8e42efaa37fe</code>; size 7171 bytes</li>
+<li>exported object <code>35095041_d6fbe7dcab58bad491f97a8fb16f67acdd9c5880.cab</code>; SHA-256 <code>eddbff1244adffc83452a0a77a9c25fb8eb31625f9d18203acde9fd85eaa7f74</code>; size 7171 bytes</li>
+<li>exported object <code>apps.28261.13798539581762600.abe1643f-1704-4a4d-a61b-47ccc25da012.ada314ec-db8e-49bb-a756-60487526418e%3fw=150&amp;h=150</code>; SHA-256 <code>84520bc8bb4f129be41a7ab2a1ff1064efcd060d5521c2d5c23afd8710339411</code>; size 2222 bytes</li>
+<li>exported object <code>ncsi.txt</code>; SHA-256 <code>6137f8db2192e638e13610f75e73b9247c05f4706f0afd1fdb132d86de6b4012</code>; size 14 bytes</li>
+<li>exported object <code>am_delta_patch_1.349.439.0_dcf977cccce1b58289d270f71f8151b3acc1566b(1).exe</code>; SHA-256 <code>9b8db510ef42b8ed54a3712636fda55a4f8cfcd5493e20b74ab00cd4f3979f2d</code>; size 2 bytes</li>
+</ul>
+<h2 id="actor-similarity-leads">Actor similarity leads</h2>
+<ul>
+<li>Volatile Cedar (G0123): 20% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Winnti Group (G0044): 17% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Ajax Security Team (G0130): 17% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>IndigoZebra (G0136): 14% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Nomadic Octopus (G0133): 14% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Whitefly (G0107): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Metador (G1013): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Elderwood (G0066): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Rancor (G0075): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Evilnum (G0120): 9% TTP overlap. This is an investigation lead, not attribution.</li>
+</ul>
+<h2 id="local-enrichment-and-correlations">Local enrichment and correlations</h2>
+<p>No match means unknown in this corpus. Local CTI may postdate the capture. Matches and shared infrastructure require review; no automatic promotion or attribution.
+Snapshot: <code>fd1ef8f35792013eb051dd90b6a512f313f5655d99849d97a044c7dc6beb785f</code>; recorded 2026-09-19T12:10:32.214995+00:00; mode: local-only.
+Coverage: <code>{&quot;matched_observables&quot;:0,&quot;no_exact_match&quot;:248,&quot;observable_limit&quot;:5000,&quot;observables_checked&quot;:248,&quot;observables_total&quot;:248,&quot;prior_case_limit_reached&quot;:false,&quot;prior_cases_checked&quot;:15,&quot;truncated&quot;:false}</code></p>
+<ul>
+<li>Catalog T1105: https://attack.mitre.org/techniques/T1105; detection strategies: [{&quot;attack_id&quot;:&quot;DET0060&quot;,&quot;name&quot;:&quot;Detect Ingress Tool Transfers via Behavioral Chain&quot;,&quot;stix_id&quot;:&quot;x-mitre-detection-strategy--67677c4c-5778-49eb-ae74-1920645b8554&quot;}]</li>
+<li>Prior analysis <code>8f0da1cd-9998-4d41-9fc7-683302a6ee24</code> shares 51 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>96e0e828-93ae-49d5-8104-9f14cb584c3e</code> shares 23 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>6e50c68f-5552-400c-9835-15867ddb022d</code> shares 23 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>43bc93eb-d6db-4400-b983-b0dd404c8ca4</code> shares 35 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>6df36b51-4b44-4660-b534-2fa89705e807</code> shares 35 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>29aa3ef8-47c9-4c47-b4cc-1ff3e0708142</code> shares 10 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>b79032a8-d69e-4ac1-bdd4-542473fa8e3b</code> shares 15 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>faf041c3-70e0-4a01-8780-10917e5e187c</code> shares 12 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>08324647-35af-4af2-8d82-4387eec03918</code> shares 14 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>616a90fa-f15e-4fcb-8d56-7b8e0eff5785</code> shares 4 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>459e119d-191f-49e8-85ea-c78f9de41826</code> shares 15 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>7a2cfe72-f48d-4894-8a2d-8889cb3b11b2</code> shares 12 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>81373b30-6a59-49d1-89b0-bad73ed19eaa</code> shares 13 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>38851ad7-b3a0-423d-ae89-3b7be4e4b908</code> shares 21 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>bfccc426-aa9b-4007-8558-a66d37ecb90c</code> shares 18 observations. This does not establish a common campaign.</li>
+<li>External provider queries: 0. Not requested; no unknown indicator is classified as benign.</li>
+</ul>
+<h2 id="coverage-and-limitations">Coverage and limitations</h2>
+<ul>
+<li>Packet and protocol facts are deterministic for the recorded analyzer manifest.</li>
+<li>Encrypted application payloads are not decrypted; only available metadata is reported.</li>
+<li>ATT&amp;CK mappings and actor overlaps are candidates until analyst review and promotion.</li>
+<li>HTTP object inventory: <code>{&quot;compact_objects&quot;:0,&quot;complete&quot;:true,&quot;detailed_objects&quot;:45,&quot;exported_objects&quot;:46,&quot;hashed_bytes&quot;:3675348,&quot;hashed_objects&quot;:46,&quot;omitted_unique_hashes&quot;:0,&quot;returned_unique_hashes&quot;:45,&quot;selection&quot;:&quot;content-classified first, then size descending, SHA256 tie-break; deduplicated by full hash; overflow retains a compact hash index&quot;,&quot;unhashed_objects&quot;:0,&quot;unique_hashes&quot;:45}</code>. Compact overflow hashes are retained in JSON coverage and observables.</li>
+<li>A directory subject is not necessarily a logged-in user; consult identity bindings in the JSON evidence.</li>
+<li>Rendered / available: findings 9/9, identities 4/4, observables 248/248, artifacts 45/45. Full returned inventory is in the JSON result.</li>
+</ul>
+</main></body></html>

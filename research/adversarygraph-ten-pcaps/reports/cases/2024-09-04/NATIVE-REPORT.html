@@ -1,0 +1,243 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AdversaryGraph Deterministic PCAP Analysis | 1200km</title><meta name="description" content="Public evidence supplement for ten AdversaryGraph malware-PCAP tests: reports, screenshots, audit records, provenance and limitations."><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2024-09-04/NATIVE-REPORT.html"><meta property="og:url" content="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2024-09-04/NATIVE-REPORT.html"><meta property="og:title" content="AdversaryGraph Deterministic PCAP Analysis"><meta property="og:description" content="Ten malware PCAPs, original screenshots, full case reports and qualified results."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/research/adversarygraph-ten-pcaps/screenshots/2024-11-26-packet-analysis.png"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{padding:20px;background:#11233c;color:#fff}header a{color:#b7e5ff}main{max-width:1160px;margin:28px auto;padding:32px 44px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2{margin-top:2em}a{color:#075c91}img{display:block;max-width:100%;height:auto;margin:24px auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #b8c9db;padding:10px;text-align:left}th{background:#edf4fc}pre{overflow:auto;padding:16px;background:#11233c;color:#fff}code{font-size:.85em}blockquote{margin:20px 0;padding:8px 20px;border-left:4px solid #167bb0;background:#eff6ff}.notice{padding:12px;background:#eef6fd;font-size:14px}@media(max-width:700px){main{margin:0;padding:22px 16px}body{font-size:16px}}@media print{header{display:none}main{padding:0;margin:0}pre{white-space:pre-wrap}img,tr{break-inside:avoid}}</style><meta property="article:published_time" content="2026-09-20"><meta property="article:modified_time" content="2026-09-20"></head><body><header>1200KM · ANDREY PAUTOV<br><a href="/">Home</a> · <a href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/">Article</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/REPORTS.html">Ten reports</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/SCREENSHOTS.html">Screenshot gallery</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/">Publication boundaries</a></header><main><p class="notice">Measured 19 September 2026 · Public derivative · Historical training evidence, not approved threat intelligence.</p><h1 id="adversarygraph-deterministic-pcap-analysis">AdversaryGraph Deterministic PCAP Analysis</h1>
+<p>Source: 2024-09-04-traffic-analysis-exercise.pcap
+Capture SHA-256: <code>8fee06d0b1686faab4364f5b7a741e736ad7e713d5ca9299ff9161a4b4d4862e</code>
+Semantic result SHA-256: <code>4897ba23edbbda370beb304db04a336b3872d332b86d9834b16bb29e87c6d8b5</code>
+Analyzer manifest SHA-256: <code>ee952aeb7cdc6958f4ae5178c54c274a1e4f0aec4d42f3bdb95baaff063b3dde</code></p>
+<h2 id="executive-summary">Executive summary</h2>
+<p>Decoded 5091 packets across 42 IP endpoints and 221 transport flows. Observed 173 DNS events, 57 HTTP requests, 72 TLS ClientHello events, and 6 exported HTTP object(s). Deterministic rules produced 8 finding(s): 0 high, 1 medium, and 7 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.</p>
+<h2 id="capture-facts">Capture facts</h2>
+<ul>
+<li>Packets: 5091</li>
+<li>Duration: 3576.159984 seconds</li>
+<li>Captured bytes: 2048179</li>
+<li>Endpoints: 42</li>
+<li>Flows: 221</li>
+</ul>
+<h2 id="deterministic-findings">Deterministic findings</h2>
+<h3 id="medium-repeated-outbound-http-post-activity">MEDIUM — Repeated outbound HTTP POST activity</h3>
+<p>The same endpoint pair and HTTP target produced repeated POST requests suitable for beaconing or data transfer review.</p>
+<p>Rule: <code>repeated-http-posts@pcap-rules-v3</code>; confidence: 0.72; evidence: frame 1668 / TCP stream 48, frame 1672 / TCP stream 48, frame 1697 / TCP stream 48, frame 2347 / TCP stream 56, frame 2985 / TCP stream 63.</p>
+<p>Metrics: <code>{&quot;declared_body_bytes&quot;:2046,&quot;destination&quot;:&quot;79.124.78.197&quot;,&quot;host&quot;:&quot;79.124.78.197&quot;,&quot;port&quot;:80,&quot;request_count&quot;:48,&quot;source&quot;:&quot;172.17.0.99&quot;,&quot;uri&quot;:&quot;/foots.php&quot;}</code></p>
+<h3 id="low-repeated-unsuccessful-dns-resolution">LOW — Repeated unsuccessful DNS resolution</h3>
+<p>Repeated NXDOMAIN responses may indicate a dead domain, misconfiguration, retrying software, or malicious fallback. They do not establish a domain-generation algorithm.</p>
+<p>Rule: <code>repeated-nxdomain@pcap-rules-v3</code>; confidence: 0.5; evidence: frame 41, frame 42, frame 111, frame 112, frame 215.</p>
+<p>Metrics: <code>{&quot;domain&quot;:&quot;wpad.bepositive.com&quot;,&quot;response_count&quot;:20,&quot;source&quot;:&quot;172.17.0.99&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 384 / TCP stream 14, frame 386 / TCP stream 14, frame 388 / TCP stream 14, frame 391 / TCP stream 14, frame 1074 / TCP stream 34.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.17.0.99&quot;,&quot;event_count&quot;:39,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.17.0.17&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-1">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 33 / TCP stream 0, frame 419 / TCP stream 18, frame 431 / TCP stream 18, frame 452 / TCP stream 19, frame 455 / TCP stream 19.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.17.0.99&quot;,&quot;event_count&quot;:66,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;1&quot;,&quot;4,19,19,19,5&quot;,&quot;4,5&quot;,&quot;5&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.17.0.17&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-2">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 410 / TCP stream 13, frame 415 / TCP stream 13, frame 417 / TCP stream 13, frame 420 / TCP stream 13, frame 422 / TCP stream 13.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.17.0.99&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.17.0.17&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-3">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 382 / TCP stream 14, frame 385 / TCP stream 14, frame 387 / TCP stream 14, frame 389 / TCP stream 14, frame 1073 / TCP stream 34.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.17.0.17&quot;,&quot;event_count&quot;:39,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.17.0.99&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-4">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 31 / TCP stream 0, frame 34 / TCP stream 0, frame 412 / TCP stream 18, frame 430 / TCP stream 18, frame 443 / TCP stream 19.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.17.0.17&quot;,&quot;event_count&quot;:84,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;0&quot;,&quot;2&quot;,&quot;3&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.17.0.99&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-5">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 409 / TCP stream 13, frame 413 / TCP stream 13, frame 416 / TCP stream 13, frame 418 / TCP stream 13, frame 421 / TCP stream 13.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.17.0.17&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.17.0.99&quot;}</code></p>
+<h2 id="attck-candidates">ATT&amp;CK candidates</h2>
+<ul>
+<li>No deterministic ATT&amp;CK candidates.</li>
+</ul>
+<h2 id="identities">Identities</h2>
+<ul>
+<li>account: <code>afletcher</code>; client IPs: 172.17.0.99; frames: 293, 301, 303, 317, 350</li>
+<li>full-name: <code>Andrew Fletcher</code>; client IPs: 172.17.0.99; frames: 428</li>
+<li>hostname: <code>DESKTOP-RNVO9AT</code>; client IPs: 172.17.0.99; frames: 1, 3, 20, 22, 60</li>
+<li>netbios-group: <code>BEPOSITIVE</code>; client IPs: unbound subject; frames: 21, 61, 65, 82, 85</li>
+</ul>
+<h2 id="ioc-and-artifact-candidates">IOC and artifact candidates</h2>
+<ul>
+<li>domain: <code>a1834.dscg2.akamai.net</code>; roles: dns-cname</li>
+<li>domain: <code>acroipm2.adobe.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>api.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>arc.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>assets.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>bepositive.com</code>; roles: dns-query</li>
+<li>domain: <code>blob.mwh03prdstf02a.store.core.windows.net</code>; roles: dns-cname</li>
+<li>domain: <code>client.wns.windows.com</code>; roles: tls-sni</li>
+<li>domain: <code>ctldl.windowsupdate.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>desktop-rnvo9at.bepositive.com</code>; roles: dns-query</li>
+<li>domain: <code>dns.msftncsi.com</code>; roles: dns-query</li>
+<li>domain: <code>download.windowsupdate.com</code>; roles: dns-query</li>
+<li>domain: <code>ecs.office.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fd.api.iris.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>g.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>img-s-msn-com.akamaized.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>inputsuggestions.msdxcdn.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>login.microsoftonline.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>mobile.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>odc.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>officeclient.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>oneclient.sfx.ms</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>pti.store.microsoft.com</code>; roles: dns-query</li>
+<li>domain: <code>settings-win.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>srtb.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>sso.godaddy.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>storecatalogrevocation.storequality.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>th.bing.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>v10.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>weathermapdata.blob.core.windows.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>win-ctl9xbq9y19.bepositive.com</code>; roles: dns-query</li>
+<li>domain: <code>windows.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>wpad.bepositive.com</code>; roles: dns-query</li>
+<li>domain: <code>www.bellantonicioccolato.it</code>; roles: tls-sni</li>
+<li>domain: <code>www.bing.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>www.msftconnecttest.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>x1.c.lencr.org</code>; roles: dns-query, http-host</li>
+<li>ipv4: <code>0.0.0.0</code>; roles: network-endpoint</li>
+<li>ipv4: <code>13.107.246.57</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.70.79.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.89.179.9</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>131.107.255.255</code>; roles: dns-answer</li>
+<li>ipv4: <code>172.17.0.17</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>172.17.0.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>172.17.0.99</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>184.29.137.96</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>199.232.210.172</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>199.232.214.172</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.10.31.115</code>; roles: network-endpoint</li>
+<li>ipv4: <code>20.189.173.1</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.18</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.26</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.190.135.2</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.241.44.114</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.42.73.28</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.60.228.1</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.96.153.111</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.203</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>224.0.0.251</code>; roles: network-endpoint</li>
+<li>ipv4: <code>224.0.0.252</code>; roles: network-endpoint</li>
+<li>ipv4: <code>23.194.68.140</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.195.212.189</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.220.251.149</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.220.251.153</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.220.251.158</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.220.251.160</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.220.251.47</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.220.251.48</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.49</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.50</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.51</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.52</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.53</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.55</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.56</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.57</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.58</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.221.24.62</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.63</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.64</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.68</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.69</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.221.24.70</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.24.73</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.40.145.142</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.45.119.134</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.45.119.140</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.45.119.142</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.45.119.143</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.45.119.144</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.45.119.146</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.45.119.147</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.45.119.166</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.45.119.174</code>; roles: dns-answer</li>
+<li>ipv4: <code>255.255.255.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>40.119.249.228</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.11</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.12</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.13</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.18</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.19</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.20</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.21</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.22</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.23</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.7.32</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.7.35</code>; roles: dns-answer</li>
+<li>ipv4: <code>46.254.34.201</code>; roles: network-endpoint</li>
+<li>ipv4: <code>52.109.0.142</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.0.91</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.113.194.132</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>79.124.78.197</code>; roles: http-host, network-endpoint</li>
+<li>ja3: <code>091f51a7a1c3a4504a224cc081ce9cee</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>1a0fcf72de58b80a8499dea99e961714</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>350c9b4a3f847974933dd25e9f9dc620</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>3c293bdf2a25c07559b560ba86debc77</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>3c4eb72b882d4d1442c67ce73f1292a9</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>4c6de70d03b552090a8d77fcb0e10629</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>5291cc6eebf72ef2ca72d48a1dd0d72f</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>5919f6108f098e14c2f37619021ebd4d</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>65005c9d9ae0f0ebeaf22c210571d482</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>6a5d235ee78c6aede6a61448b4e9ff1e</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>81e0f23545c783a55096f99f7c4755d7</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>a25c14084d58bfea7bb5de112124edb3</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>a35e0e26a8a46900d0f8297769d1112c</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>cad306d4b414c5fcf993c03e0d596109</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>f06a64ec6ecba24167cfe2612badcd91</code>; roles: tls-client-fingerprint</li>
+<li>sha256: <code>3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43</code>; roles: exported-object</li>
+<li>sha256: <code>5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61</code>; roles: exported-object</li>
+<li>sha256: <code>69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820</code>; roles: exported-object</li>
+<li>sha256: <code>736f0cb5cc23435dad920dbe447efcf102e61c8691fa8528f5f39f386537f43e</code>; roles: exported-object</li>
+<li>sha256: <code>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>; roles: exported-object</li>
+<li>sha256: <code>ed0855c1637e5f93be7d54acb2cb8872683a0e5eb670258abb1ebc41bfbf4591</code>; roles: exported-object</li>
+<li>url: <code>http://79.124.78.197/foots.php</code>; roles: http-request</li>
+<li>url: <code>http://79.124.78.197/index.php</code>; roles: http-request</li>
+<li>url: <code>http://79.124.78.197/index.php?id=&amp;subid=qIOuKk7U</code>; roles: http-request</li>
+<li>url: <code>http://acroipm2.adobe.com/assets/Owner/arm/ProcessMAU.txt</code>; roles: http-request</li>
+<li>url: <code>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab?d7a8a57aa5acd39b</code>; roles: http-request</li>
+<li>url: <code>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab?91717f420e6dda94</code>; roles: http-request</li>
+<li>url: <code>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab?a5fef2ac8502b132</code>; roles: http-request</li>
+<li>url: <code>http://www.msftconnecttest.com/connecttest.txt</code>; roles: http-request</li>
+<li>url: <code>http://x1.c.lencr.org/</code>; roles: http-request</li>
+<li>user_agent: <code>Microsoft NCSI</code>; roles: http-client</li>
+<li>user_agent: <code>Microsoft-CryptoAPI/10.0</code>; roles: http-client</li>
+<li>user_agent: <code>Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729)</code>; roles: http-client</li>
+<li>user_agent: <code>Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729)</code>; roles: http-client</li>
+<li>exported object <code>index.php</code>; SHA-256 <code>ed0855c1637e5f93be7d54acb2cb8872683a0e5eb670258abb1ebc41bfbf4591</code>; size 105 bytes</li>
+<li>exported object <code>index.php%3fid=&amp;subid=qIOuKk7U</code>; SHA-256 <code>736f0cb5cc23435dad920dbe447efcf102e61c8691fa8528f5f39f386537f43e</code>; size 61 bytes</li>
+<li>exported object <code>connecttest(1).txt</code>; SHA-256 <code>5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61</code>; size 22 bytes</li>
+<li>exported object <code>ProcessMAU.txt</code>; SHA-256 <code>69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820</code>; size 4 bytes</li>
+<li>exported object <code>index(1).php</code>; SHA-256 <code>3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43</code>; size 1 bytes</li>
+<li>exported object <code>foots(1).php</code>; SHA-256 <code>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>; size 0 bytes</li>
+</ul>
+<h2 id="actor-similarity-leads">Actor similarity leads</h2>
+<ul>
+<li>No actor lead was calculated.</li>
+</ul>
+<h2 id="local-enrichment-and-correlations">Local enrichment and correlations</h2>
+<p>No match means unknown in this corpus. Local CTI may postdate the capture. Matches and shared infrastructure require review; no automatic promotion or attribution.
+Snapshot: <code>99bf9b0d5c90e5eb36c1f5a055241fc0beb1b677bd448cb59545c1ac1d629049</code>; recorded 2026-09-19T12:08:45.501397+00:00; mode: local-only.
+Coverage: <code>{&quot;matched_observables&quot;:0,&quot;no_exact_match&quot;:147,&quot;observable_limit&quot;:5000,&quot;observables_checked&quot;:147,&quot;observables_total&quot;:147,&quot;prior_case_limit_reached&quot;:false,&quot;prior_cases_checked&quot;:7,&quot;truncated&quot;:false}</code></p>
+<ul>
+<li>Prior analysis <code>08324647-35af-4af2-8d82-4387eec03918</code> shares 38 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>616a90fa-f15e-4fcb-8d56-7b8e0eff5785</code> shares 12 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>459e119d-191f-49e8-85ea-c78f9de41826</code> shares 31 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>7a2cfe72-f48d-4894-8a2d-8889cb3b11b2</code> shares 47 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>81373b30-6a59-49d1-89b0-bad73ed19eaa</code> shares 26 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>38851ad7-b3a0-423d-ae89-3b7be4e4b908</code> shares 26 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>bfccc426-aa9b-4007-8558-a66d37ecb90c</code> shares 56 observations. This does not establish a common campaign.</li>
+<li>External provider queries: 0. Not requested; no unknown indicator is classified as benign.</li>
+</ul>
+<h2 id="coverage-and-limitations">Coverage and limitations</h2>
+<ul>
+<li>Packet and protocol facts are deterministic for the recorded analyzer manifest.</li>
+<li>Encrypted application payloads are not decrypted; only available metadata is reported.</li>
+<li>ATT&amp;CK mappings and actor overlaps are candidates until analyst review and promotion.</li>
+<li>HTTP object inventory: <code>{&quot;compact_objects&quot;:0,&quot;complete&quot;:true,&quot;detailed_objects&quot;:6,&quot;exported_objects&quot;:54,&quot;hashed_bytes&quot;:215,&quot;hashed_objects&quot;:54,&quot;omitted_unique_hashes&quot;:0,&quot;returned_unique_hashes&quot;:6,&quot;selection&quot;:&quot;content-classified first, then size descending, SHA256 tie-break; deduplicated by full hash; overflow retains a compact hash index&quot;,&quot;unhashed_objects&quot;:0,&quot;unique_hashes&quot;:6}</code>. Compact overflow hashes are retained in JSON coverage and observables.</li>
+<li>A directory subject is not necessarily a logged-in user; consult identity bindings in the JSON evidence.</li>
+<li>Rendered / available: findings 8/8, identities 4/4, observables 147/147, artifacts 6/6. Full returned inventory is in the JSON result.</li>
+</ul>
+</main></body></html>

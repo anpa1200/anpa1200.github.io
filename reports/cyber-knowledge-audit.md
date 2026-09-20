@@ -9,8 +9,8 @@ This report is generated from deployable source HTML. External URLs are inventor
 | Measure | Result |
 |---|---:|
 | Pages | 15 |
-| Words | 131,095 |
-| Internal links | 4,756 |
+| Words | 131,124 |
+| Internal links | 4,758 |
 | External links | 586 |
 | Broken internal links | 0 |
 | Missing anchors | 0 |
@@ -25,9 +25,9 @@ This report is generated from deployable source HTML. External URLs are inventor
 | [Red Team & Offensive Security](https://1200km.com/cyber-knowledge/red-team.html) | field guide | 25633 | 289 | 587 | 17 | indexable |
 | [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13239 | 159 | 460 | 13 | indexable |
 | [Vulnerability Research & Exploit Development](https://1200km.com/cyber-knowledge/vulnerability-research.html) | field guide | 10698 | 127 | 348 | 42 | indexable |
-| [Malware Analysis & Reverse Engineering](https://1200km.com/cyber-knowledge/malware-analysis.html) | field guide | 7420 | 96 | 339 | 21 | indexable |
+| [Malware Analysis & Reverse Engineering](https://1200km.com/cyber-knowledge/malware-analysis.html) | field guide | 7436 | 96 | 340 | 21 | indexable |
 | [Secure Code & Application Security](https://1200km.com/cyber-knowledge/secure-code.html) | field guide | 7120 | 73 | 347 | 16 | indexable |
-| [Digital Forensics & Incident Response (DFIR)](https://1200km.com/cyber-knowledge/dfir.html) | field guide | 8235 | 70 | 343 | 17 | indexable |
+| [Digital Forensics & Incident Response (DFIR)](https://1200km.com/cyber-knowledge/dfir.html) | field guide | 8248 | 70 | 344 | 17 | indexable |
 | [Cloud Security](https://1200km.com/cyber-knowledge/cloud-security.html) | field guide | 8788 | 69 | 359 | 20 | indexable |
 | [Governance, Risk & Compliance (GRC)](https://1200km.com/cyber-knowledge/grc.html) | field guide | 9084 | 89 | 357 | 39 | indexable |
 | [OSINT & Reconnaissance](https://1200km.com/cyber-knowledge/osint.html) | field guide | 10145 | 114 | 304 | 29 | indexable |

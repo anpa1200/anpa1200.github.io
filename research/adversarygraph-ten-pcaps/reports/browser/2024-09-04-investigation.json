@@ -1,0 +1,4716 @@
+{
+  "id": "51b8fd21-ce38-44fb-9a74-86602c0275db",
+  "name": "PCAP verified workflow 2024-09-04 20260919",
+  "description": "Explicit test workspace: real training capture; review remains draft. Not a production incident.",
+  "status": "active",
+  "domain": "enterprise-attack",
+  "actor_ids": [],
+  "technique_ids": [],
+  "report_ids": [],
+  "evidence_nodes": [
+    {
+      "id": "log-pcap:faf041c3-70e0-4a01-8780-10917e5e187c",
+      "type": "log-pcap-analysis",
+      "label": "2024-09-04-traffic-analysis-exercise.pcap",
+      "report": "# AdversaryGraph Deterministic PCAP Analysis\n\nSource: 2024-09-04-traffic-analysis-exercise.pcap\nCapture SHA-256: `8fee06d0b1686faab4364f5b7a741e736ad7e713d5ca9299ff9161a4b4d4862e`\nSemantic result SHA-256: `4897ba23edbbda370beb304db04a336b3872d332b86d9834b16bb29e87c6d8b5`\nAnalyzer manifest SHA-256: `ee952aeb7cdc6958f4ae5178c54c274a1e4f0aec4d42f3bdb95baaff063b3dde`\n\n## Executive summary\n\nDecoded 5091 packets across 42 IP endpoints and 221 transport flows. Observed 173 DNS events, 57 HTTP requests, 72 TLS ClientHello events, and 6 exported HTTP object(s). Deterministic rules produced 8 finding(s): 0 high, 1 medium, and 7 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.\n\n## Capture facts\n\n- Packets: 5091\n- Duration: 3576.159984 seconds\n- Captured bytes: 2048179\n- Endpoints: 42\n- Flows: 221\n\n## Deterministic findings\n\n### MEDIUM — Repeated outbound HTTP POST activity\n\nThe same endpoint pair and HTTP target produced repeated POST requests suitable for beaconing or data transfer review.\n\nRule: `repeated-http-posts@pcap-rules-v3`; confidence: 0.72; evidence: frame 1668 / TCP stream 48, frame 1672 / TCP stream 48, frame 1697 / TCP stream 48, frame 2347 / TCP stream 56, frame 2985 / TCP stream 63.\n\nMetrics: `{\"declared_body_bytes\":2046,\"destination\":\"79.124.78.197\",\"host\":\"79.124.78.197\",\"port\":80,\"request_count\":48,\"source\":\"172.17.0.99\",\"uri\":\"/foots.php\"}`\n\n### LOW — Repeated unsuccessful DNS resolution\n\nRepeated NXDOMAIN responses may indicate a dead domain, misconfiguration, retrying software, or malicious fallback. They do not establish a domain-generation algorithm.\n\nRule: `repeated-nxdomain@pcap-rules-v3`; confidence: 0.5; evidence: frame 41, frame 42, frame 111, frame 112, frame 215.\n\nMetrics: `{\"domain\":\"wpad.bepositive.com\",\"response_count\":20,\"source\":\"172.17.0.99\"}`\n\n### LOW — Directory-service protocol activity\n\nDirectory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\n\nRule: `directory-service-activity@pcap-rules-v3`; confidence: 0.95; evidence: frame 384 / TCP stream 14, frame 386 / TCP stream 14, frame 388 / TCP stream 14, frame 391 / TCP stream 14, frame 1074 / TCP stream 34.\n\nMetrics: `{\"destination\":\"172.17.0.99\",\"event_count\":39,\"operation_numbers\":[\"0\",\"1\",\"12\"],\"protocol\":\"drsuapi\",\"source\":\"172.17.0.17\"}`\n\n### LOW — Directory-service protocol activity\n\nDirectory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\n\nRule: `directory-service-activity@pcap-rules-v3`; confidence: 0.95; evidence: frame 33 / TCP stream 0, frame 419 / TCP stream 18, frame 431 / TCP stream 18, frame 452 / TCP stream 19, frame 455 / TCP stream 19.\n\nMetrics: `{\"destination\":\"172.17.0.99\",\"event_count\":66,\"operation_numbers\":[\"\",\"1\",\"4,19,19,19,5\",\"4,5\",\"5\"],\"protocol\":\"ldap\",\"source\":\"172.17.0.17\"}`\n\n### LOW — Directory-service protocol activity\n\nDirectory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\n\nRule: `directory-service-activity@pcap-rules-v3`; confidence: 0.95; evidence: frame 410 / TCP stream 13, frame 415 / TCP stream 13, frame 417 / TCP stream 13, frame 420 / TCP stream 13, frame 422 / TCP stream 13.\n\nMetrics: `{\"destination\":\"172.17.0.99\",\"event_count\":15,\"operation_numbers\":[\"1\",\"16\",\"17\",\"3\",\"34\",\"36\",\"39\",\"5\",\"6\",\"64\",\"7\"],\"protocol\":\"samr\",\"source\":\"172.17.0.17\"}`\n\n### LOW — Directory-service protocol activity\n\nDirectory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\n\nRule: `directory-service-activity@pcap-rules-v3`; confidence: 0.95; evidence: frame 382 / TCP stream 14, frame 385 / TCP stream 14, frame 387 / TCP stream 14, frame 389 / TCP stream 14, frame 1073 / TCP stream 34.\n\nMetrics: `{\"destination\":\"172.17.0.17\",\"event_count\":39,\"operation_numbers\":[\"0\",\"1\",\"12\"],\"protocol\":\"drsuapi\",\"source\":\"172.17.0.99\"}`\n\n### LOW — Directory-service protocol activity\n\nDirectory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\n\nRule: `directory-service-activity@pcap-rules-v3`; confidence: 0.95; evidence: frame 31 / TCP stream 0, frame 34 / TCP stream 0, frame 412 / TCP stream 18, frame 430 / TCP stream 18, frame 443 / TCP stream 19.\n\nMetrics: `{\"destination\":\"172.17.0.17\",\"event_count\":84,\"operation_numbers\":[\"\",\"0\",\"2\",\"3\"],\"protocol\":\"ldap\",\"source\":\"172.17.0.99\"}`\n\n### LOW — Directory-service protocol activity\n\nDirectory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\n\nRule: `directory-service-activity@pcap-rules-v3`; confidence: 0.95; evidence: frame 409 / TCP stream 13, frame 413 / TCP stream 13, frame 416 / TCP stream 13, frame 418 / TCP stream 13, frame 421 / TCP stream 13.\n\nMetrics: `{\"destination\":\"172.17.0.17\",\"event_count\":15,\"operation_numbers\":[\"1\",\"16\",\"17\",\"3\",\"34\",\"36\",\"39\",\"5\",\"6\",\"64\",\"7\"],\"protocol\":\"samr\",\"source\":\"172.17.0.99\"}`\n\n## ATT&CK candidates\n\n- No deterministic ATT&CK candidates.\n\n## Identities\n\n- account: `afletcher`; client IPs: 172.17.0.99; frames: 293, 301, 303, 317, 350\n- full-name: `Andrew Fletcher`; client IPs: 172.17.0.99; frames: 428\n- hostname: `DESKTOP-RNVO9AT`; client IPs: 172.17.0.99; frames: 1, 3, 20, 22, 60\n- netbios-group: `BEPOSITIVE`; client IPs: unbound subject; frames: 21, 61, 65, 82, 85\n\n## IOC and artifact candidates\n\n- domain: `a1834.dscg2.akamai.net`; roles: dns-cname\n- domain: `acroipm2.adobe.com`; roles: dns-query, http-host\n- domain: `api.msn.com`; roles: dns-query, tls-sni\n- domain: `arc.msn.com`; roles: dns-query, tls-sni\n- domain: `assets.msn.com`; roles: dns-query, tls-sni\n- domain: `bepositive.com`; roles: dns-query\n- domain: `blob.mwh03prdstf02a.store.core.windows.net`; roles: dns-cname\n- domain: `client.wns.windows.com`; roles: tls-sni\n- domain: `ctldl.windowsupdate.com`; roles: dns-query, http-host\n- domain: `desktop-rnvo9at.bepositive.com`; roles: dns-query\n- domain: `dns.msftncsi.com`; roles: dns-query\n- domain: `download.windowsupdate.com`; roles: dns-query\n- domain: `ecs.office.com`; roles: dns-query, tls-sni\n- domain: `fd.api.iris.microsoft.com`; roles: dns-query, tls-sni\n- domain: `g.live.com`; roles: dns-query, tls-sni\n- domain: `img-s-msn-com.akamaized.net`; roles: dns-query, tls-sni\n- domain: `inputsuggestions.msdxcdn.microsoft.com`; roles: dns-query, tls-sni\n- domain: `login.microsoftonline.com`; roles: dns-query, tls-sni\n- domain: `mobile.events.data.microsoft.com`; roles: dns-query, tls-sni\n- domain: `odc.officeapps.live.com`; roles: dns-query, tls-sni\n- domain: `officeclient.microsoft.com`; roles: dns-query, tls-sni\n- domain: `oneclient.sfx.ms`; roles: dns-query, tls-sni\n- domain: `pti.store.microsoft.com`; roles: dns-query\n- domain: `settings-win.data.microsoft.com`; roles: dns-query, tls-sni\n- domain: `srtb.msn.com`; roles: dns-query, tls-sni\n- domain: `sso.godaddy.com`; roles: dns-query, tls-sni\n- domain: `storecatalogrevocation.storequality.microsoft.com`; roles: dns-query, tls-sni\n- domain: `th.bing.com`; roles: dns-query, tls-sni\n- domain: `v10.events.data.microsoft.com`; roles: dns-query, tls-sni\n- domain: `weathermapdata.blob.core.windows.net`; roles: dns-query, tls-sni\n- domain: `win-ctl9xbq9y19.bepositive.com`; roles: dns-query\n- domain: `windows.msn.com`; roles: dns-query, tls-sni\n- domain: `wpad.bepositive.com`; roles: dns-query\n- domain: `www.bellantonicioccolato.it`; roles: tls-sni\n- domain: `www.bing.com`; roles: dns-query, tls-sni\n- domain: `www.msftconnecttest.com`; roles: dns-query, http-host\n- domain: `www.msn.com`; roles: dns-query, tls-sni\n- domain: `x1.c.lencr.org`; roles: dns-query, http-host\n- ipv4: `0.0.0.0`; roles: network-endpoint\n- ipv4: `13.107.246.57`; roles: dns-answer, network-endpoint\n- ipv4: `13.70.79.200`; roles: dns-answer, network-endpoint\n- ipv4: `13.89.179.9`; roles: dns-answer, network-endpoint\n- ipv4: `131.107.255.255`; roles: dns-answer\n- ipv4: `172.17.0.17`; roles: dns-answer, network-endpoint\n- ipv4: `172.17.0.255`; roles: network-endpoint\n- ipv4: `172.17.0.99`; roles: dns-answer, network-endpoint\n- ipv4: `184.29.137.96`; roles: dns-answer, network-endpoint\n- ipv4: `199.232.210.172`; roles: dns-answer, network-endpoint\n- ipv4: `199.232.214.172`; roles: dns-answer, network-endpoint\n- ipv4: `20.10.31.115`; roles: network-endpoint\n- ipv4: `20.189.173.1`; roles: dns-answer, network-endpoint\n- ipv4: `20.189.173.18`; roles: dns-answer, network-endpoint\n- ipv4: `20.189.173.26`; roles: dns-answer, network-endpoint\n- ipv4: `20.190.135.2`; roles: dns-answer\n- ipv4: `20.241.44.114`; roles: dns-answer, network-endpoint\n- ipv4: `20.42.73.28`; roles: dns-answer, network-endpoint\n- ipv4: `20.60.228.1`; roles: dns-answer, network-endpoint\n- ipv4: `20.96.153.111`; roles: dns-answer, network-endpoint\n- ipv4: `204.79.197.203`; roles: dns-answer, network-endpoint\n- ipv4: `224.0.0.251`; roles: network-endpoint\n- ipv4: `224.0.0.252`; roles: network-endpoint\n- ipv4: `23.194.68.140`; roles: dns-answer, network-endpoint\n- ipv4: `23.195.212.189`; roles: dns-answer, network-endpoint\n- ipv4: `23.220.251.149`; roles: dns-answer, network-endpoint\n- ipv4: `23.220.251.153`; roles: dns-answer, network-endpoint\n- ipv4: `23.220.251.158`; roles: dns-answer, network-endpoint\n- ipv4: `23.220.251.160`; roles: dns-answer\n- ipv4: `23.220.251.47`; roles: dns-answer, network-endpoint\n- ipv4: `23.220.251.48`; roles: dns-answer\n- ipv4: `23.221.24.49`; roles: dns-answer\n- ipv4: `23.221.24.50`; roles: dns-answer\n- ipv4: `23.221.24.51`; roles: dns-answer\n- ipv4: `23.221.24.52`; roles: dns-answer\n- ipv4: `23.221.24.53`; roles: dns-answer\n- ipv4: `23.221.24.55`; roles: dns-answer\n- ipv4: `23.221.24.56`; roles: dns-answer\n- ipv4: `23.221.24.57`; roles: dns-answer\n- ipv4: `23.221.24.58`; roles: dns-answer, network-endpoint\n- ipv4: `23.221.24.62`; roles: dns-answer\n- ipv4: `23.221.24.63`; roles: dns-answer\n- ipv4: `23.221.24.64`; roles: dns-answer\n- ipv4: `23.221.24.68`; roles: dns-answer\n- ipv4: `23.221.24.69`; roles: dns-answer, network-endpoint\n- ipv4: `23.221.24.70`; roles: dns-answer\n- ipv4: `23.221.24.73`; roles: dns-answer\n- ipv4: `23.40.145.142`; roles: dns-answer, network-endpoint\n- ipv4: `23.45.119.134`; roles: dns-answer\n- ipv4: `23.45.119.140`; roles: dns-answer\n- ipv4: `23.45.119.142`; roles: dns-answer\n- ipv4: `23.45.119.143`; roles: dns-answer, network-endpoint\n- ipv4: `23.45.119.144`; roles: dns-answer, network-endpoint\n- ipv4: `23.45.119.146`; roles: dns-answer\n- ipv4: `23.45.119.147`; roles: dns-answer, network-endpoint\n- ipv4: `23.45.119.166`; roles: dns-answer\n- ipv4: `23.45.119.174`; roles: dns-answer\n- ipv4: `255.255.255.255`; roles: network-endpoint\n- ipv4: `40.119.249.228`; roles: dns-answer, network-endpoint\n- ipv4: `40.126.28.11`; roles: dns-answer\n- ipv4: `40.126.28.12`; roles: dns-answer, network-endpoint\n- ipv4: `40.126.28.13`; roles: dns-answer\n- ipv4: `40.126.28.18`; roles: dns-answer\n- ipv4: `40.126.28.19`; roles: dns-answer\n- ipv4: `40.126.28.20`; roles: dns-answer\n- ipv4: `40.126.28.21`; roles: dns-answer\n- ipv4: `40.126.28.22`; roles: dns-answer, network-endpoint\n- ipv4: `40.126.28.23`; roles: dns-answer\n- ipv4: `40.126.7.32`; roles: dns-answer\n- ipv4: `40.126.7.35`; roles: dns-answer\n- ipv4: `46.254.34.201`; roles: network-endpoint\n- ipv4: `52.109.0.142`; roles: dns-answer, network-endpoint\n- ipv4: `52.109.0.91`; roles: dns-answer, network-endpoint\n- ipv4: `52.113.194.132`; roles: dns-answer, network-endpoint\n- ipv4: `79.124.78.197`; roles: http-host, network-endpoint\n- ja3: `091f51a7a1c3a4504a224cc081ce9cee`; roles: tls-client-fingerprint\n- ja3: `1a0fcf72de58b80a8499dea99e961714`; roles: tls-client-fingerprint\n- ja3: `350c9b4a3f847974933dd25e9f9dc620`; roles: tls-client-fingerprint\n- ja3: `3c293bdf2a25c07559b560ba86debc77`; roles: tls-client-fingerprint\n- ja3: `3c4eb72b882d4d1442c67ce73f1292a9`; roles: tls-client-fingerprint\n- ja3: `4c6de70d03b552090a8d77fcb0e10629`; roles: tls-client-fingerprint\n- ja3: `5291cc6eebf72ef2ca72d48a1dd0d72f`; roles: tls-client-fingerprint\n- ja3: `5919f6108f098e14c2f37619021ebd4d`; roles: tls-client-fingerprint\n- ja3: `65005c9d9ae0f0ebeaf22c210571d482`; roles: tls-client-fingerprint\n- ja3: `6a5d235ee78c6aede6a61448b4e9ff1e`; roles: tls-client-fingerprint\n- ja3: `81e0f23545c783a55096f99f7c4755d7`; roles: tls-client-fingerprint\n- ja3: `a25c14084d58bfea7bb5de112124edb3`; roles: tls-client-fingerprint\n- ja3: `a35e0e26a8a46900d0f8297769d1112c`; roles: tls-client-fingerprint\n- ja3: `cad306d4b414c5fcf993c03e0d596109`; roles: tls-client-fingerprint\n- ja3: `f06a64ec6ecba24167cfe2612badcd91`; roles: tls-client-fingerprint\n- sha256: `3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43`; roles: exported-object\n- sha256: `5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61`; roles: exported-object\n- sha256: `69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820`; roles: exported-object\n- sha256: `736f0cb5cc23435dad920dbe447efcf102e61c8691fa8528f5f39f386537f43e`; roles: exported-object\n- sha256: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; roles: exported-object\n- sha256: `ed0855c1637e5f93be7d54acb2cb8872683a0e5eb670258abb1ebc41bfbf4591`; roles: exported-object\n- url: `http://79.124.78.197/foots.php`; roles: http-request\n- url: `http://79.124.78.197/index.php`; roles: http-request\n- url: `http://79.124.78.197/index.php?id=&subid=qIOuKk7U`; roles: http-request\n- url: `http://acroipm2.adobe.com/assets/Owner/arm/ProcessMAU.txt`; roles: http-request\n- url: `http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab?d7a8a57aa5acd39b`; roles: http-request\n- url: `http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab?91717f420e6dda94`; roles: http-request\n- url: `http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab?a5fef2ac8502b132`; roles: http-request\n- url: `http://www.msftconnecttest.com/connecttest.txt`; roles: http-request\n- url: `http://x1.c.lencr.org/`; roles: http-request\n- user_agent: `Microsoft NCSI`; roles: http-client\n- user_agent: `Microsoft-CryptoAPI/10.0`; roles: http-client\n- user_agent: `Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729)`; roles: http-client\n- user_agent: `Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729)`; roles: http-client\n- exported object `index.php`; SHA-256 `ed0855c1637e5f93be7d54acb2cb8872683a0e5eb670258abb1ebc41bfbf4591`; size 105 bytes\n- exported object `index.php%3fid=&subid=qIOuKk7U`; SHA-256 `736f0cb5cc23435dad920dbe447efcf102e61c8691fa8528f5f39f386537f43e`; size 61 bytes\n- exported object `connecttest(1).txt`; SHA-256 `5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61`; size 22 bytes\n- exported object `ProcessMAU.txt`; SHA-256 `69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820`; size 4 bytes\n- exported object `index(1).php`; SHA-256 `3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43`; size 1 bytes\n- exported object `foots(1).php`; SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; size 0 bytes\n\n## Actor similarity leads\n\n- No actor lead was calculated.\n\n## Local enrichment and correlations\n\nNo match means unknown in this corpus. Local CTI may postdate the capture. Matches and shared infrastructure require review; no automatic promotion or attribution.\nSnapshot: `99bf9b0d5c90e5eb36c1f5a055241fc0beb1b677bd448cb59545c1ac1d629049`; recorded 2026-09-19T12:08:45.501397+00:00; mode: local-only.\nCoverage: `{\"matched_observables\":0,\"no_exact_match\":147,\"observable_limit\":5000,\"observables_checked\":147,\"observables_total\":147,\"prior_case_limit_reached\":false,\"prior_cases_checked\":7,\"truncated\":false}`\n\n- Prior analysis `08324647-35af-4af2-8d82-4387eec03918` shares 38 observations. This does not establish a common campaign.\n- Prior analysis `616a90fa-f15e-4fcb-8d56-7b8e0eff5785` shares 12 observations. This does not establish a common campaign.\n- Prior analysis `459e119d-191f-49e8-85ea-c78f9de41826` shares 31 observations. This does not establish a common campaign.\n- Prior analysis `7a2cfe72-f48d-4894-8a2d-8889cb3b11b2` shares 47 observations. This does not establish a common campaign.\n- Prior analysis `81373b30-6a59-49d1-89b0-bad73ed19eaa` shares 26 observations. This does not establish a common campaign.\n- Prior analysis `38851ad7-b3a0-423d-ae89-3b7be4e4b908` shares 26 observations. This does not establish a common campaign.\n- Prior analysis `bfccc426-aa9b-4007-8558-a66d37ecb90c` shares 56 observations. This does not establish a common campaign.\n- External provider queries: 0. Not requested; no unknown indicator is classified as benign.\n\n## Coverage and limitations\n\n- Packet and protocol facts are deterministic for the recorded analyzer manifest.\n- Encrypted application payloads are not decrypted; only available metadata is reported.\n- ATT&CK mappings and actor overlaps are candidates until analyst review and promotion.\n- HTTP object inventory: `{\"compact_objects\":0,\"complete\":true,\"detailed_objects\":6,\"exported_objects\":54,\"hashed_bytes\":215,\"hashed_objects\":54,\"omitted_unique_hashes\":0,\"returned_unique_hashes\":6,\"selection\":\"content-classified first, then size descending, SHA256 tie-break; deduplicated by full hash; overflow retains a compact hash index\",\"unhashed_objects\":0,\"unique_hashes\":6}`. Compact overflow hashes are retained in JSON coverage and observables.\n- A directory subject is not necessarily a logged-in user; consult identity bindings in the JSON evidence.\n- Rendered / available: findings 8/8, identities 4/4, observables 147/147, artifacts 6/6. Full returned inventory is in the JSON result.\n",
+      "summary": "Decoded 5091 packets across 42 IP endpoints and 221 transport flows. Observed 173 DNS events, 57 HTTP requests, 72 TLS ClientHello events, and 6 exported HTTP object(s). Deterministic rules produced 8 finding(s): 0 high, 1 medium, and 7 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "observables": [
+        {
+          "type": "domain",
+          "value": "a1834.dscg2.akamai.net",
+          "confidence": 1,
+          "description": "dns-cname; frame 2622 / UDP stream 38, frame 2625 / UDP stream 39"
+        },
+        {
+          "type": "domain",
+          "value": "acroipm2.adobe.com",
+          "confidence": 1,
+          "description": "dns-query, http-host; frame 3435 / UDP stream 48, frame 3436 / UDP stream 48, frame 3440 / TCP stream 85"
+        },
+        {
+          "type": "domain",
+          "value": "api.msn.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 2485 / UDP stream 28, frame 2486 / UDP stream 29, frame 2490 / UDP stream 28, frame 2491 / UDP stream 29, frame 2499 / TCP stream 60 +1 more"
+        },
+        {
+          "type": "domain",
+          "value": "arc.msn.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 565 / UDP stream 16, frame 575 / UDP stream 16, frame 579 / TCP stream 25"
+        },
+        {
+          "type": "domain",
+          "value": "assets.msn.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 528 / UDP stream 16, frame 531 / UDP stream 16, frame 2487 / UDP stream 30, frame 2488 / UDP stream 31, frame 2489 / UDP stream 30 +15 more"
+        },
+        {
+          "type": "domain",
+          "value": "bepositive.com",
+          "confidence": 1,
+          "description": "dns-query; frame 17 / UDP stream 5, frame 19 / UDP stream 5"
+        },
+        {
+          "type": "domain",
+          "value": "blob.mwh03prdstf02a.store.core.windows.net",
+          "confidence": 1,
+          "description": "dns-cname; frame 3390 / UDP stream 47"
+        },
+        {
+          "type": "domain",
+          "value": "client.wns.windows.com",
+          "confidence": 1,
+          "description": "tls-sni; frame 188 / TCP stream 6"
+        },
+        {
+          "type": "domain",
+          "value": "ctldl.windowsupdate.com",
+          "confidence": 1,
+          "description": "dns-query, http-host; frame 4115 / UDP stream 57, frame 4116 / UDP stream 57, frame 4311 / UDP stream 60, frame 4312 / UDP stream 60, frame 4120 / TCP stream 112 +2 more"
+        },
+        {
+          "type": "domain",
+          "value": "desktop-rnvo9at.bepositive.com",
+          "confidence": 1,
+          "description": "dns-query; frame 12 / UDP stream 5, frame 14 / UDP stream 5"
+        },
+        {
+          "type": "domain",
+          "value": "dns.msftncsi.com",
+          "confidence": 1,
+          "description": "dns-query; frame 105 / UDP stream 12, frame 106 / UDP stream 12, frame 4419 / UDP stream 12, frame 4420 / UDP stream 12, frame 4452 / UDP stream 61 +1 more"
+        },
+        {
+          "type": "domain",
+          "value": "download.windowsupdate.com",
+          "confidence": 1,
+          "description": "dns-query; frame 3139 / UDP stream 41"
+        },
+        {
+          "type": "domain",
+          "value": "ecs.office.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 4077 / UDP stream 56, frame 4078 / UDP stream 56, frame 4082 / TCP stream 111, frame 4086 / TCP stream 111, frame 4157 / TCP stream 114 +7 more"
+        },
+        {
+          "type": "domain",
+          "value": "fd.api.iris.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 3037 / UDP stream 22, frame 3038 / UDP stream 22, frame 3042 / TCP stream 67"
+        },
+        {
+          "type": "domain",
+          "value": "g.live.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 1051 / UDP stream 20, frame 1052 / UDP stream 20, frame 1056 / TCP stream 32"
+        },
+        {
+          "type": "domain",
+          "value": "img-s-msn-com.akamaized.net",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 2586 / UDP stream 38, frame 2587 / UDP stream 39, frame 2622 / UDP stream 38, frame 2625 / UDP stream 39, frame 2656 / TCP stream 62"
+        },
+        {
+          "type": "domain",
+          "value": "inputsuggestions.msdxcdn.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 1244 / UDP stream 21, frame 1245 / UDP stream 21, frame 1249 / TCP stream 40, frame 1253 / TCP stream 40"
+        },
+        {
+          "type": "domain",
+          "value": "login.microsoftonline.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 1126 / UDP stream 21, frame 1140 / UDP stream 21, frame 3620 / UDP stream 50, frame 3621 / UDP stream 50, frame 1147 / TCP stream 37 +5 more"
+        },
+        {
+          "type": "domain",
+          "value": "mobile.events.data.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 4034 / UDP stream 55, frame 4035 / UDP stream 55, frame 4039 / TCP stream 109, frame 4042 / TCP stream 109, frame 5003 / TCP stream 150 +1 more"
+        },
+        {
+          "type": "domain",
+          "value": "odc.officeapps.live.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 885 / UDP stream 19, frame 886 / UDP stream 19, frame 890 / TCP stream 30"
+        },
+        {
+          "type": "domain",
+          "value": "officeclient.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 668 / UDP stream 16, frame 805 / UDP stream 16, frame 830 / TCP stream 29"
+        },
+        {
+          "type": "domain",
+          "value": "oneclient.sfx.ms",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 1150 / UDP stream 21, frame 1154 / UDP stream 21, frame 1158 / TCP stream 38"
+        },
+        {
+          "type": "domain",
+          "value": "pti.store.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query; frame 152 / UDP stream 16, frame 153 / UDP stream 16"
+        },
+        {
+          "type": "domain",
+          "value": "settings-win.data.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 3683 / UDP stream 53, frame 3691 / UDP stream 53, frame 3707 / TCP stream 97, frame 3741 / TCP stream 98"
+        },
+        {
+          "type": "domain",
+          "value": "srtb.msn.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 2535 / UDP stream 33, frame 2536 / UDP stream 34, frame 2537 / UDP stream 33, frame 2538 / UDP stream 34, frame 2549 / TCP stream 61 +1 more"
+        },
+        {
+          "type": "domain",
+          "value": "sso.godaddy.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 1198 / UDP stream 21, frame 1199 / UDP stream 21, frame 1629 / UDP stream 22, frame 1630 / UDP stream 22, frame 3645 / UDP stream 51 +4 more"
+        },
+        {
+          "type": "domain",
+          "value": "storecatalogrevocation.storequality.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 3203 / UDP stream 42, frame 3204 / UDP stream 42, frame 3208 / TCP stream 74"
+        },
+        {
+          "type": "domain",
+          "value": "th.bing.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 2563 / UDP stream 36, frame 2564 / UDP stream 37, frame 2579 / UDP stream 36, frame 2595 / UDP stream 37, frame 2594"
+        },
+        {
+          "type": "domain",
+          "value": "v10.events.data.microsoft.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 243 / UDP stream 16, frame 244 / UDP stream 16, frame 3140 / UDP stream 42, frame 3141 / UDP stream 42, frame 3259 / UDP stream 43 +10 more"
+        },
+        {
+          "type": "domain",
+          "value": "weathermapdata.blob.core.windows.net",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 3389 / UDP stream 47, frame 3390 / UDP stream 47, frame 3394 / TCP stream 84, frame 3397 / TCP stream 84"
+        },
+        {
+          "type": "domain",
+          "value": "win-ctl9xbq9y19.bepositive.com",
+          "confidence": 1,
+          "description": "dns-query; frame 13 / UDP stream 6, frame 15 / UDP stream 6"
+        },
+        {
+          "type": "domain",
+          "value": "windows.msn.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 2385 / UDP stream 24, frame 2386 / UDP stream 25, frame 2387 / UDP stream 24, frame 2394 / UDP stream 25, frame 3803 / UDP stream 54 +7 more"
+        },
+        {
+          "type": "domain",
+          "value": "wpad.bepositive.com",
+          "confidence": 1,
+          "description": "dns-query; frame 39 / UDP stream 10, frame 40 / UDP stream 11, frame 41 / UDP stream 10, frame 42 / UDP stream 11, frame 109 / UDP stream 12 +15 more"
+        },
+        {
+          "type": "domain",
+          "value": "www.bellantonicioccolato.it",
+          "confidence": 1,
+          "description": "tls-sni; frame 1279 / TCP stream 41, frame 1704 / TCP stream 50"
+        },
+        {
+          "type": "domain",
+          "value": "www.bing.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 498 / UDP stream 16, frame 499 / UDP stream 16, frame 504 / TCP stream 22, frame 623 / TCP stream 27"
+        },
+        {
+          "type": "domain",
+          "value": "www.msftconnecttest.com",
+          "confidence": 1,
+          "description": "dns-query, http-host; frame 47 / UDP stream 11, frame 48 / UDP stream 11, frame 67 / UDP stream 12, frame 68 / UDP stream 12, frame 52 / TCP stream 1 +1 more"
+        },
+        {
+          "type": "domain",
+          "value": "www.msn.com",
+          "confidence": 1,
+          "description": "dns-query, tls-sni; frame 599 / UDP stream 16, frame 602 / UDP stream 16, frame 2437 / UDP stream 26, frame 2438 / UDP stream 27, frame 2439 / UDP stream 26 +5 more"
+        },
+        {
+          "type": "domain",
+          "value": "x1.c.lencr.org",
+          "confidence": 1,
+          "description": "dns-query, http-host; frame 4303 / UDP stream 59, frame 4304 / UDP stream 59, frame 4308 / TCP stream 119"
+        },
+        {
+          "type": "ipv4",
+          "value": "0.0.0.0",
+          "confidence": 1,
+          "description": "network-endpoint; no frame reference"
+        },
+        {
+          "type": "ipv4",
+          "value": "13.107.246.57",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 1245 / UDP stream 21"
+        },
+        {
+          "type": "ipv4",
+          "value": "13.70.79.200",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 4256 / UDP stream 58"
+        },
+        {
+          "type": "ipv4",
+          "value": "13.89.179.9",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 3141 / UDP stream 42"
+        },
+        {
+          "type": "ipv4",
+          "value": "131.107.255.255",
+          "confidence": 1,
+          "description": "dns-answer; frame 106 / UDP stream 12, frame 4420 / UDP stream 12, frame 4453 / UDP stream 61"
+        },
+        {
+          "type": "ipv4",
+          "value": "172.17.0.17",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 9 / UDP stream 2, frame 14 / UDP stream 5, frame 15 / UDP stream 6, frame 25 / UDP stream 6, frame 2251 / UDP stream 22 +3 more"
+        },
+        {
+          "type": "ipv4",
+          "value": "172.17.0.255",
+          "confidence": 1,
+          "description": "network-endpoint; no frame reference"
+        },
+        {
+          "type": "ipv4",
+          "value": "172.17.0.99",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 17 / UDP stream 5, frame 19 / UDP stream 5"
+        },
+        {
+          "type": "ipv4",
+          "value": "184.29.137.96",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 4304 / UDP stream 59"
+        },
+        {
+          "type": "ipv4",
+          "value": "199.232.210.172",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 4116 / UDP stream 57, frame 4312 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "199.232.214.172",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 4116 / UDP stream 57, frame 4312 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.10.31.115",
+          "confidence": 1,
+          "description": "network-endpoint; no frame reference"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.189.173.1",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 3667 / UDP stream 52"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.189.173.18",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 4035 / UDP stream 55"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.189.173.26",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 3260 / UDP stream 43"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.190.135.2",
+          "confidence": 1,
+          "description": "dns-answer; frame 3621 / UDP stream 50"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.241.44.114",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 1052 / UDP stream 20"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.42.73.28",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 244 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.60.228.1",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 3390 / UDP stream 47"
+        },
+        {
+          "type": "ipv4",
+          "value": "20.96.153.111",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 575 / UDP stream 16, frame 3038 / UDP stream 22"
+        },
+        {
+          "type": "ipv4",
+          "value": "204.79.197.203",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 602 / UDP stream 16, frame 2387 / UDP stream 24, frame 2439 / UDP stream 26, frame 2490 / UDP stream 28, frame 2537 / UDP stream 33 +1 more"
+        },
+        {
+          "type": "ipv4",
+          "value": "224.0.0.251",
+          "confidence": 1,
+          "description": "network-endpoint; no frame reference"
+        },
+        {
+          "type": "ipv4",
+          "value": "224.0.0.252",
+          "confidence": 1,
+          "description": "network-endpoint; no frame reference"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.194.68.140",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 3204 / UDP stream 42"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.195.212.189",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 1199 / UDP stream 21, frame 1630 / UDP stream 22, frame 3647 / UDP stream 51"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.220.251.149",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 48 / UDP stream 11, frame 68 / UDP stream 12"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.220.251.153",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 2622 / UDP stream 38"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.220.251.158",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 48 / UDP stream 11, frame 68 / UDP stream 12"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.220.251.160",
+          "confidence": 1,
+          "description": "dns-answer; frame 2622 / UDP stream 38"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.220.251.47",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 3436 / UDP stream 48"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.220.251.48",
+          "confidence": 1,
+          "description": "dns-answer; frame 3436 / UDP stream 48"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.49",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.50",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.51",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.52",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.53",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.55",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.56",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16, frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.57",
+          "confidence": 1,
+          "description": "dns-answer; frame 499 / UDP stream 16"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.58",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 499 / UDP stream 16, frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.62",
+          "confidence": 1,
+          "description": "dns-answer; frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.63",
+          "confidence": 1,
+          "description": "dns-answer; frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.64",
+          "confidence": 1,
+          "description": "dns-answer; frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.68",
+          "confidence": 1,
+          "description": "dns-answer; frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.69",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.70",
+          "confidence": 1,
+          "description": "dns-answer; frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.221.24.73",
+          "confidence": 1,
+          "description": "dns-answer; frame 2579 / UDP stream 36"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.40.145.142",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 1154 / UDP stream 21"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.134",
+          "confidence": 1,
+          "description": "dns-answer; frame 4696 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.140",
+          "confidence": 1,
+          "description": "dns-answer; frame 4696 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.142",
+          "confidence": 1,
+          "description": "dns-answer; frame 4696 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.143",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 531 / UDP stream 16, frame 2489 / UDP stream 30, frame 3353 / UDP stream 44, frame 3504 / UDP stream 49"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.144",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 531 / UDP stream 16, frame 2489 / UDP stream 30, frame 3353 / UDP stream 44, frame 3504 / UDP stream 49, frame 4696 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.146",
+          "confidence": 1,
+          "description": "dns-answer; frame 2489 / UDP stream 30, frame 4696 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.147",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 4696 / UDP stream 60"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.166",
+          "confidence": 1,
+          "description": "dns-answer; frame 3139 / UDP stream 41"
+        },
+        {
+          "type": "ipv4",
+          "value": "23.45.119.174",
+          "confidence": 1,
+          "description": "dns-answer; frame 3139 / UDP stream 41"
+        },
+        {
+          "type": "ipv4",
+          "value": "255.255.255.255",
+          "confidence": 1,
+          "description": "network-endpoint; no frame reference"
+        },
+        {
+          "type": "ipv4",
+          "value": "40.119.249.228",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 3691 / UDP stream 53"
+        },
+        {
+          "type": "ipv4",
+          "value": "40.126.28.11",
+          "confidence": 1,
+          "description": "dns-answer; frame 1140 / UDP stream 21, frame 3621 / UDP stream 50"
+        },
+        {
+          "type": "ipv4",
+          "value": "40.126.28.12",
+          "confidence": 1,
+          "description": "dns-answer, network-endpoint; frame 1140 / UDP stream 21"
+        },
+        {
+          "type": "ipv4",
+          "value": "40.126.28.13",
+          "confidence": 1,
+          "description": "dns-answer; frame 1140 / UDP stream 21"
+        }
+      ],
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap"
+      ],
+      "source_sha256": "8fee06d0b1686faab4364f5b7a741e736ad7e713d5ca9299ff9161a4b4d4862e",
+      "semantic_sha256": "4897ba23edbbda370beb304db04a336b3872d332b86d9834b16bb29e87c6d8b5",
+      "observable_count": 147,
+      "evidence_copy_scope": "bounded-preview-full-evidence-retained-in-source-analysis",
+      "source_analysis_ref": "/api/pcap/analyses/faf041c3-70e0-4a01-8780-10917e5e187c",
+      "suspicious_findings": [
+        {
+          "reason": "The same endpoint pair and HTTP target produced repeated POST requests suitable for beaconing or data transfer review. Rule repeated-http-posts@pcap-rules-v3; confidence 72%.",
+          "category": "Repeated outbound HTTP POST activity",
+          "evidence": "frame 1668 / TCP stream 48, frame 1672 / TCP stream 48, frame 1697 / TCP stream 48, frame 2347 / TCP stream 56, frame 2985 / TCP stream 63 +43 more",
+          "severity": "medium"
+        },
+        {
+          "reason": "Repeated NXDOMAIN responses may indicate a dead domain, misconfiguration, retrying software, or malicious fallback. They do not establish a domain-generation algorithm. Rule repeated-nxdomain@pcap-rules-v3; confidence 50%.",
+          "category": "Repeated unsuccessful DNS resolution",
+          "evidence": "frame 41 / UDP stream 10, frame 42 / UDP stream 11, frame 111 / UDP stream 12, frame 112 / UDP stream 16, frame 215 / UDP stream 16 +15 more",
+          "severity": "low"
+        },
+        {
+          "reason": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync. Rule directory-service-activity@pcap-rules-v3; confidence 95%.",
+          "category": "Directory-service protocol activity",
+          "evidence": "frame 384 / TCP stream 14, frame 386 / TCP stream 14, frame 388 / TCP stream 14, frame 391 / TCP stream 14, frame 1074 / TCP stream 34 +34 more",
+          "severity": "low"
+        },
+        {
+          "reason": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync. Rule directory-service-activity@pcap-rules-v3; confidence 95%.",
+          "category": "Directory-service protocol activity",
+          "evidence": "frame 33 / TCP stream 0, frame 419 / TCP stream 18, frame 431 / TCP stream 18, frame 452 / TCP stream 19, frame 455 / TCP stream 19 +61 more",
+          "severity": "low"
+        },
+        {
+          "reason": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync. Rule directory-service-activity@pcap-rules-v3; confidence 95%.",
+          "category": "Directory-service protocol activity",
+          "evidence": "frame 410 / TCP stream 13, frame 415 / TCP stream 13, frame 417 / TCP stream 13, frame 420 / TCP stream 13, frame 422 / TCP stream 13 +10 more",
+          "severity": "low"
+        },
+        {
+          "reason": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync. Rule directory-service-activity@pcap-rules-v3; confidence 95%.",
+          "category": "Directory-service protocol activity",
+          "evidence": "frame 382 / TCP stream 14, frame 385 / TCP stream 14, frame 387 / TCP stream 14, frame 389 / TCP stream 14, frame 1073 / TCP stream 34 +34 more",
+          "severity": "low"
+        },
+        {
+          "reason": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync. Rule directory-service-activity@pcap-rules-v3; confidence 95%.",
+          "category": "Directory-service protocol activity",
+          "evidence": "frame 31 / TCP stream 0, frame 34 / TCP stream 0, frame 412 / TCP stream 18, frame 430 / TCP stream 18, frame 443 / TCP stream 19 +79 more",
+          "severity": "low"
+        },
+        {
+          "reason": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync. Rule directory-service-activity@pcap-rules-v3; confidence 95%.",
+          "category": "Directory-service protocol activity",
+          "evidence": "frame 409 / TCP stream 13, frame 413 / TCP stream 13, frame 416 / TCP stream 13, frame 418 / TCP stream 13, frame 421 / TCP stream 13 +10 more",
+          "severity": "low"
+        }
+      ],
+      "observables_truncated": true,
+      "actor_similarity_leads": [],
+      "expected_suspicious_behaviors": []
+    },
+    {
+      "id": "ioc:a1834.dscg2.akamai.net",
+      "type": "ioc",
+      "value": "a1834.dscg2.akamai.net",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-cname; frame 2622 / UDP stream 38, frame 2625 / UDP stream 39",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:acroipm2.adobe.com",
+      "type": "ioc",
+      "value": "acroipm2.adobe.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, http-host; frame 3435 / UDP stream 48, frame 3436 / UDP stream 48, frame 3440 / TCP stream 85",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:api.msn.com",
+      "type": "ioc",
+      "value": "api.msn.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 2485 / UDP stream 28, frame 2486 / UDP stream 29, frame 2490 / UDP stream 28, frame 2491 / UDP stream 29, frame 2499 / TCP stream 60 +1 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:arc.msn.com",
+      "type": "ioc",
+      "value": "arc.msn.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 565 / UDP stream 16, frame 575 / UDP stream 16, frame 579 / TCP stream 25",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:assets.msn.com",
+      "type": "ioc",
+      "value": "assets.msn.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 528 / UDP stream 16, frame 531 / UDP stream 16, frame 2487 / UDP stream 30, frame 2488 / UDP stream 31, frame 2489 / UDP stream 30 +15 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:bepositive.com",
+      "type": "ioc",
+      "value": "bepositive.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query; frame 17 / UDP stream 5, frame 19 / UDP stream 5",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:blob.mwh03prdstf02a.store.core.windows.net",
+      "type": "ioc",
+      "value": "blob.mwh03prdstf02a.store.core.windows.net",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-cname; frame 3390 / UDP stream 47",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:client.wns.windows.com",
+      "type": "ioc",
+      "value": "client.wns.windows.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "tls-sni; frame 188 / TCP stream 6",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:ctldl.windowsupdate.com",
+      "type": "ioc",
+      "value": "ctldl.windowsupdate.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, http-host; frame 4115 / UDP stream 57, frame 4116 / UDP stream 57, frame 4311 / UDP stream 60, frame 4312 / UDP stream 60, frame 4120 / TCP stream 112 +2 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:desktop-rnvo9at.bepositive.com",
+      "type": "ioc",
+      "value": "desktop-rnvo9at.bepositive.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query; frame 12 / UDP stream 5, frame 14 / UDP stream 5",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:dns.msftncsi.com",
+      "type": "ioc",
+      "value": "dns.msftncsi.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query; frame 105 / UDP stream 12, frame 106 / UDP stream 12, frame 4419 / UDP stream 12, frame 4420 / UDP stream 12, frame 4452 / UDP stream 61 +1 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:download.windowsupdate.com",
+      "type": "ioc",
+      "value": "download.windowsupdate.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query; frame 3139 / UDP stream 41",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:ecs.office.com",
+      "type": "ioc",
+      "value": "ecs.office.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 4077 / UDP stream 56, frame 4078 / UDP stream 56, frame 4082 / TCP stream 111, frame 4086 / TCP stream 111, frame 4157 / TCP stream 114 +7 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:fd.api.iris.microsoft.com",
+      "type": "ioc",
+      "value": "fd.api.iris.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 3037 / UDP stream 22, frame 3038 / UDP stream 22, frame 3042 / TCP stream 67",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:g.live.com",
+      "type": "ioc",
+      "value": "g.live.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 1051 / UDP stream 20, frame 1052 / UDP stream 20, frame 1056 / TCP stream 32",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:img-s-msn-com.akamaized.net",
+      "type": "ioc",
+      "value": "img-s-msn-com.akamaized.net",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 2586 / UDP stream 38, frame 2587 / UDP stream 39, frame 2622 / UDP stream 38, frame 2625 / UDP stream 39, frame 2656 / TCP stream 62",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:inputsuggestions.msdxcdn.microsoft.com",
+      "type": "ioc",
+      "value": "inputsuggestions.msdxcdn.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 1244 / UDP stream 21, frame 1245 / UDP stream 21, frame 1249 / TCP stream 40, frame 1253 / TCP stream 40",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:login.microsoftonline.com",
+      "type": "ioc",
+      "value": "login.microsoftonline.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 1126 / UDP stream 21, frame 1140 / UDP stream 21, frame 3620 / UDP stream 50, frame 3621 / UDP stream 50, frame 1147 / TCP stream 37 +5 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:mobile.events.data.microsoft.com",
+      "type": "ioc",
+      "value": "mobile.events.data.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 4034 / UDP stream 55, frame 4035 / UDP stream 55, frame 4039 / TCP stream 109, frame 4042 / TCP stream 109, frame 5003 / TCP stream 150 +1 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:odc.officeapps.live.com",
+      "type": "ioc",
+      "value": "odc.officeapps.live.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 885 / UDP stream 19, frame 886 / UDP stream 19, frame 890 / TCP stream 30",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:officeclient.microsoft.com",
+      "type": "ioc",
+      "value": "officeclient.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 668 / UDP stream 16, frame 805 / UDP stream 16, frame 830 / TCP stream 29",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:oneclient.sfx.ms",
+      "type": "ioc",
+      "value": "oneclient.sfx.ms",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 1150 / UDP stream 21, frame 1154 / UDP stream 21, frame 1158 / TCP stream 38",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:pti.store.microsoft.com",
+      "type": "ioc",
+      "value": "pti.store.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query; frame 152 / UDP stream 16, frame 153 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:settings-win.data.microsoft.com",
+      "type": "ioc",
+      "value": "settings-win.data.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 3683 / UDP stream 53, frame 3691 / UDP stream 53, frame 3707 / TCP stream 97, frame 3741 / TCP stream 98",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:srtb.msn.com",
+      "type": "ioc",
+      "value": "srtb.msn.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 2535 / UDP stream 33, frame 2536 / UDP stream 34, frame 2537 / UDP stream 33, frame 2538 / UDP stream 34, frame 2549 / TCP stream 61 +1 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:sso.godaddy.com",
+      "type": "ioc",
+      "value": "sso.godaddy.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 1198 / UDP stream 21, frame 1199 / UDP stream 21, frame 1629 / UDP stream 22, frame 1630 / UDP stream 22, frame 3645 / UDP stream 51 +4 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:storecatalogrevocation.storequality.microsoft.com",
+      "type": "ioc",
+      "value": "storecatalogrevocation.storequality.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 3203 / UDP stream 42, frame 3204 / UDP stream 42, frame 3208 / TCP stream 74",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:th.bing.com",
+      "type": "ioc",
+      "value": "th.bing.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 2563 / UDP stream 36, frame 2564 / UDP stream 37, frame 2579 / UDP stream 36, frame 2595 / UDP stream 37, frame 2594",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:v10.events.data.microsoft.com",
+      "type": "ioc",
+      "value": "v10.events.data.microsoft.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 243 / UDP stream 16, frame 244 / UDP stream 16, frame 3140 / UDP stream 42, frame 3141 / UDP stream 42, frame 3259 / UDP stream 43 +10 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:weathermapdata.blob.core.windows.net",
+      "type": "ioc",
+      "value": "weathermapdata.blob.core.windows.net",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 3389 / UDP stream 47, frame 3390 / UDP stream 47, frame 3394 / TCP stream 84, frame 3397 / TCP stream 84",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:win-ctl9xbq9y19.bepositive.com",
+      "type": "ioc",
+      "value": "win-ctl9xbq9y19.bepositive.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query; frame 13 / UDP stream 6, frame 15 / UDP stream 6",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:windows.msn.com",
+      "type": "ioc",
+      "value": "windows.msn.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 2385 / UDP stream 24, frame 2386 / UDP stream 25, frame 2387 / UDP stream 24, frame 2394 / UDP stream 25, frame 3803 / UDP stream 54 +7 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:wpad.bepositive.com",
+      "type": "ioc",
+      "value": "wpad.bepositive.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query; frame 39 / UDP stream 10, frame 40 / UDP stream 11, frame 41 / UDP stream 10, frame 42 / UDP stream 11, frame 109 / UDP stream 12 +15 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:www.bellantonicioccolato.it",
+      "type": "ioc",
+      "value": "www.bellantonicioccolato.it",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "tls-sni; frame 1279 / TCP stream 41, frame 1704 / TCP stream 50",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:www.bing.com",
+      "type": "ioc",
+      "value": "www.bing.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 498 / UDP stream 16, frame 499 / UDP stream 16, frame 504 / TCP stream 22, frame 623 / TCP stream 27",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:www.msftconnecttest.com",
+      "type": "ioc",
+      "value": "www.msftconnecttest.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, http-host; frame 47 / UDP stream 11, frame 48 / UDP stream 11, frame 67 / UDP stream 12, frame 68 / UDP stream 12, frame 52 / TCP stream 1 +1 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:www.msn.com",
+      "type": "ioc",
+      "value": "www.msn.com",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, tls-sni; frame 599 / UDP stream 16, frame 602 / UDP stream 16, frame 2437 / UDP stream 26, frame 2438 / UDP stream 27, frame 2439 / UDP stream 26 +5 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:x1.c.lencr.org",
+      "type": "ioc",
+      "value": "x1.c.lencr.org",
+      "source": "log-pcap-analysis",
+      "ioc_type": "domain",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-query, http-host; frame 4303 / UDP stream 59, frame 4304 / UDP stream 59, frame 4308 / TCP stream 119",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:0.0.0.0",
+      "type": "ioc",
+      "value": "0.0.0.0",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "network-endpoint; no frame reference",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:13.107.246.57",
+      "type": "ioc",
+      "value": "13.107.246.57",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 1245 / UDP stream 21",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:13.70.79.200",
+      "type": "ioc",
+      "value": "13.70.79.200",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 4256 / UDP stream 58",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:13.89.179.9",
+      "type": "ioc",
+      "value": "13.89.179.9",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 3141 / UDP stream 42",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:131.107.255.255",
+      "type": "ioc",
+      "value": "131.107.255.255",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 106 / UDP stream 12, frame 4420 / UDP stream 12, frame 4453 / UDP stream 61",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:172.17.0.17",
+      "type": "ioc",
+      "value": "172.17.0.17",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 9 / UDP stream 2, frame 14 / UDP stream 5, frame 15 / UDP stream 6, frame 25 / UDP stream 6, frame 2251 / UDP stream 22 +3 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:172.17.0.255",
+      "type": "ioc",
+      "value": "172.17.0.255",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "network-endpoint; no frame reference",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:172.17.0.99",
+      "type": "ioc",
+      "value": "172.17.0.99",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 17 / UDP stream 5, frame 19 / UDP stream 5",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:184.29.137.96",
+      "type": "ioc",
+      "value": "184.29.137.96",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 4304 / UDP stream 59",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:199.232.210.172",
+      "type": "ioc",
+      "value": "199.232.210.172",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 4116 / UDP stream 57, frame 4312 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:199.232.214.172",
+      "type": "ioc",
+      "value": "199.232.214.172",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 4116 / UDP stream 57, frame 4312 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.10.31.115",
+      "type": "ioc",
+      "value": "20.10.31.115",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "network-endpoint; no frame reference",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.189.173.1",
+      "type": "ioc",
+      "value": "20.189.173.1",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 3667 / UDP stream 52",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.189.173.18",
+      "type": "ioc",
+      "value": "20.189.173.18",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 4035 / UDP stream 55",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.189.173.26",
+      "type": "ioc",
+      "value": "20.189.173.26",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 3260 / UDP stream 43",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.190.135.2",
+      "type": "ioc",
+      "value": "20.190.135.2",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 3621 / UDP stream 50",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.241.44.114",
+      "type": "ioc",
+      "value": "20.241.44.114",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 1052 / UDP stream 20",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.42.73.28",
+      "type": "ioc",
+      "value": "20.42.73.28",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 244 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.60.228.1",
+      "type": "ioc",
+      "value": "20.60.228.1",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 3390 / UDP stream 47",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:20.96.153.111",
+      "type": "ioc",
+      "value": "20.96.153.111",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 575 / UDP stream 16, frame 3038 / UDP stream 22",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:204.79.197.203",
+      "type": "ioc",
+      "value": "204.79.197.203",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 602 / UDP stream 16, frame 2387 / UDP stream 24, frame 2439 / UDP stream 26, frame 2490 / UDP stream 28, frame 2537 / UDP stream 33 +1 more",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:224.0.0.251",
+      "type": "ioc",
+      "value": "224.0.0.251",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "network-endpoint; no frame reference",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:224.0.0.252",
+      "type": "ioc",
+      "value": "224.0.0.252",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "network-endpoint; no frame reference",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.194.68.140",
+      "type": "ioc",
+      "value": "23.194.68.140",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 3204 / UDP stream 42",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.195.212.189",
+      "type": "ioc",
+      "value": "23.195.212.189",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 1199 / UDP stream 21, frame 1630 / UDP stream 22, frame 3647 / UDP stream 51",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.220.251.149",
+      "type": "ioc",
+      "value": "23.220.251.149",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 48 / UDP stream 11, frame 68 / UDP stream 12",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.220.251.153",
+      "type": "ioc",
+      "value": "23.220.251.153",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 2622 / UDP stream 38",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.220.251.158",
+      "type": "ioc",
+      "value": "23.220.251.158",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 48 / UDP stream 11, frame 68 / UDP stream 12",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.220.251.160",
+      "type": "ioc",
+      "value": "23.220.251.160",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2622 / UDP stream 38",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.220.251.47",
+      "type": "ioc",
+      "value": "23.220.251.47",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 3436 / UDP stream 48",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.220.251.48",
+      "type": "ioc",
+      "value": "23.220.251.48",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 3436 / UDP stream 48",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.49",
+      "type": "ioc",
+      "value": "23.221.24.49",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.50",
+      "type": "ioc",
+      "value": "23.221.24.50",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.51",
+      "type": "ioc",
+      "value": "23.221.24.51",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.52",
+      "type": "ioc",
+      "value": "23.221.24.52",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.53",
+      "type": "ioc",
+      "value": "23.221.24.53",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.55",
+      "type": "ioc",
+      "value": "23.221.24.55",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.56",
+      "type": "ioc",
+      "value": "23.221.24.56",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16, frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.57",
+      "type": "ioc",
+      "value": "23.221.24.57",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 499 / UDP stream 16",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.58",
+      "type": "ioc",
+      "value": "23.221.24.58",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 499 / UDP stream 16, frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.62",
+      "type": "ioc",
+      "value": "23.221.24.62",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.63",
+      "type": "ioc",
+      "value": "23.221.24.63",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.64",
+      "type": "ioc",
+      "value": "23.221.24.64",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.68",
+      "type": "ioc",
+      "value": "23.221.24.68",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.69",
+      "type": "ioc",
+      "value": "23.221.24.69",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.70",
+      "type": "ioc",
+      "value": "23.221.24.70",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.221.24.73",
+      "type": "ioc",
+      "value": "23.221.24.73",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2579 / UDP stream 36",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.40.145.142",
+      "type": "ioc",
+      "value": "23.40.145.142",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 1154 / UDP stream 21",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.134",
+      "type": "ioc",
+      "value": "23.45.119.134",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 4696 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.140",
+      "type": "ioc",
+      "value": "23.45.119.140",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 4696 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.142",
+      "type": "ioc",
+      "value": "23.45.119.142",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 4696 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.143",
+      "type": "ioc",
+      "value": "23.45.119.143",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 531 / UDP stream 16, frame 2489 / UDP stream 30, frame 3353 / UDP stream 44, frame 3504 / UDP stream 49",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.144",
+      "type": "ioc",
+      "value": "23.45.119.144",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 531 / UDP stream 16, frame 2489 / UDP stream 30, frame 3353 / UDP stream 44, frame 3504 / UDP stream 49, frame 4696 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.146",
+      "type": "ioc",
+      "value": "23.45.119.146",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 2489 / UDP stream 30, frame 4696 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.147",
+      "type": "ioc",
+      "value": "23.45.119.147",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 4696 / UDP stream 60",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.166",
+      "type": "ioc",
+      "value": "23.45.119.166",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 3139 / UDP stream 41",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:23.45.119.174",
+      "type": "ioc",
+      "value": "23.45.119.174",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 3139 / UDP stream 41",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:255.255.255.255",
+      "type": "ioc",
+      "value": "255.255.255.255",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "network-endpoint; no frame reference",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:40.119.249.228",
+      "type": "ioc",
+      "value": "40.119.249.228",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 3691 / UDP stream 53",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:40.126.28.11",
+      "type": "ioc",
+      "value": "40.126.28.11",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 1140 / UDP stream 21, frame 3621 / UDP stream 50",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:40.126.28.12",
+      "type": "ioc",
+      "value": "40.126.28.12",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer, network-endpoint; frame 1140 / UDP stream 21",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "ioc:40.126.28.13",
+      "type": "ioc",
+      "value": "40.126.28.13",
+      "source": "log-pcap-analysis",
+      "ioc_type": "ipv4",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "description": "dns-answer; frame 1140 / UDP stream 21",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "log-pcap-analysis"
+      ]
+    },
+    {
+      "id": "finding-1462733523147699ecaa2de6",
+      "type": "pcap-finding",
+      "label": "Repeated outbound HTTP POST activity",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "uri": "/foots.php",
+        "host": "79.124.78.197",
+        "port": 80,
+        "source": "172.17.0.99",
+        "destination": "79.124.78.197",
+        "request_count": 48,
+        "declared_body_bytes": 2046
+      },
+      "rule_id": "repeated-http-posts",
+      "severity": "medium",
+      "confidence": 0.72,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "The same endpoint pair and HTTP target produced repeated POST requests suitable for beaconing or data transfer review.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "tcp_stream": 48,
+          "frame_number": 1668,
+          "display_filter": "frame.number == 1668",
+          "timestamp_epoch": "1725471307.211814000"
+        },
+        {
+          "tcp_stream": 48,
+          "frame_number": 1672,
+          "display_filter": "frame.number == 1672",
+          "timestamp_epoch": "1725471307.858400000"
+        },
+        {
+          "tcp_stream": 48,
+          "frame_number": 1697,
+          "display_filter": "frame.number == 1697",
+          "timestamp_epoch": "1725471308.684142000"
+        },
+        {
+          "tcp_stream": 56,
+          "frame_number": 2347,
+          "display_filter": "frame.number == 2347",
+          "timestamp_epoch": "1725471377.781476000"
+        },
+        {
+          "tcp_stream": 63,
+          "frame_number": 2985,
+          "display_filter": "frame.number == 2985",
+          "timestamp_epoch": "1725471446.911862000"
+        },
+        {
+          "tcp_stream": 68,
+          "frame_number": 3077,
+          "display_filter": "frame.number == 3077",
+          "timestamp_epoch": "1725471516.062291000"
+        },
+        {
+          "tcp_stream": 71,
+          "frame_number": 3129,
+          "display_filter": "frame.number == 3129",
+          "timestamp_epoch": "1725471585.206401000"
+        },
+        {
+          "tcp_stream": 73,
+          "frame_number": 3181,
+          "display_filter": "frame.number == 3181",
+          "timestamp_epoch": "1725471654.324762000"
+        },
+        {
+          "tcp_stream": 73,
+          "frame_number": 3191,
+          "display_filter": "frame.number == 3191",
+          "timestamp_epoch": "1725471714.999064000"
+        },
+        {
+          "tcp_stream": 73,
+          "frame_number": 3232,
+          "display_filter": "frame.number == 3232",
+          "timestamp_epoch": "1725471775.696228000"
+        },
+        {
+          "tcp_stream": 75,
+          "frame_number": 3251,
+          "display_filter": "frame.number == 3251",
+          "timestamp_epoch": "1725471836.836309000"
+        },
+        {
+          "tcp_stream": 83,
+          "frame_number": 3385,
+          "display_filter": "frame.number == 3385",
+          "timestamp_epoch": "1725471897.919897000"
+        },
+        {
+          "tcp_stream": 83,
+          "frame_number": 3429,
+          "display_filter": "frame.number == 3429",
+          "timestamp_epoch": "1725471958.615189000"
+        },
+        {
+          "tcp_stream": 86,
+          "frame_number": 3464,
+          "display_filter": "frame.number == 3464",
+          "timestamp_epoch": "1725472019.697304000"
+        },
+        {
+          "tcp_stream": 89,
+          "frame_number": 3531,
+          "display_filter": "frame.number == 3531",
+          "timestamp_epoch": "1725472104.750554000"
+        },
+        {
+          "tcp_stream": 99,
+          "frame_number": 3772,
+          "display_filter": "frame.number == 3772",
+          "timestamp_epoch": "1725472189.873627000"
+        },
+        {
+          "tcp_stream": 100,
+          "frame_number": 3799,
+          "display_filter": "frame.number == 3799",
+          "timestamp_epoch": "1725472275.032276000"
+        },
+        {
+          "tcp_stream": 103,
+          "frame_number": 3873,
+          "display_filter": "frame.number == 3873",
+          "timestamp_epoch": "1725472360.171010000"
+        },
+        {
+          "tcp_stream": 104,
+          "frame_number": 3908,
+          "display_filter": "frame.number == 3908",
+          "timestamp_epoch": "1725472450.320388000"
+        },
+        {
+          "tcp_stream": 106,
+          "frame_number": 3962,
+          "display_filter": "frame.number == 3962",
+          "timestamp_epoch": "1725472540.401561000"
+        },
+        {
+          "tcp_stream": 107,
+          "frame_number": 3984,
+          "display_filter": "frame.number == 3984",
+          "timestamp_epoch": "1725472630.504776000"
+        },
+        {
+          "tcp_stream": 108,
+          "frame_number": 4011,
+          "display_filter": "frame.number == 4011",
+          "timestamp_epoch": "1725472720.632883000"
+        },
+        {
+          "tcp_stream": 110,
+          "frame_number": 4064,
+          "display_filter": "frame.number == 4064",
+          "timestamp_epoch": "1725472806.765839000"
+        },
+        {
+          "tcp_stream": 113,
+          "frame_number": 4135,
+          "display_filter": "frame.number == 4135",
+          "timestamp_epoch": "1725472892.834551000"
+        },
+        {
+          "tcp_stream": 116,
+          "frame_number": 4214,
+          "display_filter": "frame.number == 4214",
+          "timestamp_epoch": "1725472978.902877000"
+        },
+        {
+          "tcp_stream": 117,
+          "frame_number": 4247,
+          "display_filter": "frame.number == 4247",
+          "timestamp_epoch": "1725473065.026600000"
+        },
+        {
+          "tcp_stream": 121,
+          "frame_number": 4330,
+          "display_filter": "frame.number == 4330",
+          "timestamp_epoch": "1725473153.133865000"
+        },
+        {
+          "tcp_stream": 123,
+          "frame_number": 4402,
+          "display_filter": "frame.number == 4402",
+          "timestamp_epoch": "1725473242.405323000"
+        },
+        {
+          "tcp_stream": 124,
+          "frame_number": 4440,
+          "display_filter": "frame.number == 4440",
+          "timestamp_epoch": "1725473330.470020000"
+        },
+        {
+          "tcp_stream": 125,
+          "frame_number": 4477,
+          "display_filter": "frame.number == 4477",
+          "timestamp_epoch": "1725473418.609257000"
+        },
+        {
+          "tcp_stream": 126,
+          "frame_number": 4499,
+          "display_filter": "frame.number == 4499",
+          "timestamp_epoch": "1725473496.778262000"
+        },
+        {
+          "tcp_stream": 128,
+          "frame_number": 4545,
+          "display_filter": "frame.number == 4545",
+          "timestamp_epoch": "1725473574.825234000"
+        },
+        {
+          "tcp_stream": 133,
+          "frame_number": 4653,
+          "display_filter": "frame.number == 4653",
+          "timestamp_epoch": "1725473653.888797000"
+        },
+        {
+          "tcp_stream": 134,
+          "frame_number": 4671,
+          "display_filter": "frame.number == 4671",
+          "timestamp_epoch": "1725473731.986370000"
+        },
+        {
+          "tcp_stream": 135,
+          "frame_number": 4691,
+          "display_filter": "frame.number == 4691",
+          "timestamp_epoch": "1725473807.300640000"
+        },
+        {
+          "tcp_stream": 139,
+          "frame_number": 4786,
+          "display_filter": "frame.number == 4786",
+          "timestamp_epoch": "1725473881.418761000"
+        },
+        {
+          "tcp_stream": 140,
+          "frame_number": 4811,
+          "display_filter": "frame.number == 4811",
+          "timestamp_epoch": "1725473955.568280000"
+        },
+        {
+          "tcp_stream": 141,
+          "frame_number": 4832,
+          "display_filter": "frame.number == 4832",
+          "timestamp_epoch": "1725474029.695712000"
+        },
+        {
+          "tcp_stream": 142,
+          "frame_number": 4854,
+          "display_filter": "frame.number == 4854",
+          "timestamp_epoch": "1725474103.799656000"
+        },
+        {
+          "tcp_stream": 143,
+          "frame_number": 4876,
+          "display_filter": "frame.number == 4876",
+          "timestamp_epoch": "1725474175.903686000"
+        },
+        {
+          "tcp_stream": 144,
+          "frame_number": 4904,
+          "display_filter": "frame.number == 4904",
+          "timestamp_epoch": "1725474248.045044000"
+        },
+        {
+          "tcp_stream": 145,
+          "frame_number": 4921,
+          "display_filter": "frame.number == 4921",
+          "timestamp_epoch": "1725474320.202713000"
+        },
+        {
+          "tcp_stream": 146,
+          "frame_number": 4943,
+          "display_filter": "frame.number == 4943",
+          "timestamp_epoch": "1725474392.348254000"
+        },
+        {
+          "tcp_stream": 147,
+          "frame_number": 4959,
+          "display_filter": "frame.number == 4959",
+          "timestamp_epoch": "1725474464.546934000"
+        },
+        {
+          "tcp_stream": 148,
+          "frame_number": 4974,
+          "display_filter": "frame.number == 4974",
+          "timestamp_epoch": "1725474526.700596000"
+        },
+        {
+          "tcp_stream": 149,
+          "frame_number": 4987,
+          "display_filter": "frame.number == 4987",
+          "timestamp_epoch": "1725474588.843962000"
+        },
+        {
+          "tcp_stream": 151,
+          "frame_number": 5032,
+          "display_filter": "frame.number == 5032",
+          "timestamp_epoch": "1725474650.997683000"
+        },
+        {
+          "tcp_stream": 154,
+          "frame_number": 5077,
+          "display_filter": "frame.number == 5077",
+          "timestamp_epoch": "1725474713.072428000"
+        }
+      ]
+    },
+    {
+      "id": "finding-99970ae01bf2fac5f4f43b24",
+      "type": "pcap-finding",
+      "label": "Repeated unsuccessful DNS resolution",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "domain": "wpad.bepositive.com",
+        "source": "172.17.0.99",
+        "response_count": 20
+      },
+      "rule_id": "repeated-nxdomain",
+      "severity": "low",
+      "confidence": 0.5,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "Repeated NXDOMAIN responses may indicate a dead domain, misconfiguration, retrying software, or malicious fallback. They do not establish a domain-generation algorithm.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "udp_stream": 10,
+          "frame_number": 41,
+          "display_filter": "frame.number == 41",
+          "timestamp_epoch": "1725471151.819563000"
+        },
+        {
+          "udp_stream": 11,
+          "frame_number": 42,
+          "display_filter": "frame.number == 42",
+          "timestamp_epoch": "1725471151.819563000"
+        },
+        {
+          "udp_stream": 12,
+          "frame_number": 111,
+          "display_filter": "frame.number == 111",
+          "timestamp_epoch": "1725471169.837437000"
+        },
+        {
+          "udp_stream": 16,
+          "frame_number": 112,
+          "display_filter": "frame.number == 112",
+          "timestamp_epoch": "1725471169.837588000"
+        },
+        {
+          "udp_stream": 16,
+          "frame_number": 215,
+          "display_filter": "frame.number == 215",
+          "timestamp_epoch": "1725471229.852947000"
+        },
+        {
+          "udp_stream": 12,
+          "frame_number": 216,
+          "display_filter": "frame.number == 216",
+          "timestamp_epoch": "1725471229.853010000"
+        },
+        {
+          "udp_stream": 22,
+          "frame_number": 2384,
+          "display_filter": "frame.number == 2384",
+          "timestamp_epoch": "1725471397.237001000"
+        },
+        {
+          "udp_stream": 22,
+          "frame_number": 2967,
+          "display_filter": "frame.number == 2967",
+          "timestamp_epoch": "1725471405.244456000"
+        },
+        {
+          "udp_stream": 12,
+          "frame_number": 3238,
+          "display_filter": "frame.number == 3238",
+          "timestamp_epoch": "1725471829.837499000"
+        },
+        {
+          "udp_stream": 43,
+          "frame_number": 3239,
+          "display_filter": "frame.number == 3239",
+          "timestamp_epoch": "1725471829.838019000"
+        },
+        {
+          "udp_stream": 49,
+          "frame_number": 3446,
+          "display_filter": "frame.number == 3446",
+          "timestamp_epoch": "1725471996.162993000"
+        },
+        {
+          "udp_stream": 49,
+          "frame_number": 3454,
+          "display_filter": "frame.number == 3454",
+          "timestamp_epoch": "1725472004.172794000"
+        },
+        {
+          "udp_stream": 12,
+          "frame_number": 3887,
+          "display_filter": "frame.number == 3887",
+          "timestamp_epoch": "1725472429.829740000"
+        },
+        {
+          "udp_stream": 55,
+          "frame_number": 3888,
+          "display_filter": "frame.number == 3888",
+          "timestamp_epoch": "1725472429.829740000"
+        },
+        {
+          "udp_stream": 58,
+          "frame_number": 4228,
+          "display_filter": "frame.number == 4228",
+          "timestamp_epoch": "1725473029.805065000"
+        },
+        {
+          "udp_stream": 12,
+          "frame_number": 4229,
+          "display_filter": "frame.number == 4229",
+          "timestamp_epoch": "1725473029.805065000"
+        },
+        {
+          "udp_stream": 64,
+          "frame_number": 4633,
+          "display_filter": "frame.number == 4633",
+          "timestamp_epoch": "1725473629.795240000"
+        },
+        {
+          "udp_stream": 60,
+          "frame_number": 4634,
+          "display_filter": "frame.number == 4634",
+          "timestamp_epoch": "1725473629.795240000"
+        },
+        {
+          "udp_stream": 64,
+          "frame_number": 4882,
+          "display_filter": "frame.number == 4882",
+          "timestamp_epoch": "1725474229.786354000"
+        },
+        {
+          "udp_stream": 65,
+          "frame_number": 4883,
+          "display_filter": "frame.number == 4883",
+          "timestamp_epoch": "1725474229.786887000"
+        }
+      ]
+    },
+    {
+      "id": "finding-8c6df9f2decff1732e943737",
+      "type": "pcap-finding",
+      "label": "Directory-service protocol activity",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "source": "172.17.0.17",
+        "protocol": "drsuapi",
+        "destination": "172.17.0.99",
+        "event_count": 39,
+        "operation_numbers": [
+          "0",
+          "1",
+          "12"
+        ]
+      },
+      "rule_id": "directory-service-activity",
+      "severity": "low",
+      "confidence": 0.95,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "tcp_stream": 14,
+          "frame_number": 384,
+          "display_filter": "frame.number == 384",
+          "timestamp_epoch": "1725471275.487796000"
+        },
+        {
+          "tcp_stream": 14,
+          "frame_number": 386,
+          "display_filter": "frame.number == 386",
+          "timestamp_epoch": "1725471275.488723000"
+        },
+        {
+          "tcp_stream": 14,
+          "frame_number": 388,
+          "display_filter": "frame.number == 388",
+          "timestamp_epoch": "1725471275.489598000"
+        },
+        {
+          "tcp_stream": 14,
+          "frame_number": 391,
+          "display_filter": "frame.number == 391",
+          "timestamp_epoch": "1725471275.489946000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1074,
+          "display_filter": "frame.number == 1074",
+          "timestamp_epoch": "1725471280.065417000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1076,
+          "display_filter": "frame.number == 1076",
+          "timestamp_epoch": "1725471280.066267000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1078,
+          "display_filter": "frame.number == 1078",
+          "timestamp_epoch": "1725471280.066598000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1082,
+          "display_filter": "frame.number == 1082",
+          "timestamp_epoch": "1725471280.068331000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1084,
+          "display_filter": "frame.number == 1084",
+          "timestamp_epoch": "1725471280.069061000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1086,
+          "display_filter": "frame.number == 1086",
+          "timestamp_epoch": "1725471280.069418000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1441,
+          "display_filter": "frame.number == 1441",
+          "timestamp_epoch": "1725471306.291308000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1443,
+          "display_filter": "frame.number == 1443",
+          "timestamp_epoch": "1725471306.292294000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1445,
+          "display_filter": "frame.number == 1445",
+          "timestamp_epoch": "1725471306.292766000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1449,
+          "display_filter": "frame.number == 1449",
+          "timestamp_epoch": "1725471306.294708000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1451,
+          "display_filter": "frame.number == 1451",
+          "timestamp_epoch": "1725471306.295594000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1453,
+          "display_filter": "frame.number == 1453",
+          "timestamp_epoch": "1725471306.296049000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2271,
+          "display_filter": "frame.number == 2271",
+          "timestamp_epoch": "1725471336.281244000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2273,
+          "display_filter": "frame.number == 2273",
+          "timestamp_epoch": "1725471336.282937000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2275,
+          "display_filter": "frame.number == 2275",
+          "timestamp_epoch": "1725471336.283854000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2279,
+          "display_filter": "frame.number == 2279",
+          "timestamp_epoch": "1725471336.287735000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2281,
+          "display_filter": "frame.number == 2281",
+          "timestamp_epoch": "1725471336.289099000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2283,
+          "display_filter": "frame.number == 2283",
+          "timestamp_epoch": "1725471336.289993000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3566,
+          "display_filter": "frame.number == 3566",
+          "timestamp_epoch": "1725472175.785750000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3568,
+          "display_filter": "frame.number == 3568",
+          "timestamp_epoch": "1725472175.786748000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3570,
+          "display_filter": "frame.number == 3570",
+          "timestamp_epoch": "1725472175.787147000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3574,
+          "display_filter": "frame.number == 3574",
+          "timestamp_epoch": "1725472175.789311000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3576,
+          "display_filter": "frame.number == 3576",
+          "timestamp_epoch": "1725472175.790105000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3578,
+          "display_filter": "frame.number == 3578",
+          "timestamp_epoch": "1725472175.790477000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4570,
+          "display_filter": "frame.number == 4570",
+          "timestamp_epoch": "1725473582.138420000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4572,
+          "display_filter": "frame.number == 4572",
+          "timestamp_epoch": "1725473582.139507000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4574,
+          "display_filter": "frame.number == 4574",
+          "timestamp_epoch": "1725473582.140024000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4578,
+          "display_filter": "frame.number == 4578",
+          "timestamp_epoch": "1725473582.141715000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4580,
+          "display_filter": "frame.number == 4580",
+          "timestamp_epoch": "1725473582.142667000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4582,
+          "display_filter": "frame.number == 4582",
+          "timestamp_epoch": "1725473582.143161000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5059,
+          "display_filter": "frame.number == 5059",
+          "timestamp_epoch": "1725474712.485285000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5061,
+          "display_filter": "frame.number == 5061",
+          "timestamp_epoch": "1725474712.486185000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5063,
+          "display_filter": "frame.number == 5063",
+          "timestamp_epoch": "1725474712.487014000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5065,
+          "display_filter": "frame.number == 5065",
+          "timestamp_epoch": "1725474712.487821000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5067,
+          "display_filter": "frame.number == 5067",
+          "timestamp_epoch": "1725474712.488205000"
+        }
+      ]
+    },
+    {
+      "id": "finding-7554a50e1a4a9ef2df003606",
+      "type": "pcap-finding",
+      "label": "Directory-service protocol activity",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "source": "172.17.0.17",
+        "protocol": "ldap",
+        "destination": "172.17.0.99",
+        "event_count": 66,
+        "operation_numbers": [
+          "",
+          "1",
+          "4,19,19,19,5",
+          "4,5",
+          "5"
+        ]
+      },
+      "rule_id": "directory-service-activity",
+      "severity": "low",
+      "confidence": 0.95,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "tcp_stream": 0,
+          "frame_number": 33,
+          "display_filter": "frame.number == 33",
+          "timestamp_epoch": "1725471151.433776000"
+        },
+        {
+          "tcp_stream": 18,
+          "frame_number": 419,
+          "display_filter": "frame.number == 419",
+          "timestamp_epoch": "1725471275.494529000"
+        },
+        {
+          "tcp_stream": 18,
+          "frame_number": 431,
+          "display_filter": "frame.number == 431",
+          "timestamp_epoch": "1725471275.498918000"
+        },
+        {
+          "tcp_stream": 19,
+          "frame_number": 452,
+          "display_filter": "frame.number == 452",
+          "timestamp_epoch": "1725471275.502867000"
+        },
+        {
+          "tcp_stream": 19,
+          "frame_number": 455,
+          "display_filter": "frame.number == 455",
+          "timestamp_epoch": "1725471275.503379000"
+        },
+        {
+          "tcp_stream": 19,
+          "frame_number": 457,
+          "display_filter": "frame.number == 457",
+          "timestamp_epoch": "1725471275.503918000"
+        },
+        {
+          "tcp_stream": 18,
+          "frame_number": 459,
+          "display_filter": "frame.number == 459",
+          "timestamp_epoch": "1725471275.504814000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1092,
+          "display_filter": "frame.number == 1092",
+          "timestamp_epoch": "1725471280.071847000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1097,
+          "display_filter": "frame.number == 1097",
+          "timestamp_epoch": "1725471280.074307000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1099,
+          "display_filter": "frame.number == 1099",
+          "timestamp_epoch": "1725471280.074994000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1101,
+          "display_filter": "frame.number == 1101",
+          "timestamp_epoch": "1725471280.075489000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1103,
+          "display_filter": "frame.number == 1103",
+          "timestamp_epoch": "1725471280.075982000"
+        },
+        {
+          "tcp_stream": 36,
+          "frame_number": 1110,
+          "display_filter": "frame.number == 1110",
+          "timestamp_epoch": "1725471280.079136000"
+        },
+        {
+          "tcp_stream": 36,
+          "frame_number": 1114,
+          "display_filter": "frame.number == 1114",
+          "timestamp_epoch": "1725471280.079994000"
+        },
+        {
+          "tcp_stream": 36,
+          "frame_number": 1117,
+          "display_filter": "frame.number == 1117",
+          "timestamp_epoch": "1725471280.080390000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1459,
+          "display_filter": "frame.number == 1459",
+          "timestamp_epoch": "1725471306.298697000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1465,
+          "display_filter": "frame.number == 1465",
+          "timestamp_epoch": "1725471306.301060000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1467,
+          "display_filter": "frame.number == 1467",
+          "timestamp_epoch": "1725471306.301925000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1469,
+          "display_filter": "frame.number == 1469",
+          "timestamp_epoch": "1725471306.302581000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1471,
+          "display_filter": "frame.number == 1471",
+          "timestamp_epoch": "1725471306.303249000"
+        },
+        {
+          "tcp_stream": 45,
+          "frame_number": 1478,
+          "display_filter": "frame.number == 1478",
+          "timestamp_epoch": "1725471306.307290000"
+        },
+        {
+          "tcp_stream": 45,
+          "frame_number": 1482,
+          "display_filter": "frame.number == 1482",
+          "timestamp_epoch": "1725471306.308524000"
+        },
+        {
+          "tcp_stream": 45,
+          "frame_number": 1485,
+          "display_filter": "frame.number == 1485",
+          "timestamp_epoch": "1725471306.309206000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2289,
+          "display_filter": "frame.number == 2289",
+          "timestamp_epoch": "1725471336.296276000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2294,
+          "display_filter": "frame.number == 2294",
+          "timestamp_epoch": "1725471336.299715000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2296,
+          "display_filter": "frame.number == 2296",
+          "timestamp_epoch": "1725471336.301053000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2298,
+          "display_filter": "frame.number == 2298",
+          "timestamp_epoch": "1725471336.302215000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2300,
+          "display_filter": "frame.number == 2300",
+          "timestamp_epoch": "1725471336.303221000"
+        },
+        {
+          "tcp_stream": 55,
+          "frame_number": 2307,
+          "display_filter": "frame.number == 2307",
+          "timestamp_epoch": "1725471336.309847000"
+        },
+        {
+          "tcp_stream": 55,
+          "frame_number": 2311,
+          "display_filter": "frame.number == 2311",
+          "timestamp_epoch": "1725471336.311125000"
+        },
+        {
+          "tcp_stream": 55,
+          "frame_number": 2314,
+          "display_filter": "frame.number == 2314",
+          "timestamp_epoch": "1725471336.311805000"
+        },
+        {
+          "tcp_stream": 64,
+          "frame_number": 3000,
+          "display_filter": "frame.number == 3000",
+          "timestamp_epoch": "1725471470.868117000"
+        },
+        {
+          "tcp_stream": 64,
+          "frame_number": 3017,
+          "display_filter": "frame.number == 3017",
+          "timestamp_epoch": "1725471470.874745000"
+        },
+        {
+          "tcp_stream": 64,
+          "frame_number": 3019,
+          "display_filter": "frame.number == 3019",
+          "timestamp_epoch": "1725471470.876521000"
+        },
+        {
+          "tcp_stream": 66,
+          "frame_number": 3030,
+          "display_filter": "frame.number == 3030",
+          "timestamp_epoch": "1725471470.886990000"
+        },
+        {
+          "tcp_stream": 66,
+          "frame_number": 3032,
+          "display_filter": "frame.number == 3032",
+          "timestamp_epoch": "1725471470.887754000"
+        },
+        {
+          "tcp_stream": 69,
+          "frame_number": 3098,
+          "display_filter": "frame.number == 3098",
+          "timestamp_epoch": "1725471576.756020000"
+        },
+        {
+          "tcp_stream": 69,
+          "frame_number": 3103,
+          "display_filter": "frame.number == 3103",
+          "timestamp_epoch": "1725471576.759128000"
+        },
+        {
+          "tcp_stream": 69,
+          "frame_number": 3105,
+          "display_filter": "frame.number == 3105",
+          "timestamp_epoch": "1725471576.760813000"
+        },
+        {
+          "tcp_stream": 70,
+          "frame_number": 3114,
+          "display_filter": "frame.number == 3114",
+          "timestamp_epoch": "1725471576.768679000"
+        },
+        {
+          "tcp_stream": 70,
+          "frame_number": 3116,
+          "display_filter": "frame.number == 3116",
+          "timestamp_epoch": "1725471576.769369000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3294,
+          "display_filter": "frame.number == 3294",
+          "timestamp_epoch": "1725471878.246043000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3299,
+          "display_filter": "frame.number == 3299",
+          "timestamp_epoch": "1725471878.248800000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3301,
+          "display_filter": "frame.number == 3301",
+          "timestamp_epoch": "1725471878.249906000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3303,
+          "display_filter": "frame.number == 3303",
+          "timestamp_epoch": "1725471878.251424000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3316,
+          "display_filter": "frame.number == 3316",
+          "timestamp_epoch": "1725471878.365237000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3329,
+          "display_filter": "frame.number == 3329",
+          "timestamp_epoch": "1725471878.474418000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3337,
+          "display_filter": "frame.number == 3337",
+          "timestamp_epoch": "1725471878.477360000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3345,
+          "display_filter": "frame.number == 3345",
+          "timestamp_epoch": "1725471878.481232000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3347,
+          "display_filter": "frame.number == 3347",
+          "timestamp_epoch": "1725471878.482820000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3584,
+          "display_filter": "frame.number == 3584",
+          "timestamp_epoch": "1725472175.793201000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3589,
+          "display_filter": "frame.number == 3589",
+          "timestamp_epoch": "1725472175.795404000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3591,
+          "display_filter": "frame.number == 3591",
+          "timestamp_epoch": "1725472175.796022000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3593,
+          "display_filter": "frame.number == 3593",
+          "timestamp_epoch": "1725472175.796445000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3595,
+          "display_filter": "frame.number == 3595",
+          "timestamp_epoch": "1725472175.796820000"
+        },
+        {
+          "tcp_stream": 93,
+          "frame_number": 3602,
+          "display_filter": "frame.number == 3602",
+          "timestamp_epoch": "1725472175.800184000"
+        },
+        {
+          "tcp_stream": 93,
+          "frame_number": 3606,
+          "display_filter": "frame.number == 3606",
+          "timestamp_epoch": "1725472175.801121000"
+        },
+        {
+          "tcp_stream": 93,
+          "frame_number": 3609,
+          "display_filter": "frame.number == 3609",
+          "timestamp_epoch": "1725472175.801725000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4592,
+          "display_filter": "frame.number == 4592",
+          "timestamp_epoch": "1725473582.251027000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4597,
+          "display_filter": "frame.number == 4597",
+          "timestamp_epoch": "1725473582.254343000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4599,
+          "display_filter": "frame.number == 4599",
+          "timestamp_epoch": "1725473582.255808000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4601,
+          "display_filter": "frame.number == 4601",
+          "timestamp_epoch": "1725473582.256904000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4603,
+          "display_filter": "frame.number == 4603",
+          "timestamp_epoch": "1725473582.257973000"
+        },
+        {
+          "tcp_stream": 132,
+          "frame_number": 4610,
+          "display_filter": "frame.number == 4610",
+          "timestamp_epoch": "1725473582.266232000"
+        },
+        {
+          "tcp_stream": 132,
+          "frame_number": 4614,
+          "display_filter": "frame.number == 4614",
+          "timestamp_epoch": "1725473582.268104000"
+        },
+        {
+          "tcp_stream": 132,
+          "frame_number": 4617,
+          "display_filter": "frame.number == 4617",
+          "timestamp_epoch": "1725473582.269010000"
+        }
+      ]
+    },
+    {
+      "id": "finding-c12435e5fb1d2d38701df4f7",
+      "type": "pcap-finding",
+      "label": "Directory-service protocol activity",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "source": "172.17.0.17",
+        "protocol": "samr",
+        "destination": "172.17.0.99",
+        "event_count": 15,
+        "operation_numbers": [
+          "1",
+          "16",
+          "17",
+          "3",
+          "34",
+          "36",
+          "39",
+          "5",
+          "6",
+          "64",
+          "7"
+        ]
+      },
+      "rule_id": "directory-service-activity",
+      "severity": "low",
+      "confidence": 0.95,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "tcp_stream": 13,
+          "frame_number": 410,
+          "display_filter": "frame.number == 410",
+          "timestamp_epoch": "1725471275.492327000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 415,
+          "display_filter": "frame.number == 415",
+          "timestamp_epoch": "1725471275.493110000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 417,
+          "display_filter": "frame.number == 417",
+          "timestamp_epoch": "1725471275.493798000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 420,
+          "display_filter": "frame.number == 420",
+          "timestamp_epoch": "1725471275.494592000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 422,
+          "display_filter": "frame.number == 422",
+          "timestamp_epoch": "1725471275.495317000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 424,
+          "display_filter": "frame.number == 424",
+          "timestamp_epoch": "1725471275.496085000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 426,
+          "display_filter": "frame.number == 426",
+          "timestamp_epoch": "1725471275.497023000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 428,
+          "display_filter": "frame.number == 428",
+          "timestamp_epoch": "1725471275.498011000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 432,
+          "display_filter": "frame.number == 432",
+          "timestamp_epoch": "1725471275.499053000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 434,
+          "display_filter": "frame.number == 434",
+          "timestamp_epoch": "1725471275.499727000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 439,
+          "display_filter": "frame.number == 439",
+          "timestamp_epoch": "1725471275.500351000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 441,
+          "display_filter": "frame.number == 441",
+          "timestamp_epoch": "1725471275.500908000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 446,
+          "display_filter": "frame.number == 446",
+          "timestamp_epoch": "1725471275.501610000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 448,
+          "display_filter": "frame.number == 448",
+          "timestamp_epoch": "1725471275.502192000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 450,
+          "display_filter": "frame.number == 450",
+          "timestamp_epoch": "1725471275.502748000"
+        }
+      ]
+    },
+    {
+      "id": "finding-023ac4b3d6b6fce3323ddbfa",
+      "type": "pcap-finding",
+      "label": "Directory-service protocol activity",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "source": "172.17.0.99",
+        "protocol": "drsuapi",
+        "destination": "172.17.0.17",
+        "event_count": 39,
+        "operation_numbers": [
+          "0",
+          "1",
+          "12"
+        ]
+      },
+      "rule_id": "directory-service-activity",
+      "severity": "low",
+      "confidence": 0.95,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "tcp_stream": 14,
+          "frame_number": 382,
+          "display_filter": "frame.number == 382",
+          "timestamp_epoch": "1725471275.487359000"
+        },
+        {
+          "tcp_stream": 14,
+          "frame_number": 385,
+          "display_filter": "frame.number == 385",
+          "timestamp_epoch": "1725471275.488004000"
+        },
+        {
+          "tcp_stream": 14,
+          "frame_number": 387,
+          "display_filter": "frame.number == 387",
+          "timestamp_epoch": "1725471275.488895000"
+        },
+        {
+          "tcp_stream": 14,
+          "frame_number": 389,
+          "display_filter": "frame.number == 389",
+          "timestamp_epoch": "1725471275.489718000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1073,
+          "display_filter": "frame.number == 1073",
+          "timestamp_epoch": "1725471280.064881000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1075,
+          "display_filter": "frame.number == 1075",
+          "timestamp_epoch": "1725471280.065597000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1077,
+          "display_filter": "frame.number == 1077",
+          "timestamp_epoch": "1725471280.066380000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1081,
+          "display_filter": "frame.number == 1081",
+          "timestamp_epoch": "1725471280.068000000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1083,
+          "display_filter": "frame.number == 1083",
+          "timestamp_epoch": "1725471280.068459000"
+        },
+        {
+          "tcp_stream": 34,
+          "frame_number": 1085,
+          "display_filter": "frame.number == 1085",
+          "timestamp_epoch": "1725471280.069158000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1440,
+          "display_filter": "frame.number == 1440",
+          "timestamp_epoch": "1725471306.290821000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1442,
+          "display_filter": "frame.number == 1442",
+          "timestamp_epoch": "1725471306.291618000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1444,
+          "display_filter": "frame.number == 1444",
+          "timestamp_epoch": "1725471306.292556000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1448,
+          "display_filter": "frame.number == 1448",
+          "timestamp_epoch": "1725471306.294379000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1450,
+          "display_filter": "frame.number == 1450",
+          "timestamp_epoch": "1725471306.294987000"
+        },
+        {
+          "tcp_stream": 43,
+          "frame_number": 1452,
+          "display_filter": "frame.number == 1452",
+          "timestamp_epoch": "1725471306.295849000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2270,
+          "display_filter": "frame.number == 2270",
+          "timestamp_epoch": "1725471336.280751000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2272,
+          "display_filter": "frame.number == 2272",
+          "timestamp_epoch": "1725471336.282167000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2274,
+          "display_filter": "frame.number == 2274",
+          "timestamp_epoch": "1725471336.283480000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2278,
+          "display_filter": "frame.number == 2278",
+          "timestamp_epoch": "1725471336.287328000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2280,
+          "display_filter": "frame.number == 2280",
+          "timestamp_epoch": "1725471336.288333000"
+        },
+        {
+          "tcp_stream": 53,
+          "frame_number": 2282,
+          "display_filter": "frame.number == 2282",
+          "timestamp_epoch": "1725471336.289639000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3565,
+          "display_filter": "frame.number == 3565",
+          "timestamp_epoch": "1725472175.785208000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3567,
+          "display_filter": "frame.number == 3567",
+          "timestamp_epoch": "1725472175.786067000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3569,
+          "display_filter": "frame.number == 3569",
+          "timestamp_epoch": "1725472175.786931000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3573,
+          "display_filter": "frame.number == 3573",
+          "timestamp_epoch": "1725472175.788982000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3575,
+          "display_filter": "frame.number == 3575",
+          "timestamp_epoch": "1725472175.789505000"
+        },
+        {
+          "tcp_stream": 91,
+          "frame_number": 3577,
+          "display_filter": "frame.number == 3577",
+          "timestamp_epoch": "1725472175.790267000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4569,
+          "display_filter": "frame.number == 4569",
+          "timestamp_epoch": "1725473582.137922000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4571,
+          "display_filter": "frame.number == 4571",
+          "timestamp_epoch": "1725473582.138836000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4573,
+          "display_filter": "frame.number == 4573",
+          "timestamp_epoch": "1725473582.139817000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4577,
+          "display_filter": "frame.number == 4577",
+          "timestamp_epoch": "1725473582.141394000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4579,
+          "display_filter": "frame.number == 4579",
+          "timestamp_epoch": "1725473582.142062000"
+        },
+        {
+          "tcp_stream": 130,
+          "frame_number": 4581,
+          "display_filter": "frame.number == 4581",
+          "timestamp_epoch": "1725473582.142965000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5058,
+          "display_filter": "frame.number == 5058",
+          "timestamp_epoch": "1725474712.484883000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5060,
+          "display_filter": "frame.number == 5060",
+          "timestamp_epoch": "1725474712.485484000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5062,
+          "display_filter": "frame.number == 5062",
+          "timestamp_epoch": "1725474712.486429000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5064,
+          "display_filter": "frame.number == 5064",
+          "timestamp_epoch": "1725474712.487239000"
+        },
+        {
+          "tcp_stream": 153,
+          "frame_number": 5066,
+          "display_filter": "frame.number == 5066",
+          "timestamp_epoch": "1725474712.487995000"
+        }
+      ]
+    },
+    {
+      "id": "finding-86175cf0a61d613434da7ba2",
+      "type": "pcap-finding",
+      "label": "Directory-service protocol activity",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "source": "172.17.0.99",
+        "protocol": "ldap",
+        "destination": "172.17.0.17",
+        "event_count": 84,
+        "operation_numbers": [
+          "",
+          "0",
+          "2",
+          "3"
+        ]
+      },
+      "rule_id": "directory-service-activity",
+      "severity": "low",
+      "confidence": 0.95,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "tcp_stream": 0,
+          "frame_number": 31,
+          "display_filter": "frame.number == 31",
+          "timestamp_epoch": "1725471151.433000000"
+        },
+        {
+          "tcp_stream": 0,
+          "frame_number": 34,
+          "display_filter": "frame.number == 34",
+          "timestamp_epoch": "1725471151.434061000"
+        },
+        {
+          "tcp_stream": 18,
+          "frame_number": 412,
+          "display_filter": "frame.number == 412",
+          "timestamp_epoch": "1725471275.492576000"
+        },
+        {
+          "tcp_stream": 18,
+          "frame_number": 430,
+          "display_filter": "frame.number == 430",
+          "timestamp_epoch": "1725471275.498180000"
+        },
+        {
+          "tcp_stream": 19,
+          "frame_number": 443,
+          "display_filter": "frame.number == 443",
+          "timestamp_epoch": "1725471275.501123000"
+        },
+        {
+          "tcp_stream": 19,
+          "frame_number": 454,
+          "display_filter": "frame.number == 454",
+          "timestamp_epoch": "1725471275.503133000"
+        },
+        {
+          "tcp_stream": 19,
+          "frame_number": 456,
+          "display_filter": "frame.number == 456",
+          "timestamp_epoch": "1725471275.503548000"
+        },
+        {
+          "tcp_stream": 18,
+          "frame_number": 458,
+          "display_filter": "frame.number == 458",
+          "timestamp_epoch": "1725471275.504158000"
+        },
+        {
+          "tcp_stream": 19,
+          "frame_number": 460,
+          "display_filter": "frame.number == 460",
+          "timestamp_epoch": "1725471275.509681000"
+        },
+        {
+          "tcp_stream": 18,
+          "frame_number": 464,
+          "display_filter": "frame.number == 464",
+          "timestamp_epoch": "1725471275.512106000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1090,
+          "display_filter": "frame.number == 1090",
+          "timestamp_epoch": "1725471280.071077000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1095,
+          "display_filter": "frame.number == 1095",
+          "timestamp_epoch": "1725471280.072734000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1098,
+          "display_filter": "frame.number == 1098",
+          "timestamp_epoch": "1725471280.074571000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1100,
+          "display_filter": "frame.number == 1100",
+          "timestamp_epoch": "1725471280.075141000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1102,
+          "display_filter": "frame.number == 1102",
+          "timestamp_epoch": "1725471280.075615000"
+        },
+        {
+          "tcp_stream": 36,
+          "frame_number": 1108,
+          "display_filter": "frame.number == 1108",
+          "timestamp_epoch": "1725471280.078342000"
+        },
+        {
+          "tcp_stream": 36,
+          "frame_number": 1111,
+          "display_filter": "frame.number == 1111",
+          "timestamp_epoch": "1725471280.079385000"
+        },
+        {
+          "tcp_stream": 36,
+          "frame_number": 1116,
+          "display_filter": "frame.number == 1116",
+          "timestamp_epoch": "1725471280.080142000"
+        },
+        {
+          "tcp_stream": 36,
+          "frame_number": 1118,
+          "display_filter": "frame.number == 1118",
+          "timestamp_epoch": "1725471280.080498000"
+        },
+        {
+          "tcp_stream": 35,
+          "frame_number": 1121,
+          "display_filter": "frame.number == 1121",
+          "timestamp_epoch": "1725471280.080647000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1457,
+          "display_filter": "frame.number == 1457",
+          "timestamp_epoch": "1725471306.297898000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1462,
+          "display_filter": "frame.number == 1462",
+          "timestamp_epoch": "1725471306.299514000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1466,
+          "display_filter": "frame.number == 1466",
+          "timestamp_epoch": "1725471306.301487000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1468,
+          "display_filter": "frame.number == 1468",
+          "timestamp_epoch": "1725471306.302227000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1470,
+          "display_filter": "frame.number == 1470",
+          "timestamp_epoch": "1725471306.302878000"
+        },
+        {
+          "tcp_stream": 45,
+          "frame_number": 1476,
+          "display_filter": "frame.number == 1476",
+          "timestamp_epoch": "1725471306.305744000"
+        },
+        {
+          "tcp_stream": 45,
+          "frame_number": 1479,
+          "display_filter": "frame.number == 1479",
+          "timestamp_epoch": "1725471306.307647000"
+        },
+        {
+          "tcp_stream": 45,
+          "frame_number": 1484,
+          "display_filter": "frame.number == 1484",
+          "timestamp_epoch": "1725471306.308675000"
+        },
+        {
+          "tcp_stream": 45,
+          "frame_number": 1486,
+          "display_filter": "frame.number == 1486",
+          "timestamp_epoch": "1725471306.309483000"
+        },
+        {
+          "tcp_stream": 44,
+          "frame_number": 1488,
+          "display_filter": "frame.number == 1488",
+          "timestamp_epoch": "1725471306.309623000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2287,
+          "display_filter": "frame.number == 2287",
+          "timestamp_epoch": "1725471336.295378000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2292,
+          "display_filter": "frame.number == 2292",
+          "timestamp_epoch": "1725471336.298170000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2295,
+          "display_filter": "frame.number == 2295",
+          "timestamp_epoch": "1725471336.300536000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2297,
+          "display_filter": "frame.number == 2297",
+          "timestamp_epoch": "1725471336.301631000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2299,
+          "display_filter": "frame.number == 2299",
+          "timestamp_epoch": "1725471336.302747000"
+        },
+        {
+          "tcp_stream": 55,
+          "frame_number": 2305,
+          "display_filter": "frame.number == 2305",
+          "timestamp_epoch": "1725471336.308259000"
+        },
+        {
+          "tcp_stream": 55,
+          "frame_number": 2308,
+          "display_filter": "frame.number == 2308",
+          "timestamp_epoch": "1725471336.310226000"
+        },
+        {
+          "tcp_stream": 55,
+          "frame_number": 2313,
+          "display_filter": "frame.number == 2313",
+          "timestamp_epoch": "1725471336.311301000"
+        },
+        {
+          "tcp_stream": 55,
+          "frame_number": 2315,
+          "display_filter": "frame.number == 2315",
+          "timestamp_epoch": "1725471336.312087000"
+        },
+        {
+          "tcp_stream": 54,
+          "frame_number": 2317,
+          "display_filter": "frame.number == 2317",
+          "timestamp_epoch": "1725471336.312163000"
+        },
+        {
+          "tcp_stream": 64,
+          "frame_number": 2998,
+          "display_filter": "frame.number == 2998",
+          "timestamp_epoch": "1725471470.867780000"
+        },
+        {
+          "tcp_stream": 64,
+          "frame_number": 3015,
+          "display_filter": "frame.number == 3015",
+          "timestamp_epoch": "1725471470.873223000"
+        },
+        {
+          "tcp_stream": 64,
+          "frame_number": 3018,
+          "display_filter": "frame.number == 3018",
+          "timestamp_epoch": "1725471470.875904000"
+        },
+        {
+          "tcp_stream": 64,
+          "frame_number": 3020,
+          "display_filter": "frame.number == 3020",
+          "timestamp_epoch": "1725471470.876713000"
+        },
+        {
+          "tcp_stream": 66,
+          "frame_number": 3028,
+          "display_filter": "frame.number == 3028",
+          "timestamp_epoch": "1725471470.885465000"
+        },
+        {
+          "tcp_stream": 66,
+          "frame_number": 3031,
+          "display_filter": "frame.number == 3031",
+          "timestamp_epoch": "1725471470.887295000"
+        },
+        {
+          "tcp_stream": 66,
+          "frame_number": 3033,
+          "display_filter": "frame.number == 3033",
+          "timestamp_epoch": "1725471470.887987000"
+        },
+        {
+          "tcp_stream": 69,
+          "frame_number": 3096,
+          "display_filter": "frame.number == 3096",
+          "timestamp_epoch": "1725471576.755314000"
+        },
+        {
+          "tcp_stream": 69,
+          "frame_number": 3101,
+          "display_filter": "frame.number == 3101",
+          "timestamp_epoch": "1725471576.757205000"
+        },
+        {
+          "tcp_stream": 69,
+          "frame_number": 3104,
+          "display_filter": "frame.number == 3104",
+          "timestamp_epoch": "1725471576.760212000"
+        },
+        {
+          "tcp_stream": 69,
+          "frame_number": 3106,
+          "display_filter": "frame.number == 3106",
+          "timestamp_epoch": "1725471576.760941000"
+        },
+        {
+          "tcp_stream": 70,
+          "frame_number": 3112,
+          "display_filter": "frame.number == 3112",
+          "timestamp_epoch": "1725471576.767157000"
+        },
+        {
+          "tcp_stream": 70,
+          "frame_number": 3115,
+          "display_filter": "frame.number == 3115",
+          "timestamp_epoch": "1725471576.768906000"
+        },
+        {
+          "tcp_stream": 70,
+          "frame_number": 3117,
+          "display_filter": "frame.number == 3117",
+          "timestamp_epoch": "1725471576.769467000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3292,
+          "display_filter": "frame.number == 3292",
+          "timestamp_epoch": "1725471878.245362000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3297,
+          "display_filter": "frame.number == 3297",
+          "timestamp_epoch": "1725471878.247067000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3300,
+          "display_filter": "frame.number == 3300",
+          "timestamp_epoch": "1725471878.249524000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3302,
+          "display_filter": "frame.number == 3302",
+          "timestamp_epoch": "1725471878.250577000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3314,
+          "display_filter": "frame.number == 3314",
+          "timestamp_epoch": "1725471878.364735000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3327,
+          "display_filter": "frame.number == 3327",
+          "timestamp_epoch": "1725471878.473909000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3335,
+          "display_filter": "frame.number == 3335",
+          "timestamp_epoch": "1725471878.476777000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3343,
+          "display_filter": "frame.number == 3343",
+          "timestamp_epoch": "1725471878.480714000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3346,
+          "display_filter": "frame.number == 3346",
+          "timestamp_epoch": "1725471878.482300000"
+        },
+        {
+          "tcp_stream": 77,
+          "frame_number": 3348,
+          "display_filter": "frame.number == 3348",
+          "timestamp_epoch": "1725471878.483405000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3582,
+          "display_filter": "frame.number == 3582",
+          "timestamp_epoch": "1725472175.792406000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3587,
+          "display_filter": "frame.number == 3587",
+          "timestamp_epoch": "1725472175.794146000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3590,
+          "display_filter": "frame.number == 3590",
+          "timestamp_epoch": "1725472175.795734000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3592,
+          "display_filter": "frame.number == 3592",
+          "timestamp_epoch": "1725472175.796264000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3594,
+          "display_filter": "frame.number == 3594",
+          "timestamp_epoch": "1725472175.796636000"
+        },
+        {
+          "tcp_stream": 93,
+          "frame_number": 3600,
+          "display_filter": "frame.number == 3600",
+          "timestamp_epoch": "1725472175.799429000"
+        },
+        {
+          "tcp_stream": 93,
+          "frame_number": 3603,
+          "display_filter": "frame.number == 3603",
+          "timestamp_epoch": "1725472175.800452000"
+        },
+        {
+          "tcp_stream": 93,
+          "frame_number": 3608,
+          "display_filter": "frame.number == 3608",
+          "timestamp_epoch": "1725472175.801275000"
+        },
+        {
+          "tcp_stream": 93,
+          "frame_number": 3610,
+          "display_filter": "frame.number == 3610",
+          "timestamp_epoch": "1725472175.801872000"
+        },
+        {
+          "tcp_stream": 92,
+          "frame_number": 3613,
+          "display_filter": "frame.number == 3613",
+          "timestamp_epoch": "1725472175.802068000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4590,
+          "display_filter": "frame.number == 4590",
+          "timestamp_epoch": "1725473582.250270000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4595,
+          "display_filter": "frame.number == 4595",
+          "timestamp_epoch": "1725473582.253520000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4598,
+          "display_filter": "frame.number == 4598",
+          "timestamp_epoch": "1725473582.255407000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4600,
+          "display_filter": "frame.number == 4600",
+          "timestamp_epoch": "1725473582.256492000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4602,
+          "display_filter": "frame.number == 4602",
+          "timestamp_epoch": "1725473582.257551000"
+        },
+        {
+          "tcp_stream": 132,
+          "frame_number": 4608,
+          "display_filter": "frame.number == 4608",
+          "timestamp_epoch": "1725473582.265434000"
+        },
+        {
+          "tcp_stream": 132,
+          "frame_number": 4611,
+          "display_filter": "frame.number == 4611",
+          "timestamp_epoch": "1725473582.267302000"
+        },
+        {
+          "tcp_stream": 132,
+          "frame_number": 4616,
+          "display_filter": "frame.number == 4616",
+          "timestamp_epoch": "1725473582.268728000"
+        },
+        {
+          "tcp_stream": 132,
+          "frame_number": 4618,
+          "display_filter": "frame.number == 4618",
+          "timestamp_epoch": "1725473582.269649000"
+        },
+        {
+          "tcp_stream": 131,
+          "frame_number": 4622,
+          "display_filter": "frame.number == 4622",
+          "timestamp_epoch": "1725473582.270163000"
+        }
+      ]
+    },
+    {
+      "id": "finding-a49be6f52e47825b864daab9",
+      "type": "pcap-finding",
+      "label": "Directory-service protocol activity",
+      "source": "deterministic-pcap-analysis",
+      "metrics": {
+        "source": "172.17.0.99",
+        "protocol": "samr",
+        "destination": "172.17.0.17",
+        "event_count": 15,
+        "operation_numbers": [
+          "1",
+          "16",
+          "17",
+          "3",
+          "34",
+          "36",
+          "39",
+          "5",
+          "6",
+          "64",
+          "7"
+        ]
+      },
+      "rule_id": "directory-service-activity",
+      "severity": "low",
+      "confidence": 0.95,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "explanation": "Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "rule_version": "pcap-rules-v3",
+      "frame_evidence": [
+        {
+          "tcp_stream": 13,
+          "frame_number": 409,
+          "display_filter": "frame.number == 409",
+          "timestamp_epoch": "1725471275.491823000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 413,
+          "display_filter": "frame.number == 413",
+          "timestamp_epoch": "1725471275.492594000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 416,
+          "display_filter": "frame.number == 416",
+          "timestamp_epoch": "1725471275.493261000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 418,
+          "display_filter": "frame.number == 418",
+          "timestamp_epoch": "1725471275.493938000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 421,
+          "display_filter": "frame.number == 421",
+          "timestamp_epoch": "1725471275.494763000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 423,
+          "display_filter": "frame.number == 423",
+          "timestamp_epoch": "1725471275.495492000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 425,
+          "display_filter": "frame.number == 425",
+          "timestamp_epoch": "1725471275.496220000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 427,
+          "display_filter": "frame.number == 427",
+          "timestamp_epoch": "1725471275.497152000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 429,
+          "display_filter": "frame.number == 429",
+          "timestamp_epoch": "1725471275.498143000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 433,
+          "display_filter": "frame.number == 433",
+          "timestamp_epoch": "1725471275.499194000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 436,
+          "display_filter": "frame.number == 436",
+          "timestamp_epoch": "1725471275.499914000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 440,
+          "display_filter": "frame.number == 440",
+          "timestamp_epoch": "1725471275.500507000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 444,
+          "display_filter": "frame.number == 444",
+          "timestamp_epoch": "1725471275.501141000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 447,
+          "display_filter": "frame.number == 447",
+          "timestamp_epoch": "1725471275.501755000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 449,
+          "display_filter": "frame.number == 449",
+          "timestamp_epoch": "1725471275.502313000"
+        }
+      ]
+    },
+    {
+      "id": "identity-d170589102e27d1a098c356d",
+      "type": "identity",
+      "label": "account: afletcher",
+      "value": "afletcher",
+      "source": "deterministic-pcap-analysis",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "ip_addresses": [
+        "172.17.0.99"
+      ],
+      "identity_type": "account",
+      "frame_evidence": [
+        {
+          "tcp_stream": 9,
+          "frame_number": 293,
+          "display_filter": "frame.number == 293",
+          "timestamp_epoch": "1725471275.303608000"
+        },
+        {
+          "tcp_stream": 10,
+          "frame_number": 301,
+          "display_filter": "frame.number == 301",
+          "timestamp_epoch": "1725471275.309704000"
+        },
+        {
+          "tcp_stream": 10,
+          "frame_number": 303,
+          "display_filter": "frame.number == 303",
+          "timestamp_epoch": "1725471275.311510000"
+        },
+        {
+          "tcp_stream": 11,
+          "frame_number": 317,
+          "display_filter": "frame.number == 317",
+          "timestamp_epoch": "1725471275.315483000"
+        },
+        {
+          "tcp_stream": 16,
+          "frame_number": 350,
+          "display_filter": "frame.number == 350",
+          "timestamp_epoch": "1725471275.484008000"
+        },
+        {
+          "tcp_stream": 15,
+          "frame_number": 354,
+          "display_filter": "frame.number == 354",
+          "timestamp_epoch": "1725471275.484265000"
+        },
+        {
+          "tcp_stream": 17,
+          "frame_number": 373,
+          "display_filter": "frame.number == 373",
+          "timestamp_epoch": "1725471275.486633000"
+        },
+        {
+          "tcp_stream": 13,
+          "frame_number": 428,
+          "display_filter": "frame.number == 428",
+          "timestamp_epoch": "1725471275.498011000"
+        },
+        {
+          "tcp_stream": 21,
+          "frame_number": 483,
+          "display_filter": "frame.number == 483",
+          "timestamp_epoch": "1725471275.576097000"
+        },
+        {
+          "tcp_stream": 65,
+          "frame_number": 3009,
+          "display_filter": "frame.number == 3009",
+          "timestamp_epoch": "1725471470.872547000"
+        }
+      ]
+    },
+    {
+      "id": "identity-6281eabc5dfb393f2954d4ab",
+      "type": "identity",
+      "label": "full-name: Andrew Fletcher",
+      "value": "Andrew Fletcher",
+      "source": "deterministic-pcap-analysis",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "ip_addresses": [
+        "172.17.0.99"
+      ],
+      "identity_type": "full-name",
+      "frame_evidence": [
+        {
+          "tcp_stream": 13,
+          "frame_number": 428,
+          "display_filter": "frame.number == 428",
+          "timestamp_epoch": "1725471275.498011000"
+        }
+      ]
+    },
+    {
+      "id": "identity-a6415d058485fbf8447ef670",
+      "type": "identity",
+      "label": "hostname: DESKTOP-RNVO9AT",
+      "value": "DESKTOP-RNVO9AT",
+      "source": "deterministic-pcap-analysis",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "ip_addresses": [
+        "172.17.0.99"
+      ],
+      "identity_type": "hostname",
+      "frame_evidence": [
+        {
+          "udp_stream": 0,
+          "frame_number": 1,
+          "display_filter": "frame.number == 1",
+          "timestamp_epoch": "1725471151.318609000"
+        },
+        {
+          "udp_stream": 0,
+          "frame_number": 3,
+          "display_filter": "frame.number == 3",
+          "timestamp_epoch": "1725471151.319898000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 20,
+          "display_filter": "frame.number == 20",
+          "timestamp_epoch": "1725471151.396549000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 22,
+          "display_filter": "frame.number == 22",
+          "timestamp_epoch": "1725471151.396549000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 60,
+          "display_filter": "frame.number == 60",
+          "timestamp_epoch": "1725471152.150023000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 62,
+          "display_filter": "frame.number == 62",
+          "timestamp_epoch": "1725471152.150023000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 64,
+          "display_filter": "frame.number == 64",
+          "timestamp_epoch": "1725471152.912861000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 66,
+          "display_filter": "frame.number == 66",
+          "timestamp_epoch": "1725471152.912861000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 81,
+          "display_filter": "frame.number == 81",
+          "timestamp_epoch": "1725471153.663907000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 83,
+          "display_filter": "frame.number == 83",
+          "timestamp_epoch": "1725471153.663907000"
+        },
+        {
+          "udp_stream": 14,
+          "frame_number": 97,
+          "display_filter": "frame.number == 97",
+          "timestamp_epoch": "1725471157.536757000"
+        },
+        {
+          "udp_stream": 14,
+          "frame_number": 98,
+          "display_filter": "frame.number == 98",
+          "timestamp_epoch": "1725471157.540516000"
+        },
+        {
+          "udp_stream": 14,
+          "frame_number": 130,
+          "display_filter": "frame.number == 130",
+          "timestamp_epoch": "1725471188.148346000"
+        },
+        {
+          "tcp_stream": 4,
+          "frame_number": 141,
+          "display_filter": "frame.number == 141",
+          "timestamp_epoch": "1725471188.172679000"
+        },
+        {
+          "udp_stream": 14,
+          "frame_number": 147,
+          "display_filter": "frame.number == 147",
+          "timestamp_epoch": "1725471188.176195000"
+        },
+        {
+          "udp_stream": 14,
+          "frame_number": 150,
+          "display_filter": "frame.number == 150",
+          "timestamp_epoch": "1725471188.185423000"
+        },
+        {
+          "tcp_stream": 5,
+          "frame_number": 174,
+          "display_filter": "frame.number == 174",
+          "timestamp_epoch": "1725471218.199311000"
+        },
+        {
+          "udp_stream": 14,
+          "frame_number": 180,
+          "display_filter": "frame.number == 180",
+          "timestamp_epoch": "1725471218.203910000"
+        },
+        {
+          "udp_stream": 14,
+          "frame_number": 183,
+          "display_filter": "frame.number == 183",
+          "timestamp_epoch": "1725471218.222904000"
+        },
+        {
+          "tcp_stream": 7,
+          "frame_number": 232,
+          "display_filter": "frame.number == 232",
+          "timestamp_epoch": "1725471248.256719000"
+        }
+      ]
+    },
+    {
+      "id": "identity-498252bc3d6ec8cb44cd6137",
+      "type": "identity",
+      "label": "netbios-group: BEPOSITIVE",
+      "value": "BEPOSITIVE",
+      "source": "deterministic-pcap-analysis",
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "ip_addresses": [],
+      "identity_type": "netbios-group",
+      "frame_evidence": [
+        {
+          "udp_stream": 8,
+          "frame_number": 21,
+          "display_filter": "frame.number == 21",
+          "timestamp_epoch": "1725471151.396549000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 61,
+          "display_filter": "frame.number == 61",
+          "timestamp_epoch": "1725471152.150023000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 65,
+          "display_filter": "frame.number == 65",
+          "timestamp_epoch": "1725471152.912861000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 82,
+          "display_filter": "frame.number == 82",
+          "timestamp_epoch": "1725471153.663907000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 85,
+          "display_filter": "frame.number == 85",
+          "timestamp_epoch": "1725471154.449002000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 91,
+          "display_filter": "frame.number == 91",
+          "timestamp_epoch": "1725471155.224995000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 92,
+          "display_filter": "frame.number == 92",
+          "timestamp_epoch": "1725471155.975604000"
+        },
+        {
+          "udp_stream": 8,
+          "frame_number": 96,
+          "display_filter": "frame.number == 96",
+          "timestamp_epoch": "1725471156.745729000"
+        }
+      ]
+    },
+    {
+      "id": "artifact-dc888079f167d1c11773e5c8",
+      "type": "file-artifact",
+      "label": "index.php",
+      "value": "ed0855c1637e5f93be7d54acb2cb8872683a0e5eb670258abb1ebc41bfbf4591",
+      "sha256": "ed0855c1637e5f93be7d54acb2cb8872683a0e5eb670258abb1ebc41bfbf4591",
+      "source": "deterministic-pcap-analysis",
+      "size_bytes": 105,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "content_type": "application/octet-stream"
+    },
+    {
+      "id": "artifact-3e1db0eeb5d2d42d075dfa96",
+      "type": "file-artifact",
+      "label": "index.php%3fid=&subid=qIOuKk7U",
+      "value": "736f0cb5cc23435dad920dbe447efcf102e61c8691fa8528f5f39f386537f43e",
+      "sha256": "736f0cb5cc23435dad920dbe447efcf102e61c8691fa8528f5f39f386537f43e",
+      "source": "deterministic-pcap-analysis",
+      "size_bytes": 61,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "content_type": "application/octet-stream"
+    },
+    {
+      "id": "artifact-d50a69716d8b2738e4aeba86",
+      "type": "file-artifact",
+      "label": "connecttest(1).txt",
+      "value": "5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61",
+      "sha256": "5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61",
+      "source": "deterministic-pcap-analysis",
+      "size_bytes": 22,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "content_type": "text/plain"
+    },
+    {
+      "id": "artifact-ebdbcb860d8457f5b93076a8",
+      "type": "file-artifact",
+      "label": "ProcessMAU.txt",
+      "value": "69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820",
+      "sha256": "69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820",
+      "source": "deterministic-pcap-analysis",
+      "size_bytes": 4,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "content_type": "text/plain"
+    },
+    {
+      "id": "artifact-28a949461c43984fc1939b46",
+      "type": "file-artifact",
+      "label": "index(1).php",
+      "value": "3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43",
+      "sha256": "3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43",
+      "source": "deterministic-pcap-analysis",
+      "size_bytes": 1,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "content_type": "application/octet-stream"
+    },
+    {
+      "id": "artifact-11ff07d077434887076489c0",
+      "type": "file-artifact",
+      "label": "foots(1).php",
+      "value": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "deterministic-pcap-analysis",
+      "size_bytes": 0,
+      "source_ref": "2024-09-04-traffic-analysis-exercise.pcap",
+      "analysis_id": "faf041c3-70e0-4a01-8780-10917e5e187c",
+      "source_refs": [
+        "2024-09-04-traffic-analysis-exercise.pcap",
+        "deterministic-pcap-analysis"
+      ],
+      "content_type": "application/octet-stream"
+    }
+  ],
+  "evidence_edges": [],
+  "timeline": [
+    {
+      "at": "2026-09-19T12:50:31.188Z",
+      "event": "Added Log/PCAP analysis 2024-09-04-traffic-analysis-exercise.pcap",
+      "source": "Log/PCAP analysis 2024-09-04-traffic-analysis-exercise.pcap",
+      "actor_count": 0,
+      "report_count": 0,
+      "technique_count": 0
+    },
+    {
+      "at": "2026-09-19T12:58:19.809Z",
+      "event": "Added Log/PCAP analysis 2024-09-04-traffic-analysis-exercise.pcap",
+      "source": "Log/PCAP analysis 2024-09-04-traffic-analysis-exercise.pcap",
+      "actor_count": 0,
+      "report_count": 0,
+      "technique_count": 0
+    }
+  ],
+  "created_at": "2026-09-19T12:50:27.998960+00:00",
+  "updated_at": "2026-09-19T12:58:19.832940+00:00"
+}

@@ -1,0 +1,2243 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>2021-12-08: AdversaryGraph live-instance PCAP report | 1200km</title><meta name="description" content="Public evidence supplement for ten AdversaryGraph malware-PCAP tests: reports, screenshots, audit records, provenance and limitations."><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2021-12-08/REPORT.html"><meta property="og:url" content="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2021-12-08/REPORT.html"><meta property="og:title" content="2021-12-08: AdversaryGraph live-instance PCAP report"><meta property="og:description" content="Ten malware PCAPs, original screenshots, full case reports and qualified results."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/research/adversarygraph-ten-pcaps/screenshots/2024-11-26-packet-analysis.png"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{padding:20px;background:#11233c;color:#fff}header a{color:#b7e5ff}main{max-width:1160px;margin:28px auto;padding:32px 44px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2{margin-top:2em}a{color:#075c91}img{display:block;max-width:100%;height:auto;margin:24px auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #b8c9db;padding:10px;text-align:left}th{background:#edf4fc}pre{overflow:auto;padding:16px;background:#11233c;color:#fff}code{font-size:.85em}blockquote{margin:20px 0;padding:8px 20px;border-left:4px solid #167bb0;background:#eff6ff}.notice{padding:12px;background:#eef6fd;font-size:14px}@media(max-width:700px){main{margin:0;padding:22px 16px}body{font-size:16px}}@media print{header{display:none}main{padding:0;margin:0}pre{white-space:pre-wrap}img,tr{break-inside:avoid}}</style><meta property="article:published_time" content="2026-09-20"><meta property="article:modified_time" content="2026-09-20"></head><body><header>1200KM · ANDREY PAUTOV<br><a href="/">Home</a> · <a href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/">Article</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/REPORTS.html">Ten reports</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/SCREENSHOTS.html">Screenshot gallery</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/">Publication boundaries</a></header><main><p class="notice">Measured 19 September 2026 · Public derivative · Historical training evidence, not approved threat intelligence.</p><h1 id="2021-12-08-adversarygraph-live-instance-pcap-report">2021-12-08: AdversaryGraph live-instance PCAP report</h1>
+<p>Actual deployment: <code>[local-workspace]</code>, HTTP <code>[local-instance]</code>. This is a regression validation, not an independent blind trial. No malware was executed and no malicious endpoint was contacted.</p>
+<h2 id="executive-assessment">Executive assessment</h2>
+<p>Decoded 55390 packets across 756 IP endpoints and 2044 transport flows. Observed 1726 DNS events, 17 HTTP requests, 191 TLS ClientHello events, and 500 exported HTTP object(s). Deterministic rules produced 18 finding(s): 0 high, 12 medium, and 6 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.</p>
+<p>These findings identify observations and review priorities, not a proven malware family, actor, or causal infection chain. Source-frame evidence takes precedence over exercise answer typos.</p>
+<h2 id="capture-and-execution-evidence">Capture and execution evidence</h2>
+<p>Capture window: 2021-12-03T19:41:50.282150+00:00 to 2021-12-03T20:15:46.320562+00:00 UTC.
+Capture SHA-256: <code>91e547acc39e8ef27d7ec549404157fe527e090bd5caf6fe189c2bae6d4a57ef</code>.
+Analysis ID: <code>96e0e828-93ae-49d5-8104-9f14cb584c3e</code>; review session: <code>69fc74e8-a685-4c8b-bde3-5ee0bb1190f6</code>.
+First real HTTP upload/analysis: <strong>21.972 seconds</strong>. Fresh uncached decoder repeat: <strong>27.496 seconds</strong>. Prior isolated upload: 20.329 seconds.
+The fresh repeat ran while builds/tests were active; these timings are not a controlled performance comparison. Native packet analysis used <strong>zero LLM calls and zero LLM tokens</strong>. Coding-agent token usage was not instrumented.</p>
+<p>Packet result equals prior isolated result: True; fresh repeat exact: True; retained capture checksum valid: True; API retrieval identical: True; idempotent upload: True.</p>
+<h2 id="internal-host-identities">Internal host identities</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Address</th>
+<th>MAC addresses</th>
+<th>Frame-backed identities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.12.3.1</td>
+<td>00:30:b6:89:08:49</td>
+<td></td>
+</tr>
+<tr>
+<td>10.12.3.255</td>
+<td>ff:ff:ff:ff:ff:ff</td>
+<td></td>
+</tr>
+<tr>
+<td>10.12.3.3</td>
+<td>10:98:36:b9:41:7c</td>
+<td></td>
+</tr>
+<tr>
+<td>10.12.3.35</td>
+<td>00:4f:49:f9:3a:6f</td>
+<td></td>
+</tr>
+<tr>
+<td>10.12.3.38</td>
+<td>00:4f:49:c8:4e:37</td>
+<td></td>
+</tr>
+<tr>
+<td>10.12.3.66</td>
+<td>00:4f:49:e7:81:3d</td>
+<td>account: darin.figueroa; domain: FARGREENTECH; full-name: Darin Figueroa; hostname: DESKTOP-LUOABV1; hostname: FARGREENTECH</td>
+</tr>
+<tr>
+<td>192.168.201.133</td>
+<td>00:30:b6:89:08:49</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="evidence-timeline">Evidence timeline</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>UTC</th>
+<th style="text-align:right">Frame</th>
+<th>Candidate observation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2021-12-03T19:41:50.675316+00:00</td>
+<td style="text-align:right">43</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2021-12-03T19:41:50.676125+00:00</td>
+<td style="text-align:right">46</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2021-12-03T19:42:09.027599+00:00</td>
+<td style="text-align:right">290</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2021-12-03T19:42:09.027946+00:00</td>
+<td style="text-align:right">291</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2021-12-03T19:42:09.117621+00:00</td>
+<td style="text-align:right">352</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2021-12-03T19:42:09.117762+00:00</td>
+<td style="text-align:right">353</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2021-12-03T19:42:47.664570+00:00</td>
+<td style="text-align:right">1743</td>
+<td>medium: HTTP client claiming a PowerShell User-Agent</td>
+</tr>
+<tr>
+<td>2021-12-03T19:42:48.410086+00:00</td>
+<td style="text-align:right">1771</td>
+<td>medium: HTTP client claiming a PowerShell User-Agent</td>
+</tr>
+<tr>
+<td>2021-12-03T20:09:49.711447+00:00</td>
+<td style="text-align:right">11092</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:09:52.632698+00:00</td>
+<td style="text-align:right">11301</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:10:20.118295+00:00</td>
+<td style="text-align:right">13057</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:11:23.142675+00:00</td>
+<td style="text-align:right">18188</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:11:56.538087+00:00</td>
+<td style="text-align:right">21451</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:12:02.890489+00:00</td>
+<td style="text-align:right">23295</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:12:33.057066+00:00</td>
+<td style="text-align:right">28378</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:13:27.885993+00:00</td>
+<td style="text-align:right">43910</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:13:53.220600+00:00</td>
+<td style="text-align:right">46108</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+<tr>
+<td>2021-12-03T20:14:17.368790+00:00</td>
+<td style="text-align:right">47842</td>
+<td>medium: Sustained external TCP conversation outside decoded application coverage</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="highest-volume-conversations">Highest-volume conversations</h2>
+<p>Wire volume includes overhead/retransmissions. A large or periodic flow is not automatically exfiltration or C2.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Initiator</th>
+<th>Responder</th>
+<th>Stream</th>
+<th style="text-align:right">Wire bytes</th>
+<th style="text-align:right">First frame</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.12.3.66:53013</td>
+<td>91.207.181.106:8080</td>
+<td>tcp 748</td>
+<td style="text-align:right">2,960,550</td>
+<td style="text-align:right">28378</td>
+</tr>
+<tr>
+<td>10.12.3.66:53438</td>
+<td>91.207.181.106:8080</td>
+<td>tcp 1272</td>
+<td style="text-align:right">1,881,584</td>
+<td style="text-align:right">51524</td>
+</tr>
+<tr>
+<td>10.12.3.66:52457</td>
+<td>172.104.227.98:443</td>
+<td>tcp 71</td>
+<td style="text-align:right">1,600,976</td>
+<td style="text-align:right">8614</td>
+</tr>
+<tr>
+<td>10.12.3.66:52456</td>
+<td>172.104.227.98:443</td>
+<td>tcp 70</td>
+<td style="text-align:right">1,587,057</td>
+<td style="text-align:right">6591</td>
+</tr>
+<tr>
+<td>10.12.3.66:52415</td>
+<td>139.59.6.175:80</td>
+<td>tcp 29</td>
+<td style="text-align:right">1,211,230</td>
+<td style="text-align:right">1756</td>
+</tr>
+<tr>
+<td>10.12.3.66:53129</td>
+<td>173.247.253.179:465</td>
+<td>tcp 886</td>
+<td style="text-align:right">1,001,959</td>
+<td style="text-align:right">36181</td>
+</tr>
+<tr>
+<td>10.12.3.66:53001</td>
+<td>186.202.161.96:465</td>
+<td>tcp 728</td>
+<td style="text-align:right">987,489</td>
+<td style="text-align:right">25667</td>
+</tr>
+<tr>
+<td>10.12.3.66:53106</td>
+<td>108.179.194.17:465</td>
+<td>tcp 854</td>
+<td style="text-align:right">953,894</td>
+<td style="text-align:right">35188</td>
+</tr>
+<tr>
+<td>10.12.3.66:52888</td>
+<td>74.220.206.23:465</td>
+<td>tcp 595</td>
+<td style="text-align:right">952,534</td>
+<td style="text-align:right">21029</td>
+</tr>
+<tr>
+<td>10.12.3.66:52989</td>
+<td>208.84.244.140:465</td>
+<td>tcp 703</td>
+<td style="text-align:right">951,040</td>
+<td style="text-align:right">25168</td>
+</tr>
+<tr>
+<td>10.12.3.66:53104</td>
+<td>108.167.153.167:587</td>
+<td>tcp 852</td>
+<td style="text-align:right">948,727</td>
+<td style="text-align:right">35168</td>
+</tr>
+<tr>
+<td>10.12.3.66:52559</td>
+<td>203.211.136.199:587</td>
+<td>tcp 206</td>
+<td style="text-align:right">947,921</td>
+<td style="text-align:right">12289</td>
+</tr>
+<tr>
+<td>10.12.3.66:53244</td>
+<td>186.64.117.195:587</td>
+<td>tcp 1014</td>
+<td style="text-align:right">945,771</td>
+<td style="text-align:right">45476</td>
+</tr>
+<tr>
+<td>10.12.3.66:52890</td>
+<td>91.207.181.106:8080</td>
+<td>tcp 597</td>
+<td style="text-align:right">805,994</td>
+<td style="text-align:right">21451</td>
+</tr>
+<tr>
+<td>10.12.3.66:52408</td>
+<td>204.79.197.200:443</td>
+<td>tcp 20</td>
+<td style="text-align:right">801,226</td>
+<td style="text-align:right">488</td>
+</tr>
+<tr>
+<td>10.12.3.66:53125</td>
+<td>199.79.63.117:587</td>
+<td>tcp 882</td>
+<td style="text-align:right">744,297</td>
+<td style="text-align:right">36087</td>
+</tr>
+<tr>
+<td>10.12.3.66:53121</td>
+<td>74.220.199.65:587</td>
+<td>tcp 877</td>
+<td style="text-align:right">739,207</td>
+<td style="text-align:right">35948</td>
+</tr>
+<tr>
+<td>10.12.3.66:52978</td>
+<td>192.64.117.195:465</td>
+<td>tcp 689</td>
+<td style="text-align:right">544,020</td>
+<td style="text-align:right">24744</td>
+</tr>
+<tr>
+<td>10.12.3.66:52429</td>
+<td>172.104.227.98:443</td>
+<td>tcp 43</td>
+<td style="text-align:right">540,063</td>
+<td style="text-align:right">4112</td>
+</tr>
+<tr>
+<td>10.12.3.66:52967</td>
+<td>58.80.137.169:587</td>
+<td>tcp 678</td>
+<td style="text-align:right">507,101</td>
+<td style="text-align:right">24446</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="native-packet-findings-artifacts-and-limitations">Native packet findings, artifacts and limitations</h2>
+<h1 id="adversarygraph-deterministic-pcap-analysis">AdversaryGraph Deterministic PCAP Analysis</h1>
+<p>Source: 2021-12-08-ISC-Forensic-Challenge.pcap
+Capture SHA-256: <code>91e547acc39e8ef27d7ec549404157fe527e090bd5caf6fe189c2bae6d4a57ef</code>
+Semantic result SHA-256: <code>3343d2811e62c53a10dfd853861eeb3e3316a3080f654a63017c370f005b6af8</code>
+Analyzer manifest SHA-256: <code>ee952aeb7cdc6958f4ae5178c54c274a1e4f0aec4d42f3bdb95baaff063b3dde</code></p>
+<h2 id="executive-summary">Executive summary</h2>
+<p>Decoded 55390 packets across 756 IP endpoints and 2044 transport flows. Observed 1726 DNS events, 17 HTTP requests, 191 TLS ClientHello events, and 500 exported HTTP object(s). Deterministic rules produced 18 finding(s): 0 high, 12 medium, and 6 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.</p>
+<h2 id="capture-facts">Capture facts</h2>
+<ul>
+<li>Packets: 55390</li>
+<li>Duration: 2036.038412 seconds</li>
+<li>Captured bytes: 32089556</li>
+<li>Endpoints: 756</li>
+<li>Flows: 2044</li>
+</ul>
+<h2 id="deterministic-findings">Deterministic findings</h2>
+<h3 id="medium-http-client-claiming-a-powershell-user-agent">MEDIUM — HTTP client claiming a PowerShell User-Agent</h3>
+<p>The HTTP User-Agent claims Windows PowerShell. User-Agent strings can be spoofed; this alone does not prove interpreter execution or malicious intent.</p>
+<p>Rule: <code>powershell-http-client@pcap-rules-v3</code>; confidence: 0.94; evidence: frame 1743 / TCP stream 27.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;104.21.29.80&quot;,&quot;request_count&quot;:1,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;user_agent&quot;:&quot;Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.19041.1320&quot;}</code></p>
+<h3 id="medium-http-client-claiming-a-powershell-user-agent-1">MEDIUM — HTTP client claiming a PowerShell User-Agent</h3>
+<p>The HTTP User-Agent claims Windows PowerShell. User-Agent strings can be spoofed; this alone does not prove interpreter execution or malicious intent.</p>
+<p>Rule: <code>powershell-http-client@pcap-rules-v3</code>; confidence: 0.94; evidence: frame 1771 / TCP stream 29.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;139.59.6.175&quot;,&quot;request_count&quot;:1,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;user_agent&quot;:&quot;Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.19041.1320&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 353 / TCP stream 11, frame 355 / TCP stream 11, frame 357 / TCP stream 11, frame 359 / TCP stream 11, frame 3126 / TCP stream 32.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.12.3.66&quot;,&quot;event_count&quot;:16,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;10.12.3.3&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-1">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 46 / TCP stream 0, frame 52 / TCP stream 0, frame 428 / TCP stream 17, frame 433 / TCP stream 17, frame 435 / TCP stream 17.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.12.3.66&quot;,&quot;event_count&quot;:25,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;4,19,19,19,5&quot;,&quot;4,5&quot;,&quot;5&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;10.12.3.3&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-2">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 291 / TCP stream 8, frame 293 / TCP stream 8, frame 295 / TCP stream 8, frame 297 / TCP stream 8, frame 299 / TCP stream 8.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.12.3.66&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;10.12.3.3&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-3">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 352 / TCP stream 11, frame 354 / TCP stream 11, frame 356 / TCP stream 11, frame 358 / TCP stream 11, frame 3125 / TCP stream 32.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.12.3.3&quot;,&quot;event_count&quot;:16,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;10.12.3.66&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-4">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 43 / TCP stream 0, frame 50 / TCP stream 0, frame 53 / TCP stream 0, frame 426 / TCP stream 17, frame 431 / TCP stream 17.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.12.3.3&quot;,&quot;event_count&quot;:32,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;2&quot;,&quot;3&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;10.12.3.66&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-5">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 290 / TCP stream 8, frame 292 / TCP stream 8, frame 294 / TCP stream 8, frame 296 / TCP stream 8, frame 298 / TCP stream 8.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.12.3.3&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;10.12.3.66&quot;}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 11092 / TCP stream 92.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:30.685,&quot;packets&quot;:107,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:73616}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-1">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 11301 / TCP stream 113.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:57.532,&quot;packets&quot;:147,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:105748}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-2">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 13057 / TCP stream 241.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:42.498,&quot;packets&quot;:168,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:125939}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-3">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 18188 / TCP stream 443.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:33.66,&quot;packets&quot;:583,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:454912}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-4">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 21451 / TCP stream 597.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:36.785,&quot;packets&quot;:1049,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:805994}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-5">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 23295 / TCP stream 598.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:59.968,&quot;packets&quot;:108,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:73622}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-6">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 28378 / TCP stream 748.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:34.519,&quot;packets&quot;:3721,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:2960550}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-7">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 43910 / TCP stream 895.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:49.751,&quot;packets&quot;:111,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:74055}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-8">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 46108 / TCP stream 1057.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:54.922,&quot;packets&quot;:353,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:265548}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-9">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 47842 / TCP stream 1128.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;91.207.181.106&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:40.215,&quot;packets&quot;:331,&quot;source&quot;:&quot;10.12.3.66&quot;,&quot;wire_bytes&quot;:262342}</code></p>
+<h2 id="attck-candidates">ATT&amp;CK candidates</h2>
+<ul>
+<li>T1059.001 Command and Scripting Interpreter: PowerShell (execution), confidence=0.5, status=suggested; basis=versioned-deterministic-rule.</li>
+</ul>
+<h2 id="identities">Identities</h2>
+<ul>
+<li>account: <code>darin.figueroa</code>; client IPs: 10.12.3.66; frames: 224, 232, 234, 246, 274</li>
+<li>domain: <code>FARGREENTECH</code>; client IPs: 10.12.3.66; frames: 274</li>
+<li>full-name: <code>Darin Figueroa</code>; client IPs: 10.12.3.66; frames: 305</li>
+<li>hostname: <code>DESKTOP-LUOABV1</code>; client IPs: 10.12.3.66; frames: 1, 3, 23, 59, 72</li>
+<li>hostname: <code>FARGREENTECH</code>; client IPs: 10.12.3.66; frames: 132, 136, 137, 172</li>
+<li>netbios-group: <code>FARGREENTECH</code>; client IPs: unbound subject; frames: 60, 80, 113, 118, 120</li>
+</ul>
+<h2 id="ioc-and-artifact-candidates">IOC and artifact candidates</h2>
+<ul>
+<li>domain: <code>a.temp.pl</code>; roles: dns-query</li>
+<li>domain: <code>acerodelcibao.com</code>; roles: dns-query</li>
+<li>domain: <code>actsb.com.my</code>; roles: dns-cname</li>
+<li>domain: <code>adomengineering.com</code>; roles: dns-cname</li>
+<li>domain: <code>amaralcoleta.com.br</code>; roles: dns-cname</li>
+<li>domain: <code>api.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>arketipo.com.mx</code>; roles: dns-cname</li>
+<li>domain: <code>atmail15.worldsoft-mail.net</code>; roles: dns-query</li>
+<li>domain: <code>auth.smtp.1and1.co.uk</code>; roles: dns-query</li>
+<li>domain: <code>auth.smtp.configtools.de</code>; roles: dns-query</li>
+<li>domain: <code>auth.smtp.kundenserver.de</code>; roles: dns-cname, dns-query</li>
+<li>domain: <code>baidyanath.info</code>; roles: dns-query</li>
+<li>domain: <code>bh.frameworks-studios.com</code>; roles: dns-query</li>
+<li>domain: <code>box5718.bluehost.com</code>; roles: dns-query</li>
+<li>domain: <code>broker.zgora.pl</code>; roles: dns-query</li>
+<li>domain: <code>bsmtp.telekom.at</code>; roles: dns-query</li>
+<li>domain: <code>c1.icoremail.net</code>; roles: dns-query</li>
+<li>domain: <code>capchile.cl</code>; roles: dns-cname</li>
+<li>domain: <code>chaudharygroup.com</code>; roles: dns-query</li>
+<li>domain: <code>checkappexec.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>ci-aduanas.com</code>; roles: dns-query</li>
+<li>domain: <code>cityangkorhotel.com</code>; roles: dns-cname</li>
+<li>domain: <code>client.wns.windows.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>cmusoft.webhost4life.com</code>; roles: dns-query</li>
+<li>domain: <code>cpmail.contactplus.com.pk</code>; roles: dns-query</li>
+<li>domain: <code>dmfseguros.com.br</code>; roles: dns-cname</li>
+<li>domain: <code>dns.msftncsi.com</code>; roles: dns-query</li>
+<li>domain: <code>dunyakalip.com</code>; roles: dns-cname</li>
+<li>domain: <code>egyptetouring.com</code>; roles: dns-query</li>
+<li>domain: <code>ekopraxis.com.ec</code>; roles: dns-cname</li>
+<li>domain: <code>email-proxy.imaginet.co.za</code>; roles: dns-cname</li>
+<li>domain: <code>email-ssl.com.br</code>; roles: dns-query</li>
+<li>domain: <code>email.aon.at</code>; roles: dns-query</li>
+<li>domain: <code>email.srb.gos.pk</code>; roles: dns-query</li>
+<li>domain: <code>emko.com.pl</code>; roles: dns-query</li>
+<li>domain: <code>enseigneslandreville.com</code>; roles: dns-cname</li>
+<li>domain: <code>eurocertindia.com</code>; roles: dns-cname</li>
+<li>domain: <code>eurodesigngroup.net</code>; roles: dns-cname</li>
+<li>domain: <code>fargreentech-dc.fargreentech.com</code>; roles: dns-query</li>
+<li>domain: <code>fargreentech.com</code>; roles: dns-query</li>
+<li>domain: <code>ff.zydusphils.com</code>; roles: dns-query</li>
+<li>domain: <code>fibre.gondrandvalence.com</code>; roles: dns-cname</li>
+<li>domain: <code>fileserver-int.net</code>; roles: dns-cname</li>
+<li>domain: <code>frameworks-studios.com</code>; roles: dns-cname</li>
+<li>domain: <code>gamaes.shop</code>; roles: dns-query, http-host</li>
+<li>domain: <code>gameplayapi.intel.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>gator4266.hostgator.com</code>; roles: dns-query</li>
+<li>domain: <code>ghs.google.com</code>; roles: dns-cname</li>
+<li>domain: <code>global.sky1technologies.com</code>; roles: dns-query</li>
+<li>domain: <code>globalfreight.pk</code>; roles: dns-cname</li>
+<li>domain: <code>gm-pool.centrum.cz</code>; roles: dns-cname</li>
+<li>domain: <code>gottharthotel.com</code>; roles: dns-query</li>
+<li>domain: <code>gruporadialcristocentrica.com</code>; roles: dns-cname</li>
+<li>domain: <code>gs862.ggsv.jp</code>; roles: dns-query</li>
+<li>domain: <code>hades.dewebworks.net</code>; roles: dns-cname</li>
+<li>domain: <code>hdredirect-lb5-1afb6e2973825a56.elb.us-east-1.amazonaws.com</code>; roles: dns-cname</li>
+<li>domain: <code>hmapumps.com</code>; roles: dns-cname</li>
+<li>domain: <code>hortim.cz</code>; roles: dns-cname</li>
+<li>domain: <code>hosting.netclick.cz</code>; roles: dns-query</li>
+<li>domain: <code>hosting.pronto.hn</code>; roles: dns-query</li>
+<li>domain: <code>hotelandros.com</code>; roles: dns-cname</li>
+<li>domain: <code>hsgroupcal.com</code>; roles: dns-cname</li>
+<li>domain: <code>hueber.pl</code>; roles: dns-query</li>
+<li>domain: <code>hv31svg105.neubox.net</code>; roles: dns-query</li>
+<li>domain: <code>imap.1and1.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.1and1.es</code>; roles: dns-query</li>
+<li>domain: <code>imap.1and1.fr</code>; roles: dns-query</li>
+<li>domain: <code>imap.1und1.de</code>; roles: dns-query</li>
+<li>domain: <code>imap.aol.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.comcast.net</code>; roles: dns-query</li>
+<li>domain: <code>imap.conzulere-nextwealth.in</code>; roles: dns-query</li>
+<li>domain: <code>imap.ge.xfinity.com</code>; roles: dns-cname</li>
+<li>domain: <code>imap.iomartmail.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.ionos.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.mail.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.mail.yahoo.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.mi.com.co</code>; roles: dns-query</li>
+<li>domain: <code>imap.nerim.fr</code>; roles: dns-query</li>
+<li>domain: <code>imap.nerim.net</code>; roles: dns-cname</li>
+<li>domain: <code>imap.otenet.gr</code>; roles: dns-query</li>
+<li>domain: <code>imap.prmail.vn</code>; roles: dns-query</li>
+<li>domain: <code>imap.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>imap.strato.de</code>; roles: dns-query</li>
+<li>domain: <code>imap.theblossomvn.com</code>; roles: dns-query</li>
+<li>domain: <code>inbound.att.net</code>; roles: dns-query</li>
+<li>domain: <code>inbound.electric.net</code>; roles: dns-query</li>
+<li>domain: <code>inside.evoc.cn</code>; roles: dns-query</li>
+<li>domain: <code>interline.mx</code>; roles: dns-cname</li>
+<li>domain: <code>internal-aol.imap.mail.g03.yahoodns.net</code>; roles: dns-cname</li>
+<li>domain: <code>jsamerica.net</code>; roles: dns-cname</li>
+<li>domain: <code>jumbosprepackers.co.za</code>; roles: dns-cname</li>
+<li>domain: <code>kdn3.futureweb.at</code>; roles: dns-query</li>
+<li>domain: <code>kitchencuisine.com.pk</code>; roles: dns-query</li>
+<li>domain: <code>kopt-eonet-pop.xspmail.jp</code>; roles: dns-cname</li>
+<li>domain: <code>lagranciudad.mx</code>; roles: dns-cname</li>
+<li>domain: <code>loki.aserv.co.za</code>; roles: dns-query</li>
+<li>domain: <code>macquarieoms-syd.chsecure.zone</code>; roles: dns-query</li>
+<li>domain: <code>mail-out.cytanet.com.cy</code>; roles: dns-query</li>
+<li>domain: <code>mail-out.telenet.be</code>; roles: dns-query</li>
+<li>domain: <code>mail.1and1.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.1und1.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.abdullahbrothers.com.pk</code>; roles: dns-query</li>
+<li>domain: <code>mail.acmeroof.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.acoop-ks.co.jp</code>; roles: dns-query</li>
+<li>domain: <code>mail.actsb.com.my</code>; roles: dns-query</li>
+<li>domain: <code>mail.adomengineering.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.africaonline.co.zw</code>; roles: dns-query</li>
+<li>domain: <code>mail.aguilarenterprisesfl.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.aisairlines.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.alestraune.net.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.alfredoparedesyasociados.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.alramooz.net</code>; roles: dns-cname, dns-query</li>
+<li>domain: <code>mail.amarujala.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.apotheke-am-roeterberg.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.arcor.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.arcparc.ro</code>; roles: dns-query</li>
+<li>domain: <code>mail.argo.ge</code>; roles: dns-query</li>
+<li>domain: <code>mail.arketipo.com.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.arnes.si</code>; roles: dns-query</li>
+<li>domain: <code>mail.arptradingbd.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.aseanbalihotel.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.ava.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.belzonaquebec.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.bfx.vn</code>; roles: dns-query</li>
+<li>domain: <code>mail.bggreenwood.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.blancolaer.co.za</code>; roles: dns-query</li>
+<li>domain: <code>mail.bnf.hu</code>; roles: dns-query</li>
+<li>domain: <code>mail.bopumu.co.za</code>; roles: dns-query</li>
+<li>domain: <code>mail.borsodweb.hu</code>; roles: dns-query</li>
+<li>domain: <code>mail.bssb.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.cable-connection.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.cable-connection.com.netsolmail.net</code>; roles: dns-cname</li>
+<li>domain: <code>mail.cachetbeachcabo.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.calustro.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.cantv.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.capchile.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.casaflorencio.com.br</code>; roles: dns-query</li>
+<li>domain: <code>mail.casarramona.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.casi.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>mail.centrum.cz</code>; roles: dns-query</li>
+<li>domain: <code>mail.cesky-hosting.cz</code>; roles: dns-query</li>
+<li>domain: <code>mail.chac.vn</code>; roles: dns-query</li>
+<li>domain: <code>mail.chenabgrw.edu.pk</code>; roles: dns-query</li>
+<li>domain: <code>mail.chot.cz</code>; roles: dns-query</li>
+<li>domain: <code>mail.cine-equipment.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.circlekindonesia.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.cityangkorhotel.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.cn.yusen-logistics.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.comcast.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.copeval.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.countyofindiana.org</code>; roles: dns-query</li>
+<li>domain: <code>mail.cubimsa.com.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.degollado.gob.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.demisport.sk</code>; roles: dns-query</li>
+<li>domain: <code>mail.dmfseguros.com.br</code>; roles: dns-query</li>
+<li>domain: <code>mail.dunyakalip.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.dwidayakarya.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.dywit.it</code>; roles: dns-query</li>
+<li>domain: <code>mail.easy-trade.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>mail.easyname.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail.ecovidatrc.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.eim.ae</code>; roles: dns-query</li>
+<li>domain: <code>mail.ekopraxis.com.ec</code>; roles: dns-query</li>
+<li>domain: <code>mail.emailsrvr.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail.emepamendoza.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.emirates.net.ae</code>; roles: dns-query</li>
+<li>domain: <code>mail.enseigneslandreville.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.esabrasil.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.essve.ee</code>; roles: dns-query</li>
+<li>domain: <code>mail.estelec.es</code>; roles: dns-query</li>
+<li>domain: <code>mail.ethiopiaetravelling.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.eurocertindia.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.eurodesigngroup.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.eurokel.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.exclusivehosting.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.f2slovakia.sk</code>; roles: dns-query</li>
+<li>domain: <code>mail.fedearroz.com.co</code>; roles: dns-query</li>
+<li>domain: <code>mail.feposa.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.ferreteriacalzada.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.fileserver-int.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.finesseincasso.nl</code>; roles: dns-query</li>
+<li>domain: <code>mail.firma.hortim.cz</code>; roles: dns-query</li>
+<li>domain: <code>mail.flowlinevalves.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.fournarakis.gr</code>; roles: dns-query</li>
+<li>domain: <code>mail.galaxysivtek.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.geoecuatoriana.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.glas-weiss.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.glasofenbau-leipzig.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.globalfreight.pk</code>; roles: dns-query</li>
+<li>domain: <code>mail.globetrotter.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.gmail.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.gmx.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.grimescountyso.org</code>; roles: dns-query</li>
+<li>domain: <code>mail.gruporadialcristocentrica.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.hacioglumetalyapi.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.hielooriental.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.hikam.com.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.hilliarddental.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.hmapumps.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.hosting.gob.do</code>; roles: dns-query</li>
+<li>domain: <code>mail.hotelandros.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.hoteliers.guru</code>; roles: dns-query</li>
+<li>domain: <code>mail.hotelmoskva.rs</code>; roles: dns-query</li>
+<li>domain: <code>mail.hsgroupcal.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.i-miyazawa.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.icd.co.kr</code>; roles: dns-query</li>
+<li>domain: <code>mail.imaginet.co.za</code>; roles: dns-query</li>
+<li>domain: <code>mail.imexpharm.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.infomaniak.ch</code>; roles: dns-cname</li>
+<li>domain: <code>mail.inkote.co.id</code>; roles: dns-query</li>
+<li>domain: <code>mail.interline.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.ionos.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.ionos.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.ita.locamail.com.br</code>; roles: dns-cname</li>
+<li>domain: <code>mail.itep.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>mail.itsolutions-asia.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail.ivermedi.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.jsamerica.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.jumbosprepackers.co.za</code>; roles: dns-query</li>
+<li>domain: <code>mail.jurton.sk</code>; roles: dns-query</li>
+<li>domain: <code>mail.kantoushokuken.co.jp</code>; roles: dns-query</li>
+<li>domain: <code>mail.kvadra.hr</code>; roles: dns-query</li>
+<li>domain: <code>mail.lagranciudad.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.leiyueh.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.lemex-feinkost.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.lentaba.co.za</code>; roles: dns-query</li>
+<li>domain: <code>mail.lestarijayaraya.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.libero.it</code>; roles: dns-query</li>
+<li>domain: <code>mail.lietkabelis.lt</code>; roles: dns-query</li>
+<li>domain: <code>mail.live.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.lojack.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>mail.mail.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.mail.com.np</code>; roles: dns-query</li>
+<li>domain: <code>mail.mail.yahoo.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.maisondelegance.com.py</code>; roles: dns-query</li>
+<li>domain: <code>mail.mangalamyatra.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.masilagroup.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.mawo-elektro.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.messagingengine.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.mgmltda.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.mi.com.co</code>; roles: dns-query</li>
+<li>domain: <code>mail.michal-plumbohm.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.mtsbiz.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.myaccess.ca</code>; roles: dns-query</li>
+<li>domain: <code>mail.myoffice.lu</code>; roles: dns-query</li>
+<li>domain: <code>mail.nkol.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.nobleconcierge.pl</code>; roles: dns-query</li>
+<li>domain: <code>mail.nominalia.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail.northernnamthaison.com.vn</code>; roles: dns-query</li>
+<li>domain: <code>mail.notariacarreno.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.notariacuadragazmuri.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.npo-forum.ch</code>; roles: dns-query</li>
+<li>domain: <code>mail.ocn.ne.jp</code>; roles: dns-query</li>
+<li>domain: <code>mail.omkarcomputers.in</code>; roles: dns-query</li>
+<li>domain: <code>mail.one.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.oneeach.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.orcaseed.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.otenet.gr</code>; roles: dns-query</li>
+<li>domain: <code>mail.outlook.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.oxinsanat.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.parcospa.eu</code>; roles: dns-query</li>
+<li>domain: <code>mail.paul-transporte.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.pec.aruba.it</code>; roles: dns-query</li>
+<li>domain: <code>mail.pecc2.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.pella.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.phhca.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.phhca.com.netsolmail.net</code>; roles: dns-cname</li>
+<li>domain: <code>mail.pizzahut.com.do</code>; roles: dns-query</li>
+<li>domain: <code>mail.plustarget.com.co</code>; roles: dns-query</li>
+<li>domain: <code>mail.pondokindahmall.co.id</code>; roles: dns-query</li>
+<li>domain: <code>mail.porta.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.powerexpress.com.ph</code>; roles: dns-query</li>
+<li>domain: <code>mail.q.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.q.syn-alias.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail.qlc.co.in</code>; roles: dns-query</li>
+<li>domain: <code>mail.quicknet.ch</code>; roles: dns-query</li>
+<li>domain: <code>mail.rakitsolutions.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.rcilogistics.co.in</code>; roles: dns-query</li>
+<li>domain: <code>mail.readyhosting.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.riungmitra.co.id</code>; roles: dns-query</li>
+<li>domain: <code>mail.ronbermudez.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.santurcexray.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.sasktel.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.sbctransportation.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.scaf.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.scienceworldpublish.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.securitycontroldesign.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.seek4.dk</code>; roles: dns-query</li>
+<li>domain: <code>mail.sepauc.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.server301.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.servitarsa.com.gt</code>; roles: dns-query</li>
+<li>domain: <code>mail.sheratonparco.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.shinseng.co.kr</code>; roles: dns-query</li>
+<li>domain: <code>mail.sigis.com.ve</code>; roles: dns-query</li>
+<li>domain: <code>mail.siol.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.siprocimeca.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.sisacsa.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.skywaygrainsystems.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.smartcloudpt.pt</code>; roles: dns-query</li>
+<li>domain: <code>mail.sng.com.ec</code>; roles: dns-query</li>
+<li>domain: <code>mail.soal.com.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.stackmail.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail.stoneworx.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.strato.de</code>; roles: dns-query</li>
+<li>domain: <code>mail.stsmail.ro</code>; roles: dns-query</li>
+<li>domain: <code>mail.stylecraftltd.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.t-com.sk</code>; roles: dns-query</li>
+<li>domain: <code>mail.t-email.hu</code>; roles: dns-query</li>
+<li>domain: <code>mail.t-online.hu</code>; roles: dns-cname, dns-query</li>
+<li>domain: <code>mail.tctwest.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.tds.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.techosindustriales.com.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.tele2.ee</code>; roles: dns-query</li>
+<li>domain: <code>mail.telekom.sk</code>; roles: dns-query</li>
+<li>domain: <code>mail.telstra.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.terraplan.si</code>; roles: dns-query</li>
+<li>domain: <code>mail.texasfirecraft.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.texasfirecraft.com.netsolmail.net</code>; roles: dns-cname</li>
+<li>domain: <code>mail.thiemer.at</code>; roles: dns-query</li>
+<li>domain: <code>mail.tlcmedicalsas.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.topsoiledmonton.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.toyotatownship.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.tremcar.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.triplestarpackaging.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.tudogar.com.mx</code>; roles: dns-query</li>
+<li>domain: <code>mail.twc.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.ucil.com.pk</code>; roles: dns-query</li>
+<li>domain: <code>mail.unidentas.lt</code>; roles: dns-query</li>
+<li>domain: <code>mail.upcbusiness.at</code>; roles: dns-cname</li>
+<li>domain: <code>mail.verizon.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.vietsuncorp.com.vn</code>; roles: dns-query</li>
+<li>domain: <code>mail.vnptmail.vn</code>; roles: dns-query</li>
+<li>domain: <code>mail.washingtonandwells.net</code>; roles: dns-query</li>
+<li>domain: <code>mail.webmail.co.za</code>; roles: dns-query</li>
+<li>domain: <code>mail.wildrepublic.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.xpertcomex.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.yandex.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.yandex.com.tr</code>; roles: dns-query</li>
+<li>domain: <code>mail.yemen.net.ye</code>; roles: dns-query</li>
+<li>domain: <code>mail.yorkdaledufferinmazda.ca</code>; roles: dns-query</li>
+<li>domain: <code>mail.zahnandmore.ch</code>; roles: dns-query</li>
+<li>domain: <code>mail.zwirgi.ch</code>; roles: dns-query</li>
+<li>domain: <code>mail1.circlekindo.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail1.jramoncorp.com</code>; roles: dns-query</li>
+<li>domain: <code>mail1.qlc.co.in</code>; roles: dns-cname</li>
+<li>domain: <code>mail11.hostmaster.sk</code>; roles: dns-cname</li>
+<li>domain: <code>mail2.medigroup.rs</code>; roles: dns-query</li>
+<li>domain: <code>mail3.armstrong.syn-alias.com</code>; roles: dns-cname</li>
+<li>domain: <code>mail3.bigcommerce.com</code>; roles: dns-query</li>
+<li>domain: <code>mail7.hostmaster.sk</code>; roles: dns-cname</li>
+<li>domain: <code>mailbox.ischl.net</code>; roles: dns-cname</li>
+<li>domain: <code>mailgate.kkp.gr</code>; roles: dns-query</li>
+<li>domain: <code>mailgate.otenet.gr</code>; roles: dns-query</li>
+<li>domain: <code>mailgate.shopkeeper.de</code>; roles: dns-query</li>
+<li>domain: <code>mailhost.hetnet.nl</code>; roles: dns-query</li>
+<li>domain: <code>mailout.hl-c.eu</code>; roles: dns-query</li>
+<li>domain: <code>mailout.sssnet.com</code>; roles: dns-query</li>
+<li>domain: <code>mailserver.naic.edu</code>; roles: dns-query</li>
+<li>domain: <code>mailv.emirates.net.ae</code>; roles: dns-query</li>
+<li>domain: <code>maisondelegance.com.py</code>; roles: dns-cname</li>
+<li>domain: <code>masilagroup.com</code>; roles: dns-cname</li>
+<li>domain: <code>max-schoen.home.pl</code>; roles: dns-query</li>
+<li>domain: <code>mbox.cert.legalmail.it</code>; roles: dns-query</li>
+<li>domain: <code>mgmltda.cl</code>; roles: dns-cname</li>
+<li>domain: <code>mongo.planethoster.net</code>; roles: dns-query</li>
+<li>domain: <code>ms1.isat.co.za</code>; roles: dns-cname</li>
+<li>domain: <code>msa.m.dion.ne.jp</code>; roles: dns-query</li>
+<li>domain: <code>mx.em-it.at</code>; roles: dns-query</li>
+<li>domain: <code>mx.freenet.de</code>; roles: dns-query</li>
+<li>domain: <code>mx.sharpness.info</code>; roles: dns-query</li>
+<li>domain: <code>mx1.domainadmin.eu</code>; roles: dns-query</li>
+<li>domain: <code>mx1.trustlab.cz</code>; roles: dns-query</li>
+<li>domain: <code>newsaarctech.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>nexus.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>nexusrules.officeapps.live.com</code>; roles: tls-sni</li>
+<li>domain: <code>notaria9acapulco.com</code>; roles: dns-query</li>
+<li>domain: <code>notariacuadragazmuri.cl</code>; roles: dns-cname</li>
+<li>domain: <code>notes.damc.or.kr</code>; roles: dns-query</li>
+<li>domain: <code>ns0.ovh.net</code>; roles: dns-cname</li>
+<li>domain: <code>office15client.microsoft.com</code>; roles: dns-query</li>
+<li>domain: <code>omkarcomputers.in</code>; roles: dns-cname</li>
+<li>domain: <code>out.alice.it</code>; roles: dns-query</li>
+<li>domain: <code>out.aliceposta.it</code>; roles: dns-cname</li>
+<li>domain: <code>out.smtp.cz</code>; roles: dns-query</li>
+<li>domain: <code>outmail.is.lt</code>; roles: dns-query</li>
+<li>domain: <code>p04-imap.mail.me.com</code>; roles: dns-query</li>
+<li>domain: <code>p16-smtp.mail.me.com</code>; roles: dns-query</li>
+<li>domain: <code>p22-imap.mail.me.com</code>; roles: dns-query</li>
+<li>domain: <code>p3plcpnl0106.prod.phx3.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>p3plcpnl021.prod.phx3.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>p47-imap.mail.me.com</code>; roles: dns-query</li>
+<li>domain: <code>paragonknits.com</code>; roles: dns-query</li>
+<li>domain: <code>pasts.ts.gov.lv</code>; roles: dns-query</li>
+<li>domain: <code>peach.mail.plala.or.jp</code>; roles: dns-query</li>
+<li>domain: <code>pl-07.webmail.emailsrvr.com</code>; roles: dns-cname</li>
+<li>domain: <code>plustarget.com.co</code>; roles: dns-cname</li>
+<li>domain: <code>pmaila.emirates.net.ae</code>; roles: dns-cname</li>
+<li>domain: <code>poczta.maxtel.com.pl</code>; roles: dns-query</li>
+<li>domain: <code>poczta.tech-media.pl</code>; roles: dns-query</li>
+<li>domain: <code>poczta.webio.pl</code>; roles: dns-query</li>
+<li>domain: <code>pondokindahmall.co.id</code>; roles: dns-cname</li>
+<li>domain: <code>pop-aliant.owm.bell.net</code>; roles: dns-cname</li>
+<li>domain: <code>pop-ha.skymail.net.br</code>; roles: dns-cname</li>
+<li>domain: <code>pop-verizonmail.egslb.aol.com</code>; roles: dns-cname</li>
+<li>domain: <code>pop.1and1.co.uk</code>; roles: dns-query</li>
+<li>domain: <code>pop.1and1.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.1und1.de</code>; roles: dns-query</li>
+<li>domain: <code>pop.africaonline.com.na</code>; roles: dns-query</li>
+<li>domain: <code>pop.alestra.pangia.biz</code>; roles: dns-cname</li>
+<li>domain: <code>pop.alestraune.net.mx</code>; roles: dns-query</li>
+<li>domain: <code>pop.alpha-prm.jp</code>; roles: dns-query</li>
+<li>domain: <code>pop.alramooz.net</code>; roles: dns-query</li>
+<li>domain: <code>pop.altajuris.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.asia.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>pop.att.yahoo.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.bellaliant.net</code>; roles: dns-query</li>
+<li>domain: <code>pop.bellnet.ca</code>; roles: dns-cname, dns-query</li>
+<li>domain: <code>pop.biz.rr.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.broserimmo.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.crcollision.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.earthlink.net</code>; roles: dns-query</li>
+<li>domain: <code>pop.earthlinkbusiness.com</code>; roles: dns-cname</li>
+<li>domain: <code>pop.eastav.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.easyname.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.emailsrvr.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.eonet.ne.jp</code>; roles: dns-query</li>
+<li>domain: <code>pop.exchangeadministrado.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.fecamsc.org.br</code>; roles: dns-query</li>
+<li>domain: <code>pop.fibertel.com.ar</code>; roles: dns-cname</li>
+<li>domain: <code>pop.gmail.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.infinitummail.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.infinitummail.mail2world.com</code>; roles: dns-cname</li>
+<li>domain: <code>pop.infovia.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop.itsolutions-asia.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.mail.g.yahoo.co.jp</code>; roles: dns-cname</li>
+<li>domain: <code>pop.mail.yahoo.co.jp</code>; roles: dns-query</li>
+<li>domain: <code>pop.nbflogistica.com.br</code>; roles: dns-query</li>
+<li>domain: <code>pop.net4india.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.one.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.oxfordal.us</code>; roles: dns-query</li>
+<li>domain: <code>pop.poncacityhousingauthority.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.prodigy.net.mx</code>; roles: dns-query</li>
+<li>domain: <code>pop.prosites.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.rediffmailpro.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.sbcglobal.yahoo.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.securemail.pro</code>; roles: dns-query</li>
+<li>domain: <code>pop.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>pop.serviciodecorreo.es</code>; roles: dns-query</li>
+<li>domain: <code>pop.sofimex.com.mx</code>; roles: dns-query</li>
+<li>domain: <code>pop.sonic.net</code>; roles: dns-query</li>
+<li>domain: <code>pop.speedy.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop.sunbeltcustommineral.com</code>; roles: dns-query</li>
+<li>domain: <code>pop.super.net.pk</code>; roles: dns-query</li>
+<li>domain: <code>pop.yandex.com.tr</code>; roles: dns-query</li>
+<li>domain: <code>pop.zoho.com</code>; roles: dns-query</li>
+<li>domain: <code>pop3.anticorrosiva.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop3.arnet.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop3.ciudad.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop3.dimarasalud.com</code>; roles: dns-query</li>
+<li>domain: <code>pop3.enet.cu</code>; roles: dns-query</li>
+<li>domain: <code>pop3.fibertel.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop3.forpsi.com</code>; roles: dns-query</li>
+<li>domain: <code>pop3.frontier.com</code>; roles: dns-query</li>
+<li>domain: <code>pop3.guidoguidi.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop3.iq.pl</code>; roles: dns-query</li>
+<li>domain: <code>pop3.isat.co.za</code>; roles: dns-query</li>
+<li>domain: <code>pop3.iso3.it</code>; roles: dns-query</li>
+<li>domain: <code>pop3.mailprotect.be</code>; roles: dns-query</li>
+<li>domain: <code>pop3.massalud.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop3.mweb.co.za</code>; roles: dns-query</li>
+<li>domain: <code>pop3.netcologne.de</code>; roles: dns-query</li>
+<li>domain: <code>pop3.pldauto.fr</code>; roles: dns-query</li>
+<li>domain: <code>pop3.siasaweb.com.ar</code>; roles: dns-query</li>
+<li>domain: <code>pop3.smartcloudpt.pt</code>; roles: dns-query</li>
+<li>domain: <code>pop3.telkomsa.net</code>; roles: dns-query</li>
+<li>domain: <code>pop3.tintasultramix.com.br</code>; roles: dns-query</li>
+<li>domain: <code>pop3.utande.co.zw</code>; roles: dns-cname</li>
+<li>domain: <code>pop3.webmail.mw</code>; roles: dns-query</li>
+<li>domain: <code>pop3.world4you.com</code>; roles: dns-query</li>
+<li>domain: <code>pop3.yoafrica.com</code>; roles: dns-query</li>
+<li>domain: <code>pop3.zoominternet.net</code>; roles: dns-query</li>
+<li>domain: <code>pop51.on.aibn.com</code>; roles: dns-query</li>
+<li>domain: <code>poplar.ocn.ne.jp</code>; roles: dns-query</li>
+<li>domain: <code>poppro.zoho.com</code>; roles: dns-query</li>
+<li>domain: <code>post.strato.de</code>; roles: dns-query</li>
+<li>domain: <code>prod-w.nexus.live.com.akadns.net</code>; roles: dns-cname</li>
+<li>domain: <code>q1.epropiadns.com</code>; roles: dns-query</li>
+<li>domain: <code>radiadoreslider.com</code>; roles: dns-cname</li>
+<li>domain: <code>rakitsolutions.com</code>; roles: dns-cname</li>
+<li>domain: <code>relais.videotron.ca</code>; roles: dns-query</li>
+<li>domain: <code>relay.edpnet.be</code>; roles: dns-query</li>
+<li>domain: <code>relay.glb.proximus.be</code>; roles: dns-cname</li>
+<li>domain: <code>riungmitra.co.id</code>; roles: dns-cname</li>
+<li>domain: <code>rkrisltx.bpiwd.com</code>; roles: dns-query</li>
+<li>domain: <code>roaming.iskon.hr</code>; roles: dns-query</li>
+<li>domain: <code>schindler-kg.at</code>; roles: dns-query</li>
+<li>domain: <code>secure.bst-system.com</code>; roles: dns-cname</li>
+<li>domain: <code>secure.emailsrvr.com</code>; roles: dns-query</li>
+<li>domain: <code>securepop.t-online.de</code>; roles: dns-query</li>
+<li>exported object <code>sSTToaEwCG5VASw</code>; SHA-256 <code>0a85cba8c2e6aa44684f15047dcaa4c4d7f86ec356891bc8e0b8ee36bb151f7a</code>; size 4334 bytes</li>
+<li>exported object <code>object52357</code>; SHA-256 <code>2c80de6ffeb0759cb01dd7ad50437ea8dfcb7e4b8582a0129e7e7f700b593e38</code>; size 1523 bytes</li>
+<li>exported object <code>object15143</code>; SHA-256 <code>43a258e943f8cd5728ccf1018a03865b61c37dfed7f48995afe4ffd47b6cb8b7</code>; size 1523 bytes</li>
+<li>exported object <code>object30893</code>; SHA-256 <code>0b2e930d209670f78f6aaa3f2d19fd749c38c7bc223d2f6325df6b9f7614b5ff</code>; size 1442 bytes</li>
+<li>exported object <code>object53515</code>; SHA-256 <code>0cf2273cfb4ed1bc7051f653b37843c2fb2209d2bc95d5a38e4c8b76a97e3dac</code>; size 1442 bytes</li>
+<li>exported object <code>object46438</code>; SHA-256 <code>245afb556ba5bd1d4eff3e45c51f83f18ebdedefe744a7cd668a720ac0be841e</code>; size 1442 bytes</li>
+<li>exported object <code>object15275</code>; SHA-256 <code>250d82db6d12fbc6a4f93c9be1cfc6d819cb4f6d6e0d66648b2c66286d1e0c5f</code>; size 1442 bytes</li>
+<li>exported object <code>object32536</code>; SHA-256 <code>26ec6c18d689cdab1e882b3e5c40454fdde105b4dad784fc0b70ec34f33a685d</code>; size 1442 bytes</li>
+<li>exported object <code>object22887</code>; SHA-256 <code>2b5cd53248ff8bc195e931ea07c8ec7a6a6d4c9c3b3e326b3af21ca6d2e396a3</code>; size 1442 bytes</li>
+<li>exported object <code>object31033</code>; SHA-256 <code>32f3a788a007aded055b0c3f1596e75876843afc5f7e2562ffb2a981954bc5b9</code>; size 1442 bytes</li>
+<li>exported object <code>object53575</code>; SHA-256 <code>33bf9ccf421e4074ef459928e02242cc1e678da63061f3c4fdbd77aaa5a5c899</code>; size 1442 bytes</li>
+<li>exported object <code>object52709</code>; SHA-256 <code>34efa567764f17e790931c8a0bd8c00126acab0e76f53a9847f674c0c4eaad95</code>; size 1442 bytes</li>
+<li>exported object <code>object49925</code>; SHA-256 <code>367912ca5e87e14e40985a68eab3831fcc2cf94405a80442f4d2440ade4e434d</code>; size 1442 bytes</li>
+<li>exported object <code>object54034</code>; SHA-256 <code>38cbe5f6f1edafbf65fcb5fbe27f69c8d2de10fa41e05f8162bc0091bdd0082c</code>; size 1442 bytes</li>
+<li>exported object <code>object54392</code>; SHA-256 <code>398d8ab91648e39ce8559875ceffc4a8724e4259089bbe99a8ab871bd8cd510a</code>; size 1442 bytes</li>
+<li>exported object <code>object29937</code>; SHA-256 <code>465a2843237e39fd98af179ad65eb4f108513067d1c969bbeaa1c2cfccb26e5c</code>; size 1442 bytes</li>
+<li>exported object <code>object52814</code>; SHA-256 <code>4724352878e31617bd51e7499dd320a9f3d0c759ae4768ae31acd2612ece99b2</code>; size 1442 bytes</li>
+<li>exported object <code>object51834</code>; SHA-256 <code>473e9d4a177530efe3f1ed28ec3fdfe042a999f93ee3ea6cfb5f0fbf1509eb3d</code>; size 1442 bytes</li>
+<li>exported object <code>object53351</code>; SHA-256 <code>4db16bca2fd7324cdc66d241e0b3e950e153bb9534e60c1160d1ba0e9c18d083</code>; size 1442 bytes</li>
+<li>exported object <code>object32196</code>; SHA-256 <code>4ed21b81e706b20773e4f3c10dbe7fb015dbce15aa429db06f93d804a4e0ff62</code>; size 1442 bytes</li>
+<li>exported object <code>object31009</code>; SHA-256 <code>4f56fad91f1644a4257195137fcf8f6e821e3ea3ea96e165daf57e529fe521ff</code>; size 1442 bytes</li>
+<li>exported object <code>object52046</code>; SHA-256 <code>4fa3add17dca31bdfb61917c627b2ec9fff3716ed0eee78d31ca10bce3b5ad7b</code>; size 1442 bytes</li>
+<li>exported object <code>object54214</code>; SHA-256 <code>51ada0d3e87516cded91d77b86d32a08bfedd96cf5b5e3fddd084fe61d5d7a21</code>; size 1442 bytes</li>
+<li>exported object <code>object32123</code>; SHA-256 <code>526ba4dd3baed534f591d3b8f53cc2268d8e11d3ac3961fdeec21e8bb6078063</code>; size 1442 bytes</li>
+<li>exported object <code>object52334</code>; SHA-256 <code>53bbc8b15e8f03691544144a2b45d417d5c5d840b1f779624afcc479d8fa8813</code>; size 1442 bytes</li>
+<li>exported object <code>object32989</code>; SHA-256 <code>56d9a87699b652053de95016b18a677a850b948d1f0061aeef3951f9cbecd2ac</code>; size 1442 bytes</li>
+<li>exported object <code>object30399</code>; SHA-256 <code>57865023300c0ed7bcc2e312f58b481635f5efa0ee8750a39da4838b25dbed10</code>; size 1442 bytes</li>
+<li>exported object <code>object22862</code>; SHA-256 <code>5b43f9a38fc4125cd084c915a715fd8080bd829e34406729e73ac02b6d80b288</code>; size 1442 bytes</li>
+<li>exported object <code>object33448</code>; SHA-256 <code>5f3061cb3b17856f18adaefd99f3960482f2474c1f0191de970a7cac0444260d</code>; size 1442 bytes</li>
+<li>exported object <code>object30376</code>; SHA-256 <code>61fb009bf5c563ebd3f2334446057d1013f68f052fb08f48a297bb2edb57f71b</code>; size 1442 bytes</li>
+<li>exported object <code>object52180</code>; SHA-256 <code>63137c9e2fdc28ddaec8c99e9df36eab9d63a2129438ae0921f9827defc3806d</code>; size 1442 bytes</li>
+<li>exported object <code>object18811</code>; SHA-256 <code>6956751df0c5ab706d011b2746a3709835f56e2d620a8775133f79362c4e1bda</code>; size 1442 bytes</li>
+<li>exported object <code>object30761</code>; SHA-256 <code>6b659e04d03b4c6abeb9fc4d31d4d4442801e0a6c5e06d56f62fe49d915e8a0e</code>; size 1442 bytes</li>
+<li>exported object <code>object18745</code>; SHA-256 <code>7038bd0d004e61fbdd451623d51c217ffda4fb2723975dbc02a1b10fa121ff26</code>; size 1442 bytes</li>
+<li>exported object <code>object31121</code>; SHA-256 <code>7e08110ab733043f314cb23d05ca5fc0bd4beb2de9c33e6ab35836a6eb0a00a5</code>; size 1442 bytes</li>
+<li>exported object <code>object18619</code>; SHA-256 <code>82391338f3ede30f52a646fc558a4c20beba5db70ef26d1e7f1c63b11970ab67</code>; size 1442 bytes</li>
+<li>exported object <code>object29113</code>; SHA-256 <code>88f42f2c65bfe60c6395328f200ed242f0cf3dded1c22a3cd07204d56525bf28</code>; size 1442 bytes</li>
+<li>exported object <code>object54190</code>; SHA-256 <code>8ff8d44a63e43c9aea1d597f0a101445df8d6679df657c92c0d6faeb07245422</code>; size 1442 bytes</li>
+<li>exported object <code>object33388</code>; SHA-256 <code>93e83129d829e059611c03fb9536529c7581e94017a8a247d0764df0c0889791</code>; size 1442 bytes</li>
+<li>exported object <code>object53376</code>; SHA-256 <code>93e914a6facbc2481df7473c52459dbb24ca163e4510445893fd03ebc444480b</code>; size 1442 bytes</li>
+<li>exported object <code>object32566</code>; SHA-256 <code>971fa77239886aaf06e6f65eca0a607cc8ada189aaca1f69eb9f894c0deb4a96</code>; size 1442 bytes</li>
+<li>exported object <code>object53160</code>; SHA-256 <code>9f6d91ccc16d4a26cf0fe623bc1ef1a597d983f166826ba47e6434910d1c3336</code>; size 1442 bytes</li>
+<li>exported object <code>object53916</code>; SHA-256 <code>9ff868e0d2918a01a1f6c8a72cbed18403b8f66d25ccf0d19acad8ca7bb6986d</code>; size 1442 bytes</li>
+<li>exported object <code>object53672</code>; SHA-256 <code>a6f76feb3a4d155ed886c5dbc9980941ec147872aa7a8b89abea415216fb972f</code>; size 1442 bytes</li>
+<li>exported object <code>object31505</code>; SHA-256 <code>a7ea74281391750b02cfcb614469e8f355443ee33290f512b27b6a6c50f84622</code>; size 1442 bytes</li>
+<li>exported object <code>object23504</code>; SHA-256 <code>b947d88ec74e3504f3b45342741c224d51d504af8368c7fae4841310def2bfe1</code>; size 1442 bytes</li>
+<li>exported object <code>object51765</code>; SHA-256 <code>b982edb41289eb8e2a0be5c14616d9522142daa952415f0d0c96deef2eefeda5</code>; size 1442 bytes</li>
+<li>exported object <code>object31261</code>; SHA-256 <code>bb8d070ab43578233d89a2400c7c434f3ee15dc8c76ce5456e265cd68613a7f9</code>; size 1442 bytes</li>
+<li>exported object <code>object52500</code>; SHA-256 <code>cc2d680db9b64012df081755faba4281f0a482b1efe5c0d45cccbf44e1146cf2</code>; size 1442 bytes</li>
+<li>exported object <code>object23724</code>; SHA-256 <code>ce7336e46e69697b00c496073012548a733921e8b584e241053b38a086040f6a</code>; size 1442 bytes</li>
+<li>exported object <code>object44224</code>; SHA-256 <code>cf9b3de8917fbd7b627d4f0a32f4ab067c0d4a047ca87bf2dd7c1c0fa5977c53</code>; size 1442 bytes</li>
+<li>exported object <code>object33492</code>; SHA-256 <code>d1e9ccf86eb1e1e97645ea5bd8b2fe203903501273bdafe211aaaf43a050e42f</code>; size 1442 bytes</li>
+<li>exported object <code>object22839</code>; SHA-256 <code>d4109a6ae38b5f386c33b725308bc7b9ba01c0f7fb177b3edbbee1d5d5c203b9</code>; size 1442 bytes</li>
+<li>exported object <code>object53810</code>; SHA-256 <code>d4d48dea91cd0ebb930092dfd4d693f5eac915fdab0c53040ed9277d30aff980</code>; size 1442 bytes</li>
+<li>exported object <code>object51812</code>; SHA-256 <code>ea356b9fe5e4cd10ff16783e8f0d9a36054b1e8650e02253d7fd5d05b71a5146</code>; size 1442 bytes</li>
+<li>exported object <code>object30029</code>; SHA-256 <code>ef772f43958315122fc750cb52a6c8f60362283e68c2a1ac449ec41cf1b0f561</code>; size 1442 bytes</li>
+<li>exported object <code>object52203</code>; SHA-256 <code>effad7b3021800a4d426f10291186b533f0a6434fc1bfc91be07361faa78b663</code>; size 1442 bytes</li>
+<li>exported object <code>object52909</code>; SHA-256 <code>f3f4bd16d2dccbdcb3c378e8cbcf5fc3fdbe1750da5c411c408d6c695f3c2374</code>; size 1442 bytes</li>
+<li>exported object <code>object29136</code>; SHA-256 <code>f938fc5c9098e2f06b104998f23d8c691e23465d50b7bd7549112751e9c75e6f</code>; size 1442 bytes</li>
+<li>exported object <code>object53486</code>; SHA-256 <code>fe07c43edc7a3842e06bfd354f506e86a7dcb13689a4be3b94843d6fe655fa28</code>; size 1442 bytes</li>
+<li>exported object <code>object33144</code>; SHA-256 <code>fe6e39f569582b37f300c2d258a4440dd6473e89e44e2f1c05219020e56d7c6f</code>; size 1442 bytes</li>
+<li>exported object <code>object54319</code>; SHA-256 <code>fe796664efee221a3b7427e112e3e816629ddfc20433bb3fc032f31a7652bec7</code>; size 1442 bytes</li>
+<li>exported object <code>object30496</code>; SHA-256 <code>0012aa801678ae49c2d6e962920c3f912672e7deabd1338b08f786e71f91e911</code>; size 1361 bytes</li>
+<li>exported object <code>object49973</code>; SHA-256 <code>00572b8a56fba936d13eb443442624bbd01a0f8c9c676a8428f5c14c78b3dee9</code>; size 1361 bytes</li>
+<li>exported object <code>object15513</code>; SHA-256 <code>006623b67391b15bdc7f15ea38951f72b3f0bc2aef1279f5e2ef4c49fdceb61f</code>; size 1361 bytes</li>
+<li>exported object <code>object32910</code>; SHA-256 <code>0072d405aa5414a5aa300a5dbc908c12b181988c74010c4fb5f12c19b55b075e</code>; size 1361 bytes</li>
+<li>exported object <code>object34020</code>; SHA-256 <code>00a17cac5a3fd69a5b23dc5387136fe283d71d9c9088288ab31370542c493c5c</code>; size 1361 bytes</li>
+<li>exported object <code>object31492</code>; SHA-256 <code>00dc31d414c0738b0d71cdbfca06346612a337a8bb93f48191e7743acfadfc23</code>; size 1361 bytes</li>
+<li>exported object <code>object15587</code>; SHA-256 <code>00dd56a10881d0d22c2c6d6666f7227317cbd5c53342ef99cb4ccbde46d1513f</code>; size 1361 bytes</li>
+<li>exported object <code>object51603</code>; SHA-256 <code>00f88c0a50b5db8457f302b996f10e6e213aa415bd35764e878af92d1d98dbeb</code>; size 1361 bytes</li>
+<li>exported object <code>object33178</code>; SHA-256 <code>0104013328f4d3f2b6f57f798cb6a327940aaef2f390131951ad1159de6bc6bd</code>; size 1361 bytes</li>
+<li>exported object <code>object49985</code>; SHA-256 <code>012ef80f044aeac2bb3b458fd60b94c7cf05aa792a99b3ed90874652418d3c2b</code>; size 1361 bytes</li>
+<li>exported object <code>object46287</code>; SHA-256 <code>013362d5b3634cb0e8991a6b1516aeb4da26196fb07776f2de19aed375f506f0</code>; size 1361 bytes</li>
+<li>exported object <code>object30974</code>; SHA-256 <code>0157f5d604041e48cd6e91b973c8b610189a7b5c180845a55413c8663235af64</code>; size 1361 bytes</li>
+<li>exported object <code>object16659</code>; SHA-256 <code>01883ea44373de2ba27f0b322e6ee9e150f51a1a1f9ebb1c8990c55fb5ffb500</code>; size 1361 bytes</li>
+<li>exported object <code>object53163</code>; SHA-256 <code>01a99e3f02848b519b3c3a036af0d26363b9c38ef8bb162144100367c3ef68ea</code>; size 1361 bytes</li>
+<li>exported object <code>object13108</code>; SHA-256 <code>01ab3d222b25628cb40111921527735ae76c39fa4cec77784dc7a21da51f7fde</code>; size 1361 bytes</li>
+<li>exported object <code>object30260</code>; SHA-256 <code>01c6989be26c5296352274615da5427b35ebeb8fab60e3677716ba8ddde9f580</code>; size 1361 bytes</li>
+<li>exported object <code>object15539</code>; SHA-256 <code>025a33285a9207330b494981bdf5276647b94d41e022225c8ae671f1ae60567e</code>; size 1361 bytes</li>
+<li>exported object <code>object51887</code>; SHA-256 <code>029046b4eb0c08411ed9b3201220c86a89b6fc2e776711595914c4b8414c6694</code>; size 1361 bytes</li>
+<li>exported object <code>object32028</code>; SHA-256 <code>02b9310a633169e1e199f3129745cedef8be1886bbd63ef55a95f2419b4e810e</code>; size 1361 bytes</li>
+<li>exported object <code>object33440</code>; SHA-256 <code>0332d0cbae4950c24bc6619fbbe1465c57e6c8e12040586494a35619b28fd122</code>; size 1361 bytes</li>
+<li>exported object <code>object29431</code>; SHA-256 <code>03a354f9de7d86876f7d23695b1a1d7f3466b0982462e542e80bd53a41e6850c</code>; size 1361 bytes</li>
+<li>exported object <code>object52325</code>; SHA-256 <code>03b590abb054b607f92d48b851f88ccf57fd51bf17becbf5fcdec2926388df8d</code>; size 1361 bytes</li>
+<li>exported object <code>object49964</code>; SHA-256 <code>03b6d46d7cceeed3b05bd04e02f2794a603fafccad5eeb88e2dc7bcaf8ff91a8</code>; size 1361 bytes</li>
+<li>exported object <code>object15112</code>; SHA-256 <code>03c8e8681de20f44fca121de3691c487d7d6fef3fadfc37e5cfb9f11907beb0f</code>; size 1361 bytes</li>
+<li>exported object <code>object54199</code>; SHA-256 <code>03d054646bce2a15c17a2b9f1e6abcff498d5b4dbd8555396e5a11584358431c</code>; size 1361 bytes</li>
+<li>exported object <code>object48073</code>; SHA-256 <code>03d8eade1fbf830407059b3531802fd500b60ae267cd77612ef2ef1bf5370c75</code>; size 1361 bytes</li>
+<li>exported object <code>object23580</code>; SHA-256 <code>03da014864a4f3e63c1840a57a7a41d260779e9e4783b7439a2ffe91d0564f6d</code>; size 1361 bytes</li>
+<li>exported object <code>object23495</code>; SHA-256 <code>0405bac83ab8c5f11913dbb716075cae23e482c66d88a28c099dcdbd145b6dcb</code>; size 1361 bytes</li>
+<li>exported object <code>object32055</code>; SHA-256 <code>041467a3bee037373a1c5a5c745e243c91b3e23b85e96ea6c92c14402cd6003f</code>; size 1361 bytes</li>
+<li>exported object <code>object54018</code>; SHA-256 <code>04156590b6fd4be0762d5f6b5b3ad92b3bcd2981945ee402948dc837e7e5e979</code>; size 1361 bytes</li>
+<li>exported object <code>object33152</code>; SHA-256 <code>041952257a132d2b4338692650357096c8f6bf6d1300a37429d7d532da0941b1</code>; size 1361 bytes</li>
+<li>exported object <code>object33684</code>; SHA-256 <code>045281fc55e6d6578fac3b7cd59d914d0c004dee44a5747807687b02f2c6bf95</code>; size 1361 bytes</li>
+<li>exported object <code>object13177</code>; SHA-256 <code>0483ba73e19d23352009800bc48ad89b9366572500a60a67019383755995017a</code>; size 1361 bytes</li>
+<li>exported object <code>object53140</code>; SHA-256 <code>04c196337ac9e4ea59491ebe0161ba1fea2df8cf008da680d61f91b44381735d</code>; size 1361 bytes</li>
+<li>exported object <code>object32627</code>; SHA-256 <code>04f84c9cb8a90f08af403970bc08bc44833a198ede19dae2337fbcccfd173796</code>; size 1361 bytes</li>
+<li>exported object <code>object52923</code>; SHA-256 <code>04ff3f7973ed0862d3a40581b6f2f57ecf11b2443ff09ddc4d8d472d1b6ece4b</code>; size 1361 bytes</li>
+<li>exported object <code>object30319</code>; SHA-256 <code>053e49637cadeb1904e14922390d3973ee989c9e6b4e923d0fda878343c3bf3e</code>; size 1361 bytes</li>
+<li>exported object <code>object28909</code>; SHA-256 <code>054a254feaca85b72805a88f8a8aa75ce34a8f3ad73c8319bc636a2cf4341761</code>; size 1361 bytes</li>
+<li>exported object <code>object32769</code>; SHA-256 <code>05611c6f6bfec60af30c517f092b00a88c284a90a26948d1ee7d620b2ddce5f1</code>; size 1361 bytes</li>
+<li>exported object <code>object30947</code>; SHA-256 <code>05a65a61ec1885e2778d455dcda107c65247dabfa4ec60bbc75191d8b2e0b4c3</code>; size 1361 bytes</li>
+<li>exported object <code>object52062</code>; SHA-256 <code>05be44dc237edf7e9d54e1865748bd2cc593134f43aecb64d5eb28bfed0fa01a</code>; size 1361 bytes</li>
+<li>exported object <code>object29597</code>; SHA-256 <code>05c3667639fd25b51fff051b8d6ede5c730d927a542feb13135a04e4b3a8f265</code>; size 1361 bytes</li>
+<li>exported object <code>object52912</code>; SHA-256 <code>05fc4007dd365609c4dd7b73cd625397355e410662f0622ba7e60301585739a2</code>; size 1361 bytes</li>
+<li>exported object <code>object43929</code>; SHA-256 <code>0608f7fa7485e032a5a0fe8848bd690875aedda49ce9d6c1188aad65dc642680</code>; size 1361 bytes</li>
+<li>exported object <code>object29573</code>; SHA-256 <code>0629069e5ebb927dd394772027e3e9cbd1532733afff3ea7273985ce231de7c5</code>; size 1361 bytes</li>
+<li>exported object <code>object50037</code>; SHA-256 <code>0662465237674f31f5d26e21fe3123bedd4d01c4f1caa2591fb30d595a4b8b2a</code>; size 1361 bytes</li>
+<li>exported object <code>object33317</code>; SHA-256 <code>067c37a96ba039a4de134e74e71d06b952812e176303689238ac013788cbc1ae</code>; size 1361 bytes</li>
+<li>exported object <code>object34457</code>; SHA-256 <code>067fb5afeff836328b32d1f4210a6fa495554fd83df4b9501698cfef030fffae</code>; size 1361 bytes</li>
+<li>exported object <code>object33502</code>; SHA-256 <code>06a3a1aab53a94e085ada9bcd92958b43b1c8e8572ee1480ee37df584f81dca7</code>; size 1361 bytes</li>
+<li>exported object <code>object44077</code>; SHA-256 <code>0711a06d485902ad60e6a04a1893529e2b9865d44e91fde009e4457ca61825b5</code>; size 1361 bytes</li>
+<li>exported object <code>object48012</code>; SHA-256 <code>071a5da339b1d1596cb8481499412c20de3114d5600398be06f5a2b1cd43d778</code>; size 1361 bytes</li>
+<li>exported object <code>object23516</code>; SHA-256 <code>071d2002e64f4e65d93a52b1697093392b76ab11cf2a753867370d454da56a29</code>; size 1361 bytes</li>
+<li>exported object <code>object31703</code>; SHA-256 <code>0747ae71c073eb86e0e5afc4b6f7b3785624b4139c0f1e08402142c4c1e458c3</code>; size 1361 bytes</li>
+<li>exported object <code>object29413</code>; SHA-256 <code>0776e5afb1e90077bf644e994228c9cf06699d7e3cf71e68d67f08a79bd4b27c</code>; size 1361 bytes</li>
+<li>exported object <code>object13209</code>; SHA-256 <code>0796454cd492f8133c920ae565d235b5cd34b21a4e05dca423a21e104d6f812e</code>; size 1361 bytes</li>
+<li>exported object <code>object52387</code>; SHA-256 <code>07dd2f025b05a1339e661fa39a58aa6e2237ae30462e2a67e3dbf579979be568</code>; size 1361 bytes</li>
+<li>exported object <code>object22661</code>; SHA-256 <code>07f256bae45201651cdd122f4d3f656e63069206e59f22d609f3a5e60ae9c232</code>; size 1361 bytes</li>
+<li>exported object <code>object22815</code>; SHA-256 <code>083d2a4e9eca6ceddf634735ff1702e41018e1e0e177715ab03b00885999aede</code>; size 1361 bytes</li>
+<li>exported object <code>object29955</code>; SHA-256 <code>08abe123c978232970cc565c513c9f8215d99d322cd2085a7e149a22f34c2d23</code>; size 1361 bytes</li>
+<li>exported object <code>object29631</code>; SHA-256 <code>0903b6b8edc761ef3ba9d7ccc93e479e7c84fd5942bc46ab77a135c175aad715</code>; size 1361 bytes</li>
+<li>exported object <code>object33393</code>; SHA-256 <code>092105ddf74cbb404dc763472e8e336980a75b3266fc71ab6cd5872590933024</code>; size 1361 bytes</li>
+<li>exported object <code>object46400</code>; SHA-256 <code>094bba08127b66e3097bcbcf2e119a0b31624c578a51b392649ab146419274e8</code>; size 1361 bytes</li>
+<li>exported object <code>object15603</code>; SHA-256 <code>097b0737527b8d5a604fd600b050827353ca1fd75de5aad95c0108da1ade342d</code>; size 1361 bytes</li>
+<li>exported object <code>object15086</code>; SHA-256 <code>09e40529169ae90908609819469ea3ac9c086a9434a10c65ef753cdf99e29b74</code>; size 1361 bytes</li>
+<li>exported object <code>object54462</code>; SHA-256 <code>0a0886e7aa6ff36d13816a445a02e5b3882f91105a7efd72fc1058b03e63d800</code>; size 1361 bytes</li>
+<li>exported object <code>object29728</code>; SHA-256 <code>0a6d89fa6a8ed133ab9f9aec883513e25118c9715c1dadb77b5ed2dd39987988</code>; size 1361 bytes</li>
+<li>exported object <code>object21825</code>; SHA-256 <code>0acc8bad510081dc93c8ac019cc283594256dafd20553eea64d0fff666ee630a</code>; size 1361 bytes</li>
+<li>exported object <code>object30860</code>; SHA-256 <code>0ade63619d6d528e5ab89494f642cbf1c0148623e3dfeaf77e9a0fbb440299b2</code>; size 1361 bytes</li>
+<li>exported object <code>object21909</code>; SHA-256 <code>0ae794ee1d89e5b3cce28e650cfc3c3e24acdd8e4d95e2f9da1607b8de4e97f7</code>; size 1361 bytes</li>
+<li>exported object <code>object47902</code>; SHA-256 <code>0b0e34b03f2958d9714ae2b515f2b3bae39c102e255e2c793ffe5037388409bc</code>; size 1361 bytes</li>
+<li>exported object <code>object11543</code>; SHA-256 <code>0b2631d837c93672d27c18cba5275de75364c435ff4916da5dd46946db61a1dc</code>; size 1361 bytes</li>
+<li>exported object <code>object47906</code>; SHA-256 <code>0b30ef8d01ba40ab5b8586ef39476b1c4db51d8a95f4d2b56dbdd6b5d6d74475</code>; size 1361 bytes</li>
+<li>exported object <code>object52344</code>; SHA-256 <code>0b43402fb6e8725c7f8dcd581cd653543fb04c4e87a69c533c7cf39adec6f9a2</code>; size 1361 bytes</li>
+<li>exported object <code>object31012</code>; SHA-256 <code>0b4e47d118b34afd6fb3b14b0af17ed2c7abf41835d2ed2715df684ea8d6ffd8</code>; size 1361 bytes</li>
+<li>exported object <code>object31520</code>; SHA-256 <code>0b8db45a74f8225b297dba01ffbfe9223cfe5ff96717b33cdee3c7d7952d0c0b</code>; size 1361 bytes</li>
+<li>exported object <code>object15133</code>; SHA-256 <code>0bb0f8bb74e2ed6b391ac01b767211179370df14e7a3cd9b6a3c734e10abaa7d</code>; size 1361 bytes</li>
+<li>exported object <code>object33736</code>; SHA-256 <code>0be2658fdf946e5f974ca5bd4d3aadbf0417c4a67f31634f9e438291f157307f</code>; size 1361 bytes</li>
+<li>exported object <code>object52341</code>; SHA-256 <code>0be3de6cbe02649cac51b45bd94ff6d19a983412ba64b0e8d09bf001d670f936</code>; size 1361 bytes</li>
+<li>exported object <code>object52540</code>; SHA-256 <code>0c1699035ad33d5a5bbb3a1757c1403a6dd6e6701c0b44c440475272da405c92</code>; size 1361 bytes</li>
+<li>exported object <code>object53277</code>; SHA-256 <code>0c371ce96d766cf8f8b5a3e9f5fb6455f6357e8ae9f1df6f9cc5e9d570c47786</code>; size 1361 bytes</li>
+<li>exported object <code>object22855</code>; SHA-256 <code>0c7235740ffbcef98e3563dec0a7f00e0c540477142df44f30c786a5b802c7dd</code>; size 1361 bytes</li>
+<li>exported object <code>object18748</code>; SHA-256 <code>0c92140f9b3f7aeeaec909bf9c931e8470956ac8ff4b3fc00989a30742126d7f</code>; size 1361 bytes</li>
+<li>exported object <code>object33806</code>; SHA-256 <code>0ca5ce010722d08937143314f81e2a841c0ed3d6dcd196b1beb8b5f838e989bb</code>; size 1361 bytes</li>
+<li>exported object <code>object54410</code>; SHA-256 <code>0cac5dce45567504fec6f2175c02e8a9a2a1a291c65f341adb699ca5698da188</code>; size 1361 bytes</li>
+<li>exported object <code>object32737</code>; SHA-256 <code>0ce846a948032ea005cf44971ba98a1274be595acec2e801988f2e6d7b4d2144</code>; size 1361 bytes</li>
+<li>exported object <code>object33682</code>; SHA-256 <code>0cf01d966db97935bd75cf1e21aac60ea9971b148a6582fc76c8735ef4d2e9e9</code>; size 1361 bytes</li>
+<li>exported object <code>object15272</code>; SHA-256 <code>0d28d6f7d557164abfeded843a250023793d3a0354d6a7d8146edabef20b7dd9</code>; size 1361 bytes</li>
+<li>exported object <code>object48159</code>; SHA-256 <code>0d44094ee78b64cb11f220bfbd6a351569cc9cbe56192cf869815338779417d6</code>; size 1361 bytes</li>
+<li>exported object <code>object31373</code>; SHA-256 <code>0d5268d8703a78be118b790b6f318c29468e10d93d904e3f8a2d89e748dcc04c</code>; size 1361 bytes</li>
+<li>exported object <code>object31010</code>; SHA-256 <code>0d65f283876d720094daa97b3279e684c74128cecbb7cceb3181286e2fbbbc20</code>; size 1361 bytes</li>
+<li>exported object <code>object22523</code>; SHA-256 <code>0d794efd08478c1b15832783b865b8f123a8f225bf2c806b0f9ab5e1e3bb1b52</code>; size 1361 bytes</li>
+<li>exported object <code>object53034</code>; SHA-256 <code>0d9fddc732c93bb2d938e458c82784703edde666fe2efebda3ce00cb0349899d</code>; size 1361 bytes</li>
+<li>exported object <code>object32731</code>; SHA-256 <code>0daaa88b20226ae1f4c42c17c4c6cbbfa11dedfd9703cb779ebfd44b76ad82b1</code>; size 1361 bytes</li>
+<li>exported object <code>object23591</code>; SHA-256 <code>0de0c8f286db181c37bdc2195928e89de5197597e75ad4cad75ff5d4288937f5</code>; size 1361 bytes</li>
+<li>exported object <code>object33780</code>; SHA-256 <code>0de95a6dd74bfe274dbbd7c0ceb5f141adcdf595ce11730e42de61877c464fc4</code>; size 1361 bytes</li>
+<li>exported object <code>object48036</code>; SHA-256 <code>0e1caceac5a7205259b6f6bcf942a11ff76fe5545d648927d016773497c719d3</code>; size 1361 bytes</li>
+<li>exported object <code>object51997</code>; SHA-256 <code>0e25b544fbab68265ea690a46f017495adea916e109b1182928e9465ecaa94f2</code>; size 1361 bytes</li>
+<li>exported object <code>object31683</code>; SHA-256 <code>0e5b4a758abe3ab92146ccf55b4d2c3bf8cbc21668bd0bb56ea5d3640d513d85</code>; size 1361 bytes</li>
+<li>exported object <code>object44004</code>; SHA-256 <code>0e6fa606a24e4e6078c8bf8ac0cbb36c2bed47e9be2f287272c8ba792c14c014</code>; size 1361 bytes</li>
+<li>exported object <code>object32921</code>; SHA-256 <code>0e82c907c8cd9aa157c7c761e99cac8f45006fc84bdbbb05ec75fcded4238253</code>; size 1361 bytes</li>
+<li>exported object <code>object22857</code>; SHA-256 <code>0e9ea89f80df75091a4cc812e5dbd17cc224ec6bd8ea00f4ff4ea63445ffb325</code>; size 1361 bytes</li>
+<li>exported object <code>object53715</code>; SHA-256 <code>0eac0fa0f97d8bab85621c5fbfb4fa060ecc5ba7352ff2be940e58c9d7c12760</code>; size 1361 bytes</li>
+<li>exported object <code>object53125</code>; SHA-256 <code>0ee52f2355c117842f2f19d3f0c879d314ffbc5baa5e519c64f215be721476ee</code>; size 1361 bytes</li>
+<li>exported object <code>object49929</code>; SHA-256 <code>0f260101f477681eecd0d3f1a9d7ac49b4e0455a82cc9fbdcf5f0e7cde9fc361</code>; size 1361 bytes</li>
+<li>exported object <code>object33055</code>; SHA-256 <code>0f4364784a913740609a3600f0cfff9aaf587e0211b7f02c929f8bd0b36a816b</code>; size 1361 bytes</li>
+<li>exported object <code>object18560</code>; SHA-256 <code>0f47ad71c32b5bd256982e0e91759df7f55ca94082303c0663d94acaa93ca02c</code>; size 1361 bytes</li>
+<li>exported object <code>object44430</code>; SHA-256 <code>0fab4f6ca7bd6b8bb0e7bc56221b5171100fe3bc932100aa8ea788881c83e103</code>; size 1361 bytes</li>
+<li>exported object <code>object22373</code>; SHA-256 <code>0fb3e36e6534b2319c9aa3ef11bdc5e63f4936f0dd7602f1dd4d635e5896a5a4</code>; size 1361 bytes</li>
+<li>exported object <code>object23499</code>; SHA-256 <code>0fb4e4a743f5c30d4b05958d27a67e73f8bbc36ac2f65d04762a8c4d68023255</code>; size 1361 bytes</li>
+<li>exported object <code>object46266</code>; SHA-256 <code>0fbaacfe6e94b7f83a1c39b7c780ca0d2f0678560015cc2c771e778a3f473001</code>; size 1361 bytes</li>
+<li>exported object <code>object23298</code>; SHA-256 <code>0ff9fac2113e3888b5d144463c5c6945c11564c980a6089b7f7dfe1b9d614a80</code>; size 1361 bytes</li>
+<li>exported object <code>object13298</code>; SHA-256 <code>100ddabc33cdc6fe76fa4b540256bd06d6b5accb0002b2f7d4369d38a4351cc7</code>; size 1361 bytes</li>
+<li>exported object <code>object32582</code>; SHA-256 <code>103bf4c5c14533e16574153b81b6f1734b23fe110be50fb68ff18fac125477bf</code>; size 1361 bytes</li>
+<li>exported object <code>object30325</code>; SHA-256 <code>105cc58ea985855602cd233b66281c8e2de8832dc2ca6003253b78e875fb4b16</code>; size 1361 bytes</li>
+<li>exported object <code>object31586</code>; SHA-256 <code>10732599c70bbacdef1b5bfc15f5edba67539976fd97e48a51b1667cd29a5083</code>; size 1361 bytes</li>
+<li>exported object <code>object22158</code>; SHA-256 <code>10960552d889333d5bf995aa02e95d0261a39679a06beeac34c37f654bbda708</code>; size 1361 bytes</li>
+<li>exported object <code>object33404</code>; SHA-256 <code>109baac39f865d43b65478d15e0b6f7f3929f58dd9c2ec72cc6ed8c46cb66261</code>; size 1361 bytes</li>
+<li>exported object <code>object52754</code>; SHA-256 <code>10b860c3f90e1d7185a94151c42cc1404908d4d4af02fcdfa3e2f2e9c85f0513</code>; size 1361 bytes</li>
+<li>exported object <code>object51868</code>; SHA-256 <code>1111281d22bf620459aca772ceb3f5dc821c3f978939b3ac5cca81b709b4e2ba</code>; size 1361 bytes</li>
+<li>exported object <code>object44376</code>; SHA-256 <code>1115a41f4fd7b629b5f8b70dceaef84f4fc8b6cb82f05962a22cc97379583757</code>; size 1361 bytes</li>
+<li>exported object <code>object30132</code>; SHA-256 <code>111f968c11e5c908654bc87bbb11a8cd66d1859c003021dcf76371b61562e48d</code>; size 1361 bytes</li>
+<li>exported object <code>object53581</code>; SHA-256 <code>1181373ff5e53f848c7ef0692b70725ca8dbd7e1cf1b2354bfb0d40233621624</code>; size 1361 bytes</li>
+<li>exported object <code>object44444</code>; SHA-256 <code>1187b0e0bc25bb9cad44ea2f15eaa0553feaca599b6319004fc33177bddb512d</code>; size 1361 bytes</li>
+<li>exported object <code>object18307</code>; SHA-256 <code>11d95a0597638c7ebfd636d7fa665d7b96ba1d6a938a0a7f7eeceada33c477aa</code>; size 1361 bytes</li>
+<li>exported object <code>object49965</code>; SHA-256 <code>11e9f276cfe626be7ee28f5768bb67c94bd5036f1d1b27baeb3259655814306a</code>; size 1361 bytes</li>
+<li>exported object <code>object33015</code>; SHA-256 <code>1223006aefd1f01c7303af2a2b63b5d6140b2add24f00a843ca8f3e0beca7ce0</code>; size 1361 bytes</li>
+<li>exported object <code>object33442</code>; SHA-256 <code>124564c8d2a52347de7eb3af2b2c43b99f35dbb3b41f35eede3db7d027541f00</code>; size 1361 bytes</li>
+<li>exported object <code>object52320</code>; SHA-256 <code>124ab8ab6d95f1864ccb201bb3af9518629a54cb206ab971736846650e252c76</code>; size 1361 bytes</li>
+<li>exported object <code>object53098</code>; SHA-256 <code>12574189186de0aba6103d97667532aba80d8e2f39b5d5c6c0ac834ce07e2fd9</code>; size 1361 bytes</li>
+<li>exported object <code>object22453</code>; SHA-256 <code>126e38fa9c87810aaf9e9828daaf5b29ff4d2a1564f7edda27105a9bc7ea4763</code>; size 1361 bytes</li>
+<li>exported object <code>object30483</code>; SHA-256 <code>12eb91f6db9ec98c6507086c04ce36593b26a442e7fc346ff6c653dd3356eca7</code>; size 1361 bytes</li>
+<li>exported object <code>object32640</code>; SHA-256 <code>12f98788142404142f0ebcfc2e1b26fb68fbff42256f02178f681a5e01082075</code>; size 1361 bytes</li>
+<li>exported object <code>object22682</code>; SHA-256 <code>12fda192ab97a921a90112e345bc008e67f44337a36e29e4eaafa76c9bd109d3</code>; size 1361 bytes</li>
+<li>exported object <code>object53104</code>; SHA-256 <code>1313f26f132af560385da3614ebb327c0d7ee4c40771a23da6b87c505c22e6c3</code>; size 1361 bytes</li>
+<li>exported object <code>object29295</code>; SHA-256 <code>13444fc6df6157e6bb1510f5a024f22986ae6fac7e212edfe092f9c854141f3f</code>; size 1361 bytes</li>
+<li>exported object <code>object31545</code>; SHA-256 <code>13549461fdd383ce263d5645d080a25de84be85daacf70d9ff015e60ca315832</code>; size 1361 bytes</li>
+<li>exported object <code>object22956</code>; SHA-256 <code>13728223b67c5f320b624d7f199d8308e036e4a5fa0c585255acfc11b500f660</code>; size 1361 bytes</li>
+<li>exported object <code>object30393</code>; SHA-256 <code>137b6f81c662562efddf079930b84f11f4b57a8bbcc21e454c6b0a61878a6540</code>; size 1361 bytes</li>
+</ul>
+<h2 id="actor-similarity-leads">Actor similarity leads</h2>
+<ul>
+<li>Thrip (G0076): 25% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>TA459 (G0062): 20% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Gallmaker (G0084): 17% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>DarkHydrus (G0079): 14% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Nomadic Octopus (G0133): 14% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Poseidon Group (G0033): 12% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>CopyKittens (G0052): 12% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>MoustachedBouncer (G1019): 12% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>GOLD SOUTHFIELD (G0115): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>DarkVishnya (G0105): 10% TTP overlap. This is an investigation lead, not attribution.</li>
+</ul>
+<h2 id="local-enrichment-and-correlations">Local enrichment and correlations</h2>
+<p>No match means unknown in this corpus. Local CTI may postdate the capture. Matches and shared infrastructure require review; no automatic promotion or attribution.
+Snapshot: <code>37c4030f9b25335ca7a7a8cd23b5f050fab86309243d1fc8d5d3462e90e2a5a9</code>; recorded 2026-09-19T12:09:53.287759+00:00; mode: local-only.
+Coverage: <code>{&quot;matched_observables&quot;:0,&quot;no_exact_match&quot;:3662,&quot;observable_limit&quot;:5000,&quot;observables_checked&quot;:3662,&quot;observables_total&quot;:3662,&quot;prior_case_limit_reached&quot;:false,&quot;prior_cases_checked&quot;:13,&quot;truncated&quot;:false}</code></p>
+<ul>
+<li>Catalog T1059.001: https://attack.mitre.org/techniques/T1059/001; detection strategies: [{&quot;attack_id&quot;:&quot;DET0455&quot;,&quot;name&quot;:&quot;Abuse of PowerShell for Arbitrary Execution&quot;,&quot;stix_id&quot;:&quot;x-mitre-detection-strategy--72b209e2-8c65-4217-8532-fabd0cb54ae5&quot;}]</li>
+<li>Prior analysis <code>6e50c68f-5552-400c-9835-15867ddb022d</code> shares 17 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>43bc93eb-d6db-4400-b983-b0dd404c8ca4</code> shares 41 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>6df36b51-4b44-4660-b534-2fa89705e807</code> shares 20 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>29aa3ef8-47c9-4c47-b4cc-1ff3e0708142</code> shares 11 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>b79032a8-d69e-4ac1-bdd4-542473fa8e3b</code> shares 11 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>faf041c3-70e0-4a01-8780-10917e5e187c</code> shares 10 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>08324647-35af-4af2-8d82-4387eec03918</code> shares 13 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>616a90fa-f15e-4fcb-8d56-7b8e0eff5785</code> shares 3 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>459e119d-191f-49e8-85ea-c78f9de41826</code> shares 10 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>7a2cfe72-f48d-4894-8a2d-8889cb3b11b2</code> shares 12 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>81373b30-6a59-49d1-89b0-bad73ed19eaa</code> shares 12 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>38851ad7-b3a0-423d-ae89-3b7be4e4b908</code> shares 12 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>bfccc426-aa9b-4007-8558-a66d37ecb90c</code> shares 14 observations. This does not establish a common campaign.</li>
+<li>External provider queries: 0. Not requested; no unknown indicator is classified as benign.</li>
+</ul>
+<h2 id="coverage-and-limitations">Coverage and limitations</h2>
+<ul>
+<li>Packet and protocol facts are deterministic for the recorded analyzer manifest.</li>
+<li>Encrypted application payloads are not decrypted; only available metadata is reported.</li>
+<li>ATT&amp;CK mappings and actor overlaps are candidates until analyst review and promotion.</li>
+<li>HTTP object inventory: <code>{&quot;compact_objects&quot;:1555,&quot;complete&quot;:true,&quot;detailed_objects&quot;:500,&quot;exported_objects&quot;:2055,&quot;hashed_bytes&quot;:2729292,&quot;hashed_objects&quot;:2055,&quot;omitted_unique_hashes&quot;:0,&quot;returned_unique_hashes&quot;:2055,&quot;selection&quot;:&quot;content-classified first, then size descending, SHA256 tie-break; deduplicated by full hash; overflow retains a compact hash index&quot;,&quot;unhashed_objects&quot;:0,&quot;unique_hashes&quot;:2055}</code>. Compact overflow hashes are retained in JSON coverage and observables.</li>
+<li>A directory subject is not necessarily a logged-in user; consult identity bindings in the JSON evidence.</li>
+<li>Rendered / available: findings 18/18, identities 6/6, observables 500/3662, artifacts 200/500. Full returned inventory is in the JSON result.</li>
+</ul>
+<h2 id="live-enrichment-and-correlation-validation">Live enrichment and correlation validation</h2>
+<p>The actual IOC library contained 156,125 records. Exact typed matches: <strong>0</strong>; source actor assertions: <strong>0</strong>. Independent SQL agrees: IOC=True, actors=True.
+A miss is unknown in this corpus, not evidence of benignness. The earlier isolated corpus included publisher-reference records; its positive matches were not live-provider detections and are not comparable to natural coverage here.
+ATT&amp;CK catalog candidates: 1; current-version catalog checks passed: True. Detection-strategy joins were checked independently.
+Cross-case links: 13; independently verified: True. These are shared observations, predominantly common service infrastructure, not common-campaign assertions.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Passive local lookup target</th>
+<th>Type</th>
+<th style="text-align:right">Local matches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gamaes.shop</code></td>
+<td>domain</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>newsaarctech.com</code></td>
+<td>domain</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>172.104.227.98</code></td>
+<td>ipv4</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>163.172.50.82</code></td>
+<td>ipv4</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>0a85cba8c2e6aa44684f15047dcaa4c4d7f86ec356891bc8e0b8ee36bb151f7a</code></td>
+<td>sha256</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>2c80de6ffeb0759cb01dd7ad50437ea8dfcb7e4b8582a0129e7e7f700b593e38</code></td>
+<td>sha256</td>
+<td style="text-align:right">0</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="approved-external-passive-enrichment">Approved external passive enrichment</h2>
+<p>Completed 6/6 planned case indicators. Shared indicators reuse one saved lookup rather than consume provider quota repeatedly.</p>
+<p>These lookups used the actual local application and were explicitly authorized. No PCAP or payload was uploaded, no private address was disclosed, no target was scanned, and no AI provider was invoked. Tier-two/three pivots query the local corpus only.</p>
+<p>Provider intelligence was retrieved after the captures: current reputation, hosting and service observations do not establish historical causality. <code>not_found</code> means absent from that provider, not benign. Family labels and ATT&amp;CK/actor leads remain source assertions awaiting review.</p>
+<p>Historical coverage caveat: ThreatFox documents a six-month IOC expiration policy for its API since May 2025. That can limit these older exercises; it does not prove why any particular lookup missed. <a href="https://threatfox.abuse.ch/api/">ThreatFox API policy</a>.</p>
+<h3 id="gamaesshop"><code>gamaes.shop</code></h3>
+<p>Type: domain; request: 7.763 seconds; completed: 2026-09-19T14:05:56.714469+00:00. Persistence reread identical: True.
+<a href="../../enrichment/8822145d553d29c5dfbb.json">Public provider summary</a>.
+Platform triage score: 95/100 (highly suspicious); a heuristic priority, not calibrated probability. Graph: 21 nodes, 26 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>4 engines marked malicious and 1 suspicious; 49 harmless, 35 undetected.</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>skipped</td>
+<td>MalwareBazaar is hash-focused; input is not a hash.</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 2 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 10 scan result(s). urlscan activity analysis found 4 suspicious pattern(s).</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>ok</td>
+<td>Censys web property lookup returned 2 record(s) for gamaes.shop. Broader Censys search requires an organization-enabled account and API role.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider ATT&amp;CK leads (not packet-observed execution):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Source / scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1059</td>
+<td>Command and Scripting Interpreter</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1137</td>
+<td>Office Application Startup</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1218</td>
+<td>System Binary Proxy Execution</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1027</td>
+<td>Obfuscated Files or Information</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="newsaarctechcom"><code>newsaarctech.com</code></h3>
+<p>Type: domain; request: 18.240 seconds; completed: 2026-09-19T13:57:40.593205+00:00. Persistence reread identical: True.
+<a href="../../enrichment/750b2f09792b80c68445.json">Public provider summary</a>.
+Platform triage score: 83/100 (highly suspicious); a heuristic priority, not calibrated probability. Graph: 23 nodes, 29 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>2 engines marked malicious and 3 suspicious; 52 harmless, 32 undetected.</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>skipped</td>
+<td>MalwareBazaar is hash-focused; input is not a hash.</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 3 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 10 scan result(s). urlscan activity analysis found 2 suspicious pattern(s).</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>ok</td>
+<td>Censys web property lookup returned 2 record(s) for newsaarctech.com. Broader Censys search requires an organization-enabled account and API role.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider ATT&amp;CK leads (not packet-observed execution):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Source / scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1583</td>
+<td>Acquire Infrastructure</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1584</td>
+<td>Compromise Infrastructure</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1608</td>
+<td>Stage Capabilities</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1190</td>
+<td>Exploit Public-Facing Application</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1078</td>
+<td>Valid Accounts</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1090</td>
+<td>Proxy</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1505.003</td>
+<td>Web Shell</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1573</td>
+<td>Encrypted Channel</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1539</td>
+<td>Steal Web Session Cookie</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1071.001</td>
+<td>Web Protocols</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1567</td>
+<td>Exfiltration Over Web Service</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1059</td>
+<td>Command and Scripting Interpreter</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1137</td>
+<td>Office Application Startup</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1218</td>
+<td>System Binary Proxy Execution</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1027</td>
+<td>Obfuscated Files or Information</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="17210422798"><code>172.104.227.98</code></h3>
+<p>Type: ip; request: 6.358 seconds; completed: 2026-09-19T13:57:48.536759+00:00. Persistence reread identical: True.
+<a href="../../enrichment/6e04b9c0fff0c3c39468.json">Public provider summary</a>.
+Platform triage score: 49/100 (suspicious); a heuristic priority, not calibrated probability. Graph: 11 nodes, 14 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>5 engines marked malicious and 0 suspicious; 51 harmless, 33 undetected.</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>skipped</td>
+<td>MalwareBazaar is hash-focused; input is not a hash.</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 50 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 6 scan result(s). urlscan activity analysis found 1 suspicious pattern(s).</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>not_found</td>
+<td>GreyNoise classification: unknown. Query status: not_found</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>ok</td>
+<td>AbuseIPDB confidence score: 0/100.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>not_found</td>
+<td>Shodan returned 0 open port(s). Query status: not_found</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>ok</td>
+<td>Censys host lookup returned 0 service(s).</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="1631725082"><code>163.172.50.82</code></h3>
+<p>Type: ip; request: 8.869 seconds; completed: 2026-09-19T13:58:11.047188+00:00. Persistence reread identical: True.
+<a href="../../enrichment/bb24fd2f9b346f309af9.json">Public provider summary</a>.
+Platform triage score: 75/100 (highly suspicious); a heuristic priority, not calibrated probability. Graph: 13 nodes, 17 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>11 engines marked malicious and 0 suspicious; 46 harmless, 32 undetected.</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>skipped</td>
+<td>MalwareBazaar is hash-focused; input is not a hash.</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 50 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 9 scan result(s). urlscan activity analysis found 1 suspicious pattern(s).</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>not_found</td>
+<td>GreyNoise classification: unknown. Query status: not_found</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>ok</td>
+<td>AbuseIPDB confidence score: 0/100.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>ok</td>
+<td>Shodan returned 98 open port(s).</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>ok</td>
+<td>Censys host lookup returned 48 service(s).</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider ATT&amp;CK leads (not packet-observed execution):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Source / scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1045</td>
+<td></td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1055</td>
+<td>Process Injection</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1129</td>
+<td>Shared Modules</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1143</td>
+<td></td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1057</td>
+<td>Process Discovery</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1105</td>
+<td>Ingress Tool Transfer</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1071</td>
+<td>Application Layer Protocol</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1071.001</td>
+<td>Web Protocols</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1071.004</td>
+<td>DNS</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1491</td>
+<td>Defacement</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1491.001</td>
+<td>Internal Defacement</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1156</td>
+<td></td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1399</td>
+<td></td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1027</td>
+<td>Obfuscated Files or Information</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1053</td>
+<td>Scheduled Task/Job</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1080</td>
+<td>Taint Shared Content</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1102</td>
+<td>Web Service</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1210</td>
+<td>Exploitation of Remote Services</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1486</td>
+<td>Data Encrypted for Impact</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1490</td>
+<td>Inhibit System Recovery</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1566</td>
+<td>Phishing</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="0a85cba8c2e6aa44684f15047dcaa4c4d7f86ec356891bc8e0b8ee36bb151f7a"><code>0a85cba8c2e6aa44684f15047dcaa4c4d7f86ec356891bc8e0b8ee36bb151f7a</code></h3>
+<p>Type: hash; request: 3.095 seconds; completed: 2026-09-19T13:58:25.265449+00:00. Persistence reread identical: True.
+<a href="../../enrichment/24b33f055a98b846c0da.json">Public provider summary</a>.
+Platform triage score: 20/100 (needs review); a heuristic priority, not calibrated probability. Graph: 1 nodes, 0 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>No malicious detections in last analysis; 0 harmless, 61 undetected.</td>
+</tr>
+<tr>
+<td>VirusTotal classification/name hints</td>
+<td>unreviewed; may include benign filenames</td>
+<td>sSTToaEwCG5VASw</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>not_found</td>
+<td>MalwareBazaar returned 0 sample record(s). Query status: hash_not_found</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 0 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 0 scan result(s). urlscan activity analysis found no obvious suspicious pattern.</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>skipped</td>
+<td>Censys host and search pivots support IP, domain, and URL inputs.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider ATT&amp;CK leads (not packet-observed execution):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Source / scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1036</td>
+<td>Masquerading</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1046</td>
+<td>Network Service Discovery</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1055</td>
+<td>Process Injection</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1055.011</td>
+<td>Extra Window Memory Injection</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1071</td>
+<td>Application Layer Protocol</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1095</td>
+<td>Non-Application Layer Protocol</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1189</td>
+<td>Drive-by Compromise</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1573</td>
+<td>Encrypted Channel</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="2c80de6ffeb0759cb01dd7ad50437ea8dfcb7e4b8582a0129e7e7f700b593e38"><code>2c80de6ffeb0759cb01dd7ad50437ea8dfcb7e4b8582a0129e7e7f700b593e38</code></h3>
+<p>Type: hash; request: 2.919 seconds; completed: 2026-09-19T14:06:11.868303+00:00. Persistence reread identical: True.
+<a href="../../enrichment/604bbbfd66ef0118feb5.json">Public provider summary</a>.
+Platform triage score: 0/100 (low signal); a heuristic priority, not calibrated probability. Graph: 1 nodes, 0 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>not_found</td>
+<td>virustotal has no record for this lookup. Query status: not_found</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>not_found</td>
+<td>MalwareBazaar returned 0 sample record(s). Query status: hash_not_found</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 0 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 0 scan result(s). urlscan activity analysis found no obvious suspicious pattern.</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>skipped</td>
+<td>Censys host and search pivots support IP, domain, and URL inputs.</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="packet-to-provider-evidence-links">Packet-to-provider evidence links</h3>
+<p>The live case contains 6 explicitly linked, exact-type/value PCAP observables. 4 retain frame references; remaining exported-object hashes retain native object IDs and capture-export provenance, <strong>not an exact packet-frame map</strong>. Every link retains the capture checksum, points to a saved provider investigation, and was reread from the real API. Case actor associations remain empty.
+<a href="../../packet-enrichment-links/2021-12-08-updated.json">Verified graph links</a>.</p>
+<h3 id="current-attck-catalog-and-detection-strategy-joins">Current ATT&amp;CK catalog and detection-strategy joins</h3>
+<p>These are read-only joins against the actual database, not generated detections or proof that the victim executed the technique. A valid catalog join cannot validate the original provider assertion.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Current catalog match</th>
+<th>Available detection strategies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1027</td>
+<td>True</td>
+<td>Behavioral Detection of Obfuscated Files or Information (x-mitre-detection-strategy--e3758cbb-5dd9-4aad-b848-0539a8c56307)</td>
+</tr>
+<tr>
+<td>T1036</td>
+<td>True</td>
+<td>Behavioral Detection of Masquerading Across Platforms via Metadata and Execution Discrepancy (x-mitre-detection-strategy--408aedab-4a23-41ad-809d-fe9c3805b7f6)</td>
+</tr>
+<tr>
+<td>T1045</td>
+<td>False</td>
+<td>None returned</td>
+</tr>
+<tr>
+<td>T1046</td>
+<td>True</td>
+<td>Behavioral Detection Strategy for Network Service Discovery Across Platforms (x-mitre-detection-strategy--82e20b1f-300e-43cc-9259-1d506ef5d1f8)</td>
+</tr>
+<tr>
+<td>T1053</td>
+<td>True</td>
+<td>Cross-Platform Behavioral Detection of Scheduled Task/Job Abuse (x-mitre-detection-strategy--df11466a-27a2-4cb1-bf73-2a3a4aaee0d9)</td>
+</tr>
+<tr>
+<td>T1055</td>
+<td>True</td>
+<td>Behavioral Detection of Process Injection Across Platforms (x-mitre-detection-strategy--9833b57b-4c83-4f58-b4cf-76f041b29273)</td>
+</tr>
+<tr>
+<td>T1055.011</td>
+<td>True</td>
+<td>Detection Strategy for Extra Window Memory (EWM) Injection on Windows (x-mitre-detection-strategy--1a8d87f1-48ca-4929-a5cc-2b2a03983f12)</td>
+</tr>
+<tr>
+<td>T1057</td>
+<td>True</td>
+<td>Detection of Adversarial Process Discovery Behavior (x-mitre-detection-strategy--309ca3cd-d3f0-4aea-8932-558550aa89f4)</td>
+</tr>
+<tr>
+<td>T1059</td>
+<td>True</td>
+<td>Behavioral Detection of Command and Scripting Interpreter Abuse (x-mitre-detection-strategy--8582f5e6-44a5-4950-b7e8-a3e1b6d58d63)</td>
+</tr>
+<tr>
+<td>T1071</td>
+<td>True</td>
+<td>Detection of Command and Control Over Application Layer Protocols (x-mitre-detection-strategy--155cab5b-c70b-4cfb-ba52-f62a21836b19)</td>
+</tr>
+<tr>
+<td>T1071.001</td>
+<td>True</td>
+<td>Detection of Web Protocol-Based C2 Over HTTP, HTTPS, or WebSockets (x-mitre-detection-strategy--e6496b9b-2458-4616-9712-a7c0da7fd3bc)</td>
+</tr>
+<tr>
+<td>T1071.004</td>
+<td>True</td>
+<td>Behavioral Detection of DNS Tunneling and Application Layer Abuse (x-mitre-detection-strategy--c2721658-fa76-4b6f-9f84-50618de81ae0)</td>
+</tr>
+<tr>
+<td>T1078</td>
+<td>True</td>
+<td>Detection of Valid Account Abuse Across Platforms (x-mitre-detection-strategy--a6245075-b59f-46cf-8b76-e8d95c378a22)</td>
+</tr>
+<tr>
+<td>T1080</td>
+<td>True</td>
+<td>Detection of Tainted Content Written to Shared Storage (x-mitre-detection-strategy--cdfe6166-43e9-434a-a961-139edd58ca0c)</td>
+</tr>
+<tr>
+<td>T1090</td>
+<td>True</td>
+<td>Detection of Proxy Infrastructure Setup and Traffic Bridging (x-mitre-detection-strategy--5c44619a-da36-4bbd-9730-efceacf2409f)</td>
+</tr>
+<tr>
+<td>T1095</td>
+<td>True</td>
+<td>Detection of Non-Application Layer Protocols for C2 (x-mitre-detection-strategy--2cb544af-ef54-4376-9608-b399ad67d3d6)</td>
+</tr>
+<tr>
+<td>T1102</td>
+<td>True</td>
+<td>Suspicious Use of Web Services for C2 (x-mitre-detection-strategy--769615c5-08d5-4f51-8f3b-7ac2f1febce8)</td>
+</tr>
+<tr>
+<td>T1105</td>
+<td>True</td>
+<td>Detect Ingress Tool Transfers via Behavioral Chain (x-mitre-detection-strategy--67677c4c-5778-49eb-ae74-1920645b8554)</td>
+</tr>
+<tr>
+<td>T1129</td>
+<td>True</td>
+<td>Behavior-chain, platform-aware detection strategy for T1129 Shared Modules (x-mitre-detection-strategy--928a6ce6-fca0-4d66-aba3-1121431b953e)</td>
+</tr>
+<tr>
+<td>T1137</td>
+<td>True</td>
+<td>Detect Office Startup-Based Persistence via Macros, Forms, and Registry Hooks (x-mitre-detection-strategy--71a8576b-c9ef-4485-b461-d706fd757a67)</td>
+</tr>
+<tr>
+<td>T1143</td>
+<td>False</td>
+<td>None returned</td>
+</tr>
+<tr>
+<td>T1156</td>
+<td>False</td>
+<td>None returned</td>
+</tr>
+<tr>
+<td>T1189</td>
+<td>True</td>
+<td>Drive-by Compromise — Behavior-based, Multi-platform Detection Strategy (T1189) (x-mitre-detection-strategy--a070f9d2-3480-4362-99b3-8b36f5be0189)</td>
+</tr>
+<tr>
+<td>T1190</td>
+<td>True</td>
+<td>Exploit Public-Facing Application – multi-signal correlation (request → error → post-exploit process/egress) (x-mitre-detection-strategy--dd8477c8-2aad-4db3-b810-fe0d2f605fa8)</td>
+</tr>
+<tr>
+<td>T1210</td>
+<td>True</td>
+<td>Exploitation of Remote Services – multi-platform lateral movement detection (x-mitre-detection-strategy--ee73dd97-cf1a-4220-a7cf-52d864811bb4)</td>
+</tr>
+<tr>
+<td>T1218</td>
+<td>True</td>
+<td>Detection of Proxy Execution via Trusted Signed Binaries Across Platforms (x-mitre-detection-strategy--ce0b969a-1411-4b6f-a6aa-c31ef6fe6727)</td>
+</tr>
+<tr>
+<td>T1399</td>
+<td>False</td>
+<td>None returned</td>
+</tr>
+<tr>
+<td>T1486</td>
+<td>True</td>
+<td>Detection of Multi-Platform File Encryption for Impact (x-mitre-detection-strategy--d080a1b1-5ad1-45a1-8f7b-b736986c20d9)</td>
+</tr>
+<tr>
+<td>T1490</td>
+<td>True</td>
+<td>Behavioral Detection for T1490 - Inhibit System Recovery (x-mitre-detection-strategy--b13116ed-e9c0-4cd5-81f6-676074078477)</td>
+</tr>
+<tr>
+<td>T1491</td>
+<td>True</td>
+<td>Defacement via File and Web Content Modification Across Platforms (x-mitre-detection-strategy--2d5f2445-a395-4012-b378-c953f2df7353)</td>
+</tr>
+<tr>
+<td>T1491.001</td>
+<td>True</td>
+<td>Internal Website and System Content Defacement via UI or Messaging Modifications (x-mitre-detection-strategy--c8b4a2e4-386f-45b3-b32a-8ca4113e5592)</td>
+</tr>
+<tr>
+<td>T1505.003</td>
+<td>True</td>
+<td>Web Shell Detection via Server Behavior and File Execution Chains (x-mitre-detection-strategy--abb052c6-4edd-4592-9b9b-e53a55ac53b8)</td>
+</tr>
+<tr>
+<td>T1539</td>
+<td>True</td>
+<td>Detection of Web Session Cookie Theft via File, Memory, and Network Artifacts (x-mitre-detection-strategy--26fdbcb2-abc1-4844-8e5d-2c6039336cb7)</td>
+</tr>
+<tr>
+<td>T1566</td>
+<td>True</td>
+<td>Detection Strategy for Phishing across platforms. (x-mitre-detection-strategy--7ee73f2e-76b2-4f00-bcc0-7fb79d31d344)</td>
+</tr>
+<tr>
+<td>T1567</td>
+<td>True</td>
+<td>Detection Strategy for Exfiltration Over Web Service (x-mitre-detection-strategy--1753ab98-4530-4284-9bc3-5d4813abfb9e)</td>
+</tr>
+<tr>
+<td>T1573</td>
+<td>True</td>
+<td>Detection Strategy for Encrypted Channel across OS Platforms (x-mitre-detection-strategy--08861418-398c-4972-8850-5e11f2d32944)</td>
+</tr>
+<tr>
+<td>T1583</td>
+<td>True</td>
+<td>Detection of Acquire Infrastructure (x-mitre-detection-strategy--56752265-8647-4ce2-bc6c-c38c2e14685c)</td>
+</tr>
+<tr>
+<td>T1584</td>
+<td>True</td>
+<td>Detection of Compromise Infrastructure (x-mitre-detection-strategy--7f3e2c35-7394-4cc6-baef-73a830930953)</td>
+</tr>
+<tr>
+<td>T1608</td>
+<td>True</td>
+<td>Detection of Stage Capabilities (x-mitre-detection-strategy--5a1ada5b-5729-45d5-8b3d-f6fa7d2a3352)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Prior analysis</th>
+<th style="text-align:right">Shared count</th>
+<th>Example observations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6e50c68f-5552-400c-9835-15867ddb022d</td>
+<td style="text-align:right">17</td>
+<td>api.msn.com, client.wns.windows.com, dns.msftncsi.com, settings-win.data.microsoft.com, settingsfd-geo.trafficmanager.net</td>
+</tr>
+<tr>
+<td>43bc93eb-d6db-4400-b983-b0dd404c8ca4</td>
+<td style="text-align:right">41</td>
+<td>api.msn.com, checkappexec.microsoft.com, client.wns.windows.com, dns.msftncsi.com, imap.aol.com</td>
+</tr>
+<tr>
+<td>6df36b51-4b44-4660-b534-2fa89705e807</td>
+<td style="text-align:right">20</td>
+<td>api.msn.com, checkappexec.microsoft.com, client.wns.windows.com, dns.msftncsi.com, nexusrules.officeapps.live.com</td>
+</tr>
+<tr>
+<td>29aa3ef8-47c9-4c47-b4cc-1ff3e0708142</td>
+<td style="text-align:right">11</td>
+<td>api.msn.com, client.wns.windows.com, settings-win.data.microsoft.com, v10.events.data.microsoft.com, wns.notify.trafficmanager.net</td>
+</tr>
+<tr>
+<td>b79032a8-d69e-4ac1-bdd4-542473fa8e3b</td>
+<td style="text-align:right">11</td>
+<td>api.msn.com, client.wns.windows.com, settings-win.data.microsoft.com, v10.events.data.microsoft.com, wns.notify.trafficmanager.net</td>
+</tr>
+<tr>
+<td>faf041c3-70e0-4a01-8780-10917e5e187c</td>
+<td style="text-align:right">10</td>
+<td>api.msn.com, client.wns.windows.com, dns.msftncsi.com, settings-win.data.microsoft.com, v10.events.data.microsoft.com</td>
+</tr>
+<tr>
+<td>08324647-35af-4af2-8d82-4387eec03918</td>
+<td style="text-align:right">13</td>
+<td>api.msn.com, checkappexec.microsoft.com, client.wns.windows.com, dns.msftncsi.com, v10.events.data.microsoft.com</td>
+</tr>
+<tr>
+<td>616a90fa-f15e-4fcb-8d56-7b8e0eff5785</td>
+<td style="text-align:right">3</td>
+<td>settings-win.data.microsoft.com, v10.events.data.microsoft.com, www.bing.com</td>
+</tr>
+<tr>
+<td>459e119d-191f-49e8-85ea-c78f9de41826</td>
+<td style="text-align:right">10</td>
+<td>api.msn.com, client.wns.windows.com, settings-win.data.microsoft.com, v10.events.data.microsoft.com, wns.notify.trafficmanager.net</td>
+</tr>
+<tr>
+<td>7a2cfe72-f48d-4894-8a2d-8889cb3b11b2</td>
+<td style="text-align:right">12</td>
+<td>api.msn.com, client.wns.windows.com, settings-win.data.microsoft.com, v10.events.data.microsoft.com, wns.notify.trafficmanager.net</td>
+</tr>
+<tr>
+<td>81373b30-6a59-49d1-89b0-bad73ed19eaa</td>
+<td style="text-align:right">12</td>
+<td>api.msn.com, client.wns.windows.com, dns.msftncsi.com, settings-win.data.microsoft.com, v10.events.data.microsoft.com</td>
+</tr>
+<tr>
+<td>38851ad7-b3a0-423d-ae89-3b7be4e4b908</td>
+<td style="text-align:right">12</td>
+<td>api.msn.com, client.wns.windows.com, dns.msftncsi.com, settings-win.data.microsoft.com, v10.events.data.microsoft.com</td>
+</tr>
+<tr>
+<td>bfccc426-aa9b-4007-8558-a66d37ecb90c</td>
+<td style="text-align:right">14</td>
+<td>api.msn.com, checkappexec.microsoft.com, client.wns.windows.com, dns.msftncsi.com, settings-win.data.microsoft.com</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="comparison-with-publisher-answers-and-earlier-runs">Comparison with publisher answers and earlier runs</h2>
+<p>The following comparison is separate from native inference. It measures availability of selected facts, not 100% incident-diagnosis accuracy.</p>
+<p><a href="https://isc.sans.edu/diary/28160">Publisher answer</a>.</p>
+<p>Identity and the listed infrastructure are packet-visible. Native family attribution, an infection-onset conclusion, and extraction/classification of 17 SMTP emails are not implemented. Publisher notes that the Emotet DLL cannot be exported from this capture. Do not interpret HTTP-export completeness as complete malware recovery.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Field</th>
+<th>Packet-verified expected value</th>
+<th>Live</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.12.3.66</td>
+<td>ip</td>
+<td>10.12.3.66</td>
+<td>True</td>
+</tr>
+<tr>
+<td>10.12.3.66</td>
+<td>hostname</td>
+<td>DESKTOP-LUOABV1</td>
+<td>True</td>
+</tr>
+<tr>
+<td>10.12.3.66</td>
+<td>account</td>
+<td>darin.figueroa</td>
+<td>True</td>
+</tr>
+</tbody>
+</table></div>
+<p>Declared IOC subset available: 4/4. Not exhaustive recall.</p>
+<ul>
+<li><code>gamaes.shop</code>: present</li>
+<li><code>newsaarctech.com</code>: present</li>
+<li><code>172.104.227.98</code>: present</li>
+<li><code>163.172.50.82</code>: present</li>
+</ul>
+<h2 id="complete-flow-checks-and-evidence-links">Complete-flow checks and evidence links</h2>
+<p>Browser history/open, Markdown export and investigation transfer: True. Investigation ID: <code>40fe3cfe-82bb-402a-98a4-11b7a58a0b41</code>.
+Investigation transfers preserve a bounded preview, total count, source-analysis URL and hashes. Complete evidence remains server-side. TTP-overlap leads are not inserted into actor associations.
+PDF export: HTTP 200, including an explicitly non-authoritative packet-evidence appendix. STIX export remains HTTP 409 until a human completes review/promotion; this is a successful safety check.</p>
+<ul>
+<li><a href="api-upload.json">Full native JSON</a>, <a href="database-audit.json">independent database audit</a>, <a href="NATIVE-REPORT.html">native Markdown</a>, <a href="pdf-export-fixed.pdf">PDF</a>.</li>
+<li><a href="../../browser/2021-12-08.png">Browser screenshot</a>, <a href="../../browser/2021-12-08-investigation.json">investigation evidence</a>.</li>
+</ul>
+<h2 id="follow-up-priorities">Follow-up priorities</h2>
+<p>Validate high/medium findings using frame/stream evidence; obtain process and endpoint telemetry for execution, persistence and credential-theft hypotheses. Provider data above is current-time external context, not historical execution evidence. Review shared-CDN matches for specificity. Do not execute exported objects or treat encrypted payload metadata as decrypted evidence.</p>
+</main></body></html>
