@@ -3,12 +3,24 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import test from 'node:test';
+import { createContentItem } from '../scripts/content-catalog-lib.mjs';
 
 const root = resolve(new URL('../research/adversarygraph-ten-pcaps/', import.meta.url).pathname);
 const read = name => readFileSync(join(root, name), 'utf8');
 const json = name => JSON.parse(read(name));
 const sha = data => createHash('sha256').update(data).digest('hex');
 const files = directory => readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? files(join(directory, entry.name)) : [join(directory, entry.name)]);
+
+test('first-party article provenance cannot be replaced by an external footer profile', () => {
+  const config = JSON.parse(readFileSync(new URL('../data/content-catalog.config.json', import.meta.url), 'utf8'));
+  const url = 'https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/';
+  const html = `<html><head><link rel="canonical" href="${url}"><meta name="description" content="Ten-case deterministic PCAP experiment."></head><body><main><h1>AdversaryGraph vs Ten Malware PCAPs</h1></main><footer><a href="https://infosecwriteups.com/@1200km">Author profile</a></footer></body></html>`;
+  const item = createContentItem({ url, html }, config);
+  assert.equal(item.source_url, url);
+  assert.equal(item.source_platform, '1200km.com');
+  assert.equal(item.primary_type, 'article');
+  assert.equal(item.evidence_level, 'lab-validated');
+});
 
 test('public evidence covers only the ten additional cases and preserves qualified metrics', () => {
   const summary = json('evidence/summary.json');
