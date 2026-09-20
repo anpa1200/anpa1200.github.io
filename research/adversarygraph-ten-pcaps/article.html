@@ -1,0 +1,521 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AdversaryGraph vs Ten Malware PCAPs: What the Evidence Actually Shows | 1200km</title><meta name="description" content="Public evidence supplement for ten AdversaryGraph malware-PCAP tests: reports, screenshots, audit records, provenance and limitations."><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/"><meta property="og:url" content="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/"><meta property="og:title" content="AdversaryGraph vs Ten Malware PCAPs: What the Evidence Actually Shows"><meta property="og:description" content="Ten malware PCAPs, original screenshots, full case reports and qualified results."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/research/adversarygraph-ten-pcaps/screenshots/2024-11-26-packet-analysis.png"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{padding:20px;background:#11233c;color:#fff}header a{color:#b7e5ff}main{max-width:1160px;margin:28px auto;padding:32px 44px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2{margin-top:2em}a{color:#075c91}img{display:block;max-width:100%;height:auto;margin:24px auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #b8c9db;padding:10px;text-align:left}th{background:#edf4fc}pre{overflow:auto;padding:16px;background:#11233c;color:#fff}code{font-size:.85em}blockquote{margin:20px 0;padding:8px 20px;border-left:4px solid #167bb0;background:#eff6ff}.notice{padding:12px;background:#eef6fd;font-size:14px}@media(max-width:700px){main{margin:0;padding:22px 16px}body{font-size:16px}}@media print{header{display:none}main{padding:0;margin:0}pre{white-space:pre-wrap}img,tr{break-inside:avoid}}</style><meta property="article:published_time" content="2026-09-20"><meta property="article:modified_time" content="2026-09-20"></head><body><header>1200KM · ANDREY PAUTOV<br><a href="/">Home</a> · <a href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/">Article</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/REPORTS.html">Ten reports</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/SCREENSHOTS.html">Screenshot gallery</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/">Publication boundaries</a></header><main><p class="notice">Measured 19 September 2026 · Public derivative · Historical training evidence, not approved threat intelligence.</p><h1 id="adversarygraph-vs-ten-malware-pcaps-what-the-evidence-actually-shows">AdversaryGraph vs Ten Malware PCAPs: What the Evidence Actually Shows</h1>
+<p><strong>A real-instance test of deterministic packet analysis, passive enrichment, and reviewable correlations—with screenshots, packet-level evidence, and ten downloadable case reports.</strong></p>
+<p>A packet-analysis platform can produce an impressive report and still fail at the parts that matter: assigning an account to the correct host, retaining an important file hash, preserving evidence through the API, or distinguishing a useful intelligence lead from an unsupported attribution.</p>
+<p>I tested AdversaryGraph against ten additional malware-traffic exercises to examine those boundaries. The work went beyond checking whether files uploaded successfully. It included packet extraction, comparison with publisher answers, defect remediation, a retest on my actual running instance, passive external enrichment, database verification, and browser-based evidence handoffs.</p>
+<p>The headline results were <strong>52 of 52 selected identity facts recovered</strong>, <strong>87 of 88 selected indicators available</strong>, and <strong>115.02 seconds of combined upload-and-analysis time</strong>. Those are useful measurements. They are not evidence of 98.86% malware-detection accuracy, complete incident reconstruction, or human-equivalent reasoning.</p>
+<p>This article covers only these ten cases. It explains what worked, what the scores conceal, and how to inspect the evidence rather than trust the summary. Measured on 19 September 2026; published on 20 September 2026. A <a href="REPORTS.html">report and screenshot index</a> accompanies the article; the <a href="evidence/summary.json">machine-readable summary</a> contains the ten-case totals.</p>
+<blockquote>
+<p><strong>Scope and safety:</strong> These are public training captures, not a live incident. Captured executables and scripts were not executed, and suspected malicious infrastructure was not contacted. External enrichment used an approved subset of public IP addresses, domains, and hashes. Raw captures, payloads, private addresses, and credentials were not submitted to those providers. Indicators in this article are historical evidence, not a current blocklist. Public addresses and domains are defanged in prose; preserved evidence files retain their original values.</p>
+</blockquote>
+<h2 id="table-of-contents">Table of contents</h2>
+<ol>
+<li><a href="#what-this-experiment-measured">What this experiment measured</a></li>
+<li><a href="#the-tested-environment-and-workflow">The tested environment and workflow</a></li>
+<li><a href="#the-ten-case-results">The ten-case results</a></li>
+<li><a href="#what-each-case-revealed">What each case revealed</a>
+<ul>
+<li><a href="#warmcookie-the-missing-archive-child">WarmCookie: the missing archive child</a></li>
+<li><a href="#sunnystation-a-good-score-can-hide-missing-artifacts">Sunnystation: a good score can hide missing artifacts</a></li>
+<li><a href="#burnincandle-low-severity-is-not-a-clean-bill-of-health">Burnincandle: low severity is not a clean bill of health</a></li>
+</ul>
+</li>
+<li><a href="#when-the-answer-key-disagrees-with-the-packets">When the answer key disagrees with the packets</a></li>
+<li><a href="#passive-enrichment-coverage-is-not-a-verdict">Passive enrichment: coverage is not a verdict</a></li>
+<li><a href="#correlations-that-can-be-audited">Correlations that can be audited</a></li>
+<li><a href="#time-models-tokens-and-cost-boundaries">Time, models, tokens, and cost boundaries</a></li>
+<li><a href="#how-to-verify-the-screenshots-and-reports">How to verify the screenshots and reports</a></li>
+<li><a href="#what-remains-unproven">What remains unproven</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#related-work">Related work</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#follow-my-work">Follow My Work</a></li>
+</ol>
+<h2 id="what-this-experiment-measured">What this experiment measured</h2>
+<p>The source corpus came from <a href="https://www.malware-traffic-analysis.net/training-exercises.html">Malware-Traffic-Analysis.net's training index</a>. The selection continued backward through directly hosted captures. The externally hosted 2023 Unit 42 quizzes were skipped, which explains the jump from July 2024 to March 2022. This was a defined acquisition choice, not a random or representative sample of current malware.</p>
+<p>The ten captures contain <strong>263,116 packets</strong>. Some exercises focus on one Windows client; others include several infected clients or require evidence outside the PCAP. Those differences matter when interpreting a single aggregate score.</p>
+<p>There were three distinct phases:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>What happened</th>
+<th>What it can establish</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First additional-case pass, v2</td>
+<td>Code and outputs were frozen before publisher answers were consulted</td>
+<td>Initial performance on these newly introduced captures; titles were visible</td>
+</tr>
+<tr>
+<td>Remediation and v3 regression</td>
+<td>Packet review exposed gaps; extraction and correlation logic were corrected</td>
+<td>Whether fixes address known failures without breaking retained evidence</td>
+</tr>
+<tr>
+<td>Final live-instance validation</td>
+<td>The cases were exercised on the actual application, followed by enrichment and integration audits</td>
+<td>Operational behavior and evidence consistency on the deployed revision</td>
+</tr>
+</tbody>
+</table></div>
+<p>The first pass already exposed 52/52 selected identity values and 87/88 selected indicators. The final run retained those totals. However, that does not mean the first implementation was equivalent to the final one: an artifact-inventory audit found thousands of omitted hashes outside the selected score.</p>
+<p>The final retest was <strong>not blind</strong>. The cases had been inspected during development. Publisher answer material was not fed into the deterministic decoder, but answer-informed evaluation and later analyst interpretation must remain separate from native product output. The <a href="evidence/first-pass-comparison.json">first-pass comparison</a>, <a href="evidence/first-pass-freeze.json">frozen implementation metadata</a>, and preserved per-case first-pass outputs make that distinction inspectable.</p>
+<p>Two denominators were used. The 52 identity facts cover selected IP, MAC, hostname, and account values, depending on the case. The 88-item indicator set is a declared comparison subset, including infrastructure and hashes. It also includes legitimate services observed within an infection investigation. Availability in the output does not mean the engine classified a value as malicious.</p>
+<h2 id="the-tested-environment-and-workflow">The tested environment and workflow</h2>
+<p>The final deployment was the real local AdversaryGraph installation, accessed through its browser frontend on loopback. The recorded source revision was <code>93a79512f6304ce719d5d32cd1b6d26960865f75</code>. Packet parsing used TShark 4.4.18, the <code>tshark-evidence-v3</code> profile, and <code>pcap-rules-v3</code>.</p>
+<p>The relevant implementation is a deterministic saved-PCAP route with an internal analyzer service, structured evidence, database persistence, and investigation handoffs. AdversaryGraph has AI-assisted capabilities elsewhere, but the route tested here did not invoke an LLM. Its presence under an <strong>AI Analysis</strong> screen—and a visible provider selector—does not mean that provider processed the capture. The result itself identifies the deterministic profile. See the <a href="https://github.com/anpa1200/adversarygraph">project repository</a> and the per-case analyzer manifests in the native JSON files.</p>
+<p>The operational sequence was:</p>
+<pre><code class="language-text">Saved capture + source checksum
+    → isolated decode + versioned rules
+    → structured packet evidence + semantic checksum
+    → persistence + API retrieval + independent repeat
+    → selected public-indicator enrichment
+    → typed evidence links + catalog relationships
+    → draft reports + human-review boundary
+</code></pre>
+<p>The test checked each transition. A successful upload alone cannot establish that retrieved evidence is unchanged, that a graph edge reaches the correct node, or that an exported PDF contains the full packet appendix.</p>
+<p>For these ten cases, uploads were performed through the real HTTP API; saved results, investigation handoffs, and reporting were exercised through the browser. This should not be read as ten separate browser drag-and-drop tests. External enrichment was separately orchestrated and authorized; a PCAP upload by itself did not automatically perform all nine-provider lookups.</p>
+<p>The environment retained its existing local authentication-disabled mode. This was not a multi-user authorization acceptance test. Similarly, successful detection-reference joins were not SIEM deployments, and no malware execution was performed to validate a payload's behavior.</p>
+<h2 id="the-ten-case-results">The ten-case results</h2>
+<p>The following measurements are from the final live run. Analysis time is the upload/analysis request duration, not the time to investigate and write the complete case report.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Capture</th>
+<th>Exercise</th>
+<th style="text-align:right">Selected facts</th>
+<th style="text-align:right">Selected indicators</th>
+<th style="text-align:right">Analysis time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2021-09-10</td>
+<td>AngryPoutine</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right">5/5</td>
+<td style="text-align:right">5.39 s</td>
+</tr>
+<tr>
+<td>2021-10-22</td>
+<td>October ISC Forensic Contest</td>
+<td style="text-align:right">9/9</td>
+<td style="text-align:right">5/5</td>
+<td style="text-align:right">30.94 s</td>
+</tr>
+<tr>
+<td>2021-12-08</td>
+<td>December ISC Forensic Contest</td>
+<td style="text-align:right">3/3</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right">21.97 s</td>
+</tr>
+<tr>
+<td>2022-01-07</td>
+<td>Spoonwatch</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right">6/6</td>
+<td style="text-align:right">4.29 s</td>
+</tr>
+<tr>
+<td>2022-02-23</td>
+<td>Sunnystation</td>
+<td style="text-align:right">12/12</td>
+<td style="text-align:right">37/37</td>
+<td style="text-align:right">14.59 s</td>
+</tr>
+<tr>
+<td>2022-03-21</td>
+<td>Burnincandle</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right">14/14</td>
+<td style="text-align:right">7.67 s</td>
+</tr>
+<tr>
+<td>2024-07-30</td>
+<td>You dirty rat!</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right">5/5</td>
+<td style="text-align:right">5.40 s</td>
+</tr>
+<tr>
+<td>2024-08-15</td>
+<td>WarmCookie</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right"><strong>7/8</strong></td>
+<td style="text-align:right">11.40 s</td>
+</tr>
+<tr>
+<td>2024-09-04</td>
+<td>Big Fish in a Little Pond</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right">1/1</td>
+<td style="text-align:right">3.56 s</td>
+</tr>
+<tr>
+<td>2024-11-26</td>
+<td>Nemotodes</td>
+<td style="text-align:right">4/4</td>
+<td style="text-align:right">3/3</td>
+<td style="text-align:right">9.81 s</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>Ten captures</strong></td>
+<td style="text-align:right"><strong>52/52</strong></td>
+<td style="text-align:right"><strong>87/88</strong></td>
+<td style="text-align:right"><strong>115.02 s</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Source: <a href="evidence/live-evaluation.json">live evaluation</a> and <a href="evidence/live-metrics.json">request timings</a>. The aggregate is calculated from unrounded values.</p>
+<p>All ten passed stored-result retrieval equality and idempotency checks. Fresh decoder calls reproduced the same semantic results. After enrichment, all ten retained identical native packet results, produced valid PDF responses, and refused unreviewed STIX exports. The <a href="evidence/post-enrichment-checks.json">post-enrichment checks</a> and <a href="evidence/fresh-decode.json">fresh-decode records</a> preserve these results.</p>
+<p>The rules produced <strong>173 candidate findings</strong>. This is not a count of 173 confirmed malicious actions. It includes contextual observations, such as directory-protocol activity, that also occur in normal Windows environments.</p>
+<p>The indicator denominator is uneven: Sunnystation contributes 37 of the 88 selected values. A high aggregate score therefore says less about generalization than ten equally weighted, independently labeled investigations would.</p>
+<h2 id="what-each-case-revealed">What each case revealed</h2>
+<h3 id="nemotodes-port-443-does-not-make-traffic-tls">Nemotodes: port 443 does not make traffic TLS</h3>
+<p>The November 2024 case identified <code>10.11.26.183</code>, hostname <code>DESKTOP-B8TQK49</code>, and account <code>oboomwald</code>. The important network behavior was not simply a connection to port 443. The decoder observed <strong>58 cleartext HTTP POSTs</strong> associated with <code>194.180.191[.]64</code>, a <code>NetSupport Manager/1.3</code> User-Agent, and a <code>/fakeurl.htm</code> request target. The callback cluster had a median interval of <strong>60.154 seconds</strong>.</p>
+<p>Together, those observations provide a useful remote-access investigation lead. They do not independently establish whether the software was authorized, which process launched it, or the complete delivery chain. A protocol decoder is valuable here precisely because a port-number-only interpretation would miss the cleartext HTTP behavior.</p>
+<p><img src="screenshots/2024-11-26-packet-analysis.png" alt="Nemotodes packet analysis showing cleartext HTTP on port 443, periodic callbacks, and frame references." loading="lazy" width="1600" height="1100" /></p>
+<p><em>Figure 1. Actual saved-result view. Findings retain rule identifiers and packet references; severity and confidence are rule outputs, not calibrated probabilities of compromise.</em></p>
+<p>Evidence: <a href="reports/cases/2024-11-26/REPORT.html">full report</a>, <a href="reports/cases/2024-11-26/api-upload.json">native JSON</a>, and <a href="https://www.malware-traffic-analysis.net/2024/11/26/index.html">publisher exercise</a>.</p>
+<h3 id="big-fish-in-a-little-pond-a-behavior-cluster-is-not-a-family-classifier">Big Fish in a Little Pond: a behavior cluster is not a family classifier</h3>
+<p>For September 2024, the selected identity was <code>172.17.0.99</code>, <code>DESKTOP-RNVO9AT</code>, account <code>afletcher</code>. One native rule retained <strong>48 POST requests</strong> to <code>79.124.78[.]197/foots.php</code>, with <strong>2,046 declared body bytes</strong> across that cluster. The first cited request was frame 1668.</p>
+<p>This is repeatable evidence of a communication pattern. It is not a standalone identification of Koi Stealer. The publisher's family conclusion uses supplied alert context; those alerts were not fed into the PCAP-only decoder. A one-indicator benchmark can therefore pass while the broader family-identification task remains unmeasured.</p>
+<p>Evidence: <a href="reports/cases/2024-09-04/REPORT.html">full report</a>, <a href="reports/cases/2024-09-04/api-upload.json">native JSON</a>, and <a href="https://www.malware-traffic-analysis.net/2024/09/04/page2.html">publisher answer source</a>.</p>
+<h3 id="warmcookie-the-missing-archive-child">WarmCookie: the missing archive child</h3>
+<p>The August 2024 case recovered the selected identity for <code>10.8.15.133</code>, <code>DESKTOP-H8ALZBV</code>, account <code>plucero</code>. It retained the selected infrastructure and the transferred ZIP/DLL hashes. It did <strong>not</strong> recover one JavaScript child hash from inside the ZIP:</p>
+<pre><code class="language-text">dab98819d1d7677a60f5d06be210d45b74ae5fd8cf0c24ec1b3766e25ce6dc2c
+</code></pre>
+<p>That is the single missing item behind 87/88. It is a real extraction boundary, not a failed reputation lookup. Enriching the outer archive cannot make the inner file hash appear in packet extraction output. Fixing this requires bounded archive inspection, with controls for nesting depth, decompressed size, file count, and unsafe paths; it does not require executing the content.</p>
+<p>The current native profile did not implement that step. Nor could it reveal the complete URL path of an encrypted follow-up request from TLS metadata alone. The WarmCookie family label comes from the exercise context and supporting intelligence, not an independent general-purpose family classifier.</p>
+<p><img src="screenshots/2024-08-15-packet-analysis.png" alt="WarmCookie saved packet-analysis result and its evidence inventory." loading="lazy" width="1600" height="1100" /></p>
+<p><em>Figure 2. A valid packet report can coexist with an unextracted archive child. Neither a successful UI workflow nor an HTTP-export inventory proves recursive artifact completeness.</em></p>
+<p>Evidence: <a href="reports/cases/2024-08-15/REPORT.html">full report</a>, <a href="evidence/answer-reference.json">declared answer reference</a>, and <a href="https://www.malware-traffic-analysis.net/2024/08/15/index.html">publisher exercise</a>.</p>
+<h3 id="you-dirty-rat-useful-evidence-outside-http-and-tls">You dirty rat!: useful evidence outside HTTP and TLS</h3>
+<p>The July 2024 capture exposed a gap in the first additional-case pass: meaningful custom TCP behavior was not adequately surfaced. The final rules retained a connection from <code>172.16.1.66</code> to <code>141.98.10[.]79:12132</code>, lasting <strong>508.67 seconds</strong>, with <strong>411 packets</strong>.</p>
+<p>A cleartext message at frame <strong>9119</strong> contains the software label <code>STRRAT</code>, along with a claimed hostname and account. The final output reports 102 matching self-identification messages. That gives an analyst a strong, directly inspectable lead rather than an opaque family guess.</p>
+<p>The wording still matters. A software label transmitted by a client is self-reported content; it is not cryptographically authenticated identity. The hash, protocol context, and corroborating evidence should decide how strongly to use it. Observed GitHub, Maven, or public-IP services are not inherently malicious merely because they appear in this capture.</p>
+<p>Evidence: <a href="reports/cases/2024-07-30/REPORT.html">full report</a>, <a href="reports/cases/2024-07-30/api-upload.json">native JSON</a>, and <a href="https://www.malware-traffic-analysis.net/2024/07/30/index.html">publisher exercise</a>.</p>
+<h3 id="burnincandle-low-severity-is-not-a-clean-bill-of-health">Burnincandle: low severity is not a clean bill of health</h3>
+<p>The March 2022 case recovered <code>10.0.19.14</code>, <code>DESKTOP-5QS3D5D</code>, and <code>patrick.zimmerman</code>, together with all 14 selected infrastructure values. Yet its final native output contained <strong>eight low-severity findings and no medium- or high-severity findings</strong>.</p>
+<p>This is an important counterexample to treating extraction coverage as detection quality. The capture includes network evidence that warrants investigation, including a conversation with <code>23.227.198[.]203:757</code>, but the implemented rules did not independently reconstruct the publisher's IcedID/Cobalt Strike narrative.</p>
+<p>A high fact-recovery score can coexist with weak prioritization. Unknown application behavior and encrypted sessions must remain visible to the analyst, even when the rule engine has no high-confidence label for them. “No high findings” must not become “no compromise.”</p>
+<p>Evidence: <a href="reports/cases/2022-03-21/REPORT.html">full report</a> and the correct <a href="https://www.malware-traffic-analysis.net/2022/03/21/index3.html">Burnincandle exercise page</a>. Other pages under the same date describe different infections; the capture filename and checksum prevent that source mix-up.</p>
+<h3 id="sunnystation-a-good-score-can-hide-missing-artifacts">Sunnystation: a good score can hide missing artifacts</h3>
+<p>Sunnystation contains three client identities that must remain separate. The selected account bindings were <code>tricia.becker</code>, <code>everett.french</code>, and <code>nick.montgomery</code>, on different hosts. The final output retained all 12 selected identity values and all 37 selected indicators.</p>
+<p>The first-pass artifact inventory nevertheless returned only <strong>500 of 2,636 unique HTTP object hashes</strong>. It had hashed the exports internally, but the detailed-output cap prevented <strong>2,136 hashes</strong> from reaching consumers. A hash that never reaches enrichment is operationally missing even if a temporary extraction step computed it.</p>
+<p>The final design retains rich records for a bounded detailed set and a compact hash inventory for the overflow. Sunnystation now exposes all 2,636 unique hashes within the profile's limits. That fixes evidence availability, not the separate problems of classifying every file or attributing a malware family to each host.</p>
+<p><img src="screenshots/2022-02-23-packet-analysis.png" alt="Sunnystation packet-analysis view from the actual local application." loading="lazy" width="1600" height="1100" /></p>
+<p><em>Figure 3. The UI is a bounded view of the result. The complete retained hash inventory must be checked in the structured evidence, not inferred from the number of visible cards.</em></p>
+<p>Evidence: <a href="reports/cases/2022-02-23/REPORT.html">full report</a>, <a href="evidence/first-pass-v2/2022-02-23/api-upload.json">first-pass native response</a>, <a href="reports/cases/2022-02-23/api-upload.json">final native response</a>, and <a href="https://www.malware-traffic-analysis.net/2022/02/23/index.html">publisher exercise</a>.</p>
+<h3 id="spoonwatch-dependency-downloads-are-not-automatically-malware">Spoonwatch: dependency downloads are not automatically malware</h3>
+<p>The January 2022 case recovered <code>192.168.1.216</code>, <code>DESKTOP-GXMYNO2</code>, and <code>steve.smith</code>, with all six selected indicators available. It also preserved a packet-backed correction to the published MAC address.</p>
+<p>The analytical trap is the file inventory. Legitimate library files can appear in a malicious workflow; calling every downloaded DLL malware would be a classification error. The native engine retained downloads and the external endpoint but did not independently identify OskiStealer or inspect the contents of an uploaded archive.</p>
+<p>The useful output is therefore an evidence inventory with file roles still subject to review—not a list in which every binary receives the same malicious verdict.</p>
+<p>Evidence: <a href="reports/cases/2022-01-07/REPORT.html">full report</a> and <a href="https://www.malware-traffic-analysis.net/2022/01/07/page2.html">publisher answer source</a>.</p>
+<h3 id="december-isc-forensic-contest-complete-http-coverage-is-not-complete-forensics">December ISC Forensic Contest: complete HTTP coverage is not complete forensics</h3>
+<p>The December 2021 capture recovered the three selected identity values for <code>10.12.3.66</code>, <code>DESKTOP-LUOABV1</code>, and <code>darin.figueroa</code>, plus four selected infrastructure values. Like Sunnystation, it exposed an output-cap problem: v2 returned 500 unique HTTP hashes where the export inventory contained <strong>2,055</strong>. V3 retained the missing <strong>1,555</strong> in its compact index.</p>
+<p>That improvement should not obscure the remaining scope gap. The native profile did not implement the broader email extraction/classification and infection-onset analysis described in the case comparison. Recovering every supported HTTP object does not recover every relevant artifact from SMTP, encrypted traffic, or an incomplete capture.</p>
+<p>Evidence: <a href="reports/cases/2021-12-08/REPORT.html">full report</a>, <a href="evidence/first-pass-comparison.json">first-pass comparison</a>, and <a href="https://www.malware-traffic-analysis.net/2021/12/08/index.html">publisher contest page</a>, which links its answer diary. The answer diary presented an anti-bot challenge during article-source verification; the preserved experiment comparison is distinguished from a fresh successful web fetch.</p>
+<h3 id="october-isc-forensic-contest-the-original-task-needs-more-than-a-pcap">October ISC Forensic Contest: the original task needs more than a PCAP</h3>
+<p>The October 2021 case recovered nine selected identity values across three hosts and all five selected indicators. The account bindings were <code>marcus.cobb</code>, <code>kevin.henderson</code>, and <code>agnes.warren</code>.</p>
+<p>However, the original contest asks the analyst to associate <strong>three separate malicious emails</strong> with their infected hosts and users. Those email files were not supplied to this PCAP-only engine. A 9/9 identity result therefore does not mean the original contest task was completely solved.</p>
+<p>This is a scope problem, not a reason to adjust the score upward. The additional evidence must be ingested and its linkage tested before claiming email-to-host reconstruction. The <a href="https://isc.sans.edu/diary/October%2B2021%2BForensic%2BContest%2BAnswers%2Band%2BAnalysis/27998">publisher's analysis</a> explicitly describes that task and also notes a missing HTTPS acquisition in the capture.</p>
+<p><img src="screenshots/2021-10-22-packet-analysis.png" alt="October ISC contest saved packet-analysis result with multiple host identities." loading="lazy" width="1600" height="1100" /></p>
+<p><em>Figure 4. Retaining multiple client identities is necessary, but it does not establish the relationship to external email files that the engine never received.</em></p>
+<p>Evidence: <a href="reports/cases/2021-10-22/REPORT.html">full report</a> and <a href="reports/cases/2021-10-22/api-upload.json">native JSON</a>.</p>
+<h3 id="angrypoutine-a-file-match-is-not-actor-attribution">AngryPoutine: a file match is not actor attribution</h3>
+<p>The September 2021 case recovered <code>10.9.10.102</code>, <code>DESKTOP-KKITB6Q</code>, and <code>hobart.gunnarsson</code>. The selected infrastructure and DLL hash were available, giving 4/4 identity values and 5/5 selected indicators.</p>
+<p>The publisher's BazarLoader and TA551 context is useful for comparison, but neither a generic file-transfer rule nor the presence of a matching infrastructure value constitutes native actor attribution. The final ten-case enrichment run produced no actor leads, and the case records did not acquire automatic actor associations.</p>
+<p>This is a case where preserving the distinction between a source assertion and an accepted case conclusion is more valuable than forcing an actor name into the report.</p>
+<p>Evidence: <a href="reports/cases/2021-09-10/REPORT.html">full report</a> and <a href="https://www.malware-traffic-analysis.net/2021/09/10/page2.html">publisher answer source</a>.</p>
+<h2 id="when-the-answer-key-disagrees-with-the-packets">When the answer key disagrees with the packets</h2>
+<p>Publisher answers are comparison material, not infallible packet truth. Five discrepancies were verified against the captures. The correction process retained the literal published value, the observed alternative, a display filter, and supporting frame counts.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Field</th>
+<th>Published value</th>
+<th>Packet-backed value</th>
+<th style="text-align:right">Frames matching packet-backed value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nemotodes</td>
+<td>C2 address</td>
+<td><code>194.180.191[.]164</code></td>
+<td><code>194.180.191[.]64</code></td>
+<td style="text-align:right">132</td>
+</tr>
+<tr>
+<td>WarmCookie</td>
+<td>Follow-up address</td>
+<td><code>172.67.170[.]169</code></td>
+<td><code>172.67.170[.]159</code></td>
+<td style="text-align:right">1,143</td>
+</tr>
+<tr>
+<td>You dirty rat!</td>
+<td>Remote address</td>
+<td><code>141.98.10[.]69</code></td>
+<td><code>141.98.10[.]79</code></td>
+<td style="text-align:right">411</td>
+</tr>
+<tr>
+<td>Burnincandle</td>
+<td>Client address</td>
+<td><code>10.0.18.14</code></td>
+<td><code>10.0.19.14</code></td>
+<td style="text-align:right">15,350</td>
+</tr>
+<tr>
+<td>Spoonwatch</td>
+<td>Client MAC</td>
+<td><code>95:5c:8e:32:58:f9</code></td>
+<td><code>9c:5c:8e:32:58:f9</code></td>
+<td style="text-align:right">5,880</td>
+</tr>
+</tbody>
+</table></div>
+<p>The tested filters found zero matching frames for the conflicting published alternatives. The <a href="evidence/publisher-conflicts.json">conflict evidence</a> supplies exact, executable filters and initial matching frames. These counts describe the particular filters, not unique connections or attack events.</p>
+<p>Against literal publisher values, the selected results would be <strong>50/52 identity facts</strong> and <strong>84/88 indicators</strong>. Against packet-verified values, they are <strong>52/52</strong> and <strong>87/88</strong>. Both views belong in the record. Quietly changing an answer key and reporting only the higher score would make the experiment harder to audit.</p>
+<p>For example, after acquiring the exact Nemotodes capture, this read-only TShark command inspects the protocol evidence without contacting the address:</p>
+<pre><code class="language-bash">tshark -n -r 2024-11-26-traffic-analysis-exercise.pcap \
+  -Y 'http.request &amp;&amp; ip.addr == 194.180.191.64 &amp;&amp; tcp.port == 443' \
+  -T fields -e frame.number -e ip.src -e tcp.dstport \
+  -e http.request.method -e http.request.uri -e http.user_agent
+</code></pre>
+<p>The address is intentionally not defanged inside this runnable offline filter. The <code>-n</code> option disables name resolution; <code>-r</code> reads the supplied file rather than capturing live traffic. For like-for-like verification, use the recorded TShark 4.4.18 environment; a host-installed version may differ. Use a patched analysis environment and do not execute exported content. These options are documented in the <a href="https://www.wireshark.org/docs/man-pages/tshark.html">TShark manual</a>.</p>
+<h2 id="passive-enrichment-coverage-is-not-a-verdict">Passive enrichment: coverage is not a verdict</h2>
+<p>The final ten-case subset contains <strong>52 unique enriched indicators</strong>: 16 public IPv4 addresses, 16 domains, and 20 SHA-256 hashes. One indicator is shared between cases, producing <strong>53 case–indicator associations</strong>. This enrichment selection is separate from the 88-item extraction benchmark; it is not a claim that all 88 comparison values were queried.</p>
+<p>The approved external sources were VirusTotal, ThreatFox, MalwareBazaar, AlienVault OTX, urlscan, GreyNoise, AbuseIPDB, Shodan, and Censys. Local database lookups were recorded separately. Each saved result preserves its source outcomes, and an independent database audit checks that persistence did not alter the returned evidence.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th style="text-align:right">Processed response</th>
+<th style="text-align:right">Not found</th>
+<th style="text-align:right">Type skipped</th>
+<th style="text-align:right">Final errors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local database</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>VirusTotal</td>
+<td style="text-align:right">50</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>ThreatFox</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">51</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>MalwareBazaar</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right">13</td>
+<td style="text-align:right">32</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>AlienVault OTX</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>GreyNoise</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">16</td>
+<td style="text-align:right">36</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>AbuseIPDB</td>
+<td style="text-align:right">16</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">36</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Shodan</td>
+<td style="text-align:right">9</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right">36</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Censys</td>
+<td style="text-align:right">32</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">20</td>
+<td style="text-align:right">0</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each row has a denominator of 52 unique indicators. A processed response can contain zero results or no adverse assessments. <code>Not found</code> is not a benign verdict; <code>type skipped</code> is not a failed request. The local database returned no exact primary matches for this selected set. That is a coverage observation, not evidence that the captures were harmless. Source: <a href="evidence/enrichment-metrics.json">deduplicated enrichment metrics</a>.</p>
+<p>Historical captures also create a time mismatch. A 2026 reputation response is not a snapshot of what a service knew in 2021. ThreatFox, for example, documents exclusion of indicators older than six months from its API/export data. That policy can limit historical coverage, but it does not prove why each individual query missed. <a href="https://threatfox.abuse.ch/api/">ThreatFox API documentation</a>.</p>
+<h3 id="the-shared-hosting-score-that-should-not-become-a-blocking-rule">The shared-hosting score that should not become a blocking rule</h3>
+<p>One result deserves more attention than a successful API status. The WarmCookie-associated shared Cloudflare address <code>104.21.55[.]70</code> received a platform heuristic score of <strong>100/100</strong>, while its saved VirusTotal evidence reported <strong>zero malicious, one suspicious, and 53 harmless assessments</strong>.</p>
+<p><img src="screenshots/2024-08-15-enrichment.png" alt="Saved enrichment result showing a 100 out of 100 score beside mixed provider evidence for a shared-hosting IP." loading="lazy" width="1600" height="1100" /></p>
+<p><em>Figure 5. An actual calibration problem, not a synthetic illustration. The platform's high score and the provider evidence are both preserved. Do not interpret this score as a 100% probability that the shared address is malicious.</em></p>
+<p>A graph can accumulate suspicious hosted-content relationships around shared infrastructure. That does not justify blocking every tenant of the address. The relevant scope may be a hostname, URL, file, or historical relationship rather than the IP as a whole.</p>
+<p>The defensible conclusion is that enrichment integration worked, while score calibration still needs work. The screenshot is useful because it makes the tension visible; the <a href="reports/enrichment/5227c07b63528de74033.json">public provider summary</a> preserves the platform score and provider outcome summary; bulk provider responses are retained privately, not redistributed.</p>
+<h2 id="correlations-that-can-be-audited">Correlations that can be audited</h2>
+<p>For these ten cases, provider results produced <strong>113 distinct ATT&amp;CK technique leads</strong>. Of those, <strong>99 resolved to the current local catalog</strong>, with <strong>99 associated detection-strategy links</strong>. The remaining <strong>14</strong> stayed unresolved rather than being silently relabeled. These ten-case numbers are intentionally separate from the larger parent experiment.</p>
+<p>A valid catalog join proves that an identifier resolves to a catalog record. It does not prove that the packet capture demonstrates the technique. A sandbox report about a submitted hash, a related infrastructure pivot, and a native packet behavior are different evidence sources and must retain that distinction.</p>
+<p>The case-to-enrichment audit verified 53 exact, typed joins:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provenance level</th>
+<th style="text-align:right">Associations</th>
+<th>What is retained</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Packet or exact-flow frame evidence</td>
+<td style="text-align:right">33</td>
+<td>A capture-backed observation with frame references</td>
+</tr>
+<tr>
+<td>Exported-object extraction record</td>
+<td style="text-align:right">20</td>
+<td>Capture checksum, artifact identity, object hash, and extraction provenance; no exact object-to-frame mapping</td>
+</tr>
+</tbody>
+</table></div>
+<p>The second category is useful evidence, but weaker for navigation back to specific packets. An IP-flow frame does not prove where an exported file begins. The reports disclose that gap instead of inventing a frame number.</p>
+<p>All ten audited case graphs retained bound edge endpoints, distinct edge identifiers, and their expected packet-to-provider links. Provider assertions remained advisory. There were <strong>zero actor leads</strong>, <strong>zero case actor associations</strong>, and <strong>zero automatic intelligence promotions</strong> in this subset. Unreviewed STIX export was refused for every case.</p>
+<p>Eight saved lookups retain earlier node-ID casing. Replaying the final code preserved relationship content and risk scores for all 52 lookups, but those eight do not have identical regenerated graph identifiers. The audit records this distinction rather than silently rewriting historical results.</p>
+<p>Evidence: <a href="evidence/enrichment-database-audit.json">database correlation audit</a> and <a href="evidence/packet-enrichment-links.json">capture-to-provider joins</a>. These are separate from the UI screenshots: a graph that renders successfully is not, by itself, proof of correct relationships.</p>
+<h2 id="time-models-tokens-and-cost-boundaries">Time, models, tokens, and cost boundaries</h2>
+<p>The combined upload-and-analysis duration was <strong>115.02 seconds</strong>, or about <strong>11.50 seconds per capture</strong>. The final successful enrichment requests for the 52 unique indicators contributed <strong>402.61 aggregate request seconds</strong>, about <strong>6m43s</strong>.</p>
+<p>Those two totals are not an end-to-end stopwatch. Enrichment used pacing; the parent run interleaved cases; prior failed or superseded attempts, builds, debugging, browser checks, and report authoring are not included in the successful-request subtotal. Adding the totals would not establish the time required to complete ten investigations.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model usage</th>
+<th>What was measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Native packet extraction and deterministic rules</td>
+<td>No LLM</td>
+<td>Per-request timings and retained outputs</td>
+</tr>
+<tr>
+<td>Tested passive enrichment and structured correlations</td>
+<td>No LLM; AI summaries disabled</td>
+<td>Saved responses, request timings, provenance and persistence checks</td>
+</tr>
+<tr>
+<td>Coding assistance, interpretation, and article writing</td>
+<td>Separate assistant work</td>
+<td>Exact token usage and per-case authoring time were not instrumented</td>
+</tr>
+</tbody>
+</table></div>
+<p>The pipeline therefore used <strong>zero LLM calls and zero LLM tokens</strong>. That does not make the full engineering experiment free: compute, storage, provider access, and analyst effort still have costs. No complete monetary cost measurement was collected.</p>
+<p>There was no agent-only run of these same ten cases and no timed human control. Consequently, this experiment cannot establish that AdversaryGraph outperformed an AI agent or a human analyst. A theoretical division of labor is reasonable—automation for consistent extraction and bookkeeping, an analyst for causality and context—but it is not a measured human-performance result.</p>
+<h2 id="how-to-verify-the-screenshots-and-reports">How to verify the screenshots and reports</h2>
+<p>The supplement includes a <a href="REPORTS.html">ten-case report index</a>, complete analyst dossiers, native Markdown/PDF reports, structured native responses, derived provider summaries, and focused validation records. Native PDFs remain draft evidence exports; they should not be mistaken for human-approved incident conclusions.</p>
+<p>For each case, the report index links the full report, native PDF, native JSON, detailed enrichment, and two screenshots. The article embeds representative views; the <a href="SCREENSHOTS.html">complete gallery</a> supplies all 20.</p>
+<p>The screenshots were freshly captured from the actual local application while reopening saved results. The browser script allowed only local read requests, made no provider investigation calls or case changes, and compared displayed API responses with the archived results. Only normal navigation and dismissal of a status popup were used. The images were not edited, reconstructed, or generated. Their <a href="evidence/screenshot-verification.json">verification record</a> includes timestamps, session references, and image hashes.</p>
+<p>This is presentation evidence, not a new timing run. Some surrounding UI history can show unrelated saved investigations; those entries are not part of the ten-case counts. All raw packet-result and provider-result comparisons refer to the selected case or indicator.</p>
+<p>Three levels of proof should stay separate:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Best evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Did the application display the saved result?</td>
+<td>Screenshot plus browser response comparison</td>
+</tr>
+<tr>
+<td>Did the result survive persistence and handoff unchanged?</td>
+<td>API/database audits, semantic checksums, exact graph joins</td>
+</tr>
+<tr>
+<td>Is the security interpretation justified?</td>
+<td>Packet fields, frame references, artifact provenance, source context, and analyst review</td>
+</tr>
+</tbody>
+</table></div>
+<p>To inspect the supplement without running malware or contacting any provider, use Python 3, <code>jq</code>, and standard checksum tools from the extracted article directory:</p>
+<pre><code class="language-bash">sha256sum -c SHA256SUMS
+jq '.totals' evidence/summary.json
+jq '.[] | select(.date == &quot;2024-08-15&quot;)' evidence/live-metrics.json
+jq '.lookups | all(.stored_exact and .ai_disabled)' evidence/enrichment-database-audit.json
+</code></pre>
+<p>These commands check packaged file integrity and inspect retained results. A passing checksum shows the files match the manifest; it does not independently certify every interpretation inside them. To validate packet claims, obtain the exact source capture from the linked publisher, compare its SHA-256 with <a href="evidence/capture-acquisition.json">capture acquisition</a>, and apply the report's display filters in Wireshark or TShark.</p>
+<p>The archived first-upload metrics deliberately retain earlier failures, including the initial PDF-export error. Final PDF success belongs to the later checks and fixed PDF files; historical rows were not rewritten to make the run look clean. This is why evidence needs chronology rather than a single green status.</p>
+<p>The package excludes raw PCAPs, exported malware, credentials, and database backups. Publisher answer archives are linked, not redistributed. The public reports remove workstation paths and local-only session URLs. Native PDFs and the 20 screenshots retain their original bytes; native JSON and audit files are public derivatives. Provider summaries replace bulk third-party responses. <a href="README.html">Publication boundaries and provenance</a> document these transformations and the limits of independent public replay.</p>
+<h2 id="what-remains-unproven">What remains unproven</h2>
+<p>The first and final headline scores are strong within a narrow definition. Several important analytical capabilities remain outside that definition.</p>
+<p><strong>Archive and protocol completeness.</strong> The WarmCookie child hash is missing. SMTP/email extraction is incomplete, encrypted contents remain unavailable, and complete HTTP hashing is not complete recovery of all malicious artifacts.</p>
+<p><strong>Autonomous incident reasoning.</strong> The native rules do not independently reconstruct every infection chain, assign every malware family, determine exact compromise onset, or establish endpoint execution. Burnincandle's low-only result demonstrates why fact availability and incident prioritization need separate evaluations.</p>
+<p><strong>Calibration and benign behavior.</strong> The shared-hosting example shows a risk score that should not drive an automatic block. No representative benign corpus was used to establish a false-positive rate for these ten cases. A collection of known-malicious exercises cannot measure specificity by itself.</p>
+<p><strong>Historical intelligence.</strong> Provider results describe what was returned at lookup time, not necessarily what was true or available at capture time. Missing provider records remain unknown. Current reputation is not retroactive ground truth.</p>
+<p><strong>Independent generalization.</strong> Titles were visible, cases were inspected during remediation, and the final run was a regression. There was no blinded family-classification benchmark or controlled analyst comparison. The artifact caps and first-pass omissions also show how a selected benchmark can miss material defects.</p>
+<p>The next meaningful evaluation would freeze the implementation and its rubric, then introduce unseen malicious and benign captures with complete task-level ground truth. It should separately measure extraction, host binding, behavioral detection, false positives, family claims, evidence completeness, and analyst effort. A single percentage cannot represent all of those dimensions.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The ten-case test shows that AdversaryGraph can perform repeatable packet extraction, retain selected host identities and infrastructure, attach passive intelligence, and carry evidence through a real investigation workflow. The final run recovered all 52 selected identity facts and 87 of 88 selected indicators, while preserving audit records that make those numbers inspectable.</p>
+<p>The more useful findings sit behind the score: two output caps hid 3,691 HTTP hashes; one archive child remained unextracted; an exercise required email evidence the engine never received; an infected-case investigation produced only low-severity native findings; and a shared-hosting address received an overconfident risk score.</p>
+<p>Those are not reasons to discard automation. They are reasons to structure it carefully. Keep observations separate from conclusions, preserve missing evidence, make every relationship traceable, and require review before turning a candidate into accepted intelligence or a blocking action.</p>
+<p>The result is a stronger evidence workflow—not a demonstrated replacement for an investigator.</p>
+<h2 id="related-work">Related work</h2>
+<p>This is a separate ten-case platform regression, not a rerun of the original <a href="https://1200km.com/articles/read/2026/2026-09-18-ai-agent-vs-human-with-wireshark-six-malware-pcaps-put-to-the-test-63ffeaed97de/">AI Agent vs. Human with Wireshark six-case experiment</a>. That earlier experiment used Daybreak Blue at extra-high reasoning effort; it is not a measured model baseline for these ten cases. Explore the <a href="https://1200km.com/adversarygraph/">AdversaryGraph platform</a>, <a href="https://1200km.com/articles/adversarygraph-from-log-to-report-ioc-investigation.html">CTI-to-detection workflow</a>, <a href="https://1200km.com/cyber-knowledge/dfir.html">DFIR learning hub</a>, and <a href="https://1200km.com/cyber-knowledge/malware-analysis.html">malware-analysis learning hub</a>.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.malware-traffic-analysis.net/training-exercises.html">Malware-Traffic-Analysis.net training exercises</a> — corpus selection and original exercise links.</li>
+<li><a href="https://github.com/anpa1200/adversarygraph">AdversaryGraph repository</a> — implementation context; this experiment records revision <code>93a79512f6304ce719d5d32cd1b6d26960865f75</code>, not an unspecified latest build.</li>
+<li><a href="https://www.wireshark.org/docs/man-pages/tshark.html">TShark manual</a> — saved-capture reading, field extraction, and display-filter options.</li>
+<li><a href="https://threatfox.abuse.ch/api/">ThreatFox API documentation</a> — provider behavior and historical-indicator expiration policy.</li>
+<li><a href="https://isc.sans.edu/diary/October%2B2021%2BForensic%2BContest%2BAnswers%2Band%2BAnalysis/27998">October 2021 ISC contest analysis</a> — original email-to-host task and packet-coverage limitations.</li>
+<li><a href="REPORTS.html">Ten-case report index and publisher sources</a> — individual dossiers, PDFs, JSON, screenshots, and exercise/answer links.</li>
+<li><a href="evidence/first-pass-comparison.json">First-pass and final comparison</a>, <a href="evidence/live-evaluation.json">live evaluation</a>, and <a href="evidence/publisher-conflicts.json">publisher conflicts</a> — score definitions and discrepancies.</li>
+<li><a href="evidence/enrichment-metrics.json">Enrichment metrics</a>, <a href="evidence/enrichment-database-audit.json">database audit</a>, and <a href="evidence/packet-enrichment-links.json">packet-to-provider links</a> — provider outcomes and correlation evidence.</li>
+<li><a href="evidence/screenshot-verification.json">Screenshot verification</a> and <a href="evidence/source-provenance.json">source provenance</a> — presentation and artifact integrity.</li>
+</ul>
+<h2 id="follow-my-work">Follow My Work</h2>
+<p>I publish practical cybersecurity research, CTI workflows, detection engineering notes, malware-analysis projects, AI-security research, open-source tools, labs, and technical guides.</p>
+<ul>
+<li><a href="https://1200km.com/">Website — 1200km.com</a></li>
+<li><a href="https://medium.com/@1200km">Medium — @1200km</a></li>
+<li><a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn — Andrey Pautov</a></li>
+<li><a href="https://github.com/anpa1200">GitHub — tools and labs</a></li>
+<li><a href="mailto:1200km@gmail.com">Contact — 1200km@gmail.com</a></li>
+</ul>
+</main></body></html>

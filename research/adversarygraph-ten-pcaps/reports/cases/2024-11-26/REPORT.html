@@ -1,0 +1,1374 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>2024-11-26: AdversaryGraph live-instance PCAP report | 1200km</title><meta name="description" content="Public evidence supplement for ten AdversaryGraph malware-PCAP tests: reports, screenshots, audit records, provenance and limitations."><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2024-11-26/REPORT.html"><meta property="og:url" content="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2024-11-26/REPORT.html"><meta property="og:title" content="2024-11-26: AdversaryGraph live-instance PCAP report"><meta property="og:description" content="Ten malware PCAPs, original screenshots, full case reports and qualified results."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/research/adversarygraph-ten-pcaps/screenshots/2024-11-26-packet-analysis.png"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{padding:20px;background:#11233c;color:#fff}header a{color:#b7e5ff}main{max-width:1160px;margin:28px auto;padding:32px 44px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2{margin-top:2em}a{color:#075c91}img{display:block;max-width:100%;height:auto;margin:24px auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #b8c9db;padding:10px;text-align:left}th{background:#edf4fc}pre{overflow:auto;padding:16px;background:#11233c;color:#fff}code{font-size:.85em}blockquote{margin:20px 0;padding:8px 20px;border-left:4px solid #167bb0;background:#eff6ff}.notice{padding:12px;background:#eef6fd;font-size:14px}@media(max-width:700px){main{margin:0;padding:22px 16px}body{font-size:16px}}@media print{header{display:none}main{padding:0;margin:0}pre{white-space:pre-wrap}img,tr{break-inside:avoid}}</style><meta property="article:published_time" content="2026-09-20"><meta property="article:modified_time" content="2026-09-20"></head><body><header>1200KM · ANDREY PAUTOV<br><a href="/">Home</a> · <a href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/">Article</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/REPORTS.html">Ten reports</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/SCREENSHOTS.html">Screenshot gallery</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/">Publication boundaries</a></header><main><p class="notice">Measured 19 September 2026 · Public derivative · Historical training evidence, not approved threat intelligence.</p><h1 id="2024-11-26-adversarygraph-live-instance-pcap-report">2024-11-26: AdversaryGraph live-instance PCAP report</h1>
+<p>Actual deployment: <code>[local-workspace]</code>, HTTP <code>[local-instance]</code>. This is a regression validation, not an independent blind trial. No malware was executed and no malicious endpoint was contacted.</p>
+<h2 id="executive-assessment">Executive assessment</h2>
+<p>Decoded 26922 packets across 61 IP endpoints and 276 transport flows. Observed 343 DNS events, 74 HTTP requests, 109 TLS ClientHello events, and 11 exported HTTP object(s). Deterministic rules produced 12 finding(s): 2 high, 2 medium, and 8 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.</p>
+<p>These findings identify observations and review priorities, not a proven malware family, actor, or causal infection chain. Source-frame evidence takes precedence over exercise answer typos.</p>
+<h2 id="capture-and-execution-evidence">Capture and execution evidence</h2>
+<p>Capture window: 2024-11-26T04:49:38.458138+00:00 to 2024-11-26T05:43:58.109487+00:00 UTC.
+Capture SHA-256: <code>a38267943a7bf3b0e445d7e51cb0a68b3dee797d67081bc9a033f73d079c0f50</code>.
+Analysis ID: <code>08324647-35af-4af2-8d82-4387eec03918</code>; review session: <code>426471ed-5e63-4b7e-ac6c-d36e060a4739</code>.
+First real HTTP upload/analysis: <strong>9.812 seconds</strong>. Fresh uncached decoder repeat: <strong>13.871 seconds</strong>. Prior isolated upload: 10.383 seconds.
+The fresh repeat ran while builds/tests were active; these timings are not a controlled performance comparison. Native packet analysis used <strong>zero LLM calls and zero LLM tokens</strong>. Coding-agent token usage was not instrumented.</p>
+<p>Packet result equals prior isolated result: True; fresh repeat exact: True; retained capture checksum valid: True; API retrieval identical: True; idempotent upload: True.</p>
+<h2 id="internal-host-identities">Internal host identities</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Address</th>
+<th>MAC addresses</th>
+<th>Frame-backed identities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.11.26.183</td>
+<td>d0:57:7b:ce:fc:8b</td>
+<td>account: oboomwald; full-name: Oliver Q. Boomwald; hostname: DESKTOP-B8TQK49</td>
+</tr>
+<tr>
+<td>10.11.26.255</td>
+<td>ff:ff:ff:ff:ff:ff</td>
+<td></td>
+</tr>
+<tr>
+<td>10.11.26.3</td>
+<td>00:24:e8:7f:09:5d</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="evidence-timeline">Evidence timeline</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>UTC</th>
+<th style="text-align:right">Frame</th>
+<th>Candidate observation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2024-11-26T04:49:38.919159+00:00</td>
+<td style="text-align:right">19</td>
+<td>low: Repeated unsuccessful DNS resolution</td>
+</tr>
+<tr>
+<td>2024-11-26T04:49:38.919448+00:00</td>
+<td style="text-align:right">23</td>
+<td>low: Repeated unsuccessful DNS resolution</td>
+</tr>
+<tr>
+<td>2024-11-26T04:49:39.029388+00:00</td>
+<td style="text-align:right">36</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2024-11-26T04:49:39.030853+00:00</td>
+<td style="text-align:right">40</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2024-11-26T04:49:55.586808+00:00</td>
+<td style="text-align:right">304</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2024-11-26T04:49:55.587007+00:00</td>
+<td style="text-align:right">305</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2024-11-26T04:49:55.590229+00:00</td>
+<td style="text-align:right">330</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2024-11-26T04:49:55.590598+00:00</td>
+<td style="text-align:right">333</td>
+<td>low: Directory-service protocol activity</td>
+</tr>
+<tr>
+<td>2024-11-26T04:50:45.849438+00:00</td>
+<td style="text-align:right">20340</td>
+<td>medium: Cleartext HTTP observed on TCP/443</td>
+</tr>
+<tr>
+<td>2024-11-26T04:50:45.849438+00:00</td>
+<td style="text-align:right">20340</td>
+<td>high: Periodic HTTP callback pattern</td>
+</tr>
+<tr>
+<td>2024-11-26T04:50:45.849438+00:00</td>
+<td style="text-align:right">20340</td>
+<td>high: Remote-access software network signature</td>
+</tr>
+<tr>
+<td>2024-11-26T04:50:45.849438+00:00</td>
+<td style="text-align:right">20340</td>
+<td>medium: Repeated outbound HTTP POST activity</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="highest-volume-conversations">Highest-volume conversations</h2>
+<p>Wire volume includes overhead/retransmissions. A large or periodic flow is not automatically exfiltration or C2.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Initiator</th>
+<th>Responder</th>
+<th>Stream</th>
+<th style="text-align:right">Wire bytes</th>
+<th style="text-align:right">First frame</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.11.26.183:53360</td>
+<td>193.42.38.139:443</td>
+<td>tcp 75</td>
+<td style="text-align:right">5,718,632</td>
+<td style="text-align:right">12768</td>
+</tr>
+<tr>
+<td>10.11.26.183:53322</td>
+<td>213.246.109.5:443</td>
+<td>tcp 41</td>
+<td style="text-align:right">3,269,072</td>
+<td style="text-align:right">1184</td>
+</tr>
+<tr>
+<td>10.11.26.183:53337</td>
+<td>193.42.38.139:443</td>
+<td>tcp 54</td>
+<td style="text-align:right">2,844,417</td>
+<td style="text-align:right">2517</td>
+</tr>
+<tr>
+<td>10.11.26.183:53348</td>
+<td>193.42.38.139:443</td>
+<td>tcp 65</td>
+<td style="text-align:right">2,149,301</td>
+<td style="text-align:right">3937</td>
+</tr>
+<tr>
+<td>10.11.26.183:53440</td>
+<td>173.222.49.101:443</td>
+<td>tcp 124</td>
+<td style="text-align:right">1,326,163</td>
+<td style="text-align:right">24033</td>
+</tr>
+<tr>
+<td>10.11.26.183:53438</td>
+<td>173.222.49.101:443</td>
+<td>tcp 122</td>
+<td style="text-align:right">823,777</td>
+<td style="text-align:right">23575</td>
+</tr>
+<tr>
+<td>10.11.26.183:53437</td>
+<td>173.222.49.101:443</td>
+<td>tcp 120</td>
+<td style="text-align:right">719,436</td>
+<td style="text-align:right">22388</td>
+</tr>
+<tr>
+<td>10.11.26.183:53436</td>
+<td>173.222.49.101:443</td>
+<td>tcp 121</td>
+<td style="text-align:right">415,744</td>
+<td style="text-align:right">22389</td>
+</tr>
+<tr>
+<td>10.11.26.183:53349</td>
+<td>193.42.38.139:443</td>
+<td>tcp 66</td>
+<td style="text-align:right">397,787</td>
+<td style="text-align:right">3938</td>
+</tr>
+<tr>
+<td>10.11.26.183:53335</td>
+<td>142.250.115.95:443</td>
+<td>tcp 52</td>
+<td style="text-align:right">322,365</td>
+<td style="text-align:right">2115</td>
+</tr>
+<tr>
+<td>10.11.26.183:53356</td>
+<td>213.246.109.5:443</td>
+<td>tcp 71</td>
+<td style="text-align:right">281,283</td>
+<td style="text-align:right">12372</td>
+</tr>
+<tr>
+<td>10.11.26.183:53344</td>
+<td>142.250.113.94:443</td>
+<td>tcp 61</td>
+<td style="text-align:right">249,952</td>
+<td style="text-align:right">3791</td>
+</tr>
+<tr>
+<td>10.11.26.183:63303</td>
+<td>104.117.244.105:443</td>
+<td>udp 95</td>
+<td style="text-align:right">119,785</td>
+<td style="text-align:right">20701</td>
+</tr>
+<tr>
+<td>10.11.26.183:53414</td>
+<td>52.165.164.15:443</td>
+<td>tcp 103</td>
+<td style="text-align:right">108,271</td>
+<td style="text-align:right">21476</td>
+</tr>
+<tr>
+<td>10.11.26.183:53429</td>
+<td>52.113.194.132:443</td>
+<td>tcp 114</td>
+<td style="text-align:right">107,603</td>
+<td style="text-align:right">21856</td>
+</tr>
+<tr>
+<td>10.11.26.183:53340</td>
+<td>18.160.156.61:443</td>
+<td>tcp 57</td>
+<td style="text-align:right">88,947</td>
+<td style="text-align:right">3603</td>
+</tr>
+<tr>
+<td>10.11.26.183:53345</td>
+<td>142.250.138.94:443</td>
+<td>tcp 62</td>
+<td style="text-align:right">88,233</td>
+<td style="text-align:right">3854</td>
+</tr>
+<tr>
+<td>10.11.26.183:53310</td>
+<td>23.221.22.46:443</td>
+<td>tcp 30</td>
+<td style="text-align:right">81,810</td>
+<td style="text-align:right">754</td>
+</tr>
+<tr>
+<td>10.11.26.183:53334</td>
+<td>142.250.113.120:443</td>
+<td>tcp 51</td>
+<td style="text-align:right">80,197</td>
+<td style="text-align:right">2111</td>
+</tr>
+<tr>
+<td>10.11.26.183:53430</td>
+<td>52.113.194.132:443</td>
+<td>tcp 115</td>
+<td style="text-align:right">68,815</td>
+<td style="text-align:right">21957</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="native-packet-findings-artifacts-and-limitations">Native packet findings, artifacts and limitations</h2>
+<h1 id="adversarygraph-deterministic-pcap-analysis">AdversaryGraph Deterministic PCAP Analysis</h1>
+<p>Source: 2024-11-26-traffic-analysis-exercise.pcap
+Capture SHA-256: <code>a38267943a7bf3b0e445d7e51cb0a68b3dee797d67081bc9a033f73d079c0f50</code>
+Semantic result SHA-256: <code>4fa4f2aabaa7bcc51a396dcd62fc65dbd2ee862d01d0ba16095da5915212d518</code>
+Analyzer manifest SHA-256: <code>ee952aeb7cdc6958f4ae5178c54c274a1e4f0aec4d42f3bdb95baaff063b3dde</code></p>
+<h2 id="executive-summary">Executive summary</h2>
+<p>Decoded 26922 packets across 61 IP endpoints and 276 transport flows. Observed 343 DNS events, 74 HTTP requests, 109 TLS ClientHello events, and 11 exported HTTP object(s). Deterministic rules produced 12 finding(s): 2 high, 2 medium, and 8 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.</p>
+<h2 id="capture-facts">Capture facts</h2>
+<ul>
+<li>Packets: 26922</li>
+<li>Duration: 3259.651349 seconds</li>
+<li>Captured bytes: 20851149</li>
+<li>Endpoints: 61</li>
+<li>Flows: 276</li>
+</ul>
+<h2 id="deterministic-findings">Deterministic findings</h2>
+<h3 id="medium-cleartext-http-observed-on-tcp443">MEDIUM — Cleartext HTTP observed on TCP/443</h3>
+<p>The decoded application protocol is HTTP despite use of the conventional TLS port.</p>
+<p>Rule: <code>http-on-tls-port@pcap-rules-v3</code>; confidence: 0.98; evidence: frame 20340 / TCP stream 77, frame 20342 / TCP stream 77, frame 20348 / TCP stream 77, frame 20350 / TCP stream 77, frame 20572 / TCP stream 77.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;194.180.191.64&quot;,&quot;host&quot;:&quot;194.180.191.64&quot;,&quot;request_count&quot;:58,&quot;source&quot;:&quot;10.11.26.183&quot;,&quot;uri&quot;:&quot;http://194.180.191.64/fakeurl.htm&quot;}</code></p>
+<h3 id="high-periodic-http-callback-pattern">HIGH — Periodic HTTP callback pattern</h3>
+<p>Repeated requests have a stable cadence consistent with automated callback or beacon behavior.</p>
+<p>Rule: <code>periodic-http-callbacks@pcap-rules-v3</code>; confidence: 0.88; evidence: frame 20340 / TCP stream 77, frame 20342 / TCP stream 77, frame 20348 / TCP stream 77, frame 20350 / TCP stream 77, frame 20572 / TCP stream 77.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;194.180.191.64&quot;,&quot;host&quot;:&quot;194.180.191.64&quot;,&quot;median_absolute_deviation&quot;:0.091,&quot;median_interval_seconds&quot;:60.154,&quot;method&quot;:&quot;POST&quot;,&quot;port&quot;:443,&quot;request_count&quot;:58,&quot;source&quot;:&quot;10.11.26.183&quot;,&quot;uri&quot;:&quot;http://194.180.191.64/fakeurl.htm&quot;}</code></p>
+<h3 id="high-remote-access-software-network-signature">HIGH — Remote-access software network signature</h3>
+<p>An HTTP User-Agent explicitly identifies remote-access software. Validate authorization and endpoint ownership.</p>
+<p>Rule: <code>remote-access-user-agent@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 20340 / TCP stream 77, frame 20342 / TCP stream 77, frame 20348 / TCP stream 77, frame 20350 / TCP stream 77, frame 20572 / TCP stream 77.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;194.180.191.64&quot;,&quot;request_count&quot;:58,&quot;source&quot;:&quot;10.11.26.183&quot;,&quot;user_agent&quot;:&quot;NetSupport Manager/1.3&quot;}</code></p>
+<h3 id="medium-repeated-outbound-http-post-activity">MEDIUM — Repeated outbound HTTP POST activity</h3>
+<p>The same endpoint pair and HTTP target produced repeated POST requests suitable for beaconing or data transfer review.</p>
+<p>Rule: <code>repeated-http-posts@pcap-rules-v3</code>; confidence: 0.72; evidence: frame 20340 / TCP stream 77, frame 20342 / TCP stream 77, frame 20348 / TCP stream 77, frame 20350 / TCP stream 77, frame 20572 / TCP stream 77.</p>
+<p>Metrics: <code>{&quot;declared_body_bytes&quot;:2624,&quot;destination&quot;:&quot;194.180.191.64&quot;,&quot;host&quot;:&quot;194.180.191.64&quot;,&quot;port&quot;:443,&quot;request_count&quot;:58,&quot;source&quot;:&quot;10.11.26.183&quot;,&quot;uri&quot;:&quot;http://194.180.191.64/fakeurl.htm&quot;}</code></p>
+<h3 id="low-repeated-unsuccessful-dns-resolution">LOW — Repeated unsuccessful DNS resolution</h3>
+<p>Repeated NXDOMAIN responses may indicate a dead domain, misconfiguration, retrying software, or malicious fallback. They do not establish a domain-generation algorithm.</p>
+<p>Rule: <code>repeated-nxdomain@pcap-rules-v3</code>; confidence: 0.5; evidence: frame 23, frame 25, frame 189, frame 190, frame 902.</p>
+<p>Metrics: <code>{&quot;domain&quot;:&quot;wpad.mshome.net&quot;,&quot;response_count&quot;:24,&quot;source&quot;:&quot;10.11.26.183&quot;}</code></p>
+<h3 id="low-repeated-unsuccessful-dns-resolution-1">LOW — Repeated unsuccessful DNS resolution</h3>
+<p>Repeated NXDOMAIN responses may indicate a dead domain, misconfiguration, retrying software, or malicious fallback. They do not establish a domain-generation algorithm.</p>
+<p>Rule: <code>repeated-nxdomain@pcap-rules-v3</code>; confidence: 0.5; evidence: frame 19, frame 20, frame 185, frame 186, frame 898.</p>
+<p>Metrics: <code>{&quot;domain&quot;:&quot;wpad.nemotoads.health&quot;,&quot;response_count&quot;:24,&quot;source&quot;:&quot;10.11.26.183&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 304 / TCP stream 11, frame 309 / TCP stream 11, frame 312 / TCP stream 11, frame 315 / TCP stream 11, frame 486 / TCP stream 24.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.11.26.3&quot;,&quot;event_count&quot;:25,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;10.11.26.183&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-1">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 36 / TCP stream 1, frame 43 / TCP stream 1, frame 46 / TCP stream 1, frame 359 / TCP stream 16, frame 371 / TCP stream 16.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.11.26.3&quot;,&quot;event_count&quot;:64,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;0&quot;,&quot;2&quot;,&quot;3&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;10.11.26.183&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-2">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 330 / TCP stream 10, frame 334 / TCP stream 10, frame 340 / TCP stream 10, frame 344 / TCP stream 10, frame 346 / TCP stream 10.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.11.26.3&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;10.11.26.183&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-3">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 305 / TCP stream 11, frame 311 / TCP stream 11, frame 313 / TCP stream 11, frame 316 / TCP stream 11, frame 487 / TCP stream 24.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.11.26.183&quot;,&quot;event_count&quot;:25,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;10.11.26.3&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-4">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 40 / TCP stream 1, frame 45 / TCP stream 1, frame 363 / TCP stream 16, frame 379 / TCP stream 16, frame 383 / TCP stream 16.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.11.26.183&quot;,&quot;event_count&quot;:49,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;1&quot;,&quot;4,19,19,19,5&quot;,&quot;4,5&quot;,&quot;5&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;10.11.26.3&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-5">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 333 / TCP stream 10, frame 337 / TCP stream 10, frame 342 / TCP stream 10, frame 345 / TCP stream 10, frame 348 / TCP stream 10.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;10.11.26.183&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;10.11.26.3&quot;}</code></p>
+<h2 id="attck-candidates">ATT&amp;CK candidates</h2>
+<ul>
+<li>T1071.001 Application Layer Protocol: Web Protocols (command-and-control), confidence=0.85, status=suggested; basis=versioned-deterministic-rule.</li>
+<li>T1219 Remote Access Software (command-and-control), confidence=0.9, status=suggested; basis=versioned-deterministic-rule.</li>
+</ul>
+<h2 id="identities">Identities</h2>
+<ul>
+<li>account: <code>oboomwald</code>; client IPs: 10.11.26.183; frames: 213, 221, 223, 235, 275</li>
+<li>full-name: <code>Oliver Q. Boomwald</code>; client IPs: 10.11.26.183; frames: 355</li>
+<li>hostname: <code>DESKTOP-B8TQK49</code>; client IPs: 10.11.26.183; frames: 69, 70, 145, 146, 174</li>
+<li>netbios-group: <code>NEMOTODES</code>; client IPs: unbound subject; frames: 71, 144, 176, 180, 191</li>
+</ul>
+<h2 id="ioc-and-artifact-candidates">IOC and artifact candidates</h2>
+<ul>
+<li>domain: <code>a1834.dscg2.akamai.net</code>; roles: dns-cname</li>
+<li>domain: <code>acroipm2.adobe.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>api.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>armmf.adobe.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>assets.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>checkappexec.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>classicgrand.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>client.wns.windows.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>code.jquery.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>confirmsubscription.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>css.createsend1.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>ctldl.windowsupdate.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>d33w6v2v5ta015.cloudfront.net</code>; roles: dns-cname</li>
+<li>domain: <code>data-edge.smartscreen.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>default.exp-tas.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>displaycatalog.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>dns.msftncsi.com</code>; roles: dns-query</li>
+<li>domain: <code>ecs.office.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>edge-microsoft-com.dual-a-0036.a-msedge.net</code>; roles: dns-cname</li>
+<li>domain: <code>edge.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fa000000002.resources.office.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fa000000005.resources.office.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fa000000116.resources.office.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fa000000128.resources.office.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fa000000163.resources.office.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fd.api.iris.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fe3cr.delivery.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fonts.googleapis.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fonts.gstatic.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>geo.netsupportsoftware.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>img-s-msn-com.akamaized.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>inputsuggestions.msdxcdn.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>js.createsend1.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>licensing.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>login.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>login.microsoftonline.com</code>; roles: tls-sni</li>
+<li>domain: <code>maps.googleapis.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>maps.gstatic.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>mobile.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>modandcrackedapk.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>mrodevicemgr.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>nav.smartscreen.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>nemotodes-dc.nemotoads.health</code>; roles: dns-query</li>
+<li>domain: <code>odc.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>officeclient.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>prod.mrodevicemgr.live.com.akadns.net</code>; roles: dns-cname</li>
+<li>domain: <code>r10.o.lencr.org</code>; roles: dns-query, http-host</li>
+<li>domain: <code>srtb.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>storecatalogrevocation.storequality.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>th.bing.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>v10.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>windows.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>wns.notify.trafficmanager.net</code>; roles: dns-cname</li>
+<li>domain: <code>wpad.mshome.net</code>; roles: dns-query</li>
+<li>domain: <code>wpad.nemotoads.health</code>; roles: dns-query</li>
+<li>domain: <code>www.bing.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>www.google.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>www.gstatic.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>www.msftconnecttest.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>ipv4: <code>10.11.26.183</code>; roles: network-endpoint</li>
+<li>ipv4: <code>10.11.26.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>10.11.26.3</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.117.244.104</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.105</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.117.244.106</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.117.244.107</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.112</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.117.244.114</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.72</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.74</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.81</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.82</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.88</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.89</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.91</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.96</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.117.244.97</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.244.99</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.247.139</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.247.144</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.247.162</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.117.247.184</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.117.247.186</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.247.67</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.117.247.99</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.26.0.231</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.26.1.231</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.21.239</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.246.57</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.5.93</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.56.30.207</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>131.107.255.255</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.250.113.120</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>142.250.113.94</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>142.250.113.95</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.250.114.95</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.250.115.95</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>142.250.138.94</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>142.251.116.95</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.251.186.103</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.251.186.104</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.251.186.105</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.251.186.106</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.251.186.147</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>142.251.186.95</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>142.251.186.99</code>; roles: dns-answer</li>
+<li>ipv4: <code>151.101.130.137</code>; roles: dns-answer</li>
+<li>ipv4: <code>151.101.194.137</code>; roles: dns-answer</li>
+<li>ipv4: <code>151.101.2.137</code>; roles: dns-answer</li>
+<li>ipv4: <code>151.101.66.137</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>172.67.68.212</code>; roles: dns-answer</li>
+<li>ipv4: <code>173.222.49.101</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>18.160.156.103</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>18.160.156.61</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>18.160.156.77</code>; roles: dns-answer</li>
+<li>ipv4: <code>18.160.156.92</code>; roles: dns-answer</li>
+<li>ipv4: <code>193.42.38.139</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>194.180.191.64</code>; roles: http-host, network-endpoint</li>
+<li>ipv4: <code>20.189.173.16</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.23</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.26</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.6</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.190.135.2</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.135.3</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.135.6</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.190.135.7</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.42.73.25</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.42.73.28</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.7.1.246</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.7.2.167</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.96.153.111</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.99.184.37</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.203</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.239</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>213.246.109.5</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>224.0.0.251</code>; roles: network-endpoint</li>
+<li>ipv4: <code>224.0.0.252</code>; roles: network-endpoint</li>
+<li>ipv4: <code>23.201.68.167</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.204.171.61</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.219.87.81</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.196</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.205</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.206</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.207</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.208</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.209</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.221.22.217</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.218</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.219</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.221.22.46</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.221.22.57</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.53.127.105</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.53.127.114</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.53.127.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>239.255.255.250</code>; roles: http-host, network-endpoint</li>
+<li>ipv4: <code>4.149.227.78</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>4.150.155.223</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.118.171.167</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.11</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.14</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.22</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.9</code>; roles: network-endpoint</li>
+<li>ipv4: <code>40.126.7.32</code>; roles: dns-answer</li>
+<li>ipv4: <code>52.109.0.136</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.20.47</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.8.89</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.113.194.132</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.165.164.15</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.168.112.67</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.8.34.0</code>; roles: dns-answer, network-endpoint</li>
+<li>ja3: <code>0652c09be13a164e73c3c66e2d5cd600</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>089117d8abb9d0685ac2756412f44d8c</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>091f51a7a1c3a4504a224cc081ce9cee</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>0d7e324cc471d537395a5a84963ff4c0</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>10b3abe91219287930575e96187aab46</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>129a4a4460936a7d35cf0b4a876c02c5</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>1a41c18f74e0a1125e7eb86dc20da423</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>1aef2a0442d1535b67c961be49fbd9b0</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>1d2c110dc93a519d4c14a15898f20f6c</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>258a5a1e95b8a911872bae9081526644</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>2800f914a7a4ba98aa9df62d316a460c</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>2dd32544ddd46095f157e79a028dcda9</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>2ef63960b5419ce0be770acb72a1e6d5</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>34578b889dbdfd86b5a0639eb869f9c5</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>39a2db8b2473a3d4cfe7cb23a26e03d6</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>46181092bc7467ccd870ec99523f7113</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>488f29e13a0873e296eb2dcca6ec38d0</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>4c24b4903c9a3c9b3c46306472bda896</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>53e42f80bc48a39739f5221b803b1f70</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>5c0851e1f7c97a5fdf8ee34bd73a8ff4</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>6634ba84945fce7cc2d7864edc49b103</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>68b3ecfaf0034bb9fcbecd518b5ab8d4</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>6a5d235ee78c6aede6a61448b4e9ff1e</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>7117eb033929b913d5dbbef620c9ca24</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>7230db75fbd5472f76d02c10787af505</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>82fc3feb7b73141563a581cb3a02b9e2</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>893fda16143345fbd7d6384fd5f69a44</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>8f08a45cb17ce5d331bb4a861f26181f</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>910d5ef16eeb9c556a6f011876c16d38</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>9763df22d3de0549862e28d0f1103365</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>97cdfdfb6ce55b090e5070647c73305e</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>996d810fbaded0fd221205ee7a391364</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>9c5ffd0e64cc58a2ad1806964fe2da4e</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>a702db92a1dad8b0a7ddf9ef0fcf3d68</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>ab617a1bfb55ac132b8893703d7cfec3</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>af5ca235cbec16c4b5ad43da2bd9b40a</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>b13922eb23a33bd76cd8442814f25cb5</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>b6b910fa2621ea444621910f5e10aa4a</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>b8f7a95293e0d02d297ecef1efcc79d5</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>c73376907efd66947a8978eacfd15135</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>c806504b9d641f3b26d1af269ed474ab</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>c86423ffed1add9d50dccf646bd7fdbd</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>cbcf96af03d431db8e0fd90215b03309</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>d7268fba5c8ebdc86121861931c04402</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>e544273138fcf6e7dc137dd4f74d6fd0</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>e71e6cff682837413473fd63dc10f5d4</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>f24a7ea8a60779966dc83806405c4091</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>f82158b828f02d82f1f70fbb0f1d6145</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>fae0e5d973c96ae1888b99538efa0363</code>; roles: tls-client-fingerprint</li>
+<li>sha256: <code>2b69346572041eefe558a82b58d654237e087ce9ab4e0876254a40a8954279a9</code>; roles: exported-object</li>
+<li>sha256: <code>59dc18363d5d0313ae94aa0ecad2d06dc77144758eeae2cc5ed8b4eee3923752</code>; roles: exported-object</li>
+<li>sha256: <code>5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61</code>; roles: exported-object</li>
+<li>sha256: <code>69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820</code>; roles: exported-object</li>
+<li>sha256: <code>79653567106d923034d36a9025d2d37955ff55dae5d77c1a79a321d850235d00</code>; roles: exported-object</li>
+<li>sha256: <code>839e234a3a10b60d559ee5679d2019ad4e58d9cd66e6cfd971207c3c6ef8ea4d</code>; roles: exported-object</li>
+<li>sha256: <code>975b5678560775735da4a9e8b805dce370329179b8e17ebc1c289aaeb293f7ff</code>; roles: exported-object</li>
+<li>sha256: <code>a5a0a597e4b76ebec517a83126dbce37625a763b57307afe7064d9eb0a523956</code>; roles: exported-object</li>
+<li>sha256: <code>af0c1c32558e6dc1e4e8f3e1d151268b8f6eb7cd844c9ac6dfc4b862decc7983</code>; roles: exported-object</li>
+<li>sha256: <code>cd6f72bd96cbbad446325f8c2d087283f051ccaf77523dc436eec2d98be29bf7</code>; roles: exported-object</li>
+<li>sha256: <code>f0e200cacd273e3dd257057f27aeda839a1f2f31482e0bb01ea8b1363a7af245</code>; roles: exported-object</li>
+<li>url: <code>http://194.180.191.64/fakeurl.htm</code>; roles: http-request</li>
+<li>url: <code>http://239.255.255.250:1900*</code>; roles: http-request</li>
+<li>url: <code>http://acroipm2.adobe.com/assets/Owner/arm/ProcessMAU.txt</code>; roles: http-request</li>
+<li>url: <code>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab?778a0928305752e9</code>; roles: http-request</li>
+<li>url: <code>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab?ce02e9976e1239e1</code>; roles: http-request</li>
+<li>url: <code>http://geo.netsupportsoftware.com/location/loca.asp</code>; roles: http-request</li>
+<li>url: <code>http://r10.o.lencr.org/MFMwUTBPME0wSzAJBgUrDgMCGgUABBRpD%2BQVZ%2B1vf7U0RGQGBm8JZwdxcgQUdKR2KRcYVIUxN75n5gZYwLzFBXICEgRSsdGCXQJklJZNbHi669GH4A%3D%3D</code>; roles: http-request</li>
+<li>url: <code>http://www.msftconnecttest.com/connecttest.txt</code>; roles: http-request</li>
+<li>user_agent: <code>Microsoft NCSI</code>; roles: http-client</li>
+<li>user_agent: <code>Microsoft-CryptoAPI/10.0</code>; roles: http-client</li>
+<li>user_agent: <code>Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; Tablet PC 2.0)</code>; roles: http-client</li>
+<li>user_agent: <code>NetSupport Manager/1.3</code>; roles: http-client</li>
+<li>exported object <code>MFMwUTBPME0wSzAJBgUrDgMCGgUABBRpD%2BQVZ%2B1vf7U0RGQGBm8JZwdxcgQUdKR2KRcYVIUxN75n5gZYwLzFBXICEgRSsdGCXQJklJZNbHi669GH4A%3D%3D</code>; SHA-256 <code>cd6f72bd96cbbad446325f8c2d087283f051ccaf77523dc436eec2d98be29bf7</code>; size 504 bytes</li>
+<li>exported object <code>fakeurl(2).htm</code>; SHA-256 <code>839e234a3a10b60d559ee5679d2019ad4e58d9cd66e6cfd971207c3c6ef8ea4d</code>; size 250 bytes</li>
+<li>exported object <code>fakeurl(3).htm</code>; SHA-256 <code>a5a0a597e4b76ebec517a83126dbce37625a763b57307afe7064d9eb0a523956</code>; size 152 bytes</li>
+<li>exported object <code>fakeurl(5).htm</code>; SHA-256 <code>59dc18363d5d0313ae94aa0ecad2d06dc77144758eeae2cc5ed8b4eee3923752</code>; size 84 bytes</li>
+<li>exported object <code>fakeurl(4).htm</code>; SHA-256 <code>f0e200cacd273e3dd257057f27aeda839a1f2f31482e0bb01ea8b1363a7af245</code>; size 76 bytes</li>
+<li>exported object <code>fakeurl(1).htm</code>; SHA-256 <code>79653567106d923034d36a9025d2d37955ff55dae5d77c1a79a321d850235d00</code>; size 61 bytes</li>
+<li>exported object <code>fakeurl(10).htm</code>; SHA-256 <code>975b5678560775735da4a9e8b805dce370329179b8e17ebc1c289aaeb293f7ff</code>; size 36 bytes</li>
+<li>exported object <code>fakeurl(54).htm</code>; SHA-256 <code>2b69346572041eefe558a82b58d654237e087ce9ab4e0876254a40a8954279a9</code>; size 22 bytes</li>
+<li>exported object <code>connecttest.txt</code>; SHA-256 <code>5e9a7996fe94d7be10595d7133748760bf8348198b71b7a50fd8affaa980ac61</code>; size 22 bytes</li>
+<li>exported object <code>loca.asp</code>; SHA-256 <code>af0c1c32558e6dc1e4e8f3e1d151268b8f6eb7cd844c9ac6dfc4b862decc7983</code>; size 16 bytes</li>
+<li>exported object <code>ProcessMAU.txt</code>; SHA-256 <code>69bf0bc46f51b33377c4f3d92caf876714f6bbbe99e7544487327920873f9820</code>; size 4 bytes</li>
+</ul>
+<h2 id="actor-similarity-leads">Actor similarity leads</h2>
+<ul>
+<li>Orangeworm (G0071): 33% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>SilverTerrier (G0083): 20% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>RedEcho (G1042): 17% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Carbanak (G0008): 10% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Metador (G1013): 10% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>GOLD SOUTHFIELD (G0115): 10% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Rancor (G0075): 10% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>DarkVishnya (G0105): 9% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>APT18 (G0026): 8% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>FIN4 (G0085): 8% TTP overlap. This is an investigation lead, not attribution.</li>
+</ul>
+<h2 id="local-enrichment-and-correlations">Local enrichment and correlations</h2>
+<p>No match means unknown in this corpus. Local CTI may postdate the capture. Matches and shared infrastructure require review; no automatic promotion or attribution.
+Snapshot: <code>82f0a542eadbd91c1d0554cf45b8bd4f69607e372cf96649bcd6ec9cab5fafb8</code>; recorded 2026-09-19T12:08:41.573203+00:00; mode: local-only.
+Coverage: <code>{&quot;matched_observables&quot;:0,&quot;no_exact_match&quot;:243,&quot;observable_limit&quot;:5000,&quot;observables_checked&quot;:243,&quot;observables_total&quot;:243,&quot;prior_case_limit_reached&quot;:false,&quot;prior_cases_checked&quot;:6,&quot;truncated&quot;:false}</code></p>
+<ul>
+<li>Catalog T1071.001: https://attack.mitre.org/techniques/T1071/001; detection strategies: [{&quot;attack_id&quot;:&quot;DET0027&quot;,&quot;name&quot;:&quot;Detection of Web Protocol-Based C2 Over HTTP, HTTPS, or WebSockets&quot;,&quot;stix_id&quot;:&quot;x-mitre-detection-strategy--e6496b9b-2458-4616-9712-a7c0da7fd3bc&quot;}]</li>
+<li>Catalog T1219: https://attack.mitre.org/techniques/T1219; detection strategies: [{&quot;attack_id&quot;:&quot;DET0496&quot;,&quot;name&quot;:&quot;Behavior-Chain Detection for Remote Access Tools (Tool-Agnostic)&quot;,&quot;stix_id&quot;:&quot;x-mitre-detection-strategy--ec412019-109f-4f84-aa2f-d623f40254e0&quot;}]</li>
+<li>Prior analysis <code>616a90fa-f15e-4fcb-8d56-7b8e0eff5785</code> shares 10 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>459e119d-191f-49e8-85ea-c78f9de41826</code> shares 30 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>7a2cfe72-f48d-4894-8a2d-8889cb3b11b2</code> shares 46 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>81373b30-6a59-49d1-89b0-bad73ed19eaa</code> shares 37 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>38851ad7-b3a0-423d-ae89-3b7be4e4b908</code> shares 37 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>bfccc426-aa9b-4007-8558-a66d37ecb90c</code> shares 54 observations. This does not establish a common campaign.</li>
+<li>External provider queries: 0. Not requested; no unknown indicator is classified as benign.</li>
+</ul>
+<h2 id="coverage-and-limitations">Coverage and limitations</h2>
+<ul>
+<li>Packet and protocol facts are deterministic for the recorded analyzer manifest.</li>
+<li>Encrypted application payloads are not decrypted; only available metadata is reported.</li>
+<li>ATT&amp;CK mappings and actor overlaps are candidates until analyst review and promotion.</li>
+<li>HTTP object inventory: <code>{&quot;compact_objects&quot;:0,&quot;complete&quot;:true,&quot;detailed_objects&quot;:11,&quot;exported_objects&quot;:66,&quot;hashed_bytes&quot;:3596,&quot;hashed_objects&quot;:66,&quot;omitted_unique_hashes&quot;:0,&quot;returned_unique_hashes&quot;:11,&quot;selection&quot;:&quot;content-classified first, then size descending, SHA256 tie-break; deduplicated by full hash; overflow retains a compact hash index&quot;,&quot;unhashed_objects&quot;:0,&quot;unique_hashes&quot;:11}</code>. Compact overflow hashes are retained in JSON coverage and observables.</li>
+<li>A directory subject is not necessarily a logged-in user; consult identity bindings in the JSON evidence.</li>
+<li>Rendered / available: findings 12/12, identities 4/4, observables 243/243, artifacts 11/11. Full returned inventory is in the JSON result.</li>
+</ul>
+<h2 id="live-enrichment-and-correlation-validation">Live enrichment and correlation validation</h2>
+<p>The actual IOC library contained 156,125 records. Exact typed matches: <strong>0</strong>; source actor assertions: <strong>0</strong>. Independent SQL agrees: IOC=True, actors=True.
+A miss is unknown in this corpus, not evidence of benignness. The earlier isolated corpus included publisher-reference records; its positive matches were not live-provider detections and are not comparable to natural coverage here.
+ATT&amp;CK catalog candidates: 2; current-version catalog checks passed: True. Detection-strategy joins were checked independently.
+Cross-case links: 6; independently verified: True. These are shared observations, predominantly common service infrastructure, not common-campaign assertions.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Passive local lookup target</th>
+<th>Type</th>
+<th style="text-align:right">Local matches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>194.180.191.64</code></td>
+<td>ipv4</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>modandcrackedapk.com</code></td>
+<td>domain</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>classicgrand.com</code></td>
+<td>domain</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>cd6f72bd96cbbad446325f8c2d087283f051ccaf77523dc436eec2d98be29bf7</code></td>
+<td>sha256</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><code>839e234a3a10b60d559ee5679d2019ad4e58d9cd66e6cfd971207c3c6ef8ea4d</code></td>
+<td>sha256</td>
+<td style="text-align:right">0</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="approved-external-passive-enrichment">Approved external passive enrichment</h2>
+<p>Completed 5/5 planned case indicators. Shared indicators reuse one saved lookup rather than consume provider quota repeatedly.</p>
+<p>These lookups used the actual local application and were explicitly authorized. No PCAP or payload was uploaded, no private address was disclosed, no target was scanned, and no AI provider was invoked. Tier-two/three pivots query the local corpus only.</p>
+<p>Provider intelligence was retrieved after the captures: current reputation, hosting and service observations do not establish historical causality. <code>not_found</code> means absent from that provider, not benign. Family labels and ATT&amp;CK/actor leads remain source assertions awaiting review.</p>
+<p>Historical coverage caveat: ThreatFox documents a six-month IOC expiration policy for its API since May 2025. That can limit these older exercises; it does not prove why any particular lookup missed. <a href="https://threatfox.abuse.ch/api/">ThreatFox API policy</a>.</p>
+<h3 id="19418019164"><code>194.180.191.64</code></h3>
+<p>Type: ip; request: 6.078 seconds; completed: 2026-09-19T14:16:15.053804+00:00. Persistence reread identical: True.
+<a href="../../enrichment/78dc073b6a55699b75cd.json">Public provider summary</a>.
+Platform triage score: 70/100 (suspicious); a heuristic priority, not calibrated probability. Graph: 14 nodes, 17 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>3 engines marked malicious and 1 suspicious; 52 harmless, 33 undetected.</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>skipped</td>
+<td>MalwareBazaar is hash-focused; input is not a hash.</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 7 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 2 scan result(s). urlscan activity analysis found 1 suspicious pattern(s).</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>not_found</td>
+<td>GreyNoise classification: unknown. Query status: not_found</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>ok</td>
+<td>AbuseIPDB confidence score: 0/100.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>ok</td>
+<td>Shodan returned 1 open port(s).</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>ok</td>
+<td>Censys host lookup returned 5 service(s).</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider ATT&amp;CK leads (not packet-observed execution):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Source / scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1059.001</td>
+<td>PowerShell</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1055</td>
+<td>Process Injection</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1074.001</td>
+<td>Local Data Staging</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1057</td>
+<td>Process Discovery</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1547.001</td>
+<td>Registry Run Keys / Startup Folder</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1204.002</td>
+<td>Malicious File</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1027</td>
+<td>Obfuscated Files or Information</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1041</td>
+<td>Exfiltration Over C2 Channel</td>
+<td>otx (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="modandcrackedapkcom"><code>modandcrackedapk.com</code></h3>
+<p>Type: domain; request: 7.576 seconds; completed: 2026-09-19T14:16:36.542993+00:00. Persistence reread identical: True.
+<a href="../../enrichment/e8b6be26b88f5b7f799d.json">Public provider summary</a>.
+Platform triage score: 100/100 (highly suspicious); a heuristic priority, not calibrated probability. Graph: 21 nodes, 24 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>7 engines marked malicious and 1 suspicious; 48 harmless, 33 undetected.</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>skipped</td>
+<td>MalwareBazaar is hash-focused; input is not a hash.</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 4 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 10 scan result(s). urlscan activity analysis found 7 suspicious pattern(s).</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>ok</td>
+<td>Censys web property lookup returned 2 record(s) for modandcrackedapk.com. Broader Censys search requires an organization-enabled account and API role.</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="classicgrandcom"><code>classicgrand.com</code></h3>
+<p>Type: domain; request: 6.760 seconds; completed: 2026-09-19T14:16:55.719775+00:00. Persistence reread identical: True.
+<a href="../../enrichment/17434908a24430d728e7.json">Public provider summary</a>.
+Platform triage score: 67/100 (suspicious); a heuristic priority, not calibrated probability. Graph: 16 nodes, 20 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>1 engines marked malicious and 0 suspicious; 54 harmless, 34 undetected.</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>skipped</td>
+<td>MalwareBazaar is hash-focused; input is not a hash.</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 0 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 10 scan result(s). urlscan activity analysis found 6 suspicious pattern(s).</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>ok</td>
+<td>Censys web property lookup returned 2 record(s) for classicgrand.com. Broader Censys search requires an organization-enabled account and API role.</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="cd6f72bd96cbbad446325f8c2d087283f051ccaf77523dc436eec2d98be29bf7"><code>cd6f72bd96cbbad446325f8c2d087283f051ccaf77523dc436eec2d98be29bf7</code></h3>
+<p>Type: hash; request: 3.972 seconds; completed: 2026-09-19T14:17:12.930273+00:00. Persistence reread identical: True.
+<a href="../../enrichment/d74fc53a2c47a37933bd.json">Public provider summary</a>.
+Platform triage score: 20/100 (needs review); a heuristic priority, not calibrated probability. Graph: 1 nodes, 0 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>No malicious detections in last analysis; 0 harmless, 61 undetected.</td>
+</tr>
+<tr>
+<td>VirusTotal classification/name hints</td>
+<td>unreviewed; may include benign filenames</td>
+<td>MFMwUTBPME0wSzAJBgUrDgMCGgUABBRpD%2BQVZ%2B1vf7U0RGQGBm8JZwdxcgQUdKR2KRcYVIUxN75n5gZYwLzFBXICEgRSsdGCXQJklJZNbHi669GH4A%3D%3D.java</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>not_found</td>
+<td>MalwareBazaar returned 0 sample record(s). Query status: hash_not_found</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 0 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 0 scan result(s). urlscan activity analysis found no obvious suspicious pattern.</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>skipped</td>
+<td>Censys host and search pivots support IP, domain, and URL inputs.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider ATT&amp;CK leads (not packet-observed execution):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Source / scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1036</td>
+<td>Masquerading</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1059</td>
+<td>Command and Scripting Interpreter</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1071</td>
+<td>Application Layer Protocol</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1082</td>
+<td>System Information Discovery</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1095</td>
+<td>Non-Application Layer Protocol</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1574</td>
+<td>Hijack Execution Flow</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1574.002</td>
+<td></td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="839e234a3a10b60d559ee5679d2019ad4e58d9cd66e6cfd971207c3c6ef8ea4d"><code>839e234a3a10b60d559ee5679d2019ad4e58d9cd66e6cfd971207c3c6ef8ea4d</code></h3>
+<p>Type: hash; request: 4.625 seconds; completed: 2026-09-19T14:17:33.579014+00:00. Persistence reread identical: True.
+<a href="../../enrichment/7fd5e33afe3cbed87b40.json">Public provider summary</a>.
+Platform triage score: 20/100 (needs review); a heuristic priority, not calibrated probability. Graph: 1 nodes, 0 edges; local deeper-tier matches: 0/0.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Outcome</th>
+<th>Returned context / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>local-db</td>
+<td>ok</td>
+<td>Found 0 local IOC record(s).</td>
+</tr>
+<tr>
+<td>virustotal</td>
+<td>ok</td>
+<td>No malicious detections in last analysis; 0 harmless, 61 undetected.</td>
+</tr>
+<tr>
+<td>VirusTotal classification/name hints</td>
+<td>unreviewed; may include benign filenames</td>
+<td>fakeurl2.exe</td>
+</tr>
+<tr>
+<td>threatfox</td>
+<td>not_found</td>
+<td>ThreatFox returned 0 record(s). Query status: no_result</td>
+</tr>
+<tr>
+<td>malwarebazaar</td>
+<td>not_found</td>
+<td>MalwareBazaar returned 0 sample record(s). Query status: hash_not_found</td>
+</tr>
+<tr>
+<td>otx</td>
+<td>ok</td>
+<td>OTX returned 0 pulse(s).</td>
+</tr>
+<tr>
+<td>urlscan</td>
+<td>ok</td>
+<td>urlscan returned 0 scan result(s). urlscan activity analysis found no obvious suspicious pattern.</td>
+</tr>
+<tr>
+<td>greynoise</td>
+<td>skipped</td>
+<td>GreyNoise is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>abuseipdb</td>
+<td>skipped</td>
+<td>AbuseIPDB is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>shodan</td>
+<td>skipped</td>
+<td>Shodan host lookup is IP-focused; input is not an IP.</td>
+</tr>
+<tr>
+<td>censys</td>
+<td>skipped</td>
+<td>Censys host and search pivots support IP, domain, and URL inputs.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Provider ATT&amp;CK leads (not packet-observed execution):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Source / scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1036</td>
+<td>Masquerading</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1055</td>
+<td>Process Injection</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1055.011</td>
+<td>Extra Window Memory Injection</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1059</td>
+<td>Command and Scripting Interpreter</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1071</td>
+<td>Application Layer Protocol</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1082</td>
+<td>System Information Discovery</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1095</td>
+<td>Non-Application Layer Protocol</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1574</td>
+<td>Hijack Execution Flow</td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+<tr>
+<td>T1574.002</td>
+<td></td>
+<td>virustotal (submitted indicator; provider-reported lead, not packet execution proof)</td>
+</tr>
+</tbody>
+</table></div>
+<p>No actor lead returned. This does not establish absence of an actor.</p>
+<h3 id="packet-to-provider-evidence-links">Packet-to-provider evidence links</h3>
+<p>The live case contains 5 explicitly linked, exact-type/value PCAP observables. 3 retain frame references; remaining exported-object hashes retain native object IDs and capture-export provenance, <strong>not an exact packet-frame map</strong>. Every link retains the capture checksum, points to a saved provider investigation, and was reread from the real API. Case actor associations remain empty.
+<a href="../../packet-enrichment-links/2024-11-26-updated.json">Verified graph links</a>.</p>
+<h3 id="current-attck-catalog-and-detection-strategy-joins">Current ATT&amp;CK catalog and detection-strategy joins</h3>
+<p>These are read-only joins against the actual database, not generated detections or proof that the victim executed the technique. A valid catalog join cannot validate the original provider assertion.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Current catalog match</th>
+<th>Available detection strategies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1027</td>
+<td>True</td>
+<td>Behavioral Detection of Obfuscated Files or Information (x-mitre-detection-strategy--e3758cbb-5dd9-4aad-b848-0539a8c56307)</td>
+</tr>
+<tr>
+<td>T1036</td>
+<td>True</td>
+<td>Behavioral Detection of Masquerading Across Platforms via Metadata and Execution Discrepancy (x-mitre-detection-strategy--408aedab-4a23-41ad-809d-fe9c3805b7f6)</td>
+</tr>
+<tr>
+<td>T1041</td>
+<td>True</td>
+<td>Detection Strategy for Exfiltration Over C2 Channel (x-mitre-detection-strategy--beb3a98c-f1a4-434a-81e7-29d178b14db2)</td>
+</tr>
+<tr>
+<td>T1055</td>
+<td>True</td>
+<td>Behavioral Detection of Process Injection Across Platforms (x-mitre-detection-strategy--9833b57b-4c83-4f58-b4cf-76f041b29273)</td>
+</tr>
+<tr>
+<td>T1055.011</td>
+<td>True</td>
+<td>Detection Strategy for Extra Window Memory (EWM) Injection on Windows (x-mitre-detection-strategy--1a8d87f1-48ca-4929-a5cc-2b2a03983f12)</td>
+</tr>
+<tr>
+<td>T1057</td>
+<td>True</td>
+<td>Detection of Adversarial Process Discovery Behavior (x-mitre-detection-strategy--309ca3cd-d3f0-4aea-8932-558550aa89f4)</td>
+</tr>
+<tr>
+<td>T1059</td>
+<td>True</td>
+<td>Behavioral Detection of Command and Scripting Interpreter Abuse (x-mitre-detection-strategy--8582f5e6-44a5-4950-b7e8-a3e1b6d58d63)</td>
+</tr>
+<tr>
+<td>T1059.001</td>
+<td>True</td>
+<td>Abuse of PowerShell for Arbitrary Execution (x-mitre-detection-strategy--72b209e2-8c65-4217-8532-fabd0cb54ae5)</td>
+</tr>
+<tr>
+<td>T1071</td>
+<td>True</td>
+<td>Detection of Command and Control Over Application Layer Protocols (x-mitre-detection-strategy--155cab5b-c70b-4cfb-ba52-f62a21836b19)</td>
+</tr>
+<tr>
+<td>T1074.001</td>
+<td>True</td>
+<td>Detection of Local Data Staging Prior to Exfiltration (x-mitre-detection-strategy--e91165c5-e850-465e-9042-6ba82478b522)</td>
+</tr>
+<tr>
+<td>T1082</td>
+<td>True</td>
+<td>System Discovery via Native and Remote Utilities (x-mitre-detection-strategy--75161d5e-2b6d-4112-ab4d-338f70ea97f0)</td>
+</tr>
+<tr>
+<td>T1095</td>
+<td>True</td>
+<td>Detection of Non-Application Layer Protocols for C2 (x-mitre-detection-strategy--2cb544af-ef54-4376-9608-b399ad67d3d6)</td>
+</tr>
+<tr>
+<td>T1204.002</td>
+<td>True</td>
+<td>User Execution – Malicious File via download/open → spawn chain (T1204.002) (x-mitre-detection-strategy--e2023eb5-d813-4a08-985e-e8c998672037)</td>
+</tr>
+<tr>
+<td>T1547.001</td>
+<td>True</td>
+<td>Detect Registry and Startup Folder Persistence (Windows) (x-mitre-detection-strategy--8febbfe8-91ae-4625-8fc7-656639b90a11)</td>
+</tr>
+<tr>
+<td>T1574</td>
+<td>True</td>
+<td>Detection Strategy for Hijack Execution Flow across OS platforms. (x-mitre-detection-strategy--07669925-383b-455b-a3e2-3a79e18eed27)</td>
+</tr>
+<tr>
+<td>T1574.002</td>
+<td>False</td>
+<td>None returned</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Prior analysis</th>
+<th style="text-align:right">Shared count</th>
+<th>Example observations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>616a90fa-f15e-4fcb-8d56-7b8e0eff5785</td>
+<td style="text-align:right">10</td>
+<td>code.jquery.com, edge.microsoft.com, fd.api.iris.microsoft.com, login.live.com, login.microsoftonline.com</td>
+</tr>
+<tr>
+<td>459e119d-191f-49e8-85ea-c78f9de41826</td>
+<td style="text-align:right">30</td>
+<td>a1834.dscg2.akamai.net, api.msn.com, assets.msn.com, client.wns.windows.com, ctldl.windowsupdate.com</td>
+</tr>
+<tr>
+<td>7a2cfe72-f48d-4894-8a2d-8889cb3b11b2</td>
+<td style="text-align:right">46</td>
+<td>a1834.dscg2.akamai.net, acroipm2.adobe.com, api.msn.com, armmf.adobe.com, assets.msn.com</td>
+</tr>
+<tr>
+<td>81373b30-6a59-49d1-89b0-bad73ed19eaa</td>
+<td style="text-align:right">37</td>
+<td>a1834.dscg2.akamai.net, api.msn.com, assets.msn.com, client.wns.windows.com, dns.msftncsi.com</td>
+</tr>
+<tr>
+<td>38851ad7-b3a0-423d-ae89-3b7be4e4b908</td>
+<td style="text-align:right">37</td>
+<td>acroipm2.adobe.com, api.msn.com, assets.msn.com, client.wns.windows.com, ctldl.windowsupdate.com</td>
+</tr>
+<tr>
+<td>bfccc426-aa9b-4007-8558-a66d37ecb90c</td>
+<td style="text-align:right">54</td>
+<td>a1834.dscg2.akamai.net, api.msn.com, assets.msn.com, checkappexec.microsoft.com, client.wns.windows.com</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="comparison-with-publisher-answers-and-earlier-runs">Comparison with publisher answers and earlier runs</h2>
+<p>The following comparison is separate from native inference. It measures availability of selected facts, not 100% incident-diagnosis accuracy.</p>
+<p><a href="https://www.malware-traffic-analysis.net/2024/11/26/page2.html">Publisher answer</a>.</p>
+<p>Native NetSupport User-Agent, cleartext port 443 and periodic callbacks support the tool identification. The delivery-chain explanation and malicious authorization context require the publisher or endpoint evidence. Shared site visits alone do not prove causation.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Field</th>
+<th>Packet-verified expected value</th>
+<th>Live</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.11.26.183</td>
+<td>ip</td>
+<td>10.11.26.183</td>
+<td>True</td>
+</tr>
+<tr>
+<td>10.11.26.183</td>
+<td>mac</td>
+<td>d0:57:7b:ce:fc:8b</td>
+<td>True</td>
+</tr>
+<tr>
+<td>10.11.26.183</td>
+<td>hostname</td>
+<td>DESKTOP-B8TQK49</td>
+<td>True</td>
+</tr>
+<tr>
+<td>10.11.26.183</td>
+<td>account</td>
+<td>oboomwald</td>
+<td>True</td>
+</tr>
+</tbody>
+</table></div>
+<p>Declared IOC subset available: 3/3. Not exhaustive recall.</p>
+<ul>
+<li><code>194.180.191.64</code>: present</li>
+<li><code>modandcrackedapk.com</code>: present</li>
+<li><code>classicgrand.com</code>: present</li>
+<li>Reference conflict: published <code>194.180.191.164</code>, packet-supported <code>194.180.191.64</code>. Summary IOC conflicts with its own walkthrough and the packet destinations.</li>
+</ul>
+<h2 id="complete-flow-checks-and-evidence-links">Complete-flow checks and evidence links</h2>
+<p>Browser history/open, Markdown export and investigation transfer: True. Investigation ID: <code>19851c85-b03b-4655-bc64-64c6f1520100</code>.
+Investigation transfers preserve a bounded preview, total count, source-analysis URL and hashes. Complete evidence remains server-side. TTP-overlap leads are not inserted into actor associations.
+PDF export: HTTP 200, including an explicitly non-authoritative packet-evidence appendix. STIX export remains HTTP 409 until a human completes review/promotion; this is a successful safety check.</p>
+<ul>
+<li><a href="api-upload.json">Full native JSON</a>, <a href="database-audit.json">independent database audit</a>, <a href="NATIVE-REPORT.html">native Markdown</a>, <a href="pdf-export-fixed.pdf">PDF</a>.</li>
+<li><a href="../../browser/2024-11-26.png">Browser screenshot</a>, <a href="../../browser/2024-11-26-investigation.json">investigation evidence</a>.</li>
+</ul>
+<h2 id="follow-up-priorities">Follow-up priorities</h2>
+<p>Validate high/medium findings using frame/stream evidence; obtain process and endpoint telemetry for execution, persistence and credential-theft hypotheses. Provider data above is current-time external context, not historical execution evidence. Review shared-CDN matches for specificity. Do not execute exported objects or treat encrypted payload metadata as decrypted evidence.</p>
+</main></body></html>

@@ -1,0 +1,1012 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AdversaryGraph Deterministic PCAP Analysis | 1200km</title><meta name="description" content="Public evidence supplement for ten AdversaryGraph malware-PCAP tests: reports, screenshots, audit records, provenance and limitations."><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2022-02-23/NATIVE-REPORT.html"><meta property="og:url" content="https://1200km.com/research/adversarygraph-ten-pcaps/reports/cases/2022-02-23/NATIVE-REPORT.html"><meta property="og:title" content="AdversaryGraph Deterministic PCAP Analysis"><meta property="og:description" content="Ten malware PCAPs, original screenshots, full case reports and qualified results."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/research/adversarygraph-ten-pcaps/screenshots/2024-11-26-packet-analysis.png"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{padding:20px;background:#11233c;color:#fff}header a{color:#b7e5ff}main{max-width:1160px;margin:28px auto;padding:32px 44px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2{margin-top:2em}a{color:#075c91}img{display:block;max-width:100%;height:auto;margin:24px auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #b8c9db;padding:10px;text-align:left}th{background:#edf4fc}pre{overflow:auto;padding:16px;background:#11233c;color:#fff}code{font-size:.85em}blockquote{margin:20px 0;padding:8px 20px;border-left:4px solid #167bb0;background:#eff6ff}.notice{padding:12px;background:#eef6fd;font-size:14px}@media(max-width:700px){main{margin:0;padding:22px 16px}body{font-size:16px}}@media print{header{display:none}main{padding:0;margin:0}pre{white-space:pre-wrap}img,tr{break-inside:avoid}}</style><meta property="article:published_time" content="2026-09-20"><meta property="article:modified_time" content="2026-09-20"></head><body><header>1200KM · ANDREY PAUTOV<br><a href="/">Home</a> · <a href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/">Article</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/REPORTS.html">Ten reports</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/SCREENSHOTS.html">Screenshot gallery</a> · <a href="https://1200km.com/research/adversarygraph-ten-pcaps/">Publication boundaries</a></header><main><p class="notice">Measured 19 September 2026 · Public derivative · Historical training evidence, not approved threat intelligence.</p><h1 id="adversarygraph-deterministic-pcap-analysis">AdversaryGraph Deterministic PCAP Analysis</h1>
+<p>Source: 2022-02-23-traffic-analysis-exercise.pcap
+Capture SHA-256: <code>eefc7e61b50e7846f5a3282d7645539d7b2b4b85aa08a09d0b823896c9449d1f</code>
+Semantic result SHA-256: <code>8a329890ed01eedca67808c92bdfa492463b036b435540749e5ff2e599d7deee</code>
+Analyzer manifest SHA-256: <code>ee952aeb7cdc6958f4ae5178c54c274a1e4f0aec4d42f3bdb95baaff063b3dde</code></p>
+<h2 id="executive-summary">Executive summary</h2>
+<p>Decoded 30023 packets across 143 IP endpoints and 809 transport flows. Observed 499 DNS events, 43 HTTP requests, 111 TLS ClientHello events, and 500 exported HTTP object(s). Deterministic rules produced 57 finding(s): 0 high, 39 medium, and 18 low. Findings are evidence-bound candidates and require analyst review; encrypted payload contents remain unavailable.</p>
+<h2 id="capture-facts">Capture facts</h2>
+<ul>
+<li>Packets: 30023</li>
+<li>Duration: 2680.736661 seconds</li>
+<li>Captured bytes: 19277433</li>
+<li>Endpoints: 143</li>
+<li>Flows: 809</li>
+</ul>
+<h2 id="deterministic-findings">Deterministic findings</h2>
+<h3 id="medium-script-archive-or-executable-transfer-candidate">MEDIUM — Script, archive, or executable transfer candidate</h3>
+<p>HTTP metadata names a script, archive, or executable. This is a transfer candidate, not proof of file type, execution, or malicious intent; legitimate updates use the same formats.</p>
+<p>Rule: <code>script-or-executable-transfer@pcap-rules-v3</code>; confidence: 0.86; evidence: frame 3995 / TCP stream 186, frame 4675 / TCP stream 186.</p>
+<p>Metrics: <code>{&quot;content_type&quot;:&quot;application/x-msdownload&quot;,&quot;declared_body_bytes&quot;:593920,&quot;destination&quot;:&quot;172.16.0.149&quot;,&quot;response_count&quot;:1,&quot;source&quot;:&quot;64.34.171.228&quot;,&quot;uri&quot;:&quot;/c7g8t/zbBYgukXYxzAF2hZc/&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 178 / TCP stream 8, frame 180 / TCP stream 8, frame 182 / TCP stream 8, frame 184 / TCP stream 8, frame 1710 / TCP stream 8.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:8,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.16.0.131&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-1">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 100 / TCP stream 5, frame 117 / TCP stream 5, frame 120 / TCP stream 5, frame 212 / TCP stream 13, frame 229 / TCP stream 13.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:41,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;0&quot;,&quot;2&quot;,&quot;3&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.16.0.131&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-2">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 1785 / TCP stream 87, frame 1787 / TCP stream 87, frame 1790 / TCP stream 87, frame 1793 / TCP stream 87, frame 1795 / TCP stream 87.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.16.0.131&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-3">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 2143 / TCP stream 101, frame 2159 / TCP stream 101, frame 2162 / TCP stream 101, frame 2168 / TCP stream 101, frame 2214 / TCP stream 111.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:53,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;,&quot;13&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.16.0.149&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-4">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 1944 / TCP stream 94, frame 2015 / TCP stream 94, frame 2018 / TCP stream 94, frame 2055 / TCP stream 102, frame 2091 / TCP stream 102.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:103,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;0&quot;,&quot;2&quot;,&quot;3&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.16.0.149&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-5">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 2867 / TCP stream 95, frame 2869 / TCP stream 95, frame 2871 / TCP stream 95, frame 2873 / TCP stream 95, frame 2875 / TCP stream 95.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.16.0.149&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-6">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 746 / TCP stream 43, frame 748 / TCP stream 43, frame 750 / TCP stream 43, frame 752 / TCP stream 43, frame 784 / TCP stream 45.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:53,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;,&quot;13&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.16.0.170&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-7">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 577 / TCP stream 32, frame 618 / TCP stream 35, frame 673 / TCP stream 35, frame 682 / TCP stream 35, frame 684 / TCP stream 35.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:98,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;0&quot;,&quot;2&quot;,&quot;3&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.16.0.170&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-8">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 1424 / TCP stream 31, frame 1430 / TCP stream 31, frame 1435 / TCP stream 31, frame 1437 / TCP stream 31, frame 1439 / TCP stream 31.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.52&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.16.0.170&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-9">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 179 / TCP stream 8, frame 181 / TCP stream 8, frame 183 / TCP stream 8, frame 185 / TCP stream 8, frame 1711 / TCP stream 8.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.131&quot;,&quot;event_count&quot;:8,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-10">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 102 / TCP stream 5, frame 119 / TCP stream 5, frame 214 / TCP stream 13, frame 231 / TCP stream 13, frame 233 / TCP stream 13.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.131&quot;,&quot;event_count&quot;:33,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;1&quot;,&quot;4,19,19,19,5&quot;,&quot;4,5&quot;,&quot;5&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-11">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 1786 / TCP stream 87, frame 1788 / TCP stream 87, frame 1792 / TCP stream 87, frame 1794 / TCP stream 87, frame 1796 / TCP stream 87.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.131&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-12">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 2147 / TCP stream 101, frame 2161 / TCP stream 101, frame 2164 / TCP stream 101, frame 2169 / TCP stream 101, frame 2215 / TCP stream 111.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.149&quot;,&quot;event_count&quot;:53,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;,&quot;13&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-13">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 1946 / TCP stream 94, frame 2017 / TCP stream 94, frame 2057 / TCP stream 102, frame 2093 / TCP stream 102, frame 2099 / TCP stream 102.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.149&quot;,&quot;event_count&quot;:83,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;1&quot;,&quot;4,19,19,19,5&quot;,&quot;4,5&quot;,&quot;5&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-14">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 2868 / TCP stream 95, frame 2870 / TCP stream 95, frame 2872 / TCP stream 95, frame 2874 / TCP stream 95, frame 2876 / TCP stream 95.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.149&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-15">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 747 / TCP stream 43, frame 749 / TCP stream 43, frame 751 / TCP stream 43, frame 753 / TCP stream 43, frame 785 / TCP stream 45.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.170&quot;,&quot;event_count&quot;:53,&quot;operation_numbers&quot;:[&quot;0&quot;,&quot;1&quot;,&quot;12&quot;,&quot;13&quot;],&quot;protocol&quot;:&quot;drsuapi&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-16">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 579 / TCP stream 32, frame 620 / TCP stream 35, frame 681 / TCP stream 35, frame 683 / TCP stream 35, frame 686 / TCP stream 35.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.170&quot;,&quot;event_count&quot;:79,&quot;operation_numbers&quot;:[&quot;&quot;,&quot;1&quot;,&quot;4,19,19,19,5&quot;,&quot;4,5&quot;,&quot;5&quot;],&quot;protocol&quot;:&quot;ldap&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="low-directory-service-protocol-activity-17">LOW — Directory-service protocol activity</h3>
+<p>Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.</p>
+<p>Rule: <code>directory-service-activity@pcap-rules-v3</code>; confidence: 0.95; evidence: frame 1427 / TCP stream 31, frame 1433 / TCP stream 31, frame 1436 / TCP stream 31, frame 1438 / TCP stream 31, frame 1440 / TCP stream 31.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;172.16.0.170&quot;,&quot;event_count&quot;:15,&quot;operation_numbers&quot;:[&quot;1&quot;,&quot;16&quot;,&quot;17&quot;,&quot;3&quot;,&quot;34&quot;,&quot;36&quot;,&quot;39&quot;,&quot;5&quot;,&quot;6&quot;,&quot;64&quot;,&quot;7&quot;],&quot;protocol&quot;:&quot;samr&quot;,&quot;source&quot;:&quot;172.16.0.52&quot;}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 4679 / TCP stream 187.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:52.845,&quot;packets&quot;:127,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:87055}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-1">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 4802 / TCP stream 188.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:96.025,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:2721}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-2">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 5068 / TCP stream 198.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:47.78,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:2517}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-3">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 6688 / TCP stream 203.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;27.254.174.84&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:60.005,&quot;packets&quot;:117,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:86156}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-4">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 6805 / TCP stream 204.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;27.254.174.84&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:104.051,&quot;packets&quot;:20,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:3034}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-5">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 7688 / TCP stream 213.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;27.254.174.84&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:49.984,&quot;packets&quot;:18,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:2793}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-6">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 7719 / TCP stream 214.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:46.582,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:2755}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-7">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 7792 / TCP stream 216.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;27.254.174.84&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:41.718,&quot;packets&quot;:76,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:54377}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-8">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 8729 / TCP stream 221.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:51.375,&quot;packets&quot;:412,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:320581}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-9">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 9146 / TCP stream 222.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:76.16,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:3342}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-10">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 9331 / TCP stream 227.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:117.001,&quot;packets&quot;:559,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:492888}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-11">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 10803 / TCP stream 236.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:66.043,&quot;packets&quot;:21,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:3237}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-12">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 10835 / TCP stream 237.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:61.284,&quot;packets&quot;:117,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:89737}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-13">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 10946 / TCP stream 238.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:61.474,&quot;packets&quot;:21,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:3151}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-14">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 11650 / TCP stream 247.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:46.562,&quot;packets&quot;:412,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:340415}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-15">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 11743 / TCP stream 249.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:95.062,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:2986}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-16">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 12139 / TCP stream 251.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:44.834,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:3271}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-17">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 13103 / TCP stream 261.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:48.149,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:2678}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-18">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 13119 / TCP stream 262.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:79.426,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:3058}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-19">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 13219 / TCP stream 268.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:94.94,&quot;packets&quot;:398,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:319970}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-20">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 13452 / TCP stream 272.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:49.955,&quot;packets&quot;:132,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:101806}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-21">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 13684 / TCP stream 274.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:55.29,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:2461}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-22">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 14063 / TCP stream 281.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:90.205,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:2359}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-23">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 14528 / TCP stream 293.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:34.782,&quot;packets&quot;:21,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:4464}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-24">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 14623 / TCP stream 298.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;168.197.250.14&quot;,&quot;destination_port&quot;:80,&quot;duration_seconds&quot;:40.858,&quot;packets&quot;:201,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:159636}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-25">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 16159 / TCP stream 306.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;162.144.76.184&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:32.803,&quot;packets&quot;:767,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:545561}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-26">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 17066 / TCP stream 311.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;128.199.93.156&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:36.477,&quot;packets&quot;:767,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:546358}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-27">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 18531 / TCP stream 324.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:51.515,&quot;packets&quot;:422,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:342682}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-28">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 18949 / TCP stream 325.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:83.461,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:2922}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-29">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 19849 / TCP stream 329.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:35.196,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:2531}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-30">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 20080 / TCP stream 333.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;135.148.121.246&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:85.095,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.149&quot;,&quot;wire_bytes&quot;:3198}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-31">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 20948 / TCP stream 367.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;139.196.72.155&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:51.093,&quot;packets&quot;:124,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:101936}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-32">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 21069 / TCP stream 368.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;139.196.72.155&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:38.15,&quot;packets&quot;:19,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:3125}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-33">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 21121 / TCP stream 369.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;139.196.72.155&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:58.283,&quot;packets&quot;:413,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:356002}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-34">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 21759 / TCP stream 390.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;185.184.25.78&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:123.7,&quot;packets&quot;:1334,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:1155759}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-35">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 23259 / TCP stream 411.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;54.37.106.167&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:122.065,&quot;packets&quot;:23,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:4023}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-36">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 23301 / TCP stream 417.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;198.199.98.78&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:95.397,&quot;packets&quot;:890,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:789030}</code></p>
+<h3 id="medium-sustained-external-tcp-conversation-outside-decoded-application-coverage-37">MEDIUM — Sustained external TCP conversation outside decoded application coverage</h3>
+<p>The flow exchanges traffic with a public endpoint but has no HTTP/TLS/identity event in this profile. Inspect the stream for a custom protocol or a missing handshake. This is a coverage/investigation lead, not a malware verdict.</p>
+<p>Rule: <code>unclassified-external-tcp@pcap-rules-v3</code>; confidence: 0.7; evidence: frame 24437 / TCP stream 469.</p>
+<p>Metrics: <code>{&quot;destination&quot;:&quot;128.199.192.135&quot;,&quot;destination_port&quot;:8080,&quot;duration_seconds&quot;:49.124,&quot;packets&quot;:302,&quot;source&quot;:&quot;172.16.0.170&quot;,&quot;wire_bytes&quot;:248547}</code></p>
+<h2 id="attck-candidates">ATT&amp;CK candidates</h2>
+<ul>
+<li>T1105 Ingress Tool Transfer (command-and-control), confidence=0.8, status=suggested; basis=versioned-deterministic-rule.</li>
+</ul>
+<h2 id="identities">Identities</h2>
+<ul>
+<li>account: <code>desktop-kpq9fdb$</code>; client IPs: 172.16.0.149; frames: 1987, 1995, 1997, 2009, 2062</li>
+<li>account: <code>desktop-vd151o7$</code>; client IPs: 172.16.0.131; frames: 30, 38, 40, 52, 64</li>
+<li>account: <code>desktop-w5tftqy$</code>; client IPs: 172.16.0.170; frames: 625, 633, 637, 647, 663</li>
+<li>account: <code>everett.french</code>; client IPs: 172.16.0.170; frames: 1337, 1345, 1347, 1359, 1373</li>
+<li>account: <code>nick.montgomery</code>; client IPs: 172.16.0.149; frames: 2755, 2763, 2765, 2777, 2787</li>
+<li>account: <code>tricia.becker</code>; client IPs: 172.16.0.131; frames: 1658, 1666, 1668, 1680, 1699</li>
+<li>domain: <code>SUNNYSTATION</code>; client IPs: 172.16.0.131; frames: 1750</li>
+<li>full-name: <code>Everett French</code>; client IPs: 172.16.0.170; frames: 1448</li>
+<li>full-name: <code>Nick Montgomery</code>; client IPs: 172.16.0.149; frames: 2882</li>
+<li>full-name: <code>Tricia Becker</code>; client IPs: 172.16.0.131; frames: 1802</li>
+<li>hostname: <code>DESKTOP-KPQ9FDB</code>; client IPs: 172.16.0.149; frames: 1915, 1937, 2040, 2281, 2327</li>
+<li>hostname: <code>DESKTOP-VD151O7</code>; client IPs: 172.16.0.131; frames: 1, 10, 99, 293, 361</li>
+<li>hostname: <code>DESKTOP-W5TFTQY</code>; client IPs: 172.16.0.170; frames: 519, 538, 797, 867, 1074</li>
+<li>netbios-group: <code>SUNNYSTATION</code>; client IPs: unbound subject; frames: 11, 292, 389, 393, 397</li>
+</ul>
+<h2 id="ioc-and-artifact-candidates">IOC and artifact candidates</h2>
+<ul>
+<li>domain: <code>a-0010.a-msedge.net</code>; roles: dns-cname</li>
+<li>domain: <code>a-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>ajaxmatters.com</code>; roles: dns-cname</li>
+<li>domain: <code>api.msn.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>autodiscover.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>awridahmed.com</code>; roles: dns-cname</li>
+<li>domain: <code>b-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>c-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>checkappexec.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>client.wns.windows.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>ctldl.windowsupdate.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>dalgahavuzu.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>desktop-kpq9fdb.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>desktop-vd151o7.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>desktop-w5tftqy.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>dns.msftncsi.com</code>; roles: dns-query</li>
+<li>domain: <code>ecs.office.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>ext-cust.squarespace.com</code>; roles: dns-cname</li>
+<li>domain: <code>fe2cr.update.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fe2cr.update.msft.com.trafficmanager.net</code>; roles: dns-cname</li>
+<li>domain: <code>fe3cr.delivery.mp.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-afd-nocache.azureedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-afd.azureedge.us</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-afd.azurefd.us</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-as-nocache.azureedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-as.azureedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fp-vp.azureedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>fs.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>gator4020.hostgator.com</code>; roles: dns-query</li>
+<li>domain: <code>ghs.googlehosted.com</code>; roles: dns-cname</li>
+<li>domain: <code>globalsovereignbank.com</code>; roles: dns-cname</li>
+<li>domain: <code>imap.123-reg.co.uk</code>; roles: dns-query</li>
+<li>domain: <code>imap.aol.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.gmail.com</code>; roles: dns-query</li>
+<li>domain: <code>imap.ionos.mx</code>; roles: dns-query</li>
+<li>domain: <code>imap.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>internal-aol.imap.mail.g03.yahoodns.net</code>; roles: dns-cname</li>
+<li>domain: <code>ipv6.msftncsi.com</code>; roles: dns-query</li>
+<li>domain: <code>isatap.localdomain</code>; roles: dns-query</li>
+<li>domain: <code>isatap.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>login.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>login.microsoftonline.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>mail.alienergy.com.pk</code>; roles: dns-query</li>
+<li>domain: <code>mail.gmail.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.idn-ltd.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.ionos.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.mail.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.mail.yahoo.com</code>; roles: dns-query</li>
+<li>domain: <code>mail.mitsuwagroup.co.jp</code>; roles: dns-query</li>
+<li>domain: <code>mail.proteinchile.cl</code>; roles: dns-query</li>
+<li>domain: <code>mail.sapporo-kiden.co.jp</code>; roles: dns-query</li>
+<li>domain: <code>mail.zoho.com</code>; roles: dns-query</li>
+<li>domain: <code>mitsuwagroup.co.jp</code>; roles: dns-cname</li>
+<li>domain: <code>nexusrules.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>odc.officeapps.live.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>ow1.res.office365.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>parkingpage.namecheap.com</code>; roles: dns-cname</li>
+<li>domain: <code>pop.km-plan.co.jp</code>; roles: dns-query</li>
+<li>domain: <code>privilegetroissecurity.com</code>; roles: dns-cname</li>
+<li>domain: <code>prod.nexusrules.live.com.akadns.net</code>; roles: dns-cname</li>
+<li>domain: <code>proteinchile.cl</code>; roles: dns-cname</li>
+<li>domain: <code>pti.store.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>riskprotek.com</code>; roles: dns-cname</li>
+<li>domain: <code>s-ring.msedge.net</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>self.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>settings-win.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>shops.myshopify.com</code>; roles: dns-cname</li>
+<li>domain: <code>smtp.aruba.it</code>; roles: dns-query</li>
+<li>domain: <code>smtp.bstem.jp</code>; roles: dns-query</li>
+<li>domain: <code>smtp.hanwa-net.co.jp</code>; roles: dns-query</li>
+<li>domain: <code>smtp.live.com</code>; roles: dns-query</li>
+<li>domain: <code>smtp.mail.com</code>; roles: dns-query</li>
+<li>domain: <code>smtp.nifty.com</code>; roles: dns-query</li>
+<li>domain: <code>smtp.ocn.ne.jp</code>; roles: dns-query</li>
+<li>domain: <code>smtp.office365.com</code>; roles: dns-query</li>
+<li>domain: <code>smtp.secureserver.net</code>; roles: dns-query</li>
+<li>domain: <code>sunnyfileserver.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>sunnystation-dc.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>target.clickfunnels.com</code>; roles: dns-cname</li>
+<li>domain: <code>tring.clo.footprintdns.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>v10.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>v20.events.data.microsoft.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>wns.notify.trafficmanager.net</code>; roles: dns-cname</li>
+<li>domain: <code>wpad.localdomain</code>; roles: dns-query</li>
+<li>domain: <code>wpad.sunnystation.com</code>; roles: dns-query</li>
+<li>domain: <code>www.32342240.xyz</code>; roles: dns-query</li>
+<li>domain: <code>www.ajaxmatters.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.awridahmed.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.ban-click.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.barrcoplumbingsupply.com</code>; roles: dns-query</li>
+<li>domain: <code>www.bing.com</code>; roles: dns-query, tls-sni</li>
+<li>domain: <code>www.byaliciafryearson.com</code>; roles: dns-query</li>
+<li>domain: <code>www.campdiscount.info</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.centroimprenta.xyz</code>; roles: dns-query</li>
+<li>domain: <code>www.chinadqwx.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.czzhudi.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.db-propertygroup.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.e-scooters.frl</code>; roles: dns-query</li>
+<li>domain: <code>www.elsiepupz.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.freedomteaminc.com</code>; roles: dns-query</li>
+<li>domain: <code>www.globalsovereignbank.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.hentainftxxx.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.hydrocheats.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.jmtmjz.com</code>; roles: dns-query</li>
+<li>domain: <code>www.jogoreviravolta.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.katchybugonsale.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.keysine.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.klassociates.info</code>; roles: dns-query</li>
+<li>domain: <code>www.krpano.pro</code>; roles: dns-query</li>
+<li>domain: <code>www.moonshot.properties</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.msftncsi.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.mystore.guide</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.nt-renewable.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.privilegetroissecurity.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.riskprotek.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.seo-python.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.theperfecttrainer.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>www.xn--pckwb0cye6947ajzku8opzi.com</code>; roles: dns-query, http-host</li>
+<li>domain: <code>yahoo.com</code>; roles: dns-query</li>
+<li>ipv4: <code>0.0.0.0</code>; roles: network-endpoint</li>
+<li>ipv4: <code>103.41.204.169</code>; roles: network-endpoint</li>
+<li>ipv4: <code>103.42.57.17</code>; roles: network-endpoint</li>
+<li>ipv4: <code>104.131.62.48</code>; roles: network-endpoint</li>
+<li>ipv4: <code>104.16.12.194</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.16.13.194</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.16.14.194</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.16.15.194</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.16.16.194</code>; roles: dns-answer</li>
+<li>ipv4: <code>104.21.89.147</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.212.67.52</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>104.212.67.71</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>116.254.112.253</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>118.98.72.86</code>; roles: network-endpoint</li>
+<li>ipv4: <code>120.55.51.124</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>122.17.147.238</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>128.199.192.135</code>; roles: network-endpoint</li>
+<li>ipv4: <code>128.199.93.156</code>; roles: network-endpoint</li>
+<li>ipv4: <code>13.107.21.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.213.57</code>; roles: dns-answer</li>
+<li>ipv4: <code>13.107.246.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.246.57</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.3.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.4.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.107.6.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>13.89.178.27</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>131.107.255.255</code>; roles: dns-answer</li>
+<li>ipv4: <code>134.209.156.68</code>; roles: network-endpoint</li>
+<li>ipv4: <code>135.148.121.246</code>; roles: network-endpoint</li>
+<li>ipv4: <code>136.143.191.104</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>139.196.72.155</code>; roles: network-endpoint</li>
+<li>ipv4: <code>142.250.138.108</code>; roles: dns-answer</li>
+<li>ipv4: <code>142.250.138.109</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>144.217.88.125</code>; roles: network-endpoint</li>
+<li>ipv4: <code>154.206.65.249</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>156.96.154.210</code>; roles: http-host, network-endpoint</li>
+<li>ipv4: <code>159.69.237.188</code>; roles: network-endpoint</li>
+<li>ipv4: <code>162.144.76.184</code>; roles: network-endpoint</li>
+<li>ipv4: <code>168.197.250.14</code>; roles: network-endpoint</li>
+<li>ipv4: <code>172.16.0.1</code>; roles: network-endpoint</li>
+<li>ipv4: <code>172.16.0.131</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>172.16.0.149</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>172.16.0.170</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>172.16.0.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>172.16.0.52</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>172.16.0.53</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>172.67.160.224</code>; roles: dns-answer</li>
+<li>ipv4: <code>173.201.192.129</code>; roles: dns-answer</li>
+<li>ipv4: <code>173.201.192.158</code>; roles: dns-answer</li>
+<li>ipv4: <code>173.201.193.240</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>173.201.193.97</code>; roles: dns-answer</li>
+<li>ipv4: <code>173.231.37.114</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>178.211.56.194</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>180.250.21.2</code>; roles: network-endpoint</li>
+<li>ipv4: <code>184.168.99.26</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>185.148.168.15</code>; roles: network-endpoint</li>
+<li>ipv4: <code>185.148.168.220</code>; roles: network-endpoint</li>
+<li>ipv4: <code>185.184.25.78</code>; roles: network-endpoint</li>
+<li>ipv4: <code>190.90.233.66</code>; roles: network-endpoint</li>
+<li>ipv4: <code>191.252.103.16</code>; roles: network-endpoint</li>
+<li>ipv4: <code>192.185.4.31</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>194.9.172.107</code>; roles: network-endpoint</li>
+<li>ipv4: <code>194.9.94.85</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>194.9.94.86</code>; roles: dns-answer</li>
+<li>ipv4: <code>195.154.146.35</code>; roles: network-endpoint</li>
+<li>ipv4: <code>198.185.159.144</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>198.185.159.145</code>; roles: dns-answer</li>
+<li>ipv4: <code>198.199.98.78</code>; roles: network-endpoint</li>
+<li>ipv4: <code>198.49.23.144</code>; roles: dns-answer</li>
+<li>ipv4: <code>198.49.23.145</code>; roles: dns-answer</li>
+<li>ipv4: <code>198.54.117.210</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>198.54.117.211</code>; roles: dns-answer</li>
+<li>ipv4: <code>198.54.117.212</code>; roles: dns-answer</li>
+<li>ipv4: <code>198.54.117.215</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>198.54.117.216</code>; roles: dns-answer</li>
+<li>ipv4: <code>198.54.117.217</code>; roles: dns-answer</li>
+<li>ipv4: <code>198.54.117.218</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.140.147.202</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.11</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.15</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.3</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.189.173.9</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.190.157.11</code>; roles: dns-answer</li>
+<li>ipv4: <code>20.42.73.24</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.42.73.25</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.44.10.122</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.50.80.210</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>20.54.89.15</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.203</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.212</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>204.79.197.254</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>209.17.116.163</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>210.131.2.36</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>210.57.209.142</code>; roles: network-endpoint</li>
+<li>ipv4: <code>211.13.204.5</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>211.16.12.137</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>213.186.33.5</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>216.172.184.77</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>216.230.252.20</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>216.58.193.147</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>224.0.0.22</code>; roles: network-endpoint</li>
+<li>ipv4: <code>224.0.0.251</code>; roles: network-endpoint</li>
+<li>ipv4: <code>224.0.0.252</code>; roles: network-endpoint</li>
+<li>ipv4: <code>23.218.224.137</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.218.224.148</code>; roles: dns-answer</li>
+<li>ipv4: <code>23.218.224.151</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.218.224.154</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.227.38.74</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.29.115.34</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.38.92.72</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.47.49.133</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>23.47.49.165</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>239.255.255.250</code>; roles: http-host, network-endpoint</li>
+<li>ipv4: <code>255.255.255.255</code>; roles: network-endpoint</li>
+<li>ipv4: <code>27.254.174.84</code>; roles: network-endpoint</li>
+<li>ipv4: <code>27.34.147.95</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>3.130.204.160</code>; roles: dns-answer</li>
+<li>ipv4: <code>3.130.253.23</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>37.44.244.177</code>; roles: network-endpoint</li>
+<li>ipv4: <code>37.59.209.141</code>; roles: network-endpoint</li>
+<li>ipv4: <code>40.125.122.151</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.11</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.12</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.13</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.14</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.18</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.19</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.28.20</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.21</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.22</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.28.23</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.10</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.11</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.12</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.13</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.15</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.5</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.6</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.29.7</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.8</code>; roles: dns-answer</li>
+<li>ipv4: <code>40.126.29.9</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.7.32</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.126.7.35</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.83.240.146</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.97.120.162</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>40.97.199.114</code>; roles: dns-answer</li>
+<li>ipv4: <code>45.71.195.104</code>; roles: network-endpoint</li>
+<li>ipv4: <code>52.109.20.76</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.76.31</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.8.19</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.109.8.20</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.113.194.132</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.168.117.169</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.182.141.63</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.183.220.149</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.185.211.133</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.238.248.0</code>; roles: dns-answer</li>
+<li>ipv4: <code>52.238.248.1</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.238.248.4</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>52.96.122.242</code>; roles: dns-answer</li>
+<li>ipv4: <code>52.96.191.98</code>; roles: dns-answer</li>
+<li>ipv4: <code>54.37.106.167</code>; roles: network-endpoint</li>
+<li>ipv4: <code>54.37.228.122</code>; roles: network-endpoint</li>
+<li>ipv4: <code>54.38.242.185</code>; roles: network-endpoint</li>
+<li>ipv4: <code>59.148.253.194</code>; roles: network-endpoint</li>
+<li>ipv4: <code>61.7.231.226</code>; roles: network-endpoint</li>
+<li>ipv4: <code>61.7.231.229</code>; roles: network-endpoint</li>
+<li>ipv4: <code>64.34.171.228</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>65.52.5.117</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>66.218.86.51</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>66.235.200.112</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>66.29.145.216</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>68.178.213.203</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>68.178.213.37</code>; roles: dns-answer</li>
+<li>ipv4: <code>68.178.252.117</code>; roles: dns-answer</li>
+<li>ipv4: <code>68.183.93.250</code>; roles: network-endpoint</li>
+<li>ipv4: <code>72.167.191.69</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>72.167.218.138</code>; roles: dns-answer</li>
+<li>ipv4: <code>72.167.238.29</code>; roles: dns-answer</li>
+<li>ipv4: <code>72.21.81.200</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>74.208.255.201</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>74.208.5.10</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>74.208.5.15</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>74.6.141.28</code>; roles: dns-answer</li>
+<li>ipv4: <code>74.6.143.25</code>; roles: dns-answer</li>
+<li>ipv4: <code>74.6.143.26</code>; roles: dns-answer</li>
+<li>ipv4: <code>74.6.229.28</code>; roles: dns-answer</li>
+<li>ipv4: <code>74.6.231.20</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>74.6.231.21</code>; roles: dns-answer</li>
+<li>ipv4: <code>78.46.73.125</code>; roles: network-endpoint</li>
+<li>ipv4: <code>85.214.67.203</code>; roles: network-endpoint</li>
+<li>ipv4: <code>94.136.40.232</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>94.177.209.30</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>96.7.168.59</code>; roles: dns-answer, network-endpoint</li>
+<li>ipv4: <code>97.74.135.10</code>; roles: dns-answer</li>
+<li>ipv4: <code>97.74.135.143</code>; roles: dns-answer</li>
+<li>ipv4: <code>98.137.11.163</code>; roles: dns-answer</li>
+<li>ipv4: <code>98.137.11.164</code>; roles: dns-answer</li>
+<li>ipv4: <code>98.137.159.60</code>; roles: dns-answer</li>
+<li>ja3: <code>28a2c9bd18a11de089ef85a160da29e4</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>37cdab6ff1bd1c195bacb776c5213bf2</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>37f463bf4616ecd445d4a1937da06e19</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>3b5074b1b5d032e5620f69f9f700ff0e</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>51c64c77e60f3980eea90869b68c58a8</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>6271f898ce5be7dd52b0fc260d0662b3</code>; roles: tls-client-fingerprint</li>
+<li>ja3: <code>a0e9f5d64349fb13191bc781f81f42e1</code>; roles: tls-client-fingerprint</li>
+<li>sha256: <code>004599278fd2775eb468eac406e47dab4e5775c32eeb98a0f7ff21768aa2fdcf</code>; roles: exported-object</li>
+<li>sha256: <code>0119adca455bfe449a3b6d30660b9a4fb4d7f9b1a42504166debbe61bc7a1a64</code>; roles: exported-object</li>
+<li>sha256: <code>012525bd08b8856409471857cdde9928f6f5505e0eedfdc05880783621712242</code>; roles: exported-object</li>
+<li>sha256: <code>02751d70749d493ba1989b74765a1cd1c56294db42c8b7775b3c0172828df4a6</code>; roles: exported-object</li>
+<li>sha256: <code>03e81cfa927c6cdce33587023c24bb89f21cf506458598c7624bc61c8d3f8e58</code>; roles: exported-object</li>
+<li>sha256: <code>0417dd954d3695d2bf400f237806c505bf8cccf07c44ce9467d98ed4175ea255</code>; roles: exported-object</li>
+<li>sha256: <code>04b3ca7f09694f7f1b8e7b71f3503d325b75d3ff938ed24eeb9939714635f0d2</code>; roles: exported-object</li>
+<li>sha256: <code>04b4f6035a50b1f58ebddb3f5a3e8cf1949a9b6b36b497c86b2b8c2b91e7ad4f</code>; roles: exported-object</li>
+<li>sha256: <code>04ded8bd35a45a9dd083f3cc32056559c2d62739e5edebdaf1be2b5bf6133ea3</code>; roles: exported-object</li>
+<li>sha256: <code>051f4c30c5306ffeff3f92010446f0aa0c420978da429cb787c50604c5944174</code>; roles: exported-object</li>
+<li>sha256: <code>05497fa07eb6f2ee015c09ace90d0423c20136b9c6e4a52ee3e4c60c376eacf3</code>; roles: exported-object</li>
+<li>sha256: <code>05b0dc4e3b3623d8fe2e6d653af5f42f73ce33b8d5461de62b0b113aa5f3caa0</code>; roles: exported-object</li>
+<li>sha256: <code>05ba7c0984a69934dba3a41191243d8dc8fd5abf2fea86a4ead813cf2a9d9dee</code>; roles: exported-object</li>
+<li>sha256: <code>05dfb38ed78ba413e07d3e01d40dd139683aa9b4715d3f000abc9d95e16205a6</code>; roles: exported-object</li>
+<li>sha256: <code>0604cda2873562b6894fce5ef33aab23eeb01abae54bfd1a3ade48e85e54f266</code>; roles: exported-object</li>
+<li>sha256: <code>0609a4da54220690f415ac4d27cee84f2eea7d6a39ae990017ac25889ca2ca54</code>; roles: exported-object</li>
+<li>sha256: <code>06af7d2c9ddd3737f67c6789e4fa2610ed99d3d4aeb157e15c9f0b3eab46ceed</code>; roles: exported-object</li>
+<li>sha256: <code>08387b61ba8264eef8f26f5d669b04b28b0ae71ee8ffe4de6852c8c2b9668d3d</code>; roles: exported-object</li>
+<li>sha256: <code>08ff66f98bdcf6573485fb6a07e45b72de258edb90706aa75260b1f541a961eb</code>; roles: exported-object</li>
+<li>sha256: <code>0965a8861f7f70048f6251a520c65bf2930b3b9265e0e55142aa384f4da36f24</code>; roles: exported-object</li>
+<li>sha256: <code>09b156788ec22bd98b36d95565ab19199d442dc653c73ddbab3525792130b593</code>; roles: exported-object</li>
+<li>sha256: <code>09ba1e573a77d25cfe065aa002a155189ce4f5cbfb0251ab61dc3b5eea9569f5</code>; roles: exported-object</li>
+<li>sha256: <code>0a1b9616d1191c67cb63f7b1b8bd9809f43c94a183eb23527df28490ac9666f7</code>; roles: exported-object</li>
+<li>sha256: <code>0aa09ec450e32afa62a72eeb252e83ad291b68ed378fb455ee4cb618ba04849a</code>; roles: exported-object</li>
+<li>sha256: <code>0b0e4ae56a34d0aa05dca4d67700c3964c649f66bc9d9afd2c430bdb1f063be8</code>; roles: exported-object</li>
+<li>sha256: <code>0b500a7b1a98e79df9f948812495251061d45e48ee19eb795810272216b6fbc9</code>; roles: exported-object</li>
+<li>sha256: <code>0bd44562868ac54cb8c1043310b8f1d8267e681908bbd1d5e14b27ce796b977d</code>; roles: exported-object</li>
+<li>sha256: <code>0ded265abee66125302a95e54828bf136e471f93d1c6ddbaec3513f4960254b6</code>; roles: exported-object</li>
+<li>sha256: <code>0df6c8212c4a7361f440ffbd61ee76222cbc3d4e24b3c2716946800e13fd8ce8</code>; roles: exported-object</li>
+<li>sha256: <code>0e60578c595f5d1d852562e954c270edcaeac54de126892ebf8dc2a60c9b1503</code>; roles: exported-object</li>
+<li>sha256: <code>0ec2306524e6c599765d5d1223e9a33329d8c0793039e8d26c15de173d79e958</code>; roles: exported-object</li>
+<li>sha256: <code>0f102e9552d90e78af23de4a7b4411569878a3149aaebc38e5168e422c5d247e</code>; roles: exported-object</li>
+<li>sha256: <code>0f99ac235c51cdff782c4f8193f4698892a38d6365845031d7b20f976196fe4f</code>; roles: exported-object</li>
+<li>sha256: <code>0ff8e752caa95643bf7b3776d821737814f87ffe3d6925701a3183971391edcf</code>; roles: exported-object</li>
+<li>sha256: <code>0ffbddc5bc92b9e3b50893241fa9a182f02ab2a61054568668bec4f2e8a08fe9</code>; roles: exported-object</li>
+<li>sha256: <code>10570ef48a963eeab20a1bd339618b44d213b436c19c51fb05099183a9999f4b</code>; roles: exported-object</li>
+<li>sha256: <code>10e9248a956dcfbdb1d4c8b70dd05ee54605208b614d10ceb7b8b88d150cb0ef</code>; roles: exported-object</li>
+<li>sha256: <code>118a94f5308fb6dd5bf0096ef766eb9fdc207a1c05fc23c7186aba49100ee508</code>; roles: exported-object</li>
+<li>sha256: <code>120f7dd788fe12ca8c9af5f9d47d1fa963b0f63bc63cef3afcdd28ab66bdbf6f</code>; roles: exported-object</li>
+<li>sha256: <code>121098e0cde0a928173ac2ba2da6dd82b1b626453b296059c60926787b1e4546</code>; roles: exported-object</li>
+<li>sha256: <code>1235888074ede34f4f78e3108c85f05795ab16d8fb72b534547fb0da3e6a234e</code>; roles: exported-object</li>
+<li>sha256: <code>129c768192359093317c1b658b106ba3d9968476a695fef49ea9e6d118467767</code>; roles: exported-object</li>
+<li>sha256: <code>139f6fa785927256480056be4662ba4122fa4e5a18d7b63752f8d2ae6c9395b6</code>; roles: exported-object</li>
+<li>sha256: <code>13bf0aa04849e77d7914f426c28a54bb49f547cc004ae800af68864980a4a88d</code>; roles: exported-object</li>
+<li>sha256: <code>14245b645e4103d8713e7f916fc7d4d10ae98146a05af38d2b800d52c8acc717</code>; roles: exported-object</li>
+<li>sha256: <code>142855918acb873018e7afb636a8f9d0495b3028b4d16b4cf706d68b3a7f8ce3</code>; roles: exported-object</li>
+<li>sha256: <code>147f4226dc3c57cb9d2536c745013d7145af769c26fc6b37d0848a01af884865</code>; roles: exported-object</li>
+<li>sha256: <code>148dd3a46202949f4ff34c20da8804f68644abec319cbfd57efb774b9b3ebf5d</code>; roles: exported-object</li>
+<li>sha256: <code>14a5cc536d16a41573e57bfe68ede705cb5850500eaa5ec123c42784903055c0</code>; roles: exported-object</li>
+<li>sha256: <code>14b57211308ac8ad2a63c965783d9ba1c2d1930d0cafd884374d143a481f9bf3</code>; roles: exported-object</li>
+<li>sha256: <code>14c39252741654b6e9872383aa869070317abb18e91f2d5dbbb1341b3abe62c4</code>; roles: exported-object</li>
+<li>sha256: <code>14cd9376ff8f1a914c40168783efb3d4e8f53c2526378000a0190478621eac9f</code>; roles: exported-object</li>
+<li>sha256: <code>157889eb6bfdc5fb11eca24228c4f9ae1a176455785456ca79849fb0bb5c2792</code>; roles: exported-object</li>
+<li>sha256: <code>15861b469b40931e7dbe3a8b6aacb1ee6824b431fea25281840e1db28086d255</code>; roles: exported-object</li>
+<li>sha256: <code>161004698346c45313eef873dc3e555f83bf5f4fd616d1f67947fbc8cf3b2660</code>; roles: exported-object</li>
+<li>sha256: <code>1694f0ee7be6029fe279792606f74d0e0c156eedf216eb6d30753048e33ac95c</code>; roles: exported-object</li>
+<li>sha256: <code>16f02f7a9a59c59bf6b7651c334043da2c43d100661c8345dce857c8743374b0</code>; roles: exported-object</li>
+<li>sha256: <code>178252c182d98d603e7235df45e57e1d92aa93fc0c3b71d5c27bc1b7b1c7c310</code>; roles: exported-object</li>
+<li>sha256: <code>178ca47275e40b28d97e3f2445c90926cecad89d7679ee5eb59cd1917041f61e</code>; roles: exported-object</li>
+<li>sha256: <code>18ce8668476bb27422129bf09e3992cafb555779513b7c73daa5e1b07577dbf1</code>; roles: exported-object</li>
+<li>sha256: <code>191a086e159061a0c87247adcfe042e6c15854fca15397fe2dc99a0f35efa1ed</code>; roles: exported-object</li>
+<li>sha256: <code>195aaab78e060cb793d406f91c91592c44a15d944ae7662a5fd8dc7750a121dd</code>; roles: exported-object</li>
+<li>sha256: <code>1970d832434fda01eee7325d7882f19089ff3dc6b6e623be0e2be3e21da60290</code>; roles: exported-object</li>
+<li>sha256: <code>199efb2dba801fbe4f06b60162b3cc083a63d6078f6b56224f5dc538ded3bdf4</code>; roles: exported-object</li>
+<li>sha256: <code>1a188e05405f1ce01789dc73de2d60632eade6ad95ff36cec29b988444861eb1</code>; roles: exported-object</li>
+<li>sha256: <code>1a281a2d280c6d1f1f205d3f8210057b1b555794f6c12db57e4e8e4816cb9036</code>; roles: exported-object</li>
+<li>sha256: <code>1bc147f6a38ee4f00397689ae7cbaae2a9807b40d9092404c90dbe97611ab079</code>; roles: exported-object</li>
+<li>sha256: <code>1c0c79371604a7e57f527a518397cbbfc312314c6213ac27b44d3a62abd87f17</code>; roles: exported-object</li>
+<li>sha256: <code>1c19ebc675280676ea53db434f16e8f1b97b729785511d5c82ebb610fb53f08d</code>; roles: exported-object</li>
+<li>sha256: <code>1c3694a1647d000fce54a9d5a30c1a06da57a9e6fab75870993b4d5653577417</code>; roles: exported-object</li>
+<li>sha256: <code>1cd3bcddfa4cebaeba570316c23a0248dfb1dd90898bca8e1bf01596b5beedcc</code>; roles: exported-object</li>
+<li>sha256: <code>1d16bd195b28177d0030375134b90eab863a25458c56d05c7e72ecfcda8ddfb8</code>; roles: exported-object</li>
+<li>sha256: <code>1d21900f027764a25c787c4e444214277ab36e2074037e5d5a8ce6f0efbb004e</code>; roles: exported-object</li>
+<li>sha256: <code>1d71eef40b1c844cb461ecc7197ed8eef6bc582ba1e5dc287c3bf5fc15e1b4af</code>; roles: exported-object</li>
+<li>sha256: <code>1db156538dd79f08b09c654f86b8f6d481d588fa44cc51f02c4e42fdcdca7913</code>; roles: exported-object</li>
+<li>sha256: <code>1de41672c3a500d7321663f486920a8fb5f29e8801f92be3e1aa60cb78bddbf7</code>; roles: exported-object</li>
+<li>sha256: <code>1f0fd84ce2a8a3ae572963ae3ad0937920664b081fe79acf87fde2b13acc77be</code>; roles: exported-object</li>
+<li>sha256: <code>1f68d99e75eaed0dbd08ee26e222e4a21040c56a6266f1d0d9b385730ca12fc0</code>; roles: exported-object</li>
+<li>sha256: <code>1fe5730bb3502850c53ca50dc874702126977f857a47c3dbe5d1a1226afd5c08</code>; roles: exported-object</li>
+<li>sha256: <code>206abeeaebf598ad3c984ba9e8b3d56d663989b35c5074ef330514b5841e1a6e</code>; roles: exported-object</li>
+<li>sha256: <code>209565664129ec0b9c01867286aa093f1ca15e4ad12093aac53bc290925ae39f</code>; roles: exported-object</li>
+<li>sha256: <code>211aa041d8b4ea3a643d44eb8f538f6caa0a5e0e3b63a802de3fbf0a9011a1f1</code>; roles: exported-object</li>
+<li>sha256: <code>2143e3b14753fe28b4e495e57c087ef8fea10cbd644761105d607d90b9d23633</code>; roles: exported-object</li>
+<li>sha256: <code>2194c3bdb83d8e73218ec1fc36977bd7566500eb0cc264750ce08248f7575543</code>; roles: exported-object</li>
+<li>sha256: <code>21abcfcccf584af261252953ef89fd36141f086a365fbd9d2066ae94b3c4bd76</code>; roles: exported-object</li>
+<li>sha256: <code>2251efee138848fe36171baae0d12828489e0bcc3b063bc509e2724cf671c01f</code>; roles: exported-object</li>
+<li>sha256: <code>2269981a9b387528f38aaa58c273b3a203ba1ce1e4ab7d369210e411cedaef46</code>; roles: exported-object</li>
+<li>sha256: <code>22704106a20c5a5a5f4c78a113092eade0f683945a2496a9a0d5bc69c52bd814</code>; roles: exported-object</li>
+<li>sha256: <code>2321ba015f0e7a3d74e190c407ecc25f0b772956eb0645036818a324965264ee</code>; roles: exported-object</li>
+<li>sha256: <code>2330b96b60d76e24f5bfcc6d9a4e415cb57d4a8c18d95d50566701d112ab2ca9</code>; roles: exported-object</li>
+<li>sha256: <code>23f00aaf4245b4855825f38da30d464bef3c6f81eea7235c99fc7bd5d6b726a3</code>; roles: exported-object</li>
+<li>sha256: <code>23f6e432c83a9a3dcb731391e864afb6129df0a7eedda745e7cc51baf1ea1ad2</code>; roles: exported-object</li>
+<li>sha256: <code>248430bf42f12f2b4e703bb156543d496f2890ad08148d590f93348830c1ad52</code>; roles: exported-object</li>
+<li>sha256: <code>24ec4098e828c89dfb5810b1e4df67cd3e8987e672b16a393e1045ba3ded185e</code>; roles: exported-object</li>
+<li>sha256: <code>24feb82784833ef28e43907591d6823fb703d92e6a3960435bea7934a35f15e1</code>; roles: exported-object</li>
+<li>sha256: <code>253dd1918125d171a4877950898de2ca26060c40b1d05c8fe31cc9fb56776472</code>; roles: exported-object</li>
+<li>sha256: <code>25911c516fcaaded9ea55ede4e30828fe8e21e9a895f5e8948034e9621343854</code>; roles: exported-object</li>
+<li>sha256: <code>2620bf96201e9f328aee98a74ce5b87f221e761a8b2662974b35f90991404337</code>; roles: exported-object</li>
+<li>sha256: <code>263bc7831746b36b6903d8f193117e6f1e777b2e8765086740b8c0b2af19630e</code>; roles: exported-object</li>
+<li>sha256: <code>26d630a69965af7110e23e7d89e870aa432f466b8e25d825ba90a1d615b74765</code>; roles: exported-object</li>
+<li>sha256: <code>2741234de895bed810734f6b55872a58fc208957ab25ecea14b7aed45f7c5726</code>; roles: exported-object</li>
+<li>sha256: <code>274e7318a4440240d24701135a3a037ffc4064ab6e18b7683968d7ad7557823c</code>; roles: exported-object</li>
+<li>sha256: <code>2756bae8f350efe025c1a19b8c04b741660f265fa60d9accbdcee7575d65a301</code>; roles: exported-object</li>
+<li>sha256: <code>276fdf588903250404f05a86da40c2e5c26360c7dd2cfce409d8eaf30640e1e6</code>; roles: exported-object</li>
+<li>sha256: <code>28204d9f1d7b8c17b7cd049bf7f32b5dc41e538ad9c17d884c1e06eab2d8dd39</code>; roles: exported-object</li>
+<li>sha256: <code>28c04e7c2529f941c2276321566ed73a1cd75404e1b419a0ed1afe2ef1e4bb5c</code>; roles: exported-object</li>
+<li>sha256: <code>29804a73896b8364000f4c23c69de02f4b4305e30f21c39a39097ac982863ee8</code>; roles: exported-object</li>
+<li>sha256: <code>29a06c4b40fada661ba0e4f26673529c42d9bd1fffb629bfed06cdea351634ae</code>; roles: exported-object</li>
+<li>sha256: <code>29b84a0556ab8203d2e5fde7529491a0253e9586cf9506583cf50acf715f08cc</code>; roles: exported-object</li>
+<li>sha256: <code>29bce0e3976c1a4b0c5a3dedaf4c1df15560fed60eefc170b4e8f1bfd72e881e</code>; roles: exported-object</li>
+<li>sha256: <code>2a223bc66bee6f01307afacca8cd03c762c109e39095bf5329d7d70920cdf601</code>; roles: exported-object</li>
+<li>sha256: <code>2b785b0137066ea6c9bcb8baa757e5633539962796080eeb05ccd3d775f40845</code>; roles: exported-object</li>
+<li>sha256: <code>2b79250e166209b04e6221f70295861958a9388503c781ddd638cc3864843f5a</code>; roles: exported-object</li>
+<li>sha256: <code>2b999f47b936dc400728793101b43657b4e9410a7267fb92cd15fac90fd2a482</code>; roles: exported-object</li>
+<li>sha256: <code>2ba817fc45bb0dec23acca80833f3e7d19a99b3fc71f3e2fa673ef4c38cf533c</code>; roles: exported-object</li>
+<li>sha256: <code>2c1b8be8a085bd2d29dc9c0fdc032117a77193dad38602390554138f7cdfe4cf</code>; roles: exported-object</li>
+<li>sha256: <code>2cc04e0598d2938235c3ef5eeca39c65285f0dcb3149c70fc0a7362a4ea3f490</code>; roles: exported-object</li>
+<li>sha256: <code>2d3a83cf33a1a7bbe0b8d0d003e520924b0aa95732828cc17290fb9d461ab96b</code>; roles: exported-object</li>
+<li>sha256: <code>2d4829a665a6465d8a67a009389b86e8068c01ce3d094f0459de4ed5f4ef2199</code>; roles: exported-object</li>
+<li>sha256: <code>2d4c01d66de1641649052c860fd1a8788f5193f3db96487f4f2d6d82a35d6d07</code>; roles: exported-object</li>
+<li>sha256: <code>2de61824c9fdc4a84764dee59289619829a98149225fc246989abf4dfcd5913a</code>; roles: exported-object</li>
+<li>sha256: <code>2df0449ed47af8473f3b17afa4cdffb3ed4b11a0df006bc7b090fe4f4f74b59f</code>; roles: exported-object</li>
+<li>sha256: <code>2e24ef287ea02c7f4c4cc2826389e7b69d3d559d35adbcbdc9b3d7437bd772f5</code>; roles: exported-object</li>
+<li>sha256: <code>2e3c4533bd6dbe6301f70359c32ff7b03f3c6599208e18fec224196b77ae633d</code>; roles: exported-object</li>
+<li>sha256: <code>2ef86698bfc9c4ce9dacd4733967d03b4b58e2130c0905f1ae479e689c767234</code>; roles: exported-object</li>
+<li>sha256: <code>2f41a6bbfe2c57b767df989d53cad14278bcaa7b0fe886f8c6b1e7f0cab3c019</code>; roles: exported-object</li>
+<li>sha256: <code>2f6d5d053ebbfcb3abd90f94bc862175c2782dd5cc60fb9dbb82a2fe9e8ebaf2</code>; roles: exported-object</li>
+<li>sha256: <code>311456b3d2193c6a82531c7338dba44beae1363a17ecfcaee9ead85549f3f666</code>; roles: exported-object</li>
+<li>sha256: <code>311b06d1311f38632a53291a497a27877e1d9bed83ed7d344fb3110938ceb1fa</code>; roles: exported-object</li>
+<li>sha256: <code>313ac03b87cec74ab7068a0c183daed376e45377fa754059eb752e64fa5c5186</code>; roles: exported-object</li>
+<li>sha256: <code>31b2c11ae258a1e49a65bfc346e74b260221370dcd5ccf9f3761399de9f71b3d</code>; roles: exported-object</li>
+<li>sha256: <code>31f63b033376b7488674789fd49cd0698a60403347bc2168cd5de0a8491349b7</code>; roles: exported-object</li>
+<li>sha256: <code>327eb44a247ac6e38b3d02b76dcdbdaf66a7c7064bf4f3c9fdfd4484a80452ce</code>; roles: exported-object</li>
+<li>sha256: <code>32c47cc6b8a9063141d7559f8c0a4c356571b38bba3864d454029bd2c2f0ffde</code>; roles: exported-object</li>
+<li>sha256: <code>33421c7d3bc5bae96cfb722a18967bcbbe8ff21e863a802150fe5fbbbdd04ca6</code>; roles: exported-object</li>
+<li>sha256: <code>336b14c1f82c04eb8bfd490b73dade0d1a084108f5f43af7d1ab5a5de7e3ccff</code>; roles: exported-object</li>
+<li>sha256: <code>3376656a1065f217ece24cf4039aaba336fe35a6c6e29be159fb03cb712ef62d</code>; roles: exported-object</li>
+<li>sha256: <code>3443f2dc0c7b74b068d09f28b4ad0e322d341983f4c57893f2eda38427dbd65e</code>; roles: exported-object</li>
+<li>sha256: <code>347c0bc98abf0e16e86f72cc7058b8290880c7e089d83d19cbf80aa295e142e6</code>; roles: exported-object</li>
+<li>sha256: <code>352dd136c9810049178064b46cfeb6149a21cf74198d62455be96509ec710262</code>; roles: exported-object</li>
+<li>sha256: <code>35714a390651048138a4be4ddeaceb8234628ae85b8f508f3ef4879adcabacb2</code>; roles: exported-object</li>
+<li>sha256: <code>384b409d1a3538287c7be92f275d5388cd10d404aac05286d0031e384d110558</code>; roles: exported-object</li>
+<li>sha256: <code>38dbf8fe6f99d95e30c7264d7e6bc83d61d675636a461affdc7dedb3bc96439f</code>; roles: exported-object</li>
+<li>sha256: <code>3916a0813dfb36961722d081fe5a4835a4e8ccf57258402b6417700b70e71966</code>; roles: exported-object</li>
+<li>sha256: <code>3a200099bd79b734329a90776df195da10460140051847e25e839069912dcf1c</code>; roles: exported-object</li>
+<li>sha256: <code>3b163eb96641057909fb4f1a4fd2d42771dcf7c8961a4e9d1862e681037afe86</code>; roles: exported-object</li>
+<li>sha256: <code>3b967843e46088c05b6f3563768f1046ff9b2a132740ba90c9cb9657632f443a</code>; roles: exported-object</li>
+<li>sha256: <code>3ba62e70a1c2b45133051bf258188a375751d777542eba48cdb7c6e219d4d052</code>; roles: exported-object</li>
+<li>sha256: <code>3c235f28b3544e94b6cb9b106fbed857e46407f2edaeab306ec9f044dc1561c6</code>; roles: exported-object</li>
+<li>sha256: <code>3c24ca5e6fc65f64bc89254b7b65a57ce91d2f94a0669264d29cff8b7bee1a6d</code>; roles: exported-object</li>
+<li>sha256: <code>3c3fc27182b240f7ef25684b89055f2fb6104216d204c2858ff2f4cc5c5aad73</code>; roles: exported-object</li>
+<li>sha256: <code>3c6209fdc3f7b8ab8749023d1c5fd58ac6fcc0cca7f25bedff908e9cb0c32aa5</code>; roles: exported-object</li>
+<li>sha256: <code>3cbf196455ce3dc4596ef48d543346ba6019cee0ec3037214ec0e53a023d33db</code>; roles: exported-object</li>
+<li>sha256: <code>3cc8277d0766bef38be25da17bc2a547529710bf31e228cdf62b0dac9e218801</code>; roles: exported-object</li>
+<li>sha256: <code>3d44c0dfce89c86e116520de3075683d7d7d829e5f450632a37ecccbafda0bdc</code>; roles: exported-object</li>
+<li>sha256: <code>3dc4423e315cbeb8e53913228588374f6b5e95c702acd32a1663d0175d92edd0</code>; roles: exported-object</li>
+<li>sha256: <code>3edd8e1011fa1e97cdc6dc3d2985ec4ff531fb3ae3c674053341df220b2e4590</code>; roles: exported-object</li>
+<li>sha256: <code>3ee2866b868219e05cb89be1f203e90124621837871344428e9c0b2b73a53500</code>; roles: exported-object</li>
+<li>sha256: <code>3fa3195a19af437b9c8356765972bb2af3ababa3bb5563fda1770a04b8e0d958</code>; roles: exported-object</li>
+<li>sha256: <code>3fb33da40450b7b4c991439b671829118e433f2b30e6a9aa69b9d4e3e21ffd17</code>; roles: exported-object</li>
+<li>sha256: <code>3ff8a8023e97907778f39cd4ce45bc69e65f719162ae3a0618a8db425416fd78</code>; roles: exported-object</li>
+<li>sha256: <code>40487f3ccba51bd4740d8e296129781a2d40293fcff0e8688c6b9c47b48a3e64</code>; roles: exported-object</li>
+<li>sha256: <code>415401907436fd5ce187fdaf01b06dd9c25620971a900cd48d396af77ca1cc16</code>; roles: exported-object</li>
+<li>sha256: <code>4226968bc416ca4299ceed0b41b92a0bd28ba32dd6964c95919eed35001769ac</code>; roles: exported-object</li>
+<li>sha256: <code>42a8a1c74a9fcf27a35963517aae581973e0f89b65bef4cf7bc8bf835364ade1</code>; roles: exported-object</li>
+<li>sha256: <code>42b7c8ac10d317ebce9ddcac972286ca8f3cea590d578ae5dc853ceecc946c2a</code>; roles: exported-object</li>
+<li>sha256: <code>42bb95c4eb86938a55171e950d23e21b10d70ea15943c2432a6afb5f4ef163a5</code>; roles: exported-object</li>
+<li>sha256: <code>435c771adb307c3456f296da31f2000676759f1481c2484c7ec38751fb153b10</code>; roles: exported-object</li>
+<li>sha256: <code>4385a17fa2ce6c83c6079bb0593482b48df5bc4b5bd15f913225d7076d5574f8</code>; roles: exported-object</li>
+<li>sha256: <code>43e5e8f4682cf04c0a879423e15449b67785926aaf6bb3752d2c019ebf06e6e3</code>; roles: exported-object</li>
+<li>sha256: <code>43fc9856c71f37798d1793f95080fdcbd6925cddc9427b68237453a4f7a6801e</code>; roles: exported-object</li>
+<li>sha256: <code>445bca5a135f9179c266dcff83841f82fd4637a22ccc7ae656e4e41e20fc9d16</code>; roles: exported-object</li>
+<li>sha256: <code>45100f25534e7567b0d6894478c2fcf74a259d0e1938d6ef1c3e152bedbc9275</code>; roles: exported-object</li>
+<li>exported object <code>zbBYgukXYxzAF2hZc</code>; SHA-256 <code>14b57211308ac8ad2a63c965783d9ba1c2d1930d0cafd884374d143a481f9bf3</code>; size 593920 bytes
+Static content: <code>{&quot;content_kind&quot;:&quot;pe&quot;,&quot;features&quot;:[],&quot;inspected_bytes&quot;:262144,&quot;inspection_truncated&quot;:true,&quot;interpretation&quot;:&quot;Static content only; not proof of execution, intent, or malware family&quot;}</code>. Not execution proof.</li>
+<li>exported object <code>object26220</code>; SHA-256 <code>abca26cf70ef57ef879c81a3b45d9fc5ce4437f54bda65d0170f3f5bae8a54f5</code>; size 1376 bytes
+Static content: <code>{&quot;content_kind&quot;:&quot;script-like-text&quot;,&quot;features&quot;:[{&quot;excerpt&quot;:&quot;iex&quot;,&quot;feature&quot;:&quot;dynamic-evaluation&quot;,&quot;offset&quot;:827}],&quot;inspected_bytes&quot;:1376,&quot;inspection_truncated&quot;:false,&quot;interpretation&quot;:&quot;Static content only; not proof of execution, intent, or malware family&quot;}</code>. Not execution proof.</li>
+<li>exported object <code>Ocklqc.jpg</code>; SHA-256 <code>2620bf96201e9f328aee98a74ce5b87f221e761a8b2662974b35f90991404337</code>; size 719872 bytes</li>
+<li>exported object <code>%3fOXtd9L=cFNTMFX8k4Sl&amp;WN68=YMSFGVfdS9ONGuAKqerSFa9naGdXyzjeSZBgl3Bk94ai8h1oihtuDN4qXdcs1YMbgxqWO7UijFru1VtwMrj0Yg==</code>; SHA-256 <code>1a281a2d280c6d1f1f205d3f8210057b1b555794f6c12db57e4e8e4816cb9036</code>; size 5149 bytes</li>
+<li>exported object <code>object27533</code>; SHA-256 <code>4662635889a87f2f39280975ae841f8ff9c51a45cee3c5922e08778dae69b077</code>; size 1528 bytes</li>
+<li>exported object <code>object17412</code>; SHA-256 <code>004599278fd2775eb468eac406e47dab4e5775c32eeb98a0f7ff21768aa2fdcf</code>; size 1460 bytes</li>
+<li>exported object <code>object23470</code>; SHA-256 <code>0119adca455bfe449a3b6d30660b9a4fb4d7f9b1a42504166debbe61bc7a1a64</code>; size 1460 bytes</li>
+<li>exported object <code>object17433</code>; SHA-256 <code>012525bd08b8856409471857cdde9928f6f5505e0eedfdc05880783621712242</code>; size 1460 bytes</li>
+<li>exported object <code>object11310</code>; SHA-256 <code>02751d70749d493ba1989b74765a1cd1c56294db42c8b7775b3c0172828df4a6</code>; size 1460 bytes</li>
+<li>exported object <code>object27642</code>; SHA-256 <code>03e81cfa927c6cdce33587023c24bb89f21cf506458598c7624bc61c8d3f8e58</code>; size 1460 bytes</li>
+<li>exported object <code>object24152</code>; SHA-256 <code>0417dd954d3695d2bf400f237806c505bf8cccf07c44ce9467d98ed4175ea255</code>; size 1460 bytes</li>
+<li>exported object <code>object9566</code>; SHA-256 <code>04b3ca7f09694f7f1b8e7b71f3503d325b75d3ff938ed24eeb9939714635f0d2</code>; size 1460 bytes</li>
+<li>exported object <code>object10926</code>; SHA-256 <code>04b4f6035a50b1f58ebddb3f5a3e8cf1949a9b6b36b497c86b2b8c2b91e7ad4f</code>; size 1460 bytes</li>
+<li>exported object <code>object24077</code>; SHA-256 <code>04ded8bd35a45a9dd083f3cc32056559c2d62739e5edebdaf1be2b5bf6133ea3</code>; size 1460 bytes</li>
+<li>exported object <code>object25436</code>; SHA-256 <code>051f4c30c5306ffeff3f92010446f0aa0c420978da429cb787c50604c5944174</code>; size 1460 bytes</li>
+<li>exported object <code>object21540</code>; SHA-256 <code>05497fa07eb6f2ee015c09ace90d0423c20136b9c6e4a52ee3e4c60c376eacf3</code>; size 1460 bytes</li>
+<li>exported object <code>object17594</code>; SHA-256 <code>05b0dc4e3b3623d8fe2e6d653af5f42f73ce33b8d5461de62b0b113aa5f3caa0</code>; size 1460 bytes</li>
+<li>exported object <code>object16434</code>; SHA-256 <code>05ba7c0984a69934dba3a41191243d8dc8fd5abf2fea86a4ead813cf2a9d9dee</code>; size 1460 bytes</li>
+<li>exported object <code>object11911</code>; SHA-256 <code>05dfb38ed78ba413e07d3e01d40dd139683aa9b4715d3f000abc9d95e16205a6</code>; size 1460 bytes</li>
+<li>exported object <code>object11550</code>; SHA-256 <code>0604cda2873562b6894fce5ef33aab23eeb01abae54bfd1a3ade48e85e54f266</code>; size 1460 bytes</li>
+<li>exported object <code>object24129</code>; SHA-256 <code>0609a4da54220690f415ac4d27cee84f2eea7d6a39ae990017ac25889ca2ca54</code>; size 1460 bytes</li>
+<li>exported object <code>object21424</code>; SHA-256 <code>06af7d2c9ddd3737f67c6789e4fa2610ed99d3d4aeb157e15c9f0b3eab46ceed</code>; size 1460 bytes</li>
+<li>exported object <code>object21425</code>; SHA-256 <code>08387b61ba8264eef8f26f5d669b04b28b0ae71ee8ffe4de6852c8c2b9668d3d</code>; size 1460 bytes</li>
+<li>exported object <code>object7819</code>; SHA-256 <code>08ff66f98bdcf6573485fb6a07e45b72de258edb90706aa75260b1f541a961eb</code>; size 1460 bytes</li>
+<li>exported object <code>object9111</code>; SHA-256 <code>0965a8861f7f70048f6251a520c65bf2930b3b9265e0e55142aa384f4da36f24</code>; size 1460 bytes</li>
+<li>exported object <code>object23590</code>; SHA-256 <code>09b156788ec22bd98b36d95565ab19199d442dc653c73ddbab3525792130b593</code>; size 1460 bytes</li>
+<li>exported object <code>object16612</code>; SHA-256 <code>09ba1e573a77d25cfe065aa002a155189ce4f5cbfb0251ab61dc3b5eea9569f5</code>; size 1460 bytes</li>
+<li>exported object <code>object23550</code>; SHA-256 <code>0a1b9616d1191c67cb63f7b1b8bd9809f43c94a183eb23527df28490ac9666f7</code>; size 1460 bytes</li>
+<li>exported object <code>object25308</code>; SHA-256 <code>0aa09ec450e32afa62a72eeb252e83ad291b68ed378fb455ee4cb618ba04849a</code>; size 1460 bytes</li>
+<li>exported object <code>object11969</code>; SHA-256 <code>0b0e4ae56a34d0aa05dca4d67700c3964c649f66bc9d9afd2c430bdb1f063be8</code>; size 1460 bytes</li>
+<li>exported object <code>object25385</code>; SHA-256 <code>0b500a7b1a98e79df9f948812495251061d45e48ee19eb795810272216b6fbc9</code>; size 1460 bytes</li>
+<li>exported object <code>object13663</code>; SHA-256 <code>0bd44562868ac54cb8c1043310b8f1d8267e681908bbd1d5e14b27ce796b977d</code>; size 1460 bytes</li>
+<li>exported object <code>object23853</code>; SHA-256 <code>0ded265abee66125302a95e54828bf136e471f93d1c6ddbaec3513f4960254b6</code>; size 1460 bytes</li>
+<li>exported object <code>object23927</code>; SHA-256 <code>0df6c8212c4a7361f440ffbd61ee76222cbc3d4e24b3c2716946800e13fd8ce8</code>; size 1460 bytes</li>
+<li>exported object <code>object17580</code>; SHA-256 <code>0e60578c595f5d1d852562e954c270edcaeac54de126892ebf8dc2a60c9b1503</code>; size 1460 bytes</li>
+<li>exported object <code>object17735</code>; SHA-256 <code>0ec2306524e6c599765d5d1223e9a33329d8c0793039e8d26c15de173d79e958</code>; size 1460 bytes</li>
+<li>exported object <code>object22136</code>; SHA-256 <code>0f102e9552d90e78af23de4a7b4411569878a3149aaebc38e5168e422c5d247e</code>; size 1460 bytes</li>
+<li>exported object <code>object10934</code>; SHA-256 <code>0f99ac235c51cdff782c4f8193f4698892a38d6365845031d7b20f976196fe4f</code>; size 1460 bytes</li>
+<li>exported object <code>object16749</code>; SHA-256 <code>0ff8e752caa95643bf7b3776d821737814f87ffe3d6925701a3183971391edcf</code>; size 1460 bytes</li>
+<li>exported object <code>object23930</code>; SHA-256 <code>0ffbddc5bc92b9e3b50893241fa9a182f02ab2a61054568668bec4f2e8a08fe9</code>; size 1460 bytes</li>
+<li>exported object <code>object11134</code>; SHA-256 <code>10570ef48a963eeab20a1bd339618b44d213b436c19c51fb05099183a9999f4b</code>; size 1460 bytes</li>
+<li>exported object <code>object16496</code>; SHA-256 <code>10e9248a956dcfbdb1d4c8b70dd05ee54605208b614d10ceb7b8b88d150cb0ef</code>; size 1460 bytes</li>
+<li>exported object <code>object21251</code>; SHA-256 <code>118a94f5308fb6dd5bf0096ef766eb9fdc207a1c05fc23c7186aba49100ee508</code>; size 1460 bytes</li>
+<li>exported object <code>object17490</code>; SHA-256 <code>120f7dd788fe12ca8c9af5f9d47d1fa963b0f63bc63cef3afcdd28ab66bdbf6f</code>; size 1460 bytes</li>
+<li>exported object <code>object17178</code>; SHA-256 <code>121098e0cde0a928173ac2ba2da6dd82b1b626453b296059c60926787b1e4546</code>; size 1460 bytes</li>
+<li>exported object <code>object17210</code>; SHA-256 <code>1235888074ede34f4f78e3108c85f05795ab16d8fb72b534547fb0da3e6a234e</code>; size 1460 bytes</li>
+<li>exported object <code>object22466</code>; SHA-256 <code>129c768192359093317c1b658b106ba3d9968476a695fef49ea9e6d118467767</code>; size 1460 bytes</li>
+<li>exported object <code>object26286</code>; SHA-256 <code>139f6fa785927256480056be4662ba4122fa4e5a18d7b63752f8d2ae6c9395b6</code>; size 1460 bytes</li>
+<li>exported object <code>object11872</code>; SHA-256 <code>13bf0aa04849e77d7914f426c28a54bb49f547cc004ae800af68864980a4a88d</code>; size 1460 bytes</li>
+<li>exported object <code>object13662</code>; SHA-256 <code>14245b645e4103d8713e7f916fc7d4d10ae98146a05af38d2b800d52c8acc717</code>; size 1460 bytes</li>
+<li>exported object <code>object24538</code>; SHA-256 <code>142855918acb873018e7afb636a8f9d0495b3028b4d16b4cf706d68b3a7f8ce3</code>; size 1460 bytes</li>
+<li>exported object <code>object16912</code>; SHA-256 <code>147f4226dc3c57cb9d2536c745013d7145af769c26fc6b37d0848a01af884865</code>; size 1460 bytes</li>
+<li>exported object <code>object17734</code>; SHA-256 <code>148dd3a46202949f4ff34c20da8804f68644abec319cbfd57efb774b9b3ebf5d</code>; size 1460 bytes</li>
+<li>exported object <code>object16512</code>; SHA-256 <code>14a5cc536d16a41573e57bfe68ede705cb5850500eaa5ec123c42784903055c0</code>; size 1460 bytes</li>
+<li>exported object <code>object11546</code>; SHA-256 <code>14c39252741654b6e9872383aa869070317abb18e91f2d5dbbb1341b3abe62c4</code>; size 1460 bytes</li>
+<li>exported object <code>object26741</code>; SHA-256 <code>14cd9376ff8f1a914c40168783efb3d4e8f53c2526378000a0190478621eac9f</code>; size 1460 bytes</li>
+<li>exported object <code>object21920</code>; SHA-256 <code>157889eb6bfdc5fb11eca24228c4f9ae1a176455785456ca79849fb0bb5c2792</code>; size 1460 bytes</li>
+<li>exported object <code>object16587</code>; SHA-256 <code>15861b469b40931e7dbe3a8b6aacb1ee6824b431fea25281840e1db28086d255</code>; size 1460 bytes</li>
+<li>exported object <code>object16905</code>; SHA-256 <code>161004698346c45313eef873dc3e555f83bf5f4fd616d1f67947fbc8cf3b2660</code>; size 1460 bytes</li>
+<li>exported object <code>object11466</code>; SHA-256 <code>1694f0ee7be6029fe279792606f74d0e0c156eedf216eb6d30753048e33ac95c</code>; size 1460 bytes</li>
+<li>exported object <code>object16517</code>; SHA-256 <code>16f02f7a9a59c59bf6b7651c334043da2c43d100661c8345dce857c8743374b0</code>; size 1460 bytes</li>
+<li>exported object <code>object14759</code>; SHA-256 <code>178252c182d98d603e7235df45e57e1d92aa93fc0c3b71d5c27bc1b7b1c7c310</code>; size 1460 bytes</li>
+<li>exported object <code>object16254</code>; SHA-256 <code>178ca47275e40b28d97e3f2445c90926cecad89d7679ee5eb59cd1917041f61e</code>; size 1460 bytes</li>
+<li>exported object <code>object21272</code>; SHA-256 <code>18ce8668476bb27422129bf09e3992cafb555779513b7c73daa5e1b07577dbf1</code>; size 1460 bytes</li>
+<li>exported object <code>object10754</code>; SHA-256 <code>191a086e159061a0c87247adcfe042e6c15854fca15397fe2dc99a0f35efa1ed</code>; size 1460 bytes</li>
+<li>exported object <code>object21917</code>; SHA-256 <code>195aaab78e060cb793d406f91c91592c44a15d944ae7662a5fd8dc7750a121dd</code>; size 1460 bytes</li>
+<li>exported object <code>object16797</code>; SHA-256 <code>1970d832434fda01eee7325d7882f19089ff3dc6b6e623be0e2be3e21da60290</code>; size 1460 bytes</li>
+<li>exported object <code>object16273</code>; SHA-256 <code>199efb2dba801fbe4f06b60162b3cc083a63d6078f6b56224f5dc538ded3bdf4</code>; size 1460 bytes</li>
+<li>exported object <code>object16871</code>; SHA-256 <code>1a188e05405f1ce01789dc73de2d60632eade6ad95ff36cec29b988444861eb1</code>; size 1460 bytes</li>
+<li>exported object <code>object16257</code>; SHA-256 <code>1bc147f6a38ee4f00397689ae7cbaae2a9807b40d9092404c90dbe97611ab079</code>; size 1460 bytes</li>
+<li>exported object <code>object16374</code>; SHA-256 <code>1c0c79371604a7e57f527a518397cbbfc312314c6213ac27b44d3a62abd87f17</code>; size 1460 bytes</li>
+<li>exported object <code>object25354</code>; SHA-256 <code>1c19ebc675280676ea53db434f16e8f1b97b729785511d5c82ebb610fb53f08d</code>; size 1460 bytes</li>
+<li>exported object <code>object17272</code>; SHA-256 <code>1c3694a1647d000fce54a9d5a30c1a06da57a9e6fab75870993b4d5653577417</code>; size 1460 bytes</li>
+<li>exported object <code>object27275</code>; SHA-256 <code>1cd3bcddfa4cebaeba570316c23a0248dfb1dd90898bca8e1bf01596b5beedcc</code>; size 1460 bytes</li>
+<li>exported object <code>object21299</code>; SHA-256 <code>1d16bd195b28177d0030375134b90eab863a25458c56d05c7e72ecfcda8ddfb8</code>; size 1460 bytes</li>
+<li>exported object <code>object14756</code>; SHA-256 <code>1d21900f027764a25c787c4e444214277ab36e2074037e5d5a8ce6f0efbb004e</code>; size 1460 bytes</li>
+<li>exported object <code>object11261</code>; SHA-256 <code>1d71eef40b1c844cb461ecc7197ed8eef6bc582ba1e5dc287c3bf5fc15e1b4af</code>; size 1460 bytes</li>
+<li>exported object <code>object17680</code>; SHA-256 <code>1db156538dd79f08b09c654f86b8f6d481d588fa44cc51f02c4e42fdcdca7913</code>; size 1460 bytes</li>
+<li>exported object <code>object8253</code>; SHA-256 <code>1de41672c3a500d7321663f486920a8fb5f29e8801f92be3e1aa60cb78bddbf7</code>; size 1460 bytes</li>
+<li>exported object <code>object10548</code>; SHA-256 <code>1f0fd84ce2a8a3ae572963ae3ad0937920664b081fe79acf87fde2b13acc77be</code>; size 1460 bytes</li>
+<li>exported object <code>object16737</code>; SHA-256 <code>1f68d99e75eaed0dbd08ee26e222e4a21040c56a6266f1d0d9b385730ca12fc0</code>; size 1460 bytes</li>
+<li>exported object <code>object25391</code>; SHA-256 <code>1fe5730bb3502850c53ca50dc874702126977f857a47c3dbe5d1a1226afd5c08</code>; size 1460 bytes</li>
+<li>exported object <code>object16725</code>; SHA-256 <code>206abeeaebf598ad3c984ba9e8b3d56d663989b35c5074ef330514b5841e1a6e</code>; size 1460 bytes</li>
+<li>exported object <code>object17689</code>; SHA-256 <code>209565664129ec0b9c01867286aa093f1ca15e4ad12093aac53bc290925ae39f</code>; size 1460 bytes</li>
+<li>exported object <code>object8292</code>; SHA-256 <code>211aa041d8b4ea3a643d44eb8f538f6caa0a5e0e3b63a802de3fbf0a9011a1f1</code>; size 1460 bytes</li>
+<li>exported object <code>object23923</code>; SHA-256 <code>2143e3b14753fe28b4e495e57c087ef8fea10cbd644761105d607d90b9d23633</code>; size 1460 bytes</li>
+<li>exported object <code>object17692</code>; SHA-256 <code>2194c3bdb83d8e73218ec1fc36977bd7566500eb0cc264750ce08248f7575543</code>; size 1460 bytes</li>
+<li>exported object <code>object7549</code>; SHA-256 <code>21abcfcccf584af261252953ef89fd36141f086a365fbd9d2066ae94b3c4bd76</code>; size 1460 bytes</li>
+<li>exported object <code>object23085</code>; SHA-256 <code>2251efee138848fe36171baae0d12828489e0bcc3b063bc509e2724cf671c01f</code>; size 1460 bytes</li>
+<li>exported object <code>object11399</code>; SHA-256 <code>2269981a9b387528f38aaa58c273b3a203ba1ce1e4ab7d369210e411cedaef46</code>; size 1460 bytes</li>
+<li>exported object <code>object24672</code>; SHA-256 <code>22704106a20c5a5a5f4c78a113092eade0f683945a2496a9a0d5bc69c52bd814</code>; size 1460 bytes</li>
+<li>exported object <code>object16263</code>; SHA-256 <code>2321ba015f0e7a3d74e190c407ecc25f0b772956eb0645036818a324965264ee</code>; size 1460 bytes</li>
+<li>exported object <code>object25375</code>; SHA-256 <code>2330b96b60d76e24f5bfcc6d9a4e415cb57d4a8c18d95d50566701d112ab2ca9</code>; size 1460 bytes</li>
+<li>exported object <code>object24844</code>; SHA-256 <code>23f00aaf4245b4855825f38da30d464bef3c6f81eea7235c99fc7bd5d6b726a3</code>; size 1460 bytes</li>
+<li>exported object <code>object17105</code>; SHA-256 <code>23f6e432c83a9a3dcb731391e864afb6129df0a7eedda745e7cc51baf1ea1ad2</code>; size 1460 bytes</li>
+<li>exported object <code>object11458</code>; SHA-256 <code>248430bf42f12f2b4e703bb156543d496f2890ad08148d590f93348830c1ad52</code>; size 1460 bytes</li>
+<li>exported object <code>object21888</code>; SHA-256 <code>24ec4098e828c89dfb5810b1e4df67cd3e8987e672b16a393e1045ba3ded185e</code>; size 1460 bytes</li>
+<li>exported object <code>object10704</code>; SHA-256 <code>24feb82784833ef28e43907591d6823fb703d92e6a3960435bea7934a35f15e1</code>; size 1460 bytes</li>
+<li>exported object <code>object11569</code>; SHA-256 <code>253dd1918125d171a4877950898de2ca26060c40b1d05c8fe31cc9fb56776472</code>; size 1460 bytes</li>
+<li>exported object <code>object11545</code>; SHA-256 <code>25911c516fcaaded9ea55ede4e30828fe8e21e9a895f5e8948034e9621343854</code>; size 1460 bytes</li>
+<li>exported object <code>object22695</code>; SHA-256 <code>263bc7831746b36b6903d8f193117e6f1e777b2e8765086740b8c0b2af19630e</code>; size 1460 bytes</li>
+<li>exported object <code>object12127</code>; SHA-256 <code>26d630a69965af7110e23e7d89e870aa432f466b8e25d825ba90a1d615b74765</code>; size 1460 bytes</li>
+<li>exported object <code>object10927</code>; SHA-256 <code>2741234de895bed810734f6b55872a58fc208957ab25ecea14b7aed45f7c5726</code>; size 1460 bytes</li>
+<li>exported object <code>object21048</code>; SHA-256 <code>274e7318a4440240d24701135a3a037ffc4064ab6e18b7683968d7ad7557823c</code>; size 1460 bytes</li>
+<li>exported object <code>object10936</code>; SHA-256 <code>2756bae8f350efe025c1a19b8c04b741660f265fa60d9accbdcee7575d65a301</code>; size 1460 bytes</li>
+<li>exported object <code>object23410</code>; SHA-256 <code>276fdf588903250404f05a86da40c2e5c26360c7dd2cfce409d8eaf30640e1e6</code>; size 1460 bytes</li>
+<li>exported object <code>object9386</code>; SHA-256 <code>28204d9f1d7b8c17b7cd049bf7f32b5dc41e538ad9c17d884c1e06eab2d8dd39</code>; size 1460 bytes</li>
+<li>exported object <code>object17777</code>; SHA-256 <code>28c04e7c2529f941c2276321566ed73a1cd75404e1b419a0ed1afe2ef1e4bb5c</code>; size 1460 bytes</li>
+<li>exported object <code>object11451</code>; SHA-256 <code>29804a73896b8364000f4c23c69de02f4b4305e30f21c39a39097ac982863ee8</code>; size 1460 bytes</li>
+<li>exported object <code>object23095</code>; SHA-256 <code>29a06c4b40fada661ba0e4f26673529c42d9bd1fffb629bfed06cdea351634ae</code>; size 1460 bytes</li>
+<li>exported object <code>object22946</code>; SHA-256 <code>29b84a0556ab8203d2e5fde7529491a0253e9586cf9506583cf50acf715f08cc</code>; size 1460 bytes</li>
+<li>exported object <code>object26524</code>; SHA-256 <code>29bce0e3976c1a4b0c5a3dedaf4c1df15560fed60eefc170b4e8f1bfd72e881e</code>; size 1460 bytes</li>
+<li>exported object <code>object17748</code>; SHA-256 <code>2a223bc66bee6f01307afacca8cd03c762c109e39095bf5329d7d70920cdf601</code>; size 1460 bytes</li>
+<li>exported object <code>object18886</code>; SHA-256 <code>2b785b0137066ea6c9bcb8baa757e5633539962796080eeb05ccd3d775f40845</code>; size 1460 bytes</li>
+<li>exported object <code>object11115</code>; SHA-256 <code>2b79250e166209b04e6221f70295861958a9388503c781ddd638cc3864843f5a</code>; size 1460 bytes</li>
+<li>exported object <code>object17615</code>; SHA-256 <code>2b999f47b936dc400728793101b43657b4e9410a7267fb92cd15fac90fd2a482</code>; size 1460 bytes</li>
+<li>exported object <code>object7437</code>; SHA-256 <code>2ba817fc45bb0dec23acca80833f3e7d19a99b3fc71f3e2fa673ef4c38cf533c</code>; size 1460 bytes</li>
+<li>exported object <code>object12132</code>; SHA-256 <code>2c1b8be8a085bd2d29dc9c0fdc032117a77193dad38602390554138f7cdfe4cf</code>; size 1460 bytes</li>
+<li>exported object <code>object22156</code>; SHA-256 <code>2cc04e0598d2938235c3ef5eeca39c65285f0dcb3149c70fc0a7362a4ea3f490</code>; size 1460 bytes</li>
+<li>exported object <code>object17468</code>; SHA-256 <code>2d3a83cf33a1a7bbe0b8d0d003e520924b0aa95732828cc17290fb9d461ab96b</code>; size 1460 bytes</li>
+<li>exported object <code>object11999</code>; SHA-256 <code>2d4829a665a6465d8a67a009389b86e8068c01ce3d094f0459de4ed5f4ef2199</code>; size 1460 bytes</li>
+<li>exported object <code>object16315</code>; SHA-256 <code>2d4c01d66de1641649052c860fd1a8788f5193f3db96487f4f2d6d82a35d6d07</code>; size 1460 bytes</li>
+<li>exported object <code>object24106</code>; SHA-256 <code>2de61824c9fdc4a84764dee59289619829a98149225fc246989abf4dfcd5913a</code>; size 1460 bytes</li>
+<li>exported object <code>object11971</code>; SHA-256 <code>2df0449ed47af8473f3b17afa4cdffb3ed4b11a0df006bc7b090fe4f4f74b59f</code>; size 1460 bytes</li>
+<li>exported object <code>object16563</code>; SHA-256 <code>2e24ef287ea02c7f4c4cc2826389e7b69d3d559d35adbcbdc9b3d7437bd772f5</code>; size 1460 bytes</li>
+<li>exported object <code>object17774</code>; SHA-256 <code>2e3c4533bd6dbe6301f70359c32ff7b03f3c6599208e18fec224196b77ae633d</code>; size 1460 bytes</li>
+<li>exported object <code>object21024</code>; SHA-256 <code>2ef86698bfc9c4ce9dacd4733967d03b4b58e2130c0905f1ae479e689c767234</code>; size 1460 bytes</li>
+<li>exported object <code>object22062</code>; SHA-256 <code>2f41a6bbfe2c57b767df989d53cad14278bcaa7b0fe886f8c6b1e7f0cab3c019</code>; size 1460 bytes</li>
+<li>exported object <code>object11479</code>; SHA-256 <code>2f6d5d053ebbfcb3abd90f94bc862175c2782dd5cc60fb9dbb82a2fe9e8ebaf2</code>; size 1460 bytes</li>
+<li>exported object <code>object21961</code>; SHA-256 <code>311456b3d2193c6a82531c7338dba44beae1363a17ecfcaee9ead85549f3f666</code>; size 1460 bytes</li>
+<li>exported object <code>object23442</code>; SHA-256 <code>311b06d1311f38632a53291a497a27877e1d9bed83ed7d344fb3110938ceb1fa</code>; size 1460 bytes</li>
+<li>exported object <code>object12055</code>; SHA-256 <code>313ac03b87cec74ab7068a0c183daed376e45377fa754059eb752e64fa5c5186</code>; size 1460 bytes</li>
+<li>exported object <code>object22064</code>; SHA-256 <code>31b2c11ae258a1e49a65bfc346e74b260221370dcd5ccf9f3761399de9f71b3d</code>; size 1460 bytes</li>
+<li>exported object <code>object17181</code>; SHA-256 <code>31f63b033376b7488674789fd49cd0698a60403347bc2168cd5de0a8491349b7</code>; size 1460 bytes</li>
+<li>exported object <code>object8754</code>; SHA-256 <code>327eb44a247ac6e38b3d02b76dcdbdaf66a7c7064bf4f3c9fdfd4484a80452ce</code>; size 1460 bytes</li>
+<li>exported object <code>object26365</code>; SHA-256 <code>32c47cc6b8a9063141d7559f8c0a4c356571b38bba3864d454029bd2c2f0ffde</code>; size 1460 bytes</li>
+<li>exported object <code>object9380</code>; SHA-256 <code>33421c7d3bc5bae96cfb722a18967bcbbe8ff21e863a802150fe5fbbbdd04ca6</code>; size 1460 bytes</li>
+<li>exported object <code>object17514</code>; SHA-256 <code>336b14c1f82c04eb8bfd490b73dade0d1a084108f5f43af7d1ab5a5de7e3ccff</code>; size 1460 bytes</li>
+<li>exported object <code>object16485</code>; SHA-256 <code>3376656a1065f217ece24cf4039aaba336fe35a6c6e29be159fb03cb712ef62d</code>; size 1460 bytes</li>
+<li>exported object <code>object22208</code>; SHA-256 <code>3443f2dc0c7b74b068d09f28b4ad0e322d341983f4c57893f2eda38427dbd65e</code>; size 1460 bytes</li>
+<li>exported object <code>object11525</code>; SHA-256 <code>347c0bc98abf0e16e86f72cc7058b8290880c7e089d83d19cbf80aa295e142e6</code>; size 1460 bytes</li>
+<li>exported object <code>object25421</code>; SHA-256 <code>352dd136c9810049178064b46cfeb6149a21cf74198d62455be96509ec710262</code>; size 1460 bytes</li>
+<li>exported object <code>object16734</code>; SHA-256 <code>35714a390651048138a4be4ddeaceb8234628ae85b8f508f3ef4879adcabacb2</code>; size 1460 bytes</li>
+<li>exported object <code>object16216</code>; SHA-256 <code>384b409d1a3538287c7be92f275d5388cd10d404aac05286d0031e384d110558</code>; size 1460 bytes</li>
+<li>exported object <code>object21421</code>; SHA-256 <code>38dbf8fe6f99d95e30c7264d7e6bc83d61d675636a461affdc7dedb3bc96439f</code>; size 1460 bytes</li>
+<li>exported object <code>object23852</code>; SHA-256 <code>3916a0813dfb36961722d081fe5a4835a4e8ccf57258402b6417700b70e71966</code>; size 1460 bytes</li>
+<li>exported object <code>object16789</code>; SHA-256 <code>3a200099bd79b734329a90776df195da10460140051847e25e839069912dcf1c</code>; size 1460 bytes</li>
+<li>exported object <code>object16322</code>; SHA-256 <code>3b163eb96641057909fb4f1a4fd2d42771dcf7c8961a4e9d1862e681037afe86</code>; size 1460 bytes</li>
+<li>exported object <code>object22152</code>; SHA-256 <code>3b967843e46088c05b6f3563768f1046ff9b2a132740ba90c9cb9657632f443a</code>; size 1460 bytes</li>
+<li>exported object <code>object17273</code>; SHA-256 <code>3ba62e70a1c2b45133051bf258188a375751d777542eba48cdb7c6e219d4d052</code>; size 1460 bytes</li>
+<li>exported object <code>object17421</code>; SHA-256 <code>3c235f28b3544e94b6cb9b106fbed857e46407f2edaeab306ec9f044dc1561c6</code>; size 1460 bytes</li>
+<li>exported object <code>object22858</code>; SHA-256 <code>3c24ca5e6fc65f64bc89254b7b65a57ce91d2f94a0669264d29cff8b7bee1a6d</code>; size 1460 bytes</li>
+<li>exported object <code>object11547</code>; SHA-256 <code>3c3fc27182b240f7ef25684b89055f2fb6104216d204c2858ff2f4cc5c5aad73</code>; size 1460 bytes</li>
+<li>exported object <code>object23850</code>; SHA-256 <code>3c6209fdc3f7b8ab8749023d1c5fd58ac6fcc0cca7f25bedff908e9cb0c32aa5</code>; size 1460 bytes</li>
+<li>exported object <code>object17435</code>; SHA-256 <code>3cbf196455ce3dc4596ef48d543346ba6019cee0ec3037214ec0e53a023d33db</code>; size 1460 bytes</li>
+<li>exported object <code>object8057</code>; SHA-256 <code>3cc8277d0766bef38be25da17bc2a547529710bf31e228cdf62b0dac9e218801</code>; size 1460 bytes</li>
+<li>exported object <code>object9465</code>; SHA-256 <code>3d44c0dfce89c86e116520de3075683d7d7d829e5f450632a37ecccbafda0bdc</code>; size 1460 bytes</li>
+<li>exported object <code>object28195</code>; SHA-256 <code>3dc4423e315cbeb8e53913228588374f6b5e95c702acd32a1663d0175d92edd0</code>; size 1460 bytes</li>
+<li>exported object <code>object25402</code>; SHA-256 <code>3edd8e1011fa1e97cdc6dc3d2985ec4ff531fb3ae3c674053341df220b2e4590</code>; size 1460 bytes</li>
+<li>exported object <code>object7902</code>; SHA-256 <code>3ee2866b868219e05cb89be1f203e90124621837871344428e9c0b2b73a53500</code>; size 1460 bytes</li>
+<li>exported object <code>object24486</code>; SHA-256 <code>3fa3195a19af437b9c8356765972bb2af3ababa3bb5563fda1770a04b8e0d958</code>; size 1460 bytes</li>
+<li>exported object <code>object24104</code>; SHA-256 <code>3fb33da40450b7b4c991439b671829118e433f2b30e6a9aa69b9d4e3e21ffd17</code>; size 1460 bytes</li>
+<li>exported object <code>object17228</code>; SHA-256 <code>3ff8a8023e97907778f39cd4ce45bc69e65f719162ae3a0618a8db425416fd78</code>; size 1460 bytes</li>
+<li>exported object <code>object18660</code>; SHA-256 <code>40487f3ccba51bd4740d8e296129781a2d40293fcff0e8688c6b9c47b48a3e64</code>; size 1460 bytes</li>
+<li>exported object <code>object16647</code>; SHA-256 <code>415401907436fd5ce187fdaf01b06dd9c25620971a900cd48d396af77ca1cc16</code>; size 1460 bytes</li>
+<li>exported object <code>object17114</code>; SHA-256 <code>4226968bc416ca4299ceed0b41b92a0bd28ba32dd6964c95919eed35001769ac</code>; size 1460 bytes</li>
+<li>exported object <code>object24858</code>; SHA-256 <code>42a8a1c74a9fcf27a35963517aae581973e0f89b65bef4cf7bc8bf835364ade1</code>; size 1460 bytes</li>
+<li>exported object <code>object10748</code>; SHA-256 <code>42b7c8ac10d317ebce9ddcac972286ca8f3cea590d578ae5dc853ceecc946c2a</code>; size 1460 bytes</li>
+<li>exported object <code>object6726</code>; SHA-256 <code>42bb95c4eb86938a55171e950d23e21b10d70ea15943c2432a6afb5f4ef163a5</code>; size 1460 bytes</li>
+<li>exported object <code>object16237</code>; SHA-256 <code>435c771adb307c3456f296da31f2000676759f1481c2484c7ec38751fb153b10</code>; size 1460 bytes</li>
+<li>exported object <code>object17792</code>; SHA-256 <code>4385a17fa2ce6c83c6079bb0593482b48df5bc4b5bd15f913225d7076d5574f8</code>; size 1460 bytes</li>
+<li>exported object <code>object21854</code>; SHA-256 <code>43e5e8f4682cf04c0a879423e15449b67785926aaf6bb3752d2c019ebf06e6e3</code>; size 1460 bytes</li>
+<li>exported object <code>object21420</code>; SHA-256 <code>43fc9856c71f37798d1793f95080fdcbd6925cddc9427b68237453a4f7a6801e</code>; size 1460 bytes</li>
+<li>exported object <code>object17350</code>; SHA-256 <code>445bca5a135f9179c266dcff83841f82fd4637a22ccc7ae656e4e41e20fc9d16</code>; size 1460 bytes</li>
+<li>exported object <code>object22139</code>; SHA-256 <code>45100f25534e7567b0d6894478c2fcf74a259d0e1938d6ef1c3e152bedbc9275</code>; size 1460 bytes</li>
+<li>exported object <code>object28025</code>; SHA-256 <code>4555fab8ca58e6531304dbf84796b86c0a8aeb95708120c29191f52d26c4ae7a</code>; size 1460 bytes</li>
+<li>exported object <code>object23825</code>; SHA-256 <code>458cf2b38545678d1498b3421a870e90f30d351db27e24179a6763846ff23d19</code>; size 1460 bytes</li>
+<li>exported object <code>object9345</code>; SHA-256 <code>45974b10e99ee53cbd42b5c87ecd4f1b95d7d0e55deec332973245d450df28ee</code>; size 1460 bytes</li>
+<li>exported object <code>object26211</code>; SHA-256 <code>45cc01eea937401159bab02926bc7c8fa12b6abd5edbe27e84662ee6fe2f4a78</code>; size 1460 bytes</li>
+<li>exported object <code>object23401</code>; SHA-256 <code>46e2824454f8e01957f504c3ea01016f6e4e555e313cae11814c23931a7d3694</code>; size 1460 bytes</li>
+<li>exported object <code>object16839</code>; SHA-256 <code>46f4a99d212ea9ee939197ff520853f8ce77a42cb3d927ff8e30b083e481c995</code>; size 1460 bytes</li>
+<li>exported object <code>object16250</code>; SHA-256 <code>470265729c00e3bcbda9f914676782eb091be09a456a33e3fedc7baf31a4016c</code>; size 1460 bytes</li>
+<li>exported object <code>object18776</code>; SHA-256 <code>470566239f44e73efaee1810cec3843e5febe44fd291bfbede8addc4f3c446be</code>; size 1460 bytes</li>
+<li>exported object <code>object22920</code>; SHA-256 <code>4827626c1838692796d0f167b74b839d36668d4dff4858f71ac7a9cb71816a9d</code>; size 1460 bytes</li>
+<li>exported object <code>object16690</code>; SHA-256 <code>483e04ca9f7fb302c5dd99db40bb808a64c04248218362a86d73a96f4354ab1b</code>; size 1460 bytes</li>
+<li>exported object <code>object11785</code>; SHA-256 <code>48bd20a01954fbab1004775b2dab614c0263b425e5c2ddaa634a7172a03f1bad</code>; size 1460 bytes</li>
+<li>exported object <code>object23431</code>; SHA-256 <code>48c2f29bc316db8422e221b3fd10dc1560eda97df6d5f465f6e1a077f92a527d</code>; size 1460 bytes</li>
+<li>exported object <code>object16731</code>; SHA-256 <code>48e600b7724a48ec70eba63611a2d56b390a0c3a6879946b25e604f573abf59f</code>; size 1460 bytes</li>
+<li>exported object <code>object16531</code>; SHA-256 <code>493f648828927027e221562702d50127b5666dec98de5c51008f342bdb3f6102</code>; size 1460 bytes</li>
+<li>exported object <code>object13914</code>; SHA-256 <code>496dff3fb8bc99c8d9b06d06831c28e36fa4c23090034654ccb35d3c8ed91581</code>; size 1460 bytes</li>
+<li>exported object <code>object4765</code>; SHA-256 <code>49e4663867cb56cd43920fb62bd661c360fdbbba47a4192105c6e5131138b1a0</code>; size 1460 bytes</li>
+<li>exported object <code>object22686</code>; SHA-256 <code>4bad85e1a0939636cd9279ff7e57378973d6871337d78d1d8b133694656a3e20</code>; size 1460 bytes</li>
+<li>exported object <code>object16621</code>; SHA-256 <code>4bc2d63ee2dd6106fb98a65debb9630a485b2c3d1cec7ae9e79b604307583dc2</code>; size 1460 bytes</li>
+<li>exported object <code>object24139</code>; SHA-256 <code>4bdf2e59647db894d51afb06855b310b1ee57c2ddc04a411002681d0dc3d7f10</code>; size 1460 bytes</li>
+<li>exported object <code>object23658</code>; SHA-256 <code>4c5231a06021c2fa48a0a9d5e98b3d703a0cfa9dc99257d89146ea79712f6df9</code>; size 1460 bytes</li>
+<li>exported object <code>object7871</code>; SHA-256 <code>4cea0c8974225cb7875e6c44d41fb0138d0ce2b92bde96161c3569ff5730c07a</code>; size 1460 bytes</li>
+<li>exported object <code>object16511</code>; SHA-256 <code>4cebf9ed49197981b171430848037b9115e2d361f5d33fefe4ae85912ff69772</code>; size 1460 bytes</li>
+<li>exported object <code>object8843</code>; SHA-256 <code>4d2d2217e048300dd1f29754b980ed31c578404e59bc93078be9b5c38f22ea08</code>; size 1460 bytes</li>
+<li>exported object <code>object16736</code>; SHA-256 <code>4d9180d2c2d43c67c8347589226fa9cae45fb9a94d35c04ad732e7187bd05ff5</code>; size 1460 bytes</li>
+<li>exported object <code>object21843</code>; SHA-256 <code>4de5765591e01487bc7f0e2d135b3a3158603eda8c6016aa8576a7ea2ad7dbfd</code>; size 1460 bytes</li>
+</ul>
+<h2 id="actor-similarity-leads">Actor similarity leads</h2>
+<ul>
+<li>Volatile Cedar (G0123): 20% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Winnti Group (G0044): 17% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Ajax Security Team (G0130): 17% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>IndigoZebra (G0136): 14% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Nomadic Octopus (G0133): 14% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Whitefly (G0107): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Metador (G1013): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Elderwood (G0066): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Rancor (G0075): 11% TTP overlap. This is an investigation lead, not attribution.</li>
+<li>Evilnum (G0120): 9% TTP overlap. This is an investigation lead, not attribution.</li>
+</ul>
+<h2 id="local-enrichment-and-correlations">Local enrichment and correlations</h2>
+<p>No match means unknown in this corpus. Local CTI may postdate the capture. Matches and shared infrastructure require review; no automatic promotion or attribution.
+Snapshot: <code>27cd896e9110b1fda7f2da6c5f4df9153ce2ef635709a10b488145ec018823aa</code>; recorded 2026-09-19T12:09:25.907745+00:00; mode: local-only.
+Coverage: <code>{&quot;matched_observables&quot;:0,&quot;no_exact_match&quot;:2994,&quot;observable_limit&quot;:5000,&quot;observables_checked&quot;:2994,&quot;observables_total&quot;:2994,&quot;prior_case_limit_reached&quot;:false,&quot;prior_cases_checked&quot;:11,&quot;truncated&quot;:false}</code></p>
+<ul>
+<li>Catalog T1105: https://attack.mitre.org/techniques/T1105; detection strategies: [{&quot;attack_id&quot;:&quot;DET0060&quot;,&quot;name&quot;:&quot;Detect Ingress Tool Transfers via Behavioral Chain&quot;,&quot;stix_id&quot;:&quot;x-mitre-detection-strategy--67677c4c-5778-49eb-ae74-1920645b8554&quot;}]</li>
+<li>Prior analysis <code>6df36b51-4b44-4660-b534-2fa89705e807</code> shares 31 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>29aa3ef8-47c9-4c47-b4cc-1ff3e0708142</code> shares 24 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>b79032a8-d69e-4ac1-bdd4-542473fa8e3b</code> shares 36 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>faf041c3-70e0-4a01-8780-10917e5e187c</code> shares 28 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>08324647-35af-4af2-8d82-4387eec03918</code> shares 26 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>616a90fa-f15e-4fcb-8d56-7b8e0eff5785</code> shares 13 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>459e119d-191f-49e8-85ea-c78f9de41826</code> shares 22 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>7a2cfe72-f48d-4894-8a2d-8889cb3b11b2</code> shares 43 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>81373b30-6a59-49d1-89b0-bad73ed19eaa</code> shares 26 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>38851ad7-b3a0-423d-ae89-3b7be4e4b908</code> shares 29 observations. This does not establish a common campaign.</li>
+<li>Prior analysis <code>bfccc426-aa9b-4007-8558-a66d37ecb90c</code> shares 44 observations. This does not establish a common campaign.</li>
+<li>External provider queries: 0. Not requested; no unknown indicator is classified as benign.</li>
+</ul>
+<h2 id="coverage-and-limitations">Coverage and limitations</h2>
+<ul>
+<li>Packet and protocol facts are deterministic for the recorded analyzer manifest.</li>
+<li>Encrypted application payloads are not decrypted; only available metadata is reported.</li>
+<li>ATT&amp;CK mappings and actor overlaps are candidates until analyst review and promotion.</li>
+<li>HTTP object inventory: <code>{&quot;compact_objects&quot;:2136,&quot;complete&quot;:true,&quot;detailed_objects&quot;:500,&quot;exported_objects&quot;:2638,&quot;hashed_bytes&quot;:4922527,&quot;hashed_objects&quot;:2638,&quot;omitted_unique_hashes&quot;:0,&quot;returned_unique_hashes&quot;:2636,&quot;selection&quot;:&quot;content-classified first, then size descending, SHA256 tie-break; deduplicated by full hash; overflow retains a compact hash index&quot;,&quot;unhashed_objects&quot;:0,&quot;unique_hashes&quot;:2636}</code>. Compact overflow hashes are retained in JSON coverage and observables.</li>
+<li>A directory subject is not necessarily a logged-in user; consult identity bindings in the JSON evidence.</li>
+<li>Rendered / available: findings 57/57, identities 14/14, observables 500/2994, artifacts 200/500. Full returned inventory is in the JSON result.</li>
+</ul>
+</main></body></html>
