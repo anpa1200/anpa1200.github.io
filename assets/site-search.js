@@ -4,6 +4,15 @@
   if (window.__1200kmSiteSearch) return;
   window.__1200kmSiteSearch = true;
 
+  // Shared topic navigation also serves embedded Docusaurus collections.
+  if (!document.querySelector('script[data-anomaly-loader]')) {
+    const anomalyLoader = document.createElement('script');
+    anomalyLoader.src = '/assets/anomaly-tags.js?v=20260921-1';
+    anomalyLoader.dataset.anomalyLoader = 'true';
+    anomalyLoader.defer = true;
+    document.head.appendChild(anomalyLoader);
+  }
+
   const ASSET_VERSION = '20260722-3';
   const PAGEFIND_VERSION = '1.5.2';
   const SEARCH_PAGE_BATCH_SIZE = 20;
@@ -19,6 +28,7 @@
     { key: 'source', label: 'Source' },
     { key: 'updated_year', label: 'Updated year' },
     { key: 'topic', label: 'Topic' },
+    { key: 'anomaly', label: 'Anomaly type' },
     { key: 'section', label: 'Collection' },
   ];
   const compactNavigation = window.matchMedia('(max-width: 1180px)');

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { addHeadingIds, markPagefindContent } from './release-html-lib.mjs';
 import { topicsFromText } from './content-topic-lib.mjs';
+import {anomalyTagsForUrl} from './anomaly-tags-lib.mjs';
 import {
   isAuthorizedTrainsecCanonical,
   trainsecCanonicalForLocalUrl,
@@ -395,6 +396,7 @@ export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
     catalogItem?.canonical_owner ? `<meta content="${escapeAttribute(catalogItem.canonical_owner)}" data-pagefind-meta="canonical_owner[content]">` : '',
     `<meta content="${escapeAttribute(updatedYear)}" data-pagefind-filter="updated_year[content]" data-pagefind-meta="updated_year[content]">`,
     ...topics.map((topic) => `<meta content="${escapeAttribute(topic)}" data-pagefind-filter="topic[content]">`),
+    ...anomalyTagsForUrl(url.href).map(tag => `<meta content="${escapeAttribute(tag)}" data-pagefind-filter="anomaly[content]">`),
     `<meta content="${escapeAttribute(topics.join(', '))}" data-pagefind-meta="topics[content]">`,
     date ? `<meta content="${escapeAttribute(date)}" data-pagefind-meta="date[content]">` : '',
   ].filter(Boolean).join('\n    ');
