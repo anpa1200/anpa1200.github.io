@@ -33,7 +33,7 @@ function run(script, ...flags) {
     stdio: 'inherit'
   });
 }
-run('stage-article-archive-governance.mjs', '--site', site, '--source', root, '--archive', archive, '--archive-commit', 'ea0c071ae80fedc0381c78efc0125ae0f51ab179');
+run('stage-article-archive-governance.mjs', '--site', site, '--source', root, '--archive', archive, '--archive-commit', '65ee7a53a0507cc09d7b372aa83428e6a88fd2b7');
 run('build-site-shell.mjs', '--site', site);
 run('build-site-artifacts.mjs', '--site', site, '--source', root);
 run('build-platform-sidebar.mjs', '--site', site);
