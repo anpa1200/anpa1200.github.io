@@ -10,6 +10,13 @@ export function anomalyUrlKey(value) {
   } catch { return ''; }
 }
 export function anomalyTagsForUrl(url) { return byUrl.get(anomalyUrlKey(url)) || []; }
+export function withAnomalyTopicLoader(html, url) {
+  // Topic navigation is independent of search eligibility. In particular, a
+  // permitted mirror keeps its external canonical and can still display tags.
+  if (!anomalyTagsForUrl(url).length || !/<\/head>/i.test(html)
+    || /<script\b[^>]*\bsrc=["'][^"']*\/assets\/anomaly-tags\.js(?:\?[^"']*)?["']/i.test(html)) return html;
+  return html.replace(/<\/head>/i, '  <script src="/assets/anomaly-tags.js?v=20260921-1" defer></script>\n</head>');
+}
 export function withAnomalyTags(item) {
   const reviewed = [item.canonical_url, ...(item.alternate_urls || [])].flatMap(anomalyTagsForUrl);
   return {...item, tags: [...new Set([...(item.tags || []).filter(tag => !tag.startsWith('anomaly-')), ...reviewed])]};

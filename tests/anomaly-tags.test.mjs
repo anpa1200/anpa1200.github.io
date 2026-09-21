@@ -1,9 +1,41 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import {anomalyTaxonomy, anomalyAssignments, anomalyTagsForUrl, withAnomalyTags, anomalySearchHref} from '../scripts/anomaly-tags-lib.mjs';
-import {prepareHtmlForSearch} from '../scripts/search-index-lib.mjs';
+import {readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {tmpdir} from 'node:os';
+import {dirname, join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {anomalyTaxonomy, anomalyAssignments, anomalyTagsForUrl, withAnomalyTags, withAnomalyTopicLoader, anomalySearchHref} from '../scripts/anomaly-tags-lib.mjs';
+import {prepareHtmlForSearch, validatePage} from '../scripts/search-index-lib.mjs';
 const json = path => JSON.parse(readFileSync(new URL('../'+path, import.meta.url)));
+test('reviewed mirrors get topic navigation without changing canonical ownership or search eligibility', () => {
+  const path = '/articles/trainsec/windows-internals-windows-logon-sessions-and-tokens.html';
+  const html = readFileSync(new URL('..'+path, import.meta.url), 'utf8');
+  const url = 'https://1200km.com'+path;
+  const before = validatePage(url, html);
+  assert.equal(before.indexable, false);
+  const injected = withAnomalyTopicLoader(html, url);
+  const loader = '  <script src="/assets/anomaly-tags.js?v=20260921-1" defer></script>\n';
+  assert.ok(injected.includes(loader));
+  assert.equal(injected.replace(loader, ''), html, 'Only the topic loader may change');
+  assert.deepEqual(validatePage(url, injected), before);
+  assert.equal(withAnomalyTopicLoader(injected, url), injected, 'Injection must be idempotent');
+  assert.equal(withAnomalyTopicLoader(html, '/untagged-mirror.html'), html);
+});
+test('real staging command adds the reviewed mirror loader before excluding it from search', t => {
+  const temp = mkdtempSync(join(tmpdir(), '1200km-anomaly-mirror-test-'));
+  t.after(() => rmSync(temp, {recursive:true, force:true}));
+  const path = 'articles/trainsec/windows-internals-windows-logon-sessions-and-tokens.html';
+  const html = readFileSync(new URL('../'+path, import.meta.url), 'utf8');
+  const file = join(temp, path);
+  mkdirSync(dirname(file), {recursive:true});
+  writeFileSync(file, html);
+  execFileSync(process.execPath, [fileURLToPath(new URL('../scripts/inject-search-loader.mjs', import.meta.url)), '--site', temp]);
+  const staged = readFileSync(file, 'utf8');
+  assert.equal(staged, withAnomalyTopicLoader(html, '/'+path));
+  assert.equal(validatePage('https://1200km.com/'+path, staged).indexable, false);
+  assert.doesNotMatch(staged, /src="\/assets\/site-search\.js/);
+});
 test('all fifteen operational headings have unique, defined tags and evidence', () => {
   assert.equal(anomalyTaxonomy.tags.length, 15);
   const ids = anomalyTaxonomy.tags.map(tag => tag.id);

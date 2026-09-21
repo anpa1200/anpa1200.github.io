@@ -2,6 +2,7 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { SITE_ORIGIN, normalizeSiteUrl, validatePage } from './search-index-lib.mjs';
+import { withAnomalyTopicLoader } from './anomaly-tags-lib.mjs';
 
 const args = process.argv.slice(2);
 const siteIndex = args.indexOf('--site');
@@ -20,12 +21,20 @@ async function walk(directory) {
 }
 
 let injected = 0;
+let topicInjected = 0;
 for (const file of await walk(site)) {
   const relative = file.slice(site.length).replace(/\\/g, '/');
   let html = await readFile(file, 'utf8');
   if (relative === '/threat-matrix/index.html') continue;
   const pageUrl = normalizeSiteUrl(new URL(relative, SITE_ORIGIN).href);
-  if (!pageUrl || !validatePage(pageUrl.href, html).indexable) continue;
+  if (!pageUrl) continue;
+  const withTopics = withAnomalyTopicLoader(html, pageUrl.href);
+  if (withTopics !== html) {
+    html = withTopics;
+    await writeFile(file, html);
+    topicInjected += 1;
+  }
+  if (!validatePage(pageUrl.href, html).indexable) continue;
   // Inject directly even when a shared theme/ecosystem loader is present. The
   // loader scripts detect this tag and stand down, while the versioned URL
   // prevents a previously cached shared loader from hiding a new search release.
@@ -37,3 +46,4 @@ for (const file of await walk(site)) {
 }
 
 console.log(`Injected the site-search loader into ${injected} staged HTML page(s).`);
+console.log(`Injected reviewed anomaly navigation into ${topicInjected} staged HTML page(s), independently of search eligibility.`);
