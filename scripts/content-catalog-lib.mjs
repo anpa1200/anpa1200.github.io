@@ -10,6 +10,7 @@ import {
   isAuthorizedTrainsecCanonical,
   trainsecCanonicalEntryForLocalUrl,
 } from './trainsec-canonical-lib.mjs';
+import {withAnomalyTags} from './anomaly-tags-lib.mjs';
 
 export const VOCABULARIES = Object.freeze({
   primary_types: [
@@ -565,7 +566,7 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
     indexable: !['external-index', 'nonindex-local', 'external-canonical-mirror'].includes(source),
     ...(collection ? { collection_id: collection.id } : {}),
   };
-  return governedItem(applyOverride(item, config.overrides[deployedUrl] || config.overrides[canonical]), config);
+  return withAnomalyTags(governedItem(applyOverride(item, config.overrides[deployedUrl] || config.overrides[canonical]), config));
 }
 
 function anchorSummary(html, offset, title) {
@@ -631,7 +632,7 @@ function counts(items, field) {
 }
 
 export function buildCatalog(items, config, scope = 'local-source-catalog') {
-  const sorted = items.map((item) => governedItem(item, config))
+  const sorted = items.map((item) => withAnomalyTags(governedItem(item, config)))
     .sort((a, b) => a.canonical_url.localeCompare(b.canonical_url));
   return {
     $schema: './content-catalog.schema.json',
