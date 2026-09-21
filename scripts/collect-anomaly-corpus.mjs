@@ -5,6 +5,7 @@ import {resolve, join, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {localFileForUrl, stripHtml} from './search-index-lib.mjs';
+import {removeHtmlElements} from './html-token-utils.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -58,7 +59,9 @@ for (const prefix of prefixes) {
 function mainText(body, markdown) {
   if (markdown) return body.replace(/^---\n[\s\S]*?\n---\n/, '').replace(/<!-- anomaly-tags:start -->[\s\S]*?<!-- anomaly-tags:end -->/g, '');
   let text = body.match(/<article\b[^>]*>[\s\S]*?<\/article>/i)?.[0] || body.match(/<main\b[^>]*>[\s\S]*?<\/main>/i)?.[0] || body;
-  text = text.replace(/<(script|style|nav|footer|aside)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+  // Corpus extraction produces plain text, not HTML safe for rendering. Use the
+  // shared token helper so quoted tag boundaries are handled consistently.
+  for (const tag of ['script', 'style', 'nav', 'footer', 'aside']) text = removeHtmlElements(text, tag);
   text = text.replace(/<\/(?:p|li|h[1-6]|tr|pre|div)>/gi, '$&\n\n');
   return text.split(/\n\s*\n/).map(part => stripHtml(part).replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n\n');
 }
