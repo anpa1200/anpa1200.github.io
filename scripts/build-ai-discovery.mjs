@@ -83,6 +83,8 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 - [Local article archive](https://1200km.com/articles/)
 - [AdversaryGraph vs Ten Malware PCAPs](https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/) — separate ten-case deterministic-platform regression with original screenshots, full reports, enrichment and correlation audits; selected-indicator coverage is not detection accuracy
 - [Ten-PCAP public evidence supplement](https://1200km.com/research/adversarygraph-ten-pcaps/) — downloadable reports, native results, derived provider summaries, integrity checks and publication boundaries
+- [Can AdversaryGraph Tell the Story of a Malware PCAP?](https://1200km.com/articles/read/2026/adversarygraph-pcap-investigation-stories/) — twenty historical captures, short native reports, 20 original screenshots and official-answer comparisons; 12 partial, four missed, four withheld outcomes
+- [Twenty-PCAP public evidence supplement](https://1200km.com/research/adversarygraph-pcap-stories/) — concise reviewed explanations, source-bound native reports, model and usage records, checksums and public evidence download
 
 ## Courses and learning paths
 

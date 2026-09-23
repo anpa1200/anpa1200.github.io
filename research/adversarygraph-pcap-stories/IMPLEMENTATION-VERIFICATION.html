@@ -1,0 +1,111 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCAP reporting revision: verification record | 1200km</title><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/research/adversarygraph-pcap-stories/IMPLEMENTATION-VERIFICATION.html"><meta name="description" content="Twenty malware PCAP tests with real AdversaryGraph screenshots, short reports, IOC checks, official-answer comparisons, and downloadable evidence."><meta property="og:title" content="PCAP reporting revision: verification record"><meta property="og:description" content="Twenty malware PCAP tests with real AdversaryGraph screenshots, short reports, IOC checks, official-answer comparisons, and downloadable evidence."><meta property="og:url" content="https://1200km.com/research/adversarygraph-pcap-stories/IMPLEMENTATION-VERIFICATION.html"><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/articles/article-assets/adversarygraph-pcap-stories/cover.png"><meta property="article:published_time" content="2026-09-23"><meta property="article:modified_time" content="2026-09-23"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{background:#11233c;padding:20px;color:white}header a{color:#b7e5ff}main{max-width:1160px;margin:24px auto;padding:28px 36px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2,h3{margin-top:2em}a{color:#075c91}img{max-width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3fa;padding:18px}table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid #cbd5e1;padding:8px;text-align:left}blockquote{margin:20px 0;padding:10px 20px;background:#edf3fa;border-left:4px solid #257ba5}@media(max-width:700px){main{padding:18px;margin:0}body{font-size:16px}td,th{padding:4px}}</style></head><body><header><nav aria-label="Evidence navigation"><a href="/">1200km</a> · <a href="https://1200km.com/articles/read/2026/adversarygraph-pcap-investigation-stories/">Full article</a> · <a href="https://1200km.com/research/adversarygraph-pcap-stories/">Evidence boundaries</a> · <a href="https://1200km.com/research/adversarygraph-pcap-stories/20-REVIEWED-SHORT-REPORTS.html">20 short reviews</a></nav></header><main><h1 id="pcap-reporting-revision-verification-record">PCAP reporting revision: verification record</h1>
+<h2 id="implemented-and-running-locally">Implemented and running locally</h2>
+<p>The new PCAP report-writing stage is available after packet analysis and approved
+enrichment. It produces a concise, cited analyst-review report and a focused
+<code>/pcap/:analysisId/report</code> view. The packet evidence and original reports remain
+intact. All case data is from public training captures; no malware was executed.</p>
+<p>Implementation is in the isolated <code>adversarygraph-pcap-quality</code> worktree on branch
+<code>feat/pcap-readable-summary-20260922</code>, based on
+<code>817f74b13d9c4155db6c161e260747df0b0d1abe</code>. Current-turn changes are <strong>not committed
+or pushed</strong>, and no website publication was performed. Unrelated changes in the
+canonical checkout were preserved.</p>
+<h2 id="changed-components">Changed components</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backend/app/services/pcap_story.py</code></td>
+<td>Bounded short-report evidence selection, prompt, validation, conservative optional-claim filtering, rendering and provenance</td>
+</tr>
+<tr>
+<td><code>backend/app/api/routes/pcap.py</code></td>
+<td>Read-only preflight, saved summary access and explicit report-writing endpoint; permissions, TLP, consent and concurrent-source checks</td>
+</tr>
+<tr>
+<td><code>backend/app/services/investigation_story.py</code></td>
+<td>Reusable citation-bound generation, bounded repair diagnostics and actual model/usage metadata</td>
+</tr>
+<tr>
+<td><code>backend/app/services/ai/openai.py</code></td>
+<td>Strict server-issued citation/indicator enums and returned model metadata</td>
+</tr>
+<tr>
+<td><code>backend/app/services/ai/claude.py</code></td>
+<td>Returned model, stop reason and usage accounting including cache input tokens</td>
+</tr>
+<tr>
+<td><code>backend/app/services/pcap_assessment.py</code></td>
+<td>Hash-qualified PE-under-image-path file-review candidates; no automatic host-IP promotion</td>
+</tr>
+<tr>
+<td><code>frontend/src/components/PcapSummaryPanel.tsx</code></td>
+<td>Explicit final reporting stage, readable report card, exports and separate evidence details</td>
+</tr>
+<tr>
+<td><code>frontend/src/pages/PcapReport.tsx</code>, <code>frontend/src/App.tsx</code></td>
+<td>Focused live report route</td>
+</tr>
+<tr>
+<td><code>frontend/src/api/client.ts</code></td>
+<td>Typed PCAP summary API contract</td>
+</tr>
+<tr>
+<td><code>frontend/src/pages/Analyze.tsx</code></td>
+<td>Integrate the final stage and bound oversized investigation handoffs</td>
+</tr>
+<tr>
+<td>Backend unit/integration and frontend PCAP browser tests</td>
+<td>Evidence limits, provenance, authorization, source changes, readability and handoff regressions</td>
+</tr>
+<tr>
+<td><code>docs/PCAP-SHORT-REPORTS.md</code></td>
+<td>Report contract, governance and review checklist</td>
+</tr>
+</tbody>
+</table>
+<h2 id="validation">Validation</h2>
+<ul>
+<li>Final backend regression output: <strong>1,624 passed, 180 skipped, 46 warnings</strong> in
+64.44 seconds. Skips are not counted as passed integration coverage.
+<a href="backend-tests-final.log">Full backend test output</a>.</li>
+<li>Frontend lint passed; TypeScript/Vite production build passed. Vite retains an
+existing large-code-chunk warning; this is not reported as a clean warning-free build.</li>
+<li>All four targeted PCAP browser tests passed: report writing/consent/readability,
+reputation selection, report quality, and large-investigation handoff.
+<a href="frontend-tests-final.log">Browser test output</a>.</li>
+<li>The two previously rejected oversized handoffs returned HTTP 200 through the
+real local UI. Original texts were 297,320 and 502,983 characters; bounded
+handoff descriptions were 537 and 541 characters. Full reports remain stored.
+<a href="2019-11-12/handoff-retest.json">Okay-Boomer handoff proof</a>,
+<a href="2018-12-18/handoff-retest.json">Eggnog Soup handoff proof</a>.</li>
+<li>Selected deployed backend source hashes are checked against the worktree, and
+exact service image IDs are retained in <a href="runtime-provenance.json">runtime provenance</a>.</li>
+<li>Original packet results and internal-context snapshots are checked against the
+490-file baseline freeze. Final native reports have a separate pre-answer freeze.</li>
+<li>Every published case screenshot must have a matching validation JSON recording
+live IDs, hash, model, DOM checks, image hash and completed visual inspection.
+Image presentation success does <strong>not</strong> mean investigation correctness.</li>
+</ul>
+<p>All 20 final report-card images now have matching checksums and individual visual
+inspection records: 16 show saved reports and four show an explicit withheld state.
+No screenshots were fabricated or substituted with answer-assisted report images.</p>
+<p>The final optional-citation reliability fixes were deployed in backend image
+<code>summary-20260922-v11</code>; the frontend is <code>summary-20260922-v6</code>. Their unit and
+browser regressions passed. The four intended live Claude retries were blocked
+by the execution approval mechanism, pending explicit consent to send the exact
+bounded public-training metadata to Anthropic. They are <strong>not</strong> reported as
+successfully retested. Subsequent reference-answer review did not alter any
+frozen native report or submit any answer text to a model.</p>
+<h2 id="known-boundaries">Known boundaries</h2>
+<p>Strict JSON, exact quotations and literal-identifier checks do not establish
+semantic correctness. Current reputation is not capture-time reputation. A
+download is not execution, and missing telemetry is not a clean verdict. Global
+negative claims, weak POST-based leads and incomplete attack chains are assessed
+explicitly in the per-case answer comparison instead of being hidden by a passing
+software test result.</p>
+</main></body></html>

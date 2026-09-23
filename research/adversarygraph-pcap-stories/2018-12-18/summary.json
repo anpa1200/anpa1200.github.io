@@ -1,0 +1,398 @@
+{
+  "id": "investigation-summary:dc26ff68-c6d3-4f90-92b1-6c06d9cd5b6f",
+  "type": "pcap-investigation-summary",
+  "label": "PCAP investigation summary",
+  "model": "gpt-4.1-2025-04-14",
+  "stale": false,
+  "status": "analyst-review-required",
+  "content": "# PCAP investigation summary\n\n## What happened\n\nHost 172.16.3.133 downloaded a Portable Executable \\(PE\\) file from 93.90.146.108 via http://www.prolightphotovideo.net/dVk\\_hwBIaehh/, indicating potential delivery of an executable payload.\n\nHost 172.16.3.133 also downloaded an OLE document from 82.80.25.215 at http://entisrael.com/wp-content/uploads/2018/jemHu-SahjLpTw\\_r-7Kd/PaymentStatus/default/US\\_us/Companies-Invoice-0970945/, which may contain a malicious macro or embedded exploit.\n\nNo evidence confirms execution of the downloaded files or subsequent compromise within the available capture.\n\n## Who was involved\n\n- 172.16.3.133 appears as the client for both high-risk file downloads and is associated with the account conception.varner.\n- Account conception.varner is bound to 172.16.3.133 via Kerberos principal activity.\n\n## What remains uncertain\n\n- It remains unknown if the downloaded PE or OLE files were executed or if any further post-compromise activity occurred in this session.\n\n## Next check\n\n- Review endpoint logs on 172.16.3.133 for signs of execution or process launch correlated with the SHA-256 values of the downloaded PE and OLE files.\n\nAnalyst-review draft. Exact evidence references and provider provenance are retained in the structured record.",
+  "summary": "Host 172.16.3.133 downloaded a Portable Executable (PE) file from 93.90.146.108 via http://www.prolightphotovideo.net/dVk_hwBIaehh/, indicating potential delivery of an executable payload. Host 172.16.3.133 also downloaded an OLE document from 82.80.25.215 at http://entisrael.com/wp-content/uploads/2018/jemHu-SahjLpTw_r-7Kd/PaymentStatus/default/US_us/Companies-Invoice-0970945/, which may contain a malicious macro or embedded exploit. No evidence confirms execution of the downloaded files or subsequent compromise within the available capture.",
+  "coverage": {
+    "warnings": [
+      "Raw HTTP fallback limited to 100 of 180 streams"
+    ],
+    "projection": "pcap-brief-evidence-v2-compact",
+    "source_digest": "e93804940a7874496153bbdc1a859f8145b3c4f1c2fe41106c786d9ccce66065",
+    "candidate_total": 38,
+    "omitted_records": {
+      "findings": 252,
+      "artifacts": 543,
+      "candidates": 33,
+      "identities": 12,
+      "techniques": 2,
+      "selected_network_events": 133
+    },
+    "compact_evidence": true,
+    "included_records": {
+      "limits": 1,
+      "capture": 1,
+      "network": 4,
+      "transfers": 6,
+      "candidates": 5,
+      "identities": 5,
+      "reputation_coverage": 1
+    },
+    "supplement_scope": "Bounded selected packet metadata, direct reputation, identities and transfer relationships; no payload bodies, prior-case content or exhaustive inventory. Full data remains in source analysis.",
+    "source_characters": 9828,
+    "enrichment_retained_targets": 164
+  },
+  "filename": "2018-12-18-traffic-analysis-exercise.pcap",
+  "provider": "openai",
+  "report_id": "pcap:0c443755-98f4-45dd-a9c4-e04e0415fe14",
+  "created_at": "2026-09-22T19:16:14.082307+00:00",
+  "structured": {
+    "iocs": [],
+    "ttps": [],
+    "identities": [
+      {
+        "kind": "ip",
+        "text": "172.16.3.133 appears as the client for both high-risk file downloads and is associated with the account conception.varner.",
+        "basis": "observed",
+        "value": "172.16.3.133",
+        "evidence": [
+          {
+            "end": 363,
+            "quote": "{\"client_ip\":\"172.16.3.133\",\"completeness\":\"unknown\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":48350,\"response_frame\":48493,\"server_ip\":\"93.90.146.108\",\"sha256\":\"4a6ff2d1af33424fe9033c836b8e64c8361e6428e8e45d0cc14a38892941cfd6\",\"url_without_query_or_fragment\":\"http://www.prolightphotovideo.net/dVk_hwBIaehh/\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-8d7f6dbb69dcccb18436eab5",
+            "source_id": "S0009",
+            "source_sha256": "666a3cb06582a3c7c119935a7c0cb25ebed13e6c49a7fa35cc6c2cba94ae42f5"
+          },
+          {
+            "end": 445,
+            "quote": "{\"client_ip\":\"172.16.3.133\",\"completeness\":\"unknown\",\"content_kind\":\"ole-document\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":47166,\"response_frame\":47322,\"server_ip\":\"82.80.25.215\",\"sha256\":\"c8212610730cc6902883eee501e0ba8a2b043b880f7ab374df4a5c585d88ac8b\",\"url_without_query_or_fragment\":\"http://entisrael.com/wp-content/uploads/2018/jemHu-SahjLpTw_r-7Kd/PaymentStatus/default/US_us/Companies-Invoice-0970945/\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-5884b4e6d79e5790274d7c32",
+            "source_id": "S0010",
+            "source_sha256": "7f761bf3653d9d3fd10a1fcac5c35bf6fd1336e8b7eb80b9784250ab8ee32522"
+          },
+          {
+            "end": 339,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":37227,\"owner_ip\":\"172.16.3.133\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":37235,\"owner_ip\":\"172.16.3.133\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"172.16.3.133\"],\"mac_addresses\":[\"00:1a:92:bf:04:13\"],\"type\":\"account\",\"value\":\"conception.varner\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#identity/identity-22a9ad32e9a87e766cad43bc",
+            "source_id": "S0019",
+            "source_sha256": "3aafbdcd238e58d736c59da44a24f85a9a5766e27573391a9cb4e0e08a7ab6b8"
+          }
+        ]
+      },
+      {
+        "kind": "account",
+        "text": "Account conception.varner is bound to 172.16.3.133 via Kerberos principal activity.",
+        "basis": "observed",
+        "value": "conception.varner",
+        "evidence": [
+          {
+            "end": 339,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":37227,\"owner_ip\":\"172.16.3.133\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":37235,\"owner_ip\":\"172.16.3.133\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"172.16.3.133\"],\"mac_addresses\":[\"00:1a:92:bf:04:13\"],\"type\":\"account\",\"value\":\"conception.varner\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#identity/identity-22a9ad32e9a87e766cad43bc",
+            "source_id": "S0019",
+            "source_sha256": "3aafbdcd238e58d736c59da44a24f85a9a5766e27573391a9cb4e0e08a7ab6b8"
+          }
+        ]
+      }
+    ],
+    "next_steps": [
+      {
+        "text": "Review endpoint logs on 172.16.3.133 for signs of execution or process launch correlated with the SHA-256 values of the downloaded PE and OLE files.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 363,
+            "quote": "{\"client_ip\":\"172.16.3.133\",\"completeness\":\"unknown\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":48350,\"response_frame\":48493,\"server_ip\":\"93.90.146.108\",\"sha256\":\"4a6ff2d1af33424fe9033c836b8e64c8361e6428e8e45d0cc14a38892941cfd6\",\"url_without_query_or_fragment\":\"http://www.prolightphotovideo.net/dVk_hwBIaehh/\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-8d7f6dbb69dcccb18436eab5",
+            "source_id": "S0009",
+            "source_sha256": "666a3cb06582a3c7c119935a7c0cb25ebed13e6c49a7fa35cc6c2cba94ae42f5"
+          },
+          {
+            "end": 445,
+            "quote": "{\"client_ip\":\"172.16.3.133\",\"completeness\":\"unknown\",\"content_kind\":\"ole-document\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":47166,\"response_frame\":47322,\"server_ip\":\"82.80.25.215\",\"sha256\":\"c8212610730cc6902883eee501e0ba8a2b043b880f7ab374df4a5c585d88ac8b\",\"url_without_query_or_fragment\":\"http://entisrael.com/wp-content/uploads/2018/jemHu-SahjLpTw_r-7Kd/PaymentStatus/default/US_us/Companies-Invoice-0970945/\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-5884b4e6d79e5790274d7c32",
+            "source_id": "S0010",
+            "source_sha256": "7f761bf3653d9d3fd10a1fcac5c35bf6fd1336e8b7eb80b9784250ab8ee32522"
+          }
+        ]
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "It remains unknown if the downloaded PE or OLE files were executed or if any further post-compromise activity occurred in this session.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 451,
+            "quote": "{\"internal_lookup\":{\"matched_observables\":0,\"no_exact_match\":5000,\"observable_limit\":5000,\"observables_checked\":5000,\"observables_total\":5362,\"prior_case_limit_reached\":true,\"prior_cases_checked\":50,\"truncated\":true},\"visibility\":\"Encrypted application payloads are not decrypted. No endpoint execution, persistence or actor attribution is established by a download or connection alone.\",\"warnings\":[\"Raw HTTP fallback limited to 100 of 180 streams\"]}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#coverage",
+            "source_id": "S0002",
+            "source_sha256": "54d25b8bbb3dce87d9017325f332df916de222668e33553f9e263b74cc54e44e"
+          }
+        ]
+      }
+    ],
+    "what_happened": [
+      {
+        "text": "Host 172.16.3.133 downloaded a Portable Executable (PE) file from 93.90.146.108 via http://www.prolightphotovideo.net/dVk_hwBIaehh/, indicating potential delivery of an executable payload.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 363,
+            "quote": "{\"client_ip\":\"172.16.3.133\",\"completeness\":\"unknown\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":48350,\"response_frame\":48493,\"server_ip\":\"93.90.146.108\",\"sha256\":\"4a6ff2d1af33424fe9033c836b8e64c8361e6428e8e45d0cc14a38892941cfd6\",\"url_without_query_or_fragment\":\"http://www.prolightphotovideo.net/dVk_hwBIaehh/\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-8d7f6dbb69dcccb18436eab5",
+            "source_id": "S0009",
+            "source_sha256": "666a3cb06582a3c7c119935a7c0cb25ebed13e6c49a7fa35cc6c2cba94ae42f5"
+          }
+        ]
+      },
+      {
+        "text": "Host 172.16.3.133 also downloaded an OLE document from 82.80.25.215 at http://entisrael.com/wp-content/uploads/2018/jemHu-SahjLpTw_r-7Kd/PaymentStatus/default/US_us/Companies-Invoice-0970945/, which may contain a malicious macro or embedded exploit.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 445,
+            "quote": "{\"client_ip\":\"172.16.3.133\",\"completeness\":\"unknown\",\"content_kind\":\"ole-document\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":47166,\"response_frame\":47322,\"server_ip\":\"82.80.25.215\",\"sha256\":\"c8212610730cc6902883eee501e0ba8a2b043b880f7ab374df4a5c585d88ac8b\",\"url_without_query_or_fragment\":\"http://entisrael.com/wp-content/uploads/2018/jemHu-SahjLpTw_r-7Kd/PaymentStatus/default/US_us/Companies-Invoice-0970945/\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-5884b4e6d79e5790274d7c32",
+            "source_id": "S0010",
+            "source_sha256": "7f761bf3653d9d3fd10a1fcac5c35bf6fd1336e8b7eb80b9784250ab8ee32522"
+          }
+        ]
+      },
+      {
+        "text": "No evidence confirms execution of the downloaded files or subsequent compromise within the available capture.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 451,
+            "quote": "{\"internal_lookup\":{\"matched_observables\":0,\"no_exact_match\":5000,\"observable_limit\":5000,\"observables_checked\":5000,\"observables_total\":5362,\"prior_case_limit_reached\":true,\"prior_cases_checked\":50,\"truncated\":true},\"visibility\":\"Encrypted application payloads are not decrypted. No endpoint execution, persistence or actor attribution is established by a download or connection alone.\",\"warnings\":[\"Raw HTTP fallback limited to 100 of 180 streams\"]}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#coverage",
+            "source_id": "S0002",
+            "source_sha256": "54d25b8bbb3dce87d9017325f332df916de222668e33553f9e263b74cc54e44e"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": "schema-and-exact-quote-binding; not semantic proof",
+  "word_count": 127,
+  "analysis_id": "0c443755-98f4-45dd-a9c4-e04e0415fe14",
+  "token_usage": {
+    "total_tokens": 8449,
+    "prompt_tokens": 7835,
+    "completion_tokens": 614
+  },
+  "authoritative": false,
+  "effective_tlp": "TLP:CLEAR",
+  "source_sha256": "d034bec080cd2939a8c09a48ac49ee028af7fbf9fc06e1b3074bba7949d64846",
+  "capture_sha256": "d35d186bb34fe0bf6a2e8787ebd71f44ec3ed0b90b3bbc890a97bad8823d92b8",
+  "prompt_version": "pcap-investigation-summary-v5",
+  "requested_model": "gpt-4.1",
+  "source_manifest": [
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "ddfed5b51e9bb9961f102e3f82f554cf1284da1cfbbb093599aa0339458bab67",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#capture",
+      "source_id": "S0001"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "54d25b8bbb3dce87d9017325f332df916de222668e33553f9e263b74cc54e44e",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#coverage",
+      "source_id": "S0002"
+    },
+    {
+      "kind": "intelligence_lead",
+      "offset": 0,
+      "sha256": "ba2bef179a3d86d62b867d7258cee3990a3aee01ce04d013a84d04d02c61fdea",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#enrichment-coverage",
+      "source_id": "S0003"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "9ecc0bc7cb1e18ee270e4b737b571addcb082142bdb72dc97420438cc2c7de2f",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#assessment/observable-c23e2d2655796c924e9d1389",
+      "source_id": "S0004"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "ccde4b75e74e730f23ed59e4d3cb4141b5d4d4e51a33323e77cc0cb2bb539051",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#assessment/observable-4f3a628313bbb807af7999cc",
+      "source_id": "S0005"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "c4818de1cefca55d5364881b1e4a254508e212ddf29222dade22bcbd74c50493",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#assessment/observable-f47236c2a5eb7c574b7b2efb",
+      "source_id": "S0006"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "01ee34dbd4b7b9703cc594f80f0096d54c06881424f809bafe481330860d871d",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#assessment/observable-1b4071a1b3e7518f620c3bd7",
+      "source_id": "S0007"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "feb96bc57f4c8ae4d492e0ffd484e0122cb7490dde4b5649999656abfac32b29",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#assessment/observable-11972d2e7ac891c69ffc3286",
+      "source_id": "S0008"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "666a3cb06582a3c7c119935a7c0cb25ebed13e6c49a7fa35cc6c2cba94ae42f5",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-8d7f6dbb69dcccb18436eab5",
+      "source_id": "S0009"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "7f761bf3653d9d3fd10a1fcac5c35bf6fd1336e8b7eb80b9784250ab8ee32522",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-5884b4e6d79e5790274d7c32",
+      "source_id": "S0010"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "66c66774e970fab8177dc4dfcff06922fee594fe2d9f96331f1f253320ca6d91",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-3f4fe76d5a12a0c3542883d8",
+      "source_id": "S0011"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3d0be9456c5b79b12f8352b25f1a2a9d00bf0d0580fa5fa33fb70d4c4ef9fe8b",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-ef4c0c4f2e1248a2f721481c",
+      "source_id": "S0012"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "0c59e6782c0c6ba21dbe95a5ed67e5c3750fe40ad44c3ecb64faeb64510aa6f2",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-31cc30770995093145a0a8cb",
+      "source_id": "S0013"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "1b2e5e750ad4b37bba9c892b3054e556eee9e03f48f71b3ee4501722418f176d",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#artifact/artifact-ff6af9bf32dad041160515d9",
+      "source_id": "S0014"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "ee6b631d102492514afc842479d7944aa06323ae8b020777ad65fe276640c516",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#frame/5817",
+      "source_id": "S0015"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3c851a02e521d4e1348cc122a6d3b853b88e782f320cf10140d8bbb83a412b2e",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#frame/5818",
+      "source_id": "S0016"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3a35d0bad5ae7be445bac47c670adb6783a1eb59ad38ff6f1e127ad579658d16",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#frame/17159",
+      "source_id": "S0017"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "d96f1a7531358dc56d1ad8578052955f2192d176837ce35c8bf0ff20b21d183b",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#frame/17543",
+      "source_id": "S0018"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3aafbdcd238e58d736c59da44a24f85a9a5766e27573391a9cb4e0e08a7ab6b8",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#identity/identity-22a9ad32e9a87e766cad43bc",
+      "source_id": "S0019"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "aec55b67a8c3ce47dd781270ae6ef76258d13f6961f455e10e1e2edc70a198aa",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#identity/identity-605ab5059520bb18b47f66e7",
+      "source_id": "S0020"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "27718e0914726eb0a3bba6a429782289728b5287249f77e6c042e8faa82e29fd",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#identity/identity-2277e24e9002575666c185cc",
+      "source_id": "S0021"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "dd8e5911ac5ebb86cea18af21889993ff61aadde142c36b0ccd52f02c07ec7d9",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#identity/identity-2bfa2036b434d1487242ad68",
+      "source_id": "S0022"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "d986fc239ce3d921caa4f2ef391f744668b9cd727af1dac5413ab3cb7a0a140c",
+      "reference": "/api/pcap/analyses/0c443755-98f4-45dd-a9c4-e04e0415fe14#identity/identity-7e27d7b49919251836855169",
+      "source_id": "S0023"
+    }
+  ],
+  "token_usage_note": "Provider-reported counts when available; never estimated from character length.",
+  "generation_seconds": 6.514,
+  "generation_attempts": [
+    {
+      "attempt": 1,
+      "validation": "passed",
+      "token_usage": {
+        "total_tokens": 8449,
+        "prompt_tokens": 7835,
+        "completion_tokens": 614,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "stop",
+      "provider_returned_model": "gpt-4.1-2025-04-14"
+    }
+  ],
+  "validation_adjustments": [
+    {
+      "index": 0,
+      "action": "optional-claim-omitted",
+      "reason": "identifier_binding",
+      "section": "iocs"
+    },
+    {
+      "index": 0,
+      "action": "optional-claim-omitted",
+      "reason": "identifier_binding",
+      "section": "ttps"
+    }
+  ],
+  "provider_returned_model": "gpt-4.1-2025-04-14"
+}

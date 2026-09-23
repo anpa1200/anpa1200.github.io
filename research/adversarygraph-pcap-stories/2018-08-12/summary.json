@@ -1,0 +1,502 @@
+{
+  "id": "investigation-summary:faa2e9a4-9421-475e-b2aa-c3abee8088a2",
+  "type": "pcap-investigation-summary",
+  "label": "PCAP investigation summary",
+  "model": "gpt-4.1-2025-04-14",
+  "stale": false,
+  "status": "analyst-review-required",
+  "content": "# PCAP investigation summary\n\n## What happened\n\nThe internal host 192.168.1.95 \\(Petrov2018-PC\\) downloaded an HTTP file with SHA-256 b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314, which static review flagged as suspicious, but no execution is proven.\n\nFollowing these downloads, the same host established repeated HTTP POST connections to http://185.68.93.18/dot.php, consistent with automated beacon or callback patterns, but this activity alone does not prove compromise.\n\n## Who was involved\n\n- 192.168.1.95 observed as the source of downloads and callbacks.\n- Petrov2018-PC is the hostname of the involved device.\n- mikhail.petrov account associated to 192.168.1.95 by Kerberos principal.\n\n## Key indicators\n\n- SHA-256 b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314 is the downloaded suspicious file for review, flagged by static features.\n- IP 185.68.93.18 is the external host receiving repeated HTTP POST callbacks from the involved host.\n- http://185.68.93.18/dot.php is the suspicious callback URL for POST activity from the internal host.\n\n## Supported technique candidates\n\n- T1071.001 — Suspected use of application layer web protocols for command-and-control based on repeated HTTP POSTs to dot.php.\n- T1105 — Possible ingress tool transfer via HTTP download, including suspicious script-like file, but adversary presence is not established by this alone.\n\n## What remains uncertain\n\n- It is not established whether the suspicious downloaded file was executed or resulted in system compromise.\n\nAnalyst-review draft. Exact evidence references and provider provenance are retained in the structured record.",
+  "summary": "The internal host 192.168.1.95 (Petrov2018-PC) downloaded an HTTP file with SHA-256 b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314, which static review flagged as suspicious, but no execution is proven. Following these downloads, the same host established repeated HTTP POST connections to http://185.68.93.18/dot.php, consistent with automated beacon or callback patterns, but this activity alone does not prove compromise.",
+  "coverage": {
+    "warnings": [],
+    "projection": "pcap-brief-evidence-v2-compact",
+    "source_digest": "eff186db84f39bad8d8e2238b877933bb8a81647330004f85a47dde7eb9b8ce5",
+    "candidate_total": 3,
+    "omitted_records": {
+      "findings": 42,
+      "artifacts": 104,
+      "candidates": 0,
+      "identities": 0,
+      "techniques": 0,
+      "selected_network_events": 31
+    },
+    "compact_evidence": true,
+    "included_records": {
+      "limits": 1,
+      "capture": 1,
+      "network": 2,
+      "findings": 3,
+      "transfers": 6,
+      "candidates": 3,
+      "identities": 3,
+      "techniques": 2,
+      "reputation_coverage": 1
+    },
+    "supplement_scope": "Bounded selected packet metadata, direct reputation, identities and transfer relationships; no payload bodies, prior-case content or exhaustive inventory. Full data remains in source analysis.",
+    "source_characters": 8810,
+    "enrichment_retained_targets": 81
+  },
+  "filename": "2018-08-12-traffic-analysis-exercise.pcap",
+  "provider": "openai",
+  "report_id": "pcap:720a1250-ec20-4280-911f-2a97345018f1",
+  "created_at": "2026-09-22T19:20:47.724146+00:00",
+  "structured": {
+    "iocs": [
+      {
+        "kind": "sha256",
+        "text": "SHA-256 b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314 is the downloaded suspicious file for review, flagged by static features.",
+        "basis": "assessment",
+        "value": "b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314",
+        "evidence": [
+          {
+            "end": 375,
+            "quote": "{\"client_ip\":\"192.168.1.95\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"script-like-text\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":7263,\"response_frame\":7266,\"server_ip\":\"149.129.222.112\",\"sha256\":\"b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314\",\"url_without_query_or_fragment\":\"http://r53x.com/1.rar\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-b8c70bac7d2ead3799659b33",
+            "source_id": "S0007",
+            "source_sha256": "0b60ead361cea397f6a6a00fa49558a87774055d0395852ee09d6300943836b9"
+          },
+          {
+            "end": 525,
+            "quote": "\"value\":\"b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314\"}",
+            "start": 450,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-adb255911d18e7d3b23f4927",
+            "source_id": "S0004",
+            "source_sha256": "4f65806f1e660aed4d3fbbc1a05c0b3833edd6d2b64b6e92f9a785087ae84d7d"
+          }
+        ]
+      },
+      {
+        "kind": "ipv4",
+        "text": "IP 185.68.93.18 is the external host receiving repeated HTTP POST callbacks from the involved host.",
+        "basis": "assessment",
+        "value": "185.68.93.18",
+        "evidence": [
+          {
+            "end": 460,
+            "quote": "{\"dst_ip\":\"185.68.93.18\",\"dst_port\":80,\"fields\":{\"http.host\":\"185.68.93.18\",\"http.request.full_uri\":\"http://185.68.93.18/dot.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E)\"},\"frame\":39557,\"kind\":\"http_request\",\"src_ip\":\"192.168.1.95\",\"timestamp_epoch\":\"1533965406.977212000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#frame/39557",
+            "source_id": "S0013",
+            "source_sha256": "7ba1a15a2153e83a53786a243bfa40952a8d130beb3bcb66db4b12dd21237491"
+          },
+          {
+            "end": 460,
+            "quote": "{\"dst_ip\":\"185.68.93.18\",\"dst_port\":80,\"fields\":{\"http.host\":\"185.68.93.18\",\"http.request.full_uri\":\"http://185.68.93.18/dot.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E)\"},\"frame\":39676,\"kind\":\"http_request\",\"src_ip\":\"192.168.1.95\",\"timestamp_epoch\":\"1533965418.580357000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#frame/39676",
+            "source_id": "S0014",
+            "source_sha256": "5ed4afba45a75c704f135edbf0832953a5d4ae4a1441f1c749b74720424cc7ab"
+          },
+          {
+            "end": 642,
+            "quote": "\"threatfox\":\"not_found\",\"virustotal\":\"deferred-rate-limit\"},\"role\":\"investigation candidate, not an unconditional malicious verdict\",\"type\":\"ipv4\",\"value\":\"185.68.93.18\"}",
+            "start": 472,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-e17f8b987c9ba869003a6d26",
+            "source_id": "S0005",
+            "source_sha256": "490437f6fb42cee9d7091039996590dadfb0543acfd2cfe8228d8cf6fd3c9c1d"
+          }
+        ]
+      },
+      {
+        "kind": "url",
+        "text": "http://185.68.93.18/dot.php is the suspicious callback URL for POST activity from the internal host.",
+        "basis": "assessment",
+        "value": "http://185.68.93.18/dot.php",
+        "evidence": [
+          {
+            "end": 460,
+            "quote": "{\"dst_ip\":\"185.68.93.18\",\"dst_port\":80,\"fields\":{\"http.host\":\"185.68.93.18\",\"http.request.full_uri\":\"http://185.68.93.18/dot.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E)\"},\"frame\":39557,\"kind\":\"http_request\",\"src_ip\":\"192.168.1.95\",\"timestamp_epoch\":\"1533965406.977212000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#frame/39557",
+            "source_id": "S0013",
+            "source_sha256": "7ba1a15a2153e83a53786a243bfa40952a8d130beb3bcb66db4b12dd21237491"
+          },
+          {
+            "end": 565,
+            "quote": "an unconditional malicious verdict\",\"type\":\"url\",\"value\":\"http://185.68.93.18/dot.php\"}",
+            "start": 478,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-153c6ce86ff09322f8ea1b7f",
+            "source_id": "S0006",
+            "source_sha256": "2cda832459f6a0ba18693d2d4c803af2b7edea0f0f00404fd49cd113f77aabad"
+          }
+        ]
+      }
+    ],
+    "ttps": [
+      {
+        "text": "Suspected use of application layer web protocols for command-and-control based on repeated HTTP POSTs to dot.php.",
+        "basis": "assessment",
+        "status": "behavior_candidate",
+        "evidence": [
+          {
+            "end": 213,
+            "quote": "{\"attack_id\":\"T1071.001\",\"frames\":[39557,39676,39681],\"name\":\"Application Layer Protocol: Web Protocols\",\"status\":\"Heuristic technique candidate, not established adversary activity\",\"tactic\":\"command-and-control\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#technique/T1071.001",
+            "source_id": "S0021",
+            "source_sha256": "1ff123b23615412eba0bd486be5d6ec02765c7bbcee2d1044239be3a0245bf0c"
+          }
+        ],
+        "attack_id": "T1071.001"
+      },
+      {
+        "text": "Possible ingress tool transfer via HTTP download, including suspicious script-like file, but adversary presence is not established by this alone.",
+        "basis": "assessment",
+        "status": "behavior_candidate",
+        "evidence": [
+          {
+            "end": 189,
+            "quote": "{\"attack_id\":\"T1105\",\"frames\":[40113,40209,40506],\"name\":\"Ingress Tool Transfer\",\"status\":\"Heuristic technique candidate, not established adversary activity\",\"tactic\":\"command-and-control\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#technique/T1105",
+            "source_id": "S0022",
+            "source_sha256": "a8cb36997e7a4f4cdb71c5113b68c178d4bc48f5efd2b582f2a3514ef5d46665"
+          },
+          {
+            "end": 375,
+            "quote": "{\"client_ip\":\"192.168.1.95\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"script-like-text\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":7263,\"response_frame\":7266,\"server_ip\":\"149.129.222.112\",\"sha256\":\"b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314\",\"url_without_query_or_fragment\":\"http://r53x.com/1.rar\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-b8c70bac7d2ead3799659b33",
+            "source_id": "S0007",
+            "source_sha256": "0b60ead361cea397f6a6a00fa49558a87774055d0395852ee09d6300943836b9"
+          }
+        ],
+        "attack_id": "T1105"
+      }
+    ],
+    "identities": [
+      {
+        "kind": "ip",
+        "text": "192.168.1.95 observed as the source of downloads and callbacks.",
+        "basis": "observed",
+        "value": "192.168.1.95",
+        "evidence": [
+          {
+            "end": 375,
+            "quote": "{\"client_ip\":\"192.168.1.95\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"script-like-text\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":7263,\"response_frame\":7266,\"server_ip\":\"149.129.222.112\",\"sha256\":\"b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314\",\"url_without_query_or_fragment\":\"http://r53x.com/1.rar\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-b8c70bac7d2ead3799659b33",
+            "source_id": "S0007",
+            "source_sha256": "0b60ead361cea397f6a6a00fa49558a87774055d0395852ee09d6300943836b9"
+          }
+        ]
+      },
+      {
+        "kind": "host",
+        "text": "Petrov2018-PC is the hostname of the involved device.",
+        "basis": "observed",
+        "value": "Petrov2018-PC",
+        "evidence": [
+          {
+            "end": 350,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":1,\"owner_ip\":\"0.0.0.0\",\"relationship\":\"dhcp-client-assertion\"},{\"account\":\"\",\"frame_number\":288,\"owner_ip\":\"0.0.0.0\",\"relationship\":\"dhcp-client-assertion\"}],\"ip_addresses\":[\"192.168.1.95\"],\"mac_addresses\":[\"f4:b5:20:68:b1:93\",\"f4:b5:20:68:b1:93,f4:b5:20:68:b1:93\"],\"type\":\"hostname\",\"value\":\"Petrov2018-PC\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#identity/identity-76ebf5d1062beb41778dfad8",
+            "source_id": "S0017",
+            "source_sha256": "58a7678471984f79241470deb26326141ae8fe9d4965132e77241988403b248b"
+          }
+        ]
+      },
+      {
+        "kind": "account",
+        "text": "mikhail.petrov account associated to 192.168.1.95 by Kerberos principal.",
+        "basis": "observed",
+        "value": "mikhail.petrov",
+        "evidence": [
+          {
+            "end": 332,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":403,\"owner_ip\":\"192.168.1.95\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":411,\"owner_ip\":\"192.168.1.95\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"192.168.1.95\"],\"mac_addresses\":[\"f4:b5:20:68:b1:93\"],\"type\":\"account\",\"value\":\"mikhail.petrov\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#identity/identity-71d2f6ef05c3b0064bfb2dd6",
+            "source_id": "S0015",
+            "source_sha256": "9eba52da9e903374a5fc2510365ee7e851f74eb6a1ffc5676ddc1d7b40124c34"
+          }
+        ]
+      }
+    ],
+    "next_steps": [],
+    "uncertainties": [
+      {
+        "text": "It is not established whether the suspicious downloaded file was executed or resulted in system compromise.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 403,
+            "quote": "{\"internal_lookup\":{\"matched_observables\":0,\"no_exact_match\":1459,\"observable_limit\":5000,\"observables_checked\":1459,\"observables_total\":1459,\"prior_case_limit_reached\":true,\"prior_cases_checked\":50,\"truncated\":false},\"visibility\":\"Encrypted application payloads are not decrypted. No endpoint execution, persistence or actor attribution is established by a download or connection alone.\",\"warnings\":[]}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#coverage",
+            "source_id": "S0002",
+            "source_sha256": "bf0527b0ded4e063774284d59dd61c1373e4c978f76efea552726aa20e9ec605"
+          }
+        ]
+      }
+    ],
+    "what_happened": [
+      {
+        "text": "The internal host 192.168.1.95 (Petrov2018-PC) downloaded an HTTP file with SHA-256 b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314, which static review flagged as suspicious, but no execution is proven.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 375,
+            "quote": "{\"client_ip\":\"192.168.1.95\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"script-like-text\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":7263,\"response_frame\":7266,\"server_ip\":\"149.129.222.112\",\"sha256\":\"b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314\",\"url_without_query_or_fragment\":\"http://r53x.com/1.rar\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-b8c70bac7d2ead3799659b33",
+            "source_id": "S0007",
+            "source_sha256": "0b60ead361cea397f6a6a00fa49558a87774055d0395852ee09d6300943836b9"
+          },
+          {
+            "end": 450,
+            "quote": "{\"classification\":\"suspicious\",\"reasons\":[{\"artifact_id\":\"artifact-b8c70bac7d2ead3799659b33\",\"features\":[\"dynamic-evaluation\",\"powershell-download\"],\"interpretation\":\"Suspicious static features, not execution or malware proof\",\"kind\":\"static-review\"}],\"reputation_status\":{\"malwarebazaar\":\"not_found\",\"threatfox\":\"not_found\",\"virustotal\":\"deferred-rate-limit\"},\"role\":\"investigation candidate, not an unconditional malicious verdict\",\"type\":\"sha256\",",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-adb255911d18e7d3b23f4927",
+            "source_id": "S0004",
+            "source_sha256": "4f65806f1e660aed4d3fbbc1a05c0b3833edd6d2b64b6e92f9a785087ae84d7d"
+          },
+          {
+            "end": 525,
+            "quote": "\"value\":\"b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314\"}",
+            "start": 450,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-adb255911d18e7d3b23f4927",
+            "source_id": "S0004",
+            "source_sha256": "4f65806f1e660aed4d3fbbc1a05c0b3833edd6d2b64b6e92f9a785087ae84d7d"
+          }
+        ]
+      },
+      {
+        "text": "Following these downloads, the same host established repeated HTTP POST connections to http://185.68.93.18/dot.php, consistent with automated beacon or callback patterns, but this activity alone does not prove compromise.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 460,
+            "quote": "{\"dst_ip\":\"185.68.93.18\",\"dst_port\":80,\"fields\":{\"http.host\":\"185.68.93.18\",\"http.request.full_uri\":\"http://185.68.93.18/dot.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E)\"},\"frame\":39557,\"kind\":\"http_request\",\"src_ip\":\"192.168.1.95\",\"timestamp_epoch\":\"1533965406.977212000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#frame/39557",
+            "source_id": "S0013",
+            "source_sha256": "7ba1a15a2153e83a53786a243bfa40952a8d130beb3bcb66db4b12dd21237491"
+          },
+          {
+            "end": 460,
+            "quote": "{\"dst_ip\":\"185.68.93.18\",\"dst_port\":80,\"fields\":{\"http.host\":\"185.68.93.18\",\"http.request.full_uri\":\"http://185.68.93.18/dot.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E)\"},\"frame\":39676,\"kind\":\"http_request\",\"src_ip\":\"192.168.1.95\",\"timestamp_epoch\":\"1533965418.580357000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#frame/39676",
+            "source_id": "S0014",
+            "source_sha256": "5ed4afba45a75c704f135edbf0832953a5d4ae4a1441f1c749b74720424cc7ab"
+          },
+          {
+            "end": 434,
+            "quote": "{\"explanation\":\"Repeated requests have a stable cadence consistent with automated callback or beacon behavior.\",\"frames\":[39557,39676,39681],\"metrics\":{\"destination\":\"185.68.93.18\",\"host\":\"185.68.93.18\",\"median_absolute_deviation\":0.098,\"median_interval_seconds\":16.172,\"method\":\"POST\",\"port\":80,\"request_count\":33,\"source\":\"192.168.1.95\",\"uri\":\"/dot.php\"},\"rule_id\":\"periodic-http-callbacks\",\"title\":\"Periodic HTTP callback pattern\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#finding/finding-8798192d6b4571d1d4d40028",
+            "source_id": "S0018",
+            "source_sha256": "e551bca72d17af0507c10a3760f1df4d0650097d308eeb78745c72217dc90489"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": "schema-and-exact-quote-binding; not semantic proof",
+  "word_count": 169,
+  "analysis_id": "720a1250-ec20-4280-911f-2a97345018f1",
+  "token_usage": {
+    "total_tokens": 8091,
+    "prompt_tokens": 7222,
+    "completion_tokens": 869
+  },
+  "authoritative": false,
+  "effective_tlp": "TLP:CLEAR",
+  "source_sha256": "c1c81f5c3705058c5d48684db28dd73929550b4d42cce6a3826c60b75592837f",
+  "capture_sha256": "c9e136e6e53daec4deec416e545d56e3c430dbc2d38374cf7a4dc839a0f4a3ff",
+  "prompt_version": "pcap-investigation-summary-v5",
+  "requested_model": "gpt-4.1",
+  "source_manifest": [
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "1bc8120f69af832babe73e679ab7ed5a0f3c99865dc6dbcde3f9cd2f118deb9a",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#capture",
+      "source_id": "S0001"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "bf0527b0ded4e063774284d59dd61c1373e4c978f76efea552726aa20e9ec605",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#coverage",
+      "source_id": "S0002"
+    },
+    {
+      "kind": "intelligence_lead",
+      "offset": 0,
+      "sha256": "7fbdf454614b6568bbe6f8aba350aff3a28fe2a3001075f96a8fb56bcc5b43a1",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#enrichment-coverage",
+      "source_id": "S0003"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "4f65806f1e660aed4d3fbbc1a05c0b3833edd6d2b64b6e92f9a785087ae84d7d",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-adb255911d18e7d3b23f4927",
+      "source_id": "S0004"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "490437f6fb42cee9d7091039996590dadfb0543acfd2cfe8228d8cf6fd3c9c1d",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-e17f8b987c9ba869003a6d26",
+      "source_id": "S0005"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "2cda832459f6a0ba18693d2d4c803af2b7edea0f0f00404fd49cd113f77aabad",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#assessment/observable-153c6ce86ff09322f8ea1b7f",
+      "source_id": "S0006"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "0b60ead361cea397f6a6a00fa49558a87774055d0395852ee09d6300943836b9",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-b8c70bac7d2ead3799659b33",
+      "source_id": "S0007"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "98dede96163d00922695f9d282725bd7a93b0cb8cdeb631f0afbe72bd95da13b",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-f7137015f0e1869f85b08850",
+      "source_id": "S0008"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "8336f761cc5eaa66865fc7ed3ee1ebfdfebd7132808fb05dceae579e43af4d25",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-b40f64f91a680c96de36ab82",
+      "source_id": "S0009"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "5ea96f5c1557a25c0011e095fcb8c4703f28d5d847b91214937e724c35bd1746",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-31a4a12d7a90521ccf346c19",
+      "source_id": "S0010"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "47da45e973741796976daed5de695cb0e9e2d90dc35c2ced243b6b384860b0dd",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-cadc37ef2db510406ba78e1c",
+      "source_id": "S0011"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "498cfe5322c13342f9a319d094e367fb5ec03d6b6057c6a61b4782090453e40b",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#artifact/artifact-81b03a5bc900d779112ee655",
+      "source_id": "S0012"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "7ba1a15a2153e83a53786a243bfa40952a8d130beb3bcb66db4b12dd21237491",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#frame/39557",
+      "source_id": "S0013"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "5ed4afba45a75c704f135edbf0832953a5d4ae4a1441f1c749b74720424cc7ab",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#frame/39676",
+      "source_id": "S0014"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "9eba52da9e903374a5fc2510365ee7e851f74eb6a1ffc5676ddc1d7b40124c34",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#identity/identity-71d2f6ef05c3b0064bfb2dd6",
+      "source_id": "S0015"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "8abb9481f476fd62d38ed63d8181b6c46e78a39cade99ce3979a7e2d898b1088",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#identity/identity-2c97e5af1376b26c8664ece9",
+      "source_id": "S0016"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "58a7678471984f79241470deb26326141ae8fe9d4965132e77241988403b248b",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#identity/identity-76ebf5d1062beb41778dfad8",
+      "source_id": "S0017"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "e551bca72d17af0507c10a3760f1df4d0650097d308eeb78745c72217dc90489",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#finding/finding-8798192d6b4571d1d4d40028",
+      "source_id": "S0018"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "dcaf65bb7ea85d409aef0c15dd57726ae09e2fed7ca15ff7cf7a95e392724f95",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#finding/finding-2110a36a2975eaeb0d73edf9",
+      "source_id": "S0019"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "89f0348843e623afcbd455f81822845cf8a9aa7940c22033f6ec1822e561aea6",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#finding/finding-f6fbeb351fe8b8310aaae04b",
+      "source_id": "S0020"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "1ff123b23615412eba0bd486be5d6ec02765c7bbcee2d1044239be3a0245bf0c",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#technique/T1071.001",
+      "source_id": "S0021"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "a8cb36997e7a4f4cdb71c5113b68c178d4bc48f5efd2b582f2a3514ef5d46665",
+      "reference": "/api/pcap/analyses/720a1250-ec20-4280-911f-2a97345018f1#technique/T1105",
+      "source_id": "S0022"
+    }
+  ],
+  "token_usage_note": "Provider-reported counts when available; never estimated from character length.",
+  "generation_seconds": 15.151,
+  "generation_attempts": [
+    {
+      "attempt": 1,
+      "validation": "passed",
+      "token_usage": {
+        "total_tokens": 8091,
+        "prompt_tokens": 7222,
+        "completion_tokens": 869,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "stop",
+      "provider_returned_model": "gpt-4.1-2025-04-14"
+    }
+  ],
+  "validation_adjustments": [
+    {
+      "index": 0,
+      "action": "optional-claim-omitted",
+      "reason": "uncited_identifier",
+      "section": "next_steps"
+    }
+  ],
+  "provider_returned_model": "gpt-4.1-2025-04-14"
+}

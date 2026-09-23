@@ -1,0 +1,1180 @@
+{
+  "statistics": {
+    "scope": "Manual incident-story comparison against full published scenario, not a single model accuracy score.",
+    "cases": 20,
+    "native_outcomes": {
+      "partial": 12,
+      "missed": 4,
+      "withheld": 4
+    },
+    "fully_explained_reference_scenarios": 0,
+    "affected_ip_present_saved_summaries": 15,
+    "affected_ip_reference_text_explicit_matches": 14,
+    "selected_packet_extractable_reference_hashes": 19,
+    "reference_hashes_in_original_artifacts": 19,
+    "reference_hashes_in_short_claim_text": 8,
+    "reference_hashes_in_short_ioc_lists": 3,
+    "short_ioc_review_counts": {
+      "corroborated_exact_payload": 3,
+      "not_explicitly_addressed_by_reference_text": 3,
+      "incorrect_security_role_target_not_c2": 2,
+      "packet_verified_reference_ip_discrepancy": 1,
+      "corroborated_callback": 2
+    },
+    "family_boundary": "17 cases provide named malware/campaign context (Sputnik is tentative); 4 withheld, 12 saved reports leave labels unresolved, 1 partially recognises NetSupport but misses SocGholish. IDS alerts and other reference inputs were not supplied to the model.",
+    "no_claim_of_complete_ioc_precision_or_recall": true,
+    "reviewed_at": "2026-09-22T20:00:34.660910+00:00"
+  },
+  "cases": [
+    {
+      "date": "2020-04-24",
+      "affected": "10.0.0.167",
+      "family": "Qakbot / Qbot",
+      "outcome": "partial",
+      "reviewed_story": "Elmer Obrien’s workstation (10.0.0.167, DESKTOP-GRIONXA) received a Windows executable disguised as a PNG from alphapioneer[.]com. Its recovered SHA-256 matches the publisher’s Qakbot sample. The packet transfer and identity are established; the family identification comes from the published investigation, not a successful live reputation lookup in this run.",
+      "matched": "Correct affected workstation, user, download server, disguised payload and exact SHA-256.",
+      "gaps": "The native report does not identify Qakbot or reconstruct its later activity. It spends space on another ZIP transfer whose relevance is unresolved.",
+      "caution": "The reference explicitly does not enumerate all Qakbot indicators. An unlisted transfer is not automatically benign or a false positive.",
+      "hashes": [
+        "f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1"
+      ],
+      "case_number": 1,
+      "name": "Steelcoffee",
+      "analysis_id": "c66676ab-7276-4989-8c27-65017a63c2ba",
+      "capture_sha256": "498ffc6e11fa8b38c07202a6fcb44da2a1064e9f89f6f8516b2985b08532f5e7",
+      "summary_id": "investigation-summary:c2b79478-9161-4da8-b3eb-4afa38d5843d",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2020/04/24/2020-04-24-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:42.127798+00:00",
+        "zip_sha256": "feeea1a752285bc3565625bd247cc69c5299e5632b4b2094c9a12598350393e0",
+        "pdf_sha256": "7581b2cf8ed9af0d759e702bdb5992e0924da50b53a7f7eba007e8d1998a3c96",
+        "archive_member": "2020-04-24-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2020/04/24/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-f0534328830e4534e66f10ca",
+          "size_bytes": 1950208,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://alphapioneer.com/spool/8888.png?uid=VwBpAG4AZABvAHcAcwAgAEQAZQBmAGUAbgBkAGUAcgAgAC0AIAA2ACwAMgAxACwAMAB8AE0AaQBjAHIAbwBzAG8AZgB0ACAAVwBpAG4AZABvAHcAcwAgADEAMAAgAFAAcgBvAA==",
+              "client_ip": "10.0.0.167",
+              "server_ip": "119.31.234.40",
+              "tcp_stream": 136,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 5518,
+              "response_frame": 7388
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": true
+        }
+      ],
+      "native_ioc_reviews": [
+        {
+          "value": "f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1",
+          "kind": "sha256",
+          "native_explanation": "SHA-256 hash f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1 identifies the downloaded PE file and should be reviewed to determine maliciousness; no threat intelligence verdict is returned at this time.",
+          "review": "corroborated_exact_payload"
+        }
+      ],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2020-03-14",
+      "affected": "10.3.11.194",
+      "family": "Trickbot",
+      "outcome": "partial",
+      "reviewed_story": "On March 11, Otis Witherspoon’s laptop (10.3.11.194, LAPTOP-7XMV2SN) received Trickbot and made follow-on encrypted and HTTP communications. The published chain starts with YAS20.exe from bolton-tech[.]com; later executable modules were served as cursor.png and imgpaper.png from 64.44.133[.]131. The native summary covers those later downloads, not the complete chain.",
+      "matched": "Correct victim IP and follow-up download server; two selected payload hashes match the answer exactly.",
+      "gaps": "Initial payload, user/hostname, Trickbot identification and post-infection destinations are absent from the short report.",
+      "caution": "The exercise page is dated March 14, but the incident is March 11. A third native hash is not addressed by the non-exhaustive answer.",
+      "hashes": [
+        "02db3c6b9aff73bf8a11c41107c836b6c800c919c5d3d1304f336aee03f79f4c",
+        "68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e",
+        "8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2"
+      ],
+      "case_number": 2,
+      "name": "Mondogreek",
+      "analysis_id": "246dbce6-c561-4434-bedb-dd496ba758d2",
+      "capture_sha256": "8df815a53e873e01803010c33752080414b0975709c1c02327e12661eec883a4",
+      "summary_id": "investigation-summary:a0b8e16c-23db-409b-9382-043a4e1c3fde",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2020/03/14/2020-03-14-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:42.376036+00:00",
+        "zip_sha256": "4e4cb1fcf123090a80b9a6562f43bdfa3d51685ebe556bf8a96b17a4558e311a",
+        "pdf_sha256": "5f7d645913eeaf2d160cd626695320389e1ee68d333b5277277b3cde886c9ac3",
+        "archive_member": "2020-03-14-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2020/03/14/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "02db3c6b9aff73bf8a11c41107c836b6c800c919c5d3d1304f336aee03f79f4c",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-81ea815cbb3693b810124184",
+          "size_bytes": 466944,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://bolton-tech.com/YAS20.exe",
+              "client_ip": "10.3.11.194",
+              "server_ip": "50.87.248.17",
+              "tcp_stream": 259,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 8616,
+              "response_frame": 8998
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        },
+        {
+          "sha256": "68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-f2042332405293c1a06baa7f",
+          "size_bytes": 582144,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://64.44.133.131/images/cursor.png",
+              "client_ip": "10.3.11.194",
+              "server_ip": "64.44.133.131",
+              "tcp_stream": 434,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 19014,
+              "response_frame": 19533
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": true
+        },
+        {
+          "sha256": "8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-533bfd4c90957b3cbb58a9e1",
+          "size_bytes": 582656,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://64.44.133.131/images/imgpaper.png",
+              "client_ip": "10.3.11.194",
+              "server_ip": "64.44.133.131",
+              "tcp_stream": 434,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 18431,
+              "response_frame": 18931
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": true
+        }
+      ],
+      "native_ioc_reviews": [
+        {
+          "value": "68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e",
+          "kind": "sha256",
+          "native_explanation": "The file with SHA-256 68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e was downloaded by 10.3.11.194 from 64.44.133.131, matching a PE file signature.",
+          "review": "corroborated_exact_payload"
+        },
+        {
+          "value": "8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2",
+          "kind": "sha256",
+          "native_explanation": "The file with SHA-256 8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2 was downloaded by 10.3.11.194 from 64.44.133.131, matching a PE file signature.",
+          "review": "corroborated_exact_payload"
+        },
+        {
+          "value": "fef9b646dba5c7372fe92b6a9d227833c1d15d8cc3a73fd22be9d1869b21cd67",
+          "kind": "sha256",
+          "native_explanation": "The file with SHA-256 fef9b646dba5c7372fe92b6a9d227833c1d15d8cc3a73fd22be9d1869b21cd67 was downloaded by 10.3.11.194 from 64.44.133.131, matching a PE file signature.",
+          "review": "not_explicitly_addressed_by_reference_text"
+        }
+      ],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2020-02-21",
+      "affected": "172.17.8.174",
+      "family": "Dridex",
+      "outcome": "partial",
+      "reviewed_story": "Gabriella Ventura’s workstation (172.17.8.174, DESKTOP-TZMKHKC) downloaded the Dridex payload from blueflag[.]xyz and subsequently communicated over TLS with 91.211.88[.]122. The native report finds the initial transfer but misses that follow-on context. The publisher’s persistence details came from additional host artifacts, which were not supplied to this PCAP-only run.",
+      "matched": "Correct victim, account, download domain/server and transfer.",
+      "gaps": "Misses Dridex and the later suspicious TLS activity. The claim that no post-download malicious behavior is supported is broader than the selected evidence justifies.",
+      "caution": "Do not count absent scheduled tasks, registry persistence or host-resident loader files as PCAP extraction failures.",
+      "hashes": [
+        "03c962ebb541a709b92957e301ea03f1790b6a57d4d0605f618fb0be392c8066"
+      ],
+      "case_number": 3,
+      "name": "One-Hot-Mess",
+      "analysis_id": "d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0",
+      "capture_sha256": "8b984eca8fb96799a9ad7ec5ee766937e640dc1afcad77101e5aeb0ba6be137d",
+      "summary_id": "investigation-summary:abf8dc27-6ce5-4668-a762-9333cb1a9955",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2020/02/21/2020-02-21-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:42.683788+00:00",
+        "zip_sha256": "9b1b083430a45660d1ac2014a71e0b63ab7e64e1186b6228297ed526787acfa1",
+        "pdf_sha256": "2033adaea7f24d64bdc575f2ef52722d0c31004faa5d4c6fd56e69f9d8e32878",
+        "archive_member": "2020-02-21-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2020/02/21/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "03c962ebb541a709b92957e301ea03f1790b6a57d4d0605f618fb0be392c8066",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-b5a7ebcc669f6e376c5917e8",
+          "size_bytes": 208896,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://blueflag.xyz/nCvQOQHCBjZFfiJvyVGA/yrkbdmt.bin",
+              "client_ip": "172.17.8.174",
+              "server_ip": "49.51.172.56",
+              "tcp_stream": 60,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 1340,
+              "response_frame": 1566
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2020-01-30",
+      "affected": "10.20.30.227",
+      "family": "Hancitor",
+      "outcome": "partial",
+      "reviewed_story": "Alejandrina Hogue’s workstation (10.20.30.227, DESKTOP-4C02EMG) received sv.exe from gengrasjeepram[.]com, then posted to twereptale[.]com. The publisher identifies Hancitor and additional encrypted payload transfers from xolightfinance[.]com. The Claude summary correctly connects the first download and POST activity, while leaving execution and attribution unconfirmed.",
+      "matched": "Correct workstation/user, executable download, hash and follow-on POST destinations.",
+      "gaps": "Hancitor identification and the later encrypted payload stage are absent.",
+      "caution": "api.ipify.org is an IP-discovery service, not inherently malicious. This case used a recorded Claude fallback, not OpenAI.",
+      "hashes": [
+        "995cbbb422634d497d65e12454cd5832cf1b4422189d9ec06efa88ed56891cda"
+      ],
+      "case_number": 4,
+      "name": "Sol-Lightnet",
+      "analysis_id": "05851801-c224-489b-b9da-9e5d035c60b4",
+      "capture_sha256": "51c84227023072a05ed3b4cae03662c7df80780551b6119c8af97301472642d4",
+      "summary_id": "investigation-summary:28fb5145-e166-4b00-abc3-e4b1ea541095",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2020/01/30/2020-01-30-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:42.932329+00:00",
+        "zip_sha256": "07cdaa577e4deda07e5a5086d1c7687cb0002e94bc37e565b2e79c625a9fde1a",
+        "pdf_sha256": "97f9b204528380f2a5ce60b2ef0fcf70faf205b25b118bb4e577c5c317a14b99",
+        "archive_member": "2020-01-30-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2020/01/30/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "995cbbb422634d497d65e12454cd5832cf1b4422189d9ec06efa88ed56891cda",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-514d7133a43d58c3e612646a",
+          "size_bytes": 81920,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://gengrasjeepram.com/sv.exe",
+              "client_ip": "10.20.30.227",
+              "server_ip": "49.51.133.162",
+              "tcp_stream": 55,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 1169,
+              "response_frame": 1235
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-12-25",
+      "affected": "10.12.25.101",
+      "family": null,
+      "outcome": "missed",
+      "reviewed_story": "This capture shows web-server reconnaissance, not an established malware callback. The scanner 139.199.184[.]166 probed the server exposed as 128.199.64[.]235, with internal address 10.12.25.101, including activity against ports 80, 8080 and 8983. The native summary reverses the investigative emphasis by describing possible beaconing or data transfer.",
+      "matched": "Contains the external scanner and server addresses, but does not explain their correct security roles.",
+      "gaps": "Wrong core scenario; omits the internal victim. Targeted server URLs are presented as beaconing-review indicators. It also suggests contacted URLs received reputation checks, although full-URL enrichment was not performed.",
+      "caution": "The PDF’s notes contain 139.119.184.166, while its main answer and capture use 139.199.184.166; this is treated as a reference inconsistency.",
+      "hashes": [],
+      "case_number": 5,
+      "name": "It happened on Christmas day",
+      "analysis_id": "389d8086-ac21-4e6d-9270-fdd62ee6d5b0",
+      "capture_sha256": "a86c6a31ed04ed05571f997d296f8e7c7be7f262f6e602bd72d9e5de656945c5",
+      "summary_id": "investigation-summary:c94b3ca0-893a-444b-ba41-36eae0216030",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": false,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/12/25/2019-12-25-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:43.234898+00:00",
+        "zip_sha256": "73a8286e8840590ca22c1186191287d2f2e2b830d004675697c67004153d9131",
+        "pdf_sha256": "5d710b4c238f949a08ccc31324cd52ecabb5a248f571f2acc03fd30b76835608",
+        "archive_member": "2019-12-25-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/12/25/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [
+        {
+          "value": "http://128.199.64.235/1.php",
+          "kind": "url",
+          "native_explanation": "http://128.199.64.235/1.php received suspicious repeated POST requests from 139.199.184.166; flagged for potential beaconing or data transfer review.",
+          "review": "incorrect_security_role_target_not_c2"
+        },
+        {
+          "value": "http://128.199.64.235/qq.php",
+          "kind": "url",
+          "native_explanation": "http://128.199.64.235/qq.php was targeted by repeated outbound POST requests from 139.199.184.166, suggesting suspicious interaction.",
+          "review": "incorrect_security_role_target_not_c2"
+        }
+      ],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-12-03",
+      "affected": "10.18.20.97",
+      "family": "Ursnif",
+      "outcome": "missed",
+      "reviewed_story": "The publisher identifies Ursnif activity on JUANITA-WORK-PC (10.18.20.97), used by momia.juanita. Webmail activity precedes the infection, but email delivery is a hypothesis rather than proof. AdversaryGraph finds the correct identity yet summarises routine directory traffic, failing to explain the suspicious part of the capture.",
+      "matched": "Correct workstation, IP and account.",
+      "gaps": "Misses the incident and family; overgeneralises normal directory activity into a lack-of-compromise finding.",
+      "caution": "Banking and webmail domains are context, not malicious IOCs. The family in the answer is supported by associated IDS alerts that were not model input.",
+      "hashes": [],
+      "case_number": 6,
+      "name": "Icemaiden",
+      "analysis_id": "fa0da8be-03fb-404d-a526-6c99c6b4f000",
+      "capture_sha256": "01da378585edbbc7d97e9cd91418a50cc506468d615ff0002b7f4bc34e0cbe0a",
+      "summary_id": "investigation-summary:642e8b54-ddd2-4167-9588-4c9eeb609cf2",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/12/03/2019-12-03-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:44.530559+00:00",
+        "zip_sha256": "631efa8bdaae2990f29bfdcf9c1292bc2c2d32b6a7185069a352e2326274cc8c",
+        "pdf_sha256": "af3a62bea323747f15256e72030f48e2c794c12f5ebf85e40af6339c6d5ca1da",
+        "archive_member": "2019-12-03-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/12/03/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-11-12",
+      "affected": "10.11.11.203",
+      "family": null,
+      "outcome": "partial",
+      "reviewed_story": "Candice Tucker’s Windows host (10.11.11.203, TUCKER-WIN7-PC) downloaded a Windows executable from acjabogados[.]com/40group.tiff. The recovered hash matches the publisher’s sample. Subsequent TCP attempts targeted 5.188.108[.]58 and 138.201.6[.]195 without a response. These are attempted connections, not proof of a successful command-and-control session.",
+      "matched": "Correct victim, identity, disguised payload URL and SHA-256.",
+      "gaps": "Omits the subsequent connection attempts. The exact payload is not included in the short IOC list; the new extension-mismatch rule does not yet cover .tiff.",
+      "caution": "The answer does not establish a specific malware family. Its historical VirusTotal ratio is not a current result from this run.",
+      "hashes": [
+        "8d5d36c8ffb0a9c81b145aa40c1ff3475702fb0b5f9e08e0577bdc405087e635"
+      ],
+      "case_number": 7,
+      "name": "Okay-Boomer",
+      "analysis_id": "76f521c2-4e4a-41d5-95ad-a44fd9887dd8",
+      "capture_sha256": "1c607e6b1245a2ee781551fb8a9c629763f848410c3756f28d80615c55fc22d1",
+      "summary_id": "investigation-summary:241f2780-d4c1-4048-8bdd-09d4fb6c15f8",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/11/12/2019-11-12-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:52.523929+00:00",
+        "zip_sha256": "659ca5b6cdbef25bbfca934c5e675e551551cd30c0bc5214f4d94c295eb87dc6",
+        "pdf_sha256": "ae0f11b0c72975a39f594ef7e796576a8fc5052cf5be2b07d529a445f2e33080",
+        "archive_member": "2019-11-12-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/11/12/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "8d5d36c8ffb0a9c81b145aa40c1ff3475702fb0b5f9e08e0577bdc405087e635",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-86b99b01439d20dbcedf6528",
+          "size_bytes": 389120,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://acjabogados.com/40group.tiff",
+              "client_ip": "10.11.11.203",
+              "server_ip": "188.95.248.71",
+              "tcp_stream": 264,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 11415,
+              "response_frame": 11979
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-08-20",
+      "affected": "10.8.20.101",
+      "family": "Ursnif / Gozi, then Trickbot",
+      "outcome": "withheld",
+      "reviewed_story": "The published investigation identifies Ursnif followed by Trickbot on Reginald Chandler’s TAMPA-OFFICE-PC (10.8.20.101). Initial delivery, encrypted follow-up transfers and later executable modules form a multi-stage infection. Some .rar-looking responses contain encrypted data, not recoverable plaintext executables. The platform has packet evidence, but no validated native short summary was saved.",
+      "matched": "Not scored as a native summary success: report writing was withheld.",
+      "gaps": "No saved incident story, family explanation or short IOC action list.",
+      "caution": "A final provider retry was blocked pending explicit consent for the exact metadata transfer. The reference-based paragraph here is not a substituted platform result.",
+      "hashes": [],
+      "case_number": 8,
+      "name": "Badbundt",
+      "analysis_id": "1c2e6d58-c62a-4009-939b-3aa82de281a2",
+      "capture_sha256": "500da44cbb442f282549a28815bec1dc55e6c0120286c532c43f8dd4a8c5d94d",
+      "summary_id": null,
+      "native_summary_saved": false,
+      "affected_ip_in_short_report": false,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/08/20/2019-08-20-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:53.504376+00:00",
+        "zip_sha256": "a917b99c664e616b5b49c339a0aa939f020d3209e8227ec65bf36595af86af75",
+        "pdf_sha256": "feb0ff25a273ea5f25d6828cbca1affdf1eedbf9930e8c178c2ed8188678847d",
+        "archive_member": "2019-08-20-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/08/20/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-07-19",
+      "affected": "172.16.4.205",
+      "family": "SocGholish / FakeUpdates delivering NetSupport Manager",
+      "outcome": "partial",
+      "reviewed_story": "The publisher describes a fake-browser-update infection on ROTTERDAM-PC (172.16.4.205), used by matthijs.devries, followed by NetSupport remote-access traffic and uploaded desktop screenshots. The native summary recognises NetSupport and large POST transfers but does not recover the full fake-update-to-screenshot-theft story. The packet destination is 31.7.62[.]214, despite the answer listing .213.",
+      "matched": "Correct host/user, NetSupport-associated traffic and large outbound transfers.",
+      "gaps": "Misses SocGholish delivery and identification of the uploaded content as screenshots. The phrase “exceeding one megabyte each” overgeneralises the cited single aggregated finding.",
+      "caution": "31.7.62.214 is directly verified in packets; the PDF lists 31.7.62.213. Commercial remote-access software and cleartext HTTP on port 443 require context, not an automatic malware verdict.",
+      "hashes": [],
+      "case_number": 9,
+      "name": "So hot right now",
+      "analysis_id": "961bdc9a-7460-440f-a246-f55748149bcc",
+      "capture_sha256": "ae759973cbf42e9cd0db35a5450c99f6210fca2c22fb8e689d252e64211bfd36",
+      "summary_id": "investigation-summary:60b13529-5cbc-4ec3-af47-296930292eeb",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/07/19/2019-07-19-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:54.851830+00:00",
+        "zip_sha256": "46f35573d8841b633dbe41cc7f635856493735f15a4a2ea740821e01b9b78552",
+        "pdf_sha256": "4997aacf214ac649969b4e58598dfd050b053c9fa9805f61173a906acb97cbd2",
+        "archive_member": "2019-07-19-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/07/19/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [
+        {
+          "value": "31.7.62.214",
+          "kind": "ipv4",
+          "native_explanation": "The IP 31.7.62.214 received repeated POST requests with a remote-access tool signature from 172.16.4.205.",
+          "review": "packet_verified_reference_ip_discrepancy"
+        },
+        {
+          "value": "b5689023.green.mattingsolutions.co",
+          "kind": "domain",
+          "native_explanation": "The domain b5689023.green.mattingsolutions.co hosted large HTTP POST traffic, which may indicate suspicious outbound data transfer.",
+          "review": "not_explicitly_addressed_by_reference_text"
+        }
+      ],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-06-22",
+      "affected": "10.0.76.109",
+      "family": "Rig exploit kit delivering KPOT Stealer",
+      "outcome": "partial",
+      "reviewed_story": "The reference identifies Rig exploit-kit delivery of KPOT Stealer to BANGKOK-8AC2-PC (10.0.76.109), used by edris.haight. Delivery involves 37.46.135[.]170; follow-on traffic uses 8.209.83[.]76 and fghjkmgru34[.]site. The native report notices the executable-declared transfer but misses the delivery mechanism, stealer and later communications.",
+      "matched": "Correct affected host and delivery server.",
+      "gaps": "No human user, exploit-kit interpretation, KPOT label or post-infection destination in the short report. A computer account is shown instead of the person’s account.",
+      "caution": "The answer’s hash is for malware retrieved from the infected host. It is not assumed to equal the encoded exploit-kit network object; family identification also uses external alerts.",
+      "hashes": [],
+      "case_number": 10,
+      "name": "Phenomenoc",
+      "analysis_id": "8879e360-655c-4073-beb9-68018699a4d4",
+      "capture_sha256": "6a89013b9e9bc6d443810245b92f49db4df33c1671a43db03a6bbde8f2bc6e63",
+      "summary_id": "investigation-summary:7ae590f3-65a9-43e6-a5a2-2f39852714f3",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/06/22/2019-06-22-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:55.413809+00:00",
+        "zip_sha256": "15f75bf9f16ac02746325c3b70dc25a13e87ba2fae8217db9b9d58f721fc6ea9",
+        "pdf_sha256": "f3aa569593168cfb0549b6df69e238fe228c592e499193f23469b65cc6c41cb3",
+        "archive_member": "2019-06-22-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/06/22/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-05-02",
+      "affected": "10.0.0.227",
+      "family": "Hawkeye keylogger",
+      "outcome": "missed",
+      "reviewed_story": "The published case identifies Hawkeye stealing information from Adriana Breaux’s workstation (10.0.0.227, BREAUX-WIN7-PC). FTP uploads carry credential data, keystrokes and screenshots to files.000webhost[.]com. The native report identifies the host and port-21 sessions but fails to interpret the FTP transfer behavior that explains the incident.",
+      "matched": "Correct workstation/account and external port-21 connections.",
+      "gaps": "Misses FTP-based theft and Hawkeye. “Decrypted stream coverage” is misleading: this workflow did not decrypt TLS payloads.",
+      "caution": "The PDF lists 154.14.* hosting IPs; packets show 145.14.144.10, 145.14.145.4 and 145.14.145.99. Hosting and IP-check services are not inherently malicious.",
+      "hashes": [],
+      "case_number": 11,
+      "name": "BeguileSoft",
+      "analysis_id": "d4027bcf-0ef6-4e3c-a68a-68dfe35adb33",
+      "capture_sha256": "41c9c4db17a58581eed3fc7f0bbebfe93c68034e2457afe131503c1a9eafac56",
+      "summary_id": "investigation-summary:0808d9fa-3047-47fe-89f5-25072e6b0b60",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/05/02/2019-05-02-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:56.195676+00:00",
+        "zip_sha256": "e99c961d17a39cdddd6d3916cff8a2c2bde83bb8ab4107cbb286163a0b7ec1e9",
+        "pdf_sha256": "737f753e22420cd2f4baac8e5f4a508fb4b97e81a200824c1440e1a581c220f4",
+        "archive_member": "2019-05-02-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/05/02/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-04-15",
+      "affected": "10.0.90.175",
+      "family": "Ursnif, then AZORult",
+      "outcome": "withheld",
+      "reviewed_story": "The reference describes Ursnif followed by AZORult on Kim Jooyoung’s SEOUL-4A67-PC (10.0.90.175). The recoverable Ursnif executable has SHA-256 50007a82…09e3a2. That exact hash also received the run’s only direct malicious-file reputation match, labelled Gozi by MalwareBazaar. Nevertheless, no validated native short report was saved.",
+      "matched": "No native-summary success. Separately, the extracted hash and direct MalwareBazaar record corroborate the first payload.",
+      "gaps": "No saved short incident story despite useful packet and reputation evidence.",
+      "caution": "The reputation record was queried in 2026 and first seen there in 2022; neither date is the date of this 2019 incident. Final retry awaits exact-transfer consent.",
+      "hashes": [
+        "50007a82f044a695ec9c1cfcc7a495211061112ea6a927710ebd3e6c4409e3a2"
+      ],
+      "case_number": 12,
+      "name": "StingrayAhoy",
+      "analysis_id": "0bb7a995-231c-4046-95ec-acea419eb7b4",
+      "capture_sha256": "2d27b8be5a880af7cfd5a51bd9a184e546344afe42261c323b41e34b961a288c",
+      "summary_id": null,
+      "native_summary_saved": false,
+      "affected_ip_in_short_report": false,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/04/15/2019-04-15-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:57.212593+00:00",
+        "zip_sha256": "842057c6e23f0da9db59361537e383797136c56cd088e9de60ded225675fecbd",
+        "pdf_sha256": "acebe0ce8ab27f2a49b9e9423ac8befb99147f0a15703e110ea49b754993a943",
+        "archive_member": "2019-04-15-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/04/15/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "50007a82f044a695ec9c1cfcc7a495211061112ea6a927710ebd3e6c4409e3a2",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-b57d8ac317ccada04eead7ea",
+          "size_bytes": 328192,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://ljeffery54ae.top/skoex/po2.php?l=cupk6.fgs",
+              "client_ip": "10.0.90.175",
+              "server_ip": "91.240.87.19",
+              "tcp_stream": 45,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 668,
+              "response_frame": 997
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-03-19",
+      "affected": "10.0.90.215",
+      "family": "Remcos RAT and Dridex",
+      "outcome": "partial",
+      "reviewed_story": "Bobby Tiger’s workstation (10.0.90.215, BOBBY-TIGER-PC) downloaded test1.exe and f4.exe. The recovered hashes exactly match the publisher’s Remcos and Dridex payloads. The reference also describes distinct follow-on communications. The native summary accurately records the two transfers but stops before explaining the two-malware incident.",
+      "matched": "Correct affected host/account, both payload servers and both exact SHA-256 hashes.",
+      "gaps": "Remcos/Dridex identification and their later communications are omitted; neither recovered file appears in the short IOC list.",
+      "caution": "TLS on port 3389 in this exercise is not automatically RDP. Downloading the files alone does not establish endpoint execution.",
+      "hashes": [
+        "2a9b0ed40f1f0bc0c13ff35d304689e9cadd633781cbcad1c2d2b92ced3f1c85",
+        "5865e801e6324166d6d05b39a14f2a8a798c6eb652831f78c2634f2b7a400eaf"
+      ],
+      "case_number": 13,
+      "name": "LittleTigers",
+      "analysis_id": "bd9602ed-341a-4123-aae3-9fafa5731518",
+      "capture_sha256": "257ba51a573232f7c2a8b43b55e127e793abe0bf067bd55f40dbee398fde6520",
+      "summary_id": "investigation-summary:9e228f2a-4391-46bf-98a8-95be922c970f",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/03/19/2019-03-19-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:58.395448+00:00",
+        "zip_sha256": "e962f12cf054d61bc2d5ba23780a84752655ef4deb3637e54bbc3aff46d755a9",
+        "pdf_sha256": "482661cef0b7058525d6b663553b9a4132f51571d95ff002e5980f3537705480",
+        "archive_member": "2019-03-19-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/03/19/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "2a9b0ed40f1f0bc0c13ff35d304689e9cadd633781cbcad1c2d2b92ced3f1c85",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-0a0a4527e8ee1e79f9cdb1d2",
+          "size_bytes": 811520,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://209.141.34.8/test1.exe",
+              "client_ip": "10.0.90.215",
+              "server_ip": "209.141.34.8",
+              "tcp_stream": 48,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 754,
+              "response_frame": 1523
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": false
+        },
+        {
+          "sha256": "5865e801e6324166d6d05b39a14f2a8a798c6eb652831f78c2634f2b7a400eaf",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-ac09c3d76fae46bbebbe3b10",
+          "size_bytes": 176128,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://217.23.14.81/f4.exe",
+              "client_ip": "10.0.90.215",
+              "server_ip": "217.23.14.81",
+              "tcp_stream": 50,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 1553,
+              "response_frame": 1713
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-02-23",
+      "affected": "10.2.23.231",
+      "family": "IcedID / Bokbot with Trickbot",
+      "outcome": "partial",
+      "reviewed_story": "The published investigation identifies IcedID and Trickbot on Ruby Ferguson’s FERGUSON-WIN-PC (10.2.23.231). Six executable downloads include files masquerading as images. The native summary finds suspicious downloads but describes only four files, then ambiguously says troll1.jpg was “also” downloaded. It does not explain the multi-stage infection.",
+      "matched": "Correct host and image-extension executable activity.",
+      "gaps": "Misses the complete six-payload account, user and two malware families; wording risks double-counting troll1.jpg. The extraction comparison below is separate from narrative completeness.",
+      "caution": "The publisher reports unsuccessful ETERNALBLUE activity against the domain controller, not a confirmed second infected host.",
+      "hashes": [
+        "3abae6dd2ddae23b2de2ccbcc160a4a5773bef8934d0e6896d50197c3d3c417f",
+        "d43159c8bf2e1bd866abdbb1687911e2282b1f98a7c063f85ffd53a7f51efed4",
+        "4c957072ab097d3474039f432466cd251d1dc7d91559b76d4e5ead4a8bd499d5",
+        "f1b789be1126b557240dd0dfe98fc5f3ad6341bb1a5d8be0a954f65b486ad32a",
+        "8cf2cddda8522975a22da3da429339be471234eacc0e11c099d6dcb732cf3cbb",
+        "38c6c5b8d6fa71d9856758a5c0c2ac9d0a0a1450f75bb1004dd988e23d73a312"
+      ],
+      "case_number": 14,
+      "name": "StormTheory",
+      "analysis_id": "5bff54cd-16de-44cb-a009-c88818ce138f",
+      "capture_sha256": "f6d740aeaac9e7d23843b481b7cbc179117cd21fab2f0d82c0e94fe8ba092775",
+      "summary_id": "investigation-summary:c9be30de-56b8-4144-a804-f2c124bf9bcc",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/02/23/2019-02-23-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:42:59.248639+00:00",
+        "zip_sha256": "6fd7f906b41f5efb88dbcbcdad291467613c38c99b49bd8d394a157d37935c95",
+        "pdf_sha256": "8744792e4bd53bf3888f3e63f0574ef474317fc8135aaef7c7f26641dfab91c1",
+        "archive_member": "2019-02-23-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/02/23/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "3abae6dd2ddae23b2de2ccbcc160a4a5773bef8934d0e6896d50197c3d3c417f",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-64c04b868e21280de7169f44",
+          "size_bytes": 270336,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://85.143.218.7/sin.png",
+              "client_ip": "10.2.23.231",
+              "server_ip": "85.143.218.7",
+              "tcp_stream": 200,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 20146,
+              "response_frame": 20903
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        },
+        {
+          "sha256": "d43159c8bf2e1bd866abdbb1687911e2282b1f98a7c063f85ffd53a7f51efed4",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-2a57148deacdd09c06651c07",
+          "size_bytes": 168448,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://46.249.62.199/Sw9JKmXqaSj.exe",
+              "client_ip": "10.2.23.231",
+              "server_ip": "46.249.62.199",
+              "tcp_stream": 109,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 6262,
+              "response_frame": 6800
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        },
+        {
+          "sha256": "4c957072ab097d3474039f432466cd251d1dc7d91559b76d4e5ead4a8bd499d5",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-c300c6cc1195496e5d11e6e0",
+          "size_bytes": 270336,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://85.143.218.7/tin.png",
+              "client_ip": "10.2.23.231",
+              "server_ip": "85.143.218.7",
+              "tcp_stream": 161,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 11986,
+              "response_frame": 13356
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        },
+        {
+          "sha256": "f1b789be1126b557240dd0dfe98fc5f3ad6341bb1a5d8be0a954f65b486ad32a",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-bc3e0c0ff9381dba43f4d332",
+          "size_bytes": 2818560,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://46.249.62.199/Tinx86_14.exe",
+              "client_ip": "10.2.23.231",
+              "server_ip": "46.249.62.199",
+              "tcp_stream": 110,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 6249,
+              "response_frame": 11971
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        },
+        {
+          "sha256": "8cf2cddda8522975a22da3da429339be471234eacc0e11c099d6dcb732cf3cbb",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-162a2189c16314dce4cad0b7",
+          "size_bytes": 122880,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://209.141.55.226/troll1.jpg",
+              "client_ip": "10.2.23.231",
+              "server_ip": "209.141.55.226",
+              "tcp_stream": 105,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 3119,
+              "response_frame": 3542
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        },
+        {
+          "sha256": "38c6c5b8d6fa71d9856758a5c0c2ac9d0a0a1450f75bb1004dd988e23d73a312",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-a44db5d69b9bc8f3fdaaff4e",
+          "size_bytes": 270336,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://85.143.218.7/win.png",
+              "client_ip": "10.2.23.231",
+              "server_ip": "85.143.218.7",
+              "tcp_stream": 150,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 10966,
+              "response_frame": 12777
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2019-01-28",
+      "affected": "172.17.8.109",
+      "family": "Dridex",
+      "outcome": "partial",
+      "reviewed_story": "Margaret Dunn’s DUNN-WINDOWS-PC (172.17.8.109) downloaded actiV.bin from 91.121.30[.]169:8000. The recovered executable hash matches the publisher’s sample; the reference’s associated IDS alerts support Dridex. The native report correctly explains the download and identity but leaves the malware family and subsequent incident unresolved.",
+      "matched": "Correct victim, user, executable URL and exact SHA-256.",
+      "gaps": "No Dridex identification or concise actionable payload indicator.",
+      "caution": "One paragraph in the PDF says 91.121.30.159, but another caption and the packets identify .169. The native .169 is not an error.",
+      "hashes": [
+        "9f6e3e65aedca997c6445329663bd1d279392a34cfda7d1b56461eb41641fa08"
+      ],
+      "case_number": 15,
+      "name": "TimberShade",
+      "analysis_id": "f4c6d05d-a600-4616-9c66-c96965645a65",
+      "capture_sha256": "2fc08b2bcdd1be009dab7cea877464e6ce9f93c65bc3e45b1583266e164408db",
+      "summary_id": "investigation-summary:6e58f2e4-e195-4862-b38f-78dd19f603f4",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2019/01/28/2019-01-28-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:43:00.304155+00:00",
+        "zip_sha256": "34e3e659d5ec077a5b567aaf2b27f248dda159c3f3fe64283af582320a70d7d9",
+        "pdf_sha256": "523c0c464afc4d6b4f84a042c30d70858f22d9699a7be05e4ce6250aeeabffc4",
+        "archive_member": "2019-01-28-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2019/01/28/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "9f6e3e65aedca997c6445329663bd1d279392a34cfda7d1b56461eb41641fa08",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-1e590e8c147fc278865188d5",
+          "size_bytes": 155648,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://91.121.30.169:8000/91msE95B/actiV.bin",
+              "client_ip": "172.17.8.109",
+              "server_ip": "91.121.30.169",
+              "tcp_stream": 50,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 802,
+              "response_frame": 983
+            }
+          ],
+          "present_in_short_claim_text": true,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2018-12-18",
+      "affected": "172.16.3.133",
+      "family": "Emotet and IcedID / Bokbot",
+      "outcome": "partial",
+      "reviewed_story": "Among several devices, the publisher identifies 172.16.3.133 as the workstation showing Emotet and IcedID activity. The native report selects the same host and connects it with executable and document downloads. It does not identify the malware chain; its wording about possible macros is a hypothesis, not extracted macro evidence.",
+      "matched": "Correct affected workstation and relevant transfer focus.",
+      "gaps": "No Emotet/IcedID interpretation; the source’s wider device inventory is outside this short incident-report objective.",
+      "caution": "This case reaches the raw fallback stream limit, so extracted evidence is not exhaustive. OLE format alone does not prove a malicious macro.",
+      "hashes": [],
+      "case_number": 16,
+      "name": "Eggnog Soup",
+      "analysis_id": "0c443755-98f4-45dd-a9c4-e04e0415fe14",
+      "capture_sha256": "d35d186bb34fe0bf6a2e8787ebd71f44ec3ed0b90b3bbc890a97bad8823d92b8",
+      "summary_id": "investigation-summary:dc26ff68-c6d3-4f90-92b1-6c06d9cd5b6f",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2018/12/18/2018-12-18-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:43:03.582896+00:00",
+        "zip_sha256": "69ba9d06c148a599a18e37c577084b77e1bd2619975ac2cea69597a3b3099215",
+        "pdf_sha256": "1b99080ca70499d34ddd6ff4a3be280122afd3f33eb52c17a8b66fe8f457f7a6",
+        "archive_member": "2018-12-18-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2018/12/18/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2018-11-07",
+      "affected": "10.22.15.119",
+      "family": "Ursnif / Gozi",
+      "outcome": "withheld",
+      "reviewed_story": "The published case identifies Ursnif/Gozi delivery to Carlos Danger’s DANGER-WIN-PC (10.22.15.119). An executable served through shumbildac[.]com is 439,808 bytes and has an answer-listed SHA-256. Ordinary university browsing in the same capture is unrelated. The native platform has retained packet evidence but no validated short narrative.",
+      "matched": "Not counted as a native-summary success. Payload extraction is evaluated independently.",
+      "gaps": "No saved concise story or action list.",
+      "caution": "A withheld report means report writing failed, not that the capture is clean. The final provider retry was blocked pending exact-transfer consent.",
+      "hashes": [
+        "97f149f146b0ec63c32abff204ae27638f0310536172b0f718f1a91a5672fe71"
+      ],
+      "case_number": 17,
+      "name": "Turkey and Defence",
+      "analysis_id": "bf107971-6797-4f93-9ffc-1301c6363bd9",
+      "capture_sha256": "79f9a39e2cb38303a7f2e8363d984f727347537a87473679d9c081e79cde527f",
+      "summary_id": null,
+      "native_summary_saved": false,
+      "affected_ip_in_short_report": false,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2018/11/07/2018-11-07-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:43:05.995852+00:00",
+        "zip_sha256": "1ec4af6be153f2e4102114ea5750be4e4bcc9c0d00194d7f37c7f05642e65afc",
+        "pdf_sha256": "76ddd4b190e14b1d21c5e57443c1d8b4295080aca95e07d9d9c864bea4b20141",
+        "archive_member": "2018-11-07-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2018/11/07/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "97f149f146b0ec63c32abff204ae27638f0310536172b0f718f1a91a5672fe71",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-00bacaef7d553f0b0ecce2ab",
+          "size_bytes": 439808,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://shumbildac.com/WES/fatog.php?l=ngul5.xap",
+              "client_ip": "10.22.15.119",
+              "server_ip": "46.29.160.132",
+              "tcp_stream": 51,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 1247,
+              "response_frame": 1690
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2018-10-31",
+      "affected": "10.100.9.107",
+      "family": "Trickbot",
+      "outcome": "withheld",
+      "reviewed_story": "The reference identifies Trickbot on Ichabod Crane’s HEADLESS-PC (10.100.9.107). The relevant executable transfer is 46.173.214[.]185/startr.ack around 15:34 UTC, after ordinary startup traffic. Its recoverable hash is listed in the answer. The platform’s final report-writing state is withheld; this explanation is reference-assisted, not native output.",
+      "matched": "No saved native short summary; original evidence remains available.",
+      "gaps": "No saved incident explanation or short IOC list.",
+      "caution": "The beginning of the capture is not the beginning of malicious activity. Final retry awaits exact-transfer consent.",
+      "hashes": [
+        "396223eeec49493a52dd9d8ba5348a332bf064483a358db79d8bb8d22e6eb62c"
+      ],
+      "case_number": 18,
+      "name": "Happy Halloween",
+      "analysis_id": "403cf219-db40-48ee-8a71-311000d90bfa",
+      "capture_sha256": "54d43f7c2f95afeebd61eb9ba9b247561a4e10267d515038b7569efdc3fb79fd",
+      "summary_id": null,
+      "native_summary_saved": false,
+      "affected_ip_in_short_report": false,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2018/10/31/2018-10-31-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:43:08.815829+00:00",
+        "zip_sha256": "ec9316c6ed959f4a39c74caa8bea107dabb86a678334dc9f7f8e4c12c52ea656",
+        "pdf_sha256": "b7040e935fae95a6d9cee91459ca9e9b1fd4967576ad6009b6451eeeda3bfe85",
+        "archive_member": "2018-10-31-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2018/10/31/page2.html",
+      "reference_hash_checks": [
+        {
+          "sha256": "396223eeec49493a52dd9d8ba5348a332bf064483a358db79d8bb8d22e6eb62c",
+          "present_in_original_artifacts": true,
+          "artifact_id": "artifact-446a68e90c43f0b3182a498e",
+          "size_bytes": 318464,
+          "completeness": "matches-declared-content-length",
+          "transfer_bindings": [
+            {
+              "url": "http://46.173.214.185/startr.ack",
+              "client_ip": "10.100.9.107",
+              "server_ip": "46.173.214.185",
+              "tcp_stream": 44,
+              "match_basis": "exact-sha256-of-decoded-http-response-body",
+              "status_code": "200",
+              "completeness": "matches-declared-content-length",
+              "request_frame": 679,
+              "response_frame": 966
+            }
+          ],
+          "present_in_short_claim_text": false,
+          "in_short_ioc_list": false
+        }
+      ],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2018-09-27",
+      "affected": "172.16.5.203",
+      "family": null,
+      "outcome": "missed",
+      "reviewed_story": "The publisher links this infection to the first supplied email, a WhatsApp-themed lure. Its URL leads through lealcontabil[.]com and 54.38.137[.]127 to a Dropbox-hosted ZIP; another response contains encoded data rather than a normal ZIP. The native summary instead describes routine directory traffic and incorrectly implies no suspicious transfers occurred.",
+      "matched": "Workstation/account bindings are present in native packet evidence; the answer text does not explicitly enumerate their values.",
+      "gaps": "Misses the redirect/download chain and overstates a clean-looking interpretation. Selecting which email initiated it requires the supplied emails, which were not inputs to this run.",
+      "caution": "Dropbox and Google should not become blanket malicious-domain IOCs. The reference says there were no meaningful IDS alerts; lack of alerts did not remove the suspicious chain.",
+      "hashes": [],
+      "case_number": 19,
+      "name": "Blank Clipboard",
+      "analysis_id": "0e0621ff-1831-43a5-b884-8ae7b2febaf3",
+      "capture_sha256": "460b5e968641264ffb63486cfe2c6586c0db9e19fcc047175c978009eaa94d7b",
+      "summary_id": "investigation-summary:1e80b94a-c04d-4688-b0ee-efdabd2760e1",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "packet-supported; reference text omits explicit identity values",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2018/09/27/2018-09-27-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:43:10.536033+00:00",
+        "zip_sha256": "e2c7fc8ef2d16051a8427cc4a69ae72920f826906d26b215489fa6928bcd0229",
+        "pdf_sha256": "266fd957699e22c5de445d9241c453901944839caf2f6d267d2635eddedc092b",
+        "archive_member": "2018-09-27-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2018/09/27/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    },
+    {
+      "date": "2018-08-12",
+      "affected": "192.168.1.95",
+      "family": "Marap-associated alert; author leaves precise family uncertain",
+      "outcome": "partial",
+      "reviewed_story": "Mikhail Petrov’s PETROV2018-PC (192.168.1.95) followed a download chain and repeatedly posted to 185.68.93[.]18/dot.php. The publisher links the chain to an IQY email attachment and notes a Marap-associated alert, while retaining family uncertainty. The native summary captures the host and callbacks but does not identify the initiating attachment or clearly explain the executable stage.",
+      "matched": "Correct workstation/user and recurring POST destination.",
+      "gaps": "Does not explain the IQY-to-download chain. Its selected suspicious file hash is not listed by the answer, so it is not counted as an answer-confirmed payload.",
+      "caution": "Email attachments were not model input. The page date is August 12, whereas the packet incident is August 11. Do not turn the publisher’s tentative family discussion into a categorical verdict.",
+      "hashes": [],
+      "case_number": 20,
+      "name": "Sputnik House",
+      "analysis_id": "720a1250-ec20-4280-911f-2a97345018f1",
+      "capture_sha256": "c9e136e6e53daec4deec416e545d56e3c430dbc2d38374cf7a4dc839a0f4a3ff",
+      "summary_id": "investigation-summary:faa2e9a4-9421-475e-b2aa-c3abee8088a2",
+      "native_summary_saved": true,
+      "affected_ip_in_short_report": true,
+      "affected_reference_boundary": "explicitly stated in reference text",
+      "reference_source": {
+        "url": "https://www.malware-traffic-analysis.net/2018/08/12/2018-08-12-traffic-analysis-exercise-answers.pdf.zip",
+        "retrieved_at": "2026-09-22T19:43:11.046922+00:00",
+        "zip_sha256": "8fdaa4ad3d8881047476bb572b82567325204272b29fb7f6856b740fe5c32018",
+        "pdf_sha256": "887fa632200779537234fa9a109d9e9785186718b807c492c6f873a1a58d0a6f",
+        "archive_member": "2018-08-12-traffic-analysis-exercise-answers.pdf",
+        "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+      },
+      "reference_answer_page": "https://www.malware-traffic-analysis.net/2018/08/12/page2.html",
+      "reference_hash_checks": [],
+      "native_ioc_reviews": [
+        {
+          "value": "b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314",
+          "kind": "sha256",
+          "native_explanation": "SHA-256 b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314 is the downloaded suspicious file for review, flagged by static features.",
+          "review": "not_explicitly_addressed_by_reference_text"
+        },
+        {
+          "value": "185.68.93.18",
+          "kind": "ipv4",
+          "native_explanation": "IP 185.68.93.18 is the external host receiving repeated HTTP POST callbacks from the involved host.",
+          "review": "corroborated_callback"
+        },
+        {
+          "value": "http://185.68.93.18/dot.php",
+          "kind": "url",
+          "native_explanation": "http://185.68.93.18/dot.php is the suspicious callback URL for POST activity from the internal host.",
+          "review": "corroborated_callback"
+        }
+      ],
+      "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+    }
+  ]
+}

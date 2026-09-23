@@ -1,0 +1,536 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Can AdversaryGraph Tell the Story of a Malware PCAP? | 1200km</title><meta name="robots" content="noindex,follow"><meta name="referrer" content="no-referrer"><link rel="canonical" href="https://1200km.com/articles/read/2026/adversarygraph-pcap-investigation-stories/"><meta name="description" content="Twenty malware PCAP tests with real AdversaryGraph screenshots, short reports, IOC checks, official-answer comparisons, and downloadable evidence."><meta property="og:title" content="Can AdversaryGraph Tell the Story of a Malware PCAP?"><meta property="og:description" content="Twenty malware PCAP tests with real AdversaryGraph screenshots, short reports, IOC checks, official-answer comparisons, and downloadable evidence."><meta property="og:url" content="https://1200km.com/articles/read/2026/adversarygraph-pcap-investigation-stories/"><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/articles/article-assets/adversarygraph-pcap-stories/cover.png"><meta property="article:published_time" content="2026-09-23"><meta property="article:modified_time" content="2026-09-23"><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{background:#11233c;padding:20px;color:white}header a{color:#b7e5ff}main{max-width:1160px;margin:24px auto;padding:28px 36px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2,h3{margin-top:2em}a{color:#075c91}img{max-width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3fa;padding:18px}table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid #cbd5e1;padding:8px;text-align:left}blockquote{margin:20px 0;padding:10px 20px;background:#edf3fa;border-left:4px solid #257ba5}@media(max-width:700px){main{padding:18px;margin:0}body{font-size:16px}td,th{padding:4px}}</style></head><body><header><nav aria-label="Evidence navigation"><a href="/">1200km</a> · <a href="https://1200km.com/articles/read/2026/adversarygraph-pcap-investigation-stories/">Full article</a> · <a href="https://1200km.com/research/adversarygraph-pcap-stories/">Evidence boundaries</a> · <a href="https://1200km.com/research/adversarygraph-pcap-stories/20-REVIEWED-SHORT-REPORTS.html">20 short reviews</a></nav></header><main><h1 id="can-adversarygraph-tell-the-story-of-a-malware-pcap">Can AdversaryGraph Tell the Story of a Malware PCAP?</h1>
+<p><strong>Twenty historical captures, genuine platform screenshots, source-bound short reports, and a separate comparison with the published answers.</strong></p>
+<blockquote>
+<p><strong>Publication and evidence:</strong> Tested on 22 September 2026; first published on 1200km.com on 23 September 2026. <a href="https://1200km.com/research/adversarygraph-pcap-stories/20-REVIEWED-SHORT-REPORTS.html">Read the 20 concise reviewed explanations</a>, <a href="https://1200km.com/research/adversarygraph-pcap-stories/adversarygraph-pcap-stories-public.zip">download the public evidence bundle</a>, or <a href="https://1200km.com/research/adversarygraph-pcap-stories/">check publication boundaries and hashes</a>. The supplied cover is an illustration, not a platform screenshot. The 20 case screenshots below retain their original bytes, including four failure states.</p>
+</blockquote>
+<p>A packet capture is not an incident report. Extracting an IP address tells us that an address appeared in traffic; it does not tell us that it is an attacker. Recovering a Windows executable proves that bytes were transferred, not that the program ran. A useful report must connect those observations into a short account of what happened—and stop where the evidence stops.</p>
+<p>This experiment tests that last step in AdversaryGraph. The original local run decoded 20 public training captures successfully, but produced long inventories rather than clear incident stories. The revised workflow adds a dedicated report-writing stage after packet analysis and approved IOC enrichment. It produces a short, cited analyst-review draft and a focused, readable report view.</p>
+<p>The important distinction is between making a report readable and making its conclusions correct. This article evaluates both. Native reports are preserved even when they miss an attack stage or overstate what a limited evidence selection can establish. The publisher's answers appear in a separate comparison; they were not fed to the report-writing model.</p>
+<blockquote>
+<p><strong>Scope and safety:</strong> These are public Malware-Traffic-Analysis.net exercises from 2018–2020. Analysis ran through the local AdversaryGraph platform. No recovered malware was executed or uploaded, and no captured infrastructure was contacted. Reputation services received selected public indicators, while the writing model received bounded public-training metadata. Historical indicators are not a current production blocklist.</p>
+</blockquote>
+<h2 id="table-of-contents">Table of contents</h2>
+<ol>
+<li><a href="#what-changed-in-the-reporting-flow">What changed in the reporting flow</a></li>
+<li><a href="#protocol-and-actual-model">Protocol and actual model</a></li>
+<li><a href="#measured-results">Measured results</a></li>
+<li><a href="#the-twenty-cases">The twenty cases</a></li>
+<li><a href="#what-the-answer-comparison-means">What the answer comparison means</a></li>
+<li><a href="#limitations-and-human-comparison">Limitations and human comparison</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#related-research">Related research</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#follow-my-work">Follow My Work</a></li>
+</ol>
+<h2 id="what-changed-in-the-reporting-flow">What changed in the reporting flow</h2>
+<p>The platform now separates three stages: <strong>packet evidence → approved IOC enrichment → summarise and write the investigation report</strong>. The last stage is an explicit action, not an automatic background disclosure to an AI provider.</p>
+<p>The report starts with “What happened?” and caps its narrative at 130 words. The complete claim text is limited to 320 words, with at most three relevant identities, five qualified indicators, two technique candidates, two material uncertainties and one next check. Empty IOC and TTP lists are valid. They are preferable to populating an action list with every IP in the capture.</p>
+<p>The evidence selection prioritises file transfers with known content types and bound client/server relationships. It distinguishes a PE file served under an image-looking URL from an ordinary image download. A qualified payload hash is a file-review lead; it does not automatically turn its hosting IP into a malicious indicator. A T1105 candidate must refer to an ingress file transfer, not merely an outbound POST.</p>
+<p>Every retained claim has source-bound citations. The server checks literal IPs, hashes and ATT&amp;CK identifiers against the passages cited by that claim. It may downgrade an evidence label or omit an invalid optional entry, recording the adjustment. A bad core narrative still fails validation; the workflow does not manufacture a substitute report. These checks constrain fabrication, but they cannot prove that a sentence correctly interprets a packet.</p>
+<p>The focused report view keeps the story readable, with evidence and provider details available separately. Screenshots are taken from that actual view, not from a mock-up. Each screenshot is checked against the saved analysis ID, summary ID, capture SHA-256, actual model and rendered claim text, then opened for visual inspection. A readable screenshot of a flawed report remains evidence of a flawed report.</p>
+<p>Two oversized investigation handoffs were also repaired. Instead of inserting hundreds of thousands of report characters into a bounded request, the UI passes a compact description and a reference to the authoritative stored analysis. The original full reports remain available.</p>
+<h2 id="protocol-and-actual-model">Protocol and actual model</h2>
+<p>The corpus contains 20 newly acquired captures relative to the recorded local testing history. Selection continued through named exercises on the same training site; it was not random. A multi-capture exercise, Tinsolutions, was excluded during acquisition and replaced with Sputnik House. This was recorded before evaluating results. “New” does not mean absent from a language model's training data.</p>
+<p>The deterministic baseline was frozen before this reporting revision. The same packet results and internal-context snapshots were retained. The first six cases became pre-answer engineering pilots; subsequent failures also informed reliability checks. This is an iterative system evaluation, <strong>not an untouched 20-case blind benchmark</strong>. All final native reports were frozen before publisher answers were retrieved. The <a href="EVALUATION-PROTOCOL.html">evaluation protocol</a> defines affected-system, incident-explanation, family-label and indicator comparisons separately.</p>
+<p>The primary platform model was requested as <code>gpt-4.1</code>. The provider returned <strong><code>gpt-4.1-2025-04-14</code></strong>. Those are recorded API values, not assumptions based on a dropdown or an earlier conversation. After native OpenAI report-writing failures, the operator explicitly selected the configured Claude provider for fallback cases; their exact recorded models and counts appear below. Fallback successes do not erase OpenAI failures. No Qwen model ran in this revision, and this is not a Daybreak Blue platform-model benchmark. The code-editing assistant and the application's report-writing model are different roles.</p>
+<p>The report prompt is <code>pcap-investigation-summary-v5</code>. The normal source selection is bounded at 18,000 characters. Larger selections can use a disclosed 10,000-character compact projection after zero-text provider <code>length</code> responses exposed a reliability problem. This did not by itself resolve Sol-Lightnet's empty responses, so their root cause remains unconfirmed. Omitted records are counted, the full packet evidence remains available, and each summary records its actual projection. A smaller model input must never be described as exhaustive review of the capture.</p>
+<p>The local runtime reports <code>8.1.0-beta.1</code>; exact images and uncommitted implementation changes are recorded in the accompanying verification report. The analyzer uses TShark 4.4.18, <code>tshark-evidence-v6</code>, and <code>pcap-rules-v5</code>. The experiment used a locally deployed research worktree. At the recorded test cutoff, those implementation changes were uncommitted; publishing this article does not claim that they are an immutable AdversaryGraph release.</p>
+<h2 id="measured-results">Measured results</h2>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Observed result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Captures decoded in the baseline</td>
+<td>20/20; 447,705 packets</td>
+</tr>
+<tr>
+<td>Saved revised native summaries</td>
+<td>16/20 (80% completion, not 80% accuracy); four withheld</td>
+</tr>
+<tr>
+<td>Actual returned models</td>
+<td>claude-opus-4-8: 1, gpt-4.1-2025-04-14: 15</td>
+</tr>
+<tr>
+<td>Original full report median</td>
+<td>5,184 whitespace-delimited words across 20 cases</td>
+</tr>
+<tr>
+<td>Revised short export median</td>
+<td>179 whitespace-delimited words across 16 saved reports</td>
+</tr>
+<tr>
+<td>Claim-text length</td>
+<td>87–199 words; median 139.5; excludes headings/provenance</td>
+</tr>
+<tr>
+<td>Final saved report generation</td>
+<td>500.973 seconds summed across 16 reports, including repair/pacing</td>
+</tr>
+<tr>
+<td>Final saved summaries: reported tokens</td>
+<td>186,886 (171,199 input; 15,687 output), including 22 model calls</td>
+</tr>
+<tr>
+<td>Superseded accepted pilots: tokens</td>
+<td>107,779</td>
+</tr>
+<tr>
+<td>Rejected endpoint attempts: reported tokens</td>
+<td>480,994</td>
+</tr>
+<tr>
+<td>Total recorded report-writing tokens</td>
+<td>775,659; one earlier accepted endpoint has unreported usage</td>
+</tr>
+<tr>
+<td>Report-writing endpoint attempts</td>
+<td>45: 23 created, 22 validation-failed; only 16 final saved reports</td>
+</tr>
+<tr>
+<td>Engineering audit window</td>
+<td>18:07:27–19:31:59 UTC on September 22: 84 min 33 s; not continuous inference time</td>
+</tr>
+<tr>
+<td>Assistant tokens and monetary cost</td>
+<td>Not available; no estimate presented</td>
+</tr>
+<tr>
+<td>Screenshots</td>
+<td>20/20 final cards: automated checks plus individual visual inspection; 16 reports and four explicit failure states</td>
+</tr>
+<tr>
+<td>Software validation</td>
+<td>1,624 backend tests passed, 180 skipped; four PCAP browser tests passed; frontend lint/build passed</td>
+</tr>
+<tr>
+<td>Baseline preserved</td>
+<td>490 frozen files unchanged; 80 final native-output files frozen before answer retrieval</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reputation outcomes:</strong> 1,114 retained per-case target records, not 1,114 completed external scans. VirusTotal: 1,112 deferred targets and two errors, no successful verdicts. ThreatFox: 11 <code>ok</code> results and 1,102 <code>not_found</code>; related IP:port hits are not exact bare-IP malicious verdicts. MalwareBazaar: one direct Gozi hash match, 96 <code>not_found</code>, 123 not applicable. One OTX lookup was retained as context only. Cache reuse and provider applicability mean these counts are not external HTTP-call counts.</p>
+<p>The internal library checked 15,750 per-case observable records with zero exact matches. Of 526 cross-case overlaps, 506 were private-address or multicast coincidences; none establishes actor attribution. The original run also retained 18 full report/PDF exports and verified the size plus MD5/SHA-1/SHA-256 of 39 selected downloads—not all 2,032 artifact records.</p>
+<p>Four cases remain withheld: Badbundt, StingrayAhoy, Turkey and Defence, and Happy Halloween. Final citation-binding reliability fixes passed local tests and were deployed, but their proposed live Claude re-tests were blocked by the approval mechanism pending explicit consent for the exact public-PCAP metadata transfer. Broad earlier API approval did not clear that check; no further cloud call was made.</p>
+<p>Reputation coverage needs particular care. VirusTotal returned rate-limit errors; deferred targets were <strong>not completed scans</strong> and were not treated as clean. ThreatFox states that older IOCs expire from its API datasets, which limits the usefulness of a present-day lookup for these historical captures. A not-found result has several possible causes and does not prove benignness. <a href="https://docs.virustotal.com/reference/errors">VirusTotal error reference</a>, <a href="https://threatfox.abuse.ch/api/">ThreatFox API documentation</a>.</p>
+<p>The internal IOC library was consulted through exact matching, but produced zero exact matches in this corpus. That is a measured lack of local corroboration, not a claim that the library was bypassed or that the traffic was benign. Cross-case shared private addresses and multicast traffic were kept separate from threat correlation; overlap alone did not establish a campaign or actor.</p>
+<h2 id="the-twenty-cases">The twenty cases</h2>
+<p>For the 16 saved summaries, each code block below is the <strong>native platform narrative</strong>, not an answer-assisted rewrite. The four failed cases instead have an explicitly labelled status message, not an invented model narrative. The linked short report and structured JSON retain the saved claims and citations. The comparison below each screenshot is evaluation commentary added only after the native-output freeze. It is not part of the model's original result.</p>
+<h3 id="1-steelcoffee--2020-04-24">1. Steelcoffee — 2020-04-24</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 199 claim-text words · 6.90 s generation · 12,072 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Steelcoffee; partial result" decoding="async" height="1028" loading="lazy" src="2020-04-24/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host 10.0.0.167, associated with the account elmer.obrien, downloaded a PE (portable executable) file via HTTP from 119.31.234.40 using the URL http://alphapioneer.com/spool/8888.png; the file's hash is f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1.
+
+This PE file download used a .png file extension, which is not a typical method for transferring executables and is flagged as highly suspicious, requiring further investigation of the payload's hash; no proof of execution or infection is present.
+
+A separate ZIP archive was also downloaded by 10.0.0.167 from 158.69.28.93, but there is no evidence yet linking this file to malicious activity within the supplied coverage.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Elmer Obrien’s workstation (10.0.0.167, DESKTOP-GRIONXA) received a Windows executable disguised as a PNG from alphapioneer[.]com. Its recovered SHA-256 matches the publisher’s Qakbot sample. The packet transfer and identity are established; the family identification comes from the published investigation, not a successful live reputation lookup in this run. <a href="https://www.malware-traffic-analysis.net/2020/04/24/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct affected workstation, user, download server, disguised payload and exact SHA-256. The native report does not identify Qakbot or reconstruct its later activity. It spends space on another ZIP transfer whose relevance is unresolved.</p>
+<p><strong>Evidence boundary:</strong> The reference explicitly does not enumerate all Qakbot indicators. An unlisted transfer is not automatically benign or a false positive.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 1/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> <code>f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1</code> — corroborated exact payload.</p>
+<p><a href="2020-04-24/SHORT-REPORT.html">Native short report</a> · <a href="2020-04-24/summary.json">Structured claims and citations</a> · <a href="2020-04-24/ANSWER-COMPARISON.json">Comparison</a> · <a href="2020-04-24/screenshot-validation.json">Screenshot validation</a> · <a href="2020-04-24/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="2-mondogreek--2020-03-14">2. Mondogreek — 2020-03-14</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 136 claim-text words · 71.55 s generation · 21,433 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Mondogreek; partial result" decoding="async" height="884" loading="lazy" src="2020-03-14/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host at 10.3.11.194 downloaded three files with PE (Windows executable) content from http://64.44.133.131/images/cursor.png and http://64.44.133.131/images/imgpaper.png during the capture window; these files were served with non-executable URL extensions, which is suspicious but does not prove execution or compromise.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> On March 11, Otis Witherspoon’s laptop (10.3.11.194, LAPTOP-7XMV2SN) received Trickbot and made follow-on encrypted and HTTP communications. The published chain starts with YAS20.exe from bolton-tech[.]com; later executable modules were served as cursor.png and imgpaper.png from 64.44.133[.]131. The native summary covers those later downloads, not the complete chain. <a href="https://www.malware-traffic-analysis.net/2020/03/14/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct victim IP and follow-up download server; two selected payload hashes match the answer exactly. Initial payload, user/hostname, Trickbot identification and post-infection destinations are absent from the short report.</p>
+<p><strong>Evidence boundary:</strong> The exercise page is dated March 14, but the incident is March 11. A third native hash is not addressed by the non-exhaustive answer.</p>
+<p><strong>Extraction check:</strong> 3/3 selected reference SHA-256 values occur in the original artifact records; 2/3 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> <code>68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e</code> — corroborated exact payload; <code>8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2</code> — corroborated exact payload; <code>fef9b646dba5c7372fe92b6a9d227833c1d15d8cc3a73fd22be9d1869b21cd67</code> — not explicitly addressed by reference text.</p>
+<p><a href="2020-03-14/SHORT-REPORT.html">Native short report</a> · <a href="2020-03-14/summary.json">Structured claims and citations</a> · <a href="2020-03-14/ANSWER-COMPARISON.json">Comparison</a> · <a href="2020-03-14/screenshot-validation.json">Screenshot validation</a> · <a href="2020-03-14/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="3-one-hot-mess--2020-02-21">3. One-Hot-Mess — 2020-02-21</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 158 claim-text words · 4.55 s generation · 6,093 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for One-Hot-Mess; partial result" decoding="async" height="821" loading="lazy" src="2020-02-21/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host at 172.17.8.174, associated with user gabriella.ventura, downloaded a Windows executable file via HTTP from blueflag.xyz (49.51.172.56); the file content was confirmed as a Portable Executable by exact SHA-256 match.
+
+The same host also downloaded a ZIP archive via HTTP from a Microsoft-associated delivery domain (205.185.216.42), with file content matching exactly by SHA-256; there is no direct evidence either downloaded file was executed.
+
+Directory-service (LDAP, SAMR, DRSUAPI) protocol traffic between 172.17.8.174 and 172.17.8.8 was present but matches normal Windows authentication and management patterns; this alone does not establish compromise or lateral movement.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Gabriella Ventura’s workstation (172.17.8.174, DESKTOP-TZMKHKC) downloaded the Dridex payload from blueflag[.]xyz and subsequently communicated over TLS with 91.211.88[.]122. The native report finds the initial transfer but misses that follow-on context. The publisher’s persistence details came from additional host artifacts, which were not supplied to this PCAP-only run. <a href="https://www.malware-traffic-analysis.net/2020/02/21/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct victim, account, download domain/server and transfer. Misses Dridex and the later suspicious TLS activity. The claim that no post-download malicious behavior is supported is broader than the selected evidence justifies.</p>
+<p><strong>Evidence boundary:</strong> Do not count absent scheduled tasks, registry persistence or host-resident loader files as PCAP extraction failures.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 0/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2020-02-21/SHORT-REPORT.html">Native short report</a> · <a href="2020-02-21/summary.json">Structured claims and citations</a> · <a href="2020-02-21/ANSWER-COMPARISON.json">Comparison</a> · <a href="2020-02-21/screenshot-validation.json">Screenshot validation</a> · <a href="2020-02-21/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="4-sol-lightnet--2020-01-30">4. Sol-Lightnet — 2020-01-30</h3>
+<p>Native result: <strong>partial</strong>. claude-opus-4-8 · 150 claim-text words · 80.92 s generation · 30,684 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Sol-Lightnet; partial result" decoding="async" height="897" loading="lazy" src="2020-01-30/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">Windows host 10.20.30.227 (DESKTOP-4C02EMG, Kerberos principal alejandrina.hogue) downloaded a PE executable over cleartext HTTP from http://gengrasjeepram.com/sv.exe (server 49.51.133.162).
+
+The same host sent repeated HTTP POST requests to twereptale.com (81.177.6.156) at /4/forum.php and /mlu/forum.php with unusual user-agent strings, a pattern suitable for beaconing review.
+
+No packet evidence establishes execution of the downloaded PE or any successful exfiltration; endpoint payloads were not decrypted and no actor attribution is supported.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Alejandrina Hogue’s workstation (10.20.30.227, DESKTOP-4C02EMG) received sv.exe from gengrasjeepram[.]com, then posted to twereptale[.]com. The publisher identifies Hancitor and additional encrypted payload transfers from xolightfinance[.]com. The Claude summary correctly connects the first download and POST activity, while leaving execution and attribution unconfirmed. <a href="https://www.malware-traffic-analysis.net/2020/01/30/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct workstation/user, executable download, hash and follow-on POST destinations. Hancitor identification and the later encrypted payload stage are absent.</p>
+<p><strong>Evidence boundary:</strong> api.ipify.org is an IP-discovery service, not inherently malicious. This case used a recorded Claude fallback, not OpenAI.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 1/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2020-01-30/SHORT-REPORT.html">Native short report</a> · <a href="2020-01-30/summary.json">Structured claims and citations</a> · <a href="2020-01-30/ANSWER-COMPARISON.json">Comparison</a> · <a href="2020-01-30/screenshot-validation.json">Screenshot validation</a> · <a href="2020-01-30/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="5-it-happened-on-christmas-day--2019-12-25">5. It happened on Christmas day — 2019-12-25</h3>
+<p>Native result: <strong>missed</strong>. gpt-4.1-2025-04-14 · 124 claim-text words · 6.16 s generation · 5,122 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for It happened on Christmas day; missed result" decoding="async" height="803" loading="lazy" src="2019-12-25/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The device with IP 139.199.184.166 initiated multiple repeated HTTP POST requests to the URLs http://128.199.64.235/1.php and http://128.199.64.235/qq.php, which may indicate beaconing or suspicious data transfer activity.
+
+Reputation and threat intelligence checks on 139.199.184.166 and the contacted URLs returned no confirmation of known threats, but rate limiting or the absence of records does not mean the endpoints are benign.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> This capture shows web-server reconnaissance, not an established malware callback. The scanner 139.199.184[.]166 probed the server exposed as 128.199.64[.]235, with internal address 10.12.25.101, including activity against ports 80, 8080 and 8983. The native summary reverses the investigative emphasis by describing possible beaconing or data transfer. <a href="https://www.malware-traffic-analysis.net/2019/12/25/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Contains the external scanner and server addresses, but does not explain their correct security roles. Wrong core scenario; omits the internal victim. Targeted server URLs are presented as beaconing-review indicators. It also suggests contacted URLs received reputation checks, although full-URL enrichment was not performed.</p>
+<p><strong>Evidence boundary:</strong> The PDF’s notes contain 139.119.184.166, while its main answer and capture use 139.199.184.166; this is treated as a reference inconsistency.</p>
+<p><strong>Short-list IOC review:</strong> <code>hxxp://128.199.64.235/1.php</code> — incorrect security role target not c2; <code>hxxp://128.199.64.235/qq.php</code> — incorrect security role target not c2.</p>
+<p><a href="2019-12-25/SHORT-REPORT.html">Native short report</a> · <a href="2019-12-25/summary.json">Structured claims and citations</a> · <a href="2019-12-25/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-12-25/screenshot-validation.json">Screenshot validation</a> · <a href="2019-12-25/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="6-icemaiden--2019-12-03">6. Icemaiden — 2019-12-03</h3>
+<p>Native result: <strong>missed</strong>. gpt-4.1-2025-04-14 · 131 claim-text words · 4.30 s generation · 4,669 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Icemaiden; missed result" decoding="async" height="746" loading="lazy" src="2019-12-03/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host 10.18.20.97, identified as Juanita-Work-PC, engaged in normal directory service protocol activity using LDAP and DRSUAPI with another internal address (10.18.20.8); these operations are consistent with standard Windows logon processes and no evidence in the capture supports credential theft, discovery, or DCSync attacks.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The publisher identifies Ursnif activity on JUANITA-WORK-PC (10.18.20.97), used by momia.juanita. Webmail activity precedes the infection, but email delivery is a hypothesis rather than proof. AdversaryGraph finds the correct identity yet summarises routine directory traffic, failing to explain the suspicious part of the capture. <a href="https://www.malware-traffic-analysis.net/2019/12/03/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct workstation, IP and account. Misses the incident and family; overgeneralises normal directory activity into a lack-of-compromise finding.</p>
+<p><strong>Evidence boundary:</strong> Banking and webmail domains are context, not malicious IOCs. The family in the answer is supported by associated IDS alerts that were not model input.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-12-03/SHORT-REPORT.html">Native short report</a> · <a href="2019-12-03/summary.json">Structured claims and citations</a> · <a href="2019-12-03/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-12-03/screenshot-validation.json">Screenshot validation</a> · <a href="2019-12-03/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="7-okay-boomer--2019-11-12">7. Okay-Boomer — 2019-11-12</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 143 claim-text words · 6.57 s generation · 10,662 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Okay-Boomer; partial result" decoding="async" height="862" loading="lazy" src="2019-11-12/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host 10.11.11.203 (TUCKER-WIN7-PC, candice.tucker) downloaded a file identified as a Windows executable (PE) from http://acjabogados.com/40group.tiff with SHA-256 8d5d36c8ffb0a9c81b145aa40c1ff3475702fb0b5f9e08e0577bdc405087e635.
+
+Multiple hosts in the environment, including TUCKER-WIN7-PC and others, retrieved various JavaScript files from reputable domains with no evidence in this data set of those scripts being malicious or executed beyond receiving them over HTTP.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Candice Tucker’s Windows host (10.11.11.203, TUCKER-WIN7-PC) downloaded a Windows executable from acjabogados[.]com/40group.tiff. The recovered hash matches the publisher’s sample. Subsequent TCP attempts targeted 5.188.108[.]58 and 138.201.6[.]195 without a response. These are attempted connections, not proof of a successful command-and-control session. <a href="https://www.malware-traffic-analysis.net/2019/11/12/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct victim, identity, disguised payload URL and SHA-256. Omits the subsequent connection attempts. The exact payload is not included in the short IOC list; the new extension-mismatch rule does not yet cover .tiff.</p>
+<p><strong>Evidence boundary:</strong> The answer does not establish a specific malware family. Its historical VirusTotal ratio is not a current result from this run.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 1/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-11-12/SHORT-REPORT.html">Native short report</a> · <a href="2019-11-12/summary.json">Structured claims and citations</a> · <a href="2019-11-12/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-11-12/screenshot-validation.json">Screenshot validation</a> · <a href="2019-11-12/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="8-badbundt--2019-08-20">8. Badbundt — 2019-08-20</h3>
+<p>Native result: <strong>withheld</strong>. No saved native model result. Earlier validation failures remain in the audit; the final retry was blocked pending exact-transfer consent.</p>
+<p><img alt="Actual AdversaryGraph report for Badbundt; withheld result" decoding="async" height="323" loading="lazy" src="2019-08-20/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">No validated native investigation summary is saved.
+Report writing failed; this is not a clean-capture verdict.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The published investigation identifies Ursnif followed by Trickbot on Reginald Chandler’s TAMPA-OFFICE-PC (10.8.20.101). Initial delivery, encrypted follow-up transfers and later executable modules form a multi-stage infection. Some .rar-looking responses contain encrypted data, not recoverable plaintext executables. The platform has packet evidence, but no validated native short summary was saved. <a href="https://www.malware-traffic-analysis.net/2019/08/20/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Not scored as a native summary success: report writing was withheld. No saved incident story, family explanation or short IOC action list.</p>
+<p><strong>Evidence boundary:</strong> A final provider retry was blocked pending explicit consent for the exact metadata transfer. The reference-based paragraph here is not a substituted platform result.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-08-20/SHORT-REPORT.html">Native short report</a> · <a href="2019-08-20/summary.json">Structured claims and citations</a> · <a href="2019-08-20/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-08-20/screenshot-validation.json">Screenshot validation</a> · <a href="2019-08-20/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="9-so-hot-right-now--2019-07-19">9. So hot right now — 2019-07-19</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 164 claim-text words · 70.35 s generation · 20,353 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for So hot right now; partial result" decoding="async" height="985" loading="lazy" src="2019-07-19/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The device with IP 172.16.4.205 made repeated outbound HTTP POST requests to 31.7.62.214 using a User-Agent string identifying NetSupport Manager remote-access software, over cleartext HTTP on TCP port 443.
+
+Around the same period, the same internal device sent large HTTP POST requests exceeding one megabyte each to 185.243.115.84 at b5689023.green.mattingsolutions.co, with POST traffic involving suspicious URL parameters.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The publisher describes a fake-browser-update infection on ROTTERDAM-PC (172.16.4.205), used by matthijs.devries, followed by NetSupport remote-access traffic and uploaded desktop screenshots. The native summary recognises NetSupport and large POST transfers but does not recover the full fake-update-to-screenshot-theft story. The packet destination is 31.7.62[.]214, despite the answer listing .213. <a href="https://www.malware-traffic-analysis.net/2019/07/19/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct host/user, NetSupport-associated traffic and large outbound transfers. Misses SocGholish delivery and identification of the uploaded content as screenshots. The phrase “exceeding one megabyte each” overgeneralises the cited single aggregated finding.</p>
+<p><strong>Evidence boundary:</strong> 31.7.62.214 is directly verified in packets; the PDF lists 31.7.62.213. Commercial remote-access software and cleartext HTTP on port 443 require context, not an automatic malware verdict.</p>
+<p><strong>Short-list IOC review:</strong> <code>31.7.62.214</code> — packet verified reference ip discrepancy; <code>b5689023.green.mattingsolutions.co</code> — not explicitly addressed by reference text.</p>
+<p><a href="2019-07-19/SHORT-REPORT.html">Native short report</a> · <a href="2019-07-19/summary.json">Structured claims and citations</a> · <a href="2019-07-19/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-07-19/screenshot-validation.json">Screenshot validation</a> · <a href="2019-07-19/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="10-phenomenoc--2019-06-22">10. Phenomenoc — 2019-06-22</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 99 claim-text words · 5.16 s generation · 7,926 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Phenomenoc; partial result" decoding="async" height="777" loading="lazy" src="2019-06-22/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">During the observed period, host 10.0.76.109 requested and received a large executable-formatted transfer (declared content type application/x-msdownload, size 584192 bytes) from 37.46.135.170; no explicit evidence establishes the intent or execution of this payload.
+
+10.0.76.109 was identified as associated with the workstation Bangkok-8ac2-PC and account bangkok-8ac2-pc$ during the capture.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The reference identifies Rig exploit-kit delivery of KPOT Stealer to BANGKOK-8AC2-PC (10.0.76.109), used by edris.haight. Delivery involves 37.46.135[.]170; follow-on traffic uses 8.209.83[.]76 and fghjkmgru34[.]site. The native report notices the executable-declared transfer but misses the delivery mechanism, stealer and later communications. <a href="https://www.malware-traffic-analysis.net/2019/06/22/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct affected host and delivery server. No human user, exploit-kit interpretation, KPOT label or post-infection destination in the short report. A computer account is shown instead of the person’s account.</p>
+<p><strong>Evidence boundary:</strong> The answer’s hash is for malware retrieved from the infected host. It is not assumed to equal the encoded exploit-kit network object; family identification also uses external alerts.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-06-22/SHORT-REPORT.html">Native short report</a> · <a href="2019-06-22/summary.json">Structured claims and citations</a> · <a href="2019-06-22/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-06-22/screenshot-validation.json">Screenshot validation</a> · <a href="2019-06-22/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="11-beguilesoft--2019-05-02">11. BeguileSoft — 2019-05-02</h3>
+<p>Native result: <strong>missed</strong>. gpt-4.1-2025-04-14 · 159 claim-text words · 69.80 s generation · 11,277 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for BeguileSoft; missed result" decoding="async" height="814" loading="lazy" src="2019-05-02/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The workstation Breaux-Win7-PC (10.0.0.227) participated in standard directory service protocol communication with 10.0.0.10, consistent with normal Windows logon activity and not by itself indicative of compromise.
+
+Breaux-Win7-PC (10.0.0.227) established sustained external TCP connections on port 21 to several public IPs, including 145.14.144.10, using protocols that could not be fully decoded; this is an investigation lead but does not alone establish malicious activity or compromise.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The published case identifies Hawkeye stealing information from Adriana Breaux’s workstation (10.0.0.227, BREAUX-WIN7-PC). FTP uploads carry credential data, keystrokes and screenshots to files.000webhost[.]com. The native report identifies the host and port-21 sessions but fails to interpret the FTP transfer behavior that explains the incident. <a href="https://www.malware-traffic-analysis.net/2019/05/02/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct workstation/account and external port-21 connections. Misses FTP-based theft and Hawkeye. “Decrypted stream coverage” is misleading: this workflow did not decrypt TLS payloads.</p>
+<p><strong>Evidence boundary:</strong> The PDF lists 154.14.* hosting IPs; packets show 145.14.144.10, 145.14.145.4 and 145.14.145.99. Hosting and IP-check services are not inherently malicious.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-05-02/SHORT-REPORT.html">Native short report</a> · <a href="2019-05-02/summary.json">Structured claims and citations</a> · <a href="2019-05-02/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-05-02/screenshot-validation.json">Screenshot validation</a> · <a href="2019-05-02/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="12-stingrayahoy--2019-04-15">12. StingrayAhoy — 2019-04-15</h3>
+<p>Native result: <strong>withheld</strong>. No saved native model result. Earlier validation failures remain in the audit; the final retry was blocked pending exact-transfer consent.</p>
+<p><img alt="Actual AdversaryGraph report for StingrayAhoy; withheld result" decoding="async" height="323" loading="lazy" src="2019-04-15/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">No validated native investigation summary is saved.
+Report writing failed; this is not a clean-capture verdict.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The reference describes Ursnif followed by AZORult on Kim Jooyoung’s SEOUL-4A67-PC (10.0.90.175). The recoverable Ursnif executable has SHA-256 50007a82…09e3a2. That exact hash also received the run’s only direct malicious-file reputation match, labelled Gozi by MalwareBazaar. Nevertheless, no validated native short report was saved. <a href="https://www.malware-traffic-analysis.net/2019/04/15/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> No native-summary success. Separately, the extracted hash and direct MalwareBazaar record corroborate the first payload. No saved short incident story despite useful packet and reputation evidence.</p>
+<p><strong>Evidence boundary:</strong> The reputation record was queried in 2026 and first seen there in 2022; neither date is the date of this 2019 incident. Final retry awaits exact-transfer consent.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 0/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-04-15/SHORT-REPORT.html">Native short report</a> · <a href="2019-04-15/summary.json">Structured claims and citations</a> · <a href="2019-04-15/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-04-15/screenshot-validation.json">Screenshot validation</a> · <a href="2019-04-15/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="13-littletigers--2019-03-19">13. LittleTigers — 2019-03-19</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 143 claim-text words · 4.94 s generation · 6,239 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for LittleTigers; partial result" decoding="async" height="846" loading="lazy" src="2019-03-19/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host 10.0.90.215 (Bobby-Tiger-PC) downloaded two executable files via HTTP from external servers 209.141.34.8 and 217.23.14.81, with SHA-256 hashes 2a9b0ed40f1f0bc0c13ff35d304689e9cadd633781cbcad1c2d2b92ced3f1c85 and 5865e801e6324166d6d05b39a14f2a8a798c6eb652831f78c2634f2b7a400eaf respectively.
+
+These downloads correspond to transfers of potential PE (Portable Executable) files named test1.exe and f4.exe, suggesting a candidate for ingress tool transfer (ATT&amp;CK T1105), but there is no evidence establishing whether the files were executed, nor proof of malicious purpose or system compromise during the capture.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Bobby Tiger’s workstation (10.0.90.215, BOBBY-TIGER-PC) downloaded test1.exe and f4.exe. The recovered hashes exactly match the publisher’s Remcos and Dridex payloads. The reference also describes distinct follow-on communications. The native summary accurately records the two transfers but stops before explaining the two-malware incident. <a href="https://www.malware-traffic-analysis.net/2019/03/19/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct affected host/account, both payload servers and both exact SHA-256 hashes. Remcos/Dridex identification and their later communications are omitted; neither recovered file appears in the short IOC list.</p>
+<p><strong>Evidence boundary:</strong> TLS on port 3389 in this exercise is not automatically RDP. Downloading the files alone does not establish endpoint execution.</p>
+<p><strong>Extraction check:</strong> 2/2 selected reference SHA-256 values occur in the original artifact records; 2/2 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-03-19/SHORT-REPORT.html">Native short report</a> · <a href="2019-03-19/summary.json">Structured claims and citations</a> · <a href="2019-03-19/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-03-19/screenshot-validation.json">Screenshot validation</a> · <a href="2019-03-19/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="14-stormtheory--2019-02-23">14. StormTheory — 2019-02-23</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 116 claim-text words · 71.18 s generation · 18,165 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for StormTheory; partial result" decoding="async" height="720" loading="lazy" src="2019-02-23/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host Ferguson-Win-PC at IP 10.2.23.231 downloaded four different PE files from external servers using HTTP requests, with three files served under PNG or JPG extensions, which is inconsistent with their content type and is suspicious.
+
+A PE file named 'troll1.jpg' was also downloaded from 209.141.55.226 by the same host Ferguson-Win-PC at 10.2.23.231, further supporting suspicious transfer activity.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The published investigation identifies IcedID and Trickbot on Ruby Ferguson’s FERGUSON-WIN-PC (10.2.23.231). Six executable downloads include files masquerading as images. The native summary finds suspicious downloads but describes only four files, then ambiguously says troll1.jpg was “also” downloaded. It does not explain the multi-stage infection. <a href="https://www.malware-traffic-analysis.net/2019/02/23/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct host and image-extension executable activity. Misses the complete six-payload account, user and two malware families; wording risks double-counting troll1.jpg. The extraction comparison below is separate from narrative completeness.</p>
+<p><strong>Evidence boundary:</strong> The publisher reports unsuccessful ETERNALBLUE activity against the domain controller, not a confirmed second infected host.</p>
+<p><strong>Extraction check:</strong> 6/6 selected reference SHA-256 values occur in the original artifact records; 0/6 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-02-23/SHORT-REPORT.html">Native short report</a> · <a href="2019-02-23/summary.json">Structured claims and citations</a> · <a href="2019-02-23/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-02-23/screenshot-validation.json">Screenshot validation</a> · <a href="2019-02-23/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="15-timbershade--2019-01-28">15. TimberShade — 2019-01-28</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 87 claim-text words · 69.93 s generation · 10,295 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for TimberShade; partial result" decoding="async" height="694" loading="lazy" src="2019-01-28/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">Host 172.17.8.109 (Dunn-Windows-PC) downloaded an executable file identified as Portable Executable (PE) format from http://91.121.30.169:8000/91msE95B/actiV.bin during the capture period.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Margaret Dunn’s DUNN-WINDOWS-PC (172.17.8.109) downloaded actiV.bin from 91.121.30[.]169:8000. The recovered executable hash matches the publisher’s sample; the reference’s associated IDS alerts support Dridex. The native report correctly explains the download and identity but leaves the malware family and subsequent incident unresolved. <a href="https://www.malware-traffic-analysis.net/2019/01/28/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct victim, user, executable URL and exact SHA-256. No Dridex identification or concise actionable payload indicator.</p>
+<p><strong>Evidence boundary:</strong> One paragraph in the PDF says 91.121.30.159, but another caption and the packets identify .169. The native .169 is not an error.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 1/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2019-01-28/SHORT-REPORT.html">Native short report</a> · <a href="2019-01-28/summary.json">Structured claims and citations</a> · <a href="2019-01-28/ANSWER-COMPARISON.json">Comparison</a> · <a href="2019-01-28/screenshot-validation.json">Screenshot validation</a> · <a href="2019-01-28/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="16-eggnog-soup--2018-12-18">16. Eggnog Soup — 2018-12-18</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 127 claim-text words · 6.51 s generation · 8,449 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Eggnog Soup; partial result" decoding="async" height="817" loading="lazy" src="2018-12-18/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">Host 172.16.3.133 downloaded a Portable Executable (PE) file from 93.90.146.108 via http://www.prolightphotovideo.net/dVk_hwBIaehh/, indicating potential delivery of an executable payload.
+
+Host 172.16.3.133 also downloaded an OLE document from 82.80.25.215 at http://entisrael.com/wp-content/uploads/2018/jemHu-SahjLpTw_r-7Kd/PaymentStatus/default/US_us/Companies-Invoice-0970945/, which may contain a malicious macro or embedded exploit.
+
+No evidence confirms execution of the downloaded files or subsequent compromise within the available capture.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Among several devices, the publisher identifies 172.16.3.133 as the workstation showing Emotet and IcedID activity. The native report selects the same host and connects it with executable and document downloads. It does not identify the malware chain; its wording about possible macros is a hypothesis, not extracted macro evidence. <a href="https://www.malware-traffic-analysis.net/2018/12/18/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct affected workstation and relevant transfer focus. No Emotet/IcedID interpretation; the source’s wider device inventory is outside this short incident-report objective.</p>
+<p><strong>Evidence boundary:</strong> This case reaches the raw fallback stream limit, so extracted evidence is not exhaustive. OLE format alone does not prove a malicious macro.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2018-12-18/SHORT-REPORT.html">Native short report</a> · <a href="2018-12-18/summary.json">Structured claims and citations</a> · <a href="2018-12-18/ANSWER-COMPARISON.json">Comparison</a> · <a href="2018-12-18/screenshot-validation.json">Screenshot validation</a> · <a href="2018-12-18/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="17-turkey-and-defence--2018-11-07">17. Turkey and Defence — 2018-11-07</h3>
+<p>Native result: <strong>withheld</strong>. No saved native model result. Earlier validation failures remain in the audit; the final retry was blocked pending exact-transfer consent.</p>
+<p><img alt="Actual AdversaryGraph report for Turkey and Defence; withheld result" decoding="async" height="323" loading="lazy" src="2018-11-07/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">No validated native investigation summary is saved.
+Report writing failed; this is not a clean-capture verdict.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The published case identifies Ursnif/Gozi delivery to Carlos Danger’s DANGER-WIN-PC (10.22.15.119). An executable served through shumbildac[.]com is 439,808 bytes and has an answer-listed SHA-256. Ordinary university browsing in the same capture is unrelated. The native platform has retained packet evidence but no validated short narrative. <a href="https://www.malware-traffic-analysis.net/2018/11/07/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Not counted as a native-summary success. Payload extraction is evaluated independently. No saved concise story or action list.</p>
+<p><strong>Evidence boundary:</strong> A withheld report means report writing failed, not that the capture is clean. The final provider retry was blocked pending exact-transfer consent.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 0/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2018-11-07/SHORT-REPORT.html">Native short report</a> · <a href="2018-11-07/summary.json">Structured claims and citations</a> · <a href="2018-11-07/ANSWER-COMPARISON.json">Comparison</a> · <a href="2018-11-07/screenshot-validation.json">Screenshot validation</a> · <a href="2018-11-07/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="18-happy-halloween--2018-10-31">18. Happy Halloween — 2018-10-31</h3>
+<p>Native result: <strong>withheld</strong>. No saved native model result. Earlier validation failures remain in the audit; the final retry was blocked pending exact-transfer consent.</p>
+<p><img alt="Actual AdversaryGraph report for Happy Halloween; withheld result" decoding="async" height="323" loading="lazy" src="2018-10-31/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">No validated native investigation summary is saved.
+Report writing failed; this is not a clean-capture verdict.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The reference identifies Trickbot on Ichabod Crane’s HEADLESS-PC (10.100.9.107). The relevant executable transfer is 46.173.214[.]185/startr.ack around 15:34 UTC, after ordinary startup traffic. Its recoverable hash is listed in the answer. The platform’s final report-writing state is withheld; this explanation is reference-assisted, not native output. <a href="https://www.malware-traffic-analysis.net/2018/10/31/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> No saved native short summary; original evidence remains available. No saved incident explanation or short IOC list.</p>
+<p><strong>Evidence boundary:</strong> The beginning of the capture is not the beginning of malicious activity. Final retry awaits exact-transfer consent.</p>
+<p><strong>Extraction check:</strong> 1/1 selected reference SHA-256 values occur in the original artifact records; 0/1 appear anywhere in the short report. This is exact-byte agreement, not proof of execution.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2018-10-31/SHORT-REPORT.html">Native short report</a> · <a href="2018-10-31/summary.json">Structured claims and citations</a> · <a href="2018-10-31/ANSWER-COMPARISON.json">Comparison</a> · <a href="2018-10-31/screenshot-validation.json">Screenshot validation</a> · <a href="2018-10-31/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="19-blank-clipboard--2018-09-27">19. Blank Clipboard — 2018-09-27</h3>
+<p>Native result: <strong>missed</strong>. gpt-4.1-2025-04-14 · 123 claim-text words · 7.01 s generation · 5,356 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Blank Clipboard; missed result" decoding="async" height="738" loading="lazy" src="2018-09-27/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The host Escritorio-PC (172.16.5.203) participated in standard Kerberos authentication and directory protocol activity within a local network, involving accounts such as thiago.almeida and escritorio-pc$.
+
+Directory protocol operations (LDAP, SAMR, DRSUAPI) were observed between Escritorio-PC and a domain controller (172.16.5.5), but this traffic matches normal Windows logon and user activity, with no evidence for credential theft, discovery, or DCSync.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> The publisher links this infection to the first supplied email, a WhatsApp-themed lure. Its URL leads through lealcontabil[.]com and 54.38.137[.]127 to a Dropbox-hosted ZIP; another response contains encoded data rather than a normal ZIP. The native summary instead describes routine directory traffic and incorrectly implies no suspicious transfers occurred. <a href="https://www.malware-traffic-analysis.net/2018/09/27/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Workstation/account bindings are present in native packet evidence; the answer text does not explicitly enumerate their values. Misses the redirect/download chain and overstates a clean-looking interpretation. Selecting which email initiated it requires the supplied emails, which were not inputs to this run.</p>
+<p><strong>Evidence boundary:</strong> Dropbox and Google should not become blanket malicious-domain IOCs. The reference says there were no meaningful IDS alerts; lack of alerts did not remove the suspicious chain.</p>
+<p><strong>Short-list IOC review:</strong> No saved action-list indicators. This is not perfect precision and not a clean verdict.</p>
+<p><a href="2018-09-27/SHORT-REPORT.html">Native short report</a> · <a href="2018-09-27/summary.json">Structured claims and citations</a> · <a href="2018-09-27/ANSWER-COMPARISON.json">Comparison</a> · <a href="2018-09-27/screenshot-validation.json">Screenshot validation</a> · <a href="2018-09-27/enriched.json">Packet and enrichment snapshot</a></p>
+<h3 id="20-sputnik-house--2018-08-12">20. Sputnik House — 2018-08-12</h3>
+<p>Native result: <strong>partial</strong>. gpt-4.1-2025-04-14 · 169 claim-text words · 15.15 s generation · 8,091 tokens including internal repairs.</p>
+<p><img alt="Actual AdversaryGraph report for Sputnik House; partial result" decoding="async" height="1057" loading="lazy" src="2018-08-12/screen-summary.png" width="1100"/></p>
+<p>Native platform narrative (unchanged):</p>
+<pre><code class="language-text">The internal host 192.168.1.95 (Petrov2018-PC) downloaded an HTTP file with SHA-256 b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314, which static review flagged as suspicious, but no execution is proven.
+
+Following these downloads, the same host established repeated HTTP POST connections to http://185.68.93.18/dot.php, consistent with automated beacon or callback patterns, but this activity alone does not prove compromise.
+</code></pre>
+<p><strong>What happened — reference-assisted review:</strong> Mikhail Petrov’s PETROV2018-PC (192.168.1.95) followed a download chain and repeatedly posted to 185.68.93[.]18/dot.php. The publisher links the chain to an IQY email attachment and notes a Marap-associated alert, while retaining family uncertainty. The native summary captures the host and callbacks but does not identify the initiating attachment or clearly explain the executable stage. <a href="https://www.malware-traffic-analysis.net/2018/08/12/page2.html">Official answer</a>.</p>
+<p><strong>Comparison:</strong> Correct workstation/user and recurring POST destination. Does not explain the IQY-to-download chain. Its selected suspicious file hash is not listed by the answer, so it is not counted as an answer-confirmed payload.</p>
+<p><strong>Evidence boundary:</strong> Email attachments were not model input. The page date is August 12, whereas the packet incident is August 11. Do not turn the publisher’s tentative family discussion into a categorical verdict.</p>
+<p><strong>Short-list IOC review:</strong> <code>b908d9b1001d0a39ba92501c086b1c25b05b171eeda035ae9f3e129d2776a314</code> — not explicitly addressed by reference text; <code>185.68.93.18</code> — corroborated callback; <code>hxxp://185.68.93.18/dot.php</code> — corroborated callback.</p>
+<p><a href="2018-08-12/SHORT-REPORT.html">Native short report</a> · <a href="2018-08-12/summary.json">Structured claims and citations</a> · <a href="2018-08-12/ANSWER-COMPARISON.json">Comparison</a> · <a href="2018-08-12/screenshot-validation.json">Screenshot validation</a> · <a href="2018-08-12/enriched.json">Packet and enrichment snapshot</a></p>
+<h2 id="what-the-answer-comparison-means">What the answer comparison means</h2>
+<p>Against the complete published scenarios, the manual review finds <strong>12 partial explanations, 4 missed or misinterpreted scenarios, and 4 withheld reports</strong>. None is counted as a complete reference-level investigation. This is not a pure model-accuracy score: several reference solutions use IDS alerts, email files or endpoint artifacts that were absent from the PCAP-only input.</p>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Native incident story</th>
+<th>Reference context</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2020-04-24 — Steelcoffee</td>
+<td>partial</td>
+<td>Qakbot / Qbot</td>
+</tr>
+<tr>
+<td>2020-03-14 — Mondogreek</td>
+<td>partial</td>
+<td>Trickbot</td>
+</tr>
+<tr>
+<td>2020-02-21 — One-Hot-Mess</td>
+<td>partial</td>
+<td>Dridex</td>
+</tr>
+<tr>
+<td>2020-01-30 — Sol-Lightnet</td>
+<td>partial</td>
+<td>Hancitor</td>
+</tr>
+<tr>
+<td>2019-12-25 — It happened on Christmas day</td>
+<td>missed</td>
+<td>No categorical family required</td>
+</tr>
+<tr>
+<td>2019-12-03 — Icemaiden</td>
+<td>missed</td>
+<td>Ursnif</td>
+</tr>
+<tr>
+<td>2019-11-12 — Okay-Boomer</td>
+<td>partial</td>
+<td>No categorical family required</td>
+</tr>
+<tr>
+<td>2019-08-20 — Badbundt</td>
+<td>withheld</td>
+<td>Ursnif / Gozi, then Trickbot</td>
+</tr>
+<tr>
+<td>2019-07-19 — So hot right now</td>
+<td>partial</td>
+<td>SocGholish / FakeUpdates delivering NetSupport Manager</td>
+</tr>
+<tr>
+<td>2019-06-22 — Phenomenoc</td>
+<td>partial</td>
+<td>Rig exploit kit delivering KPOT Stealer</td>
+</tr>
+<tr>
+<td>2019-05-02 — BeguileSoft</td>
+<td>missed</td>
+<td>Hawkeye keylogger</td>
+</tr>
+<tr>
+<td>2019-04-15 — StingrayAhoy</td>
+<td>withheld</td>
+<td>Ursnif, then AZORult</td>
+</tr>
+<tr>
+<td>2019-03-19 — LittleTigers</td>
+<td>partial</td>
+<td>Remcos RAT and Dridex</td>
+</tr>
+<tr>
+<td>2019-02-23 — StormTheory</td>
+<td>partial</td>
+<td>IcedID / Bokbot with Trickbot</td>
+</tr>
+<tr>
+<td>2019-01-28 — TimberShade</td>
+<td>partial</td>
+<td>Dridex</td>
+</tr>
+<tr>
+<td>2018-12-18 — Eggnog Soup</td>
+<td>partial</td>
+<td>Emotet and IcedID / Bokbot</td>
+</tr>
+<tr>
+<td>2018-11-07 — Turkey and Defence</td>
+<td>withheld</td>
+<td>Ursnif / Gozi</td>
+</tr>
+<tr>
+<td>2018-10-31 — Happy Halloween</td>
+<td>withheld</td>
+<td>Trickbot</td>
+</tr>
+<tr>
+<td>2018-09-27 — Blank Clipboard</td>
+<td>missed</td>
+<td>No categorical family required</td>
+</tr>
+<tr>
+<td>2018-08-12 — Sputnik House</td>
+<td>partial</td>
+<td>Marap-associated alert; author leaves precise family uncertain</td>
+</tr>
+</tbody>
+</table>
+<p>The expected workstation IP appears in 15/16 saved reports; 14 are explicit matches to reference text and one (Blank Clipboard) is supported by the packet identity record. Christmas day fails the victim-role check. Merely mentioning the right IP is not full identity or incident accuracy.</p>
+<p>The selected extraction check finds <strong>19/19 exact SHA-256 matches</strong> in original artifact records, across cases where the answer explicitly describes a recoverable PCAP payload. Only 8 of those hashes occur anywhere in the short report, and 3 are retained in its IOC list. This measures a narrow set of exact-byte matches, not total extraction recall or maliciousness. Phenomenoc's host-retrieved sample and encrypted transfers are excluded from that denominator.</p>
+<p>The short action lists contain eleven entries: three answer-confirmed payload hashes, two answer-confirmed callback entries, one packet-verified IP with a reference typo, three entries not explicitly addressed by the answer text, and two server-target URLs assigned the wrong security role in the Christmas case. Empty lists are not scored as perfect precision.</p>
+<p>Four reference inconsistencies were checked directly against packet addresses: Christmas (.199 versus .119), NetSupport (.214 versus .213), BeguileSoft (145.14.* versus 154.14.*), and TimberShade (.169 versus .159). The <a href="reference-discrepancies.json">read-only discrepancy checks</a> retain commands and results, including local TShark CLDAP warnings. The comparison does not silently treat a typo as ground truth.</p>
+<p>An answer-key match is a useful check, not a substitute for evidence. Published exercises do not necessarily list every legitimate connection or every suspicious indicator. Therefore, an indicator absent from the answer is marked <strong>not addressed</strong>, not automatically called a false positive. Likewise, spotting an answer-listed address somewhere in a packet inventory is not the same as selecting it for investigation with a correct role and explanation.</p>
+<p>The most important qualitative check is whether the report explains the incident. A report can identify the correct workstation and a real executable download yet miss the command-and-control traffic, credential theft or lateral movement that makes the exercise meaningful. A family label can be left unresolved honestly, but that does not make the investigation complete.</p>
+<p>This distinction also explains why the experiment keeps native failures. Optional-claim filtering can make a report shorter and more defensible while removing an otherwise useful IOC that the model cited incorrectly. A technically valid report can still overgeneralise from a small selection. Both outcomes belong in the results.</p>
+<h2 id="limitations-and-human-comparison">Limitations and human comparison</h2>
+<p>This was not a controlled comparison with a human analyst. No analyst completed the same cases under a matched time limit, toolset and scoring protocol. There is consequently no measured human accuracy, speedup or labour-saving percentage to report.</p>
+<p>A competent analyst could follow suspicious streams, inspect transferred file content, distinguish HTTP Host headers from packet destinations, investigate why a device changed names, and recognise that a benign-looking download might be only one stage of a longer intrusion. The analyst could also make mistakes or use threat intelligence unavailable to this run. These are differences in investigative workflow, not measured scores.</p>
+<p>The automated strengths are repeatable decoding, exact hashes, consistent evidence records, bounded external lookups, and rapid generation of a reviewable starting point. Its limitations include incomplete protocol/attack interpretation, evidence-selection blind spots, provider availability, historical reputation drift, and language that sometimes sounds more certain than its supporting evidence.</p>
+<p>The corpus is small, historical and deliberately educational. The system was improved during testing, and failed cases could receive an explicitly recorded operator-selected provider fallback. It is not a random sample, a contemporary threat benchmark, an autonomous no-intervention run, or a fair head-to-head model ranking. Generation times include validation repairs and provider pacing; total engineering elapsed time is not analyst investigation time. Unknown token usage is not silently estimated.</p>
+<p>The next accuracy work belongs upstream of prose: preserve relationships between events, retain important attack stages in the evidence selection, distinguish attacker and victim roles, improve protocol-specific behavioral findings, and test current provider coverage separately from incident-time conclusions. A stronger system prompt helps, but it cannot supply telemetry that the analysis never exposed.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The reporting revision makes AdversaryGraph's output much easier to read and audit. The useful deliverable is a short narrative linked to its supporting evidence—not a renamed packet inventory. The screenshots show actual platform results, and the answer comparisons make the remaining gaps visible.</p>
+<p>That is not the same as a near-100% investigation system. Software tests establish that the reporting workflow behaves as designed; they do not establish that every incident conclusion is correct. The defensible operating model remains <strong>automation prepares the evidence and draft; an analyst validates the story</strong>. This experiment preserves the distinction instead of hiding it behind a single accuracy number.</p>
+<h2 id="related-research">Related research</h2>
+<p><a href="https://1200km.com/articles/read/2026/2026-09-18-ai-agent-vs-human-with-wireshark-six-malware-pcaps-put-to-the-test-63ffeaed97de/">Original six-case AI-agent experiment</a> · <a href="https://1200km.com/articles/read/2026/2026-09-20-adversarygraph-vs-ten-malware-pcaps-evidence-7dfd6a0917cf/">Earlier ten-case deterministic test</a> · <a href="https://1200km.com/adversarygraph/">AdversaryGraph</a> · <a href="https://1200km.com/cyber-knowledge/malware-analysis.html">Malware analysis</a> · <a href="https://1200km.com/cyber-knowledge/dfir.html">DFIR</a></p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.malware-traffic-analysis.net/training-exercises.html">Malware-Traffic-Analysis.net training exercises</a> — corpus source; each case links its specific exercise and answer page.</li>
+<li><a href="https://www.malware-traffic-analysis.net/about.html">Malware-Traffic-Analysis.net about and handling guidance</a>.</li>
+<li><a href="https://threatfox.abuse.ch/api/">ThreatFox API documentation</a> — current IOC-retention boundaries.</li>
+<li><a href="https://docs.virustotal.com/reference/errors">VirusTotal API errors</a> — rate limiting is not a negative malware result.</li>
+<li><a href="https://developers.openai.com/api/docs/guides/structured-outputs">OpenAI Structured Outputs</a> — schema-constrained output is a structural control, not a factual-correctness guarantee.</li>
+<li><a href="https://platform.claude.com/docs/en/api/http/messages">Anthropic Messages API</a> — provider-returned message/model and usage metadata.</li>
+<li><a href="EVALUATION-PROTOCOL.html">Evaluation protocol</a>, <a href="IMPLEMENTATION-VERIFICATION.html">implementation verification</a>, <a href="runtime-provenance.json">runtime provenance</a>, <a href="usage-accounting.json">usage accounting</a>, and <a href="answer-comparisons.json">answer-comparison records</a>.</li>
+</ul>
+<h2 id="follow-my-work">Follow My Work</h2>
+<p><a href="https://1200km.com">1200km.com</a> · <a href="https://medium.com/@1200km">Medium</a> · <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> · <a href="https://github.com/anpa1200">GitHub</a> · <a href="mailto:1200km@gmail.com">Email</a></p>
+</main></body></html>
