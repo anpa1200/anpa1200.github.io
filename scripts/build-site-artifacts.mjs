@@ -17,6 +17,8 @@ import {
   transformReleaseHtml,
 } from './release-html-lib.mjs';
 
+import { archiveDatesForUrl } from './archive-dates-lib.mjs';
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 
@@ -126,6 +128,9 @@ function gitDate(path) {
   }
 }
 
+const archiveCatalogPath = join(siteRoot, 'data', 'article-catalog.json');
+const archiveCatalog = existsSync(archiveCatalogPath)
+  ? JSON.parse(await readFile(archiveCatalogPath, 'utf8')) : [];
 let articleArchiveVerifiedAt = '';
 try {
   const facts = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
@@ -298,8 +303,9 @@ const articlePages = pages.filter((page) => {
 for (const page of pages) {
   const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
   const dates = contentDates(page.html);
-  const published = dates.published || archiveDate(page.canonical);
-  const lastmod = dates.modified || published || gitDate(page.path);
+  const archiveDates = archiveDatesForUrl(page.canonical, archiveCatalog);
+  const published = dates.published || archiveDates.published || archiveDate(page.canonical);
+  const lastmod = dates.modified || archiveDates.modified || published || gitDate(page.path);
   localEntries.set(page.canonical, { loc: page.canonical, ...(lastmod ? { lastmod } : {}) });
 
   const parsed = parseJsonLd(page.html);
