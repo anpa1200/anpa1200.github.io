@@ -1,0 +1,121 @@
+{
+  "date": "2020-03-14",
+  "affected": "10.3.11.194",
+  "family": "Trickbot",
+  "outcome": "partial",
+  "reviewed_story": "On March 11, Otis Witherspoon’s laptop (10.3.11.194, LAPTOP-7XMV2SN) received Trickbot and made follow-on encrypted and HTTP communications. The published chain starts with YAS20.exe from bolton-tech[.]com; later executable modules were served as cursor.png and imgpaper.png from 64.44.133[.]131. The native summary covers those later downloads, not the complete chain.",
+  "matched": "Correct victim IP and follow-up download server; two selected payload hashes match the answer exactly.",
+  "gaps": "Initial payload, user/hostname, Trickbot identification and post-infection destinations are absent from the short report.",
+  "caution": "The exercise page is dated March 14, but the incident is March 11. A third native hash is not addressed by the non-exhaustive answer.",
+  "hashes": [
+    "02db3c6b9aff73bf8a11c41107c836b6c800c919c5d3d1304f336aee03f79f4c",
+    "68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e",
+    "8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2"
+  ],
+  "case_number": 2,
+  "name": "Mondogreek",
+  "analysis_id": "246dbce6-c561-4434-bedb-dd496ba758d2",
+  "capture_sha256": "8df815a53e873e01803010c33752080414b0975709c1c02327e12661eec883a4",
+  "summary_id": "investigation-summary:a0b8e16c-23db-409b-9382-043a4e1c3fde",
+  "native_summary_saved": true,
+  "affected_ip_in_short_report": true,
+  "affected_reference_boundary": "explicitly stated in reference text",
+  "reference_source": {
+    "url": "https://www.malware-traffic-analysis.net/2020/03/14/2020-03-14-traffic-analysis-exercise-answers.pdf.zip",
+    "retrieved_at": "2026-09-22T19:42:42.376036+00:00",
+    "zip_sha256": "4e4cb1fcf123090a80b9a6562f43bdfa3d51685ebe556bf8a96b17a4558e311a",
+    "pdf_sha256": "5f7d645913eeaf2d160cd626695320389e1ee68d333b5277277b3cde886c9ac3",
+    "archive_member": "2020-03-14-traffic-analysis-exercise-answers.pdf",
+    "scope": "Official reference answers, evaluation-only; never supplied to platform or report model."
+  },
+  "reference_answer_page": "https://www.malware-traffic-analysis.net/2020/03/14/page2.html",
+  "reference_hash_checks": [
+    {
+      "sha256": "02db3c6b9aff73bf8a11c41107c836b6c800c919c5d3d1304f336aee03f79f4c",
+      "present_in_original_artifacts": true,
+      "artifact_id": "artifact-81ea815cbb3693b810124184",
+      "size_bytes": 466944,
+      "completeness": "matches-declared-content-length",
+      "transfer_bindings": [
+        {
+          "url": "http://bolton-tech.com/YAS20.exe",
+          "client_ip": "10.3.11.194",
+          "server_ip": "50.87.248.17",
+          "tcp_stream": 259,
+          "match_basis": "exact-sha256-of-decoded-http-response-body",
+          "status_code": "200",
+          "completeness": "matches-declared-content-length",
+          "request_frame": 8616,
+          "response_frame": 8998
+        }
+      ],
+      "present_in_short_claim_text": false,
+      "in_short_ioc_list": false
+    },
+    {
+      "sha256": "68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e",
+      "present_in_original_artifacts": true,
+      "artifact_id": "artifact-f2042332405293c1a06baa7f",
+      "size_bytes": 582144,
+      "completeness": "matches-declared-content-length",
+      "transfer_bindings": [
+        {
+          "url": "http://64.44.133.131/images/cursor.png",
+          "client_ip": "10.3.11.194",
+          "server_ip": "64.44.133.131",
+          "tcp_stream": 434,
+          "match_basis": "exact-sha256-of-decoded-http-response-body",
+          "status_code": "200",
+          "completeness": "matches-declared-content-length",
+          "request_frame": 19014,
+          "response_frame": 19533
+        }
+      ],
+      "present_in_short_claim_text": true,
+      "in_short_ioc_list": true
+    },
+    {
+      "sha256": "8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2",
+      "present_in_original_artifacts": true,
+      "artifact_id": "artifact-533bfd4c90957b3cbb58a9e1",
+      "size_bytes": 582656,
+      "completeness": "matches-declared-content-length",
+      "transfer_bindings": [
+        {
+          "url": "http://64.44.133.131/images/imgpaper.png",
+          "client_ip": "10.3.11.194",
+          "server_ip": "64.44.133.131",
+          "tcp_stream": 434,
+          "match_basis": "exact-sha256-of-decoded-http-response-body",
+          "status_code": "200",
+          "completeness": "matches-declared-content-length",
+          "request_frame": 18431,
+          "response_frame": 18931
+        }
+      ],
+      "present_in_short_claim_text": true,
+      "in_short_ioc_list": true
+    }
+  ],
+  "native_ioc_reviews": [
+    {
+      "value": "68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e",
+      "kind": "sha256",
+      "native_explanation": "The file with SHA-256 68798ccf8e2a5f9682a4e011bec288ad9b3f900244f82c6ae5e8ca538725f92e was downloaded by 10.3.11.194 from 64.44.133.131, matching a PE file signature.",
+      "review": "corroborated_exact_payload"
+    },
+    {
+      "value": "8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2",
+      "kind": "sha256",
+      "native_explanation": "The file with SHA-256 8aa9c596dd3eb7560bc7416ba181e858f1174fcbcb5432050f3f9a663ed1ffa2 was downloaded by 10.3.11.194 from 64.44.133.131, matching a PE file signature.",
+      "review": "corroborated_exact_payload"
+    },
+    {
+      "value": "fef9b646dba5c7372fe92b6a9d227833c1d15d8cc3a73fd22be9d1869b21cd67",
+      "kind": "sha256",
+      "native_explanation": "The file with SHA-256 fef9b646dba5c7372fe92b6a9d227833c1d15d8cc3a73fd22be9d1869b21cd67 was downloaded by 10.3.11.194 from 64.44.133.131, matching a PE file signature.",
+      "review": "not_explicitly_addressed_by_reference_text"
+    }
+  ],
+  "scope": "Post-freeze reviewer comparison, never supplied to report-writing model. Reference may use alerts, email and endpoint artifacts absent from PCAP-only input."
+}

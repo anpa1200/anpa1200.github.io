@@ -1,0 +1,363 @@
+{
+  "id": "investigation-summary:abf8dc27-6ce5-4668-a762-9333cb1a9955",
+  "type": "pcap-investigation-summary",
+  "label": "PCAP investigation summary",
+  "model": "gpt-4.1-2025-04-14",
+  "stale": false,
+  "status": "analyst-review-required",
+  "content": "# PCAP investigation summary\n\n## What happened\n\nThe host at 172.17.8.174, associated with user gabriella.ventura, downloaded a Windows executable file via HTTP from blueflag.xyz \\(49.51.172.56\\); the file content was confirmed as a Portable Executable by exact SHA-256 match.\n\nThe same host also downloaded a ZIP archive via HTTP from a Microsoft-associated delivery domain \\(205.185.216.42\\), with file content matching exactly by SHA-256; there is no direct evidence either downloaded file was executed.\n\nDirectory-service \\(LDAP, SAMR, DRSUAPI\\) protocol traffic between 172.17.8.174 and 172.17.8.8 was present but matches normal Windows authentication and management patterns; this alone does not establish compromise or lateral movement.\n\n## Who was involved\n\n- 172.17.8.174 — Source host for both file downloads and directory authentication traffic.\n- gabriella.ventura — Windows user conducting network activity.\n\n## What remains uncertain\n\n- It is not known if either downloaded file was executed on 172.17.8.174 after download, and there is no packet evidence of post-download malicious behavior.\n\n## Next check\n\n- Verify whether the executable downloaded from blueflag.xyz was launched or present on 172.17.8.174, and investigate the provenance and intent of both downloaded files using endpoint telemetry.\n\nAnalyst-review draft. Exact evidence references and provider provenance are retained in the structured record.",
+  "summary": "The host at 172.17.8.174, associated with user gabriella.ventura, downloaded a Windows executable file via HTTP from blueflag.xyz (49.51.172.56); the file content was confirmed as a Portable Executable by exact SHA-256 match. The same host also downloaded a ZIP archive via HTTP from a Microsoft-associated delivery domain (205.185.216.42), with file content matching exactly by SHA-256; there is no direct evidence either downloaded file was executed. Directory-service (LDAP, SAMR, DRSUAPI) protocol traffic between 172.17.8.174 and 172.17.8.8 was present but matches normal Windows authentication and management patterns; this alone does not establish compromise or lateral movement.",
+  "coverage": {
+    "warnings": [],
+    "projection": "pcap-brief-evidence-v1",
+    "source_digest": "6fc7d6e1a73357c382b6269858c45faf638a8c9f52816c64ae733c965cb7611b",
+    "candidate_total": 0,
+    "omitted_records": {
+      "findings": 0,
+      "artifacts": 8,
+      "candidates": 0,
+      "identities": 0,
+      "techniques": 0,
+      "selected_network_events": 0
+    },
+    "included_records": {
+      "limits": 1,
+      "capture": 1,
+      "findings": 6,
+      "transfers": 2,
+      "identities": 5,
+      "reputation_coverage": 1
+    },
+    "supplement_scope": "Bounded selected packet metadata, direct reputation, identities and transfer relationships; no payload bodies, prior-case content or exhaustive inventory. Full data remains in source analysis.",
+    "source_characters": 6042,
+    "enrichment_retained_targets": 61
+  },
+  "filename": "2020-02-21-traffic-analysis-exercise.pcap",
+  "provider": "openai",
+  "report_id": "pcap:d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0",
+  "created_at": "2026-09-22T18:57:21.505573+00:00",
+  "structured": {
+    "iocs": [],
+    "ttps": [],
+    "identities": [
+      {
+        "kind": "ip",
+        "text": "Source host for both file downloads and directory authentication traffic.",
+        "basis": "observed",
+        "value": "172.17.8.174",
+        "evidence": [
+          {
+            "end": 332,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":87,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":95,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"172.17.8.174\"],\"mac_addresses\":[\"00:11:75:8c:fd:47\"],\"type\":\"account\",\"value\":\"desktop-tzmkhkc$\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-4811042a101e4e7cbcbe4e34",
+            "source_id": "S0006",
+            "source_sha256": "9999530d4a7a656f10354fb2025343bcbdc3804674aaeaca06a7f5e7ce5737ac"
+          },
+          {
+            "end": 335,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":718,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":726,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"172.17.8.174\"],\"mac_addresses\":[\"00:11:75:8c:fd:47\"],\"type\":\"account\",\"value\":\"gabriella.ventura\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-cd36d09ea68cc61f133fa198",
+            "source_id": "S0007",
+            "source_sha256": "c30426fe63896af64cef42dab6d8b19760c358a7d2a98d1873c41000e8af2256"
+          }
+        ]
+      },
+      {
+        "kind": "account",
+        "text": "Windows user conducting network activity.",
+        "basis": "observed",
+        "value": "gabriella.ventura",
+        "evidence": [
+          {
+            "end": 335,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":718,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":726,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"172.17.8.174\"],\"mac_addresses\":[\"00:11:75:8c:fd:47\"],\"type\":\"account\",\"value\":\"gabriella.ventura\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-cd36d09ea68cc61f133fa198",
+            "source_id": "S0007",
+            "source_sha256": "c30426fe63896af64cef42dab6d8b19760c358a7d2a98d1873c41000e8af2256"
+          }
+        ]
+      }
+    ],
+    "next_steps": [
+      {
+        "text": "Verify whether the executable downloaded from blueflag.xyz was launched or present on 172.17.8.174, and investigate the provenance and intent of both downloaded files using endpoint telemetry.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 389,
+            "quote": "{\"client_ip\":\"172.17.8.174\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":1340,\"response_frame\":1566,\"server_ip\":\"49.51.172.56\",\"sha256\":\"03c962ebb541a709b92957e301ea03f1790b6a57d4d0605f618fb0be392c8066\",\"url_without_query_or_fragment\":\"http://blueflag.xyz/nCvQOQHCBjZFfiJvyVGA/yrkbdmt.bin\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-b5a7ebcc669f6e376c5917e8",
+            "source_id": "S0004",
+            "source_sha256": "f53edabe75fa396c39594f28c8d06017961d84ac2e32293efe6eacc3e7aef6d7"
+          },
+          {
+            "end": 443,
+            "quote": "{\"client_ip\":\"172.17.8.174\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"zip\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":7398,\"response_frame\":8133,\"server_ip\":\"205.185.216.42\",\"sha256\":\"9bfd23273fceb5bb99af6d0d7afebe8ef5c2ae2d0ebb5732a771ef183d2f9c86\",\"url_without_query_or_fragment\":\"http://tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/ae6344f1-6475-4365-b7bd-43e79abac1fb\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-493d6a59f15736c443331581",
+            "source_id": "S0005",
+            "source_sha256": "f090deddf143b6d79c06fff041ae85c1e054d8ea6d28008ed9b19c46b3abed6f"
+          }
+        ]
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "It is not known if either downloaded file was executed on 172.17.8.174 after download, and there is no packet evidence of post-download malicious behavior.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 389,
+            "quote": "{\"client_ip\":\"172.17.8.174\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":1340,\"response_frame\":1566,\"server_ip\":\"49.51.172.56\",\"sha256\":\"03c962ebb541a709b92957e301ea03f1790b6a57d4d0605f618fb0be392c8066\",\"url_without_query_or_fragment\":\"http://blueflag.xyz/nCvQOQHCBjZFfiJvyVGA/yrkbdmt.bin\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-b5a7ebcc669f6e376c5917e8",
+            "source_id": "S0004",
+            "source_sha256": "f53edabe75fa396c39594f28c8d06017961d84ac2e32293efe6eacc3e7aef6d7"
+          },
+          {
+            "end": 443,
+            "quote": "{\"client_ip\":\"172.17.8.174\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"zip\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":7398,\"response_frame\":8133,\"server_ip\":\"205.185.216.42\",\"sha256\":\"9bfd23273fceb5bb99af6d0d7afebe8ef5c2ae2d0ebb5732a771ef183d2f9c86\",\"url_without_query_or_fragment\":\"http://tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/ae6344f1-6475-4365-b7bd-43e79abac1fb\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-493d6a59f15736c443331581",
+            "source_id": "S0005",
+            "source_sha256": "f090deddf143b6d79c06fff041ae85c1e054d8ea6d28008ed9b19c46b3abed6f"
+          }
+        ]
+      }
+    ],
+    "what_happened": [
+      {
+        "text": "The host at 172.17.8.174, associated with user gabriella.ventura, downloaded a Windows executable file via HTTP from blueflag.xyz (49.51.172.56); the file content was confirmed as a Portable Executable by exact SHA-256 match.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 389,
+            "quote": "{\"client_ip\":\"172.17.8.174\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":1340,\"response_frame\":1566,\"server_ip\":\"49.51.172.56\",\"sha256\":\"03c962ebb541a709b92957e301ea03f1790b6a57d4d0605f618fb0be392c8066\",\"url_without_query_or_fragment\":\"http://blueflag.xyz/nCvQOQHCBjZFfiJvyVGA/yrkbdmt.bin\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-b5a7ebcc669f6e376c5917e8",
+            "source_id": "S0004",
+            "source_sha256": "f53edabe75fa396c39594f28c8d06017961d84ac2e32293efe6eacc3e7aef6d7"
+          },
+          {
+            "end": 335,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":718,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":726,\"owner_ip\":\"172.17.8.174\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"172.17.8.174\"],\"mac_addresses\":[\"00:11:75:8c:fd:47\"],\"type\":\"account\",\"value\":\"gabriella.ventura\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-cd36d09ea68cc61f133fa198",
+            "source_id": "S0007",
+            "source_sha256": "c30426fe63896af64cef42dab6d8b19760c358a7d2a98d1873c41000e8af2256"
+          }
+        ]
+      },
+      {
+        "text": "The same host also downloaded a ZIP archive via HTTP from a Microsoft-associated delivery domain (205.185.216.42), with file content matching exactly by SHA-256; there is no direct evidence either downloaded file was executed.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 443,
+            "quote": "{\"client_ip\":\"172.17.8.174\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"zip\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":7398,\"response_frame\":8133,\"server_ip\":\"205.185.216.42\",\"sha256\":\"9bfd23273fceb5bb99af6d0d7afebe8ef5c2ae2d0ebb5732a771ef183d2f9c86\",\"url_without_query_or_fragment\":\"http://tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/ae6344f1-6475-4365-b7bd-43e79abac1fb\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-493d6a59f15736c443331581",
+            "source_id": "S0005",
+            "source_sha256": "f090deddf143b6d79c06fff041ae85c1e054d8ea6d28008ed9b19c46b3abed6f"
+          }
+        ]
+      },
+      {
+        "text": "Directory-service (LDAP, SAMR, DRSUAPI) protocol traffic between 172.17.8.174 and 172.17.8.8 was present but matches normal Windows authentication and management patterns; this alone does not establish compromise or lateral movement.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 456,
+            "quote": "{\"explanation\":\"Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\",\"frames\":[811,813,815],\"metrics\":{\"destination\":\"172.17.8.174\",\"event_count\":15,\"operation_numbers\":[\"1\",\"16\",\"17\",\"3\",\"34\",\"36\",\"39\",\"5\",\"6\",\"64\",\"7\"],\"protocol\":\"samr\",\"source\":\"172.17.8.8\"},\"rule_id\":\"directory-service-activity\",\"title\":\"Directory-service protocol activity\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-45acac4ef97bd8b4a00693ac",
+            "source_id": "S0011",
+            "source_sha256": "93485de2da978f5c731df2151cc756bef253299d5b6e50f9f61be6ae14f1570a"
+          },
+          {
+            "end": 436,
+            "quote": "{\"explanation\":\"Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\",\"frames\":[24,82,188],\"metrics\":{\"destination\":\"172.17.8.174\",\"event_count\":69,\"operation_numbers\":[\"\",\"1\",\"4,19,19,19,5\",\"4,5\",\"5\"],\"protocol\":\"ldap\",\"source\":\"172.17.8.8\"},\"rule_id\":\"directory-service-activity\",\"title\":\"Directory-service protocol activity\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-727447b4f1accc52d463c78d",
+            "source_id": "S0012",
+            "source_sha256": "80e60af14d183d63e4b6ae8dd808a4fdb0ec42a5777e7a083904f5a7074cdf1a"
+          },
+          {
+            "end": 427,
+            "quote": "{\"explanation\":\"Directory protocol operations were decoded. Normal Windows logon uses these protocols; activity alone does not establish discovery, credential theft, or DCSync.\",\"frames\":[232,234,236],\"metrics\":{\"destination\":\"172.17.8.174\",\"event_count\":38,\"operation_numbers\":[\"0\",\"1\",\"12\",\"30\"],\"protocol\":\"drsuapi\",\"source\":\"172.17.8.8\"},\"rule_id\":\"directory-service-activity\",\"title\":\"Directory-service protocol activity\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-8fa5f219e278b29a7ffe677f",
+            "source_id": "S0013",
+            "source_sha256": "ff0a203325064f584d8065b5fe0f5bb69f9fe6baa609b84bb3a9630621bfbad9"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": "schema-and-exact-quote-binding; not semantic proof",
+  "word_count": 158,
+  "analysis_id": "d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0",
+  "token_usage": {
+    "total_tokens": 6093,
+    "prompt_tokens": 5585,
+    "completion_tokens": 508
+  },
+  "authoritative": false,
+  "effective_tlp": "TLP:CLEAR",
+  "source_sha256": "208c03f5406d5789205639d60c6a6f17eb8da664578f99354d31520296e5e728",
+  "capture_sha256": "8b984eca8fb96799a9ad7ec5ee766937e640dc1afcad77101e5aeb0ba6be137d",
+  "prompt_version": "pcap-investigation-summary-v5",
+  "requested_model": "gpt-4.1",
+  "source_manifest": [
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "aca7ff1b73a4616781db7fbe3d04b477a6e3ce6135fc8bdcc7188309100771e2",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#capture",
+      "source_id": "S0001"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3be1f569beaf1f11c02b049af42775f595b3cc6cce284de65f8d28830b7389c9",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#coverage",
+      "source_id": "S0002"
+    },
+    {
+      "kind": "intelligence_lead",
+      "offset": 0,
+      "sha256": "63201730466a1115bbf4f23c51cee74a41fcdc4d8c00d795d49d2c9980cae3ef",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#enrichment-coverage",
+      "source_id": "S0003"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "f53edabe75fa396c39594f28c8d06017961d84ac2e32293efe6eacc3e7aef6d7",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-b5a7ebcc669f6e376c5917e8",
+      "source_id": "S0004"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "f090deddf143b6d79c06fff041ae85c1e054d8ea6d28008ed9b19c46b3abed6f",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#artifact/artifact-493d6a59f15736c443331581",
+      "source_id": "S0005"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "9999530d4a7a656f10354fb2025343bcbdc3804674aaeaca06a7f5e7ce5737ac",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-4811042a101e4e7cbcbe4e34",
+      "source_id": "S0006"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "c30426fe63896af64cef42dab6d8b19760c358a7d2a98d1873c41000e8af2256",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-cd36d09ea68cc61f133fa198",
+      "source_id": "S0007"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "7117a45d5dcedce188c706eeaf6745bf9b0b8c0fd70f305c5d58b228cd3540ca",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-03c1a127f49c3141aed116e1",
+      "source_id": "S0008"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "be9a156945f0b3cd067d240b0c5dc972e6a40bc0d27e04bf88675e28e66393d9",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-cb05227f3e02993a6d02b2fe",
+      "source_id": "S0009"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "b77a12ba8699b19fcd1030cc2af19fb86e5dec17e6c90ee0821d6edbc624e804",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#identity/identity-afe130e0eddde147e2c0ada3",
+      "source_id": "S0010"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "93485de2da978f5c731df2151cc756bef253299d5b6e50f9f61be6ae14f1570a",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-45acac4ef97bd8b4a00693ac",
+      "source_id": "S0011"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "80e60af14d183d63e4b6ae8dd808a4fdb0ec42a5777e7a083904f5a7074cdf1a",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-727447b4f1accc52d463c78d",
+      "source_id": "S0012"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "ff0a203325064f584d8065b5fe0f5bb69f9fe6baa609b84bb3a9630621bfbad9",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-8fa5f219e278b29a7ffe677f",
+      "source_id": "S0013"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "f0b2b844e312c70c0d6c59ffde7ede6c3fc38b5af419fea5ee4e2a2fb047ccb4",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-aa69bdb461c237cd815f5b4d",
+      "source_id": "S0014"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "712b5f503d70aab447cddebd3b5610ab8da85889e88483681558f779594e43ad",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-abcbfba4dcad2a22053513ad",
+      "source_id": "S0015"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "8d769778a3796631ccaaac7766860eb83c2576c0030e0abb7f7f4054328a1491",
+      "reference": "/api/pcap/analyses/d9aa0de8-e06d-40b7-bffc-2e1af3c53ea0#finding/finding-bc4b4e4796bf695a30d75b5d",
+      "source_id": "S0016"
+    }
+  ],
+  "token_usage_note": "Provider-reported counts when available; never estimated from character length.",
+  "generation_seconds": 4.555,
+  "generation_attempts": [
+    {
+      "attempt": 1,
+      "validation": "passed",
+      "token_usage": {
+        "total_tokens": 6093,
+        "prompt_tokens": 5585,
+        "completion_tokens": 508,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "stop",
+      "provider_returned_model": "gpt-4.1-2025-04-14"
+    }
+  ],
+  "validation_adjustments": [
+    {
+      "basis": "assessment",
+      "index": 2,
+      "action": "evidence-level-downgrade",
+      "section": "what_happened"
+    }
+  ],
+  "provider_returned_model": "gpt-4.1-2025-04-14"
+}

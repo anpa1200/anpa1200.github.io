@@ -1,0 +1,494 @@
+{
+  "id": "investigation-summary:60b13529-5cbc-4ec3-af47-296930292eeb",
+  "type": "pcap-investigation-summary",
+  "label": "PCAP investigation summary",
+  "model": "gpt-4.1-2025-04-14",
+  "stale": false,
+  "status": "analyst-review-required",
+  "content": "# PCAP investigation summary\n\n## What happened\n\nThe device with IP 172.16.4.205 made repeated outbound HTTP POST requests to 31.7.62.214 using a User-Agent string identifying NetSupport Manager remote-access software, over cleartext HTTP on TCP port 443.\n\nAround the same period, the same internal device sent large HTTP POST requests exceeding one megabyte each to 185.243.115.84 at b5689023.green.mattingsolutions.co, with POST traffic involving suspicious URL parameters.\n\n## Who was involved\n\n- Internal workstation Rotterdam-PC \\(IP 172.16.4.205\\) is associated with user matthijs.devries.\n\n## Key indicators\n\n- The IP 31.7.62.214 received repeated POST requests with a remote-access tool signature from 172.16.4.205.\n- The domain b5689023.green.mattingsolutions.co hosted large HTTP POST traffic, which may indicate suspicious outbound data transfer.\n\n## Supported technique candidates\n\n- Outbound HTTP POST requests to suspicious infrastructure are candidate Web Protocol C2 activity \\(T1071.001\\), not proven adversary command and control.\n\n## What remains uncertain\n\n- No endpoint context or execution evidence confirms whether unauthorized remote access or exfiltration occurred; observable user behavior is unknown.\n\n## Next check\n\n- Review the endpoint Rotterdam-PC for remote-access software presence, user activity, and corroborating evidence of C2 or data exfiltration, as network traffic alone is insufficient for a full compromise assessment.\n\nAnalyst-review draft. Exact evidence references and provider provenance are retained in the structured record.",
+  "summary": "The device with IP 172.16.4.205 made repeated outbound HTTP POST requests to 31.7.62.214 using a User-Agent string identifying NetSupport Manager remote-access software, over cleartext HTTP on TCP port 443. Around the same period, the same internal device sent large HTTP POST requests exceeding one megabyte each to 185.243.115.84 at b5689023.green.mattingsolutions.co, with POST traffic involving suspicious URL parameters.",
+  "coverage": {
+    "warnings": [
+      "Conflicting TCP overlap: fallback extraction rejected this direction"
+    ],
+    "projection": "pcap-brief-evidence-v1",
+    "source_digest": "340743040f70a9f0af3038197d31df11f365de0d36409446ab51f5fe97cb0f29",
+    "candidate_total": 6,
+    "omitted_records": {
+      "findings": 30,
+      "artifacts": 497,
+      "candidates": 0,
+      "identities": 0,
+      "techniques": 0,
+      "selected_network_events": 115
+    },
+    "included_records": {
+      "limits": 1,
+      "capture": 1,
+      "network": 4,
+      "findings": 10,
+      "transfers": 3,
+      "candidates": 6,
+      "identities": 4,
+      "techniques": 3,
+      "reputation_coverage": 1
+    },
+    "supplement_scope": "Bounded selected packet metadata, direct reputation, identities and transfer relationships; no payload bodies, prior-case content or exhaustive inventory. Full data remains in source analysis.",
+    "source_characters": 13093,
+    "enrichment_retained_targets": 74
+  },
+  "filename": "2019-07-19-traffic-analysis-exercise.pcap",
+  "provider": "openai",
+  "report_id": "pcap:961bdc9a-7460-440f-a246-f55748149bcc",
+  "created_at": "2026-09-22T19:03:24.918667+00:00",
+  "structured": {
+    "iocs": [
+      {
+        "kind": "ipv4",
+        "text": "The IP 31.7.62.214 received repeated POST requests with a remote-access tool signature from 172.16.4.205.",
+        "basis": "observed",
+        "value": "31.7.62.214",
+        "evidence": [
+          {
+            "end": 306,
+            "quote": "{\"dst_ip\":\"31.7.62.214\",\"dst_port\":443,\"fields\":{\"http.host\":\"31.7.62.214\",\"http.request.full_uri\":\"http://31.7.62.214/fakeurl.htm\",\"http.request.method\":\"POST\",\"http.user_agent\":\"NetSupport Manager/1.3\"},\"frame\":20522,\"kind\":\"http_request\",\"src_ip\":\"172.16.4.205\",\"timestamp_epoch\":\"1563562643.794249000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#frame/20522",
+            "source_id": "S0015",
+            "source_sha256": "948343d93ad11cf203d0ff21f7f427748f4e3ace98aec02c7d39108e4d3fb8f8"
+          }
+        ]
+      },
+      {
+        "kind": "domain",
+        "text": "The domain b5689023.green.mattingsolutions.co hosted large HTTP POST traffic, which may indicate suspicious outbound data transfer.",
+        "basis": "assessment",
+        "value": "b5689023.green.mattingsolutions.co",
+        "evidence": [
+          {
+            "end": 458,
+            "quote": "{\"explanation\":\"One or more HTTP POST requests declare at least one megabyte of outbound application data; content purpose requires endpoint context.\",\"frames\":[28458],\"metrics\":{\"declared_body_bytes\":3592220,\"destination\":\"185.243.115.84\",\"host\":\"b5689023.green.mattingsolutions.co\",\"largest_body_bytes\":3592220,\"port\":80,\"request_count\":1,\"source\":\"172.16.4.205\",\"uri\":\"/empty.gif?ss&ss2img\"},\"rule_id\":\"large-http-post\",\"title\":\"Large outbound HTTP POST\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-6d80308444d30a7356b8a942",
+            "source_id": "S0022",
+            "source_sha256": "1e9ef0903f68b101e3c814a375e1af60d9a3b9699c6f834ed03f18d53799be24"
+          }
+        ]
+      }
+    ],
+    "ttps": [
+      {
+        "text": "Outbound HTTP POST requests to suspicious infrastructure are candidate Web Protocol C2 activity (T1071.001), not proven adversary command and control.",
+        "basis": "assessment",
+        "status": "behavior_candidate",
+        "evidence": [
+          {
+            "end": 213,
+            "quote": "{\"attack_id\":\"T1071.001\",\"frames\":[20522,20571,20601],\"name\":\"Application Layer Protocol: Web Protocols\",\"status\":\"Heuristic technique candidate, not established adversary activity\",\"tactic\":\"command-and-control\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#technique/T1071.001",
+            "source_id": "S0031",
+            "source_sha256": "b60f4729f96c1ff9edfc679623a8de7df58df989399b4cc0394621d7df76a533"
+          }
+        ],
+        "attack_id": "T1071.001"
+      }
+    ],
+    "identities": [
+      {
+        "kind": "host",
+        "text": "Internal workstation Rotterdam-PC (IP 172.16.4.205) is associated with user matthijs.devries.",
+        "basis": "observed",
+        "value": "Rotterdam-PC",
+        "evidence": [
+          {
+            "end": 334,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":233,\"owner_ip\":\"172.16.4.205\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":240,\"owner_ip\":\"172.16.4.205\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"172.16.4.205\"],\"mac_addresses\":[\"00:59:07:b0:63:a4\"],\"type\":\"account\",\"value\":\"matthijs.devries\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#identity/identity-457c5dd0b1cb1be0152a7cfb",
+            "source_id": "S0017",
+            "source_sha256": "4254f453b62e71272766e65c5ce550d53ab6e5279f4a5d0a842e00274c791c83"
+          },
+          {
+            "end": 353,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":141,\"owner_ip\":\"0.0.0.0\",\"relationship\":\"dhcp-client-assertion\"},{\"account\":\"\",\"frame_number\":20473,\"owner_ip\":\"0.0.0.0\",\"relationship\":\"dhcp-client-assertion\"}],\"ip_addresses\":[\"172.16.4.205\"],\"mac_addresses\":[\"00:59:07:b0:63:a4\",\"00:59:07:b0:63:a4,00:59:07:b0:63:a4\"],\"type\":\"hostname\",\"value\":\"Rotterdam-PC\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#identity/identity-78d372a61a3de49cab7a4645",
+            "source_id": "S0019",
+            "source_sha256": "60c1d96826c71526ec3bdf866eebf3603835ba97f95c574350c713b9f8eadd81"
+          }
+        ]
+      }
+    ],
+    "next_steps": [
+      {
+        "text": "Review the endpoint Rotterdam-PC for remote-access software presence, user activity, and corroborating evidence of C2 or data exfiltration, as network traffic alone is insufficient for a full compromise assessment.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 368,
+            "quote": "{\"explanation\":\"An HTTP User-Agent explicitly identifies remote-access software. Validate authorization and endpoint ownership.\",\"frames\":[20522,20571,20601],\"metrics\":{\"destination\":\"31.7.62.214\",\"request_count\":114,\"source\":\"172.16.4.205\",\"user_agent\":\"NetSupport Manager/1.3\"},\"rule_id\":\"remote-access-user-agent\",\"title\":\"Remote-access software network signature\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-3d6b822cdbc4382b27a57da9",
+            "source_id": "S0021",
+            "source_sha256": "d4ebe0877d894d656f8613c22157773ab7ab147615de4398e20b7673a1fdb3ab"
+          }
+        ]
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "No endpoint context or execution evidence confirms whether unauthorized remote access or exfiltration occurred; observable user behavior is unknown.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 473,
+            "quote": "{\"internal_lookup\":{\"matched_observables\":0,\"no_exact_match\":2279,\"observable_limit\":5000,\"observables_checked\":2279,\"observables_total\":2279,\"prior_case_limit_reached\":true,\"prior_cases_checked\":50,\"truncated\":false},\"visibility\":\"Encrypted application payloads are not decrypted. No endpoint execution, persistence or actor attribution is established by a download or connection alone.\",\"warnings\":[\"Conflicting TCP overlap: fallback extraction rejected this direction\"]}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#coverage",
+            "source_id": "S0002",
+            "source_sha256": "03f9f52c36f9f55e1dbe75be435231f3e4c83c4ee630e2da80e686e8283a3dee"
+          }
+        ]
+      }
+    ],
+    "what_happened": [
+      {
+        "text": "The device with IP 172.16.4.205 made repeated outbound HTTP POST requests to 31.7.62.214 using a User-Agent string identifying NetSupport Manager remote-access software, over cleartext HTTP on TCP port 443.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 306,
+            "quote": "{\"dst_ip\":\"31.7.62.214\",\"dst_port\":443,\"fields\":{\"http.host\":\"31.7.62.214\",\"http.request.full_uri\":\"http://31.7.62.214/fakeurl.htm\",\"http.request.method\":\"POST\",\"http.user_agent\":\"NetSupport Manager/1.3\"},\"frame\":20522,\"kind\":\"http_request\",\"src_ip\":\"172.16.4.205\",\"timestamp_epoch\":\"1563562643.794249000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#frame/20522",
+            "source_id": "S0015",
+            "source_sha256": "948343d93ad11cf203d0ff21f7f427748f4e3ace98aec02c7d39108e4d3fb8f8"
+          }
+        ]
+      },
+      {
+        "text": "Around the same period, the same internal device sent large HTTP POST requests exceeding one megabyte each to 185.243.115.84 at b5689023.green.mattingsolutions.co, with POST traffic involving suspicious URL parameters.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 458,
+            "quote": "{\"explanation\":\"One or more HTTP POST requests declare at least one megabyte of outbound application data; content purpose requires endpoint context.\",\"frames\":[28458],\"metrics\":{\"declared_body_bytes\":3592220,\"destination\":\"185.243.115.84\",\"host\":\"b5689023.green.mattingsolutions.co\",\"largest_body_bytes\":3592220,\"port\":80,\"request_count\":1,\"source\":\"172.16.4.205\",\"uri\":\"/empty.gif?ss&ss2img\"},\"rule_id\":\"large-http-post\",\"title\":\"Large outbound HTTP POST\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-6d80308444d30a7356b8a942",
+            "source_id": "S0022",
+            "source_sha256": "1e9ef0903f68b101e3c814a375e1af60d9a3b9699c6f834ed03f18d53799be24"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": "schema-and-exact-quote-binding; not semantic proof",
+  "word_count": 164,
+  "analysis_id": "961bdc9a-7460-440f-a246-f55748149bcc",
+  "token_usage": {
+    "total_tokens": 20353,
+    "prompt_tokens": 18993,
+    "completion_tokens": 1360
+  },
+  "authoritative": false,
+  "effective_tlp": "TLP:CLEAR",
+  "source_sha256": "50557153d3c4b71e7db156a61ddd3c5ed8088d8b0da2fbb91b28a87c0a79209a",
+  "capture_sha256": "ae759973cbf42e9cd0db35a5450c99f6210fca2c22fb8e689d252e64211bfd36",
+  "prompt_version": "pcap-investigation-summary-v5",
+  "requested_model": "gpt-4.1",
+  "source_manifest": [
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3dc04e58e2b6e4ed14ca01ff1573c78b49a9e9064e73863d7ca127c960dc8984",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#capture",
+      "source_id": "S0001"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "03f9f52c36f9f55e1dbe75be435231f3e4c83c4ee630e2da80e686e8283a3dee",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#coverage",
+      "source_id": "S0002"
+    },
+    {
+      "kind": "intelligence_lead",
+      "offset": 0,
+      "sha256": "fcc7e63c69ef8b85b149ad7cbfd5e9a3c7af6999188444e882f15f96ca96fecf",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#enrichment-coverage",
+      "source_id": "S0003"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "7865a2f7a68896e7eb8cf495dbb6eefdb5bf68b622f9fa54125e0819feb89237",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#assessment/observable-3d439e857f5f7ea1192739e1",
+      "source_id": "S0004"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "0fa4012aa5835d9d786deeb75932bac3cc86cbd9638ed1c1ee26ab20eab53afe",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#assessment/observable-8c51f11bcf7132e708e33125",
+      "source_id": "S0005"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "8f83c1f13722ea17db3cc160331775c91966826fb22507034750d14164ce4d41",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#assessment/observable-809265d346c0584a4befa756",
+      "source_id": "S0006"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "876d2ef50a9d9e5c479d012f1d7f9dbed5d3dd804d43ed8ca4b56cb54a69f333",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#assessment/observable-cd13b148c388ab84720a1859",
+      "source_id": "S0007"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "d16740a69eb95e6c87f05b7882b27e0e741fb5e563200e5f70fc9fed361fb3db",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#assessment/observable-728070055d800a5d94bdedc4",
+      "source_id": "S0008"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "f368e1cf9b26f1458e48326cabcee8cd047880d554f9ee7f7b8eb0552329e67f",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#assessment/observable-08032d3dc79a10a8ab846a91",
+      "source_id": "S0009"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "f2f18eae01084b93549000c08327e00beee312e029f39d15f095940c868c0e21",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#artifact/artifact-9cec4678a0b2754edb214ca1",
+      "source_id": "S0010"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "833f45f3d7614d25b23bcab48fdcd16d80a79e28e62b539d2ff060b2b2243125",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#artifact/artifact-f47fcd44db326a798c12042f",
+      "source_id": "S0011"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "16991061c9999a4218c2c017aa9b7d3402355faf898a3aa5924b25026f479d02",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#artifact/artifact-e4af48724a057f3d01ee089d",
+      "source_id": "S0012"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "c457021d0ac7b3939cd99cda5985d084e93778e99e51ab77dd1f224fb2a14ecc",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#frame/9805",
+      "source_id": "S0013"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "ccf732f8c292a09d0c9afbb8b72e15a8f48da161a1a3011acea5f90d51a1932b",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#frame/9881",
+      "source_id": "S0014"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "948343d93ad11cf203d0ff21f7f427748f4e3ace98aec02c7d39108e4d3fb8f8",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#frame/20522",
+      "source_id": "S0015"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3c4fed03c4fe7b3b884116942ca98ae390d51a330466b2300d35b213b4f182d1",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#frame/20571",
+      "source_id": "S0016"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "4254f453b62e71272766e65c5ce550d53ab6e5279f4a5d0a842e00274c791c83",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#identity/identity-457c5dd0b1cb1be0152a7cfb",
+      "source_id": "S0017"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "e09bd2c6faf23857b14a803211ffbc317867a59a79bd8624b01426a2af428e2e",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#identity/identity-88a39f5e4f26f31036ef79a7",
+      "source_id": "S0018"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "60c1d96826c71526ec3bdf866eebf3603835ba97f95c574350c713b9f8eadd81",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#identity/identity-78d372a61a3de49cab7a4645",
+      "source_id": "S0019"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "55ae382f6e2d77e30f9115159d2dbb2c7a9e9ab7f6be8fa03b2c04b204e424f9",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#identity/identity-15bf994f674c78f0cb8408af",
+      "source_id": "S0020"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "d4ebe0877d894d656f8613c22157773ab7ab147615de4398e20b7673a1fdb3ab",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-3d6b822cdbc4382b27a57da9",
+      "source_id": "S0021"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "1e9ef0903f68b101e3c814a375e1af60d9a3b9699c6f834ed03f18d53799be24",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-6d80308444d30a7356b8a942",
+      "source_id": "S0022"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "da488826b9d8caed288fbc213195a46e6a49ad67dd1747b48949ffb069efa991",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-bc94a727d2333c98efd9f9b8",
+      "source_id": "S0023"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "63c49d6ab7794d1b7a821b309c7e15a4b27dfed6dfbf55995c6913d9f52d9714",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-e2f8927a20f9a471400c47c3",
+      "source_id": "S0024"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "9020f4a5fdb41437bbd3bddaa4971f478a8cbb9d7b3fbd3b8dbaa07e81997772",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-0fe671d4e715ee6433fe5397",
+      "source_id": "S0025"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "b3788364eaf11767dd037722c78444f690f23e7ce6e9165571704b3d6feddc51",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-d41506c98df5638d8a06d963",
+      "source_id": "S0026"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "2835fd75bd8ddf283df4786da9aecb397d1f3f3dee072e84fa2bb0129bfa6638",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-134ec6bf8e648f371e78ca0f",
+      "source_id": "S0027"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "de00532fde12a9a6ff22d443af3ec0f26b9ffe0ed24be9d37f56735efd8223f9",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-1ef006257e362aec4de94618",
+      "source_id": "S0028"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "7d4e474216108bf6567b74a4bf696ed29601903e95f6b7f2d2c690f7946cea9d",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-209e01780b7697e60d20cc77",
+      "source_id": "S0029"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "4e96a4cc559e0174a59625941d277f32f9103a5b3486dc4c38eef57587259881",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#finding/finding-21826e51efd15f5d5d1208bc",
+      "source_id": "S0030"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "b60f4729f96c1ff9edfc679623a8de7df58df989399b4cc0394621d7df76a533",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#technique/T1071.001",
+      "source_id": "S0031"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "977834194798b92ba68e98acccf415a474434a2ac22037b7c69ba6d2143ce2c2",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#technique/T1105",
+      "source_id": "S0032"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "c11bf6a522ef55d76414f54f1680d6d254cac97c8e8b859dc4dec9d637f44a74",
+      "reference": "/api/pcap/analyses/961bdc9a-7460-440f-a246-f55748149bcc#technique/T1219",
+      "source_id": "S0033"
+    }
+  ],
+  "token_usage_note": "Provider-reported counts when available; never estimated from character length.",
+  "generation_seconds": 70.35,
+  "generation_attempts": [
+    {
+      "attempt": 1,
+      "validation": "uncited_identifier",
+      "token_usage": {
+        "total_tokens": 10079,
+        "prompt_tokens": 9335,
+        "completion_tokens": 744,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "stop",
+      "provider_returned_model": "gpt-4.1-2025-04-14"
+    },
+    {
+      "attempt": 2,
+      "validation": "passed",
+      "token_usage": {
+        "total_tokens": 10274,
+        "prompt_tokens": 9658,
+        "completion_tokens": 616,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 1920
+        },
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "stop",
+      "provider_returned_model": "gpt-4.1-2025-04-14"
+    }
+  ],
+  "validation_adjustments": [
+    {
+      "basis": "assessment",
+      "index": 1,
+      "action": "evidence-level-downgrade",
+      "section": "what_happened"
+    },
+    {
+      "index": 1,
+      "action": "optional-claim-omitted",
+      "reason": "uncited_identifier",
+      "section": "ttps"
+    }
+  ],
+  "provider_returned_model": "gpt-4.1-2025-04-14"
+}

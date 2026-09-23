@@ -1,0 +1,562 @@
+{
+  "id": "investigation-summary:c2b79478-9161-4da8-b3eb-4afa38d5843d",
+  "type": "pcap-investigation-summary",
+  "label": "PCAP investigation summary",
+  "model": "gpt-4.1-2025-04-14",
+  "stale": false,
+  "status": "analyst-review-required",
+  "content": "# PCAP investigation summary\n\n## What happened\n\nThe host 10.0.0.167, associated with the account elmer.obrien, downloaded a PE \\(portable executable\\) file via HTTP from 119.31.234.40 using the URL http://alphapioneer.com/spool/8888.png; the file's hash is f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1.\n\nThis PE file download used a .png file extension, which is not a typical method for transferring executables and is flagged as highly suspicious, requiring further investigation of the payload's hash; no proof of execution or infection is present.\n\nA separate ZIP archive was also downloaded by 10.0.0.167 from 158.69.28.93, but there is no evidence yet linking this file to malicious activity within the supplied coverage.\n\n## Who was involved\n\n- 10.0.0.167 \\(host DESKTOP-GRIONXA, user elmer.obrien\\) is the device that downloaded the suspicious PE file.\n\n## Key indicators\n\n- SHA-256 hash f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1 identifies the downloaded PE file and should be reviewed to determine maliciousness; no threat intelligence verdict is returned at this time.\n\n## Supported technique candidates\n\n- Downloading a PE payload from the internet is consistent with ATT&CK technique T1105 \\(Ingress Tool Transfer\\) but execution or adversary activity is not confirmed.\n\n## What remains uncertain\n\n- It remains unknown whether the suspicious executable was run or if any malicious behavior resulted from its presence on 10.0.0.167.\n\n## Next check\n\n- Obtain and analyze the dropped executable \\(hash: f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\\) from 10.0.0.167 for static and dynamic properties to assess its intent and execution on the host.\n\nAnalyst-review draft. Exact evidence references and provider provenance are retained in the structured record.",
+  "summary": "The host 10.0.0.167, associated with the account elmer.obrien, downloaded a PE (portable executable) file via HTTP from 119.31.234.40 using the URL http://alphapioneer.com/spool/8888.png; the file's hash is f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1. This PE file download used a .png file extension, which is not a typical method for transferring executables and is flagged as highly suspicious, requiring further investigation of the payload's hash; no proof of execution or infection is present. A separate ZIP archive was also downloaded by 10.0.0.167 from 158.69.28.93, but there is no evidence yet linking this file to malicious activity within the supplied coverage.",
+  "coverage": {
+    "warnings": [
+      "Conflicting TCP overlap: fallback extraction rejected this direction"
+    ],
+    "projection": "pcap-brief-evidence-v1",
+    "source_digest": "eebc2058b78e27370df5295292948872fd98d67611a6e64607b97c73a6ab592b",
+    "candidate_total": 4,
+    "omitted_records": {
+      "findings": 53,
+      "artifacts": 113,
+      "candidates": 0,
+      "identities": 0,
+      "techniques": 0,
+      "selected_network_events": 20
+    },
+    "included_records": {
+      "limits": 1,
+      "capture": 1,
+      "network": 5,
+      "findings": 10,
+      "transfers": 10,
+      "candidates": 4,
+      "identities": 8,
+      "techniques": 1,
+      "reputation_coverage": 1
+    },
+    "supplement_scope": "Bounded selected packet metadata, direct reputation, identities and transfer relationships; no payload bodies, prior-case content or exhaustive inventory. Full data remains in source analysis.",
+    "source_characters": 16511,
+    "enrichment_retained_targets": 100
+  },
+  "filename": "2020-04-24-traffic-analysis-exercise.pcap",
+  "provider": "openai",
+  "report_id": "pcap:c66676ab-7276-4989-8c27-65017a63c2ba",
+  "created_at": "2026-09-22T18:55:36.523178+00:00",
+  "structured": {
+    "iocs": [
+      {
+        "kind": "sha256",
+        "text": "SHA-256 hash f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1 identifies the downloaded PE file and should be reviewed to determine maliciousness; no threat intelligence verdict is returned at this time.",
+        "basis": "assessment",
+        "value": "f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1",
+        "evidence": [
+          {
+            "end": 658,
+            "quote": "\"virustotal\":\"deferred-rate-limit\"},\"role\":\"investigation candidate, not an unconditional malicious verdict\",\"type\":\"sha256\",\"value\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\"}",
+            "start": 458,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#assessment/observable-c95f3693d67425ef1918cedb",
+            "source_id": "S0004",
+            "source_sha256": "b631f0c974bdfd76572dce48a1a3badae11e542c43cb8959a353ea0894ccdef6"
+          },
+          {
+            "end": 374,
+            "quote": "{\"client_ip\":\"10.0.0.167\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":5518,\"response_frame\":7388,\"server_ip\":\"119.31.234.40\",\"sha256\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\",\"url_without_query_or_fragment\":\"http://alphapioneer.com/spool/8888.png\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-f0534328830e4534e66f10ca",
+            "source_id": "S0008",
+            "source_sha256": "bd84452673ec42ba01b50946646a156f6e93d8a570587f5d02a00fb046144155"
+          }
+        ]
+      }
+    ],
+    "ttps": [
+      {
+        "text": "Downloading a PE payload from the internet is consistent with ATT&CK technique T1105 (Ingress Tool Transfer) but execution or adversary activity is not confirmed.",
+        "basis": "assessment",
+        "status": "behavior_candidate",
+        "evidence": [
+          {
+            "end": 374,
+            "quote": "{\"client_ip\":\"10.0.0.167\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":5518,\"response_frame\":7388,\"server_ip\":\"119.31.234.40\",\"sha256\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\",\"url_without_query_or_fragment\":\"http://alphapioneer.com/spool/8888.png\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-f0534328830e4534e66f10ca",
+            "source_id": "S0008",
+            "source_sha256": "bd84452673ec42ba01b50946646a156f6e93d8a570587f5d02a00fb046144155"
+          },
+          {
+            "end": 189,
+            "quote": "{\"attack_id\":\"T1105\",\"frames\":[10175,10301,10465],\"name\":\"Ingress Tool Transfer\",\"status\":\"Heuristic technique candidate, not established adversary activity\",\"tactic\":\"command-and-control\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#technique/T1105",
+            "source_id": "S0041",
+            "source_sha256": "1f2498f49999b3a764fdc105e1f176f0680432b0aae7d1ec9a4779341430f81f"
+          }
+        ],
+        "attack_id": "T1105"
+      }
+    ],
+    "identities": [
+      {
+        "kind": "ip",
+        "text": "10.0.0.167 (host DESKTOP-GRIONXA, user elmer.obrien) is the device that downloaded the suspicious PE file.",
+        "basis": "observed",
+        "value": "10.0.0.167",
+        "evidence": [
+          {
+            "end": 326,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":3998,\"owner_ip\":\"10.0.0.167\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":4010,\"owner_ip\":\"10.0.0.167\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"10.0.0.167\"],\"mac_addresses\":[\"ac:16:2d:f5:37:e5\"],\"type\":\"account\",\"value\":\"elmer.obrien\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-a6cdf51d65bfee46a0a02131",
+            "source_id": "S0024",
+            "source_sha256": "651606b32dde03c575198edc545309d1800e735005ab21fd27de0ae8a15f482a"
+          },
+          {
+            "end": 316,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":36,\"owner_ip\":\"10.0.0.167\",\"relationship\":\"netbios-registration\"},{\"account\":\"\",\"frame_number\":37,\"owner_ip\":\"10.0.0.167\",\"relationship\":\"netbios-registration\"}],\"ip_addresses\":[\"10.0.0.167\"],\"mac_addresses\":[\"ac:16:2d:f5:37:e5\"],\"type\":\"hostname\",\"value\":\"DESKTOP-GRIONXA\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-9b1272fd055698f7228cefaa",
+            "source_id": "S0027",
+            "source_sha256": "b4497af3b2583e2966a3490c875195d592cfed99377f00d42221e629ee1551e5"
+          },
+          {
+            "end": 241,
+            "quote": "{\"bindings\":[{\"account\":\"elmer.obrien\",\"frame_number\":4134,\"owner_ip\":\"10.0.0.167\",\"relationship\":\"directory-name-correlated-with-client-principal\"}],\"ip_addresses\":[\"10.0.0.167\"],\"mac_addresses\":[],\"type\":\"full-name\",\"value\":\"Elmer Obrien\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-1961d4c932a4a5ba9eeeb2b5",
+            "source_id": "S0028",
+            "source_sha256": "474ed9f188d3b2947a9397b0d03ea3b7fddd8f520f78736b914a32c8d59e6fa0"
+          }
+        ]
+      }
+    ],
+    "next_steps": [
+      {
+        "text": "Obtain and analyze the dropped executable (hash: f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1) from 10.0.0.167 for static and dynamic properties to assess its intent and execution on the host.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 658,
+            "quote": "\"virustotal\":\"deferred-rate-limit\"},\"role\":\"investigation candidate, not an unconditional malicious verdict\",\"type\":\"sha256\",\"value\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\"}",
+            "start": 458,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#assessment/observable-c95f3693d67425ef1918cedb",
+            "source_id": "S0004",
+            "source_sha256": "b631f0c974bdfd76572dce48a1a3badae11e542c43cb8959a353ea0894ccdef6"
+          },
+          {
+            "end": 374,
+            "quote": "{\"client_ip\":\"10.0.0.167\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":5518,\"response_frame\":7388,\"server_ip\":\"119.31.234.40\",\"sha256\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\",\"url_without_query_or_fragment\":\"http://alphapioneer.com/spool/8888.png\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-f0534328830e4534e66f10ca",
+            "source_id": "S0008",
+            "source_sha256": "bd84452673ec42ba01b50946646a156f6e93d8a570587f5d02a00fb046144155"
+          }
+        ]
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "It remains unknown whether the suspicious executable was run or if any malicious behavior resulted from its presence on 10.0.0.167.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 473,
+            "quote": "{\"internal_lookup\":{\"matched_observables\":0,\"no_exact_match\":1754,\"observable_limit\":5000,\"observables_checked\":1754,\"observables_total\":1754,\"prior_case_limit_reached\":true,\"prior_cases_checked\":50,\"truncated\":false},\"visibility\":\"Encrypted application payloads are not decrypted. No endpoint execution, persistence or actor attribution is established by a download or connection alone.\",\"warnings\":[\"Conflicting TCP overlap: fallback extraction rejected this direction\"]}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#coverage",
+            "source_id": "S0002",
+            "source_sha256": "86ff6febf13e306cc16e459946eff6c29e0da0fb8406ffdf9f8b049e36e0bc04"
+          },
+          {
+            "end": 374,
+            "quote": "{\"client_ip\":\"10.0.0.167\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":5518,\"response_frame\":7388,\"server_ip\":\"119.31.234.40\",\"sha256\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\",\"url_without_query_or_fragment\":\"http://alphapioneer.com/spool/8888.png\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-f0534328830e4534e66f10ca",
+            "source_id": "S0008",
+            "source_sha256": "bd84452673ec42ba01b50946646a156f6e93d8a570587f5d02a00fb046144155"
+          }
+        ]
+      }
+    ],
+    "what_happened": [
+      {
+        "text": "The host 10.0.0.167, associated with the account elmer.obrien, downloaded a PE (portable executable) file via HTTP from 119.31.234.40 using the URL http://alphapioneer.com/spool/8888.png; the file's hash is f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 374,
+            "quote": "{\"client_ip\":\"10.0.0.167\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":5518,\"response_frame\":7388,\"server_ip\":\"119.31.234.40\",\"sha256\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\",\"url_without_query_or_fragment\":\"http://alphapioneer.com/spool/8888.png\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-f0534328830e4534e66f10ca",
+            "source_id": "S0008",
+            "source_sha256": "bd84452673ec42ba01b50946646a156f6e93d8a570587f5d02a00fb046144155"
+          }
+        ]
+      },
+      {
+        "text": "This PE file download used a .png file extension, which is not a typical method for transferring executables and is flagged as highly suspicious, requiring further investigation of the payload's hash; no proof of execution or infection is present.",
+        "basis": "assessment",
+        "evidence": [
+          {
+            "end": 458,
+            "quote": "{\"classification\":\"suspicious\",\"reasons\":[{\"artifact_id\":\"artifact-f0534328830e4534e66f10ca\",\"features\":[\"pe-bytes-under-non-executable-url-extension\"],\"frames\":[7388],\"interpretation\":\"A transfer-bound PE is served under a non-executable URL extension. Investigate the exact recovered hash; this is not proof of execution or a transitive hosting-IP verdict.\",\"kind\":\"static-review\"}],\"reputation_status\":{\"malwarebazaar\":\"not_found\",\"threatfox\":\"not_found\",",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#assessment/observable-c95f3693d67425ef1918cedb",
+            "source_id": "S0004",
+            "source_sha256": "b631f0c974bdfd76572dce48a1a3badae11e542c43cb8959a353ea0894ccdef6"
+          },
+          {
+            "end": 374,
+            "quote": "{\"client_ip\":\"10.0.0.167\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":5518,\"response_frame\":7388,\"server_ip\":\"119.31.234.40\",\"sha256\":\"f6210da7865e00351c0e79464a1ba14a8ecc59dd79f650f2ff76f1697f6807b1\",\"url_without_query_or_fragment\":\"http://alphapioneer.com/spool/8888.png\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-f0534328830e4534e66f10ca",
+            "source_id": "S0008",
+            "source_sha256": "bd84452673ec42ba01b50946646a156f6e93d8a570587f5d02a00fb046144155"
+          }
+        ]
+      },
+      {
+        "text": "A separate ZIP archive was also downloaded by 10.0.0.167 from 158.69.28.93, but there is no evidence yet linking this file to malicious activity within the supplied coverage.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 410,
+            "quote": "{\"client_ip\":\"10.0.0.167\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"zip\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":4817,\"response_frame\":4929,\"server_ip\":\"158.69.28.93\",\"sha256\":\"75f9135dded44ddbc090f7640a8deda79214c41305260b94b1bc2fdf7011aae7\",\"url_without_query_or_fragment\":\"http://play.astrite.ga/docs_q50/318389448/Judgement_04222020_318389448.zip\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-9c42723952cd12fce7fd2ca2",
+            "source_id": "S0009",
+            "source_sha256": "e86013ce9f2fb9a7b3e83caea91a0f91ee193ffb7a26ec50eb25cc3f9dd82397"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": "schema-and-exact-quote-binding; not semantic proof",
+  "word_count": 199,
+  "analysis_id": "c66676ab-7276-4989-8c27-65017a63c2ba",
+  "token_usage": {
+    "total_tokens": 12072,
+    "prompt_tokens": 11318,
+    "completion_tokens": 754
+  },
+  "authoritative": false,
+  "effective_tlp": "TLP:CLEAR",
+  "source_sha256": "cfdf13d89c06cfd71305171fd0434340100313371ce059a158dfda7d9d1e978c",
+  "capture_sha256": "498ffc6e11fa8b38c07202a6fcb44da2a1064e9f89f6f8516b2985b08532f5e7",
+  "prompt_version": "pcap-investigation-summary-v5",
+  "requested_model": "gpt-4.1",
+  "source_manifest": [
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "87d77b322006c2f040bc4e3c8b8f14d9ab95cc0095d92f57bb5681c4a7d4e083",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#capture",
+      "source_id": "S0001"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "86ff6febf13e306cc16e459946eff6c29e0da0fb8406ffdf9f8b049e36e0bc04",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#coverage",
+      "source_id": "S0002"
+    },
+    {
+      "kind": "intelligence_lead",
+      "offset": 0,
+      "sha256": "6215d05cb8b092dffe01d87ec1c55e375128287bd7172377258077cdcec11076",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#enrichment-coverage",
+      "source_id": "S0003"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "b631f0c974bdfd76572dce48a1a3badae11e542c43cb8959a353ea0894ccdef6",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#assessment/observable-c95f3693d67425ef1918cedb",
+      "source_id": "S0004"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "a50031d15bc6bc6059a48e28c0bd3e497c455bfeb060187213fbf44948f9692a",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#assessment/observable-a8b985979f3cebfcb0fcb8b0",
+      "source_id": "S0005"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "65611fb3787ee1b2edc76c49fcb4d05c5ee6e235ac040de820969ee113641d2c",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#assessment/observable-f3492803d68bffc7951b287f",
+      "source_id": "S0006"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "781b700eac4cf50e711b7ad48909f6dd93e20f0809b8d54c8a237e5affdfdaf3",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#assessment/observable-c4365907855c56d1adb74dcd",
+      "source_id": "S0007"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "bd84452673ec42ba01b50946646a156f6e93d8a570587f5d02a00fb046144155",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-f0534328830e4534e66f10ca",
+      "source_id": "S0008"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "e86013ce9f2fb9a7b3e83caea91a0f91ee193ffb7a26ec50eb25cc3f9dd82397",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-9c42723952cd12fce7fd2ca2",
+      "source_id": "S0009"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "ac68608a172f13c3c34a67997fc9067a141c9642470c3688443b3ec8cf400c1f",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-79745967ce37f33ab6c22d9f",
+      "source_id": "S0010"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "978e7fa080df5bcf1097db57b1d1654d796dd43e48d1e4b41581b5e9c8f8574a",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-b03abda01ee22d83fa3c61a0",
+      "source_id": "S0011"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "a7952d6adb238113aca050f7813692ec3efbeb268bf62d4f3869975017ab3887",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-e2d0c15362ab7785d03f080f",
+      "source_id": "S0012"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "9140253a6614cd8c8407eb4858fd93752d06eaa55593bc742297e93249cdd2f1",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-35038dc1e025eacfe3e9eac6",
+      "source_id": "S0013"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "70e79338fa7d6f15dcbf53bdc76a51aab8f1c51a4b64bee6b77659146390e03f",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-fe47add2fc6991b6d7c8af08",
+      "source_id": "S0014"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "2cbc4338501820f1b6b7fb57b44ff8e364215b5e500fd1a8723a95d83a0abe44",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-49ad9f5da71325665e8b547c",
+      "source_id": "S0015"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "2193976d0a3d5e47c76abbc2fdb06fc93b8699161ec7ef162c5ea10ecfd0db73",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-8dbb097c307b1c3e844174a8",
+      "source_id": "S0016"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "c9307ca21625e15ec91305a9a0e1e365ccee55ae5283e1c252ec7927697353f7",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#artifact/artifact-0a38dc4cf447f2bafe2d57e8",
+      "source_id": "S0017"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3699b4414aab673ba3b1abc9647bef9641b584eb8fb5eb9a2499d00d7f247410",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#frame/9842",
+      "source_id": "S0018"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "7b90476c4bfc71e0d17ec515bb0ace0c11547951c4b684c8930c058442e220a2",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#frame/9844",
+      "source_id": "S0019"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "a0574eebb5ff3137091d307fb641bc1998bb95bbdb3926064a367b595040250d",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#frame/10218",
+      "source_id": "S0020"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "140383df09d529ebfc5cb7784e75682921cfd644394b7428903407c56c9f9219",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#frame/19007",
+      "source_id": "S0021"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "31973a3b692c8550b2a8ea127c4a138ba829caa511d4653144aebff5cccccb78",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#frame/19832",
+      "source_id": "S0022"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "7d63fa274087fb8d9b678b9bc52f285fec9c1f0b55f86ac1d5cdf68361e3f2a3",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-9c63815f35a050ec7a40759a",
+      "source_id": "S0023"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "651606b32dde03c575198edc545309d1800e735005ab21fd27de0ae8a15f482a",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-a6cdf51d65bfee46a0a02131",
+      "source_id": "S0024"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "10a9cb24f71a5fe6709e6df1684f307fb30eda2896eda884d3e88f7c4f28eda8",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-0946a3627374fcbacb88ffae",
+      "source_id": "S0025"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "945fd4c0649dc3485712c230c299b9b506189d29a533d583eed9f56557b0fdc4",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-23b30451e526bca132d11428",
+      "source_id": "S0026"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "b4497af3b2583e2966a3490c875195d592cfed99377f00d42221e629ee1551e5",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-9b1272fd055698f7228cefaa",
+      "source_id": "S0027"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "474ed9f188d3b2947a9397b0d03ea3b7fddd8f520f78736b914a32c8d59e6fa0",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-1961d4c932a4a5ba9eeeb2b5",
+      "source_id": "S0028"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "55c0b2857f5fc9092fc6c176da97fac33df30edee03165c6f1834cba7ba37770",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-7192d680c3cca8bb49ab26ec",
+      "source_id": "S0029"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "2c267967287ef306fcc17a10bf44c10dcc625d72c919b6e3ac9cdb85172262e4",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#identity/identity-2b17059aebc555d961e17cec",
+      "source_id": "S0030"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "31bc4b92cfad3d15dca3abcae4d095b324d3fcb1c8ce85dcd1f3e9ed9a93aa5a",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-0338b7ea3bfe2049b15abd00",
+      "source_id": "S0031"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "e276798a92999fd642020f6f472fd3778819cb4829a2bfc39a227649fe33a45b",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-119b68d095c5d0887245acb7",
+      "source_id": "S0032"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "5816f2069ee65e29bb8421c689f7d4acfbfbccf317d68606c2642313d2033117",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-355bbc3d6a4086636d8b87e1",
+      "source_id": "S0033"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "9d0561c538a149ed00394f1a27c0d89ddd666912a96969fc9bc7a0b39513399d",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-4cf96bb5ccbebff405d37297",
+      "source_id": "S0034"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "35cfc983ee48f8955616885f7e0399c6207b7b16203cc5892b0133e78cf7e203",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-c43019a3aead40e589c1427e",
+      "source_id": "S0035"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "258cf95de816b892d3c6ccddb6f572b8b316fc467de939edac6f7ddd2ed6c2ac",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-d96f1e6128b13a81424d3df6",
+      "source_id": "S0036"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "d79eb5e53efeac9c380f9d6ee8543f18aa7acfd180fc0d4a7dfef0ea2607a5a9",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-01f24e2a66621628b5d21de3",
+      "source_id": "S0037"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "ccb316921ac6f012f77adf8fe4679569a7731a5b9c1e3cabab5a7f43a6af76cf",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-06d971cc29b089296c9b9af4",
+      "source_id": "S0038"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "961a7b2f0cea63624331b804184cc9fff6f94dc2c04f1f411823e835f53a4ecc",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-0c0768075181244f4daf9711",
+      "source_id": "S0039"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "97d87966011c032a0e2bb3ae65bf3f666a7455e9bb8a3ba863404900731c6a6a",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#finding/finding-0ceac3d39da93706adec74fd",
+      "source_id": "S0040"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "1f2498f49999b3a764fdc105e1f176f0680432b0aae7d1ec9a4779341430f81f",
+      "reference": "/api/pcap/analyses/c66676ab-7276-4989-8c27-65017a63c2ba#technique/T1105",
+      "source_id": "S0041"
+    }
+  ],
+  "token_usage_note": "Provider-reported counts when available; never estimated from character length.",
+  "generation_seconds": 6.9,
+  "generation_attempts": [
+    {
+      "attempt": 1,
+      "validation": "passed",
+      "token_usage": {
+        "total_tokens": 12072,
+        "prompt_tokens": 11318,
+        "completion_tokens": 754,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "stop",
+      "provider_returned_model": "gpt-4.1-2025-04-14"
+    }
+  ],
+  "validation_adjustments": [],
+  "provider_returned_model": "gpt-4.1-2025-04-14"
+}

@@ -1,0 +1,432 @@
+{
+  "id": "investigation-summary:28fb5145-e166-4b00-abc3-e4b1ea541095",
+  "type": "pcap-investigation-summary",
+  "label": "PCAP investigation summary",
+  "model": "claude-opus-4-8",
+  "stale": false,
+  "status": "analyst-review-required",
+  "content": "# PCAP investigation summary\n\n## What happened\n\nWindows host 10.20.30.227 \\(DESKTOP-4C02EMG, Kerberos principal alejandrina.hogue\\) downloaded a PE executable over cleartext HTTP from http://gengrasjeepram.com/sv.exe \\(server 49.51.133.162\\).\n\nThe same host sent repeated HTTP POST requests to twereptale.com \\(81.177.6.156\\) at /4/forum.php and /mlu/forum.php with unusual user-agent strings, a pattern suitable for beaconing review.\n\nNo packet evidence establishes execution of the downloaded PE or any successful exfiltration; endpoint payloads were not decrypted and no actor attribution is supported.\n\n## Who was involved\n\n- 10.20.30.227 is the internal host that downloaded the PE and generated the suspicious POST traffic.\n- Kerberos client principal alejandrina.hogue is bound to host 10.20.30.227.\n\n## What remains uncertain\n\n- Whether the downloaded PE executed or established persistence is unestablished; encrypted payloads were not decrypted and no endpoint execution was observed.\n- Reputation of the download and POST destinations is inconclusive: VirusTotal was rate-limited and ThreatFox/MalwareBazaar returned not\\_found or not-applicable, which does not mean clean.\n\n## Next check\n\n- Submit the recovered PE \\(SHA-256 995cbbb422634d497d65e12454cd5832cf1b4422189d9ec06efa88ed56891cda\\) for sandbox detonation and reputation lookup to determine maliciousness.\n\nAnalyst-review draft. Exact evidence references and provider provenance are retained in the structured record.",
+  "summary": "Windows host 10.20.30.227 (DESKTOP-4C02EMG, Kerberos principal alejandrina.hogue) downloaded a PE executable over cleartext HTTP from http://gengrasjeepram.com/sv.exe (server 49.51.133.162). The same host sent repeated HTTP POST requests to twereptale.com (81.177.6.156) at /4/forum.php and /mlu/forum.php with unusual user-agent strings, a pattern suitable for beaconing review. No packet evidence establishes execution of the downloaded PE or any successful exfiltration; endpoint payloads were not decrypted and no actor attribution is supported.",
+  "coverage": {
+    "warnings": [
+      "Conflicting TCP overlap: fallback extraction rejected this direction"
+    ],
+    "projection": "pcap-brief-evidence-v2-compact",
+    "source_digest": "058c1af6f71cde55e06a5ff1ac15ceb6974d302dcb74abe1bc455994ba1d18e4",
+    "candidate_total": 16,
+    "omitted_records": {
+      "findings": 21,
+      "artifacts": 67,
+      "candidates": 11,
+      "identities": 0,
+      "techniques": 1,
+      "selected_network_events": 21
+    },
+    "compact_evidence": true,
+    "included_records": {
+      "limits": 1,
+      "capture": 1,
+      "network": 4,
+      "findings": 3,
+      "transfers": 3,
+      "candidates": 5,
+      "identities": 5,
+      "reputation_coverage": 1
+    },
+    "supplement_scope": "Bounded selected packet metadata, direct reputation, identities and transfer relationships; no payload bodies, prior-case content or exhaustive inventory. Full data remains in source analysis.",
+    "source_characters": 9877,
+    "enrichment_retained_targets": 71
+  },
+  "filename": "2020-01-30-traffic-analysis-exercise.pcap",
+  "provider": "claude",
+  "report_id": "pcap:05851801-c224-489b-b9da-9e5d035c60b4",
+  "created_at": "2026-09-22T19:31:59.943853+00:00",
+  "structured": {
+    "iocs": [],
+    "ttps": [],
+    "identities": [
+      {
+        "kind": "ip",
+        "text": "10.20.30.227 is the internal host that downloaded the PE and generated the suspicious POST traffic.",
+        "basis": "observed",
+        "value": "10.20.30.227",
+        "evidence": [
+          {
+            "end": 370,
+            "quote": "{\"client_ip\":\"10.20.30.227\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":1169,\"response_frame\":1235,\"server_ip\":\"49.51.133.162\",\"sha256\":\"995cbbb422634d497d65e12454cd5832cf1b4422189d9ec06efa88ed56891cda\",\"url_without_query_or_fragment\":\"http://gengrasjeepram.com/sv.exe\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#artifact/artifact-514d7133a43d58c3e612646a",
+            "source_id": "S0009",
+            "source_sha256": "b41ce53eebe7941f4c7ded94c437de866fae90a5f59c4d5a3f0017d4666f7445"
+          },
+          {
+            "end": 362,
+            "quote": "{\"dst_ip\":\"81.177.6.156\",\"dst_port\":80,\"fields\":{\"http.host\":\"twereptale.com\",\"http.request.full_uri\":\"http://twereptale.com/4/forum.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; rv:11.0) like Gecko\"},\"frame\":1251,\"kind\":\"http_request\",\"src_ip\":\"10.20.30.227\",\"timestamp_epoch\":\"1580345758.838022000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#frame/1251",
+            "source_id": "S0012",
+            "source_sha256": "bc5f9d11d1d9a993c5b2a250c6e9d2c2249fdcac2b9054292a9d4380d838e7e9"
+          }
+        ]
+      },
+      {
+        "kind": "account",
+        "text": "Kerberos client principal alejandrina.hogue is bound to host 10.20.30.227.",
+        "basis": "observed",
+        "value": "alejandrina.hogue",
+        "evidence": [
+          {
+            "end": 335,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":702,\"owner_ip\":\"10.20.30.227\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":710,\"owner_ip\":\"10.20.30.227\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"10.20.30.227\"],\"mac_addresses\":[\"58:94:6b:77:9b:3c\"],\"type\":\"account\",\"value\":\"alejandrina.hogue\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#identity/identity-0be037907c3b2a691e097a63",
+            "source_id": "S0016",
+            "source_sha256": "e47e3243db92e34c64c6f729e9d9a5eab07237ded882e8e95d4cd211f19c0de9"
+          }
+        ]
+      }
+    ],
+    "next_steps": [
+      {
+        "text": "Submit the recovered PE (SHA-256 995cbbb422634d497d65e12454cd5832cf1b4422189d9ec06efa88ed56891cda) for sandbox detonation and reputation lookup to determine maliciousness.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 370,
+            "quote": "{\"client_ip\":\"10.20.30.227\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":1169,\"response_frame\":1235,\"server_ip\":\"49.51.133.162\",\"sha256\":\"995cbbb422634d497d65e12454cd5832cf1b4422189d9ec06efa88ed56891cda\",\"url_without_query_or_fragment\":\"http://gengrasjeepram.com/sv.exe\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#artifact/artifact-514d7133a43d58c3e612646a",
+            "source_id": "S0009",
+            "source_sha256": "b41ce53eebe7941f4c7ded94c437de866fae90a5f59c4d5a3f0017d4666f7445"
+          }
+        ]
+      }
+    ],
+    "uncertainties": [
+      {
+        "text": "Whether the downloaded PE executed or established persistence is unestablished; encrypted payloads were not decrypted and no endpoint execution was observed.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 470,
+            "quote": "{\"internal_lookup\":{\"matched_observables\":0,\"no_exact_match\":279,\"observable_limit\":5000,\"observables_checked\":279,\"observables_total\":279,\"prior_case_limit_reached\":true,\"prior_cases_checked\":50,\"truncated\":false},\"visibility\":\"Encrypted application payloads are not decrypted. No endpoint execution, persistence or actor attribution is established by a download or connection alone.\",\"warnings\":[\"Conflicting TCP overlap: fallback extraction rejected this direction\"]}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#coverage",
+            "source_id": "S0002",
+            "source_sha256": "140ce3d4d6646b8b2bb5cd36b3456698e4c2cc09cb1fe02a414750e845865a45"
+          }
+        ]
+      },
+      {
+        "text": "Reputation of the download and POST destinations is inconclusive: VirusTotal was rate-limited and ThreatFox/MalwareBazaar returned not_found or not-applicable, which does not mean clean.",
+        "basis": "reported",
+        "evidence": [
+          {
+            "end": 448,
+            "quote": "{\"provider_status_counts\":[{\"provider\":\"malwarebazaar\",\"status\":\"not-applicable\",\"targets\":7},{\"provider\":\"malwarebazaar\",\"status\":\"not_found\",\"targets\":3},{\"provider\":\"threatfox\",\"status\":\"not_found\",\"targets\":69},{\"provider\":\"threatfox\",\"status\":\"ok\",\"targets\":2},{\"provider\":\"virustotal\",\"status\":\"deferred-rate-limit\",\"targets\":71}],\"scope\":\"Current enrichment coverage only. Rate limited, unavailable and not-found results do not mean clean.\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#enrichment-coverage",
+            "source_id": "S0003",
+            "source_sha256": "d0b206befd0d0d06479b4c10114fcc7d4650a246d298c1cc7a22ed12a190488d"
+          }
+        ]
+      }
+    ],
+    "what_happened": [
+      {
+        "text": "Windows host 10.20.30.227 (DESKTOP-4C02EMG, Kerberos principal alejandrina.hogue) downloaded a PE executable over cleartext HTTP from http://gengrasjeepram.com/sv.exe (server 49.51.133.162).",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 370,
+            "quote": "{\"client_ip\":\"10.20.30.227\",\"completeness\":\"matches-declared-content-length\",\"content_kind\":\"pe\",\"match_basis\":\"exact-sha256-of-decoded-http-response-body\",\"request_frame\":1169,\"response_frame\":1235,\"server_ip\":\"49.51.133.162\",\"sha256\":\"995cbbb422634d497d65e12454cd5832cf1b4422189d9ec06efa88ed56891cda\",\"url_without_query_or_fragment\":\"http://gengrasjeepram.com/sv.exe\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#artifact/artifact-514d7133a43d58c3e612646a",
+            "source_id": "S0009",
+            "source_sha256": "b41ce53eebe7941f4c7ded94c437de866fae90a5f59c4d5a3f0017d4666f7445"
+          },
+          {
+            "end": 335,
+            "quote": "{\"bindings\":[{\"account\":\"\",\"frame_number\":702,\"owner_ip\":\"10.20.30.227\",\"relationship\":\"kerberos-client-principal\"},{\"account\":\"\",\"frame_number\":710,\"owner_ip\":\"10.20.30.227\",\"relationship\":\"kerberos-client-principal\"}],\"ip_addresses\":[\"10.20.30.227\"],\"mac_addresses\":[\"58:94:6b:77:9b:3c\"],\"type\":\"account\",\"value\":\"alejandrina.hogue\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#identity/identity-0be037907c3b2a691e097a63",
+            "source_id": "S0016",
+            "source_sha256": "e47e3243db92e34c64c6f729e9d9a5eab07237ded882e8e95d4cd211f19c0de9"
+          }
+        ]
+      },
+      {
+        "text": "The same host sent repeated HTTP POST requests to twereptale.com (81.177.6.156) at /4/forum.php and /mlu/forum.php with unusual user-agent strings, a pattern suitable for beaconing review.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 362,
+            "quote": "{\"dst_ip\":\"81.177.6.156\",\"dst_port\":80,\"fields\":{\"http.host\":\"twereptale.com\",\"http.request.full_uri\":\"http://twereptale.com/4/forum.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; rv:11.0) like Gecko\"},\"frame\":1251,\"kind\":\"http_request\",\"src_ip\":\"10.20.30.227\",\"timestamp_epoch\":\"1580345758.838022000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#frame/1251",
+            "source_id": "S0012",
+            "source_sha256": "bc5f9d11d1d9a993c5b2a250c6e9d2c2249fdcac2b9054292a9d4380d838e7e9"
+          },
+          {
+            "end": 381,
+            "quote": "{\"dst_ip\":\"81.177.6.156\",\"dst_port\":80,\"fields\":{\"http.host\":\"twereptale.com\",\"http.request.full_uri\":\"http://twereptale.com/mlu/forum.php\",\"http.request.method\":\"POST\",\"http.user_agent\":\"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.2; WOW64; Trident/7.0; .NET4.0C; .NET4.0E)\"},\"frame\":1315,\"kind\":\"http_request\",\"src_ip\":\"10.20.30.227\",\"timestamp_epoch\":\"1580345760.647757000\"}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#frame/1315",
+            "source_id": "S0013",
+            "source_sha256": "ddd29fce3aadc78c882a18bcc57bb8cc1bfc7fb98773798cc7cc489ef1f871d1"
+          }
+        ]
+      },
+      {
+        "text": "No packet evidence establishes execution of the downloaded PE or any successful exfiltration; endpoint payloads were not decrypted and no actor attribution is supported.",
+        "basis": "observed",
+        "evidence": [
+          {
+            "end": 470,
+            "quote": "{\"internal_lookup\":{\"matched_observables\":0,\"no_exact_match\":279,\"observable_limit\":5000,\"observables_checked\":279,\"observables_total\":279,\"prior_case_limit_reached\":true,\"prior_cases_checked\":50,\"truncated\":false},\"visibility\":\"Encrypted application payloads are not decrypted. No endpoint execution, persistence or actor attribution is established by a download or connection alone.\",\"warnings\":[\"Conflicting TCP overlap: fallback extraction rejected this direction\"]}",
+            "start": 0,
+            "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#coverage",
+            "source_id": "S0002",
+            "source_sha256": "140ce3d4d6646b8b2bb5cd36b3456698e4c2cc09cb1fe02a414750e845865a45"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": "schema-and-exact-quote-binding; not semantic proof",
+  "word_count": 150,
+  "analysis_id": "05851801-c224-489b-b9da-9e5d035c60b4",
+  "token_usage": {
+    "total_tokens": 30684,
+    "prompt_tokens": 27953,
+    "completion_tokens": 2731
+  },
+  "authoritative": false,
+  "effective_tlp": "TLP:CLEAR",
+  "source_sha256": "09bae3f06c5a400dfa5ada4377e471399b4f684617bec6fba6133bcb5abfec3f",
+  "capture_sha256": "51c84227023072a05ed3b4cae03662c7df80780551b6119c8af97301472642d4",
+  "prompt_version": "pcap-investigation-summary-v5",
+  "requested_model": "claude-opus-4-8",
+  "source_manifest": [
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "3bd05ecf19ce2806536621761ced82d6452556a10750aef6552e813e4c15d4c9",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#capture",
+      "source_id": "S0001"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "140ce3d4d6646b8b2bb5cd36b3456698e4c2cc09cb1fe02a414750e845865a45",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#coverage",
+      "source_id": "S0002"
+    },
+    {
+      "kind": "intelligence_lead",
+      "offset": 0,
+      "sha256": "d0b206befd0d0d06479b4c10114fcc7d4650a246d298c1cc7a22ed12a190488d",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#enrichment-coverage",
+      "source_id": "S0003"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "7370e763925d7679c2137df18e1dba27379fea554c9940b5237a573ae5d67580",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#assessment/observable-d85ee97d407dd5e5a6294245",
+      "source_id": "S0004"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "e606f2f6e3fe18ec32c669e842401221b6e6d6b49c33ea342bd907caedc81c58",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#assessment/observable-031640c390e2212650f453d1",
+      "source_id": "S0005"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "8311ce22c35fe10b6602febe8b57a71d5fc4bb5fd7b6c9b1787cecae96b3f71c",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#assessment/observable-eddde6e5ec75a657f760bd12",
+      "source_id": "S0006"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "7ba66127a6a7886e7012ed704fb3c373d2b3e811cce5e6c460f45364307e8670",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#assessment/observable-6332f0dd29ac1493092e0454",
+      "source_id": "S0007"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "928105d346ef719440e713d54befce1715d4a069ea53d6f2e8753410e25c1a2f",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#assessment/observable-ac4a9fff9ae6d2db44e52817",
+      "source_id": "S0008"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "b41ce53eebe7941f4c7ded94c437de866fae90a5f59c4d5a3f0017d4666f7445",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#artifact/artifact-514d7133a43d58c3e612646a",
+      "source_id": "S0009"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "03c0394b57b93e2c4f9a79597b8915c9f7a85a898c545e3d5b6b38afb9e14695",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#artifact/artifact-23209c8ecd7d63bc758bc3e6",
+      "source_id": "S0010"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "ccc501e58cab44d44340ef529e6a96e6e213a5d8efc1405941146abb5c81eab5",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#artifact/artifact-28cb163c4b3c69c4c3bd7709",
+      "source_id": "S0011"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "bc5f9d11d1d9a993c5b2a250c6e9d2c2249fdcac2b9054292a9d4380d838e7e9",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#frame/1251",
+      "source_id": "S0012"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "ddd29fce3aadc78c882a18bcc57bb8cc1bfc7fb98773798cc7cc489ef1f871d1",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#frame/1315",
+      "source_id": "S0013"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "63953c4d83bf3c5ce31f3ed289748fe4bd6347994c53972da7cdd5488befe36c",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#frame/12989",
+      "source_id": "S0014"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "d318a96f995fc45e2808bbd761ce464b163515b5012dcf04218955cb28ca0027",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#frame/13042",
+      "source_id": "S0015"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "e47e3243db92e34c64c6f729e9d9a5eab07237ded882e8e95d4cd211f19c0de9",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#identity/identity-0be037907c3b2a691e097a63",
+      "source_id": "S0016"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "1dcc77d3cc4395543a50b324ed30e848894055a5f8aebf1ee80e8fb78d96988b",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#identity/identity-e833aee724780b5246d2b992",
+      "source_id": "S0017"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "8e2de9bb7ab92c326e93445bb6acf50b2163d057d8fac364467ced23eb9deb47",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#identity/identity-adf6ab9dcde981733c87f500",
+      "source_id": "S0018"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "70895e5dfef90dece22cbb333be8941ff31d224c6f6cbc4755b5abdf8729d369",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#identity/identity-afe56b16e690814a99f9553e",
+      "source_id": "S0019"
+    },
+    {
+      "kind": "packet_fact",
+      "offset": 0,
+      "sha256": "952419c048cecbd910360123ca13a61b6cd3d125b5286079e70c3df7666be2b1",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#identity/identity-0916d5f92d8fbccada470ce3",
+      "source_id": "S0020"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "ee0e2f9da6ec9d41064098aa159ba2de51c302361911084889a510d069a96ded",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#finding/finding-24258cf33df9c63f3da9f31c",
+      "source_id": "S0021"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "86bb7ffd664b767eb6a60d22f88f77eb15faa214f9278afcf201a57af0da8fb3",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#finding/finding-4374d41956c0deaa7b0a7227",
+      "source_id": "S0022"
+    },
+    {
+      "kind": "rule_candidate",
+      "offset": 0,
+      "sha256": "326f966f7ad0eb2a5c70bc81bb7ac6be7ff4ed584631b904357e4dbdd11628aa",
+      "reference": "/api/pcap/analyses/05851801-c224-489b-b9da-9e5d035c60b4#finding/finding-4ccbf4ba009b4882e4c367c4",
+      "source_id": "S0023"
+    }
+  ],
+  "token_usage_note": "Provider-reported counts when available; never estimated from character length.",
+  "generation_seconds": 80.92,
+  "generation_attempts": [
+    {
+      "attempt": 1,
+      "validation": "unknown_source",
+      "token_usage": {
+        "total_tokens": 14638,
+        "prompt_tokens": 13219,
+        "completion_tokens": 1419,
+        "uncached_input_tokens": 13219,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+      },
+      "finish_reason": "end_turn",
+      "provider_returned_model": "claude-opus-4-8"
+    },
+    {
+      "attempt": 2,
+      "validation": "passed",
+      "token_usage": {
+        "total_tokens": 16046,
+        "prompt_tokens": 14734,
+        "completion_tokens": 1312,
+        "uncached_input_tokens": 14734,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+      },
+      "finish_reason": "end_turn",
+      "provider_returned_model": "claude-opus-4-8"
+    }
+  ],
+  "validation_adjustments": [
+    {
+      "index": 0,
+      "action": "optional-claim-omitted",
+      "reason": "unqualified_ioc",
+      "section": "iocs"
+    },
+    {
+      "index": 1,
+      "action": "optional-claim-omitted",
+      "reason": "unqualified_ioc",
+      "section": "iocs"
+    },
+    {
+      "index": 2,
+      "action": "optional-claim-omitted",
+      "reason": "unqualified_ioc",
+      "section": "iocs"
+    },
+    {
+      "index": 0,
+      "action": "optional-claim-omitted",
+      "reason": "identifier_binding",
+      "section": "ttps"
+    }
+  ],
+  "provider_returned_model": "claude-opus-4-8"
+}
