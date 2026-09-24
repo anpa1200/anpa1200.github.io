@@ -9,6 +9,8 @@ const siteIndex = args.indexOf('--site');
 const siteRoot = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
 const check = args.includes('--check');
 const facts = JSON.parse(readFileSync(join(ROOT, 'data', 'site-facts.json'), 'utf8')).facts;
+const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
+const knowledgeSourceCount = knowledgeSources.sources.length;
 
 function value(key) {
   if (!facts[key] || !Object.hasOwn(facts[key], 'value')) throw new Error(`Missing site fact ${key}`);
@@ -52,7 +54,10 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 
 - [Research hub](https://1200km.com/cti.html)
 - [Research library](https://1200km.com/guides.html)
-- [Cybersecurity Knowledge Base](https://1200km.com/cyber-knowledge/) — ten source-reviewed practitioner field guides
+- [Cybersecurity Knowledge Base](https://1200km.com/cyber-knowledge/) — eleven source-reviewed practitioner field guides
+- [Cybersecurity Knowledge Sources](https://1200km.com/cyber-knowledge/knowledge-sources/) — ${knowledgeSourceCount} assessed standards, research portals, tools, datasets, and learning resources with controlled tags and internal crosslinks
+- [Knowledge Sources dataset](https://1200km.com/data/knowledge-sources.json) — machine-readable source assessments
+- [Knowledge Sources index](https://1200km.com/data/knowledge-sources-index.json) — category, tag, audience, skill, access, quality, maintenance, and evidence-use lookups
 - [Cyber Threat Intelligence field guide](https://1200km.com/cyber-knowledge/cti.html)
 - [Red Team and Offensive Security field guide](https://1200km.com/cyber-knowledge/red-team.html)
 - [Blue Team and Defensive Security field guide](https://1200km.com/cyber-knowledge/blue-team.html)

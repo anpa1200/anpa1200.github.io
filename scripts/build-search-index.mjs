@@ -8,6 +8,8 @@ import * as pagefind from 'pagefind';
 import { governanceBoost } from './search-governance-lib.mjs';
 import {
   SITE_ORIGIN,
+  KNOWLEDGE_SOURCES_URL,
+  buildKnowledgeSourceSearchRecords,
   collectLocalSitemapUrls,
   localFileForUrl,
   normalizeCanonical,
@@ -38,6 +40,8 @@ const concurrency = Math.max(1, Math.min(24, Number.parseInt(option('--concurren
 const rootSitemap = option('--sitemap', remote ? `${SITE_ORIGIN}/sitemap.xml` : join(siteRoot, 'sitemap-all.xml'));
 const canonicalSitemapOutput = option('--canonical-sitemap-output');
 const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-catalog.json')));
+const knowledgeSourcesPath = resolve(option('--knowledge-sources', join(siteRoot, 'data', 'knowledge-sources.json')));
+const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledge-sources', '125'), 10);
 const requiredIndexUrls = [
   `${SITE_ORIGIN}/`,
   `${SITE_ORIGIN}/search.html`,
@@ -45,6 +49,7 @@ const requiredIndexUrls = [
   `${SITE_ORIGIN}/threat-matrix/actors/G0034/`,
   `${SITE_ORIGIN}/threat-matrix/actors/G0069/`,
   `${SITE_ORIGIN}/ITDR/`,
+  KNOWLEDGE_SOURCES_URL,
 ];
 
 if (!existsSync(catalogPath)) throw new Error(`Content catalogue is required before search indexing: ${catalogPath}`);
@@ -56,6 +61,43 @@ for (const item of catalog.items || []) {
     if (!catalogByUrl.has(normalized)) catalogByUrl.set(normalized, item);
   }
 }
+
+if (!existsSync(knowledgeSourcesPath)) {
+  throw new Error(`Knowledge sources dataset is required before search indexing: ${knowledgeSourcesPath}`);
+}
+const knowledgeSourcesDataset = JSON.parse(await readFile(knowledgeSourcesPath, 'utf8'));
+const knowledgeSourcesModulePath = localFileForUrl(siteRoot, KNOWLEDGE_SOURCES_URL);
+if (!knowledgeSourcesModulePath) {
+  throw new Error(`Knowledge sources module is required before search indexing: ${KNOWLEDGE_SOURCES_URL}`);
+}
+const knowledgeSourcesModuleHtml = await readFile(knowledgeSourcesModulePath, 'utf8');
+const knowledgeSourcesCatalogItem = catalogByUrl.get(KNOWLEDGE_SOURCES_URL);
+if (!knowledgeSourcesCatalogItem) {
+  throw new Error(`Knowledge sources module is missing its content-catalog identity: ${KNOWLEDGE_SOURCES_URL}`);
+}
+const knowledgeSourceSearchRecords = buildKnowledgeSourceSearchRecords(
+  knowledgeSourcesDataset,
+  knowledgeSourcesModuleHtml,
+  knowledgeSourcesCatalogItem,
+);
+if (knowledgeSourceSearchRecords.length < minimumKnowledgeSourceRecords) {
+  throw new Error(`Knowledge sources search coverage is too small: ${knowledgeSourceSearchRecords.length} records; expected at least ${minimumKnowledgeSourceRecords}.`);
+}
+function searchRecordKey(value) {
+  try {
+    const url = new URL(value, SITE_ORIGIN);
+    return `${url.pathname}${url.hash}`;
+  } catch {
+    return String(value || '');
+  }
+}
+const customSearchGovernance = new Map(knowledgeSourceSearchRecords.map((record) => [
+  searchRecordKey(record.url),
+  {
+    collection_tier: record.meta.collection_tier,
+    evidence_level: record.meta.evidence_level,
+  },
+]));
 
 function log(message) {
   if (!quiet) console.log(message);
@@ -148,7 +190,7 @@ async function replaceOutput(stagedOutput, destination) {
   }
 }
 
-async function writeGovernanceMap(bundlePath) {
+async function writeGovernanceMap(bundlePath, expectedRecordCount, indexedCustomRecords) {
   const fragmentDirectory = join(bundlePath, 'fragment');
   const records = {};
   const missing = [];
@@ -158,8 +200,9 @@ async function writeGovernanceMap(bundlePath) {
     const jsonStart = decoded.indexOf('{');
     if (jsonStart < 0) throw new Error(`Pagefind fragment ${filename} has no JSON payload.`);
     const fragment = JSON.parse(decoded.slice(jsonStart));
-    const canonical = normalizeCanonical(fragment.raw_url || fragment.url);
-    const item = canonical ? catalogByUrl.get(canonical) : null;
+    const rawUrl = fragment.raw_url || fragment.url;
+    const canonical = normalizeCanonical(rawUrl);
+    const item = customSearchGovernance.get(searchRecordKey(rawUrl)) || (canonical ? catalogByUrl.get(canonical) : null);
     if (!item) {
       missing.push(fragment.raw_url || fragment.url || filename);
       continue;
@@ -171,13 +214,15 @@ async function writeGovernanceMap(bundlePath) {
       evidence_level: item.evidence_level,
     };
   }
-  if (missing.length || !Object.keys(records).length) {
-    throw new Error(`Search governance map coverage mismatch: ${Object.keys(records).length}/${indexedPages} records; missing ${missing.slice(0, 20).join(', ') || 'unknown fragments'}.`);
+  if (missing.length || Object.keys(records).length !== expectedRecordCount || !Object.keys(records).length) {
+    throw new Error(`Search governance map coverage mismatch: ${Object.keys(records).length}/${expectedRecordCount} records; missing ${missing.slice(0, 20).join(', ') || 'unknown fragments'}.`);
   }
   const governance = {
     schema_version: 1,
     content_catalog_version: catalog.catalog_version,
     indexed_page_count: indexedPages,
+    indexed_custom_record_count: indexedCustomRecords,
+    indexed_record_count: expectedRecordCount,
     record_count: Object.keys(records).length,
     records,
   };
@@ -297,6 +342,21 @@ if (missingRequired.length) {
   throw new Error(`Search index is missing required release fixtures:\n${missingRequired.join('\n')}`);
 }
 
+
+let indexedCustomRecords = 0;
+const customRecordFailures = [];
+for (const record of knowledgeSourceSearchRecords) {
+  const result = await index.addCustomRecord(record);
+  if (result.errors.length) customRecordFailures.push(`${record.url}: ${result.errors.join('; ')}`);
+  else indexedCustomRecords += 1;
+}
+if (customRecordFailures.length || indexedCustomRecords !== knowledgeSourceSearchRecords.length) {
+  await pagefind.close();
+  throw new Error(`Knowledge sources search indexing failed for ${customRecordFailures.length || knowledgeSourceSearchRecords.length - indexedCustomRecords} record(s):\n${customRecordFailures.slice(0, 20).join('\n')}`);
+}
+const indexedRecords = indexedPages + indexedCustomRecords;
+log(`Indexed ${indexedCustomRecords} knowledge-source records at stable module anchors.`);
+
 await mkdir(dirname(outputPath), { recursive: true });
 const temporaryRoot = await mkdtemp(join(dirname(outputPath), '.1200km-pagefind-'));
 const stagedOutput = join(temporaryRoot, 'pagefind');
@@ -305,7 +365,7 @@ if (writeResult.errors.length) {
   await pagefind.close();
   throw new Error(`Pagefind bundle write failed: ${writeResult.errors.join('; ')}`);
 }
-await writeGovernanceMap(stagedOutput);
+await writeGovernanceMap(stagedOutput, indexedRecords, indexedCustomRecords);
 
 const metadata = {
   schemaVersion: 1,
@@ -314,6 +374,11 @@ const metadata = {
   generatedAt: new Date().toISOString(),
   discoveredPages: urls.length,
   indexedPages,
+  indexedCustomRecords,
+  indexedRecords,
+  knowledgeSourceRecords: indexedCustomRecords,
+  knowledgeSourceDatasetVersion: knowledgeSourcesDataset.schema_version,
+  knowledgeSourceModuleUrl: KNOWLEDGE_SOURCES_URL,
   sourceCounts,
   skipped: Object.fromEntries([...skipped.entries()].sort()),
   skippedDetails: skippedDetails.slice(0, 200),

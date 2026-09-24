@@ -167,6 +167,7 @@
 </head><body id="top"><header class="site-header"><nav class="nav wrap" aria-label="Primary navigation"><a class="brand" href="/"><img src="/assets/ap-logo.png" alt="" width="36" height="36" loading="lazy" decoding="async" />1200km</a><div class="navlinks"><a href="/ai-security-course.html">Course overview</a><a href="/ai-security-course/module-00.html">Module 00</a><a href="/ai-security-course/glossary.html">Glossary</a><a href="/projects.html">Projects</a></div><button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme">☀</button></nav></header>
 <div class="hero"><div class="hero-inner wrap"><p class="eyebrow"><a href="/ai-security-course.html">AI Security Engineering</a> / Module 00 / Chapter 4</p><h1 id="transformers-and-llm-generation">Transformers and LLM Generation</h1><p class="lead">Trace an LLM request from structured messages to generated output, then place authorization, validation, and forensic evidence at the boundaries that actually enforce security.</p><aside class="notice" role="status"><span class="notice-icon" aria-hidden="true">✓</span><div><strong>Chapter complete</strong><p>Finalized 13 August 2026 with a bounded practical, completion rubric, primary references, and an evidence-first security workflow.</p></div></aside><div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 4</span><span class="pill">Complete</span><span class="pill">Transformers</span><span class="pill">LLM security</span><span class="pill">Prompt injection</span><span class="pill">CTI evidence</span></div><div class="actions"><a class="button primary" href="/ai-security-course/module-00.html">← Module 00</a><a class="button" href="/ai-security-course/module-00/chapter-03.html">Chapter 3</a><a class="button" href="/ai-security-course.html">Course syllabus</a><a class="button" href="/ai-security-course/glossary.html">Glossary</a></div></div></div>
 <main class="wrap" data-pagefind-body><article class="prose">
+<p><strong>Medium companion:</strong> <em>Not published. This canonical course page is the authoritative Chapter 4 edition.</em></p>
 <p><strong>Trace an LLM request from structured messages to generated output, then place authorization, validation, and forensic evidence at the boundaries that actually enforce security.</strong></p>
 <p>This chapter explains how an application turns messages into tokens, how a Transformer produces next-token scores, how decoding turns those scores into text, and where security controls and evidence must exist around the model.</p>
 <p>It is written for security engineers, CTI analysts, detection engineers, incident responders, and technical leaders who need to investigate an LLM-enabled application without treating fluent output as proof. The objective is a repeatable request trace: identify each artifact and trust boundary, reproduce behavior under controlled conditions, and distinguish generated text from an authorized or executed action.</p>
@@ -200,11 +201,12 @@
 <li><a href="#extraction" target="_self">14. Extraction, leakage, and sensitive context</a></li>
 <li><a href="#cti-case" target="_self">15. CTI case study: indirect prompt injection</a></li>
 <li><a href="#controls" target="_self">16. Controls, ATLAS mapping, and analyst exercise</a></li>
-<li><a href="#key-takeaways" target="_self">17. Key takeaways</a></li>
-<li><a href="#next" target="_self">18. What comes next</a></li>
-<li><a href="#conclusion" target="_self">19. Conclusion</a></li>
-<li><a href="#references" target="_self">20. References</a></li>
-<li><a href="#follow-my-work" target="_self">21. Follow My Work</a></li>
+<li><a href="#limitations" target="_self">17. Limitations and scope boundaries</a></li>
+<li><a href="#key-takeaways" target="_self">18. Key takeaways</a></li>
+<li><a href="#next" target="_self">19. What comes next</a></li>
+<li><a href="#conclusion" target="_self">20. Conclusion</a></li>
+<li><a href="#references" target="_self">21. References</a></li>
+<li><a href="#follow-my-work" target="_self">22. Follow My Work</a></li>
 </ol>
 <p><a id="mechanism"></a></p>
 <h2 id="1-why-the-generation-mechanism-matters-to-security">1. Why the generation mechanism matters to security</h2>
@@ -220,6 +222,7 @@
   → append token and repeat
   → parser, policy, tools, and downstream action
 </code></pre>
+<p><em>Figure 1 — The complete LLM request path. This text-native diagram is deliberately kept as selectable, searchable evidence: it places identity and authorization before generation and policy, execution, and audit after generation.</em></p>
 <p>Every arrow is a potential source of changed behavior. A response can change because the application selected different context, an untrusted document entered the prompt, the tokenizer or template changed, earlier instructions were truncated, a model route changed, the decoding configuration changed, or a downstream parser interpreted output differently.</p>
 <p><strong>Security consequence:</strong> “The model ignored the system prompt” is not yet an incident description. Preserve the serialized prompt or an approved privacy-safe representation, token counts, truncation decisions, model and tokenizer identifiers, decoding configuration, output, parser result, policy decision, and any action taken.</p>
 <blockquote>
@@ -343,7 +346,7 @@ template(messages)
 <p><a id="attention"></a></p>
 <h2 id="6-self-attention-learned-information-flow">6. Self-attention: learned information flow</h2>
 <p>For each position, an attention head derives a <strong>query</strong>, <strong>key</strong>, and <strong>value</strong> representation. Query–key similarity produces weights, and those weights combine value information. A common conceptual form is:</p>
-<pre><code class="language-text">Attention(Q, K, V) = softmax(QKᵀ / √d) V
+<pre><code class="language-text">Attention(Q, K, V) = softmax(QKᵀ / √d_k) V
 </code></pre>
 <p>In <strong>self-attention</strong>, queries, keys, and values are derived from positions in the same sequence. <strong>Multi-head attention</strong> performs several learned projections in parallel, allowing different patterns of information flow. A causal mask prevents a decoder-only language model from using future tokens when predicting the next token.</p>
 <p>Attention weights are not permissions, citations, confidence scores, or guaranteed explanations. High weight does not prove that a source authorized an action or that a generated claim is true.</p>
@@ -452,6 +455,7 @@ generation: temperature, top_p, top_k, max_tokens, stop, seed
 output_digest: digest of raw generated bytes
 parser_and_policy: versions and decisions
 actions: exact proposed, approved, denied, and executed actions
+safety_layer: guardrail or filter identifiers, versions, and decisions
 </code></pre>
 <p>Sensitive prompts and outputs may require encryption, minimization, field-level redaction, or shorter retention. A digest proves equality only when the canonicalization method and protected original are available for authorized investigation.</p>
 <p><strong>Security consequence:</strong> Design evidence before an incident. If privacy policy prevents full prompt logging, retain a manifest of trusted/untrusted segments, stable digests, lengths, token counts, source references, and authorization decisions.</p>
@@ -468,6 +472,7 @@ actions: exact proposed, approved, denied, and executed actions
   → execution with least-privileged identity
   → result and audit record
 </code></pre>
+<p><em>Figure 2 — From model output to authorized action. Syntax validation is only the first control; semantic validation, authorization, approval, least privilege, and audit remain application responsibilities.</em></p>
 <p><strong>Security consequence:</strong> Treat model output as untrusted input even when it matches a schema. Bind human approval to the exact normalized action, target, arguments, identity, and expiration—not to a natural-language summary.</p>
 <p><a id="prompt-injection"></a></p>
 <h2 id="13-prompt-injection-and-instruction-conflicts">13. Prompt injection and instruction conflicts</h2>
@@ -532,7 +537,11 @@ actions: exact proposed, approved, denied, and executed actions
 <p><strong>Security consequence:</strong> Apply data minimization before context assembly, output filtering only as defense in depth, least privilege to retrieval and tools, and incident-ready provenance for every sensitive segment.</p>
 <p><a id="cti-case"></a></p>
 <h2 id="15-cti-case-study-indirect-prompt-injection">15. CTI case study: indirect prompt injection</h2>
-<p>Consider a security assistant that reads external incident reports and can create tickets. A report contains hidden or visible text instructing the assistant to copy prior private context into a ticket controlled by the attacker.</p>
+<h3 id="disclosed-case-echoleak">Disclosed case: EchoLeak</h3>
+<p>EchoLeak anchors this pattern in a disclosed production-system vulnerability. AIM Security researchers reported a zero-click indirect prompt-injection chain affecting Microsoft 365 Copilot; Microsoft assigned <a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32711" target="_blank" rel="noopener noreferrer">CVE-2025-32711</a>, remediated the issue, and stated that no customer action was required. MITRE ATLAS records the research as case study <a href="https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.06" target="_blank" rel="noopener noreferrer"><code>AML.CS0059</code></a>. The ATLAS case record says a malicious email could enter Copilot&#39;s retrieval context, influence the generated response, and use rendered Markdown image behavior to create an outbound exfiltration path.</p>
+<p>In this case, <strong>zero-click</strong> means that the victim did not need to open the malicious email or select an attacker-supplied link. A later, ordinary Copilot interaction acted as the trigger after the content had entered the retrieval path; it does not mean that the system produced an effect without any subsequent request or event.</p>
+<p>This evidence supports a disclosed and reproduced capability against the affected design. It does <strong>not</strong> establish criminal exploitation in the wild, universal behavior across Copilot versions, or compromise of every tenant. Preserve that distinction when turning a case study into a detection or architectural requirement.</p>
+<p>The generalized teaching scaffold below changes the product and side effect deliberately. Consider a <strong>synthetic, course-only</strong> security assistant that reads external incident reports and can create tickets. A report contains hidden or visible text instructing the assistant to copy prior private context into a ticket controlled by the attacker.</p>
 <pre><code class="language-text">attacker-controlled report
   → authorized crawler stores content
   → analyst asks assistant to summarize report
@@ -541,7 +550,8 @@ actions: exact proposed, approved, denied, and executed actions
   → model proposes ticket creation with sensitive content
   → weak application executes proposal
 </code></pre>
-<p>The report&#39;s inclusion may be authorized while the ticket content and destination are not. The security failure occurs when untrusted content influences a side effect without an independent authorization and policy boundary.</p>
+<p><em>Figure 3 — Generalized indirect prompt-injection chain. EchoLeak used email retrieval and response rendering; the synthetic ticket workflow changes those components so learners can reason about the underlying trust-boundary failure without replaying a real exploit.</em></p>
+<p>The report&#39;s inclusion may be authorized while the ticket content and destination are not. The security failure occurs when untrusted content influences a side effect without an independent authorization and policy boundary. This general pattern was established in earlier application-integrated prompt-injection research by Greshake et al.; the EchoLeak disclosure provides a later production-system case with a CVE and a published evidence chain.</p>
 <h3 id="evidence-chain">Evidence chain</h3>
 <ol>
 <li>Preserve the retrieved object, version, parser output, and provenance.</li>
@@ -592,17 +602,20 @@ actions: exact proposed, approved, denied, and executed actions
 <li>Maintain privacy-aware evidence retention and an incident reproduction fixture.</li>
 </ul>
 <h3 id="mitre-atlas-oriented-mapping">MITRE ATLAS-oriented mapping</h3>
-<p>Using the MITRE ATLAS v2026.06 release as the reference point, this workflow can support investigation of:</p>
-<ul>
-<li>prompt injection through direct or indirectly supplied instructions;</li>
-<li>discovery of system or model information;</li>
-<li>collection of sensitive AI-system information;</li>
-<li>exfiltration through an inference or tool-enabled channel; and</li>
-<li>abuse of an AI agent or its tools where generated output can influence action.</li>
-</ul>
+<p>The official ATLAS release page listed content release <strong>2026.06</strong> as latest when this chapter was finalized on 13 August 2026. ATLAS uses <code>YYYY.MM.N</code> for content versions, while the Git tag is prefixed with <code>v</code>. The chapter records the content version as <code>2026.06</code> and links the immutable <code>v2026.06</code> release tag.</p>
+<div class="table-wrap" role="region" aria-label="Scrollable ATLAS mapping table" tabindex="0"><table class="data-table"><thead><tr><th>ATLAS ID and title in 2026.06</th><th>Chapter connection</th><th>Evidence required before mapping</th></tr></thead><tbody>
+<tr><td><code>AML.T0051.000</code> — LLM Prompt Injection: Direct</td><td>Adversary supplies the instruction through the interactive input</td><td>Original request, identity, template, output, and protected boundary affected</td></tr>
+<tr><td><code>AML.T0051.001</code> — LLM Prompt Injection: Indirect</td><td>Separate data channel is ingested by the LLM</td><td>Retrieved object, source provenance, parser output, context inclusion, and generated result</td></tr>
+<tr><td><code>AML.T0051.002</code> — LLM Prompt Injection: Triggered</td><td>Later user action or event activates a planted instruction</td><td>Infiltration event, activation trigger, request trace, and resulting behavior</td></tr>
+<tr><td><code>AML.T0070</code> — RAG Poisoning</td><td>Manipulated content is indexed and later retrieved</td><td>Indexed object, index version, retrieval trace, relevance, and source authorization</td></tr>
+<tr><td><code>AML.T0077</code> — LLM Response Rendering</td><td>Rendered output creates an external request containing protected data</td><td>Raw model output, renderer behavior, outbound request, destination, and protected value linkage</td></tr>
+<tr><td><code>AML.T0085.000</code> — Data from AI Services: RAG Databases</td><td>AI service retrieves sensitive organizational information</td><td>Caller and tenant, source object, ACL decision, retrieved content, and output linkage</td></tr>
+<tr><td><code>AML.T0086</code> — Exfiltration via AI Agent Tool Invocation</td><td>A write-capable tool carries protected data to an adversary-controlled destination</td><td>Proposed arguments, policy decision, executing identity, API result, destination, and received data</td></tr>
+</tbody></table></div>
+<p>EchoLeak&#39;s ATLAS 2026.06 case record maps specific steps to <code>AML.T0051.002</code>, <code>AML.T0070</code>, <code>AML.T0077</code>, and <code>AML.T0085.000</code>, among other techniques. That case mapping does not make the same IDs correct for every prompt-injection test.</p>
 <p>Do not force every failed instruction-following test into an ATT&amp;CK or ATLAS technique. Map observed attacker behavior and evidence, and record the ATLAS version used.</p>
 <h3 id="analyst-practical-trace-one-request">Analyst practical: trace one request</h3>
-<p>Choose an authorized test application. Do not use production secrets or unauthorized targets.</p>
+<p>Choose a course-owned or otherwise authorized local test application. Do not use production secrets or unauthorized targets. The dedicated Chapter 4 lab fixture is not yet published; until it is available, use an isolated disposable application that has no external side effects, or complete the exercise as a paper architecture trace using the synthetic ticket workflow above.</p>
 <ol>
 <li>Inventory the model, tokenizer, template, context sources, tools, and generation configuration.</li>
 <li>Send a benign request and capture the minimum reproducibility record.</li>
@@ -643,9 +656,17 @@ actions: exact proposed, approved, denied, and executed actions
 <li>What evidence distinguishes prompt disclosure from guessed prompt content?</li>
 <li>Where should authorization occur for retrieved content and tool execution?</li>
 <li>Which event proves impact: generated text, parsed proposal, approved action, or executed action?</li>
+<li>Which identifiers and isolation attributes must be part of a safe cross-request KV-cache design?</li>
+<li>Why must a chat template be versioned and reviewed as a release artifact rather than treated as invisible formatting?</li>
 </ol>
+<p><a id="limitations"></a></p>
+<h2 id="17-limitations-and-scope-boundaries">17. Limitations and scope boundaries</h2>
+<p>This chapter explains decoder-oriented text generation and the surrounding application controls. It does not teach model training, RAG construction, multimodal tokenization, autonomous agent loops, MCP, or serving operations; later Module 00 chapters own those subjects. Retrieved content and tools appear here only where they affect the request boundary.</p>
+<p>The conceptual equations and flows are architecture-neutral teaching models. A deployed provider may hide token IDs, logits, routing, kernels, safety layers, or the serialized prompt, so a complete forensic reconstruction may be impossible. Record unavailable fields as unknown rather than inferring them from visible output.</p>
+<p>The EchoLeak section is based on a disclosed research case, Microsoft remediation information, and the MITRE ATLAS case record. It is not evidence of exploitation in the wild or a claim that current Microsoft 365 Copilot versions remain vulnerable. Likewise, an ATLAS mapping organizes validated behavior; it does not prove that the behavior occurred in a learner&#39;s system.</p>
+<p>The chapter uses text-native diagrams instead of raster infographics so the logical stages remain selectable, accessible, searchable, and easy to revise. Learners should treat them as architecture models, not packet-level or provider-specific implementation diagrams.</p>
 <p><a id="key-takeaways"></a></p>
-<h2 id="17-key-takeaways">17. Key takeaways</h2>
+<h2 id="18-key-takeaways">18. Key takeaways</h2>
 <ul>
 <li>A chat application serializes structured state into a token sequence; inspect the serialization boundary.</li>
 <li>Tokenizer and chat template are versioned release artifacts, not invisible preprocessing details.</li>
@@ -657,26 +678,57 @@ actions: exact proposed, approved, denied, and executed actions
 <li>Durable controls authenticate, authorize, validate, constrain, approve, execute, and log outside the model.</li>
 </ul>
 <p><a id="next"></a></p>
-<h2 id="18-what-comes-next">18. What comes next</h2>
+<h2 id="19-what-comes-next">19. What comes next</h2>
 <p><a href="/ai-security-course/module-00.html#lifecycle" target="_self">The next Module 00 chapter</a> follows the LLM lifecycle from pre-training through instruction tuning, preference optimization, adapters, quantization, release, serving, monitoring, and retirement. It will show which artifacts change at each stage and how to preserve provenance across them.</p>
 <p><a id="conclusion"></a></p>
-<h2 id="19-conclusion">19. Conclusion</h2>
+<h2 id="20-conclusion">20. Conclusion</h2>
 <p>An LLM request is not one opaque model event. It is a chain of authenticated identities, selected context, serialization rules, tokenizer artifacts, model execution, decoding choices, parsers, policy decisions, and possible side effects. Investigations become defensible when each link is versioned and the analyst states exactly where the evidence ends.</p>
 <p>The central security discipline is therefore simple: let the model propose content, but keep trust decisions outside generation. Authorize retrieval before context assembly, validate structured output as untrusted input, approve material actions precisely, execute with least privilege, and preserve enough evidence to reproduce the result. This approach remains useful even as architectures and providers change because it is grounded in system boundaries rather than confidence in generated prose.</p>
 <p><a id="references"></a></p>
-<h2 id="20-references">20. References</h2>
+<h2 id="21-references">21. References</h2>
 <ol>
 <li>Vaswani, A. et al., <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener noreferrer">Attention Is All You Need</a>, 2017 (revised 2023).</li>
 <li>Hugging Face Transformers, <a href="https://huggingface.co/docs/transformers/main/chat_templating" target="_blank" rel="noopener noreferrer">Chat templates</a> and <a href="https://huggingface.co/docs/transformers/main/chat_templating_writing" target="_blank" rel="noopener noreferrer">Writing a chat template</a>.</li>
 <li>Hugging Face Transformers, <a href="https://huggingface.co/docs/transformers/main/generation_strategies" target="_blank" rel="noopener noreferrer">Generation strategies</a>.</li>
 <li>NIST, <a href="https://doi.org/10.6028/NIST.AI.100-2e2025" target="_blank" rel="noopener noreferrer">Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations, NIST AI 100-2 E2025</a>, 2025.</li>
 <li>NIST, <a href="https://doi.org/10.6028/NIST.AI.600-1" target="_blank" rel="noopener noreferrer">Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile, NIST AI 600-1</a>, 2024.</li>
-<li>MITRE, <a href="https://atlas.mitre.org/" target="_blank" rel="noopener noreferrer">ATLAS</a> and <a href="https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.06" target="_blank" rel="noopener noreferrer">ATLAS data release v2026.06</a>, accessed 13 August 2026.</li>
+<li>MITRE, <a href="https://atlas.mitre.org/" target="_blank" rel="noopener noreferrer">ATLAS</a> and <a href="https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.06" target="_blank" rel="noopener noreferrer">ATLAS content release 2026.06 (Git tag <code>v2026.06</code>)</a>, accessed 13 August 2026.</li>
 <li>Greshake, K. et al., <a href="https://arxiv.org/abs/2302.12173" target="_blank" rel="noopener noreferrer">More than you&#39;ve asked for: A Comprehensive Analysis of Novel Prompt Injection Threats to Application-Integrated Large Language Models</a>, 2023.</li>
-<li>OWASP, <a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener noreferrer">Top 10 for Large Language Model Applications</a>, accessed 13 August 2026; use as community guidance rather than a substitute for a system-specific threat model.</li>
+<li>Microsoft Security Response Center, <a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32711" target="_blank" rel="noopener noreferrer">CVE-2025-32711</a>, 2025.</li>
+<li>MITRE ATLAS, <a href="https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.06" target="_blank" rel="noopener noreferrer">EchoLeak: Zero-Click Prompt Injection Targeting M365 Copilot for Data Exfiltration (<code>AML.CS0059</code>)</a>, ATLAS content release 2026.06.</li>
+<li>OWASP, <a href="https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/" target="_blank" rel="noopener noreferrer">GenAI LLM Top 10 2026</a>, 3 August 2026; use as community guidance rather than a substitute for a system-specific threat model.</li>
 </ol>
+<!-- GLOSSARY DELTA -->
+<h3 id="glossary-delta">Glossary delta</h3>
+<ul>
+<li><strong>Tokenizer:</strong> A versioned algorithm and vocabulary that maps input text or bytes to token IDs and maps IDs back to output representations.</li>
+<li><strong>Vocabulary:</strong> The tokenizer&#39;s finite mapping between token representations and numeric IDs.</li>
+<li><strong>Special token:</strong> A reserved token representing protocol structure such as sequence, role, padding, tool, or document boundaries.</li>
+<li><strong>Chat template:</strong> Versioned serialization logic that converts structured messages and related control data into the token sequence expected by a chat model.</li>
+<li><strong>Token embedding:</strong> A learned vector representation associated with a token ID before contextual processing.</li>
+<li><strong>Positional information:</strong> Information that represents token order, including learned positions, fixed encodings, or rotary position embeddings (RoPE).</li>
+<li><strong>Attention head:</strong> One learned query-key-value projection and weighted information-flow operation within multi-head attention.</li>
+<li><strong>Causal mask:</strong> A constraint that prevents a decoder position from attending to future positions during next-token prediction.</li>
+<li><strong>Logit:</strong> An unnormalized model output score for a candidate token. This chapter specializes the Chapter 3 definition for language-model vocabularies.</li>
+<li><strong>Softmax:</strong> A transformation that converts a vector of scores into normalized non-negative values that sum to one.</li>
+<li><strong>Context window:</strong> The bounded token sequence available to a request, including input, selected context, and generated tokens subject to the product&#39;s accounting rules.</li>
+<li><strong>Truncation policy:</strong> The deterministic rule for rejecting, removing, summarizing, or selecting content when a request exceeds its context budget.</li>
+<li><strong>KV cache:</strong> Cached attention keys and values for earlier positions used to accelerate autoregressive generation.</li>
+<li><strong>Greedy decoding:</strong> Selecting the highest-scoring available token at each generation step.</li>
+<li><strong>Temperature:</strong> A generation parameter that rescales logits before sampling; it changes output distribution but does not provide correctness or authorization.</li>
+<li><strong>Top-k sampling:</strong> Restricting token selection to the <code>k</code> highest-scoring candidates.</li>
+<li><strong>Top-p sampling:</strong> Restricting token selection to the smallest candidate set whose cumulative probability reaches <code>p</code>.</li>
+<li><strong>Stop sequence:</strong> A configured token pattern that ends generation when matched under the serving implementation&#39;s rules.</li>
+<li><strong>Repetition penalty:</strong> A logit adjustment based on previously generated tokens, intended to reduce repetition.</li>
+<li><strong>Grammar-constrained generation:</strong> Restricting token choices so output follows a formal grammar; it improves syntax, not semantic correctness or authority.</li>
+<li><strong>Direct prompt injection:</strong> Adversarial instruction supplied through the application&#39;s interactive input channel.</li>
+<li><strong>Indirect prompt injection:</strong> Adversarial instruction supplied through separate content later ingested into model context.</li>
+<li><strong>Triggered prompt injection:</strong> A planted instruction activated later by a user action or system event.</li>
+<li><strong>Context leakage:</strong> Disclosure of protected data present in request context and unavailable to the requester through authorized means.</li>
+<li><strong>Model extraction:</strong> Using target-service outputs to approximate or recover model behavior or parameters under a stated access and query budget. This amends Chapter 3 by explicitly including artifact recovery as distinct from ordinary output imitation.</li>
+</ul>
 <p><a id="follow-my-work"></a></p>
-<h2 id="21-follow-my-work">21. Follow My Work</h2>
+<h2 id="22-follow-my-work">22. Follow My Work</h2>
 <p>I publish practical cybersecurity research, CTI workflows, detection engineering notes, malware-analysis projects, AI-security research, open-source tools, labs, and technical guides.</p>
 <ul>
 <li><a href="https://1200km.com/" target="_blank" rel="noopener noreferrer">Website — 1200km.com</a></li>
