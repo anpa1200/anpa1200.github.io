@@ -1,3 +1,4 @@
+import { sectorResearchSection } from './sector-research-lib.mjs';
 import { mkdir, readFile, writeFile, access } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -121,6 +122,7 @@ const stripHtml = (value) => stripElementBlocks(stripElementBlocks(value, 'scrip
 const normalize = (value) => stripHtml(value).toLowerCase().replace(/[^a-z0-9.]+/g, ' ');
 
 function extractModules(html, domain) {
+  html = html.replace(/<p class="section-intro sector-research-route">[\s\S]*?<\/p>/g, '');
   const rows = [];
   const sectionMatches = [...html.matchAll(/<section\b[^>]*class="[^"]*\blab-group\b[^"]*"[^>]*id="(m\d+)"[^>]*>([\s\S]*?)(?=<section\b[^>]*class="[^"]*\blab-group\b|<\/main>)/gi)]
     .map((match) => ({ source_anchor: match[1], body: match[2], element_tag: 'section' }));
@@ -270,7 +272,7 @@ function techniqueKnowledgeSection(technique, routes) {
 <section class="attack-knowledge-detail">
   <h2 id="detection-strategies">MITRE detection strategies and analytics</h2>
   <div class="grid">${detectionCards || '<p>No ATT&amp;CK detection-strategy relationship is published for this technique.</p>'}</div>
-</section>
+</section>${sectorResearchSection('techniques', technique.id)}
 ${END}`;
 }
 
@@ -327,7 +329,7 @@ async function enrichGroupPage(group, reverse) {
   const section = `${START}
 <section><h2 id="cyber-knowledge-routes">Cyber Knowledge routes</h2>
 <p>These contextual routes explain behaviors associated with this ATT&amp;CK group record. They support learning and investigation planning; they do not add attribution evidence.</p>
-<div class="grid">${routes.map((route) => `<a class="card" href="${escapeHtml(route.url)}"><strong>${escapeHtml(route.title)}</strong><br><span class="muted">${escapeHtml(route.domain_name)} · ${escapeHtml(route.basis)}</span></a>`).join('')}</div></section>
+<div class="grid">${routes.map((route) => `<a class="card" href="${escapeHtml(route.url)}"><strong>${escapeHtml(route.title)}</strong><br><span class="muted">${escapeHtml(route.domain_name)} · ${escapeHtml(route.basis)}</span></a>`).join('')}</div></section>${sectorResearchSection('actors', group.id)}
 ${END}`;
   try {
     let html = await readFile(path, 'utf8');

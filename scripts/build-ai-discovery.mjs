@@ -53,6 +53,7 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly name
 
 ## Research and field manuals
 
+- [Cyberattacks on Big Pharma and Its Ecosystem](https://1200km.com/articles/read/2026/cyberattacks-on-big-pharma-and-its-ecosystem/) — source-backed sector research, 21 ATT&CK technique routes, two infographics, and a prioritized defense plan; evidence cutoff 25 September 2026
 - [Research hub](https://1200km.com/cti.html)
 - [Research library](https://1200km.com/guides.html)
 - [AI cyberattack reference library](https://1200km.com/references/) — ${references.record_count} deduplicated research sources indexed across ${references.unique_tag_count} normalized tags

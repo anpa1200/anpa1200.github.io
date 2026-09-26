@@ -98,6 +98,9 @@ function localHtmlFile(pathname) {
 
 function validateLocalFragment(fromFile, pathname, fragment, sourceUrl) {
   if (!fragment) return true;
+  // The pinned archive is absent in source checkouts; validate its fragments
+  // strictly in the assembled site, not against the referring source page.
+  if (!checkingAssembledSite && BUILD_TIME_LOCAL_ROOTS.some(root => pathname.startsWith(root))) return true;
   // Hash-router state is application navigation, not an HTML element fragment.
   if (/^#\//.test(fragment)) return true;
   let decoded;

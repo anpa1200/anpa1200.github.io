@@ -48,6 +48,7 @@ administration requires `manage_intel`, and index administration requires
 
 ## Best Pages for Agents
 
+- `/articles/read/2026/cyberattacks-on-big-pharma-and-its-ecosystem/` - Pharmaceutical cyberattack research with evidence-scoped actor and TTP routes, two infographics, and a prioritized defensive plan; evidence cutoff 25 September 2026
 - `/` - Human-facing homepage
 - `/projects.html` - Project overview
 - `/adversarygraph/` - Flagship platform page
