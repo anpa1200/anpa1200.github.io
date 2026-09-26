@@ -426,6 +426,7 @@ function applyArticleGovernance(item, config) {
   const currentCore = new Set(policy.current_core_ids || []);
   const currentCoreSlugs = new Set(policy.current_core_slugs || []);
   const stableReference = new Set(policy.stable_reference_ids || []);
+  const stableReferenceSlugs = new Set(policy.stable_reference_slugs || []);
   const historical = new Set(policy.historical_ids || []);
   const published = item.published_at || '';
 
@@ -437,13 +438,13 @@ function applyArticleGovernance(item, config) {
     collection_tier: 'core',
     applies_to: 'current core 1200km research selected by the maintained article lifecycle policy',
   };
-  if (stableReference.has(id)) return {
+  if (stableReference.has(id) || stableReferenceSlugs.has(slug)) return {
     ...item,
     status: 'released',
     lifecycle: 'stable-reference',
     maturity: 'reference',
     collection_tier: 'reference',
-    applies_to: 'stable reference article; environment-specific commands and product details still require validation',
+    applies_to: config.overrides?.[item.canonical_url]?.applies_to || 'stable reference article; environment-specific commands and product details still require validation',
   };
   if (historical.has(id)) return {
     ...item,

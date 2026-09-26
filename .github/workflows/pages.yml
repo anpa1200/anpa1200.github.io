@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTICLE_ARCHIVE_COMMIT: 8028a722892ba6cefa4c5416e57ee29b6d3ed558
+  ARTICLE_ARCHIVE_COMMIT: 18a0aaf4770ba470dcc57de054ed79d999eda452
 
 jobs:
   quality:
@@ -86,6 +86,7 @@ jobs:
           npm run validate:archive
           npm run validate:media:local
           npm run build:embedded
+          node --test tests/big-pharma-publication.test.mjs
           mkdir -p "${RUNNER_TEMP}/site/articles"
           cp -a build/. "${RUNNER_TEMP}/site/articles/"
       - name: Stage and verify article governance data
@@ -153,6 +154,11 @@ jobs:
           npm run check-quality:browser --
           --site "${RUNNER_TEMP}/site"
           --report "${RUNNER_TEMP}/browser-quality.json"
+      - name: Validate Big Pharma article images, mobile layout, and accessibility
+        run: >-
+          node scripts/check-big-pharma-browser.mjs
+          --site "${RUNNER_TEMP}/site"
+          --archive "${RUNNER_TEMP}/site/articles"
       - name: Validate deployable-file hygiene
         run: npm run check-hygiene -- --site "${RUNNER_TEMP}/site"
       - name: Revalidate published sitemap and metadata
