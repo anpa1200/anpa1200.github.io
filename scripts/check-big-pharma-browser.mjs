@@ -8,7 +8,7 @@ const archive=resolve(value('--archive','../medium-bigpharma-release/build'));
 const site=resolve(value('--site',root));
 const report=mkdtempSync('/tmp/bigpharma-browser-');
 const path='/articles/read/2026/cyberattacks-on-big-pharma-and-its-ecosystem/';
-const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.json':'application/json','.woff2':'font/woff2'};
+const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json','.woff2':'font/woff2'};
 const server=createServer((req,res)=>{
  const pathname=decodeURIComponent(new URL(req.url,'http://local').pathname);
  const base=pathname.startsWith('/articles/')?archive:site;
