@@ -56,10 +56,14 @@ try {
   }
   await evaluate(readFileSync(join(root,'node_modules/axe-core/axe.min.js'),'utf8'));
   const result=await evaluate(`(async()=>({width:innerWidth,theme:document.documentElement.dataset.theme,h1:document.querySelectorAll('h1').length,overflow:document.documentElement.scrollWidth>innerWidth+1,images:[...document.querySelectorAll('.pharma-cover, .pharma-figure img')].map(i=>({src:i.currentSrc,loaded:i.naturalWidth>0,width:i.getBoundingClientRect().width,height:i.getBoundingClientRect().height,ratioError:Math.abs(i.getBoundingClientRect().width/i.getBoundingClientRect().height-i.naturalWidth/i.naturalHeight)})),missingFragments:[...document.querySelectorAll('a[href^="#"]')].map(a=>decodeURIComponent(a.hash.slice(1))).filter(id=>id&&!document.getElementById(id)),violations:(await axe.run(document.querySelector('article'),{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})).violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))}))()`);
-  results.push({...result,themeToggleChecks:2});
+  const tableEvidence=await evaluate(`(()=>{const article=document.querySelector('article');const tables=[...article.querySelectorAll('table')];return {tables:tables.length,rows:tables.map(t=>t.querySelectorAll('tbody tr').length),unlinkedRows:tables.flatMap(t=>[...t.querySelectorAll('tbody tr')]).filter(row=>![...row.querySelectorAll('a[href]')].some(a=>a.protocol==='https:'&&a.hostname!=='1200km.com')).map(row=>row.textContent.trim()),duplicateDiagram:!!article.querySelector('pre'),actorDossierLinks:article.querySelectorAll('a[href*="/threat-matrix/actors/"]').length}})()`);
+  if(tableEvidence.tables!==6||JSON.stringify(tableEvidence.rows)!==JSON.stringify([10,11,16,21,7,3])||tableEvidence.unlinkedRows.length||tableEvidence.duplicateDiagram||tableEvidence.actorDossierLinks<18)failures.push({width,theme,tableEvidence});
+  results.push({...result,themeToggleChecks:2,tableEvidence});
   if(result.theme!==theme||result.h1!==1||result.overflow||result.missingFragments.length||result.images.length!==3||result.images.some(i=>!i.loaded||i.ratioError>.01||i.width>width)||result.violations.length)failures.push(result);
-  await evaluate("document.querySelector('.pharma-figure').scrollIntoView({block:'start'})");
+  await evaluate("document.querySelector('.pharma-figure').scrollIntoView({block:'start',behavior:'instant'})");
   const shot=await call('Page.captureScreenshot',{format:'png'});writeFileSync(join(report,`${width}-${theme}-figure.png`),Buffer.from(shot.data,'base64'));
+  await evaluate("document.querySelectorAll('.pharma-figure')[1].querySelector('figcaption').scrollIntoView({block:'start',behavior:'instant'})");
+  const tableShot=await call('Page.captureScreenshot',{format:'png'});writeFileSync(join(report,`${width}-${theme}-evidence-table.png`),Buffer.from(tableShot.data,'base64'));
  }
 } finally {socket?.close();browser.kill();server.close();}
 writeFileSync(join(report,'results.json'),JSON.stringify({origin,results,failures},null,2)+'\n');
