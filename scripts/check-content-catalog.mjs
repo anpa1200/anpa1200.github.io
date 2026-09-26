@@ -356,7 +356,7 @@ const governedArticleIds = [
   ...(articlePolicy.stable_reference_ids || []),
   ...(articlePolicy.historical_ids || []),
 ];
-const governedArticleSlugs = articlePolicy.current_core_slugs || [];
+const governedArticleSlugs = [...(articlePolicy.current_core_slugs || []), ...(articlePolicy.stable_reference_slugs || [])];
 if (new Set(governedArticleIds).size !== governedArticleIds.length) fail('article_lifecycle_policy contains an ID in more than one lifecycle set.');
 if (new Set(governedArticleSlugs).size !== governedArticleSlugs.length) fail('article_lifecycle_policy contains a duplicate native article slug.');
 if (catalog.scope === 'deployable-domain-catalog') {

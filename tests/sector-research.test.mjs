@@ -30,6 +30,6 @@ test('publication is discoverable from hubs and six relevant field guides',()=>{
  assert.equal(config.overrides[p.url].evidence_level,'source-backed');
  assert.equal(config.overrides[p.url].lifecycle,'stable-reference');
  assert.ok(config.featured_urls.includes(p.url));
- assert.ok(config.article_lifecycle_policy.stable_reference_ids.includes(p.id));
+ assert.ok(config.article_lifecycle_policy.stable_reference_slugs.includes('cyberattacks-on-big-pharma-and-its-ecosystem'));
  assert.ok(read('llms.txt').includes(p.url));
 });
