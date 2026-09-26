@@ -35,17 +35,29 @@ try {
  await call('Page.enable');await call('Runtime.enable');
  for(const width of [390,1440])for(const theme of ['light','dark']){
   await call('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false});
-  await call('Page.navigate',{url:origin+path});
-  const started=Date.now();while(!await evaluate('document.readyState === "complete" && !!document.querySelector(".pharma-cover")')){if(Date.now()-started>30000)throw Error('Article did not load');await new Promise(r=>setTimeout(r,200));}
-  await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}; localStorage.setItem('theme',${JSON.stringify(theme)});`);
+  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:theme}]});
+  await call('Page.addScriptToEvaluateOnNewDocument',{source:`localStorage.setItem('theme',${JSON.stringify(theme)});`});
+  const destination=origin+path+'?validation='+width+'-'+theme+'-'+Date.now();
+  await call('Page.navigate',{url:destination});
+  const started=Date.now();while(!await evaluate(`location.href===${JSON.stringify(destination)} && document.readyState==='complete' && document.documentElement.dataset.hasHydrated==='true' && !!document.querySelector('.pharma-cover')`)){if(Date.now()-started>30000)throw Error('Fresh article did not hydrate');await new Promise(r=>setTimeout(r,200));}
+  await new Promise(r=>setTimeout(r,600));
+  if(await evaluate('document.documentElement.dataset.theme')!==theme)throw Error('Theme preference did not initialize');
+  await evaluate(readFileSync(join(root,'node_modules/axe-core/axe.min.js'),'utf8'));
+  for(const expected of [theme==='light'?'dark':'light',theme]){
+   await evaluate("document.getElementById('theme-btn').click()");
+   await new Promise(r=>setTimeout(r,650));
+   const active=await evaluate('document.documentElement.dataset.theme');
+   const violations=await evaluate("axe.run(document.querySelector('article'),{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}).then(r=>r.violations.map(v=>v.id))");
+   if(active!==expected||violations.length)throw Error('Theme toggle failed: '+JSON.stringify({width,expected,active,violations}));
+  }
   for(const index of [0,1,2]){
    await evaluate(`document.querySelectorAll('.pharma-cover, .pharma-figure img')[${index}].scrollIntoView({block:'center'})`);
    const start=Date.now();while(!await evaluate(`document.querySelectorAll('.pharma-cover, .pharma-figure img')[${index}].complete`)){if(Date.now()-start>15000)throw Error('Image loading timeout');await new Promise(r=>setTimeout(r,200));}
   }
   await evaluate(readFileSync(join(root,'node_modules/axe-core/axe.min.js'),'utf8'));
   const result=await evaluate(`(async()=>({width:innerWidth,theme:document.documentElement.dataset.theme,h1:document.querySelectorAll('h1').length,overflow:document.documentElement.scrollWidth>innerWidth+1,images:[...document.querySelectorAll('.pharma-cover, .pharma-figure img')].map(i=>({src:i.currentSrc,loaded:i.naturalWidth>0,width:i.getBoundingClientRect().width,height:i.getBoundingClientRect().height,ratioError:Math.abs(i.getBoundingClientRect().width/i.getBoundingClientRect().height-i.naturalWidth/i.naturalHeight)})),missingFragments:[...document.querySelectorAll('a[href^="#"]')].map(a=>decodeURIComponent(a.hash.slice(1))).filter(id=>id&&!document.getElementById(id)),violations:(await axe.run(document.querySelector('article'),{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})).violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))}))()`);
-  results.push(result);
-  if(result.h1!==1||result.overflow||result.missingFragments.length||result.images.length!==3||result.images.some(i=>!i.loaded||i.ratioError>.01||i.width>width)||result.violations.length)failures.push(result);
+  results.push({...result,themeToggleChecks:2});
+  if(result.theme!==theme||result.h1!==1||result.overflow||result.missingFragments.length||result.images.length!==3||result.images.some(i=>!i.loaded||i.ratioError>.01||i.width>width)||result.violations.length)failures.push(result);
   await evaluate("document.querySelector('.pharma-figure').scrollIntoView({block:'start'})");
   const shot=await call('Page.captureScreenshot',{format:'png'});writeFileSync(join(report,`${width}-${theme}-figure.png`),Buffer.from(shot.data,'base64'));
  }

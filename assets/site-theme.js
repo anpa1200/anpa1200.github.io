@@ -139,14 +139,6 @@
     initializeSideNavigation();
     applyTheme(preferredTheme(), false);
     initializeEmailLinks();
-
-    const button = document.getElementById('theme-btn');
-    if (button && !button.dataset.themeReady) {
-      button.dataset.themeReady = 'true';
-      button.addEventListener('click', function () {
-        applyTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light', true);
-      });
-    }
   }
 
   function initializeEmailLinks() {
@@ -158,6 +150,16 @@
       item.textContent = item.dataset.emailLabel || address;
     });
   }
+  // Docusaurus can replace its server-rendered header during hydration. Bind
+  // once to the document so a new theme button keeps working after replacement.
+  if (!window.__siteThemeToggleBound) {
+    window.__siteThemeToggleBound = true;
+    document.addEventListener('click', function (event) {
+      if (!event.target?.closest?.('#theme-btn')) return;
+      applyTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light', true);
+    });
+  }
+
 
   window.addEventListener('storage', function (event) {
     if (event.key === 'theme') applyTheme(preferredTheme(), false);

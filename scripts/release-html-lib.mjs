@@ -908,8 +908,8 @@ export function transformReleaseHtml(html, options) {
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
   transformed = transformed.replace(
-    /(["'])https:\/\/1200km\.com\/assets\/docusaurus-ecosystem\.js(\?[^"']*)?\1/gi,
-    '$1/assets/docusaurus-ecosystem.js$2$1',
+    /(["'])https:\/\/1200km\.com\/assets\/(docusaurus-ecosystem|site-theme|theme-bootstrap)\.js(\?[^"']*)?\1/gi,
+    '$1/assets/$2.js$3$1',
   );
   // Docusaurus hydrates its server-rendered application tree. Mutating that
   // tree after the framework build creates avoidable React hydration errors.
