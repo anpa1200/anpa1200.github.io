@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runInNewContext } from 'node:vm';
 import { loadSiteShell } from '../scripts/site-shell-lib.mjs';
 import {
   applyPlatformSidebar,
@@ -81,4 +82,31 @@ test('runtime sidebar classifies the AI attack study routes as threat intelligen
 test('runtime sidebar exposes and classifies the Courses module', () => {
   const runtime = readFileSync(resolve(ROOT, 'assets/platform-sidebar.js'), 'utf8');
   assert.match(runtime, /\['Courses', '\/courses\/', \['\/courses\/', '\/ai-security-course\.html', '\/ai-security-course\/'\]\]/);
+});
+
+test('Anomaly Detection Atlas belongs between detection rules and telemetry', () => {
+  const modules = shell.sidebar.sections.find(section => section.id === 'detection-lab');
+  assert.deepEqual(modules.links.slice(2, 5).map(link => link.label), [
+    'Detection Rules', 'Anomaly Detection Atlas', 'Telemetry Library',
+  ]);
+  for (const pathname of ['/anomaly-detection-atlas/', '/anomaly-detection-atlas/research/', '/anomaly-detection-atlas/families/parent-child/']) {
+    const sidebar = renderPlatformSidebar(shell, { pathname });
+    const state = pathname === '/anomaly-detection-atlas/' ? 'page' : 'location';
+    assert.ok(sidebar.includes(`href="/anomaly-detection-atlas/" aria-current="${state}"`));
+    assert.doesNotMatch(sidebar, /href="\/guides\.html" aria-current=/);
+    assert.equal((sidebar.match(/href="\/anomaly-detection-atlas\/"/g) || []).length, 1);
+  }
+  const unrelated = renderPlatformSidebar(shell, { pathname: '/anomaly-detection-atlas-other/' });
+  assert.doesNotMatch(unrelated, /href="\/anomaly-detection-atlas\/" aria-current=/);
+});
+
+test('static and hydrated sidebars share the same groups, destinations and active-route prefixes', () => {
+  const runtime = readFileSync(resolve(ROOT, 'assets/platform-sidebar.js'), 'utf8');
+  const literal = runtime.match(/var sections = ([\s\S]*?);\n/);
+  assert.ok(literal, 'runtime sidebar declaration must be inspectable');
+  const sections = JSON.parse(JSON.stringify(runInNewContext(`(${literal[1]})`, {}, { timeout: 1000 })));
+  assert.deepEqual(sections, shell.sidebar.sections.map(section => ({
+    label: section.label,
+    links: section.links.map(link => [link.label, link.href, link.match_prefixes || (link.external ? [] : [link.href]), ...(link.external ? [true] : [])]),
+  })));
 });
