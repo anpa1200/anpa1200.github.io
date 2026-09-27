@@ -29,6 +29,7 @@ const checkingAssembledSite = siteFlag >= 0;
 
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
 const LIVE_1200KM_ROOTS = [
+  '/anomaly-detection-atlas/',
   '/CTI_as_a_Code/',
   '/cti-analyst-field-manual/',
   '/israel-government-threat-actors-cti/',

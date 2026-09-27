@@ -7,7 +7,7 @@
       ['Threat intelligence', '/cti.html', ['/cti.html', '/cti-analyst-field-manual/', '/israel-government-threat-actors-cti/', '/CTI_as_a_Code/', '/operation-desert-hydra/', '/customer-driven-ai-cti-project/', '/ai-attack-statistics/']],
       ['AdversaryGraph', '/adversarygraph/', ['/adversarygraph/', '/adversarygraph-docs/', '/threat-matrix/']],
       ['Security labs', '/labs.html', ['/labs.html']],
-      ['Guides', '/guides.html', ['/guides.html', '/anomaly-detection-atlas/', '/insider-threat-detection/', '/opencti-intelligent-shield/', '/ITDR/']],
+      ['Guides', '/guides.html', ['/guides.html', '/insider-threat-detection/', '/opencti-intelligent-shield/', '/ITDR/']],
       ['Courses', '/courses/', ['/courses/', '/ai-security-course.html', '/ai-security-course/']],
       ['Cyber Knowledge', '/cyber-knowledge/', ['/cyber-knowledge/']],
       ['References', '/references/', ['/references/']],
@@ -18,6 +18,7 @@
       ['Attack Tools', '/ttp-simulation/tools/', ['/ttp-simulation/tools/']],
       ['Attack Simulations', '/ttp-simulation/', ['/ttp-simulation/index.html', '/ttp-simulation/techniques/']],
       ['Detection Rules', '/ttp-simulation/detections/', ['/ttp-simulation/detections/']],
+      ['Anomaly Detection Atlas', '/anomaly-detection-atlas/', ['/anomaly-detection-atlas/']],
       ['Telemetry Library', '/ttp-simulation/telemetry/', ['/ttp-simulation/telemetry/']],
       ['Simulation & detection tags', '/ttp-simulation/tags/', ['/ttp-simulation/tags/']]
     ] },
