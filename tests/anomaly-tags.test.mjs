@@ -85,7 +85,8 @@ test('negative controls: learning rate, training cohorts, generic product diagra
 });
 test('public registry, search facet and definition links use the same reviewed IDs', () => {
   const registry = json('data/anomaly-tags.json');
-  assert.equal(Object.keys(registry.pages).length, anomalyAssignments.length);
+  assert.equal(Object.keys(registry.pages).length, anomalyAssignments.length + 15);
+  for (const tag of registry.tags) assert.match(tag.definition_url, /^https:\/\/1200km\.com\/anomaly-detection-atlas\/families\//);
   const html = prepareHtmlForSearch(anomalyTaxonomy.article_url, '<html lang="en"><head><title>Research</title></head><body><main><h1>Research</h1><p>Anomaly research</p></main></body></html>');
   assert.equal([...html.matchAll(/data-pagefind-filter="anomaly\[content\]"/g)].length, 15);
   for (const tag of anomalyTaxonomy.tags) assert.ok(html.includes(`content="${tag.id}"`));
