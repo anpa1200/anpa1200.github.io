@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RBAC Permission Enumeration Attempt — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 84b777bd-c946-4d17-aa2e-c39f5a454325. RBAC Permission Enumeration Attempt — Sigma Rule. Detects identities attempting to enumerate their Kubernetes RBAC permissions.
+In the early stages of a breach, attackers will aim to list the permissions they have within the compromised environment.
+In a Kubernetes cluster, this can be achieved by interacting with the API server, and querying the SelfSubjectAccessReview API via e.g. a &quot;kubectl auth can-i --list&quot; command.
+This will enumerate the Role-Based Access Controls (RBAC) rules defining the compromised user&#39;s authorization.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="84b777bd-c946-4d17-aa2e-c39f5a454325, attack.t1069.003, attack.t1087.004, attack.discovery, application, kubernetes, audit, rule-status:test, severity:low, logsource-category:application, logsource-product:kubernetes, logsource-service:audit, sigma-tag:attack.t1069.003, sigma-tag:attack.t1087.004, sigma-tag:attack.discovery">
+<meta name="ttp-module-tags" content="rule-status:test, severity:low, logsource-category:application, logsource-product:kubernetes, logsource-service:audit, sigma-tag:attack.t1069.003, sigma-tag:attack.t1087.004, sigma-tag:attack.discovery">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/84b777bd-c946-4d17-aa2e-c39f5a454325/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/84b777bd-c946-4d17-aa2e-c39f5a454325/">
+<meta property="og:type" content="website"><meta property="og:title" content="RBAC Permission Enumeration Attempt — Sigma Rule"><meta property="og:description" content="Sigma rule 84b777bd-c946-4d17-aa2e-c39f5a454325. RBAC Permission Enumeration Attempt — Sigma Rule. Detects identities attempting to enumerate their Kubernetes RBAC permissions.
+In the early stages of a breach, attackers will aim to list the permissions they have within the compromised environment.
+In a Kubernetes cluster, this can be achieved by interacting with the API server, and querying the SelfSubjectAccessReview API via e.g. a &quot;kubectl auth can-i --list&quot; command.
+This will enumerate the Role-Based Access Controls (RBAC) rules defining the compromised user&#39;s authorization.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="RBAC Permission Enumeration Attempt — Sigma Rule"><meta name="twitter:description" content="Sigma rule 84b777bd-c946-4d17-aa2e-c39f5a454325. RBAC Permission Enumeration Attempt — Sigma Rule. Detects identities attempting to enumerate their Kubernetes RBAC permissions.
+In the early stages of a breach, attackers will aim to list the permissions they have within the compromised environment.
+In a Kubernetes cluster, this can be achieved by interacting with the API server, and querying the SelfSubjectAccessReview API via e.g. a &quot;kubectl auth can-i --list&quot; command.
+This will enumerate the Role-Based Access Controls (RBAC) rules defining the compromised user&#39;s authorization.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/84b777bd-c946-4d17-aa2e-c39f5a454325/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/84b777bd-c946-4d17-aa2e-c39f5a454325/","name":"RBAC Permission Enumeration Attempt — Sigma Rule","description":"Sigma rule 84b777bd-c946-4d17-aa2e-c39f5a454325. RBAC Permission Enumeration Attempt — Sigma Rule. Detects identities attempting to enumerate their Kubernetes RBAC permissions.\nIn the early stages of a breach, attackers will aim to list the permissions they have within the compromised environment.\nIn a Kubernetes cluster, this can be achieved by interacting with the API server, and querying the SelfSubjectAccessReview API via e.g. a \"kubectl auth can-i --list\" command.\nThis will enumerate the Role-Based Access Controls (RBAC) rules defining the compromised user's authorization.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>RBAC Permission Enumeration Attempt — Sigma Rule</h1><p class="lead">Sigma rule 84b777bd-c946-4d17-aa2e-c39f5a454325. RBAC Permission Enumeration Attempt — Sigma Rule. Detects identities attempting to enumerate their Kubernetes RBAC permissions.
+In the early stages of a breach, attackers will aim to list the permissions they have within the compromised environment.
+In a Kubernetes cluster, this can be achieved by interacting with the API server, and querying the SelfSubjectAccessReview API via e.g. a &quot;kubectl auth can-i --list&quot; command.
+This will enumerate the Role-Based Access Controls (RBAC) rules defining the compromised user&#39;s authorization.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/low/">low</a><a class="chip" href="/ttp-simulation/tags/logsource-category/application/">application</a><a class="chip" href="/ttp-simulation/tags/logsource-product/kubernetes/">kubernetes</a><a class="chip" href="/ttp-simulation/tags/logsource-service/audit/">audit</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1069-003/">attack.t1069.003</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087-004/">attack.t1087.004</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a></div><p>Author: Leo Tsaousis (@laripping). Source status: test; severity: low. Source dates: 2024-03-26 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;application&quot;,
+  &quot;product&quot;: &quot;kubernetes&quot;,
+  &quot;service&quot;: &quot;audit&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/application/kubernetes/audit/kubernetes_audit_rbac_permisions_listing.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: ae1b5e896a966aeb3368613ef6c5cd5d178a09b494e600f169ca9edb6fe9b733</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: RBAC Permission Enumeration Attempt
+id: 84b777bd-c946-4d17-aa2e-c39f5a454325
+status: test
+description: |
+    Detects identities attempting to enumerate their Kubernetes RBAC permissions.
+    In the early stages of a breach, attackers will aim to list the permissions they have within the compromised environment.
+    In a Kubernetes cluster, this can be achieved by interacting with the API server, and querying the SelfSubjectAccessReview API via e.g. a &quot;kubectl auth can-i --list&quot; command.
+    This will enumerate the Role-Based Access Controls (RBAC) rules defining the compromised user&#39;s authorization.
+references:
+    - https://www.elastic.co/guide/en/security/current/kubernetes-suspicious-self-subject-review.html
+author: Leo Tsaousis (@laripping)
+date: 2024-03-26
+tags:
+    - attack.t1069.003
+    - attack.t1087.004
+    - attack.discovery
+logsource:
+    category: application
+    product: kubernetes
+    service: audit
+detection:
+    selection:
+        verb: &#39;create&#39;
+        apiGroup: &#39;authorization.k8s.io&#39;
+        objectRef.resource: &#39;selfsubjectrulesreviews&#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: low
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/84b777bd-c946-4d17-aa2e-c39f5a454325.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.elastic.co/guide/en/security/current/kubernetes-suspicious-self-subject-review.html">https://www.elastic.co/guide/en/security/current/kubernetes-suspicious-self-subject-review.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1069.003/">T1069.003 · Cloud Groups</a> · <a href="/ttp-simulation/detections/enterprise/T1069.003/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1087.004/">T1087.004 · Cloud Account</a> · <a href="/ttp-simulation/detections/enterprise/T1087.004/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Malicious PowerShell Scripts - FileCreation — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule f331aa1f-8c53-4fc3-b083-cc159bc971cb. Malicious PowerShell Scripts - FileCreation — Sigma Rule. Detects the creation of known offensive powershell scripts used for exploitation">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="f331aa1f-8c53-4fc3-b083-cc159bc971cb, attack.execution, attack.t1059.001, file_event, windows, rule-status:test, severity:high, logsource-category:file_event, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:file_event, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/f331aa1f-8c53-4fc3-b083-cc159bc971cb/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/f331aa1f-8c53-4fc3-b083-cc159bc971cb/">
+<meta property="og:type" content="website"><meta property="og:title" content="Malicious PowerShell Scripts - FileCreation — Sigma Rule"><meta property="og:description" content="Sigma rule f331aa1f-8c53-4fc3-b083-cc159bc971cb. Malicious PowerShell Scripts - FileCreation — Sigma Rule. Detects the creation of known offensive powershell scripts used for exploitation"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Malicious PowerShell Scripts - FileCreation — Sigma Rule"><meta name="twitter:description" content="Sigma rule f331aa1f-8c53-4fc3-b083-cc159bc971cb. Malicious PowerShell Scripts - FileCreation — Sigma Rule. Detects the creation of known offensive powershell scripts used for exploitation"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/f331aa1f-8c53-4fc3-b083-cc159bc971cb/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/f331aa1f-8c53-4fc3-b083-cc159bc971cb/","name":"Malicious PowerShell Scripts - FileCreation — Sigma Rule","description":"Sigma rule f331aa1f-8c53-4fc3-b083-cc159bc971cb. Malicious PowerShell Scripts - FileCreation — Sigma Rule. Detects the creation of known offensive powershell scripts used for exploitation","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Malicious PowerShell Scripts - FileCreation — Sigma Rule</h1><p class="lead">Sigma rule f331aa1f-8c53-4fc3-b083-cc159bc971cb. Malicious PowerShell Scripts - FileCreation — Sigma Rule. Detects the creation of known offensive powershell scripts used for exploitation</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/file-event/">file_event</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Markus Neis, Nasreddine Bencherchali (Nextron Systems), Mustafa Kaan Demir, Georg Lauenstein. Source status: test; severity: high. Source dates: 2018-04-07 / 2025-12-10.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;file_event&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/file/file_event/file_event_win_powershell_exploit_scripts.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 1e7bdc7dcc5e4d88787eb5d717511ca1f32f3b4b81befec6bf4b4b555c070c00</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Malicious PowerShell Scripts - FileCreation
+id: f331aa1f-8c53-4fc3-b083-cc159bc971cb
+related:
+    - id: 41025fd7-0466-4650-a813-574aaacbe7f4
+      type: similar
+status: test
+description: Detects the creation of known offensive powershell scripts used for exploitation
+references:
+    - https://github.com/PowerShellMafia/PowerSploit
+    - https://github.com/NetSPI/PowerUpSQL
+    - https://github.com/CsEnox/EventViewer-UACBypass
+    - https://web.archive.org/web/20210511204621/https://github.com/AlsidOfficial/WSUSpendu
+    - https://github.com/nettitude/Invoke-PowerThIEf
+    - https://github.com/S3cur3Th1sSh1t/WinPwn
+    - https://github.com/S3cur3Th1sSh1t/PowerSharpPack/tree/master/PowerSharpBinaries
+    - https://github.com/BC-SECURITY/Invoke-ZeroLogon/blob/111d17c7fec486d9bb23387e2e828b09a26075e4/Invoke-ZeroLogon.ps1
+    - https://github.com/xorrior/RandomPS-Scripts/blob/848c919bfce4e2d67b626cbcf4404341cfe3d3b6/Get-DXWebcamVideo.ps1
+    - https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/6f23bb41f9675d7e2d32bacccff75e931ae00554/OfficeMemScraper.ps1
+    - https://github.com/dafthack/DomainPasswordSpray/blob/b13d64a5834694aa73fd2aea9911a83027c465a7/DomainPasswordSpray.ps1
+    - https://unit42.paloaltonetworks.com/threat-assessment-black-basta-ransomware/ # Invoke-TotalExec
+    - https://research.nccgroup.com/2022/06/06/shining-the-light-on-black-basta/ # Invoke-TotalExec
+    - https://github.com/HarmJ0y/DAMP
+    - https://github.com/samratashok/nishang
+    - https://github.com/DarkCoderSc/PowerRunAsSystem/
+    - https://github.com/besimorhino/powercat
+    - https://github.com/Kevin-Robertson/Powermad
+    - https://github.com/adrecon/ADRecon
+    - https://github.com/adrecon/AzureADRecon
+    - https://github.com/sadshade/veeam-creds/blob/6010eaf31ba41011b58d6af3950cffbf6f5cea32/Veeam-Get-Creds.ps1
+    - https://github.com/The-Viper-One/Invoke-PowerDPAPI/
+    - https://github.com/Arno0x/DNSExfiltrator/
+author: Markus Neis, Nasreddine Bencherchali (Nextron Systems), Mustafa Kaan Demir, Georg Lauenstein
+date: 2018-04-07
+modified: 2025-12-10
+tags:
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_generic:
+        TargetFilename|endswith:
+            # Note: Please ensure alphabetical order when adding new entries
+            - &#39;\Add-ConstrainedDelegationBackdoor.ps1&#39;
+            - &#39;\Add-Exfiltration.ps1&#39;
+            - &#39;\Add-Persistence.ps1&#39;
+            - &#39;\Add-RegBackdoor.ps1&#39;
+            - &#39;\Add-RemoteRegBackdoor.ps1&#39;
+            - &#39;\Add-ScrnSaveBackdoor.ps1&#39;
+            - &#39;\ADRecon.ps1&#39;
+            - &#39;\AzureADRecon.ps1&#39;
+            - &#39;\BadSuccessor.ps1&#39;
+            - &#39;\Check-VM.ps1&#39;
+            - &#39;\ConvertTo-ROT13.ps1&#39;
+            - &#39;\Copy-VSS.ps1&#39;
+            - &#39;\Create-MultipleSessions.ps1&#39;
+            - &#39;\DNS_TXT_Pwnage.ps1&#39;
+            - &#39;\dnscat2.ps1&#39;
+            - &#39;\Do-Exfiltration.ps1&#39;
+            - &#39;\DomainPasswordSpray.ps1&#39;
+            - &#39;\Download_Execute.ps1&#39;
+            - &#39;\Download-Execute-PS.ps1&#39;
+            - &#39;\Enable-DuplicateToken.ps1&#39;
+            - &#39;\Enabled-DuplicateToken.ps1&#39;
+            - &#39;\Execute-Command-MSSQL.ps1&#39;
+            - &#39;\Execute-DNSTXT-Code.ps1&#39;
+            - &#39;\Execute-OnTime.ps1&#39;
+            - &#39;\ExetoText.ps1&#39;
+            - &#39;\Exploit-Jboss.ps1&#39;
+            - &#39;\Find-AVSignature.ps1&#39;
+            - &#39;\Find-Fruit.ps1&#39;
+            - &#39;\Find-GPOLocation.ps1&#39;
+            - &#39;\Find-TrustedDocuments.ps1&#39;
+            - &#39;\FireBuster.ps1&#39;
+            - &#39;\FireListener.ps1&#39;
+            - &#39;\Get-ApplicationHost.ps1&#39;
+            - &#39;\Get-ChromeDump.ps1&#39;
+            - &#39;\Get-ClipboardContents.ps1&#39;
+            - &#39;\Get-ComputerDetail.ps1&#39;
+            - &#39;\Get-FoxDump.ps1&#39;
+            - &#39;\Get-GPPAutologon.ps1&#39;
+            - &#39;\Get-GPPPassword.ps1&#39;
+            - &#39;\Get-IndexedItem.ps1&#39;
+            - &#39;\Get-Keystrokes.ps1&#39;
+            - &#39;\Get-LSASecret.ps1&#39;
+            - &#39;\Get-MicrophoneAudio.ps1&#39;
+            - &#39;\Get-PassHashes.ps1&#39;
+            - &#39;\Get-PassHints.ps1&#39;
+            - &#39;\Get-RegAlwaysInstallElevated.ps1&#39;
+            - &#39;\Get-RegAutoLogon.ps1&#39;
+            - &#39;\Get-RickAstley.ps1&#39;
+            - &#39;\Get-Screenshot.ps1&#39;
+            - &#39;\Get-SecurityPackages.ps1&#39;
+            - &#39;\Get-ServiceFilePermission.ps1&#39;
+            - &#39;\Get-ServicePermission.ps1&#39;
+            - &#39;\Get-ServiceUnquoted.ps1&#39;
+            - &#39;\Get-SiteListPassword.ps1&#39;
+            - &#39;\Get-System.ps1&#39;
+            - &#39;\Get-TimedScreenshot.ps1&#39;
+            - &#39;\Get-UnattendedInstallFile.ps1&#39;
+            - &#39;\Get-Unconstrained.ps1&#39;
+            - &#39;\Get-USBKeystrokes.ps1&#39;
+            - &#39;\Get-VaultCredential.ps1&#39;
+            - &#39;\Get-VulnAutoRun.ps1&#39;
+            - &#39;\Get-VulnSchTask.ps1&#39;
+            - &#39;\Get-WebConfig.ps1&#39;
+            - &#39;\Get-WebCredentials.ps1&#39;
+            - &#39;\Get-WLAN-Keys.ps1&#39;
+            - &#39;\Gupt-Backdoor.ps1&#39;
+            - &#39;\HTTP-Backdoor.ps1&#39;
+            - &#39;\HTTP-Login.ps1&#39;
+            - &#39;\Install-ServiceBinary.ps1&#39;
+            - &#39;\Install-SSP.ps1&#39;
+            - &#39;\Invoke-ACLScanner.ps1&#39;
+            - &#39;\Invoke-ADSBackdoor.ps1&#39;
+            - &#39;\Invoke-AmsiBypass.ps1&#39;
+            - &#39;\Invoke-ARPScan.ps1&#39;
+            - &#39;\Invoke-BackdoorLNK.ps1&#39;
+            - &#39;\Invoke-BadPotato.ps1&#39;
+            - &#39;\Invoke-BetterSafetyKatz.ps1&#39;
+            - &#39;\Invoke-BruteForce.ps1&#39;
+            - &#39;\Invoke-BypassUAC.ps1&#39;
+            - &#39;\Invoke-Carbuncle.ps1&#39;
+            - &#39;\Invoke-Certify.ps1&#39;
+            - &#39;\Invoke-ConPtyShell.ps1&#39;
+            - &#39;\Invoke-CredentialInjection.ps1&#39;
+            - &#39;\Invoke-CredentialsPhish.ps1&#39;
+            - &#39;\Invoke-DAFT.ps1&#39;
+            - &#39;\Invoke-DCSync.ps1&#39;
+            - &#39;\Invoke-Decode.ps1&#39;
+            - &#39;\Invoke-DinvokeKatz.ps1&#39;
+            - &#39;\Invoke-DllInjection.ps1&#39;
+            - &#39;\Invoke-DNSExfiltrator.ps1&#39;
+            - &#39;\Invoke-DNSUpdate.ps1&#39;
+            - &#39;\Invoke-DowngradeAccount.ps1&#39;
+            - &#39;\Invoke-EgressCheck.ps1&#39;
+            - &#39;\Invoke-Encode.ps1&#39;
+            - &#39;\Invoke-EventViewer.ps1&#39;
+            - &#39;\Invoke-Eyewitness.ps1&#39;
+            - &#39;\Invoke-FakeLogonScreen.ps1&#39;
+            - &#39;\Invoke-Farmer.ps1&#39;
+            - &#39;\Invoke-Get-RBCD-Threaded.ps1&#39;
+            - &#39;\Invoke-Gopher.ps1&#39;
+            - &#39;\Invoke-Grouper2.ps1&#39;
+            - &#39;\Invoke-Grouper3.ps1&#39;
+            - &#39;\Invoke-HandleKatz.ps1&#39;
+            - &#39;\Invoke-Interceptor.ps1&#39;
+            - &#39;\Invoke-Internalmonologue.ps1&#39;
+            - &#39;\Invoke-Inveigh.ps1&#39;
+            - &#39;\Invoke-InveighRelay.ps1&#39;
+            - &#39;\Invoke-JSRatRegsvr.ps1&#39;
+            - &#39;\Invoke-JSRatRundll.ps1&#39;
+            - &#39;\Invoke-KrbRelay.ps1&#39;
+            - &#39;\Invoke-KrbRelayUp.ps1&#39;
+            - &#39;\Invoke-LdapSignCheck.ps1&#39;
+            - &#39;\Invoke-Lockless.ps1&#39;
+            - &#39;\Invoke-MalSCCM.ps1&#39;
+            - &#39;\Invoke-Mimikatz.ps1&#39;
+            - &#39;\Invoke-MimikatzWDigestDowngrade.ps1&#39;
+            - &#39;\Invoke-Mimikittenz.ps1&#39;
+            - &#39;\Invoke-MITM6.ps1&#39;
+            - &#39;\Invoke-NanoDump.ps1&#39;
+            - &#39;\Invoke-NetRipper.ps1&#39;
+            - &#39;\Invoke-NetworkRelay.ps1&#39;
+            - &#39;\Invoke-NinjaCopy.ps1&#39;
+            - &#39;\Invoke-OxidResolver.ps1&#39;
+            - &#39;\Invoke-P0wnedshell.ps1&#39;
+            - &#39;\Invoke-P0wnedshellx86.ps1&#39;
+            - &#39;\Invoke-Paranoia.ps1&#39;
+            - &#39;\Invoke-PortScan.ps1&#39;
+            - &#39;\Invoke-PoshRatHttp.ps1&#39;
+            - &#39;\Invoke-PoshRatHttps.ps1&#39;
+            - &#39;\Invoke-PostExfil.ps1&#39;
+            - &#39;\Invoke-PowerDump.ps1&#39;
+            - &#39;\Invoke-PowerDPAPI.ps1&#39;
+            - &#39;\Invoke-PowerShellIcmp.ps1&#39;
+            - &#39;\Invoke-PowerShellTCP.ps1&#39;
+            - &#39;\Invoke-PowerShellTcpOneLine.ps1&#39;
+            - &#39;\Invoke-PowerShellTcpOneLineBind.ps1&#39;
+            - &#39;\Invoke-PowerShellUdp.ps1&#39;
+            - &#39;\Invoke-PowerShellUdpOneLine.ps1&#39;
+            - &#39;\Invoke-PowerShellWMI.ps1&#39;
+            - &#39;\Invoke-PowerThIEf.ps1&#39;
+            - &#39;\Invoke-PPLDump.ps1&#39;
+            - &#39;\Invoke-Prasadhak.ps1&#39;
+            - &#39;\Invoke-PsExec.ps1&#39;
+            - &#39;\Invoke-PsGcat.ps1&#39;
+            - &#39;\Invoke-PsGcatAgent.ps1&#39;
+            - &#39;\Invoke-PSInject.ps1&#39;
+            - &#39;\Invoke-PsUaCme.ps1&#39;
+            - &#39;\Invoke-ReflectivePEInjection.ps1&#39;
+            - &#39;\Invoke-ReverseDNSLookup.ps1&#39;
+            - &#39;\Invoke-Rubeus.ps1&#39;
+            - &#39;\Invoke-RunAs.ps1&#39;
+            - &#39;\Invoke-SafetyKatz.ps1&#39;
+            - &#39;\Invoke-SauronEye.ps1&#39;
+            - &#39;\Invoke-SCShell.ps1&#39;
+            - &#39;\Invoke-Seatbelt.ps1&#39;
+            - &#39;\Invoke-ServiceAbuse.ps1&#39;
+            - &#39;\Invoke-SessionGopher.ps1&#39;
+            - &#39;\Invoke-ShellCode.ps1&#39;
+            - &#39;\Invoke-SMBScanner.ps1&#39;
+            - &#39;\Invoke-Snaffler.ps1&#39;
+            - &#39;\Invoke-Spoolsample.ps1&#39;
+            - &#39;\Invoke-SSHCommand.ps1&#39;
+            - &#39;\Invoke-SSIDExfil.ps1&#39;
+            - &#39;\Invoke-StandIn.ps1&#39;
+            - &#39;\Invoke-StickyNotesExtract.ps1&#39;
+            - &#39;\Invoke-Tater.ps1&#39;
+            - &#39;\Invoke-Thunderfox.ps1&#39;
+            - &#39;\Invoke-ThunderStruck.ps1&#39;
+            - &#39;\Invoke-TokenManipulation.ps1&#39;
+            - &#39;\Invoke-Tokenvator.ps1&#39;
+            - &#39;\Invoke-TotalExec.ps1&#39;
+            - &#39;\Invoke-UrbanBishop.ps1&#39;
+            - &#39;\Invoke-UserHunter.ps1&#39;
+            - &#39;\Invoke-VoiceTroll.ps1&#39;
+            - &#39;\Invoke-Whisker.ps1&#39;
+            - &#39;\Invoke-WinEnum.ps1&#39;
+            - &#39;\Invoke-winPEAS.ps1&#39;
+            - &#39;\Invoke-WireTap.ps1&#39;
+            - &#39;\Invoke-WmiCommand.ps1&#39;
+            - &#39;\Invoke-WScriptBypassUAC.ps1&#39;
+            - &#39;\Invoke-Zerologon.ps1&#39;
+            - &#39;\Keylogger.ps1&#39;
+            - &#39;\MailRaider.ps1&#39;
+            - &#39;\New-HoneyHash.ps1&#39;
+            - &#39;\OfficeMemScraper.ps1&#39;
+            - &#39;\Offline_Winpwn.ps1&#39;
+            - &#39;\Out-CHM.ps1&#39;
+            - &#39;\Out-DnsTxt.ps1&#39;
+            - &#39;\Out-Excel.ps1&#39;
+            - &#39;\Out-HTA.ps1&#39;
+            - &#39;\Out-Java.ps1&#39;
+            - &#39;\Out-JS.ps1&#39;
+            - &#39;\Out-Minidump.ps1&#39;
+            - &#39;\Out-RundllCommand.ps1&#39;
+            - &#39;\Out-SCF.ps1&#39;
+            - &#39;\Out-SCT.ps1&#39;
+            - &#39;\Out-Shortcut.ps1&#39;
+            - &#39;\Out-WebQuery.ps1&#39;
+            - &#39;\Out-Word.ps1&#39;
+            - &#39;\Parse_Keys.ps1&#39;
+            - &#39;\Port-Scan.ps1&#39;
+            - &#39;\PowerBreach.ps1&#39;
+            - &#39;\powercat.ps1&#39;
+            - &#39;\Powermad.ps1&#39;
+            - &#39;\PowerRunAsSystem.psm1&#39;
+            - &#39;\PowerSharpPack.ps1&#39;
+            - &#39;\PowerUp.ps1&#39;
+            - &#39;\PowerUpSQL.ps1&#39;
+            - &#39;\PowerView.ps1&#39;
+            - &#39;\PSAsyncShell.ps1&#39;
+            - &#39;\RemoteHashRetrieval.ps1&#39;
+            - &#39;\Remove-Persistence.ps1&#39;
+            - &#39;\Remove-PoshRat.ps1&#39;
+            - &#39;\Remove-Update.ps1&#39;
+            - &#39;\Run-EXEonRemote.ps1&#39;
+            - &#39;\Schtasks-Backdoor.ps1&#39;
+            - &#39;\Set-DCShadowPermissions.ps1&#39;
+            - &#39;\Set-MacAttribute.ps1&#39;
+            - &#39;\Set-RemotePSRemoting.ps1&#39;
+            - &#39;\Set-RemoteWMI.ps1&#39;
+            - &#39;\Set-Wallpaper.ps1&#39;
+            - &#39;\Show-TargetScreen.ps1&#39;
+            - &#39;\Speak.ps1&#39;
+            - &#39;\Start-CaptureServer.ps1&#39;
+            - &#39;\Start-WebcamRecorder.ps1&#39;
+            - &#39;\StringToBase64.ps1&#39;
+            - &#39;\TexttoExe.ps1&#39;
+            - &#39;\Veeam-Get-Creds.ps1&#39;
+            - &#39;\VolumeShadowCopyTools.ps1&#39;
+            - &#39;\WinPwn.ps1&#39;
+            - &#39;\WSUSpendu.ps1&#39;
+    selection_invoke_sharp:
+        TargetFilename|contains: &#39;Invoke-Sharp&#39; # Covers all &quot;Invoke-Sharp&quot; variants
+        TargetFilename|endswith: &#39;.ps1&#39;
+    condition: 1 of selection_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/f331aa1f-8c53-4fc3-b083-cc159bc971cb.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/PowerShellMafia/PowerSploit">https://github.com/PowerShellMafia/PowerSploit</a></li><li><a href="https://github.com/NetSPI/PowerUpSQL">https://github.com/NetSPI/PowerUpSQL</a></li><li><a href="https://github.com/CsEnox/EventViewer-UACBypass">https://github.com/CsEnox/EventViewer-UACBypass</a></li><li><a href="https://web.archive.org/web/20210511204621/https://github.com/AlsidOfficial/WSUSpendu">https://web.archive.org/web/20210511204621/https://github.com/AlsidOfficial/WSUSpendu</a></li><li><a href="https://github.com/nettitude/Invoke-PowerThIEf">https://github.com/nettitude/Invoke-PowerThIEf</a></li><li><a href="https://github.com/S3cur3Th1sSh1t/WinPwn">https://github.com/S3cur3Th1sSh1t/WinPwn</a></li><li><a href="https://github.com/S3cur3Th1sSh1t/PowerSharpPack/tree/master/PowerSharpBinaries">https://github.com/S3cur3Th1sSh1t/PowerSharpPack/tree/master/PowerSharpBinaries</a></li><li><a href="https://github.com/BC-SECURITY/Invoke-ZeroLogon/blob/111d17c7fec486d9bb23387e2e828b09a26075e4/Invoke-ZeroLogon.ps1">https://github.com/BC-SECURITY/Invoke-ZeroLogon/blob/111d17c7fec486d9bb23387e2e828b09a26075e4/Invoke-ZeroLogon.ps1</a></li><li><a href="https://github.com/xorrior/RandomPS-Scripts/blob/848c919bfce4e2d67b626cbcf4404341cfe3d3b6/Get-DXWebcamVideo.ps1">https://github.com/xorrior/RandomPS-Scripts/blob/848c919bfce4e2d67b626cbcf4404341cfe3d3b6/Get-DXWebcamVideo.ps1</a></li><li><a href="https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/6f23bb41f9675d7e2d32bacccff75e931ae00554/OfficeMemScraper.ps1">https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/6f23bb41f9675d7e2d32bacccff75e931ae00554/OfficeMemScraper.ps1</a></li><li><a href="https://github.com/dafthack/DomainPasswordSpray/blob/b13d64a5834694aa73fd2aea9911a83027c465a7/DomainPasswordSpray.ps1">https://github.com/dafthack/DomainPasswordSpray/blob/b13d64a5834694aa73fd2aea9911a83027c465a7/DomainPasswordSpray.ps1</a></li><li><a href="https://unit42.paloaltonetworks.com/threat-assessment-black-basta-ransomware/">https://unit42.paloaltonetworks.com/threat-assessment-black-basta-ransomware/</a></li><li><a href="https://research.nccgroup.com/2022/06/06/shining-the-light-on-black-basta/">https://research.nccgroup.com/2022/06/06/shining-the-light-on-black-basta/</a></li><li><a href="https://github.com/HarmJ0y/DAMP">https://github.com/HarmJ0y/DAMP</a></li><li><a href="https://github.com/samratashok/nishang">https://github.com/samratashok/nishang</a></li><li><a href="https://github.com/DarkCoderSc/PowerRunAsSystem/">https://github.com/DarkCoderSc/PowerRunAsSystem/</a></li><li><a href="https://github.com/besimorhino/powercat">https://github.com/besimorhino/powercat</a></li><li><a href="https://github.com/Kevin-Robertson/Powermad">https://github.com/Kevin-Robertson/Powermad</a></li><li><a href="https://github.com/adrecon/ADRecon">https://github.com/adrecon/ADRecon</a></li><li><a href="https://github.com/adrecon/AzureADRecon">https://github.com/adrecon/AzureADRecon</a></li><li><a href="https://github.com/sadshade/veeam-creds/blob/6010eaf31ba41011b58d6af3950cffbf6f5cea32/Veeam-Get-Creds.ps1">https://github.com/sadshade/veeam-creds/blob/6010eaf31ba41011b58d6af3950cffbf6f5cea32/Veeam-Get-Creds.ps1</a></li><li><a href="https://github.com/The-Viper-One/Invoke-PowerDPAPI/">https://github.com/The-Viper-One/Invoke-PowerDPAPI/</a></li><li><a href="https://github.com/Arno0x/DNSExfiltrator/">https://github.com/Arno0x/DNSExfiltrator/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

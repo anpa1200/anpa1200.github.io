@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential System DLL Sideloading From Non System Locations — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 4fc0deee-0057-4998-ab31-d24e46e0aba4. Potential System DLL Sideloading From Non System Locations — Sigma Rule. Detects DLL sideloading of DLLs usually located in system locations (System32, SysWOW64, etc.).">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="4fc0deee-0057-4998-ab31-d24e46e0aba4, attack.persistence, attack.privilege-escalation, attack.execution, attack.stealth, attack.t1574.001, image_load, windows, rule-status:test, severity:high, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1574.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1574.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/4fc0deee-0057-4998-ab31-d24e46e0aba4/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/4fc0deee-0057-4998-ab31-d24e46e0aba4/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential System DLL Sideloading From Non System Locations — Sigma Rule"><meta property="og:description" content="Sigma rule 4fc0deee-0057-4998-ab31-d24e46e0aba4. Potential System DLL Sideloading From Non System Locations — Sigma Rule. Detects DLL sideloading of DLLs usually located in system locations (System32, SysWOW64, etc.)."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential System DLL Sideloading From Non System Locations — Sigma Rule"><meta name="twitter:description" content="Sigma rule 4fc0deee-0057-4998-ab31-d24e46e0aba4. Potential System DLL Sideloading From Non System Locations — Sigma Rule. Detects DLL sideloading of DLLs usually located in system locations (System32, SysWOW64, etc.)."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/4fc0deee-0057-4998-ab31-d24e46e0aba4/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/4fc0deee-0057-4998-ab31-d24e46e0aba4/","name":"Potential System DLL Sideloading From Non System Locations — Sigma Rule","description":"Sigma rule 4fc0deee-0057-4998-ab31-d24e46e0aba4. Potential System DLL Sideloading From Non System Locations — Sigma Rule. Detects DLL sideloading of DLLs usually located in system locations (System32, SysWOW64, etc.).","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential System DLL Sideloading From Non System Locations — Sigma Rule</h1><p class="lead">Sigma rule 4fc0deee-0057-4998-ab31-d24e46e0aba4. Potential System DLL Sideloading From Non System Locations — Sigma Rule. Detects DLL sideloading of DLLs usually located in system locations (System32, SysWOW64, etc.).</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/image-load/">image_load</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1574-001/">attack.t1574.001</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: high. Source dates: 2022-08-14 / 2025-12-03.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;image_load&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/image_load/image_load_side_load_from_non_system_location.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 3ff0168cdc8111ef97e6a9c9058c6511fb43af3756e5f59c601e2f315947f2c6</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential System DLL Sideloading From Non System Locations
+id: 4fc0deee-0057-4998-ab31-d24e46e0aba4
+status: test
+description: Detects DLL sideloading of DLLs usually located in system locations (System32, SysWOW64, etc.).
+references:
+    - https://hijacklibs.net/ # For list of DLLs that could be sideloaded (search for dlls mentioned here in there). Wietze Beukema (project and research)
+    - https://blog.cyble.com/2022/07/21/qakbot-resurfaces-with-new-playbook/ # WindowsCodecs.dll
+    - https://blog.cyble.com/2022/07/27/targeted-attacks-being-carried-out-via-dll-sideloading/ # iphlpapi.dll
+    - https://github.com/XForceIR/SideLoadHunter/blob/cc7ef2e5d8908279b0c4cee4e8b6f85f7b8eed52/SideLoads/README.md # XForceIR (SideLoadHunter Project), Chris Spehn (research WFH Dridex)
+    - https://www.hexacorn.com/blog/2023/12/26/1-little-known-secret-of-runonce-exe-32-bit/
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2022-08-14
+modified: 2025-12-03
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.execution
+    - attack.stealth
+    - attack.t1574.001
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection:
+        ImageLoaded|endswith:
+            - &#39;\aclui.dll&#39;
+            - &#39;\activeds.dll&#39;
+            - &#39;\adsldpc.dll&#39;
+            - &#39;\aepic.dll&#39;
+            - &#39;\apphelp.dll&#39;
+            - &#39;\applicationframe.dll&#39;
+            - &#39;\appvpolicy.dll&#39;
+            - &#39;\appxalluserstore.dll&#39;
+            - &#39;\appxdeploymentclient.dll&#39;
+            - &#39;\archiveint.dll&#39;
+            - &#39;\atl.dll&#39;
+            - &#39;\audioses.dll&#39;
+            - &#39;\auditpolcore.dll&#39;
+            - &#39;\authfwcfg.dll&#39;
+            - &#39;\authz.dll&#39;
+            - &#39;\avrt.dll&#39;
+            - &#39;\batmeter.dll&#39;
+            - &#39;\bcd.dll&#39;
+            - &#39;\bcp47langs.dll&#39;
+            - &#39;\bcp47mrm.dll&#39;
+            - &#39;\bcrypt.dll&#39;
+            - &#39;\bderepair.dll&#39;
+            - &#39;\bootmenuux.dll&#39;
+            - &#39;\bootux.dll&#39;
+            - &#39;\cabinet.dll&#39;
+            - &#39;\cabview.dll&#39;
+            - &#39;\certcli.dll&#39;
+            - &#39;\certenroll.dll&#39;
+            - &#39;\cfgmgr32.dll&#39;
+            - &#39;\cldapi.dll&#39;
+            - &#39;\clipc.dll&#39;
+            - &#39;\clusapi.dll&#39;
+            - &#39;\cmpbk32.dll&#39;
+            - &#39;\cmutil.dll&#39;
+            - &#39;\coloradapterclient.dll&#39;
+            - &#39;\colorui.dll&#39;
+            - &#39;\comdlg32.dll&#39;
+            - &#39;\configmanager2.dll&#39;
+            - &#39;\connect.dll&#39;
+            - &#39;\coredplus.dll&#39;
+            - &#39;\coremessaging.dll&#39;
+            - &#39;\coreuicomponents.dll&#39;
+            - &#39;\credui.dll&#39;
+            - &#39;\cryptbase.dll&#39;
+            - &#39;\cryptdll.dll&#39;
+            - &#39;\cryptsp.dll&#39;
+            - &#39;\cryptui.dll&#39;
+            - &#39;\cryptxml.dll&#39;
+            - &#39;\cscapi.dll&#39;
+            - &#39;\cscobj.dll&#39;
+            - &#39;\cscui.dll&#39;
+            - &#39;\d2d1.dll&#39;
+            - &#39;\d3d10_1.dll&#39;
+            - &#39;\d3d10_1core.dll&#39;
+            - &#39;\d3d10.dll&#39;
+            - &#39;\d3d10core.dll&#39;
+            - &#39;\d3d10warp.dll&#39;
+            - &#39;\d3d11.dll&#39;
+            - &#39;\d3d12.dll&#39;
+            - &#39;\d3d9.dll&#39;
+            - &#39;\d3dx9_43.dll&#39;
+            - &#39;\dataexchange.dll&#39;
+            - &#39;\davclnt.dll&#39;
+            - &#39;\dcntel.dll&#39;
+            - &#39;\dcomp.dll&#39;
+            - &#39;\defragproxy.dll&#39;
+            - &#39;\desktopshellext.dll&#39;
+            - &#39;\deviceassociation.dll&#39;
+            - &#39;\devicecredential.dll&#39;
+            - &#39;\devicepairing.dll&#39;
+            - &#39;\devobj.dll&#39;
+            - &#39;\devrtl.dll&#39;
+            - &#39;\dhcpcmonitor.dll&#39;
+            - &#39;\dhcpcsvc.dll&#39;
+            - &#39;\dhcpcsvc6.dll&#39;
+            - &#39;\directmanipulation.dll&#39;
+            - &#39;\dismapi.dll&#39;
+            - &#39;\dismcore.dll&#39;
+            - &#39;\dmcfgutils.dll&#39;
+            - &#39;\dmcmnutils.dll&#39;
+            - &#39;\dmcommandlineutils.dll&#39;
+            - &#39;\dmenrollengine.dll&#39;
+            - &#39;\dmenterprisediagnostics.dll&#39;
+            - &#39;\dmiso8601utils.dll&#39;
+            - &#39;\dmoleaututils.dll&#39;
+            - &#39;\dmprocessxmlfiltered.dll&#39;
+            - &#39;\dmpushproxy.dll&#39;
+            - &#39;\dmxmlhelputils.dll&#39;
+            - &#39;\dnsapi.dll&#39;
+            - &#39;\dot3api.dll&#39;
+            - &#39;\dot3cfg.dll&#39;
+            - &#39;\dpx.dll&#39;
+            - &#39;\drprov.dll&#39;
+            - &#39;\drvstore.dll&#39;
+            - &#39;\dsclient.dll&#39;
+            - &#39;\dsparse.dll&#39;
+            - &#39;\dsprop.dll&#39;
+            - &#39;\dsreg.dll&#39;
+            - &#39;\dsrole.dll&#39;
+            - &#39;\dui70.dll&#39;
+            - &#39;\duser.dll&#39;
+            - &#39;\dusmapi.dll&#39;
+            - &#39;\dwmapi.dll&#39;
+            - &#39;\dwmcore.dll&#39;
+            - &#39;\dwrite.dll&#39;
+            - &#39;\dxcore.dll&#39;
+            - &#39;\dxgi.dll&#39;
+            - &#39;\dxva2.dll&#39;
+            - &#39;\dynamoapi.dll&#39;
+            - &#39;\eappcfg.dll&#39;
+            - &#39;\eappprxy.dll&#39;
+            - &#39;\edgeiso.dll&#39;
+            - &#39;\edputil.dll&#39;
+            - &#39;\efsadu.dll&#39;
+            - &#39;\efsutil.dll&#39;
+            - &#39;\esent.dll&#39;
+            - &#39;\execmodelproxy.dll&#39;
+            - &#39;\explorerframe.dll&#39;
+            - &#39;\fastprox.dll&#39;
+            - &#39;\faultrep.dll&#39;
+            - &#39;\fddevquery.dll&#39;
+            - &#39;\feclient.dll&#39;
+            - &#39;\fhcfg.dll&#39;
+            - &#39;\fhsvcctl.dll&#39;
+            - &#39;\firewallapi.dll&#39;
+            - &#39;\flightsettings.dll&#39;
+            - &#39;\fltlib.dll&#39;
+            - &#39;\framedynos.dll&#39;
+            - &#39;\fveapi.dll&#39;
+            - &#39;\fveskybackup.dll&#39;
+            - &#39;\fvewiz.dll&#39;
+            - &#39;\fwbase.dll&#39;
+            - &#39;\fwcfg.dll&#39;
+            - &#39;\fwpolicyiomgr.dll&#39;
+            - &#39;\fwpuclnt.dll&#39;
+            - &#39;\fxsapi.dll&#39;
+            - &#39;\fxsst.dll&#39;
+            - &#39;\fxstiff.dll&#39;
+            - &#39;\getuname.dll&#39;
+            - &#39;\gpapi.dll&#39;
+            - &#39;\hid.dll&#39;
+            - &#39;\hnetmon.dll&#39;
+            - &#39;\httpapi.dll&#39;
+            - &#39;\icmp.dll&#39;
+            - &#39;\idstore.dll&#39;
+            - &#39;\ieadvpack.dll&#39;
+            - &#39;\iedkcs32.dll&#39;
+            - &#39;\iernonce.dll&#39;
+            - &#39;\iertutil.dll&#39;
+            - &#39;\ifmon.dll&#39;
+            - &#39;\ifsutil.dll&#39;
+            - &#39;\inproclogger.dll&#39;
+            - &#39;\iphlpapi.dll&#39;
+            - &#39;\iri.dll&#39;
+            - &#39;\iscsidsc.dll&#39;
+            - &#39;\iscsium.dll&#39;
+            - &#39;\isv.exe_rsaenh.dll&#39;
+            - &#39;\iumbase.dll&#39;
+            - &#39;\iumsdk.dll&#39;
+            - &#39;\joinutil.dll&#39;
+            - &#39;\kdstub.dll&#39;
+            - &#39;\ksuser.dll&#39;
+            - &#39;\ktmw32.dll&#39;
+            - &#39;\licensemanagerapi.dll&#39;
+            - &#39;\licensingdiagspp.dll&#39;
+            - &#39;\linkinfo.dll&#39;
+            - &#39;\loadperf.dll&#39;
+            - &#39;\lockhostingframework.dll&#39;
+            - &#39;\logoncli.dll&#39;
+            - &#39;\logoncontroller.dll&#39;
+            - &#39;\lpksetupproxyserv.dll&#39;
+            - &#39;\lrwizdll.dll&#39;
+            - &#39;\magnification.dll&#39;
+            - &#39;\maintenanceui.dll&#39;
+            - &#39;\mapistub.dll&#39;
+            - &#39;\mbaexmlparser.dll&#39;
+            - &#39;\mdmdiagnostics.dll&#39;
+            - &#39;\mfc42u.dll&#39;
+            - &#39;\mfcore.dll&#39;
+            - &#39;\mfplat.dll&#39;
+            - &#39;\mi.dll&#39;
+            - &#39;\midimap.dll&#39;
+            - &#39;\mintdh.dll&#39;
+            - &#39;\miutils.dll&#39;
+            - &#39;\mlang.dll&#39;
+            - &#39;\mmdevapi.dll&#39;
+            - &#39;\mobilenetworking.dll&#39;
+            - &#39;\mpr.dll&#39;
+            - &#39;\mprapi.dll&#39;
+            - &#39;\mrmcorer.dll&#39;
+            - &#39;\msacm32.dll&#39;
+            - &#39;\mscms.dll&#39;
+            - &#39;\mscoree.dll&#39;
+            - &#39;\msctf.dll&#39;
+            - &#39;\msctfmonitor.dll&#39;
+            - &#39;\msdrm.dll&#39;
+            - &#39;\msdtctm.dll&#39;
+            - &#39;\msftedit.dll&#39;
+            - &#39;\msi.dll&#39;
+            - &#39;\msiso.dll&#39;
+            - &#39;\msutb.dll&#39;
+            - &#39;\msvcp110_win.dll&#39;
+            - &#39;\mswb7.dll&#39;
+            - &#39;\mswsock.dll&#39;
+            - &#39;\msxml3.dll&#39;
+            - &#39;\mtxclu.dll&#39;
+            - &#39;\napinsp.dll&#39;
+            - &#39;\ncrypt.dll&#39;
+            - &#39;\ndfapi.dll&#39;
+            - &#39;\netapi32.dll&#39;
+            - &#39;\netid.dll&#39;
+            - &#39;\netiohlp.dll&#39;
+            - &#39;\netjoin.dll&#39;
+            - &#39;\netplwiz.dll&#39;
+            - &#39;\netprofm.dll&#39;
+            - &#39;\netprovfw.dll&#39;
+            - &#39;\netsetupapi.dll&#39;
+            - &#39;\netshell.dll&#39;
+            - &#39;\nettrace.dll&#39;
+            - &#39;\netutils.dll&#39;
+            - &#39;\networkexplorer.dll&#39;
+            - &#39;\newdev.dll&#39;
+            - &#39;\ninput.dll&#39;
+            - &#39;\nlaapi.dll&#39;
+            - &#39;\nlansp_c.dll&#39;
+            - &#39;\npmproxy.dll&#39;
+            - &#39;\nshhttp.dll&#39;
+            - &#39;\nshipsec.dll&#39;
+            - &#39;\nshwfp.dll&#39;
+            - &#39;\ntdsapi.dll&#39;
+            - &#39;\ntlanman.dll&#39;
+            - &#39;\ntlmshared.dll&#39;
+            - &#39;\ntmarta.dll&#39;
+            - &#39;\ntshrui.dll&#39;
+            - &#39;\oleacc.dll&#39;
+            - &#39;\omadmapi.dll&#39;
+            - &#39;\onex.dll&#39;
+            - &#39;\opcservices.dll&#39;
+            - &#39;\osbaseln.dll&#39;
+            - &#39;\osksupport.dll&#39;
+            - &#39;\osuninst.dll&#39;
+            - &#39;\p2p.dll&#39;
+            - &#39;\p2pnetsh.dll&#39;
+            - &#39;\p9np.dll&#39;
+            - &#39;\pcaui.dll&#39;
+            - &#39;\pdh.dll&#39;
+            - &#39;\peerdistsh.dll&#39;
+            - &#39;\pkeyhelper.dll&#39;
+            - &#39;\pla.dll&#39;
+            - &#39;\playsndsrv.dll&#39;
+            - &#39;\pnrpnsp.dll&#39;
+            - &#39;\policymanager.dll&#39;
+            - &#39;\polstore.dll&#39;
+            - &#39;\powrprof.dll&#39;
+            - &#39;\printui.dll&#39;
+            - &#39;\prntvpt.dll&#39;
+            - &#39;\profapi.dll&#39;
+            - &#39;\propsys.dll&#39;
+            - &#39;\proximitycommon.dll&#39;
+            - &#39;\proximityservicepal.dll&#39;
+            - &#39;\prvdmofcomp.dll&#39;
+            - &#39;\puiapi.dll&#39;
+            - &#39;\radcui.dll&#39;
+            - &#39;\rasapi32.dll&#39;
+            - &#39;\rasdlg.dll&#39;
+            - &#39;\rasgcw.dll&#39;
+            - &#39;\rasman.dll&#39;
+            - &#39;\rasmontr.dll&#39;
+            - &#39;\reagent.dll&#39;
+            - &#39;\regapi.dll&#39;
+            - &#39;\reseteng.dll&#39;
+            - &#39;\resetengine.dll&#39;
+            - &#39;\resutils.dll&#39;
+            - &#39;\rmclient.dll&#39;
+            - &#39;\rpcnsh.dll&#39;
+            - &#39;\rsaenh.dll&#39;
+            - &#39;\rtutils.dll&#39;
+            - &#39;\rtworkq.dll&#39;
+            - &#39;\samcli.dll&#39;
+            - &#39;\samlib.dll&#39;
+            - &#39;\sapi_onecore.dll&#39;
+            - &#39;\sas.dll&#39;
+            - &#39;\scansetting.dll&#39;
+            - &#39;\scecli.dll&#39;
+            - &#39;\schedcli.dll&#39;
+            - &#39;\secur32.dll&#39;
+            - &#39;\security.dll&#39;
+            - &#39;\sensapi.dll&#39;
+            - &#39;\shell32.dll&#39;
+            - &#39;\shfolder.dll&#39;
+            - &#39;\slc.dll&#39;
+            - &#39;\snmpapi.dll&#39;
+            - &#39;\spectrumsyncclient.dll&#39;
+            - &#39;\spp.dll&#39;
+            - &#39;\sppc.dll&#39;
+            - &#39;\sppcext.dll&#39;
+            - &#39;\srclient.dll&#39;
+            - &#39;\srcore.dll&#39;
+            - &#39;\srmtrace.dll&#39;
+            - &#39;\srpapi.dll&#39;
+            - &#39;\srvcli.dll&#39;
+            - &#39;\ssp_isv.exe_rsaenh.dll&#39;
+            - &#39;\ssp.exe_rsaenh.dll&#39;
+            - &#39;\sspicli.dll&#39;
+            - &#39;\ssshim.dll&#39;
+            - &#39;\staterepository.core.dll&#39;
+            - &#39;\structuredquery.dll&#39;
+            - &#39;\sxshared.dll&#39;
+            - &#39;\systemsettingsthresholdadminflowui.dll&#39;
+            - &#39;\tapi32.dll&#39;
+            - &#39;\tbs.dll&#39;
+            - &#39;\tdh.dll&#39;
+            - &#39;\textshaping.dll&#39;
+            - &#39;\timesync.dll&#39;
+            - &#39;\tpmcoreprovisioning.dll&#39;
+            - &#39;\tquery.dll&#39;
+            - &#39;\tsworkspace.dll&#39;
+            - &#39;\ttdrecord.dll&#39;
+            - &#39;\twext.dll&#39;
+            - &#39;\twinapi.dll&#39;
+            - &#39;\twinui.appcore.dll&#39;
+            - &#39;\uianimation.dll&#39;
+            - &#39;\uiautomationcore.dll&#39;
+            - &#39;\uireng.dll&#39;
+            - &#39;\uiribbon.dll&#39;
+            - &#39;\umpdc.dll&#39;
+            - &#39;\unattend.dll&#39;
+            - &#39;\updatepolicy.dll&#39;
+            - &#39;\upshared.dll&#39;
+            - &#39;\urlmon.dll&#39;
+            - &#39;\userenv.dll&#39;
+            - &#39;\utildll.dll&#39;
+            - &#39;\uxinit.dll&#39;
+            - &#39;\uxtheme.dll&#39;
+            - &#39;\vaultcli.dll&#39;
+            - &#39;\vdsutil.dll&#39;
+            - &#39;\version.dll&#39;
+            - &#39;\virtdisk.dll&#39;
+            - &#39;\vssapi.dll&#39;
+            - &#39;\vsstrace.dll&#39;
+            - &#39;\wbemprox.dll&#39;
+            - &#39;\wbemsvc.dll&#39;
+            - &#39;\wcmapi.dll&#39;
+            - &#39;\wcnnetsh.dll&#39;
+            - &#39;\wdi.dll&#39;
+            - &#39;\wdscore.dll&#39;
+            - &#39;\webservices.dll&#39;
+            - &#39;\wecapi.dll&#39;
+            - &#39;\wer.dll&#39;
+            - &#39;\wevtapi.dll&#39;
+            - &#39;\whhelper.dll&#39;
+            - &#39;\wimgapi.dll&#39;
+            - &#39;\winbio.dll&#39;
+            - &#39;\winbrand.dll&#39;
+            - &#39;\windows.storage.dll&#39;
+            - &#39;\windows.storage.search.dll&#39;
+            - &#39;\windows.ui.immersive.dll&#39;
+            - &#39;\windowscodecs.dll&#39;
+            - &#39;\windowscodecsext.dll&#39;
+            - &#39;\windowsudk.shellcommon.dll&#39;
+            - &#39;\winhttp.dll&#39;
+            - &#39;\wininet.dll&#39;
+            - &#39;\winipsec.dll&#39;
+            - &#39;\winmde.dll&#39;
+            - &#39;\winmm.dll&#39;
+            - &#39;\winnsi.dll&#39;
+            - &#39;\winrnr.dll&#39;
+            - &#39;\winscard.dll&#39;
+            - &#39;\winsqlite3.dll&#39;
+            - &#39;\winsta.dll&#39;
+            - &#39;\winsync.dll&#39;
+            - &#39;\wkscli.dll&#39;
+            - &#39;\wlanapi.dll&#39;
+            - &#39;\wlancfg.dll&#39;
+            - &#39;\wldp.dll&#39;
+            - &#39;\wlidprov.dll&#39;
+            - &#39;\wmiclnt.dll&#39;
+            - &#39;\wmidcom.dll&#39;
+            - &#39;\wmiutils.dll&#39;
+            - &#39;\wmpdui.dll&#39;
+            - &#39;\wmsgapi.dll&#39;
+            - &#39;\wofutil.dll&#39;
+            - &#39;\wpdshext.dll&#39;
+            - &#39;\wscapi.dll&#39;
+            - &#39;\wsdapi.dll&#39;
+            - &#39;\wshbth.dll&#39;
+            - &#39;\wshelper.dll&#39;
+            - &#39;\wsmsvc.dll&#39;
+            - &#39;\wtsapi32.dll&#39;
+            - &#39;\wwancfg.dll&#39;
+            - &#39;\wwapi.dll&#39;
+            - &#39;\xmllite.dll&#39;
+            - &#39;\xolehlp.dll&#39;
+            - &#39;\xpsservices.dll&#39;
+            - &#39;\xwizards.dll&#39;
+            - &#39;\xwtpw32.dll&#39;
+            # From https://github.com/XForceIR/SideLoadHunter/blob/main/SideLoads/README.md
+            - &#39;\amsi.dll&#39;
+            - &#39;\appraiser.dll&#39;
+            - &#39;\COMRES.DLL&#39;
+            - &#39;\cryptnet.dll&#39;
+            - &#39;\DispBroker.dll&#39;
+            - &#39;\dsound.dll&#39;
+            - &#39;\dxilconv.dll&#39;
+            - &#39;\FxsCompose.dll&#39;
+            - &#39;\FXSRESM.DLL&#39;
+            - &#39;\msdtcVSp1res.dll&#39;
+            - &#39;\PrintIsolationProxy.dll&#39;
+            - &#39;\rdpendp.dll&#39;
+            - &#39;\rpchttp.dll&#39;
+            - &#39;\storageusage.dll&#39;
+            - &#39;\utcutil.dll&#39;
+            - &#39;\WfsR.dll&#39;
+            # The DLLs below exists in &quot;C:\Windows\System32\DriverStore\FileRepository\&quot; folder. But there is also a copy located in &quot;C:\ProgramData\Package Cache\XXXXXXX\Graphics\&quot;. If you see them being loaded from there. Please comment them out, don&#39;t add a filter for ProgramData :)
+            - &#39;\igd10iumd64.dll&#39;
+            - &#39;\igd12umd64.dll&#39;
+            - &#39;\igdumdim64.dll&#39;
+            - &#39;\igdusc64.dll&#39;
+            # Other
+            - &#39;\TSMSISrv.dll&#39;
+            - &#39;\TSVIPSrv.dll&#39;
+            - &#39;\wbemcomn.dll&#39;
+            - &#39;\WLBSCTRL.dll&#39;
+            - &#39;\wow64log.dll&#39;
+            - &#39;\WptsExtensions.dll&#39;
+    filter_main_generic:
+        # Note: this filter is generic on purpose to avoid insane amount of FP from legitimate third party applications. A better approach would be to baseline everything and add specific filters to avoid blind spots
+        ImageLoaded|contains:
+            - &#39;C:\$WINDOWS.~BT\&#39;
+            - &#39;C:\$WinREAgent\&#39;
+            - &#39;C:\Windows\SoftwareDistribution\&#39;
+            - &#39;C:\Windows\System32\&#39;
+            - &#39;C:\Windows\SystemTemp\&#39;
+            - &#39;C:\Windows\SysWOW64\&#39;
+            - &#39;C:\Windows\WinSxS\&#39;
+            - &#39;C:\Windows\SyChpe32\&#39; # “hybrid” binaries containing x86-to-ARM stubs to improve the x86 emulation performance
+    filter_main_windows_temp:
+        ImageLoaded|startswith: &#39;C:\Windows\Temp\&#39;
+        Image|startswith:
+            - &#39;C:\Windows\WinSxS\arm64&#39;
+            - &#39;C:\Windows\UUS\arm64\&#39;
+        Image|endswith:
+            - &#39;\TiWorker.exe&#39;
+            - &#39;\wuaucltcore.exe&#39;
+    filter_main_dot_net:
+        ImageLoaded|startswith: &#39;C:\Windows\Microsoft.NET\&#39;
+        ImageLoaded|endswith: &#39;\cscui.dll&#39;
+    filter_main_defender:
+        ImageLoaded|startswith: &#39;C:\ProgramData\Microsoft\Windows Defender\Platform\&#39;
+        ImageLoaded|endswith: &#39;\version.dll&#39;
+    filter_main_directx:
+        ImageLoaded|startswith: &#39;C:\Program Files\WindowsApps\Microsoft.DirectXRuntime_&#39;
+        ImageLoaded|endswith: &#39;\d3dx9_43.dll&#39;
+    filter_optional_exchange:
+        ImageLoaded|startswith: &#39;C:\Program Files\Microsoft\Exchange Server\&#39;
+        ImageLoaded|endswith: &#39;\mswb7.dll&#39;
+    filter_optional_arsenal_image_mounter:
+        ImageLoaded|startswith: &#39;C:\Program Files\Arsenal-Image-Mounter-&#39;
+        ImageLoaded|endswith:
+            - &#39;\mi.dll&#39;
+            - &#39;\miutils.dl&#39;
+    filter_optional_office_appvpolicy:
+        Image: &#39;C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeClickToRun.exe&#39;
+        ImageLoaded: &#39;C:\Program Files\Common Files\microsoft shared\ClickToRun\AppVPolicy.dll&#39;
+    filter_optional_azure:
+        ImageLoaded|startswith: &#39;C:\Packages\Plugins\Microsoft.GuestConfiguration.ConfigurationforWindows\&#39;
+    filter_optional_dell:
+        Image|contains:
+            - &#39;C:\Program Files\WindowsApps\DellInc.DellSupportAssistforPCs&#39;
+            - &#39;C:\Windows\System32\backgroundTaskHost.exe&#39;
+        ImageLoaded|startswith: &#39;C:\Program Files\WindowsApps\DellInc.DellSupportAssistforPCs&#39;
+    filter_optional_dell_wldp:
+        Image|startswith: &#39;C:\Program Files\WindowsApps\DellInc.DellSupportAssistforPCs&#39;
+        Image|endswith: &#39;\wldp.dll&#39;
+    filter_optional_checkpoint:
+        Image|startswith:
+            - &#39;C:\Program Files\CheckPoint\&#39;
+            - &#39;C:\Program Files (x86)\CheckPoint\&#39;
+        Image|endswith: &#39;\SmartConsole.exe&#39;
+        ImageLoaded|startswith:
+            - &#39;C:\Program Files\CheckPoint\&#39;
+            - &#39;C:\Program Files (x86)\CheckPoint\&#39;
+        ImageLoaded|endswith: &#39;\PolicyManager.dll&#39;
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Legitimate applications loading their own versions of the DLLs mentioned in this rule
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/4fc0deee-0057-4998-ab31-d24e46e0aba4.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate applications loading their own versions of the DLLs mentioned in this rule</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://hijacklibs.net/">https://hijacklibs.net/</a></li><li><a href="https://blog.cyble.com/2022/07/21/qakbot-resurfaces-with-new-playbook/">https://blog.cyble.com/2022/07/21/qakbot-resurfaces-with-new-playbook/</a></li><li><a href="https://blog.cyble.com/2022/07/27/targeted-attacks-being-carried-out-via-dll-sideloading/">https://blog.cyble.com/2022/07/27/targeted-attacks-being-carried-out-via-dll-sideloading/</a></li><li><a href="https://github.com/XForceIR/SideLoadHunter/blob/cc7ef2e5d8908279b0c4cee4e8b6f85f7b8eed52/SideLoads/README.md">https://github.com/XForceIR/SideLoadHunter/blob/cc7ef2e5d8908279b0c4cee4e8b6f85f7b8eed52/SideLoads/README.md</a></li><li><a href="https://www.hexacorn.com/blog/2023/12/26/1-little-known-secret-of-runonce-exe-32-bit/">https://www.hexacorn.com/blog/2023/12/26/1-little-known-secret-of-runonce-exe-32-bit/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1574.001/">T1574.001 · DLL</a> · <a href="/ttp-simulation/detections/enterprise/T1574.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

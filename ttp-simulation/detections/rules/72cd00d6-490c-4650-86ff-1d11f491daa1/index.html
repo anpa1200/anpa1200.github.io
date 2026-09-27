@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vulnerable Driver Load By Name — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 72cd00d6-490c-4650-86ff-1d11f491daa1. Vulnerable Driver Load By Name — Sigma Rule. Detects the load of known vulnerable drivers via the file name of the drivers.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="72cd00d6-490c-4650-86ff-1d11f491daa1, attack.persistence, attack.privilege-escalation, attack.t1543.003, attack.t1068, windows, driver_load, rule-status:test, severity:low, logsource-product:windows, logsource-category:driver_load, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1543.003, sigma-tag:attack.t1068">
+<meta name="ttp-module-tags" content="rule-status:test, severity:low, logsource-product:windows, logsource-category:driver_load, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1543.003, sigma-tag:attack.t1068">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/72cd00d6-490c-4650-86ff-1d11f491daa1/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/72cd00d6-490c-4650-86ff-1d11f491daa1/">
+<meta property="og:type" content="website"><meta property="og:title" content="Vulnerable Driver Load By Name — Sigma Rule"><meta property="og:description" content="Sigma rule 72cd00d6-490c-4650-86ff-1d11f491daa1. Vulnerable Driver Load By Name — Sigma Rule. Detects the load of known vulnerable drivers via the file name of the drivers."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Vulnerable Driver Load By Name — Sigma Rule"><meta name="twitter:description" content="Sigma rule 72cd00d6-490c-4650-86ff-1d11f491daa1. Vulnerable Driver Load By Name — Sigma Rule. Detects the load of known vulnerable drivers via the file name of the drivers."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/72cd00d6-490c-4650-86ff-1d11f491daa1/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/72cd00d6-490c-4650-86ff-1d11f491daa1/","name":"Vulnerable Driver Load By Name — Sigma Rule","description":"Sigma rule 72cd00d6-490c-4650-86ff-1d11f491daa1. Vulnerable Driver Load By Name — Sigma Rule. Detects the load of known vulnerable drivers via the file name of the drivers.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Vulnerable Driver Load By Name — Sigma Rule</h1><p class="lead">Sigma rule 72cd00d6-490c-4650-86ff-1d11f491daa1. Vulnerable Driver Load By Name — Sigma Rule. Detects the load of known vulnerable drivers via the file name of the drivers.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/low/">low</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/driver-load/">driver_load</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1543-003/">attack.t1543.003</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1068/">attack.t1068</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: low. Source dates: 2022-10-03 / 2023-12-02.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;driver_load&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/driver_load/driver_load_win_vuln_drivers_names.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: a18e1df01861cbb9c99aee5de4f2544723073369a99e58b831fea437651bba3f</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Vulnerable Driver Load By Name
+id: 72cd00d6-490c-4650-86ff-1d11f491daa1
+status: test
+description: Detects the load of known vulnerable drivers via the file name of the drivers.
+references:
+    - https://loldrivers.io/
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2022-10-03
+modified: 2023-12-02
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1543.003
+    - attack.t1068
+logsource:
+    product: windows
+    category: driver_load
+detection:
+    selection:
+        ImageLoaded|endswith:
+            - &#39;\panmonfltx64.sys&#39;
+            - &#39;\dbutil.sys&#39;
+            - &#39;\fairplaykd.sys&#39;
+            - &#39;\nvaudio.sys&#39;
+            - &#39;\superbmc.sys&#39;
+            - &#39;\bsmi.sys&#39;
+            - &#39;\smarteio64.sys&#39;
+            - &#39;\bwrsh.sys&#39;
+            - &#39;\agent64.sys&#39;
+            - &#39;\asmmap64.sys&#39;
+            - &#39;\dellbios.sys&#39;
+            - &#39;\chaos-rootkit.sys&#39;
+            - &#39;\wcpu.sys&#39;
+            - &#39;\dh_kernel.sys&#39;
+            - &#39;\sbiosio64.sys&#39;
+            - &#39;\bw.sys&#39;
+            - &#39;\asrdrv102.sys&#39;
+            - &#39;\nt6.sys&#39;
+            - &#39;\mhyprot3.sys&#39;
+            - &#39;\winio64c.sys&#39;
+            - &#39;\asupio64.sys&#39;
+            - &#39;\blackbonedrv10.sys&#39;
+            - &#39;\d.sys&#39;
+            - &#39;\driver7-x86.sys&#39;
+            - &#39;\sfdrvx32.sys&#39;
+            - &#39;\enetechio64.sys&#39;
+            - &#39;\gdrv.sys&#39;
+            - &#39;\sysinfodetectorx64.sys&#39;
+            - &#39;\fh-ethercat_dio.sys&#39;
+            - &#39;\asromgdrv.sys&#39;
+            - &#39;\my.sys&#39;
+            - &#39;\dcprotect.sys&#39;
+            - &#39;\irec.sys&#39;
+            - &#39;\gedevdrv.sys&#39;
+            - &#39;\winio32a.sys&#39;
+            - &#39;\gvcidrv64.sys&#39;
+            - &#39;\winio32.sys&#39;
+            - &#39;\bs_hwmio64.sys&#39;
+            - &#39;\nstr.sys&#39;
+            - &#39;\inpoutx64.sys&#39;
+            - &#39;\hw.sys&#39;
+            - &#39;\winio64.sys&#39;
+            - &#39;\hpportiox64.sys&#39;
+            - &#39;\iobitunlocker.sys&#39;
+            - &#39;\b1.sys&#39;
+            - &#39;\aoddriver.sys&#39;
+            - &#39;\elbycdio.sys&#39;
+            - &#39;\protects.sys&#39;
+            - &#39;\kprocesshacker.sys&#39;
+            - &#39;\speedfan.sys&#39;
+            - &#39;\radhwmgr.sys&#39;
+            - &#39;\iscflashx64.sys&#39;
+            - &#39;\black.sys&#39;
+            - &#39;\b4.sys&#39;
+            - &#39;\hwos2ec10x64.sys&#39;
+            - &#39;\winflash64.sys&#39;
+            - &#39;\corsairllaccess64.sys&#39;
+            - &#39;\bs_i2cio.sys&#39;
+            - &#39;\d3.sys&#39;
+            - &#39;\windows-xp-64.sys&#39;
+            - &#39;\aswvmm.sys&#39;
+            - &#39;\bs_i2c64.sys&#39;
+            - &#39;\1.sys&#39;
+            - &#39;\nchgbios2x64.sys&#39;
+            - &#39;\cpuz141.sys&#39;
+            - &#39;\segwindrvx64.sys&#39;
+            - &#39;\tdeio64.sys&#39;
+            - &#39;\ntiolib.sys&#39;
+            - &#39;\gtckmdfbs.sys&#39;
+            - &#39;\iomap64.sys&#39;
+            - &#39;\avalueio.sys&#39;
+            - &#39;\semav6msr.sys&#39;
+            - &#39;\lgdcatcher.sys&#39;
+            - &#39;\b.sys&#39;
+            - &#39;\hwdetectng.sys&#39;
+            - &#39;\nt4.sys&#39;
+            - &#39;\tgsafe.sys&#39;
+            - &#39;\mydrivers.sys&#39;
+            - &#39;\eneio64.sys&#39;
+            - &#39;\procexp.sys&#39;
+            - &#39;\viragt64.sys&#39;
+            - &#39;\fpcie2com.sys&#39;
+            - &#39;\lenovodiagnosticsdriver.sys&#39;
+            - &#39;\cp2x72c.sys&#39;
+            - &#39;\kerneld.amd64&#39;
+            - &#39;\bs_def64.sys&#39;
+            - &#39;\piddrv.sys&#39;
+            - &#39;\amifldrv64.sys&#39;
+            - &#39;\cpuz_x64.sys&#39;
+            - &#39;\proxy32.sys&#39;
+            - &#39;\wsdkd.sys&#39;
+            - &#39;\t8.sys&#39;
+            - &#39;\ucorew64.sys&#39;
+            - &#39;\atszio.sys&#39;
+            - &#39;\lmiinfo.sys&#39;
+            - &#39;\80.sys&#39;
+            - &#39;\nt3.sys&#39;
+            - &#39;\ngiodriver.sys&#39;
+            - &#39;\lv561av.sys&#39;
+            - &#39;\gpcidrv64.sys&#39;
+            - &#39;\fd3b7234419fafc9bdd533f48896ed73_b816c5cd.sys&#39;
+            - &#39;\rtport.sys&#39;
+            - &#39;\full.sys&#39;
+            - &#39;\viragt.sys&#39;
+            - &#39;\fiddrv64.sys&#39;
+            - &#39;\cupfixerx64.sys&#39;
+            - &#39;\cpupress.sys&#39;
+            - &#39;\hwos2ec7x64.sys&#39;
+            - &#39;\driver7-x86-withoutdbg.sys&#39;
+            - &#39;\asrdrv10.sys&#39;
+            - &#39;\nvflsh64.sys&#39;
+            - &#39;\asrrapidstartdrv.sys&#39;
+            - &#39;\tmcomm.sys&#39;
+            - &#39;\wiseunlo.sys&#39;
+            - &#39;\rwdrv.sys&#39;
+            - &#39;\asio64.sys&#39;
+            - &#39;\nvoclock.sys&#39;
+            - &#39;\panio.sys&#39;
+            - &#39;\mtcbsv64.sys&#39;
+            - &#39;\amigendrv64.sys&#39;
+            - &#39;\capcom.sys&#39;
+            - &#39;\netflt.sys&#39;
+            - &#39;\phlashnt.sys&#39;
+            - &#39;\dbutil_2_3.sys&#39;
+            - &#39;\ni.sys&#39;
+            - &#39;\ntiolib_x64.sys&#39;
+            - &#39;\atszio64.sys&#39;
+            - &#39;\lgcoretemp.sys&#39;
+            - &#39;\lha.sys&#39;
+            - &#39;\phymem64.sys&#39;
+            - &#39;\dbutildrv2.sys&#39;
+            - &#39;\asrdrv103.sys&#39;
+            - &#39;\rtcore64.sys&#39;
+            - &#39;\bs_hwmio64_w10.sys&#39;
+            - &#39;\ene.sys&#39;
+            - &#39;\winio64b.sys&#39;
+            - &#39;\piddrv64.sys&#39;
+            - &#39;\directio32.sys&#39;
+            - &#39;\monitor_win10_x64.sys&#39;
+            - &#39;\nt5.sys&#39;
+            - &#39;\asrsmartconnectdrv.sys&#39;
+            - &#39;\rtif.sys&#39;
+            - &#39;\atillk64.sys&#39;
+            - &#39;\directio.sys&#39;
+            - &#39;\asribdrv.sys&#39;
+            - &#39;\kfeco11x64.sys&#39;
+            - &#39;\citmdrv_ia64.sys&#39;
+            - &#39;\sysdrv3s.sys&#39;
+            - &#39;\amp.sys&#39;
+            - &#39;\vboxdrv.sys&#39;
+            - &#39;\adv64drv.sys&#39;
+            - &#39;\hostnt.sys&#39;
+            - &#39;\phymem_ext64.sys&#39;
+            - &#39;\echo_driver.sys&#39;
+            - &#39;\winiodrv.sys&#39;
+            - &#39;\pdfwkrnl.sys&#39;
+            - &#39;\glckio2.sys&#39;
+            - &#39;\asrdrv106.sys&#39;
+            - &#39;\nscm.sys&#39;
+            - &#39;\bs_rcio64.sys&#39;
+            - &#39;\ncpl.sys&#39;
+            - &#39;\sandra.sys&#39;
+            - &#39;\fiddrv.sys&#39;
+            - &#39;\hwrwdrv.sys&#39;
+            - &#39;\mhyprot.sys&#39;
+            - &#39;\asrsetupdrv103.sys&#39;
+            - &#39;\iqvw64.sys&#39;
+            - &#39;\b3.sys&#39;
+            - &#39;\ssport.sys&#39;
+            - &#39;\bs_def.sys&#39;
+            - &#39;\computerz.sys&#39;
+            - &#39;\windows8-10-32.sys&#39;
+            - &#39;\nstrwsk.sys&#39;
+            - &#39;\lurker.sys&#39;
+            - &#39;\bsmemx64.sys&#39;
+            - &#39;\wyproxy64.sys&#39;
+            - &#39;\asio.sys&#39;
+            - &#39;\t3.sys&#39;
+            - &#39;\cpuz.sys&#39;
+            - &#39;\rtkio.sys&#39;
+            - &#39;\driver7-x64.sys&#39;
+            - &#39;\netfilterdrv.sys&#39;
+            - &#39;\ioaccess.sys&#39;
+            - &#39;\testbone.sys&#39;
+            - &#39;\gameink.sys&#39;
+            - &#39;\kevp64.sys&#39;
+            - &#39;\mhyprot2.sys&#39;
+            - &#39;\se64a.sys&#39;
+            - &#39;\vboxusb.sys&#39;
+            - &#39;\windows7-32.sys&#39;
+            - &#39;\vproeventmonitor.sys&#39;
+            - &#39;\winio64a.sys&#39;
+            - &#39;\asrdrv101.sys&#39;
+            - &#39;\netproxydriver.sys&#39;
+            - &#39;\elrawdsk.sys&#39;
+            - &#39;\zam64.sys&#39;
+            - &#39;\cg6kwin2k.sys&#39;
+            - &#39;\asupio.sys&#39;
+            - &#39;\stdcdrvws64.sys&#39;
+            - &#39;\81.sys&#39;
+            - &#39;\citmdrv_amd64.sys&#39;
+            - &#39;\amdryzenmasterdriver.sys&#39;
+            - &#39;\vmdrv.sys&#39;
+            - &#39;\sysinfo.sys&#39;
+            - &#39;\alsysio64.sys&#39;
+            - &#39;\directio64.sys&#39;
+            - &#39;\rzpnk.sys&#39;
+            - &#39;\amdpowerprofiler.sys&#39;
+            - &#39;\truesight.sys&#39;
+            - &#39;\wirwadrv.sys&#39;
+            - &#39;\phymemx64.sys&#39;
+            - &#39;\msio64.sys&#39;
+            - &#39;\sepdrv3_1.sys&#39;
+            - &#39;\gametersafe.sys&#39;
+            - &#39;\bs_rcio.sys&#39;
+            - &#39;\d4.sys&#39;
+            - &#39;\t.sys&#39;
+            - &#39;\eio.sys&#39;
+            - &#39;\nt2.sys&#39;
+            - &#39;\winring0.sys&#39;
+            - &#39;\physmem.sys&#39;
+            - &#39;\libnicm.sys&#39;
+            - &#39;\msio32.sys&#39;
+            - &#39;\asrautochkupddrv.sys&#39;
+            - &#39;\asio32.sys&#39;
+            - &#39;\etdsupp.sys&#39;
+            - &#39;\smep_namco.sys&#39;
+            - &#39;\bandai.sys&#39;
+            - &#39;\d2.sys&#39;
+            - &#39;\magdrvamd64.sys&#39;
+            - &#39;\nvflash.sys&#39;
+            - &#39;\goad.sys&#39;
+            - &#39;\proxy64.sys&#39;
+            - &#39;\amsdk.sys&#39;
+            - &#39;\kbdcap64.sys&#39;
+            - &#39;\vdbsv64.sys&#39;
+            - &#39;\pchunter.sys&#39;
+            - &#39;\sysconp.sys&#39;
+            - &#39;\dh_kernel_10.sys&#39;
+            - &#39;\msrhook.sys&#39;
+            - &#39;\bedaisy.sys&#39;
+            - &#39;\dcr.sys&#39;
+            - &#39;\panmonflt.sys&#39;
+            - &#39;\bsmixp64.sys&#39;
+            - &#39;\otipcibus.sys&#39;
+            - &#39;\fidpcidrv.sys&#39;
+            - &#39;\kfeco10x64.sys&#39;
+            - &#39;\asrdrv104.sys&#39;
+            - &#39;\c.sys&#39;
+            - &#39;\tdklib64.sys&#39;
+            - &#39;\bsmix64.sys&#39;
+            - &#39;\bs_flash64.sys&#39;
+            - &#39;\stdcdrv64.sys&#39;
+            - &#39;\naldrv.sys&#39;
+            - &#39;\ctiio64.sys&#39;
+            - &#39;\bwrs.sys&#39;
+            - &#39;\nicm.sys&#39;
+            - &#39;\winio32b.sys&#39;
+            - &#39;\paniox64.sys&#39;
+            - &#39;\ecsiodriverx64.sys&#39;
+            - &#39;\iomem64.sys&#39;
+            - &#39;\fidpcidrv64.sys&#39;
+            - &#39;\aswarpot.sys&#39;
+            - &#39;\bs_rciow1064.sys&#39;
+            - &#39;\asmio64.sys&#39;
+            - &#39;\openlibsys.sys&#39;
+            - &#39;\viraglt64.sys&#39;
+            - &#39;\dbk64.sys&#39;
+            - &#39;\t7.sys&#39;
+            - &#39;\atlaccess.sys&#39;
+            - &#39;\nbiolib_x64.sys&#39;
+            - &#39;\smep_capcom.sys&#39;
+            - &#39;\iqvw64e.sys&#39;
+    condition: selection
+falsepositives:
+    - False positives may occur if one of the vulnerable driver names mentioned above didn&#39;t change its name between versions. So always make sure that the driver being loaded is the legitimate one and the non vulnerable version.
+    - If you experience a lot of FP you could comment the driver name or its exact known legitimate location (when possible)
+level: low
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/72cd00d6-490c-4650-86ff-1d11f491daa1.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>False positives may occur if one of the vulnerable driver names mentioned above didn&#39;t change its name between versions. So always make sure that the driver being loaded is the legitimate one and the non vulnerable version.</li><li>If you experience a lot of FP you could comment the driver name or its exact known legitimate location (when possible)</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://loldrivers.io/">https://loldrivers.io/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1068/">T1068 · Exploitation for Privilege Escalation</a> · <a href="/ttp-simulation/detections/enterprise/T1068/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1543.003/">T1543.003 · Windows Service</a> · <a href="/ttp-simulation/detections/enterprise/T1543.003/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Renamed Schtasks Execution — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule f91e51c9-f344-4b32-969b-0b6f6b8537d4. Renamed Schtasks Execution — Sigma Rule. Detects the execution of renamed schtasks.exe binary, which is a legitimate Windows utility used for scheduling tasks.
+One of the very common persistence techniques is schedule malicious tasks using schtasks.exe.
+Since, it is heavily abused, it is also heavily monitored by security products. To evade detection, threat actors may rename the schtasks.exe binary to schedule their malicious tasks.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="f91e51c9-f344-4b32-969b-0b6f6b8537d4, attack.execution, attack.persistence, attack.privilege-escalation, attack.stealth, attack.t1036.003, attack.t1053.005, process_creation, windows, rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.stealth, sigma-tag:attack.t1036.003, sigma-tag:attack.t1053.005">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.stealth, sigma-tag:attack.t1036.003, sigma-tag:attack.t1053.005">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/f91e51c9-f344-4b32-969b-0b6f6b8537d4/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/f91e51c9-f344-4b32-969b-0b6f6b8537d4/">
+<meta property="og:type" content="website"><meta property="og:title" content="Renamed Schtasks Execution — Sigma Rule"><meta property="og:description" content="Sigma rule f91e51c9-f344-4b32-969b-0b6f6b8537d4. Renamed Schtasks Execution — Sigma Rule. Detects the execution of renamed schtasks.exe binary, which is a legitimate Windows utility used for scheduling tasks.
+One of the very common persistence techniques is schedule malicious tasks using schtasks.exe.
+Since, it is heavily abused, it is also heavily monitored by security products. To evade detection, threat actors may rename the schtasks.exe binary to schedule their malicious tasks.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Renamed Schtasks Execution — Sigma Rule"><meta name="twitter:description" content="Sigma rule f91e51c9-f344-4b32-969b-0b6f6b8537d4. Renamed Schtasks Execution — Sigma Rule. Detects the execution of renamed schtasks.exe binary, which is a legitimate Windows utility used for scheduling tasks.
+One of the very common persistence techniques is schedule malicious tasks using schtasks.exe.
+Since, it is heavily abused, it is also heavily monitored by security products. To evade detection, threat actors may rename the schtasks.exe binary to schedule their malicious tasks.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/f91e51c9-f344-4b32-969b-0b6f6b8537d4/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/f91e51c9-f344-4b32-969b-0b6f6b8537d4/","name":"Renamed Schtasks Execution — Sigma Rule","description":"Sigma rule f91e51c9-f344-4b32-969b-0b6f6b8537d4. Renamed Schtasks Execution — Sigma Rule. Detects the execution of renamed schtasks.exe binary, which is a legitimate Windows utility used for scheduling tasks.\nOne of the very common persistence techniques is schedule malicious tasks using schtasks.exe.\nSince, it is heavily abused, it is also heavily monitored by security products. To evade detection, threat actors may rename the schtasks.exe binary to schedule their malicious tasks.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Renamed Schtasks Execution — Sigma Rule</h1><p class="lead">Sigma rule f91e51c9-f344-4b32-969b-0b6f6b8537d4. Renamed Schtasks Execution — Sigma Rule. Detects the execution of renamed schtasks.exe binary, which is a legitimate Windows utility used for scheduling tasks.
+One of the very common persistence techniques is schedule malicious tasks using schtasks.exe.
+Since, it is heavily abused, it is also heavily monitored by security products. To evade detection, threat actors may rename the schtasks.exe binary to schedule their malicious tasks.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1036-003/">attack.t1036.003</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1053-005/">attack.t1053.005</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2025-11-27 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_renamed_schtasks_execution.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 3c9a309363d14552c5437f2ac422be588b02aed4cf27792f20c2504caff1c2d3</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Renamed Schtasks Execution
+id: f91e51c9-f344-4b32-969b-0b6f6b8537d4
+status: experimental
+description: |
+    Detects the execution of renamed schtasks.exe binary, which is a legitimate Windows utility used for scheduling tasks.
+    One of the very common persistence techniques is schedule malicious tasks using schtasks.exe.
+    Since, it is heavily abused, it is also heavily monitored by security products. To evade detection, threat actors may rename the schtasks.exe binary to schedule their malicious tasks.
+references:
+    - https://x.com/JangPr0/status/1932034543026065833
+    - https://ss64.com/nt/schtasks.html
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-11-27
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.stealth
+    - attack.t1036.003
+    - attack.t1053.005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_cmd_operation:
+        CommandLine|contains|windash:
+            - &#39; /create &#39;
+            - &#39; /delete &#39;
+            - &#39; /query &#39;
+            - &#39; /change &#39;
+            - &#39; /run &#39;
+            - &#39; /end &#39;
+    selection_cmd_flags:
+        CommandLine|contains|windash:
+            - &#39; /tn &#39;
+            - &#39; /tr &#39;
+            - &#39; /sc &#39;
+            - &#39; /st &#39;
+            - &#39; /ru &#39;
+            - &#39; /fo &#39;
+    selection_pe:
+        OriginalFileName: &#39;schtasks.exe&#39;
+    filter_main_cmd:
+        CommandLine|contains: &#39;schtasks&#39;
+    filter_main_img:
+        Image|endswith: &#39;\schtasks.exe&#39;
+    condition: (all of selection_cmd_* and not filter_main_cmd) or (selection_pe and not filter_main_img)
+falsepositives:
+    - Unlikely
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/f91e51c9-f344-4b32-969b-0b6f6b8537d4.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unlikely</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://x.com/JangPr0/status/1932034543026065833">https://x.com/JangPr0/status/1932034543026065833</a></li><li><a href="https://ss64.com/nt/schtasks.html">https://ss64.com/nt/schtasks.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1036.003/">T1036.003 · Rename Legitimate Utilities</a> · <a href="/ttp-simulation/detections/enterprise/T1036.003/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1053.005/">T1053.005 · Scheduled Task</a> · <a href="/ttp-simulation/detections/enterprise/T1053.005/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Malicious Driver Load By Name — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 39b64854-5497-4b57-a448-40977b8c9679. Malicious Driver Load By Name — Sigma Rule. Detects loading of known malicious drivers via the file name of the drivers.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="39b64854-5497-4b57-a448-40977b8c9679, attack.persistence, attack.privilege-escalation, attack.t1543.003, attack.t1068, windows, driver_load, rule-status:test, severity:medium, logsource-product:windows, logsource-category:driver_load, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1543.003, sigma-tag:attack.t1068">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-category:driver_load, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1543.003, sigma-tag:attack.t1068">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/39b64854-5497-4b57-a448-40977b8c9679/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/39b64854-5497-4b57-a448-40977b8c9679/">
+<meta property="og:type" content="website"><meta property="og:title" content="Malicious Driver Load By Name — Sigma Rule"><meta property="og:description" content="Sigma rule 39b64854-5497-4b57-a448-40977b8c9679. Malicious Driver Load By Name — Sigma Rule. Detects loading of known malicious drivers via the file name of the drivers."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Malicious Driver Load By Name — Sigma Rule"><meta name="twitter:description" content="Sigma rule 39b64854-5497-4b57-a448-40977b8c9679. Malicious Driver Load By Name — Sigma Rule. Detects loading of known malicious drivers via the file name of the drivers."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/39b64854-5497-4b57-a448-40977b8c9679/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/39b64854-5497-4b57-a448-40977b8c9679/","name":"Malicious Driver Load By Name — Sigma Rule","description":"Sigma rule 39b64854-5497-4b57-a448-40977b8c9679. Malicious Driver Load By Name — Sigma Rule. Detects loading of known malicious drivers via the file name of the drivers.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Malicious Driver Load By Name — Sigma Rule</h1><p class="lead">Sigma rule 39b64854-5497-4b57-a448-40977b8c9679. Malicious Driver Load By Name — Sigma Rule. Detects loading of known malicious drivers via the file name of the drivers.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/driver-load/">driver_load</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1543-003/">attack.t1543.003</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1068/">attack.t1068</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2022-10-03 / 2023-12-02.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;driver_load&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/driver_load/driver_load_win_mal_drivers_names.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: f41b524f28711c500fdd4bc840f863fc30ddaa73ca9174edb328e9a7eec772dc</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Malicious Driver Load By Name
+id: 39b64854-5497-4b57-a448-40977b8c9679
+status: test
+description: Detects loading of known malicious drivers via the file name of the drivers.
+references:
+    - https://loldrivers.io/
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2022-10-03
+modified: 2023-12-02
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1543.003
+    - attack.t1068
+logsource:
+    product: windows
+    category: driver_load
+detection:
+    selection:
+        ImageLoaded|endswith:
+            - &#39;\wfshbr64.sys&#39;
+            - &#39;\ktmutil7odm.sys&#39;
+            - &#39;\ktes.sys&#39;
+            - &#39;\a26363e7b02b13f2b8d697abb90cd5c3.sys&#39;
+            - &#39;\kt2.sys&#39;
+            - &#39;\4748696211bd56c2d93c21cab91e82a5.sys&#39;
+            - &#39;\malicious.sys&#39;
+            - &#39;\a236e7d654cd932b7d11cb604629a2d0.sys&#39;
+            - &#39;\spwizimgvt.sys&#39;
+            - &#39;\c94f405c5929cfcccc8ad00b42c95083.sys&#39;
+            - &#39;\fur.sys&#39;
+            - &#39;\wantd.sys&#39;
+            - &#39;\windbg.sys&#39;
+            - &#39;\4118b86e490aed091b1a219dba45f332.sys&#39;
+            - &#39;\gmer64.sys&#39;
+            - &#39;\1fc7aeeff3ab19004d2e53eae8160ab1.sys&#39;
+            - &#39;\poortry2.sys&#39;
+            - &#39;\wintapix.sys&#39;
+            - &#39;\daxin_blank6.sys&#39;
+            - &#39;\6771b13a53b9c7449d4891e427735ea2.sys&#39;
+            - &#39;\blacklotus_driver.sys&#39;
+            - &#39;\air_system10.sys&#39;
+            - &#39;\dkrtk.sys&#39;
+            - &#39;\7.sys&#39;
+            - &#39;\sense5ext.sys&#39;
+            - &#39;\ktgn.sys&#39;
+            - &#39;\ndislan.sys&#39;
+            - &#39;\nlslexicons0024uvn.sys&#39;
+            - &#39;\be6318413160e589080df02bb3ca6e6a.sys&#39;
+            - &#39;\4.sys&#39;
+            - &#39;\wantd_2.sys&#39;
+            - &#39;\e29f6311ae87542b3d693c1f38e4e3ad.sys&#39;
+            - &#39;\daxin_blank3.sys&#39;
+            - &#39;\gftkyj64.sys&#39;
+            - &#39;\daxin_blank2.sys&#39;
+            - &#39;\wantd_4.sys&#39;
+            - &#39;\reddriver.sys&#39;
+            - &#39;\834761775.sys&#39;
+            - &#39;\mlgbbiicaihflrnh.sys&#39;
+            - &#39;\mjj0ge.sys&#39;
+            - &#39;\daxin_blank.sys&#39;
+            - &#39;\daxin_blank5.sys&#39;
+            - &#39;\poortry1.sys&#39;
+            - &#39;\msqpq.sys&#39;
+            - &#39;\mimidrv.sys&#39;
+            - &#39;\e939448b28a4edc81f1f974cebf6e7d2.sys&#39;
+            - &#39;\prokiller64.sys&#39;
+            - &#39;\nodedriver.sys&#39;
+            - &#39;\wantd_3.sys&#39;
+            - &#39;\lctka.sys&#39;
+            - &#39;\kapchelper_x64.sys&#39;
+            - &#39;\daxin_blank4.sys&#39;
+            - &#39;\a9df5964635ef8bd567ae487c3d214c4.sys&#39;
+            - &#39;\wantd_6.sys&#39;
+            - &#39;\ntbios.sys&#39;
+            - &#39;\wantd_5.sys&#39;
+            - &#39;\pciecubed.sys&#39;
+            - &#39;\mimikatz.sys&#39;
+            - &#39;\nqrmq.sys&#39;
+            - &#39;\2.sys&#39;
+            - &#39;\poortry.sys&#39;
+            - &#39;\ntbios_2.sys&#39;
+            - &#39;\fgme.sys&#39;
+            - &#39;\telephonuafy.sys&#39;
+            - &#39;\typelibde.sys&#39;
+            - &#39;\daxin_blank1.sys&#39;
+            - &#39;\ef0e1725aaf0c6c972593f860531a2ea.sys&#39;
+            - &#39;\5a4fe297c7d42539303137b6d75b150d.sys&#39;
+    condition: selection
+falsepositives:
+    - False positives may occur if one of the vulnerable driver names mentioned above didn&#39;t change its name between versions. So always make sure that the driver being loaded is the legitimate one and the non vulnerable version.
+    - If you experience a lot of FP you could comment the driver name or its exact known legitimate location (when possible)
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/39b64854-5497-4b57-a448-40977b8c9679.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>False positives may occur if one of the vulnerable driver names mentioned above didn&#39;t change its name between versions. So always make sure that the driver being loaded is the legitimate one and the non vulnerable version.</li><li>If you experience a lot of FP you could comment the driver name or its exact known legitimate location (when possible)</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://loldrivers.io/">https://loldrivers.io/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1068/">T1068 · Exploitation for Privilege Escalation</a> · <a href="/ttp-simulation/detections/enterprise/T1068/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1543.003/">T1543.003 · Windows Service</a> · <a href="/ttp-simulation/detections/enterprise/T1543.003/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

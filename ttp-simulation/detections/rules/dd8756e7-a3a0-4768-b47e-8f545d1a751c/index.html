@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule dd8756e7-a3a0-4768-b47e-8f545d1a751c. Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule. Detects exploitation of LNK file command-line length discrepancy, where attackers hide malicious commands beyond the 260-character UI limit while the actual command-line argument field supports 4096 characters using whitespace padding (e.g., 0x20, 0x09-0x0D).
+Adversaries insert non-printable whitespace characters (e.g., Line Feed \x0A, Carriage Return \x0D) to pad the visible section of the LNK file, pushing malicious commands past the UI-visible boundary.
+The hidden payload, executed at runtime but invisible in Windows Explorer properties, enables stealthy execution and evasion—commonly used for social engineering attacks.
+This rule flags suspicious use of such padding observed in real-world attacks.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="dd8756e7-a3a0-4768-b47e-8f545d1a751c, attack.initial-access, attack.execution, attack.t1204.002, process_creation, windows, rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.initial-access, sigma-tag:attack.execution, sigma-tag:attack.t1204.002">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.initial-access, sigma-tag:attack.execution, sigma-tag:attack.t1204.002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/dd8756e7-a3a0-4768-b47e-8f545d1a751c/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/dd8756e7-a3a0-4768-b47e-8f545d1a751c/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule"><meta property="og:description" content="Sigma rule dd8756e7-a3a0-4768-b47e-8f545d1a751c. Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule. Detects exploitation of LNK file command-line length discrepancy, where attackers hide malicious commands beyond the 260-character UI limit while the actual command-line argument field supports 4096 characters using whitespace padding (e.g., 0x20, 0x09-0x0D).
+Adversaries insert non-printable whitespace characters (e.g., Line Feed \x0A, Carriage Return \x0D) to pad the visible section of the LNK file, pushing malicious commands past the UI-visible boundary.
+The hidden payload, executed at runtime but invisible in Windows Explorer properties, enables stealthy execution and evasion—commonly used for social engineering attacks.
+This rule flags suspicious use of such padding observed in real-world attacks.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule"><meta name="twitter:description" content="Sigma rule dd8756e7-a3a0-4768-b47e-8f545d1a751c. Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule. Detects exploitation of LNK file command-line length discrepancy, where attackers hide malicious commands beyond the 260-character UI limit while the actual command-line argument field supports 4096 characters using whitespace padding (e.g., 0x20, 0x09-0x0D).
+Adversaries insert non-printable whitespace characters (e.g., Line Feed \x0A, Carriage Return \x0D) to pad the visible section of the LNK file, pushing malicious commands past the UI-visible boundary.
+The hidden payload, executed at runtime but invisible in Windows Explorer properties, enables stealthy execution and evasion—commonly used for social engineering attacks.
+This rule flags suspicious use of such padding observed in real-world attacks.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/dd8756e7-a3a0-4768-b47e-8f545d1a751c/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/dd8756e7-a3a0-4768-b47e-8f545d1a751c/","name":"Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule","description":"Sigma rule dd8756e7-a3a0-4768-b47e-8f545d1a751c. Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule. Detects exploitation of LNK file command-line length discrepancy, where attackers hide malicious commands beyond the 260-character UI limit while the actual command-line argument field supports 4096 characters using whitespace padding (e.g., 0x20, 0x09-0x0D).\nAdversaries insert non-printable whitespace characters (e.g., Line Feed \\x0A, Carriage Return \\x0D) to pad the visible section of the LNK file, pushing malicious commands past the UI-visible boundary.\nThe hidden payload, executed at runtime but invisible in Windows Explorer properties, enables stealthy execution and evasion—commonly used for social engineering attacks.\nThis rule flags suspicious use of such padding observed in real-world attacks.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule</h1><p class="lead">Sigma rule dd8756e7-a3a0-4768-b47e-8f545d1a751c. Suspicious LNK Command-Line Padding with Whitespace Characters — Sigma Rule. Detects exploitation of LNK file command-line length discrepancy, where attackers hide malicious commands beyond the 260-character UI limit while the actual command-line argument field supports 4096 characters using whitespace padding (e.g., 0x20, 0x09-0x0D).
+Adversaries insert non-printable whitespace characters (e.g., Line Feed \x0A, Carriage Return \x0D) to pad the visible section of the LNK file, pushing malicious commands past the UI-visible boundary.
+The hidden payload, executed at runtime but invisible in Windows Explorer properties, enables stealthy execution and evasion—commonly used for social engineering attacks.
+This rule flags suspicious use of such padding observed in real-world attacks.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-initial-access/">attack.initial-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1204-002/">attack.t1204.002</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2025-03-19 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_susp_lnk_exec_hidden_cmd.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 9dc68926b192b519ecf556c776bd0cbb44e0feb5f621b80e40dd987998a8e5c0</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious LNK Command-Line Padding with Whitespace Characters
+id: dd8756e7-a3a0-4768-b47e-8f545d1a751c
+status: experimental
+description: |
+    Detects exploitation of LNK file command-line length discrepancy, where attackers hide malicious commands beyond the 260-character UI limit while the actual command-line argument field supports 4096 characters using whitespace padding (e.g., 0x20, 0x09-0x0D).
+    Adversaries insert non-printable whitespace characters (e.g., Line Feed \x0A, Carriage Return \x0D) to pad the visible section of the LNK file, pushing malicious commands past the UI-visible boundary.
+    The hidden payload, executed at runtime but invisible in Windows Explorer properties, enables stealthy execution and evasion—commonly used for social engineering attacks.
+    This rule flags suspicious use of such padding observed in real-world attacks.
+references:
+    - https://syedhasan010.medium.com/forensics-analysis-of-an-lnk-file-da68a98b8415
+    - https://thehackernews.com/2025/03/unpatched-windows-zero-day-flaw.html
+    - https://www.trendmicro.com/en_us/research/25/c/windows-shortcut-zero-day-exploit.html
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-03-19
+tags:
+    - attack.initial-access
+    - attack.execution
+    - attack.t1204.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - ParentImage|endswith: &#39;\explorer.exe&#39;
+        - ParentCommandLine|contains: &#39;.lnk&#39;
+    selection_cmd:
+        - CommandLine|contains:
+              - &#39;                 &#39;  # Padding of SPACE (0x20)
+            # - &#39;	&#39;  # Horizontal Tab (0x9)
+              - &#39;\u0009&#39;
+              - &#39;\u000A&#39; # Line Feed
+              - &#39;\u0011&#39;
+              - &#39;\u0012&#39;
+              - &#39;\u0013&#39;
+              - &#39;\u000B&#39; # Vertical Tab
+              - &#39;\u000C&#39;  # \x0C
+              - &#39;\u000D&#39;  # \x0D
+        - CommandLine|re: &#39;\n\n\n\n\n\n&#39; # In some cases \u000[ABCD] are represented as a newline in the eventlog
+    condition: all of selection_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/dd8756e7-a3a0-4768-b47e-8f545d1a751c.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://syedhasan010.medium.com/forensics-analysis-of-an-lnk-file-da68a98b8415">https://syedhasan010.medium.com/forensics-analysis-of-an-lnk-file-da68a98b8415</a></li><li><a href="https://thehackernews.com/2025/03/unpatched-windows-zero-day-flaw.html">https://thehackernews.com/2025/03/unpatched-windows-zero-day-flaw.html</a></li><li><a href="https://www.trendmicro.com/en_us/research/25/c/windows-shortcut-zero-day-exploit.html">https://www.trendmicro.com/en_us/research/25/c/windows-shortcut-zero-day-exploit.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1204.002/">T1204.002 · Malicious File</a> · <a href="/ttp-simulation/detections/enterprise/T1204.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

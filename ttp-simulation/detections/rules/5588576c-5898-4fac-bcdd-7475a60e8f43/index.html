@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 5588576c-5898-4fac-bcdd-7475a60e8f43. Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule. Detects DNS queries containing patterns associated with Kerberos coercion attacks via DNS object spoofing.
+The pattern &quot;1UWhRCAAAAA..BAAAA&quot; is a base64-encoded signature that corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure.
+Attackers can use this technique to coerce authentication from victim systems to attacker-controlled hosts.
+It is one of the strong indicators of a Kerberos coercion attack, where adversaries manipulate DNS records
+to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="5588576c-5898-4fac-bcdd-7475a60e8f43, attack.collection, attack.credential-access, attack.persistence, attack.privilege-escalation, attack.t1557.001, attack.t1187, zeek, dns, rule-status:experimental, severity:high, logsource-product:zeek, logsource-service:dns, sigma-tag:attack.collection, sigma-tag:attack.credential-access, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1557.001, sigma-tag:attack.t1187">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-product:zeek, logsource-service:dns, sigma-tag:attack.collection, sigma-tag:attack.credential-access, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1557.001, sigma-tag:attack.t1187">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/5588576c-5898-4fac-bcdd-7475a60e8f43/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/5588576c-5898-4fac-bcdd-7475a60e8f43/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule"><meta property="og:description" content="Sigma rule 5588576c-5898-4fac-bcdd-7475a60e8f43. Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule. Detects DNS queries containing patterns associated with Kerberos coercion attacks via DNS object spoofing.
+The pattern &quot;1UWhRCAAAAA..BAAAA&quot; is a base64-encoded signature that corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure.
+Attackers can use this technique to coerce authentication from victim systems to attacker-controlled hosts.
+It is one of the strong indicators of a Kerberos coercion attack, where adversaries manipulate DNS records
+to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule"><meta name="twitter:description" content="Sigma rule 5588576c-5898-4fac-bcdd-7475a60e8f43. Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule. Detects DNS queries containing patterns associated with Kerberos coercion attacks via DNS object spoofing.
+The pattern &quot;1UWhRCAAAAA..BAAAA&quot; is a base64-encoded signature that corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure.
+Attackers can use this technique to coerce authentication from victim systems to attacker-controlled hosts.
+It is one of the strong indicators of a Kerberos coercion attack, where adversaries manipulate DNS records
+to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/5588576c-5898-4fac-bcdd-7475a60e8f43/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/5588576c-5898-4fac-bcdd-7475a60e8f43/","name":"Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule","description":"Sigma rule 5588576c-5898-4fac-bcdd-7475a60e8f43. Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule. Detects DNS queries containing patterns associated with Kerberos coercion attacks via DNS object spoofing.\nThe pattern \"1UWhRCAAAAA..BAAAA\" is a base64-encoded signature that corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure.\nAttackers can use this technique to coerce authentication from victim systems to attacker-controlled hosts.\nIt is one of the strong indicators of a Kerberos coercion attack, where adversaries manipulate DNS records\nto spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule</h1><p class="lead">Sigma rule 5588576c-5898-4fac-bcdd-7475a60e8f43. Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network — Sigma Rule. Detects DNS queries containing patterns associated with Kerberos coercion attacks via DNS object spoofing.
+The pattern &quot;1UWhRCAAAAA..BAAAA&quot; is a base64-encoded signature that corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure.
+Attackers can use this technique to coerce authentication from victim systems to attacker-controlled hosts.
+It is one of the strong indicators of a Kerberos coercion attack, where adversaries manipulate DNS records
+to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/zeek/">zeek</a><a class="chip" href="/ttp-simulation/tags/logsource-service/dns/">dns</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-collection/">attack.collection</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1557-001/">attack.t1557.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1187/">attack.t1187</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2025-06-20 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;zeek&quot;,
+  &quot;service&quot;: &quot;dns&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/network/zeek/zeek_dns_kerberos_coercion_via_dns_object_spn_spoofing.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 34912b2da9cd65c9ff462023a100a3ee563114c0135c87165d6a649d71f563f7</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious DNS Query Indicating Kerberos Coercion via DNS Object SPN Spoofing - Network
+id: 5588576c-5898-4fac-bcdd-7475a60e8f43
+related:
+    - id: b07e58cf-cacc-4135-8473-ccb2eba63dd2 # Potential Kerberos Coercion via DNS Object Spoofing
+      type: similar
+    - id: e7a21b5f-d8c4-4ae5-b8d9-93c5d3f28e1c # Suspicious DNS Query Indicating Kerberos Coercion via DNS Object Spoofing
+      type: similar
+status: experimental
+description: |
+    Detects DNS queries containing patterns associated with Kerberos coercion attacks via DNS object spoofing.
+    The pattern &quot;1UWhRCAAAAA..BAAAA&quot; is a base64-encoded signature that corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure.
+    Attackers can use this technique to coerce authentication from victim systems to attacker-controlled hosts.
+    It is one of the strong indicators of a Kerberos coercion attack, where adversaries manipulate DNS records
+    to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+references:
+    - https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025
+    - https://googleprojectzero.blogspot.com/2021/10/using-kerberos-for-authentication-relay.html
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-06-20
+tags:
+    - attack.collection
+    - attack.credential-access
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1557.001
+    - attack.t1187
+logsource:
+    product: zeek
+    service: dns
+detection:
+    selection:
+        query|contains|all:
+            - &#39;UWhRCA&#39; # Follows this pattern UWhRCAAAAA..BAAA
+            - &#39;BAAAA&#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/5588576c-5898-4fac-bcdd-7475a60e8f43.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025">https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025</a></li><li><a href="https://googleprojectzero.blogspot.com/2021/10/using-kerberos-for-authentication-relay.html">https://googleprojectzero.blogspot.com/2021/10/using-kerberos-for-authentication-relay.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1187/">T1187 · Forced Authentication</a> · <a href="/ttp-simulation/detections/enterprise/T1187/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1557.001/">T1557.001 · Name Resolution Poisoning and SMB Relay</a> · <a href="/ttp-simulation/detections/enterprise/T1557.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

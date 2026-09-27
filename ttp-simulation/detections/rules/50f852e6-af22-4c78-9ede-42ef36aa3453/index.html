@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Azure Browser SSO Abuse — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 50f852e6-af22-4c78-9ede-42ef36aa3453. Potential Azure Browser SSO Abuse — Sigma Rule. Detects abusing Azure Browser SSO by requesting OAuth 2.0 refresh tokens for an Azure-AD-authenticated Windows user (i.e. the machine is joined to Azure AD and a user logs in with their Azure AD account) wanting to perform SSO authentication in the browser.
+An attacker can use this to authenticate to Azure AD in a browser as that user.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="50f852e6-af22-4c78-9ede-42ef36aa3453, attack.persistence, attack.privilege-escalation, attack.execution, attack.stealth, attack.t1574.001, image_load, windows, rule-status:test, severity:low, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1574.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:low, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1574.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/50f852e6-af22-4c78-9ede-42ef36aa3453/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/50f852e6-af22-4c78-9ede-42ef36aa3453/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Azure Browser SSO Abuse — Sigma Rule"><meta property="og:description" content="Sigma rule 50f852e6-af22-4c78-9ede-42ef36aa3453. Potential Azure Browser SSO Abuse — Sigma Rule. Detects abusing Azure Browser SSO by requesting OAuth 2.0 refresh tokens for an Azure-AD-authenticated Windows user (i.e. the machine is joined to Azure AD and a user logs in with their Azure AD account) wanting to perform SSO authentication in the browser.
+An attacker can use this to authenticate to Azure AD in a browser as that user.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Azure Browser SSO Abuse — Sigma Rule"><meta name="twitter:description" content="Sigma rule 50f852e6-af22-4c78-9ede-42ef36aa3453. Potential Azure Browser SSO Abuse — Sigma Rule. Detects abusing Azure Browser SSO by requesting OAuth 2.0 refresh tokens for an Azure-AD-authenticated Windows user (i.e. the machine is joined to Azure AD and a user logs in with their Azure AD account) wanting to perform SSO authentication in the browser.
+An attacker can use this to authenticate to Azure AD in a browser as that user.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/50f852e6-af22-4c78-9ede-42ef36aa3453/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/50f852e6-af22-4c78-9ede-42ef36aa3453/","name":"Potential Azure Browser SSO Abuse — Sigma Rule","description":"Sigma rule 50f852e6-af22-4c78-9ede-42ef36aa3453. Potential Azure Browser SSO Abuse — Sigma Rule. Detects abusing Azure Browser SSO by requesting OAuth 2.0 refresh tokens for an Azure-AD-authenticated Windows user (i.e. the machine is joined to Azure AD and a user logs in with their Azure AD account) wanting to perform SSO authentication in the browser.\nAn attacker can use this to authenticate to Azure AD in a browser as that user.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Azure Browser SSO Abuse — Sigma Rule</h1><p class="lead">Sigma rule 50f852e6-af22-4c78-9ede-42ef36aa3453. Potential Azure Browser SSO Abuse — Sigma Rule. Detects abusing Azure Browser SSO by requesting OAuth 2.0 refresh tokens for an Azure-AD-authenticated Windows user (i.e. the machine is joined to Azure AD and a user logs in with their Azure AD account) wanting to perform SSO authentication in the browser.
+An attacker can use this to authenticate to Azure AD in a browser as that user.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/low/">low</a><a class="chip" href="/ttp-simulation/tags/logsource-category/image-load/">image_load</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1574-001/">attack.t1574.001</a></div><p>Author: Den Iuzvyk. Source status: test; severity: low. Source dates: 2020-07-15 / 2023-04-18.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;image_load&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/image_load/image_load_dll_azure_microsoft_account_token_provider_dll_load.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 8a6c33b31b57d35958e06a11634e4be1f1695e85e2019d98116a5c21cd27e550</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Azure Browser SSO Abuse
+id: 50f852e6-af22-4c78-9ede-42ef36aa3453
+status: test
+description: |
+    Detects abusing Azure Browser SSO by requesting OAuth 2.0 refresh tokens for an Azure-AD-authenticated Windows user (i.e. the machine is joined to Azure AD and a user logs in with their Azure AD account) wanting to perform SSO authentication in the browser.
+    An attacker can use this to authenticate to Azure AD in a browser as that user.
+references:
+    - https://posts.specterops.io/requesting-azure-ad-request-tokens-on-azure-ad-joined-machines-for-browser-sso-2b0409caad30
+author: Den Iuzvyk
+date: 2020-07-15
+modified: 2023-04-18
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.execution
+    - attack.stealth
+    - attack.t1574.001
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection:
+        ImageLoaded: &#39;C:\Windows\System32\MicrosoftAccountTokenProvider.dll&#39;
+    filter_main_bgtaskhost:
+        Image|startswith:
+            - &#39;C:\Windows\System32\&#39;
+            - &#39;C:\Windows\SysWOW64\&#39;
+        Image|endswith: &#39;\BackgroundTaskHost.exe&#39;
+        # CommandLine|contains: &#39;-ServerNameBackgroundTaskHost.WebAccountProvider&#39;
+    filter_optional_devenv:
+        Image|startswith:
+            - &#39;C:\Program Files\Microsoft Visual Studio\&#39;
+            - &#39;C:\Program Files (x86)\Microsoft Visual Studio\&#39;
+        Image|endswith: &#39;\IDE\devenv.exe&#39;
+    filter_optional_ie:
+        Image:
+            - &#39;C:\Program Files (x86)\Internet Explorer\iexplore.exe&#39;
+            - &#39;C:\Program Files\Internet Explorer\iexplore.exe&#39;
+    filter_optional_edge_1:
+        - Image|startswith: &#39;C:\Program Files (x86)\Microsoft\EdgeWebView\Application\&#39;
+        - Image|endswith: &#39;\WindowsApps\MicrosoftEdge.exe&#39;
+        - Image:
+              - &#39;C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe&#39;
+              - &#39;C:\Program Files\Microsoft\Edge\Application\msedge.exe&#39;
+    filter_optional_edge_2:
+        Image|startswith:
+            - &#39;C:\Program Files (x86)\Microsoft\EdgeCore\&#39;
+            - &#39;C:\Program Files\Microsoft\EdgeCore\&#39;
+        Image|endswith:
+            - &#39;\msedge.exe&#39;
+            - &#39;\msedgewebview2.exe&#39;
+    filter_optional_onedrive:
+        Image|endswith: &#39;\AppData\Local\Microsoft\OneDrive\OneDrive.exe&#39;
+    filter_optional_null:
+        Image: null
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - False positives are expected since this rules is only looking for the DLL load event. This rule is better used in correlation with related activity
+level: low
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/50f852e6-af22-4c78-9ede-42ef36aa3453.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>False positives are expected since this rules is only looking for the DLL load event. This rule is better used in correlation with related activity</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://posts.specterops.io/requesting-azure-ad-request-tokens-on-azure-ad-joined-machines-for-browser-sso-2b0409caad30">https://posts.specterops.io/requesting-azure-ad-request-tokens-on-azure-ad-joined-machines-for-browser-sso-2b0409caad30</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1574.001/">T1574.001 · DLL</a> · <a href="/ttp-simulation/detections/enterprise/T1574.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 846c7a87-8e14-4569-9d49-ecfd4276a01c. DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule. Detects execution and usage of the DSInternals PowerShell module. Which can be used to perform what might be considered as suspicious activity such as dumping DPAPI backup keys or manipulating NTDS.DIT files.
+The DSInternals PowerShell Module exposes several internal features of Active Directory and Azure Active Directory. These include FIDO2 and NGC key auditing, offline ntds.dit file manipulation, password auditing, DC recovery from IFM backups and password hash calculation.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="846c7a87-8e14-4569-9d49-ecfd4276a01c, attack.execution, attack.t1059.001, windows, ps_script, Requirements: Script Block Logging must be enabled, rule-status:test, severity:high, logsource-product:windows, logsource-category:ps_script, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:windows, logsource-category:ps_script, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/846c7a87-8e14-4569-9d49-ecfd4276a01c/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/846c7a87-8e14-4569-9d49-ecfd4276a01c/">
+<meta property="og:type" content="website"><meta property="og:title" content="DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule"><meta property="og:description" content="Sigma rule 846c7a87-8e14-4569-9d49-ecfd4276a01c. DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule. Detects execution and usage of the DSInternals PowerShell module. Which can be used to perform what might be considered as suspicious activity such as dumping DPAPI backup keys or manipulating NTDS.DIT files.
+The DSInternals PowerShell Module exposes several internal features of Active Directory and Azure Active Directory. These include FIDO2 and NGC key auditing, offline ntds.dit file manipulation, password auditing, DC recovery from IFM backups and password hash calculation.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule"><meta name="twitter:description" content="Sigma rule 846c7a87-8e14-4569-9d49-ecfd4276a01c. DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule. Detects execution and usage of the DSInternals PowerShell module. Which can be used to perform what might be considered as suspicious activity such as dumping DPAPI backup keys or manipulating NTDS.DIT files.
+The DSInternals PowerShell Module exposes several internal features of Active Directory and Azure Active Directory. These include FIDO2 and NGC key auditing, offline ntds.dit file manipulation, password auditing, DC recovery from IFM backups and password hash calculation.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/846c7a87-8e14-4569-9d49-ecfd4276a01c/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/846c7a87-8e14-4569-9d49-ecfd4276a01c/","name":"DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule","description":"Sigma rule 846c7a87-8e14-4569-9d49-ecfd4276a01c. DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule. Detects execution and usage of the DSInternals PowerShell module. Which can be used to perform what might be considered as suspicious activity such as dumping DPAPI backup keys or manipulating NTDS.DIT files.\nThe DSInternals PowerShell Module exposes several internal features of Active Directory and Azure Active Directory. These include FIDO2 and NGC key auditing, offline ntds.dit file manipulation, password auditing, DC recovery from IFM backups and password hash calculation.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule</h1><p class="lead">Sigma rule 846c7a87-8e14-4569-9d49-ecfd4276a01c. DSInternals Suspicious PowerShell Cmdlets - ScriptBlock — Sigma Rule. Detects execution and usage of the DSInternals PowerShell module. Which can be used to perform what might be considered as suspicious activity such as dumping DPAPI backup keys or manipulating NTDS.DIT files.
+The DSInternals PowerShell Module exposes several internal features of Active Directory and Azure Active Directory. These include FIDO2 and NGC key auditing, offline ntds.dit file manipulation, password auditing, DC recovery from IFM backups and password hash calculation.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/ps-script/">ps_script</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: high. Source dates: 2024-06-26 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;ps_script&quot;,
+  &quot;definition&quot;: &quot;Requirements: Script Block Logging must be enabled&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/powershell/powershell_script/posh_ps_dsinternals_cmdlets.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: b29d67eb87276e1c6ed08db0f5aea11044d1eab064fdfcddfdaf87b21b42709a</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: DSInternals Suspicious PowerShell Cmdlets - ScriptBlock
+id: 846c7a87-8e14-4569-9d49-ecfd4276a01c
+related:
+    - id: 43d91656-a9b2-4541-b7e2-6a9bd3a13f4e
+      type: similar
+status: test
+description: |
+    Detects execution and usage of the DSInternals PowerShell module. Which can be used to perform what might be considered as suspicious activity such as dumping DPAPI backup keys or manipulating NTDS.DIT files.
+    The DSInternals PowerShell Module exposes several internal features of Active Directory and Azure Active Directory. These include FIDO2 and NGC key auditing, offline ntds.dit file manipulation, password auditing, DC recovery from IFM backups and password hash calculation.
+references:
+    - https://github.com/MichaelGrafnetter/DSInternals/blob/39ee8a69bbdc1cfd12c9afdd7513b4788c4895d4/Src/DSInternals.PowerShell/DSInternals.psd1
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2024-06-26
+tags:
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    product: windows
+    category: ps_script
+    definition: &#39;Requirements: Script Block Logging must be enabled&#39;
+detection:
+    selection:
+        ScriptBlockText|contains:
+            - &#39;Add-ADDBSidHistory&#39;
+            - &#39;Add-ADNgcKey&#39;
+            - &#39;Add-ADReplNgcKey&#39;
+            - &#39;ConvertFrom-ADManagedPasswordBlob&#39;
+            - &#39;ConvertFrom-GPPrefPassword&#39;
+            - &#39;ConvertFrom-ManagedPasswordBlob&#39;
+            - &#39;ConvertFrom-UnattendXmlPassword&#39;
+            - &#39;ConvertFrom-UnicodePassword&#39;
+            - &#39;ConvertTo-AADHash&#39;
+            - &#39;ConvertTo-GPPrefPassword&#39;
+            - &#39;ConvertTo-KerberosKey&#39;
+            - &#39;ConvertTo-LMHash&#39;
+            - &#39;ConvertTo-MsoPasswordHash&#39;
+            - &#39;ConvertTo-NTHash&#39;
+            - &#39;ConvertTo-OrgIdHash&#39;
+            - &#39;ConvertTo-UnicodePassword&#39;
+            - &#39;Disable-ADDBAccount&#39;
+            - &#39;Enable-ADDBAccount&#39;
+            - &#39;Get-ADDBAccount&#39;
+            - &#39;Get-ADDBBackupKey&#39;
+            - &#39;Get-ADDBDomainController&#39;
+            - &#39;Get-ADDBGroupManagedServiceAccount&#39;
+            - &#39;Get-ADDBKdsRootKey&#39;
+            - &#39;Get-ADDBSchemaAttribute&#39;
+            - &#39;Get-ADDBServiceAccount&#39;
+            - &#39;Get-ADDefaultPasswordPolicy&#39;
+            - &#39;Get-ADKeyCredential&#39; # Covers &#39;Get-ADKeyCredentialLink&#39;
+            - &#39;Get-ADPasswordPolicy&#39;
+            - &#39;Get-ADReplAccount&#39;
+            - &#39;Get-ADReplBackupKey&#39;
+            - &#39;Get-ADReplicationAccount&#39;
+            - &#39;Get-ADSIAccount&#39;
+            - &#39;Get-AzureADUserEx&#39;
+            - &#39;Get-BootKey&#39;
+            - &#39;Get-KeyCredential&#39;
+            - &#39;Get-LsaBackupKey&#39;
+            - &#39;Get-LsaPolicy&#39; # Covers &#39;Get-LsaPolicyInformation&#39;
+            - &#39;Get-SamPasswordPolicy&#39;
+            - &#39;Get-SysKey&#39;
+            - &#39;Get-SystemKey&#39;
+            - &#39;New-ADDBRestoreFromMediaScript&#39;
+            - &#39;New-ADKeyCredential&#39; # Covers &#39;New-ADKeyCredentialLink&#39;
+            - &#39;New-ADNgcKey&#39;
+            - &#39;New-NTHashSet&#39;
+            - &#39;Remove-ADDBObject&#39;
+            - &#39;Save-DPAPIBlob&#39;
+            - &#39;Set-ADAccountPasswordHash&#39;
+            - &#39;Set-ADDBAccountPassword&#39; # Covers &#39;Set-ADDBAccountPasswordHash&#39;
+            - &#39;Set-ADDBBootKey&#39;
+            - &#39;Set-ADDBDomainController&#39;
+            - &#39;Set-ADDBPrimaryGroup&#39;
+            - &#39;Set-ADDBSysKey&#39;
+            - &#39;Set-AzureADUserEx&#39;
+            - &#39;Set-LsaPolicy&#39; # Covers &#39;Set-LSAPolicyInformation&#39;
+            - &#39;Set-SamAccountPasswordHash&#39;
+            - &#39;Set-WinUserPasswordHash&#39;
+            - &#39;Test-ADDBPasswordQuality&#39;
+            - &#39;Test-ADPasswordQuality&#39;
+            - &#39;Test-ADReplPasswordQuality&#39;
+            - &#39;Test-PasswordQuality&#39;
+            - &#39;Unlock-ADDBAccount&#39;
+            - &#39;Write-ADNgcKey&#39;
+            - &#39;Write-ADReplNgcKey&#39;
+    condition: selection
+falsepositives:
+    - Legitimate usage of DSInternals for administration or audit purpose.
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/846c7a87-8e14-4569-9d49-ecfd4276a01c.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate usage of DSInternals for administration or audit purpose.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/MichaelGrafnetter/DSInternals/blob/39ee8a69bbdc1cfd12c9afdd7513b4788c4895d4/Src/DSInternals.PowerShell/DSInternals.psd1">https://github.com/MichaelGrafnetter/DSInternals/blob/39ee8a69bbdc1cfd12c9afdd7513b4788c4895d4/Src/DSInternals.PowerShell/DSInternals.psd1</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

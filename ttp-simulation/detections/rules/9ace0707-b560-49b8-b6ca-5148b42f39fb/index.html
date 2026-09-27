@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Persistence Via Logon Scripts - Registry — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 9ace0707-b560-49b8-b6ca-5148b42f39fb. Potential Persistence Via Logon Scripts - Registry — Sigma Rule. Detects creation of &quot;UserInitMprLogonScript&quot; registry value which can be used as a persistence method by malicious actors">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="9ace0707-b560-49b8-b6ca-5148b42f39fb, attack.privilege-escalation, attack.t1037.001, attack.persistence, attack.lateral-movement, registry_set, windows, rule-status:test, severity:medium, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1037.001, sigma-tag:attack.persistence, sigma-tag:attack.lateral-movement">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1037.001, sigma-tag:attack.persistence, sigma-tag:attack.lateral-movement">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/9ace0707-b560-49b8-b6ca-5148b42f39fb/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/9ace0707-b560-49b8-b6ca-5148b42f39fb/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Persistence Via Logon Scripts - Registry — Sigma Rule"><meta property="og:description" content="Sigma rule 9ace0707-b560-49b8-b6ca-5148b42f39fb. Potential Persistence Via Logon Scripts - Registry — Sigma Rule. Detects creation of &quot;UserInitMprLogonScript&quot; registry value which can be used as a persistence method by malicious actors"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Persistence Via Logon Scripts - Registry — Sigma Rule"><meta name="twitter:description" content="Sigma rule 9ace0707-b560-49b8-b6ca-5148b42f39fb. Potential Persistence Via Logon Scripts - Registry — Sigma Rule. Detects creation of &quot;UserInitMprLogonScript&quot; registry value which can be used as a persistence method by malicious actors"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/9ace0707-b560-49b8-b6ca-5148b42f39fb/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/9ace0707-b560-49b8-b6ca-5148b42f39fb/","name":"Potential Persistence Via Logon Scripts - Registry — Sigma Rule","description":"Sigma rule 9ace0707-b560-49b8-b6ca-5148b42f39fb. Potential Persistence Via Logon Scripts - Registry — Sigma Rule. Detects creation of \"UserInitMprLogonScript\" registry value which can be used as a persistence method by malicious actors","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Persistence Via Logon Scripts - Registry — Sigma Rule</h1><p class="lead">Sigma rule 9ace0707-b560-49b8-b6ca-5148b42f39fb. Potential Persistence Via Logon Scripts - Registry — Sigma Rule. Detects creation of &quot;UserInitMprLogonScript&quot; registry value which can be used as a persistence method by malicious actors</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/registry-set/">registry_set</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1037-001/">attack.t1037.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a></div><p>Author: Tom Ueltschi (@c_APT_ure). Source status: test; severity: medium. Source dates: 2019-01-12 / 2025-10-26.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;registry_set&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/registry/registry_set/registry_set_persistence_logon_scripts_userinitmprlogonscript.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 28c8b5e8fd3c0237fd18e74202628c9ad7363a4dc2599267a7f43676cc4fc615</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Persistence Via Logon Scripts - Registry
+id: 9ace0707-b560-49b8-b6ca-5148b42f39fb
+status: test
+description: Detects creation of &quot;UserInitMprLogonScript&quot; registry value which can be used as a persistence method by malicious actors
+references:
+    - https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1037.001/T1037.001.md
+author: Tom Ueltschi (@c_APT_ure)
+date: 2019-01-12
+modified: 2025-10-26
+tags:
+    - attack.privilege-escalation
+    - attack.t1037.001
+    - attack.persistence
+    - attack.lateral-movement
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains: &#39;UserInitMprLogonScript&#39;
+    condition: selection
+falsepositives:
+    - Investigate the contents of the &quot;UserInitMprLogonScript&quot; value to determine of the added script is legitimate
+level: medium
+regression_tests_path: regression_data/rules/windows/registry/registry_set/registry_set_persistence_logon_scripts_userinitmprlogonscript/info.yml
+simulation:
+    - type: atomic-red-team
+      name: Logon Scripts
+      technique: T1037.001
+      atomic_guid: d6042746-07d4-4c92-9ad8-e644c114a231
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/9ace0707-b560-49b8-b6ca-5148b42f39fb.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Investigate the contents of the &quot;UserInitMprLogonScript&quot; value to determine of the added script is legitimate</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1037.001/T1037.001.md">https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1037.001/T1037.001.md</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1037.001/">T1037.001 · Logon Script (Windows)</a> · <a href="/ttp-simulation/detections/enterprise/T1037.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

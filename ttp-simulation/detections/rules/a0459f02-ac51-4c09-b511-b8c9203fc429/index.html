@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule a0459f02-ac51-4c09-b511-b8c9203fc429. Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule. Detects calls to &quot;SyncInvoke&quot; that is part of the &quot;CL_Invocation.ps1&quot; script to proxy execution using &quot;System.Diagnostics.Process&quot;">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="a0459f02-ac51-4c09-b511-b8c9203fc429, attack.stealth, attack.t1216, process_creation, windows, rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1216">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1216">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/a0459f02-ac51-4c09-b511-b8c9203fc429/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/a0459f02-ac51-4c09-b511-b8c9203fc429/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule"><meta property="og:description" content="Sigma rule a0459f02-ac51-4c09-b511-b8c9203fc429. Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule. Detects calls to &quot;SyncInvoke&quot; that is part of the &quot;CL_Invocation.ps1&quot; script to proxy execution using &quot;System.Diagnostics.Process&quot;"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule"><meta name="twitter:description" content="Sigma rule a0459f02-ac51-4c09-b511-b8c9203fc429. Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule. Detects calls to &quot;SyncInvoke&quot; that is part of the &quot;CL_Invocation.ps1&quot; script to proxy execution using &quot;System.Diagnostics.Process&quot;"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/a0459f02-ac51-4c09-b511-b8c9203fc429/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/a0459f02-ac51-4c09-b511-b8c9203fc429/","name":"Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule","description":"Sigma rule a0459f02-ac51-4c09-b511-b8c9203fc429. Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule. Detects calls to \"SyncInvoke\" that is part of the \"CL_Invocation.ps1\" script to proxy execution using \"System.Diagnostics.Process\"","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule</h1><p class="lead">Sigma rule a0459f02-ac51-4c09-b511-b8c9203fc429. Potential Process Execution Proxy Via CL_Invocation.ps1 — Sigma Rule. Detects calls to &quot;SyncInvoke&quot; that is part of the &quot;CL_Invocation.ps1&quot; script to proxy execution using &quot;System.Diagnostics.Process&quot;</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1216/">attack.t1216</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems), oscd.community, Natalia Shornikova. Source status: test; severity: medium. Source dates: 2020-10-14 / 2023-08-17.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_cl_invocation.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 1197578f16f899ad01565388e88b6c2823c687a50cf9a99e336a3d98a81c57c2</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Process Execution Proxy Via CL_Invocation.ps1
+id: a0459f02-ac51-4c09-b511-b8c9203fc429
+status: test
+description: Detects calls to &quot;SyncInvoke&quot; that is part of the &quot;CL_Invocation.ps1&quot; script to proxy execution using &quot;System.Diagnostics.Process&quot;
+references:
+    - https://lolbas-project.github.io/lolbas/Scripts/Cl_invocation/
+    - https://twitter.com/bohops/status/948061991012327424
+author: Nasreddine Bencherchali (Nextron Systems), oscd.community, Natalia Shornikova
+date: 2020-10-14
+modified: 2023-08-17
+tags:
+    - attack.stealth
+    - attack.t1216
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        # Note: As this function is usually called from within powershell, classical process creation even would not catch it. This will only catch inline calls via &quot;-Command&quot; or &quot;-ScriptBlock&quot; flags for example.
+        CommandLine|contains: &#39;SyncInvoke &#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/a0459f02-ac51-4c09-b511-b8c9203fc429.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://lolbas-project.github.io/lolbas/Scripts/Cl_invocation/">https://lolbas-project.github.io/lolbas/Scripts/Cl_invocation/</a></li><li><a href="https://twitter.com/bohops/status/948061991012327424">https://twitter.com/bohops/status/948061991012327424</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1216/">T1216 · System Script Proxy Execution</a> · <a href="/ttp-simulation/detections/enterprise/T1216/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

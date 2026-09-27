@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 9cfc00b6-bfb7-49ce-9781-ef78503154bb. Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule. Detects the execution of &quot;Wlrmdr.exe&quot; with the &quot;-u&quot; command line flag which allows anything passed to it to be an argument of the ShellExecute API, which would allow an attacker to execute arbitrary binaries.
+This detection also focuses on any uncommon child processes spawned from &quot;Wlrmdr.exe&quot; as a supplement for those that posses &quot;ParentImage&quot; telemetry.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="9cfc00b6-bfb7-49ce-9781-ef78503154bb, attack.stealth, attack.t1218, process_creation, windows, rule-status:experimental, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1218">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1218">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/9cfc00b6-bfb7-49ce-9781-ef78503154bb/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/9cfc00b6-bfb7-49ce-9781-ef78503154bb/">
+<meta property="og:type" content="website"><meta property="og:title" content="Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule"><meta property="og:description" content="Sigma rule 9cfc00b6-bfb7-49ce-9781-ef78503154bb. Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule. Detects the execution of &quot;Wlrmdr.exe&quot; with the &quot;-u&quot; command line flag which allows anything passed to it to be an argument of the ShellExecute API, which would allow an attacker to execute arbitrary binaries.
+This detection also focuses on any uncommon child processes spawned from &quot;Wlrmdr.exe&quot; as a supplement for those that posses &quot;ParentImage&quot; telemetry.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule"><meta name="twitter:description" content="Sigma rule 9cfc00b6-bfb7-49ce-9781-ef78503154bb. Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule. Detects the execution of &quot;Wlrmdr.exe&quot; with the &quot;-u&quot; command line flag which allows anything passed to it to be an argument of the ShellExecute API, which would allow an attacker to execute arbitrary binaries.
+This detection also focuses on any uncommon child processes spawned from &quot;Wlrmdr.exe&quot; as a supplement for those that posses &quot;ParentImage&quot; telemetry.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/9cfc00b6-bfb7-49ce-9781-ef78503154bb/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/9cfc00b6-bfb7-49ce-9781-ef78503154bb/","name":"Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule","description":"Sigma rule 9cfc00b6-bfb7-49ce-9781-ef78503154bb. Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule. Detects the execution of \"Wlrmdr.exe\" with the \"-u\" command line flag which allows anything passed to it to be an argument of the ShellExecute API, which would allow an attacker to execute arbitrary binaries.\nThis detection also focuses on any uncommon child processes spawned from \"Wlrmdr.exe\" as a supplement for those that posses \"ParentImage\" telemetry.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule</h1><p class="lead">Sigma rule 9cfc00b6-bfb7-49ce-9781-ef78503154bb. Wlrmdr.EXE Uncommon Argument Or Child Process — Sigma Rule. Detects the execution of &quot;Wlrmdr.exe&quot; with the &quot;-u&quot; command line flag which allows anything passed to it to be an argument of the ShellExecute API, which would allow an attacker to execute arbitrary binaries.
+This detection also focuses on any uncommon child processes spawned from &quot;Wlrmdr.exe&quot; as a supplement for those that posses &quot;ParentImage&quot; telemetry.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1218/">attack.t1218</a></div><p>Author: frack113, manasmbellani. Source status: experimental; severity: medium. Source dates: 2022-02-16 / 2025-10-31.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_wlrmdr_uncommon_child_process.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 2e98e7f72822d932896808794a6875d144639c396104ddcc4ee11ce2153980a2</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Wlrmdr.EXE Uncommon Argument Or Child Process
+id: 9cfc00b6-bfb7-49ce-9781-ef78503154bb
+status: experimental
+description: |
+    Detects the execution of &quot;Wlrmdr.exe&quot; with the &quot;-u&quot; command line flag which allows anything passed to it to be an argument of the ShellExecute API, which would allow an attacker to execute arbitrary binaries.
+    This detection also focuses on any uncommon child processes spawned from &quot;Wlrmdr.exe&quot; as a supplement for those that posses &quot;ParentImage&quot; telemetry.
+references:
+    - https://twitter.com/0gtweet/status/1493963591745220608?s=20&amp;t=xUg9DsZhJy1q9bPTUWgeIQ
+    - https://lolbas-project.github.io/lolbas/Binaries/Wlrmdr/
+author: frack113, manasmbellani
+date: 2022-02-16
+modified: 2025-10-31
+tags:
+    - attack.stealth
+    - attack.t1218
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent: # This selection is looking for processes spawned from wlrmdr using the &quot;-u&quot; flag
+        ParentImage|endswith: &#39;\wlrmdr.exe&#39;
+    selection_child_img:
+        - Image|endswith: &#39;\wlrmdr.exe&#39;
+        - OriginalFileName: &#39;WLRMNDR.EXE&#39;
+    selection_child_cli_flags_s:
+        CommandLine|contains|windash: &#39;-s &#39;
+    selection_child_cli_flags_f:
+        CommandLine|contains|windash: &#39;-f &#39;
+    selection_child_cli_flags_t:
+        CommandLine|contains|windash: &#39;-t &#39;
+    selection_child_cli_flags_m:
+        CommandLine|contains|windash: &#39;-m &#39;
+    selection_child_cli_flags_a:
+        CommandLine|contains|windash: &#39;-a &#39;
+    selection_child_cli_flags_u:
+        CommandLine|contains|windash: &#39;-u &#39;
+    filter_main_winlogon:
+        ParentImage: &#39;C:\Windows\System32\winlogon.exe&#39;
+    filter_main_empty:
+        ParentImage:
+            - &#39;&#39;
+            - &#39;-&#39;
+    filter_main_null:
+        ParentImage: null
+    condition: selection_parent or (all of selection_child_* and not 1 of filter_main_*)
+falsepositives:
+    - Unknown
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/9cfc00b6-bfb7-49ce-9781-ef78503154bb.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://twitter.com/0gtweet/status/1493963591745220608?s=20&amp;t=xUg9DsZhJy1q9bPTUWgeIQ">https://twitter.com/0gtweet/status/1493963591745220608?s=20&amp;t=xUg9DsZhJy1q9bPTUWgeIQ</a></li><li><a href="https://lolbas-project.github.io/lolbas/Binaries/Wlrmdr/">https://lolbas-project.github.io/lolbas/Binaries/Wlrmdr/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1218/">T1218 · System Binary Proxy Execution</a> · <a href="/ttp-simulation/detections/enterprise/T1218/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

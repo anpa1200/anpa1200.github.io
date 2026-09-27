@@ -23,7 +23,7 @@ env:
 
 jobs:
   quality:
-    timeout-minutes: 20
+    timeout-minutes: 35
     runs-on: ubuntu-latest
     steps:
       # fetch-depth: 0 (full history) is required here, not cosmetic: both
@@ -96,10 +96,16 @@ jobs:
           --source "${GITHUB_WORKSPACE}"
           --archive "${GITHUB_WORKSPACE}/.article-archive-source"
           --archive-commit "${ARTICLE_ARCHIVE_COMMIT}"
+      - name: Integrate searchable TTP modules and article backlinks
+        run: |
+          node scripts/build-ttp-integration.mjs --site "${RUNNER_TEMP}/site" --require-archive
+          node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
       - name: Build canonical metadata and release HTML
         run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
       - name: Integrate governed platform sidebar
         run: npm run build-sidebar -- --site "${RUNNER_TEMP}/site"
+      - name: Compact shared UI scripts without changing research data
+        run: node scripts/build-release-js.mjs --site "${RUNNER_TEMP}/site"
       - name: Validate complete staged site
         run: |
           npm run check-semantics -- --site "${RUNNER_TEMP}/site"
@@ -144,6 +150,11 @@ jobs:
           npm run check-search:index -- --bundle "${RUNNER_TEMP}/site/pagefind" --remote
       - name: Browser smoke test search and autocomplete
         run: npm run check-search:browser -- --site "${RUNNER_TEMP}/site" --bundle "${RUNNER_TEMP}/site/pagefind"
+      - name: Validate attack and detection modules, tags and hydrated guide backlinks
+        run: >-
+          node scripts/check-ttp-browser.mjs
+          --site "${RUNNER_TEMP}/site"
+          --report-dir "${RUNNER_TEMP}/ttp-module-browser"
       - name: Browser mobile typography and overflow regression
         run: >-
           npm run check-layout:browser --
@@ -187,6 +198,7 @@ jobs:
           path: |
             ${{ runner.temp }}/mobile-layout
             ${{ runner.temp }}/browser-quality.json
+            ${{ runner.temp }}/ttp-module-browser
             ${{ runner.temp }}/site/pagefind/search-build.json
             ${{ runner.temp }}/site/pagefind/search-governance.json
             ${{ runner.temp }}/site/pagefind/pagefind-entry.json

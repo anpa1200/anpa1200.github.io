@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule de46c52b-0bf8-4936-a327-aace94f94ac6. Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule. Detects creation of the Process Explorer drivers by processes other than Process Explorer (procexp) itself.
+Hack tools or malware may use the Process Explorer driver to elevate privileges, drops it to disk for a few moments, runs a service using that driver and removes it afterwards.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="de46c52b-0bf8-4936-a327-aace94f94ac6, attack.persistence, attack.privilege-escalation, attack.t1068, windows, file_event, rule-status:test, severity:high, logsource-product:windows, logsource-category:file_event, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1068">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:windows, logsource-category:file_event, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1068">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/de46c52b-0bf8-4936-a327-aace94f94ac6/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/de46c52b-0bf8-4936-a327-aace94f94ac6/">
+<meta property="og:type" content="website"><meta property="og:title" content="Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule"><meta property="og:description" content="Sigma rule de46c52b-0bf8-4936-a327-aace94f94ac6. Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule. Detects creation of the Process Explorer drivers by processes other than Process Explorer (procexp) itself.
+Hack tools or malware may use the Process Explorer driver to elevate privileges, drops it to disk for a few moments, runs a service using that driver and removes it afterwards.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule"><meta name="twitter:description" content="Sigma rule de46c52b-0bf8-4936-a327-aace94f94ac6. Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule. Detects creation of the Process Explorer drivers by processes other than Process Explorer (procexp) itself.
+Hack tools or malware may use the Process Explorer driver to elevate privileges, drops it to disk for a few moments, runs a service using that driver and removes it afterwards.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/de46c52b-0bf8-4936-a327-aace94f94ac6/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/de46c52b-0bf8-4936-a327-aace94f94ac6/","name":"Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule","description":"Sigma rule de46c52b-0bf8-4936-a327-aace94f94ac6. Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule. Detects creation of the Process Explorer drivers by processes other than Process Explorer (procexp) itself.\nHack tools or malware may use the Process Explorer driver to elevate privileges, drops it to disk for a few moments, runs a service using that driver and removes it afterwards.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule</h1><p class="lead">Sigma rule de46c52b-0bf8-4936-a327-aace94f94ac6. Process Explorer Driver Creation By Non-Sysinternals Binary — Sigma Rule. Detects creation of the Process Explorer drivers by processes other than Process Explorer (procexp) itself.
+Hack tools or malware may use the Process Explorer driver to elevate privileges, drops it to disk for a few moments, runs a service using that driver and removes it afterwards.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/file-event/">file_event</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1068/">attack.t1068</a></div><p>Author: Florian Roth (Nextron Systems). Source status: test; severity: high. Source dates: 2023-05-05 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;file_event&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/file/file_event/file_event_win_sysinternals_procexp_driver_susp_creation.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: a22fd85e858b036f47cbb7699839ac65bb6f6a4536118d2c67c92b316fd0124a</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Process Explorer Driver Creation By Non-Sysinternals Binary
+id: de46c52b-0bf8-4936-a327-aace94f94ac6
+status: test
+description: |
+    Detects creation of the Process Explorer drivers by processes other than Process Explorer (procexp) itself.
+    Hack tools or malware may use the Process Explorer driver to elevate privileges, drops it to disk for a few moments, runs a service using that driver and removes it afterwards.
+references:
+    - https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer
+    - https://github.com/Yaxser/Backstab
+    - https://www.elastic.co/security-labs/stopping-vulnerable-driver-attacks
+    - https://news.sophos.com/en-us/2023/04/19/aukill-edr-killer-malware-abuses-process-explorer-driver/
+author: Florian Roth (Nextron Systems)
+date: 2023-05-05
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1068
+logsource:
+    product: windows
+    category: file_event
+detection:
+    selection:
+        TargetFilename|contains: &#39;\PROCEXP&#39;
+        TargetFilename|endswith: &#39;.sys&#39;
+    filter_main_process_explorer:
+        Image|endswith:
+            - &#39;\procexp.exe&#39;
+            - &#39;\procexp64.exe&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - Some false positives may occur with legitimate renamed process explorer binaries
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/de46c52b-0bf8-4936-a327-aace94f94ac6.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Some false positives may occur with legitimate renamed process explorer binaries</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer">https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer</a></li><li><a href="https://github.com/Yaxser/Backstab">https://github.com/Yaxser/Backstab</a></li><li><a href="https://www.elastic.co/security-labs/stopping-vulnerable-driver-attacks">https://www.elastic.co/security-labs/stopping-vulnerable-driver-attacks</a></li><li><a href="https://news.sophos.com/en-us/2023/04/19/aukill-edr-killer-malware-abuses-process-explorer-driver/">https://news.sophos.com/en-us/2023/04/19/aukill-edr-killer-malware-abuses-process-explorer-driver/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1068/">T1068 · Exploitation for Privilege Escalation</a> · <a href="/ttp-simulation/detections/enterprise/T1068/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

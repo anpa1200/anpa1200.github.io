@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linux Sudo Chroot Execution — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule f2bed782-994e-4f40-9cd5-518198cb3fba. Linux Sudo Chroot Execution — Sigma Rule. Detects the execution of &#39;sudo&#39; command with &#39;--chroot&#39; option, which is used to change the root directory for command execution.
+Attackers may use this technique to evade detection and execute commands in a modified environment.
+This can be part of a privilege escalation strategy, as it allows the execution of commands with elevated privileges in a controlled environment as seen in CVE-2025-32463.
+While investigating, look out for unusual or unexpected use of &#39;sudo --chroot&#39; in conjunction with other commands or scripts such as execution from temporary directories or unusual user accounts.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="f2bed782-994e-4f40-9cd5-518198cb3fba, attack.privilege-escalation, attack.t1068, process_creation, linux, rule-status:experimental, severity:low, logsource-category:process_creation, logsource-product:linux, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1068">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:low, logsource-category:process_creation, logsource-product:linux, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1068">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/f2bed782-994e-4f40-9cd5-518198cb3fba/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/f2bed782-994e-4f40-9cd5-518198cb3fba/">
+<meta property="og:type" content="website"><meta property="og:title" content="Linux Sudo Chroot Execution — Sigma Rule"><meta property="og:description" content="Sigma rule f2bed782-994e-4f40-9cd5-518198cb3fba. Linux Sudo Chroot Execution — Sigma Rule. Detects the execution of &#39;sudo&#39; command with &#39;--chroot&#39; option, which is used to change the root directory for command execution.
+Attackers may use this technique to evade detection and execute commands in a modified environment.
+This can be part of a privilege escalation strategy, as it allows the execution of commands with elevated privileges in a controlled environment as seen in CVE-2025-32463.
+While investigating, look out for unusual or unexpected use of &#39;sudo --chroot&#39; in conjunction with other commands or scripts such as execution from temporary directories or unusual user accounts.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Linux Sudo Chroot Execution — Sigma Rule"><meta name="twitter:description" content="Sigma rule f2bed782-994e-4f40-9cd5-518198cb3fba. Linux Sudo Chroot Execution — Sigma Rule. Detects the execution of &#39;sudo&#39; command with &#39;--chroot&#39; option, which is used to change the root directory for command execution.
+Attackers may use this technique to evade detection and execute commands in a modified environment.
+This can be part of a privilege escalation strategy, as it allows the execution of commands with elevated privileges in a controlled environment as seen in CVE-2025-32463.
+While investigating, look out for unusual or unexpected use of &#39;sudo --chroot&#39; in conjunction with other commands or scripts such as execution from temporary directories or unusual user accounts.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/f2bed782-994e-4f40-9cd5-518198cb3fba/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/f2bed782-994e-4f40-9cd5-518198cb3fba/","name":"Linux Sudo Chroot Execution — Sigma Rule","description":"Sigma rule f2bed782-994e-4f40-9cd5-518198cb3fba. Linux Sudo Chroot Execution — Sigma Rule. Detects the execution of 'sudo' command with '--chroot' option, which is used to change the root directory for command execution.\nAttackers may use this technique to evade detection and execute commands in a modified environment.\nThis can be part of a privilege escalation strategy, as it allows the execution of commands with elevated privileges in a controlled environment as seen in CVE-2025-32463.\nWhile investigating, look out for unusual or unexpected use of 'sudo --chroot' in conjunction with other commands or scripts such as execution from temporary directories or unusual user accounts.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Linux Sudo Chroot Execution — Sigma Rule</h1><p class="lead">Sigma rule f2bed782-994e-4f40-9cd5-518198cb3fba. Linux Sudo Chroot Execution — Sigma Rule. Detects the execution of &#39;sudo&#39; command with &#39;--chroot&#39; option, which is used to change the root directory for command execution.
+Attackers may use this technique to evade detection and execute commands in a modified environment.
+This can be part of a privilege escalation strategy, as it allows the execution of commands with elevated privileges in a controlled environment as seen in CVE-2025-32463.
+While investigating, look out for unusual or unexpected use of &#39;sudo --chroot&#39; in conjunction with other commands or scripts such as execution from temporary directories or unusual user accounts.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/low/">low</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/linux/">linux</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1068/">attack.t1068</a></div><p>Author: Swachchhanda Shrawn Poudel (Nextron Systems). Source status: experimental; severity: low. Source dates: 2025-10-02 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;linux&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/linux/process_creation/proc_creation_lnx_chroot_execution.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: db8911e31e661b34c46d79c856e996e2a0ca5082e309795d5641e6b5d682c4a2</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Linux Sudo Chroot Execution
+id: f2bed782-994e-4f40-9cd5-518198cb3fba
+status: experimental
+description: |
+    Detects the execution of &#39;sudo&#39; command with &#39;--chroot&#39; option, which is used to change the root directory for command execution.
+    Attackers may use this technique to evade detection and execute commands in a modified environment.
+    This can be part of a privilege escalation strategy, as it allows the execution of commands with elevated privileges in a controlled environment as seen in CVE-2025-32463.
+    While investigating, look out for unusual or unexpected use of &#39;sudo --chroot&#39; in conjunction with other commands or scripts such as execution from temporary directories or unusual user accounts.
+references:
+    - https://github.com/kh4sh3i/CVE-2025-32463/blob/81bb430f84fa2089224733c3ed4bfa434c197ad4/exploit.sh
+author: Swachchhanda Shrawn Poudel (Nextron Systems)
+date: 2025-10-02
+tags:
+    - attack.privilege-escalation
+    - attack.t1068
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    selection:
+        Image|endswith: &#39;/sudo&#39;
+        CommandLine|contains:
+            - &#39; --chroot &#39;
+            - &#39;sudo -R &#39;
+    condition: selection
+falsepositives:
+    - Legitimate administrative tasks or scripts that use &#39;sudo --chroot&#39; for containerization, testing, or system management.
+level: low
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/f2bed782-994e-4f40-9cd5-518198cb3fba.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate administrative tasks or scripts that use &#39;sudo --chroot&#39; for containerization, testing, or system management.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/kh4sh3i/CVE-2025-32463/blob/81bb430f84fa2089224733c3ed4bfa434c197ad4/exploit.sh">https://github.com/kh4sh3i/CVE-2025-32463/blob/81bb430f84fa2089224733c3ed4bfa434c197ad4/exploit.sh</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1068/">T1068 · Exploitation for Privilege Escalation</a> · <a href="/ttp-simulation/detections/enterprise/T1068/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

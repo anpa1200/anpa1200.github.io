@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule b6b49cd1-34d6-4ead-b1bf-176e9edba9a4. Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule. Detects the presence of reversed PowerShell commands in the CommandLine. This is often used as a method of obfuscation by attackers">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="b6b49cd1-34d6-4ead-b1bf-176e9edba9a4, attack.stealth, attack.t1027, attack.execution, attack.t1059.001, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1027, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1027, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/b6b49cd1-34d6-4ead-b1bf-176e9edba9a4/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/b6b49cd1-34d6-4ead-b1bf-176e9edba9a4/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule"><meta property="og:description" content="Sigma rule b6b49cd1-34d6-4ead-b1bf-176e9edba9a4. Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule. Detects the presence of reversed PowerShell commands in the CommandLine. This is often used as a method of obfuscation by attackers"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule"><meta name="twitter:description" content="Sigma rule b6b49cd1-34d6-4ead-b1bf-176e9edba9a4. Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule. Detects the presence of reversed PowerShell commands in the CommandLine. This is often used as a method of obfuscation by attackers"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/b6b49cd1-34d6-4ead-b1bf-176e9edba9a4/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/b6b49cd1-34d6-4ead-b1bf-176e9edba9a4/","name":"Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule","description":"Sigma rule b6b49cd1-34d6-4ead-b1bf-176e9edba9a4. Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule. Detects the presence of reversed PowerShell commands in the CommandLine. This is often used as a method of obfuscation by attackers","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule</h1><p class="lead">Sigma rule b6b49cd1-34d6-4ead-b1bf-176e9edba9a4. Potential PowerShell Obfuscation Via Reversed Commands — Sigma Rule. Detects the presence of reversed PowerShell commands in the CommandLine. This is often used as a method of obfuscation by attackers</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1027/">attack.t1027</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Teymur Kheirkhabarov (idea), Vasiliy Burov (rule), oscd.community, Tim Shelton. Source status: test; severity: high. Source dates: 2020-10-11 / 2023-05-31.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_cmdline_reversed_strings.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 818ee3163046778cad6f1cbab391361d9c4bdefbfd514db08896b614e2f01794</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential PowerShell Obfuscation Via Reversed Commands
+id: b6b49cd1-34d6-4ead-b1bf-176e9edba9a4
+status: test
+description: Detects the presence of reversed PowerShell commands in the CommandLine. This is often used as a method of obfuscation by attackers
+references:
+    - https://2019.offzone.moscow/ru/report/hunting-for-powershell-abuses/
+    - https://speakerdeck.com/heirhabarov/hunting-for-powershell-abuse?slide=66
+author: Teymur Kheirkhabarov (idea), Vasiliy Burov (rule), oscd.community, Tim Shelton
+date: 2020-10-11
+modified: 2023-05-31
+tags:
+    - attack.stealth
+    - attack.t1027
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith:
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+        - OriginalFileName:
+              - &#39;PowerShell.EXE&#39;
+              - &#39;pwsh.dll&#39;
+    selection_cli:
+        CommandLine|contains:
+            - &#39;hctac&#39;
+            - &#39;kaerb&#39;
+            - &#39;dnammoc&#39;
+            - &#39;ekovn&#39; # Also covers &#39;ekovni&#39;
+            - &#39;eliFd&#39;
+            - &#39;rahc&#39;
+            - &#39;etirw&#39;
+            - &#39;golon&#39;
+            - &#39;tninon&#39;
+            - &#39;eddih&#39;
+            - &#39;tpircS&#39;
+            - &#39;ssecorp&#39;
+            - &#39;llehsrewop&#39;
+            - &#39;esnopser&#39;
+            - &#39;daolnwod&#39;
+            - &#39;tneilCbeW&#39;
+            - &#39;tneilc&#39;
+            - &#39;ptth&#39;
+            - &#39;elifotevas&#39;
+            - &#39;46esab&#39;
+            - &#39;htaPpmeTteG&#39;
+            - &#39;tcejbO&#39;
+            - &#39;maerts&#39;
+            - &#39;hcaerof&#39;
+            - &#39;retupmoc&#39;
+    filter_main_encoded_keyword:
+        # We exclude usage of encoded commands as they might generate FPs as shown here:
+        #   https://github.com/SigmaHQ/sigma/pull/2720
+        #   https://github.com/SigmaHQ/sigma/issues/4270
+        CommandLine|contains:
+            - &#39; -EncodedCommand &#39;
+            - &#39; -enc &#39;
+    condition: all of selection_* and not 1 of filter_main_*
+falsepositives:
+    - Unlikely
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/b6b49cd1-34d6-4ead-b1bf-176e9edba9a4.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unlikely</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://2019.offzone.moscow/ru/report/hunting-for-powershell-abuses/">https://2019.offzone.moscow/ru/report/hunting-for-powershell-abuses/</a></li><li><a href="https://speakerdeck.com/heirhabarov/hunting-for-powershell-abuse?slide=66">https://speakerdeck.com/heirhabarov/hunting-for-powershell-abuse?slide=66</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1027/">T1027 · Obfuscated Files or Information</a> · <a href="/ttp-simulation/detections/enterprise/T1027/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

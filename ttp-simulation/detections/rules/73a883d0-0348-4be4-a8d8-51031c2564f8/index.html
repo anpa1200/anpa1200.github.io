@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 73a883d0-0348-4be4-a8d8-51031c2564f8. Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule. Detects potential persistence behavior using the windows telemetry registry key.
+Windows telemetry makes use of the binary CompatTelRunner.exe to run a variety of commands and perform the actual telemetry collections.
+This binary was created to be easily extensible, and to that end, it relies on the registry to instruct on which commands to run.
+The problem is, it will run any arbitrary command without restriction of location or type.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="73a883d0-0348-4be4-a8d8-51031c2564f8, attack.privilege-escalation, attack.execution, attack.persistence, attack.t1053.005, registry_set, windows, Requirements: Sysmon config that monitors \SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\TelemetryController subkey of the HKLM hives, rule-status:test, severity:high, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.t1053.005">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.t1053.005">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/73a883d0-0348-4be4-a8d8-51031c2564f8/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/73a883d0-0348-4be4-a8d8-51031c2564f8/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule"><meta property="og:description" content="Sigma rule 73a883d0-0348-4be4-a8d8-51031c2564f8. Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule. Detects potential persistence behavior using the windows telemetry registry key.
+Windows telemetry makes use of the binary CompatTelRunner.exe to run a variety of commands and perform the actual telemetry collections.
+This binary was created to be easily extensible, and to that end, it relies on the registry to instruct on which commands to run.
+The problem is, it will run any arbitrary command without restriction of location or type.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule"><meta name="twitter:description" content="Sigma rule 73a883d0-0348-4be4-a8d8-51031c2564f8. Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule. Detects potential persistence behavior using the windows telemetry registry key.
+Windows telemetry makes use of the binary CompatTelRunner.exe to run a variety of commands and perform the actual telemetry collections.
+This binary was created to be easily extensible, and to that end, it relies on the registry to instruct on which commands to run.
+The problem is, it will run any arbitrary command without restriction of location or type.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/73a883d0-0348-4be4-a8d8-51031c2564f8/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/73a883d0-0348-4be4-a8d8-51031c2564f8/","name":"Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule","description":"Sigma rule 73a883d0-0348-4be4-a8d8-51031c2564f8. Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule. Detects potential persistence behavior using the windows telemetry registry key.\nWindows telemetry makes use of the binary CompatTelRunner.exe to run a variety of commands and perform the actual telemetry collections.\nThis binary was created to be easily extensible, and to that end, it relies on the registry to instruct on which commands to run.\nThe problem is, it will run any arbitrary command without restriction of location or type.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule</h1><p class="lead">Sigma rule 73a883d0-0348-4be4-a8d8-51031c2564f8. Potential Registry Persistence Attempt Via Windows Telemetry — Sigma Rule. Detects potential persistence behavior using the windows telemetry registry key.
+Windows telemetry makes use of the binary CompatTelRunner.exe to run a variety of commands and perform the actual telemetry collections.
+This binary was created to be easily extensible, and to that end, it relies on the registry to instruct on which commands to run.
+The problem is, it will run any arbitrary command without restriction of location or type.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/registry-set/">registry_set</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1053-005/">attack.t1053.005</a></div><p>Author: Lednyov Alexey, oscd.community, Sreeman. Source status: test; severity: high. Source dates: 2020-10-16 / 2023-08-17.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;registry_set&quot;,
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;definition&quot;: &quot;Requirements: Sysmon config that monitors \\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\TelemetryController subkey of the HKLM hives&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/registry/registry_set/registry_set_telemetry_persistence.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 14e3c07ccbe2dd7f5c7127d2a8847102d658b6f7fc052f8fdb0fe0d20138b3f4</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Registry Persistence Attempt Via Windows Telemetry
+id: 73a883d0-0348-4be4-a8d8-51031c2564f8
+related:
+    - id: 4e8d5fd3-c959-441f-a941-f73d0cdcdca5
+      type: obsolete
+status: test
+description: |
+    Detects potential persistence behavior using the windows telemetry registry key.
+    Windows telemetry makes use of the binary CompatTelRunner.exe to run a variety of commands and perform the actual telemetry collections.
+    This binary was created to be easily extensible, and to that end, it relies on the registry to instruct on which commands to run.
+    The problem is, it will run any arbitrary command without restriction of location or type.
+references:
+    - https://www.trustedsec.com/blog/abusing-windows-telemetry-for-persistence/
+author: Lednyov Alexey, oscd.community, Sreeman
+date: 2020-10-16
+modified: 2023-08-17
+tags:
+    - attack.privilege-escalation
+    - attack.execution
+    - attack.persistence
+    - attack.t1053.005
+logsource:
+    category: registry_set
+    product: windows
+    definition: &#39;Requirements: Sysmon config that monitors \SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\TelemetryController subkey of the HKLM hives&#39;
+detection:
+    selection:
+        TargetObject|contains: &#39;\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\TelemetryController\&#39;
+        TargetObject|endswith: &#39;\Command&#39;
+        Details|contains:
+            - &#39;.bat&#39;
+            - &#39;.bin&#39;
+            - &#39;.cmd&#39;
+            - &#39;.dat&#39;
+            - &#39;.dll&#39;
+            - &#39;.exe&#39;
+            - &#39;.hta&#39;
+            - &#39;.jar&#39;
+            - &#39;.js&#39;
+            - &#39;.msi&#39;
+            - &#39;.ps&#39;
+            - &#39;.sh&#39;
+            - &#39;.vb&#39;
+    filter_main_generic:
+        Details|contains:
+            - &#39;\system32\CompatTelRunner.exe&#39;
+            - &#39;\system32\DeviceCensus.exe&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/73a883d0-0348-4be4-a8d8-51031c2564f8.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.trustedsec.com/blog/abusing-windows-telemetry-for-persistence/">https://www.trustedsec.com/blog/abusing-windows-telemetry-for-persistence/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1053.005/">T1053.005 · Scheduled Task</a> · <a href="/ttp-simulation/detections/enterprise/T1053.005/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

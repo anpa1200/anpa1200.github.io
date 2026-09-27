@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registry Modification of MS-settings Protocol Handler — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule dd3ee8cc-f751-41c9-ba53-5a32ed47e563. Registry Modification of MS-settings Protocol Handler — Sigma Rule. Detects registry modifications to the &#39;ms-settings&#39; protocol handler, which is frequently targeted for UAC bypass or persistence.
+Attackers can modify this registry to execute malicious code with elevated privileges by hijacking the command execution path.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="dd3ee8cc-f751-41c9-ba53-5a32ed47e563, attack.privilege-escalation, attack.persistence, attack.defense-impairment, attack.t1548.002, attack.t1546.001, attack.t1112, process_creation, windows, rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1548.002, sigma-tag:attack.t1546.001, sigma-tag:attack.t1112">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1548.002, sigma-tag:attack.t1546.001, sigma-tag:attack.t1112">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/dd3ee8cc-f751-41c9-ba53-5a32ed47e563/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/dd3ee8cc-f751-41c9-ba53-5a32ed47e563/">
+<meta property="og:type" content="website"><meta property="og:title" content="Registry Modification of MS-settings Protocol Handler — Sigma Rule"><meta property="og:description" content="Sigma rule dd3ee8cc-f751-41c9-ba53-5a32ed47e563. Registry Modification of MS-settings Protocol Handler — Sigma Rule. Detects registry modifications to the &#39;ms-settings&#39; protocol handler, which is frequently targeted for UAC bypass or persistence.
+Attackers can modify this registry to execute malicious code with elevated privileges by hijacking the command execution path.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Registry Modification of MS-settings Protocol Handler — Sigma Rule"><meta name="twitter:description" content="Sigma rule dd3ee8cc-f751-41c9-ba53-5a32ed47e563. Registry Modification of MS-settings Protocol Handler — Sigma Rule. Detects registry modifications to the &#39;ms-settings&#39; protocol handler, which is frequently targeted for UAC bypass or persistence.
+Attackers can modify this registry to execute malicious code with elevated privileges by hijacking the command execution path.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/dd3ee8cc-f751-41c9-ba53-5a32ed47e563/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/dd3ee8cc-f751-41c9-ba53-5a32ed47e563/","name":"Registry Modification of MS-settings Protocol Handler — Sigma Rule","description":"Sigma rule dd3ee8cc-f751-41c9-ba53-5a32ed47e563. Registry Modification of MS-settings Protocol Handler — Sigma Rule. Detects registry modifications to the 'ms-settings' protocol handler, which is frequently targeted for UAC bypass or persistence.\nAttackers can modify this registry to execute malicious code with elevated privileges by hijacking the command execution path.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Registry Modification of MS-settings Protocol Handler — Sigma Rule</h1><p class="lead">Sigma rule dd3ee8cc-f751-41c9-ba53-5a32ed47e563. Registry Modification of MS-settings Protocol Handler — Sigma Rule. Detects registry modifications to the &#39;ms-settings&#39; protocol handler, which is frequently targeted for UAC bypass or persistence.
+Attackers can modify this registry to execute malicious code with elevated privileges by hijacking the command execution path.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1548-002/">attack.t1548.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1546-001/">attack.t1546.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1112/">attack.t1112</a></div><p>Author: frack113, Swachchhanda Shrawan Poudel (Nextron Systems). Source status: test; severity: medium. Source dates: 2021-12-20 / 2026-01-24.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_susp_registry_modification_of_ms_setting_protocol_handler.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: f766d684a7888edeee4b7562c32290ac782547abafe847f32fe7bff029724585</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Registry Modification of MS-settings Protocol Handler
+id: dd3ee8cc-f751-41c9-ba53-5a32ed47e563
+related:
+    - id: 152f3630-77c1-4284-bcc0-4cc68ab2f6e7
+      type: similar
+status: test
+description: |
+    Detects registry modifications to the &#39;ms-settings&#39; protocol handler, which is frequently targeted for UAC bypass or persistence.
+    Attackers can modify this registry to execute malicious code with elevated privileges by hijacking the command execution path.
+references:
+    - https://thedfirreport.com/2021/12/13/diavol-ransomware/
+    - https://www.trendmicro.com/en_us/research/25/f/water-curse.html
+author: frack113, Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2021-12-20
+modified: 2026-01-24
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.defense-impairment
+    - attack.t1548.002
+    - attack.t1546.001
+    - attack.t1112
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_reg_img:
+        - Image|endswith: &#39;\reg.exe&#39;
+        - OriginalFileName: &#39;reg.exe&#39;
+    selection_pwsh_img:
+        - Image|endswith:
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+        - OriginalFileName:
+              - &#39;powershell.exe&#39;
+              - &#39;pwsh.dll&#39;
+    selection_reg_cli:
+        CommandLine|contains: &#39;add&#39;
+    selection_pwsh_cli:
+        CommandLine|contains:
+            - &#39;New-ItemProperty&#39;
+            - &#39;Set-ItemProperty&#39;
+            - &#39;ni &#39;
+            - &#39;sp &#39;
+    selection_cli_key:
+        CommandLine|contains: &#39;\ms-settings\shell\open\command&#39;
+    condition: (all of selection_reg_* or all of selection_pwsh_*) and selection_cli_key
+falsepositives:
+    - Unknown
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/dd3ee8cc-f751-41c9-ba53-5a32ed47e563.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://thedfirreport.com/2021/12/13/diavol-ransomware/">https://thedfirreport.com/2021/12/13/diavol-ransomware/</a></li><li><a href="https://www.trendmicro.com/en_us/research/25/f/water-curse.html">https://www.trendmicro.com/en_us/research/25/f/water-curse.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1112/">T1112 · Modify Registry</a> · <a href="/ttp-simulation/detections/enterprise/T1112/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1546.001/">T1546.001 · Change Default File Association</a> · <a href="/ttp-simulation/detections/enterprise/T1546.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1548.002/">T1548.002 · Bypass User Account Control</a> · <a href="/ttp-simulation/detections/enterprise/T1548.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

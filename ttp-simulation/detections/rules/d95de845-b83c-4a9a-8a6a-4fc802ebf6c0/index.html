@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule d95de845-b83c-4a9a-8a6a-4fc802ebf6c0. Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule. Detects suspicious reconnaissance command line activity on Windows systems using Net.EXE
+Check if the user that executed the commands is suspicious (e.g. service accounts, LOCAL_SYSTEM)
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="d95de845-b83c-4a9a-8a6a-4fc802ebf6c0, attack.discovery, attack.t1087.001, attack.t1087.002, process_creation, windows, rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.discovery, sigma-tag:attack.t1087.001, sigma-tag:attack.t1087.002">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.discovery, sigma-tag:attack.t1087.001, sigma-tag:attack.t1087.002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/d95de845-b83c-4a9a-8a6a-4fc802ebf6c0/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/d95de845-b83c-4a9a-8a6a-4fc802ebf6c0/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule"><meta property="og:description" content="Sigma rule d95de845-b83c-4a9a-8a6a-4fc802ebf6c0. Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule. Detects suspicious reconnaissance command line activity on Windows systems using Net.EXE
+Check if the user that executed the commands is suspicious (e.g. service accounts, LOCAL_SYSTEM)
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule"><meta name="twitter:description" content="Sigma rule d95de845-b83c-4a9a-8a6a-4fc802ebf6c0. Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule. Detects suspicious reconnaissance command line activity on Windows systems using Net.EXE
+Check if the user that executed the commands is suspicious (e.g. service accounts, LOCAL_SYSTEM)
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/d95de845-b83c-4a9a-8a6a-4fc802ebf6c0/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/d95de845-b83c-4a9a-8a6a-4fc802ebf6c0/","name":"Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule","description":"Sigma rule d95de845-b83c-4a9a-8a6a-4fc802ebf6c0. Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule. Detects suspicious reconnaissance command line activity on Windows systems using Net.EXE\nCheck if the user that executed the commands is suspicious (e.g. service accounts, LOCAL_SYSTEM)\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule</h1><p class="lead">Sigma rule d95de845-b83c-4a9a-8a6a-4fc802ebf6c0. Suspicious Group And Account Reconnaissance Activity Using Net.EXE — Sigma Rule. Detects suspicious reconnaissance command line activity on Windows systems using Net.EXE
+Check if the user that executed the commands is suspicious (e.g. service accounts, LOCAL_SYSTEM)
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087-001/">attack.t1087.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087-002/">attack.t1087.002</a></div><p>Author: Florian Roth (Nextron Systems), omkar72, @svch0st, Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2019-01-16 / 2023-03-02.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_net_groups_and_accounts_recon.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 9d72f8de7778f0505a080d9ca09b08743b86d8df573d505f580977b4ef8bb3fb</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Group And Account Reconnaissance Activity Using Net.EXE
+id: d95de845-b83c-4a9a-8a6a-4fc802ebf6c0
+status: test
+description: |
+    Detects suspicious reconnaissance command line activity on Windows systems using Net.EXE
+    Check if the user that executed the commands is suspicious (e.g. service accounts, LOCAL_SYSTEM)
+references:
+    - https://redcanary.com/blog/how-one-hospital-thwarted-a-ryuk-ransomware-outbreak/
+    - https://thedfirreport.com/2020/10/18/ryuk-in-5-hours/
+    - https://research.nccgroup.com/2022/08/19/back-in-black-unlocking-a-lockbit-3-0-ransomware-attack/
+author: Florian Roth (Nextron Systems), omkar72, @svch0st, Nasreddine Bencherchali (Nextron Systems)
+date: 2019-01-16
+modified: 2023-03-02
+tags:
+    - attack.discovery
+    - attack.t1087.001
+    - attack.t1087.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith:
+              - &#39;\net.exe&#39;
+              - &#39;\net1.exe&#39;
+        - OriginalFileName:
+              - &#39;net.exe&#39;
+              - &#39;net1.exe&#39;
+    # Covers group and localgroup flags
+    selection_group_root:
+        CommandLine|contains:
+            - &#39; group &#39;
+            - &#39; localgroup &#39;
+    selection_group_flags:
+        CommandLine|contains:
+            # Add more groups for other languages
+            - &#39;domain admins&#39;
+            - &#39; administrator&#39; # Typo without an &#39;S&#39; so we catch both
+            - &#39; administrateur&#39; # Typo without an &#39;S&#39; so we catch both
+            - &#39;enterprise admins&#39;
+            - &#39;Exchange Trusted Subsystem&#39;
+            - &#39;Remote Desktop Users&#39;
+            - &#39;Utilisateurs du Bureau à distance&#39; # French for &quot;Remote Desktop Users&quot;
+            - &#39;Usuarios de escritorio remoto&#39; # Spanish for &quot;Remote Desktop Users&quot;
+            - &#39; /do&#39; # short for domain
+    filter_group_add:
+        # This filter is added to avoid the potential case where the point is not recon but addition
+        CommandLine|contains: &#39; /add&#39;
+    # Covers &#39;accounts&#39; flag
+    selection_accounts_root:
+        CommandLine|contains: &#39; accounts &#39;
+    selection_accounts_flags:
+        CommandLine|contains: &#39; /do&#39; # short for domain
+    condition: selection_img and ((all of selection_group_* and not filter_group_add) or all of selection_accounts_*)
+falsepositives:
+    - Inventory tool runs
+    - Administrative activity
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/d95de845-b83c-4a9a-8a6a-4fc802ebf6c0.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Inventory tool runs</li><li>Administrative activity</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://redcanary.com/blog/how-one-hospital-thwarted-a-ryuk-ransomware-outbreak/">https://redcanary.com/blog/how-one-hospital-thwarted-a-ryuk-ransomware-outbreak/</a></li><li><a href="https://thedfirreport.com/2020/10/18/ryuk-in-5-hours/">https://thedfirreport.com/2020/10/18/ryuk-in-5-hours/</a></li><li><a href="https://research.nccgroup.com/2022/08/19/back-in-black-unlocking-a-lockbit-3-0-ransomware-attack/">https://research.nccgroup.com/2022/08/19/back-in-black-unlocking-a-lockbit-3-0-ransomware-attack/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1087.001/">T1087.001 · Local Account</a> · <a href="/ttp-simulation/detections/enterprise/T1087.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1087.002/">T1087.002 · Domain Account</a> · <a href="/ttp-simulation/detections/enterprise/T1087.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

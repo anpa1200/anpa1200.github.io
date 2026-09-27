@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hidden Executable In NTFS Alternate Data Stream — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule b69888d4-380c-45ce-9cf9-d9ce46e67821. Hidden Executable In NTFS Alternate Data Stream — Sigma Rule. Detects the creation of an ADS (Alternate Data Stream) that contains an executable by looking at a non-empty Imphash">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="b69888d4-380c-45ce-9cf9-d9ce46e67821, attack.stealth, attack.s0139, attack.t1564.004, windows, create_stream_hash, Requirements: Sysmon or equivalent configured with Imphash logging, rule-status:test, severity:medium, logsource-product:windows, logsource-category:create_stream_hash, sigma-tag:attack.stealth, sigma-tag:attack.s0139, sigma-tag:attack.t1564.004">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-category:create_stream_hash, sigma-tag:attack.stealth, sigma-tag:attack.s0139, sigma-tag:attack.t1564.004">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/b69888d4-380c-45ce-9cf9-d9ce46e67821/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/b69888d4-380c-45ce-9cf9-d9ce46e67821/">
+<meta property="og:type" content="website"><meta property="og:title" content="Hidden Executable In NTFS Alternate Data Stream — Sigma Rule"><meta property="og:description" content="Sigma rule b69888d4-380c-45ce-9cf9-d9ce46e67821. Hidden Executable In NTFS Alternate Data Stream — Sigma Rule. Detects the creation of an ADS (Alternate Data Stream) that contains an executable by looking at a non-empty Imphash"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Hidden Executable In NTFS Alternate Data Stream — Sigma Rule"><meta name="twitter:description" content="Sigma rule b69888d4-380c-45ce-9cf9-d9ce46e67821. Hidden Executable In NTFS Alternate Data Stream — Sigma Rule. Detects the creation of an ADS (Alternate Data Stream) that contains an executable by looking at a non-empty Imphash"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/b69888d4-380c-45ce-9cf9-d9ce46e67821/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/b69888d4-380c-45ce-9cf9-d9ce46e67821/","name":"Hidden Executable In NTFS Alternate Data Stream — Sigma Rule","description":"Sigma rule b69888d4-380c-45ce-9cf9-d9ce46e67821. Hidden Executable In NTFS Alternate Data Stream — Sigma Rule. Detects the creation of an ADS (Alternate Data Stream) that contains an executable by looking at a non-empty Imphash","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Hidden Executable In NTFS Alternate Data Stream — Sigma Rule</h1><p class="lead">Sigma rule b69888d4-380c-45ce-9cf9-d9ce46e67821. Hidden Executable In NTFS Alternate Data Stream — Sigma Rule. Detects the creation of an ADS (Alternate Data Stream) that contains an executable by looking at a non-empty Imphash</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/create-stream-hash/">create_stream_hash</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-s0139/">attack.s0139</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1564-004/">attack.t1564.004</a></div><p>Author: Florian Roth (Nextron Systems), @0xrawsec. Source status: test; severity: medium. Source dates: 2018-06-03 / 2023-02-10.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;create_stream_hash&quot;,
+  &quot;definition&quot;: &quot;Requirements: Sysmon or equivalent configured with Imphash logging&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/create_stream_hash/create_stream_hash_ads_executable.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 8a6b88b34bf01a8a3b138bd8b70c3fc92575424efbab00a7d8f8cb403ba28f8b</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Hidden Executable In NTFS Alternate Data Stream
+id: b69888d4-380c-45ce-9cf9-d9ce46e67821
+status: test
+description: Detects the creation of an ADS (Alternate Data Stream) that contains an executable by looking at a non-empty Imphash
+references:
+    - https://twitter.com/0xrawsec/status/1002478725605273600?s=21
+author: Florian Roth (Nextron Systems), @0xrawsec
+date: 2018-06-03
+modified: 2023-02-10
+tags:
+    - attack.stealth
+    - attack.s0139
+    - attack.t1564.004
+logsource:
+    product: windows
+    category: create_stream_hash
+    definition: &#39;Requirements: Sysmon or equivalent configured with Imphash logging&#39;
+detection:
+    selection:
+        Hash|contains: &#39;IMPHASH=&#39;
+    filter_main_null:
+        Hash|contains: &#39;IMPHASH=00000000000000000000000000000000&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - This rule isn&#39;t looking for any particular binary characteristics. As legitimate installers and programs were seen embedding hidden binaries in their ADS. Some false positives are expected from browser processes and similar.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/b69888d4-380c-45ce-9cf9-d9ce46e67821.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>This rule isn&#39;t looking for any particular binary characteristics. As legitimate installers and programs were seen embedding hidden binaries in their ADS. Some false positives are expected from browser processes and similar.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://twitter.com/0xrawsec/status/1002478725605273600?s=21">https://twitter.com/0xrawsec/status/1002478725605273600?s=21</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1564.004/">T1564.004 · NTFS File Attributes</a> · <a href="/ttp-simulation/detections/enterprise/T1564.004/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

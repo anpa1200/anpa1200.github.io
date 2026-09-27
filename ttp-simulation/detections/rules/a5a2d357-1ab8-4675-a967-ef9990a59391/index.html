@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LSASS Process Memory Dump Files — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule a5a2d357-1ab8-4675-a967-ef9990a59391. LSASS Process Memory Dump Files — Sigma Rule. Detects creation of files with names used by different memory dumping tools to create a memory dump of the LSASS process memory, which contains user credentials.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="a5a2d357-1ab8-4675-a967-ef9990a59391, attack.credential-access, attack.t1003.001, windows, file_event, rule-status:test, severity:high, logsource-product:windows, logsource-category:file_event, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:windows, logsource-category:file_event, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/a5a2d357-1ab8-4675-a967-ef9990a59391/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/a5a2d357-1ab8-4675-a967-ef9990a59391/">
+<meta property="og:type" content="website"><meta property="og:title" content="LSASS Process Memory Dump Files — Sigma Rule"><meta property="og:description" content="Sigma rule a5a2d357-1ab8-4675-a967-ef9990a59391. LSASS Process Memory Dump Files — Sigma Rule. Detects creation of files with names used by different memory dumping tools to create a memory dump of the LSASS process memory, which contains user credentials."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="LSASS Process Memory Dump Files — Sigma Rule"><meta name="twitter:description" content="Sigma rule a5a2d357-1ab8-4675-a967-ef9990a59391. LSASS Process Memory Dump Files — Sigma Rule. Detects creation of files with names used by different memory dumping tools to create a memory dump of the LSASS process memory, which contains user credentials."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/a5a2d357-1ab8-4675-a967-ef9990a59391/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/a5a2d357-1ab8-4675-a967-ef9990a59391/","name":"LSASS Process Memory Dump Files — Sigma Rule","description":"Sigma rule a5a2d357-1ab8-4675-a967-ef9990a59391. LSASS Process Memory Dump Files — Sigma Rule. Detects creation of files with names used by different memory dumping tools to create a memory dump of the LSASS process memory, which contains user credentials.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>LSASS Process Memory Dump Files — Sigma Rule</h1><p class="lead">Sigma rule a5a2d357-1ab8-4675-a967-ef9990a59391. LSASS Process Memory Dump Files — Sigma Rule. Detects creation of files with names used by different memory dumping tools to create a memory dump of the LSASS process memory, which contains user credentials.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/file-event/">file_event</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-001/">attack.t1003.001</a></div><p>Author: Florian Roth (Nextron Systems). Source status: test; severity: high. Source dates: 2021-11-15 / 2024-10-08.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;file_event&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/file/file_event/file_event_win_lsass_default_dump_file_names.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: d93454fad0d02f3ba05215b5682e65a6fefcd28b37a546419e47693d28477df5</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: LSASS Process Memory Dump Files
+id: a5a2d357-1ab8-4675-a967-ef9990a59391
+related:
+    - id: db2110f3-479d-42a6-94fb-d35bc1e46492
+      type: obsolete
+    - id: 5e3d3601-0662-4af0-b1d2-36a05e90c40a
+      type: obsolete
+status: test
+description: Detects creation of files with names used by different memory dumping tools to create a memory dump of the LSASS process memory, which contains user credentials.
+references:
+    - https://www.google.com/search?q=procdump+lsass
+    - https://medium.com/@markmotig/some-ways-to-dump-lsass-exe-c4a75fdc49bf
+    - https://github.com/elastic/detection-rules/blob/c76a39796972ecde44cb1da6df47f1b6562c9770/rules/windows/credential_access_lsass_memdump_file_created.toml
+    - https://www.whiteoaksecurity.com/blog/attacks-defenses-dumping-lsass-no-mimikatz/
+    - https://github.com/helpsystems/nanodump
+    - https://github.com/CCob/MirrorDump
+    - https://github.com/safedv/RustiveDump/blob/1a9b026b477587becfb62df9677cede619d42030/src/main.rs#L35
+    - https://github.com/ricardojoserf/NativeDump/blob/01d8cd17f31f51f5955a38e85cd3c83a17596175/NativeDump/Program.cs#L258
+author: Florian Roth (Nextron Systems)
+date: 2021-11-15
+modified: 2024-10-08
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+logsource:
+    product: windows
+    category: file_event
+detection:
+    selection_1:
+        TargetFilename|endswith:
+            - &#39;\Andrew.dmp&#39;
+            - &#39;\Coredump.dmp&#39;
+            - &#39;\lsass.dmp&#39;
+            - &#39;\lsass.rar&#39;
+            - &#39;\lsass.zip&#39;
+            - &#39;\NotLSASS.zip&#39;  # https://github.com/CCob/MirrorDump
+            - &#39;\PPLBlade.dmp&#39;  # https://github.com/tastypepperoni/PPLBlade
+            - &#39;\rustive.dmp&#39; # https://github.com/safedv/RustiveDump/blob/main/src/main.rs#L35
+    selection_2:
+        TargetFilename|contains:
+            - &#39;\lsass_2&#39;  # default format of procdump v9.0 is lsass_YYMMDD_HHmmss.dmp
+            - &#39;\lsassdmp&#39;
+            - &#39;\lsassdump&#39;
+    selection_3:
+        TargetFilename|contains|all:
+            - &#39;\lsass&#39;
+            - &#39;.dmp&#39;
+    selection_4:
+        TargetFilename|contains: &#39;SQLDmpr&#39;
+        TargetFilename|endswith: &#39;.mdmp&#39;
+    selection_5:
+        TargetFilename|contains:
+            - &#39;\nanodump&#39;
+            - &#39;\proc_&#39; # NativeDump pattern https://github.com/ricardojoserf/NativeDump/blob/01d8cd17f31f51f5955a38e85cd3c83a17596175/NativeDump/Program.cs#L258
+        TargetFilename|endswith: &#39;.dmp&#39;
+    condition: 1 of selection_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/a5a2d357-1ab8-4675-a967-ef9990a59391.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.google.com/search?q=procdump+lsass">https://www.google.com/search?q=procdump+lsass</a></li><li><a href="https://medium.com/@markmotig/some-ways-to-dump-lsass-exe-c4a75fdc49bf">https://medium.com/@markmotig/some-ways-to-dump-lsass-exe-c4a75fdc49bf</a></li><li><a href="https://github.com/elastic/detection-rules/blob/c76a39796972ecde44cb1da6df47f1b6562c9770/rules/windows/credential_access_lsass_memdump_file_created.toml">https://github.com/elastic/detection-rules/blob/c76a39796972ecde44cb1da6df47f1b6562c9770/rules/windows/credential_access_lsass_memdump_file_created.toml</a></li><li><a href="https://www.whiteoaksecurity.com/blog/attacks-defenses-dumping-lsass-no-mimikatz/">https://www.whiteoaksecurity.com/blog/attacks-defenses-dumping-lsass-no-mimikatz/</a></li><li><a href="https://github.com/helpsystems/nanodump">https://github.com/helpsystems/nanodump</a></li><li><a href="https://github.com/CCob/MirrorDump">https://github.com/CCob/MirrorDump</a></li><li><a href="https://github.com/safedv/RustiveDump/blob/1a9b026b477587becfb62df9677cede619d42030/src/main.rs#L35">https://github.com/safedv/RustiveDump/blob/1a9b026b477587becfb62df9677cede619d42030/src/main.rs#L35</a></li><li><a href="https://github.com/ricardojoserf/NativeDump/blob/01d8cd17f31f51f5955a38e85cd3c83a17596175/NativeDump/Program.cs#L258">https://github.com/ricardojoserf/NativeDump/blob/01d8cd17f31f51f5955a38e85cd3c83a17596175/NativeDump/Program.cs#L258</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003.001/">T1003.001 · LSASS Memory</a> · <a href="/ttp-simulation/detections/enterprise/T1003.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azure Kubernetes Admission Controller — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule a61a3c56-4ce2-4351-a079-88ae4cbd2b58. Azure Kubernetes Admission Controller — Sigma Rule. Identifies when an admission controller is executed in Azure Kubernetes.
+A Kubernetes Admission controller intercepts, and possibly modifies, requests to the Kubernetes API server.
+The behavior of this admission controller is determined by an admission webhook (MutatingAdmissionWebhook or ValidatingAdmissionWebhook) that the user deploys in the cluster.
+An adversary can use such webhooks as the MutatingAdmissionWebhook for obtaining persistence in the cluster.
+For example, attackers can intercept and modify the pod creation operations in the cluster and add their malicious container to every created pod.
+An adversary can use the webhook ValidatingAdmissionWebhook, which could be used to obtain access credentials.
+An adversary could use the webhook to intercept the requests to the API server, record secrets, and other sensitive information.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="a61a3c56-4ce2-4351-a079-88ae4cbd2b58, attack.privilege-escalation, attack.initial-access, attack.persistence, attack.stealth, attack.t1078, attack.credential-access, attack.t1552, attack.t1552.007, azure, activitylogs, rule-status:test, severity:medium, logsource-product:azure, logsource-service:activitylogs, sigma-tag:attack.privilege-escalation, sigma-tag:attack.initial-access, sigma-tag:attack.persistence, sigma-tag:attack.stealth, sigma-tag:attack.t1078, sigma-tag:attack.credential-access, sigma-tag:attack.t1552, sigma-tag:attack.t1552.007">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:azure, logsource-service:activitylogs, sigma-tag:attack.privilege-escalation, sigma-tag:attack.initial-access, sigma-tag:attack.persistence, sigma-tag:attack.stealth, sigma-tag:attack.t1078, sigma-tag:attack.credential-access, sigma-tag:attack.t1552, sigma-tag:attack.t1552.007">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/a61a3c56-4ce2-4351-a079-88ae4cbd2b58/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/a61a3c56-4ce2-4351-a079-88ae4cbd2b58/">
+<meta property="og:type" content="website"><meta property="og:title" content="Azure Kubernetes Admission Controller — Sigma Rule"><meta property="og:description" content="Sigma rule a61a3c56-4ce2-4351-a079-88ae4cbd2b58. Azure Kubernetes Admission Controller — Sigma Rule. Identifies when an admission controller is executed in Azure Kubernetes.
+A Kubernetes Admission controller intercepts, and possibly modifies, requests to the Kubernetes API server.
+The behavior of this admission controller is determined by an admission webhook (MutatingAdmissionWebhook or ValidatingAdmissionWebhook) that the user deploys in the cluster.
+An adversary can use such webhooks as the MutatingAdmissionWebhook for obtaining persistence in the cluster.
+For example, attackers can intercept and modify the pod creation operations in the cluster and add their malicious container to every created pod.
+An adversary can use the webhook ValidatingAdmissionWebhook, which could be used to obtain access credentials.
+An adversary could use the webhook to intercept the requests to the API server, record secrets, and other sensitive information.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Azure Kubernetes Admission Controller — Sigma Rule"><meta name="twitter:description" content="Sigma rule a61a3c56-4ce2-4351-a079-88ae4cbd2b58. Azure Kubernetes Admission Controller — Sigma Rule. Identifies when an admission controller is executed in Azure Kubernetes.
+A Kubernetes Admission controller intercepts, and possibly modifies, requests to the Kubernetes API server.
+The behavior of this admission controller is determined by an admission webhook (MutatingAdmissionWebhook or ValidatingAdmissionWebhook) that the user deploys in the cluster.
+An adversary can use such webhooks as the MutatingAdmissionWebhook for obtaining persistence in the cluster.
+For example, attackers can intercept and modify the pod creation operations in the cluster and add their malicious container to every created pod.
+An adversary can use the webhook ValidatingAdmissionWebhook, which could be used to obtain access credentials.
+An adversary could use the webhook to intercept the requests to the API server, record secrets, and other sensitive information.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/a61a3c56-4ce2-4351-a079-88ae4cbd2b58/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/a61a3c56-4ce2-4351-a079-88ae4cbd2b58/","name":"Azure Kubernetes Admission Controller — Sigma Rule","description":"Sigma rule a61a3c56-4ce2-4351-a079-88ae4cbd2b58. Azure Kubernetes Admission Controller — Sigma Rule. Identifies when an admission controller is executed in Azure Kubernetes.\nA Kubernetes Admission controller intercepts, and possibly modifies, requests to the Kubernetes API server.\nThe behavior of this admission controller is determined by an admission webhook (MutatingAdmissionWebhook or ValidatingAdmissionWebhook) that the user deploys in the cluster.\nAn adversary can use such webhooks as the MutatingAdmissionWebhook for obtaining persistence in the cluster.\nFor example, attackers can intercept and modify the pod creation operations in the cluster and add their malicious container to every created pod.\nAn adversary can use the webhook ValidatingAdmissionWebhook, which could be used to obtain access credentials.\nAn adversary could use the webhook to intercept the requests to the API server, record secrets, and other sensitive information.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Azure Kubernetes Admission Controller — Sigma Rule</h1><p class="lead">Sigma rule a61a3c56-4ce2-4351-a079-88ae4cbd2b58. Azure Kubernetes Admission Controller — Sigma Rule. Identifies when an admission controller is executed in Azure Kubernetes.
+A Kubernetes Admission controller intercepts, and possibly modifies, requests to the Kubernetes API server.
+The behavior of this admission controller is determined by an admission webhook (MutatingAdmissionWebhook or ValidatingAdmissionWebhook) that the user deploys in the cluster.
+An adversary can use such webhooks as the MutatingAdmissionWebhook for obtaining persistence in the cluster.
+For example, attackers can intercept and modify the pod creation operations in the cluster and add their malicious container to every created pod.
+An adversary can use the webhook ValidatingAdmissionWebhook, which could be used to obtain access credentials.
+An adversary could use the webhook to intercept the requests to the API server, record secrets, and other sensitive information.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/azure/">azure</a><a class="chip" href="/ttp-simulation/tags/logsource-service/activitylogs/">activitylogs</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-initial-access/">attack.initial-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1078/">attack.t1078</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1552/">attack.t1552</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1552-007/">attack.t1552.007</a></div><p>Author: Austin Songer @austinsonger. Source status: test; severity: medium. Source dates: 2021-11-25 / 2022-12-18.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;azure&quot;,
+  &quot;service&quot;: &quot;activitylogs&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/cloud/azure/activity_logs/azure_kubernetes_admission_controller.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: b825b2220c4c60d2acfd5bd3682994df42b11b7ae5413f2fbc9f9ad556448e5e</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Azure Kubernetes Admission Controller
+id: a61a3c56-4ce2-4351-a079-88ae4cbd2b58
+status: test
+description: |
+  Identifies when an admission controller is executed in Azure Kubernetes.
+  A Kubernetes Admission controller intercepts, and possibly modifies, requests to the Kubernetes API server.
+  The behavior of this admission controller is determined by an admission webhook (MutatingAdmissionWebhook or ValidatingAdmissionWebhook) that the user deploys in the cluster.
+  An adversary can use such webhooks as the MutatingAdmissionWebhook for obtaining persistence in the cluster.
+  For example, attackers can intercept and modify the pod creation operations in the cluster and add their malicious container to every created pod.
+  An adversary can use the webhook ValidatingAdmissionWebhook, which could be used to obtain access credentials.
+  An adversary could use the webhook to intercept the requests to the API server, record secrets, and other sensitive information.
+references:
+    - https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations#microsoftkubernetes
+author: Austin Songer @austinsonger
+date: 2021-11-25
+modified: 2022-12-18
+tags:
+    - attack.privilege-escalation
+    - attack.initial-access
+    - attack.persistence
+    - attack.stealth
+    - attack.t1078
+    - attack.credential-access
+    - attack.t1552
+    - attack.t1552.007
+logsource:
+    product: azure
+    service: activitylogs
+detection:
+    selection:
+        operationName|startswith:
+            - &#39;MICROSOFT.KUBERNETES/CONNECTEDCLUSTERS/ADMISSIONREGISTRATION.K8S.IO&#39;
+            - &#39;MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/ADMISSIONREGISTRATION.K8S.IO&#39;
+        operationName|endswith:
+            - &#39;/MUTATINGWEBHOOKCONFIGURATIONS/WRITE&#39;
+            - &#39;/VALIDATINGWEBHOOKCONFIGURATIONS/WRITE&#39;
+    condition: selection
+falsepositives:
+    - Azure Kubernetes Admissions Controller may be done by a system administrator.
+    - If known behavior is causing false positives, it can be exempted from the rule.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/a61a3c56-4ce2-4351-a079-88ae4cbd2b58.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Azure Kubernetes Admissions Controller may be done by a system administrator.</li><li>If known behavior is causing false positives, it can be exempted from the rule.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations#microsoftkubernetes">https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations#microsoftkubernetes</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1078/">T1078 · Valid Accounts</a> · <a href="/ttp-simulation/detections/enterprise/T1078/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1552/">T1552 · Unsecured Credentials</a> · <a href="/ttp-simulation/detections/enterprise/T1552/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1552.007/">T1552.007 · Container API</a> · <a href="/ttp-simulation/detections/enterprise/T1552.007/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

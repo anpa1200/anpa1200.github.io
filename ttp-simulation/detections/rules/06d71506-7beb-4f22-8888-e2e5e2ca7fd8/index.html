@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mimikatz Use — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 06d71506-7beb-4f22-8888-e2e5e2ca7fd8. Mimikatz Use — Sigma Rule. This method detects mimikatz keywords in different Eventlogs (some of them only appear in older Mimikatz version that are however still used by different threat groups)">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="06d71506-7beb-4f22-8888-e2e5e2ca7fd8, attack.s0002, attack.lateral-movement, attack.credential-access, car.2013-07-001, car.2019-04-004, attack.t1003.002, attack.t1003.004, attack.t1003.001, attack.t1003.006, windows, rule-status:test, severity:high, logsource-product:windows, sigma-tag:attack.s0002, sigma-tag:attack.lateral-movement, sigma-tag:attack.credential-access, sigma-tag:car.2013-07-001, sigma-tag:car.2019-04-004, sigma-tag:attack.t1003.002, sigma-tag:attack.t1003.004, sigma-tag:attack.t1003.001, sigma-tag:attack.t1003.006">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:windows, sigma-tag:attack.s0002, sigma-tag:attack.lateral-movement, sigma-tag:attack.credential-access, sigma-tag:car.2013-07-001, sigma-tag:car.2019-04-004, sigma-tag:attack.t1003.002, sigma-tag:attack.t1003.004, sigma-tag:attack.t1003.001, sigma-tag:attack.t1003.006">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/06d71506-7beb-4f22-8888-e2e5e2ca7fd8/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/06d71506-7beb-4f22-8888-e2e5e2ca7fd8/">
+<meta property="og:type" content="website"><meta property="og:title" content="Mimikatz Use — Sigma Rule"><meta property="og:description" content="Sigma rule 06d71506-7beb-4f22-8888-e2e5e2ca7fd8. Mimikatz Use — Sigma Rule. This method detects mimikatz keywords in different Eventlogs (some of them only appear in older Mimikatz version that are however still used by different threat groups)"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Mimikatz Use — Sigma Rule"><meta name="twitter:description" content="Sigma rule 06d71506-7beb-4f22-8888-e2e5e2ca7fd8. Mimikatz Use — Sigma Rule. This method detects mimikatz keywords in different Eventlogs (some of them only appear in older Mimikatz version that are however still used by different threat groups)"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/06d71506-7beb-4f22-8888-e2e5e2ca7fd8/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/06d71506-7beb-4f22-8888-e2e5e2ca7fd8/","name":"Mimikatz Use — Sigma Rule","description":"Sigma rule 06d71506-7beb-4f22-8888-e2e5e2ca7fd8. Mimikatz Use — Sigma Rule. This method detects mimikatz keywords in different Eventlogs (some of them only appear in older Mimikatz version that are however still used by different threat groups)","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Mimikatz Use — Sigma Rule</h1><p class="lead">Sigma rule 06d71506-7beb-4f22-8888-e2e5e2ca7fd8. Mimikatz Use — Sigma Rule. This method detects mimikatz keywords in different Eventlogs (some of them only appear in older Mimikatz version that are however still used by different threat groups)</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-s0002/">attack.s0002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/car-2013-07-001/">car.2013-07-001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/car-2019-04-004/">car.2019-04-004</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-002/">attack.t1003.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-004/">attack.t1003.004</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-001/">attack.t1003.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-006/">attack.t1003.006</a></div><p>Author: Florian Roth (Nextron Systems), David ANDRE (additional keywords). Source status: test; severity: high. Source dates: 2017-01-10 / 2022-01-05.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/win_alert_mimikatz_keywords.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: cc57c100b03307863af571ce10dca0ec760651cd284d22913ed6dfd709891755</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Mimikatz Use
+id: 06d71506-7beb-4f22-8888-e2e5e2ca7fd8
+status: test
+description: This method detects mimikatz keywords in different Eventlogs (some of them only appear in older Mimikatz version that are however still used by different threat groups)
+references:
+    - https://tools.thehacker.recipes/mimikatz/modules
+author: Florian Roth (Nextron Systems), David ANDRE (additional keywords)
+date: 2017-01-10
+modified: 2022-01-05
+tags:
+    - attack.s0002
+    - attack.lateral-movement
+    - attack.credential-access
+    - car.2013-07-001
+    - car.2019-04-004
+    - attack.t1003.002
+    - attack.t1003.004
+    - attack.t1003.001
+    - attack.t1003.006
+logsource:
+    product: windows
+detection:
+    keywords:
+        - &#39;dpapi::masterkey&#39;
+        - &#39;eo.oe.kiwi&#39;
+        - &#39;event::clear&#39;
+        - &#39;event::drop&#39;
+        - &#39;gentilkiwi.com&#39;
+        - &#39;kerberos::golden&#39;
+        - &#39;kerberos::ptc&#39;
+        - &#39;kerberos::ptt&#39;
+        - &#39;kerberos::tgt&#39;
+        - &#39;Kiwi Legit Printer&#39;
+        - &#39;lsadump::&#39;
+        - &#39;mimidrv.sys&#39;
+        - &#39;\mimilib.dll&#39;
+        - &#39;misc::printnightmare&#39;
+        - &#39;misc::shadowcopies&#39;
+        - &#39;misc::skeleton&#39;
+        - &#39;privilege::backup&#39;
+        - &#39;privilege::debug&#39;
+        - &#39;privilege::driver&#39;
+        - &#39;sekurlsa::&#39;
+    filter:
+        EventID: 15  # Sysmon&#39;s FileStream Events (could cause false positives when Sigma rules get copied on/to a system)
+    condition: keywords and not filter
+falsepositives:
+    - Naughty administrators
+    - AV Signature updates
+    - Files with Mimikatz in their filename
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/06d71506-7beb-4f22-8888-e2e5e2ca7fd8.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Naughty administrators</li><li>AV Signature updates</li><li>Files with Mimikatz in their filename</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://tools.thehacker.recipes/mimikatz/modules">https://tools.thehacker.recipes/mimikatz/modules</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003.001/">T1003.001 · LSASS Memory</a> · <a href="/ttp-simulation/detections/enterprise/T1003.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1003.002/">T1003.002 · Security Account Manager</a> · <a href="/ttp-simulation/detections/enterprise/T1003.002/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1003.004/">T1003.004 · LSA Secrets</a> · <a href="/ttp-simulation/detections/enterprise/T1003.004/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1003.006/">T1003.006 · DCSync</a> · <a href="/ttp-simulation/detections/enterprise/T1003.006/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule cd1f961e-0b96-436b-b7c6-38da4583ec00. Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule. Detects the execution of &quot;logman&quot; utility in order to disable or delete Windows trace sessions">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="cd1f961e-0b96-436b-b7c6-38da4583ec00, attack.defense-impairment, attack.t1685, attack.t1685.005, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685, sigma-tag:attack.t1685.005">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685, sigma-tag:attack.t1685.005">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/cd1f961e-0b96-436b-b7c6-38da4583ec00/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/cd1f961e-0b96-436b-b7c6-38da4583ec00/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule"><meta property="og:description" content="Sigma rule cd1f961e-0b96-436b-b7c6-38da4583ec00. Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule. Detects the execution of &quot;logman&quot; utility in order to disable or delete Windows trace sessions"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule"><meta name="twitter:description" content="Sigma rule cd1f961e-0b96-436b-b7c6-38da4583ec00. Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule. Detects the execution of &quot;logman&quot; utility in order to disable or delete Windows trace sessions"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/cd1f961e-0b96-436b-b7c6-38da4583ec00/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/cd1f961e-0b96-436b-b7c6-38da4583ec00/","name":"Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule","description":"Sigma rule cd1f961e-0b96-436b-b7c6-38da4583ec00. Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule. Detects the execution of \"logman\" utility in order to disable or delete Windows trace sessions","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule</h1><p class="lead">Sigma rule cd1f961e-0b96-436b-b7c6-38da4583ec00. Suspicious Windows Trace ETW Session Tamper Via Logman.EXE — Sigma Rule. Detects the execution of &quot;logman&quot; utility in order to disable or delete Windows trace sessions</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1685/">attack.t1685</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1685-005/">attack.t1685.005</a></div><p>Author: Florian Roth (Nextron Systems). Source status: test; severity: high. Source dates: 2021-02-11 / 2023-02-21.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_logman_disable_eventlog.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 44fd5e2f773bd6ea70090b8ef5c017433e8b70a73078573f085922a7346d7d6a</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Windows Trace ETW Session Tamper Via Logman.EXE
+id: cd1f961e-0b96-436b-b7c6-38da4583ec00
+status: test
+description: Detects the execution of &quot;logman&quot; utility in order to disable or delete Windows trace sessions
+references:
+    - https://twitter.com/0gtweet/status/1359039665232306183?s=21
+    - https://ss64.com/nt/logman.html
+author: Florian Roth (Nextron Systems)
+date: 2021-02-11
+modified: 2023-02-21
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+    - attack.t1685.005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: &#39;\logman.exe&#39;
+        - OriginalFileName: &#39;Logman.exe&#39;
+    selection_action:
+        CommandLine|contains:
+            - &#39;stop &#39;
+            - &#39;delete &#39;
+    selection_service:
+        CommandLine|contains:
+            - &#39;Circular Kernel Context Logger&#39;
+            - &#39;EventLog-&#39; # Cover multiple traces starting with EventLog-*
+            - &#39;SYSMON TRACE&#39;
+            - &#39;SysmonDnsEtwSession&#39;
+    condition: all of selection*
+falsepositives:
+    - Legitimate deactivation by administrative staff
+    - Installer tools that disable services, e.g. before log collection agent installation
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/cd1f961e-0b96-436b-b7c6-38da4583ec00.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate deactivation by administrative staff</li><li>Installer tools that disable services, e.g. before log collection agent installation</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://twitter.com/0gtweet/status/1359039665232306183?s=21">https://twitter.com/0gtweet/status/1359039665232306183?s=21</a></li><li><a href="https://ss64.com/nt/logman.html">https://ss64.com/nt/logman.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1685/">T1685 · Disable or Modify Tools</a> · <a href="/ttp-simulation/detections/enterprise/T1685/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1685.005/">T1685.005 · Clear Windows Event Logs</a> · <a href="/ttp-simulation/detections/enterprise/T1685.005/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

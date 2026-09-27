@@ -47,6 +47,12 @@ const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-
 const knowledgeSourcesPath = resolve(option('--knowledge-sources', join(siteRoot, 'data', 'knowledge-sources.json')));
 const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledge-sources', '165'), 10);
 const requiredIndexUrls = [
+  `${SITE_ORIGIN}/ttp-simulation/`,
+  `${SITE_ORIGIN}/ttp-simulation/tools/`,
+  `${SITE_ORIGIN}/ttp-simulation/detections/`,
+  `${SITE_ORIGIN}/ttp-simulation/telemetry/`,
+  `${SITE_ORIGIN}/ttp-simulation/techniques/enterprise/T1059.001/`,
+  `${SITE_ORIGIN}/ttp-simulation/detections/enterprise/T1059.001/`,
   `${SITE_ORIGIN}/`,
   `${SITE_ORIGIN}/search.html`,
   `${SITE_ORIGIN}/references/`,
@@ -205,6 +211,7 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
   const fragmentDirectory = join(bundlePath, 'fragment');
   const records = {};
   const missing = [];
+  const indexedModuleUrls = new Set();
   let indexedPageRecords = 0;
   let indexedCustomRecords = 0;
   for (const filename of (await readdir(fragmentDirectory)).filter((name) => name.endsWith('.pf_fragment')).sort()) {
@@ -215,6 +222,7 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
     const fragment = JSON.parse(decoded.slice(jsonStart));
     const rawUrl = fragment.raw_url || fragment.url;
     const canonical = normalizeCanonical(rawUrl);
+    if (canonical?.startsWith(`${SITE_ORIGIN}/ttp-simulation/`)) indexedModuleUrls.add(canonical);
     const customItem = customSearchGovernance.get(searchRecordKey(rawUrl));
     const item = customItem || (canonical ? catalogByUrl.get(canonical) : null);
     if (!item) {
@@ -242,6 +250,14 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
   if (indexedPageRecords < Math.floor(acceptedPageCount * 0.95) || indexedPageRecords > acceptedPageCount) {
     throw new Error(`Search governance map has ${indexedPageRecords}/${acceptedPageCount} searchable page records.`);
   }
+  const moduleManifestPath = join(siteRoot, 'ttp-simulation/data/integration.json');
+  let expectedModulePages = 0;
+  if (existsSync(moduleManifestPath)) {
+    const manifest = JSON.parse(await readFile(moduleManifestPath, 'utf8'));
+    expectedModulePages = manifest.pages.length;
+    const missingModulePages = manifest.pages.filter(page => !indexedModuleUrls.has(`${SITE_ORIGIN}/ttp-simulation/${page.page}`));
+    if (missingModulePages.length) throw new Error(`Module search coverage is incomplete: ${missingModulePages.map(page => page.page).join(', ')}`);
+  }
   const governance = {
     schema_version: 1,
     content_catalog_version: catalog.catalog_version,
@@ -249,6 +265,8 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
     indexed_page_count: indexedPageRecords,
     indexed_custom_record_count: indexedCustomRecords,
     indexed_record_count: indexedRecordCount,
+    expected_module_pages: expectedModulePages,
+    indexed_module_pages: indexedModuleUrls.size,
     record_count: indexedRecordCount,
     records,
   };

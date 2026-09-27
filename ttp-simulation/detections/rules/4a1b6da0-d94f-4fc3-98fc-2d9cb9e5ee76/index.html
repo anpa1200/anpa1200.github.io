@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76. Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule. Detects process handle on LSASS process with certain access mask">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76, attack.credential-access, car.2019-04-004, attack.t1003.001, windows, security, rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.credential-access, sigma-tag:car.2019-04-004, sigma-tag:attack.t1003.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.credential-access, sigma-tag:car.2019-04-004, sigma-tag:attack.t1003.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule"><meta property="og:description" content="Sigma rule 4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76. Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule. Detects process handle on LSASS process with certain access mask"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule"><meta name="twitter:description" content="Sigma rule 4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76. Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule. Detects process handle on LSASS process with certain access mask"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76/","name":"Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule","description":"Sigma rule 4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76. Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule. Detects process handle on LSASS process with certain access mask","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule</h1><p class="lead">Sigma rule 4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76. Potentially Suspicious AccessMask Requested From LSASS — Sigma Rule. Detects process handle on LSASS process with certain access mask</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/security/">security</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/car-2019-04-004/">car.2019-04-004</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-001/">attack.t1003.001</a></div><p>Author: Roberto Rodriguez, Teymur Kheirkhabarov, Dimitrios Slamaris, Mark Russinovich, Aleksey Potapov, oscd.community (update). Source status: test; severity: medium. Source dates: 2019-11-01 / 2023-12-19.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;security&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/security/win_security_susp_lsass_dump_generic.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: b59c52f9220b87579f40ad8740e7595bb271cfb45f516aee443ec8a8050e4546</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potentially Suspicious AccessMask Requested From LSASS
+id: 4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76
+status: test
+description: Detects process handle on LSASS process with certain access mask
+references:
+    - https://web.archive.org/web/20230208123920/https://cyberwardog.blogspot.com/2017/03/chronicles-of-threat-hunter-hunting-for_22.html
+    - https://www.slideshare.net/heirhabarov/hunting-for-credentials-dumping-in-windows-environment
+author: Roberto Rodriguez, Teymur Kheirkhabarov, Dimitrios Slamaris, Mark Russinovich, Aleksey Potapov, oscd.community (update)
+date: 2019-11-01
+modified: 2023-12-19
+tags:
+    - attack.credential-access
+    - car.2019-04-004
+    - attack.t1003.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_1:
+        EventID: 4656 # A handle to an object was requested.
+        ObjectName|endswith: &#39;\lsass.exe&#39;
+        AccessMask|contains:
+            - &#39;0x40&#39;
+            - &#39;0x1400&#39;
+            # - &#39;0x1000&#39;  # minimum access requirements to query basic info from service
+            - &#39;0x100000&#39;
+            - &#39;0x1410&#39;    # car.2019-04-004
+            - &#39;0x1010&#39;    # car.2019-04-004
+            - &#39;0x1438&#39;    # car.2019-04-004
+            - &#39;0x143a&#39;    # car.2019-04-004
+            - &#39;0x1418&#39;    # car.2019-04-004
+            - &#39;0x1f0fff&#39;
+            - &#39;0x1f1fff&#39;
+            - &#39;0x1f2fff&#39;
+            - &#39;0x1f3fff&#39;
+    selection_2:
+        EventID: 4663 # An attempt was made to access an object
+        ObjectName|endswith: &#39;\lsass.exe&#39;
+        AccessList|contains:
+            - &#39;4484&#39;
+            - &#39;4416&#39;
+    filter_main_specific:
+        ProcessName|endswith:
+            - &#39;\csrss.exe&#39;
+            - &#39;\GamingServices.exe&#39;
+            - &#39;\lsm.exe&#39;
+            - &#39;\MicrosoftEdgeUpdate.exe&#39;
+            - &#39;\minionhost.exe&#39;  # Cyberreason
+            - &#39;\MRT.exe&#39;         # MS Malware Removal Tool
+            - &#39;\MsMpEng.exe&#39;     # Defender
+            - &#39;\perfmon.exe&#39;
+            - &#39;\procexp.exe&#39;
+            - &#39;\procexp64.exe&#39;
+            - &#39;\svchost.exe&#39;
+            - &#39;\taskmgr.exe&#39;
+            - &#39;\thor.exe&#39;        # THOR
+            - &#39;\thor64.exe&#39;      # THOR
+            - &#39;\vmtoolsd.exe&#39;
+            - &#39;\VsTskMgr.exe&#39;    # McAfee Enterprise
+            - &#39;\wininit.exe&#39;
+            - &#39;\wmiprvse.exe&#39;
+            - &#39;RtkAudUService64&#39; # https://medium.com/falconforce/the-curious-case-of-realtek-and-lsass-33fc0c8482ff
+        ProcessName|contains:
+            - &#39;:\Program Files (x86)\&#39;
+            - &#39;:\Program Files\&#39;
+            - &#39;:\ProgramData\Microsoft\Windows Defender\Platform\&#39;
+            - &#39;:\Windows\SysNative\&#39;
+            - &#39;:\Windows\System32\&#39;
+            - &#39;:\Windows\SysWow64\&#39;
+            - &#39;:\Windows\Temp\asgard2-agent\&#39;
+    filter_main_generic:
+        ProcessName|contains: &#39;:\Program Files&#39;  # too many false positives with legitimate AV and EDR solutions
+    filter_main_exact:
+        ProcessName|endswith:
+            - &#39;:\Windows\System32\taskhostw.exe&#39;
+            - &#39;:\Windows\System32\msiexec.exe&#39;
+            - &#39;:\Windows\CCM\CcmExec.exe&#39;
+    filter_main_sysmon:
+        ProcessName|endswith: &#39;:\Windows\Sysmon64.exe&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    filter_main_aurora:
+        ProcessName|contains: &#39;:\Windows\Temp\asgard2-agent-sc\aurora\&#39;
+        ProcessName|endswith: &#39;\aurora-agent-64.exe&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    filter_main_scenarioengine:
+        # Example: C:\a70de9569c3a5aa22184ef52a890177b\x64\SCENARIOENGINE.EXE
+        ProcessName|endswith: &#39;\x64\SCENARIOENGINE.EXE&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    filter_main_avira1:
+        ProcessName|contains|all:
+            - &#39;:\Users\&#39;
+            - &#39;\AppData\Local\Temp\is-&#39;
+        ProcessName|endswith: &#39;\avira_system_speedup.tmp&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    filter_main_avira2:
+        ProcessName|contains: &#39;:\Windows\Temp\&#39;
+        ProcessName|endswith: &#39;\avira_speedup_setup_update.tmp&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    filter_main_snmp:
+        ProcessName|endswith: &#39;:\Windows\System32\snmp.exe&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    filter_main_googleupdate:
+        ProcessName|contains: &#39;:\Windows\SystemTemp\&#39;
+        ProcessName|endswith: &#39;\GoogleUpdate.exe&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    filter_optional_procmon:
+        ProcessName|endswith:
+            - &#39;\procmon64.exe&#39;
+            - &#39;\procmon.exe&#39;
+        AccessList|contains: &#39;%%4484&#39;
+    condition: 1 of selection_* and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Legitimate software accessing LSASS process for legitimate reason; update the whitelist with it
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/4a1b6da0-d94f-4fc3-98fc-2d9cb9e5ee76.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate software accessing LSASS process for legitimate reason; update the whitelist with it</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://web.archive.org/web/20230208123920/https://cyberwardog.blogspot.com/2017/03/chronicles-of-threat-hunter-hunting-for_22.html">https://web.archive.org/web/20230208123920/https://cyberwardog.blogspot.com/2017/03/chronicles-of-threat-hunter-hunting-for_22.html</a></li><li><a href="https://www.slideshare.net/heirhabarov/hunting-for-credentials-dumping-in-windows-environment">https://www.slideshare.net/heirhabarov/hunting-for-credentials-dumping-in-windows-environment</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003.001/">T1003.001 · LSASS Memory</a> · <a href="/ttp-simulation/detections/enterprise/T1003.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

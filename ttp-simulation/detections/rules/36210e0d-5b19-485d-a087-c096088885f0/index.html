@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious PowerShell Parameter Substring — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 36210e0d-5b19-485d-a087-c096088885f0. Suspicious PowerShell Parameter Substring — Sigma Rule. Detects suspicious PowerShell invocation with a parameter substring">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="36210e0d-5b19-485d-a087-c096088885f0, attack.execution, attack.t1059.001, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/36210e0d-5b19-485d-a087-c096088885f0/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/36210e0d-5b19-485d-a087-c096088885f0/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious PowerShell Parameter Substring — Sigma Rule"><meta property="og:description" content="Sigma rule 36210e0d-5b19-485d-a087-c096088885f0. Suspicious PowerShell Parameter Substring — Sigma Rule. Detects suspicious PowerShell invocation with a parameter substring"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious PowerShell Parameter Substring — Sigma Rule"><meta name="twitter:description" content="Sigma rule 36210e0d-5b19-485d-a087-c096088885f0. Suspicious PowerShell Parameter Substring — Sigma Rule. Detects suspicious PowerShell invocation with a parameter substring"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/36210e0d-5b19-485d-a087-c096088885f0/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/36210e0d-5b19-485d-a087-c096088885f0/","name":"Suspicious PowerShell Parameter Substring — Sigma Rule","description":"Sigma rule 36210e0d-5b19-485d-a087-c096088885f0. Suspicious PowerShell Parameter Substring — Sigma Rule. Detects suspicious PowerShell invocation with a parameter substring","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious PowerShell Parameter Substring — Sigma Rule</h1><p class="lead">Sigma rule 36210e0d-5b19-485d-a087-c096088885f0. Suspicious PowerShell Parameter Substring — Sigma Rule. Detects suspicious PowerShell invocation with a parameter substring</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Florian Roth (Nextron Systems), Daniel Bohannon (idea), Roberto Rodriguez (Fix). Source status: test; severity: high. Source dates: 2019-01-16 / 2022-07-14.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_susp_parameter_variation.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: da2ab44f637116ed326fc3f64f0ac76afa94509ab936425439e078f765893e07</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious PowerShell Parameter Substring
+id: 36210e0d-5b19-485d-a087-c096088885f0
+status: test
+description: Detects suspicious PowerShell invocation with a parameter substring
+references:
+    - http://www.danielbohannon.com/blog-1/2017/3/12/powershell-execution-argument-obfuscation-how-it-can-make-detection-easier
+author: Florian Roth (Nextron Systems), Daniel Bohannon (idea), Roberto Rodriguez (Fix)
+date: 2019-01-16
+modified: 2022-07-14
+tags:
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith:
+            - &#39;\powershell.exe&#39;
+            - &#39;\pwsh.exe&#39;
+        CommandLine|contains:
+            - &#39; -windowstyle h &#39;
+            - &#39; -windowstyl h&#39;
+            - &#39; -windowsty h&#39;
+            - &#39; -windowst h&#39;
+            - &#39; -windows h&#39;
+            - &#39; -windo h&#39;
+            - &#39; -wind h&#39;
+            - &#39; -win h&#39;
+            - &#39; -wi h&#39;
+            - &#39; -win h &#39;
+            - &#39; -win hi &#39;
+            - &#39; -win hid &#39;
+            - &#39; -win hidd &#39;
+            - &#39; -win hidde &#39;
+            - &#39; -NoPr &#39;
+            - &#39; -NoPro &#39;
+            - &#39; -NoProf &#39;
+            - &#39; -NoProfi &#39;
+            - &#39; -NoProfil &#39;
+            - &#39; -nonin &#39;
+            - &#39; -nonint &#39;
+            - &#39; -noninte &#39;
+            - &#39; -noninter &#39;
+            - &#39; -nonintera &#39;
+            - &#39; -noninterac &#39;
+            - &#39; -noninteract &#39;
+            - &#39; -noninteracti &#39;
+            - &#39; -noninteractiv &#39;
+            - &#39; -ec &#39;
+            - &#39; -encodedComman &#39;
+            - &#39; -encodedComma &#39;
+            - &#39; -encodedComm &#39;
+            - &#39; -encodedCom &#39;
+            - &#39; -encodedCo &#39;
+            - &#39; -encodedC &#39;
+            - &#39; -encoded &#39;
+            - &#39; -encode &#39;
+            - &#39; -encod &#39;
+            - &#39; -enco &#39;
+            - &#39; -en &#39;
+            - &#39; -executionpolic &#39;
+            - &#39; -executionpoli &#39;
+            - &#39; -executionpol &#39;
+            - &#39; -executionpo &#39;
+            - &#39; -executionp &#39;
+            - &#39; -execution bypass&#39;
+            - &#39; -executio bypass&#39;
+            - &#39; -executi bypass&#39;
+            - &#39; -execut bypass&#39;
+            - &#39; -execu bypass&#39;
+            - &#39; -exec bypass&#39;
+            - &#39; -exe bypass&#39;
+            - &#39; -ex bypass&#39;
+            - &#39; -ep bypass&#39;
+            - &#39; /windowstyle h &#39;
+            - &#39; /windowstyl h&#39;
+            - &#39; /windowsty h&#39;
+            - &#39; /windowst h&#39;
+            - &#39; /windows h&#39;
+            - &#39; /windo h&#39;
+            - &#39; /wind h&#39;
+            - &#39; /win h&#39;
+            - &#39; /wi h&#39;
+            - &#39; /win h &#39;
+            - &#39; /win hi &#39;
+            - &#39; /win hid &#39;
+            - &#39; /win hidd &#39;
+            - &#39; /win hidde &#39;
+            - &#39; /NoPr &#39;
+            - &#39; /NoPro &#39;
+            - &#39; /NoProf &#39;
+            - &#39; /NoProfi &#39;
+            - &#39; /NoProfil &#39;
+            - &#39; /nonin &#39;
+            - &#39; /nonint &#39;
+            - &#39; /noninte &#39;
+            - &#39; /noninter &#39;
+            - &#39; /nonintera &#39;
+            - &#39; /noninterac &#39;
+            - &#39; /noninteract &#39;
+            - &#39; /noninteracti &#39;
+            - &#39; /noninteractiv &#39;
+            - &#39; /ec &#39;
+            - &#39; /encodedComman &#39;
+            - &#39; /encodedComma &#39;
+            - &#39; /encodedComm &#39;
+            - &#39; /encodedCom &#39;
+            - &#39; /encodedCo &#39;
+            - &#39; /encodedC &#39;
+            - &#39; /encoded &#39;
+            - &#39; /encode &#39;
+            - &#39; /encod &#39;
+            - &#39; /enco &#39;
+            - &#39; /en &#39;
+            - &#39; /executionpolic &#39;
+            - &#39; /executionpoli &#39;
+            - &#39; /executionpol &#39;
+            - &#39; /executionpo &#39;
+            - &#39; /executionp &#39;
+            - &#39; /execution bypass&#39;
+            - &#39; /executio bypass&#39;
+            - &#39; /executi bypass&#39;
+            - &#39; /execut bypass&#39;
+            - &#39; /execu bypass&#39;
+            - &#39; /exec bypass&#39;
+            - &#39; /exe bypass&#39;
+            - &#39; /ex bypass&#39;
+            - &#39; /ep bypass&#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/36210e0d-5b19-485d-a087-c096088885f0.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="http://www.danielbohannon.com/blog-1/2017/3/12/powershell-execution-argument-obfuscation-how-it-can-make-detection-easier">http://www.danielbohannon.com/blog-1/2017/3/12/powershell-execution-argument-obfuscation-how-it-can-make-detection-easier</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

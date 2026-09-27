@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule e043f529-8514-4205-8ab0-7f7d2927b400. DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule. Detects a DNS query by a non browser process on the system to &quot;azurewebsites.net&quot;. The latter was often used by threat actors as a malware hosting and exfiltration site.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="e043f529-8514-4205-8ab0-7f7d2927b400, attack.command-and-control, attack.t1219.002, windows, dns_query, rule-status:test, severity:medium, logsource-product:windows, logsource-category:dns_query, sigma-tag:attack.command-and-control, sigma-tag:attack.t1219.002">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-category:dns_query, sigma-tag:attack.command-and-control, sigma-tag:attack.t1219.002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/e043f529-8514-4205-8ab0-7f7d2927b400/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/e043f529-8514-4205-8ab0-7f7d2927b400/">
+<meta property="og:type" content="website"><meta property="og:title" content="DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule"><meta property="og:description" content="Sigma rule e043f529-8514-4205-8ab0-7f7d2927b400. DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule. Detects a DNS query by a non browser process on the system to &quot;azurewebsites.net&quot;. The latter was often used by threat actors as a malware hosting and exfiltration site.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule"><meta name="twitter:description" content="Sigma rule e043f529-8514-4205-8ab0-7f7d2927b400. DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule. Detects a DNS query by a non browser process on the system to &quot;azurewebsites.net&quot;. The latter was often used by threat actors as a malware hosting and exfiltration site.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/e043f529-8514-4205-8ab0-7f7d2927b400/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/e043f529-8514-4205-8ab0-7f7d2927b400/","name":"DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule","description":"Sigma rule e043f529-8514-4205-8ab0-7f7d2927b400. DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule. Detects a DNS query by a non browser process on the system to \"azurewebsites.net\". The latter was often used by threat actors as a malware hosting and exfiltration site.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule</h1><p class="lead">Sigma rule e043f529-8514-4205-8ab0-7f7d2927b400. DNS Query To AzureWebsites.NET By Non-Browser Process — Sigma Rule. Detects a DNS query by a non browser process on the system to &quot;azurewebsites.net&quot;. The latter was often used by threat actors as a malware hosting and exfiltration site.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/dns-query/">dns_query</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-command-and-control/">attack.command-and-control</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1219-002/">attack.t1219.002</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2024-06-24 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;dns_query&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/dns_query/dns_query_win_domain_azurewebsites.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 4a588a54fca7f62385e1c923e61f9835fa2f3d3bfc4875ad91425e472d1bc59d</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: DNS Query To AzureWebsites.NET By Non-Browser Process
+id: e043f529-8514-4205-8ab0-7f7d2927b400
+related:
+    - id: 5c80b618-0dbb-46e6-acbb-03d90bcb6d83
+      type: derived
+status: test
+description: |
+    Detects a DNS query by a non browser process on the system to &quot;azurewebsites.net&quot;. The latter was often used by threat actors as a malware hosting and exfiltration site.
+references:
+    - https://www.sentinelone.com/labs/wip26-espionage-threat-actors-abuse-cloud-infrastructure-in-targeted-telco-attacks/
+    - https://symantec-enterprise-blogs.security.com/threat-intelligence/harvester-new-apt-attacks-asia
+    - https://www.ptsecurity.com/ww-en/analytics/pt-esc-threat-intelligence/higaisa-or-winnti-apt-41-backdoors-old-and-new/
+    - https://intezer.com/blog/research/how-we-escaped-docker-in-azure-functions/
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2024-06-24
+tags:
+    - attack.command-and-control
+    - attack.t1219.002
+logsource:
+    product: windows
+    category: dns_query
+detection:
+    selection:
+        QueryName|endswith: &#39;azurewebsites.net&#39;
+    filter_optional_chrome:
+        Image:
+            - &#39;C:\Program Files\Google\Chrome\Application\chrome.exe&#39;
+            - &#39;C:\Program Files (x86)\Google\Chrome\Application\chrome.exe&#39;
+    filter_optional_firefox:
+        Image:
+            - &#39;C:\Program Files\Mozilla Firefox\firefox.exe&#39;
+            - &#39;C:\Program Files (x86)\Mozilla Firefox\firefox.exe&#39;
+    filter_optional_ie:
+        Image:
+            - &#39;C:\Program Files (x86)\Internet Explorer\iexplore.exe&#39;
+            - &#39;C:\Program Files\Internet Explorer\iexplore.exe&#39;
+    filter_optional_edge_1:
+        - Image|startswith: &#39;C:\Program Files (x86)\Microsoft\EdgeWebView\Application\&#39;
+        - Image|endswith: &#39;\WindowsApps\MicrosoftEdge.exe&#39;
+        - Image:
+              - &#39;C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe&#39;
+              - &#39;C:\Program Files\Microsoft\Edge\Application\msedge.exe&#39;
+    filter_optional_edge_2:
+        Image|startswith:
+            - &#39;C:\Program Files (x86)\Microsoft\EdgeCore\&#39;
+            - &#39;C:\Program Files\Microsoft\EdgeCore\&#39;
+        Image|endswith:
+            - &#39;\msedge.exe&#39;
+            - &#39;\msedgewebview2.exe&#39;
+    filter_optional_safari:
+        Image|endswith: &#39;\safari.exe&#39;
+    filter_optional_defender:
+        Image|endswith:
+            - &#39;\MsMpEng.exe&#39; # Microsoft Defender executable
+            - &#39;\MsSense.exe&#39; # Windows Defender Advanced Threat Protection Service Executable
+    filter_optional_brave:
+        Image|endswith: &#39;\brave.exe&#39;
+        Image|startswith: &#39;C:\Program Files\BraveSoftware\&#39;
+    filter_optional_maxthon:
+        Image|contains: &#39;\AppData\Local\Maxthon\&#39;
+        Image|endswith: &#39;\maxthon.exe&#39;
+    filter_optional_opera:
+        Image|contains: &#39;\AppData\Local\Programs\Opera\&#39;
+        Image|endswith: &#39;\opera.exe&#39;
+    filter_optional_seamonkey:
+        Image|startswith:
+            - &#39;C:\Program Files\SeaMonkey\&#39;
+            - &#39;C:\Program Files (x86)\SeaMonkey\&#39;
+        Image|endswith: &#39;\seamonkey.exe&#39;
+    filter_optional_vivaldi:
+        Image|contains: &#39;\AppData\Local\Vivaldi\&#39;
+        Image|endswith: &#39;\vivaldi.exe&#39;
+    filter_optional_whale:
+        Image|startswith:
+            - &#39;C:\Program Files\Naver\Naver Whale\&#39;
+            - &#39;C:\Program Files (x86)\Naver\Naver Whale\&#39;
+        Image|endswith: &#39;\whale.exe&#39;
+    filter_optional_tor:
+        Image|contains: &#39;\Tor Browser\&#39;
+    filter_optional_whaterfox:
+        Image|startswith:
+            - &#39;C:\Program Files\Waterfox\&#39;
+            - &#39;C:\Program Files (x86)\Waterfox\&#39;
+        Image|endswith: &#39;\Waterfox.exe&#39;
+    filter_optional_midori:
+        Image|contains: &#39;\AppData\Local\Programs\midori-ng\&#39;
+        Image|endswith: &#39;\Midori Next Generation.exe&#39;
+    filter_optional_slimbrowser:
+        Image|startswith:
+            - &#39;C:\Program Files\SlimBrowser\&#39;
+            - &#39;C:\Program Files (x86)\SlimBrowser\&#39;
+        Image|endswith: &#39;\slimbrowser.exe&#39;
+    filter_optional_flock:
+        Image|contains: &#39;\AppData\Local\Flock\&#39;
+        Image|endswith: &#39;\Flock.exe&#39;
+    filter_optional_phoebe:
+        Image|contains: &#39;\AppData\Local\Phoebe\&#39;
+        Image|endswith: &#39;\Phoebe.exe&#39;
+    filter_optional_falkon:
+        Image|startswith:
+            - &#39;C:\Program Files\Falkon\&#39;
+            - &#39;C:\Program Files (x86)\Falkon\&#39;
+        Image|endswith: &#39;\falkon.exe&#39;
+    filter_optional_avant:
+        Image|startswith:
+            - &#39;C:\Program Files (x86)\Avant Browser\&#39;
+            - &#39;C:\Program Files\Avant Browser\&#39;
+        Image|endswith: &#39;\avant.exe&#39;
+    condition: selection and not 1 of filter_optional_*
+falsepositives:
+    - Likely with other browser software. Apply additional filters for any other browsers you might use.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/e043f529-8514-4205-8ab0-7f7d2927b400.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Likely with other browser software. Apply additional filters for any other browsers you might use.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.sentinelone.com/labs/wip26-espionage-threat-actors-abuse-cloud-infrastructure-in-targeted-telco-attacks/">https://www.sentinelone.com/labs/wip26-espionage-threat-actors-abuse-cloud-infrastructure-in-targeted-telco-attacks/</a></li><li><a href="https://symantec-enterprise-blogs.security.com/threat-intelligence/harvester-new-apt-attacks-asia">https://symantec-enterprise-blogs.security.com/threat-intelligence/harvester-new-apt-attacks-asia</a></li><li><a href="https://www.ptsecurity.com/ww-en/analytics/pt-esc-threat-intelligence/higaisa-or-winnti-apt-41-backdoors-old-and-new/">https://www.ptsecurity.com/ww-en/analytics/pt-esc-threat-intelligence/higaisa-or-winnti-apt-41-backdoors-old-and-new/</a></li><li><a href="https://intezer.com/blog/research/how-we-escaped-docker-in-azure-functions/">https://intezer.com/blog/research/how-we-escaped-docker-in-azure-functions/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1219.002/">T1219.002 · Remote Desktop Software</a> · <a href="/ttp-simulation/detections/enterprise/T1219.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

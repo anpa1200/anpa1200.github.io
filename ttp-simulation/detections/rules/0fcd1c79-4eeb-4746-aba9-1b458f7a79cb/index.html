@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 0fcd1c79-4eeb-4746-aba9-1b458f7a79cb. Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule. Detects remote RPC calls to create or execute a scheduled task via ATSvc">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="0fcd1c79-4eeb-4746-aba9-1b458f7a79cb, attack.privilege-escalation, attack.lateral-movement, attack.execution, attack.persistence, attack.t1053, attack.t1053.002, rpc_firewall, application, Requirements: install and apply the RPC Firewall to all processes with &quot;audit:true action:block uuid:1ff70682-0a51-30e8-076d-740be8cee98b&quot;, rule-status:test, severity:high, logsource-product:rpc_firewall, logsource-category:application, sigma-tag:attack.privilege-escalation, sigma-tag:attack.lateral-movement, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.t1053, sigma-tag:attack.t1053.002">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:rpc_firewall, logsource-category:application, sigma-tag:attack.privilege-escalation, sigma-tag:attack.lateral-movement, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.t1053, sigma-tag:attack.t1053.002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/0fcd1c79-4eeb-4746-aba9-1b458f7a79cb/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/0fcd1c79-4eeb-4746-aba9-1b458f7a79cb/">
+<meta property="og:type" content="website"><meta property="og:title" content="Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule"><meta property="og:description" content="Sigma rule 0fcd1c79-4eeb-4746-aba9-1b458f7a79cb. Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule. Detects remote RPC calls to create or execute a scheduled task via ATSvc"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule"><meta name="twitter:description" content="Sigma rule 0fcd1c79-4eeb-4746-aba9-1b458f7a79cb. Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule. Detects remote RPC calls to create or execute a scheduled task via ATSvc"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/0fcd1c79-4eeb-4746-aba9-1b458f7a79cb/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/0fcd1c79-4eeb-4746-aba9-1b458f7a79cb/","name":"Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule","description":"Sigma rule 0fcd1c79-4eeb-4746-aba9-1b458f7a79cb. Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule. Detects remote RPC calls to create or execute a scheduled task via ATSvc","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule</h1><p class="lead">Sigma rule 0fcd1c79-4eeb-4746-aba9-1b458f7a79cb. Remote Schedule Task Lateral Movement via ATSvc — Sigma Rule. Detects remote RPC calls to create or execute a scheduled task via ATSvc</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/rpc-firewall/">rpc_firewall</a><a class="chip" href="/ttp-simulation/tags/logsource-category/application/">application</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1053/">attack.t1053</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1053-002/">attack.t1053.002</a></div><p>Author: Sagie Dulce, Dekel Paz. Source status: test; severity: high. Source dates: 2022-01-01 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;rpc_firewall&quot;,
+  &quot;category&quot;: &quot;application&quot;,
+  &quot;definition&quot;: &quot;Requirements: install and apply the RPC Firewall to all processes with \&quot;audit:true action:block uuid:1ff70682-0a51-30e8-076d-740be8cee98b\&quot;&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/application/rpc_firewall/rpc_firewall_atsvc_lateral_movement.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: ff084f6324a581d5b7cb6c1587ee0138af3b56c94572d9794b78823e4a24aee8</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Remote Schedule Task Lateral Movement via ATSvc
+id: 0fcd1c79-4eeb-4746-aba9-1b458f7a79cb
+status: test
+description: Detects remote RPC calls to create or execute a scheduled task via ATSvc
+references:
+    - https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-tsch/d1058a28-7e02-4948-8b8d-4a347fa64931
+    - https://github.com/jsecurity101/MSRPC-to-ATTACK/blob/ddd4608fe8684fcf2fcf9b48c5f0b3c28097f8a3/documents/MS-TSCH.md
+    - https://github.com/zeronetworks/rpcfirewall
+    - https://zeronetworks.com/blog/stopping-lateral-movement-via-the-rpc-firewall/
+author: Sagie Dulce, Dekel Paz
+date: 2022-01-01
+tags:
+    - attack.privilege-escalation
+    - attack.lateral-movement
+    - attack.execution
+    - attack.persistence
+    - attack.t1053
+    - attack.t1053.002
+logsource:
+    product: rpc_firewall
+    category: application
+    definition: &#39;Requirements: install and apply the RPC Firewall to all processes with &quot;audit:true action:block uuid:1ff70682-0a51-30e8-076d-740be8cee98b&quot;&#39;
+detection:
+    selection:
+        EventLog: RPCFW
+        EventID: 3
+        InterfaceUuid: 1ff70682-0a51-30e8-076d-740be8cee98b
+        OpNum:
+            - 0
+            - 1
+    condition: selection
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/0fcd1c79-4eeb-4746-aba9-1b458f7a79cb.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-tsch/d1058a28-7e02-4948-8b8d-4a347fa64931">https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-tsch/d1058a28-7e02-4948-8b8d-4a347fa64931</a></li><li><a href="https://github.com/jsecurity101/MSRPC-to-ATTACK/blob/ddd4608fe8684fcf2fcf9b48c5f0b3c28097f8a3/documents/MS-TSCH.md">https://github.com/jsecurity101/MSRPC-to-ATTACK/blob/ddd4608fe8684fcf2fcf9b48c5f0b3c28097f8a3/documents/MS-TSCH.md</a></li><li><a href="https://github.com/zeronetworks/rpcfirewall">https://github.com/zeronetworks/rpcfirewall</a></li><li><a href="https://zeronetworks.com/blog/stopping-lateral-movement-via-the-rpc-firewall/">https://zeronetworks.com/blog/stopping-lateral-movement-via-the-rpc-firewall/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1053/">T1053 · Scheduled Task/Job</a> · <a href="/ttp-simulation/detections/enterprise/T1053/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1053.002/">T1053.002 · At</a> · <a href="/ttp-simulation/detections/enterprise/T1053.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

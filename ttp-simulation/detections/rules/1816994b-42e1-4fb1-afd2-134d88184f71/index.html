@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PowerShell Base64 Encoded WMI Classes — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 1816994b-42e1-4fb1-afd2-134d88184f71. PowerShell Base64 Encoded WMI Classes — Sigma Rule. Detects calls to base64 encoded WMI class such as &quot;Win32_ShadowCopy&quot;, &quot;Win32_ScheduledJob&quot;, etc.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="1816994b-42e1-4fb1-afd2-134d88184f71, attack.execution, attack.stealth, attack.t1059.001, attack.t1027, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1059.001, sigma-tag:attack.t1027">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1059.001, sigma-tag:attack.t1027">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/1816994b-42e1-4fb1-afd2-134d88184f71/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/1816994b-42e1-4fb1-afd2-134d88184f71/">
+<meta property="og:type" content="website"><meta property="og:title" content="PowerShell Base64 Encoded WMI Classes — Sigma Rule"><meta property="og:description" content="Sigma rule 1816994b-42e1-4fb1-afd2-134d88184f71. PowerShell Base64 Encoded WMI Classes — Sigma Rule. Detects calls to base64 encoded WMI class such as &quot;Win32_ShadowCopy&quot;, &quot;Win32_ScheduledJob&quot;, etc."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PowerShell Base64 Encoded WMI Classes — Sigma Rule"><meta name="twitter:description" content="Sigma rule 1816994b-42e1-4fb1-afd2-134d88184f71. PowerShell Base64 Encoded WMI Classes — Sigma Rule. Detects calls to base64 encoded WMI class such as &quot;Win32_ShadowCopy&quot;, &quot;Win32_ScheduledJob&quot;, etc."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/1816994b-42e1-4fb1-afd2-134d88184f71/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/1816994b-42e1-4fb1-afd2-134d88184f71/","name":"PowerShell Base64 Encoded WMI Classes — Sigma Rule","description":"Sigma rule 1816994b-42e1-4fb1-afd2-134d88184f71. PowerShell Base64 Encoded WMI Classes — Sigma Rule. Detects calls to base64 encoded WMI class such as \"Win32_ShadowCopy\", \"Win32_ScheduledJob\", etc.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>PowerShell Base64 Encoded WMI Classes — Sigma Rule</h1><p class="lead">Sigma rule 1816994b-42e1-4fb1-afd2-134d88184f71. PowerShell Base64 Encoded WMI Classes — Sigma Rule. Detects calls to base64 encoded WMI class such as &quot;Win32_ShadowCopy&quot;, &quot;Win32_ScheduledJob&quot;, etc.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1027/">attack.t1027</a></div><p>Author: Christian Burkard (Nextron Systems), Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: high. Source dates: 2023-01-30 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_base64_wmi_classes.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 8cbaac4bf02c07046bee961f7190b5f70d2fba38f260121f56adb5104b2aa987</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: PowerShell Base64 Encoded WMI Classes
+id: 1816994b-42e1-4fb1-afd2-134d88184f71
+related:
+    - id: 47688f1b-9f51-4656-b013-3cc49a166a36
+      type: obsolete
+status: test
+description: Detects calls to base64 encoded WMI class such as &quot;Win32_ShadowCopy&quot;, &quot;Win32_ScheduledJob&quot;, etc.
+references:
+    - https://github.com/Neo23x0/Raccine/blob/20a569fa21625086433dcce8bb2765d0ea08dcb6/yara/mal_revil.yar
+author: Christian Burkard (Nextron Systems), Nasreddine Bencherchali (Nextron Systems)
+date: 2023-01-30
+tags:
+    - attack.execution
+    - attack.stealth
+    - attack.t1059.001
+    - attack.t1027
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith:
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+        - OriginalFileName:
+              - &#39;PowerShell.EXE&#39;
+              - &#39;pwsh.dll&#39;
+    selection_cli_shadowcopy:
+        # Win32_ShadowCopy
+        CommandLine|contains:
+            - &#39;VwBpAG4AMwAyAF8AUwBoAGEAZABvAHcAYwBvAHAAeQ&#39;
+            - &#39;cAaQBuADMAMgBfAFMAaABhAGQAbwB3AGMAbwBwAHkA&#39;
+            - &#39;XAGkAbgAzADIAXwBTAGgAYQBkAG8AdwBjAG8AcAB5A&#39;
+            - &#39;V2luMzJfU2hhZG93Y29we&#39;
+            - &#39;dpbjMyX1NoYWRvd2NvcH&#39;
+            - &#39;XaW4zMl9TaGFkb3djb3B5&#39;
+    selection_cli_scheduledJob:
+        # Win32_ScheduledJob
+        CommandLine|contains:
+            - &#39;VwBpAG4AMwAyAF8AUwBjAGgAZQBkAHUAbABlAGQASgBvAGIA&#39;
+            - &#39;cAaQBuADMAMgBfAFMAYwBoAGUAZAB1AGwAZQBkAEoAbwBiA&#39;
+            - &#39;XAGkAbgAzADIAXwBTAGMAaABlAGQAdQBsAGUAZABKAG8AYg&#39;
+            - &#39;V2luMzJfU2NoZWR1bGVkSm9i&#39;
+            - &#39;dpbjMyX1NjaGVkdWxlZEpvY&#39;
+            - &#39;XaW4zMl9TY2hlZHVsZWRKb2&#39;
+    selection_cli_process:
+        # Win32_Process
+        CommandLine|contains:
+            - &#39;VwBpAG4AMwAyAF8AUAByAG8AYwBlAHMAcw&#39;
+            - &#39;cAaQBuADMAMgBfAFAAcgBvAGMAZQBzAHMA&#39;
+            - &#39;XAGkAbgAzADIAXwBQAHIAbwBjAGUAcwBzA&#39;
+            - &#39;V2luMzJfUHJvY2Vzc&#39;
+            - &#39;dpbjMyX1Byb2Nlc3&#39;
+            - &#39;XaW4zMl9Qcm9jZXNz&#39;
+    selection_cli_useraccount:
+        # Win32_UserAccount
+        CommandLine|contains:
+            - &#39;VwBpAG4AMwAyAF8AVQBzAGUAcgBBAGMAYwBvAHUAbgB0A&#39;
+            - &#39;cAaQBuADMAMgBfAFUAcwBlAHIAQQBjAGMAbwB1AG4AdA&#39;
+            - &#39;XAGkAbgAzADIAXwBVAHMAZQByAEEAYwBjAG8AdQBuAHQA&#39;
+            - &#39;V2luMzJfVXNlckFjY291bn&#39;
+            - &#39;dpbjMyX1VzZXJBY2NvdW50&#39;
+            - &#39;XaW4zMl9Vc2VyQWNjb3Vud&#39;
+    selection_cli_loggedonuser:
+        # Win32_LoggedOnUser
+        CommandLine|contains:
+            - &#39;VwBpAG4AMwAyAF8ATABvAGcAZwBlAGQATwBuAFUAcwBlAHIA&#39;
+            - &#39;cAaQBuADMAMgBfAEwAbwBnAGcAZQBkAE8AbgBVAHMAZQByA&#39;
+            - &#39;XAGkAbgAzADIAXwBMAG8AZwBnAGUAZABPAG4AVQBzAGUAcg&#39;
+            - &#39;V2luMzJfTG9nZ2VkT25Vc2Vy&#39;
+            - &#39;dpbjMyX0xvZ2dlZE9uVXNlc&#39;
+            - &#39;XaW4zMl9Mb2dnZWRPblVzZX&#39;
+    condition: selection_img and 1 of selection_cli_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/1816994b-42e1-4fb1-afd2-134d88184f71.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/Neo23x0/Raccine/blob/20a569fa21625086433dcce8bb2765d0ea08dcb6/yara/mal_revil.yar">https://github.com/Neo23x0/Raccine/blob/20a569fa21625086433dcce8bb2765d0ea08dcb6/yara/mal_revil.yar</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1027/">T1027 · Obfuscated Files or Information</a> · <a href="/ttp-simulation/detections/enterprise/T1027/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

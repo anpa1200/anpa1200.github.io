@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User Added to Remote Desktop Users Group — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule ffa28e60-bdb1-46e0-9f82-05f7a61cc06e. User Added to Remote Desktop Users Group — Sigma Rule. Detects addition of users to the local Remote Desktop Users group via &quot;Net&quot; or &quot;Add-LocalGroupMember&quot;.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="ffa28e60-bdb1-46e0-9f82-05f7a61cc06e, attack.initial-access, attack.persistence, attack.lateral-movement, attack.t1133, attack.t1136.001, attack.t1021.001, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.initial-access, sigma-tag:attack.persistence, sigma-tag:attack.lateral-movement, sigma-tag:attack.t1133, sigma-tag:attack.t1136.001, sigma-tag:attack.t1021.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.initial-access, sigma-tag:attack.persistence, sigma-tag:attack.lateral-movement, sigma-tag:attack.t1133, sigma-tag:attack.t1136.001, sigma-tag:attack.t1021.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/ffa28e60-bdb1-46e0-9f82-05f7a61cc06e/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/ffa28e60-bdb1-46e0-9f82-05f7a61cc06e/">
+<meta property="og:type" content="website"><meta property="og:title" content="User Added to Remote Desktop Users Group — Sigma Rule"><meta property="og:description" content="Sigma rule ffa28e60-bdb1-46e0-9f82-05f7a61cc06e. User Added to Remote Desktop Users Group — Sigma Rule. Detects addition of users to the local Remote Desktop Users group via &quot;Net&quot; or &quot;Add-LocalGroupMember&quot;."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="User Added to Remote Desktop Users Group — Sigma Rule"><meta name="twitter:description" content="Sigma rule ffa28e60-bdb1-46e0-9f82-05f7a61cc06e. User Added to Remote Desktop Users Group — Sigma Rule. Detects addition of users to the local Remote Desktop Users group via &quot;Net&quot; or &quot;Add-LocalGroupMember&quot;."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/ffa28e60-bdb1-46e0-9f82-05f7a61cc06e/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/ffa28e60-bdb1-46e0-9f82-05f7a61cc06e/","name":"User Added to Remote Desktop Users Group — Sigma Rule","description":"Sigma rule ffa28e60-bdb1-46e0-9f82-05f7a61cc06e. User Added to Remote Desktop Users Group — Sigma Rule. Detects addition of users to the local Remote Desktop Users group via \"Net\" or \"Add-LocalGroupMember\".","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>User Added to Remote Desktop Users Group — Sigma Rule</h1><p class="lead">Sigma rule ffa28e60-bdb1-46e0-9f82-05f7a61cc06e. User Added to Remote Desktop Users Group — Sigma Rule. Detects addition of users to the local Remote Desktop Users group via &quot;Net&quot; or &quot;Add-LocalGroupMember&quot;.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-initial-access/">attack.initial-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1133/">attack.t1133</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1136-001/">attack.t1136.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1021-001/">attack.t1021.001</a></div><p>Author: Florian Roth (Nextron Systems). Source status: test; severity: high. Source dates: 2021-12-06 / 2022-09-09.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_susp_add_user_remote_desktop_group.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: b775149c19ee7df8e80b03f6e36d1a4b25dcc1fcf84143e245a983f0620a63b9</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: User Added to Remote Desktop Users Group
+id: ffa28e60-bdb1-46e0-9f82-05f7a61cc06e
+related:
+    - id: ad720b90-25ad-43ff-9b5e-5c841facc8e5 # Admin groups
+      type: similar
+    - id: 10fb649c-3600-4d37-b1e6-56ea90bb7e09 # Privileged groups
+      type: similar
+status: test
+description: Detects addition of users to the local Remote Desktop Users group via &quot;Net&quot; or &quot;Add-LocalGroupMember&quot;.
+references:
+    - https://www.microsoft.com/security/blog/2021/11/16/evolving-trends-in-iranian-threat-actor-activity-mstic-presentation-at-cyberwarcon-2021/
+author: Florian Roth (Nextron Systems)
+date: 2021-12-06
+modified: 2022-09-09
+tags:
+    - attack.initial-access
+    - attack.persistence
+    - attack.lateral-movement
+    - attack.t1133
+    - attack.t1136.001
+    - attack.t1021.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_main:
+        - CommandLine|contains|all:
+              - &#39;localgroup &#39;
+              - &#39; /add&#39;
+        - CommandLine|contains|all:
+              - &#39;Add-LocalGroupMember &#39;
+              - &#39; -Group &#39;
+    selection_group:
+        CommandLine|contains:
+            - &#39;Remote Desktop Users&#39;
+            - &#39;Utilisateurs du Bureau à distance&#39; # French for &quot;Remote Desktop Users&quot;
+            - &#39;Usuarios de escritorio remoto&#39; # Spanish for &quot;Remote Desktop Users&quot;
+    condition: all of selection_*
+falsepositives:
+    - Administrative activity
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/ffa28e60-bdb1-46e0-9f82-05f7a61cc06e.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Administrative activity</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.microsoft.com/security/blog/2021/11/16/evolving-trends-in-iranian-threat-actor-activity-mstic-presentation-at-cyberwarcon-2021/">https://www.microsoft.com/security/blog/2021/11/16/evolving-trends-in-iranian-threat-actor-activity-mstic-presentation-at-cyberwarcon-2021/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1021.001/">T1021.001 · Remote Desktop Protocol</a> · <a href="/ttp-simulation/detections/enterprise/T1021.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1133/">T1133 · External Remote Services</a> · <a href="/ttp-simulation/detections/enterprise/T1133/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1136.001/">T1136.001 · Local Account</a> · <a href="/ttp-simulation/detections/enterprise/T1136.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

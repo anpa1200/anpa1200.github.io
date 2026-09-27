@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Webshell Detection With Command Line Keywords — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule bed2a484-9348-4143-8a8a-b801c979301c. Webshell Detection With Command Line Keywords — Sigma Rule. Detects certain command line parameters often used during reconnaissance activity via web shells">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="bed2a484-9348-4143-8a8a-b801c979301c, attack.persistence, attack.discovery, attack.t1505.003, attack.t1018, attack.t1033, attack.t1087, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.discovery, sigma-tag:attack.t1505.003, sigma-tag:attack.t1018, sigma-tag:attack.t1033, sigma-tag:attack.t1087">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.discovery, sigma-tag:attack.t1505.003, sigma-tag:attack.t1018, sigma-tag:attack.t1033, sigma-tag:attack.t1087">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/bed2a484-9348-4143-8a8a-b801c979301c/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/bed2a484-9348-4143-8a8a-b801c979301c/">
+<meta property="og:type" content="website"><meta property="og:title" content="Webshell Detection With Command Line Keywords — Sigma Rule"><meta property="og:description" content="Sigma rule bed2a484-9348-4143-8a8a-b801c979301c. Webshell Detection With Command Line Keywords — Sigma Rule. Detects certain command line parameters often used during reconnaissance activity via web shells"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Webshell Detection With Command Line Keywords — Sigma Rule"><meta name="twitter:description" content="Sigma rule bed2a484-9348-4143-8a8a-b801c979301c. Webshell Detection With Command Line Keywords — Sigma Rule. Detects certain command line parameters often used during reconnaissance activity via web shells"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/bed2a484-9348-4143-8a8a-b801c979301c/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/bed2a484-9348-4143-8a8a-b801c979301c/","name":"Webshell Detection With Command Line Keywords — Sigma Rule","description":"Sigma rule bed2a484-9348-4143-8a8a-b801c979301c. Webshell Detection With Command Line Keywords — Sigma Rule. Detects certain command line parameters often used during reconnaissance activity via web shells","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Webshell Detection With Command Line Keywords — Sigma Rule</h1><p class="lead">Sigma rule bed2a484-9348-4143-8a8a-b801c979301c. Webshell Detection With Command Line Keywords — Sigma Rule. Detects certain command line parameters often used during reconnaissance activity via web shells</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1505-003/">attack.t1505.003</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1018/">attack.t1018</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1033/">attack.t1033</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087/">attack.t1087</a></div><p>Author: Florian Roth (Nextron Systems), Jonhnathan Ribeiro, Anton Kutepov, oscd.community, Chad Hudson, Matt Anderson. Source status: test; severity: high. Source dates: 2017-01-01 / 2024-12-14.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_webshell_recon_commands_and_processes.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 2db3e9674944cc3fe111ab792052016075465190d72c55eabf0e5670b9cae1a4</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Webshell Detection With Command Line Keywords
+id: bed2a484-9348-4143-8a8a-b801c979301c
+status: test
+description: Detects certain command line parameters often used during reconnaissance activity via web shells
+references:
+    - https://www.fireeye.com/blog/threat-research/2013/08/breaking-down-the-china-chopper-web-shell-part-ii.html
+    - https://unit42.paloaltonetworks.com/bumblebee-webshell-xhunt-campaign/
+    - https://www.huntress.com/blog/threat-advisory-oh-no-cleo-cleo-software-actively-being-exploited-in-the-wild
+author: Florian Roth (Nextron Systems), Jonhnathan Ribeiro, Anton Kutepov, oscd.community, Chad Hudson, Matt Anderson
+date: 2017-01-01
+modified: 2024-12-14
+tags:
+    - attack.persistence
+    - attack.discovery
+    - attack.t1505.003
+    - attack.t1018
+    - attack.t1033
+    - attack.t1087
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_webserver_image:
+        ParentImage|endswith:
+            - &#39;\w3wp.exe&#39;
+            - &#39;\php-cgi.exe&#39;
+            - &#39;\nginx.exe&#39;
+            - &#39;\httpd.exe&#39;
+            - &#39;\caddy.exe&#39;
+            - &#39;\ws_tomcatservice.exe&#39;
+    selection_webserver_characteristics_tomcat1:
+        ParentImage|endswith:
+            - &#39;\java.exe&#39;
+            - &#39;\javaw.exe&#39;
+        ParentImage|contains:
+            - &#39;-tomcat-&#39;
+            - &#39;\tomcat&#39;
+    selection_webserver_characteristics_tomcat2:
+        ParentImage|endswith:
+            - &#39;\java.exe&#39;
+            - &#39;\javaw.exe&#39;
+        CommandLine|contains:
+            - &#39;catalina.jar&#39;
+            - &#39;CATALINA_HOME&#39;
+    selection_susp_net_utility:
+        OriginalFileName:
+            - &#39;net.exe&#39;
+            - &#39;net1.exe&#39;
+        CommandLine|contains:
+            - &#39; user &#39;
+            - &#39; use &#39;
+            - &#39; group &#39;
+    selection_susp_ping_utility:
+        OriginalFileName: &#39;ping.exe&#39;
+        CommandLine|contains: &#39; -n &#39;
+    selection_susp_change_dir:
+        CommandLine|contains:
+            - &#39;&amp;cd&amp;echo&#39;  # china chopper web shell
+            - &#39;cd /d &#39;  # https://www.computerhope.com/cdhlp.htm
+    selection_susp_wmic_utility:
+        OriginalFileName: &#39;wmic.exe&#39;
+        CommandLine|contains: &#39; /node:&#39;
+    selection_susp_powershell_cli:
+        Image|endswith:
+            - &#39;\cmd.exe&#39;
+            - &#39;\powershell.exe&#39;
+            - &#39;\pwsh.exe&#39;
+        CommandLine|contains:
+            - &#39; -enc &#39;
+            - &#39; -EncodedCommand &#39;
+            - &#39; -w hidden &#39;
+            - &#39; -windowstyle hidden&#39;
+            - &#39;.WebClient).Download&#39;
+    selection_susp_misc_discovery_binaries:
+        - Image|endswith:
+              - &#39;\dsquery.exe&#39;
+              - &#39;\find.exe&#39;
+              - &#39;\findstr.exe&#39;
+              - &#39;\ipconfig.exe&#39;
+              - &#39;\netstat.exe&#39;
+              - &#39;\nslookup.exe&#39;
+              - &#39;\pathping.exe&#39;
+              - &#39;\quser.exe&#39;
+              - &#39;\schtasks.exe&#39;
+              - &#39;\systeminfo.exe&#39;
+              - &#39;\tasklist.exe&#39;
+              - &#39;\tracert.exe&#39;
+              - &#39;\ver.exe&#39;
+              - &#39;\wevtutil.exe&#39;
+              - &#39;\whoami.exe&#39;
+        - OriginalFileName:
+              - &#39;dsquery.exe&#39;
+              - &#39;find.exe&#39;
+              - &#39;findstr.exe&#39;
+              - &#39;ipconfig.exe&#39;
+              - &#39;netstat.exe&#39;
+              - &#39;nslookup.exe&#39;
+              - &#39;pathping.exe&#39;
+              - &#39;quser.exe&#39;
+              - &#39;schtasks.exe&#39;
+              - &#39;sysinfo.exe&#39;
+              - &#39;tasklist.exe&#39;
+              - &#39;tracert.exe&#39;
+              - &#39;ver.exe&#39;
+              - &#39;VSSADMIN.EXE&#39;
+              - &#39;wevtutil.exe&#39;
+              - &#39;whoami.exe&#39;
+    selection_susp_misc_discovery_commands:
+        CommandLine|contains:
+            - &#39; Test-NetConnection &#39;
+            - &#39;dir \&#39;  # remote dir: dir \&lt;redacted IP #3&gt;\C$:\windows\temp\*.exe
+    condition: 1 of selection_webserver_* and 1 of selection_susp_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/bed2a484-9348-4143-8a8a-b801c979301c.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.fireeye.com/blog/threat-research/2013/08/breaking-down-the-china-chopper-web-shell-part-ii.html">https://www.fireeye.com/blog/threat-research/2013/08/breaking-down-the-china-chopper-web-shell-part-ii.html</a></li><li><a href="https://unit42.paloaltonetworks.com/bumblebee-webshell-xhunt-campaign/">https://unit42.paloaltonetworks.com/bumblebee-webshell-xhunt-campaign/</a></li><li><a href="https://www.huntress.com/blog/threat-advisory-oh-no-cleo-cleo-software-actively-being-exploited-in-the-wild">https://www.huntress.com/blog/threat-advisory-oh-no-cleo-cleo-software-actively-being-exploited-in-the-wild</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1018/">T1018 · Remote System Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1018/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1033/">T1033 · System Owner/User Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1033/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1087/">T1087 · Account Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1087/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1505.003/">T1505.003 · Web Shell</a> · <a href="/ttp-simulation/detections/enterprise/T1505.003/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

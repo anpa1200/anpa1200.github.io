@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 3ae9974a-eb09-4044-8e70-8980a50c12c8. Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule. Detects process creation with suspicious whitespace padding followed by a &#39;#&#39; character, which may indicate ClickFix or FileFix techniques used to conceal malicious commands from visual inspection.
+ClickFix and FileFix are social engineering attack techniques where adversaries distribute phishing documents or malicious links that deceive users into opening the Windows Run dialog box or File Explorer search bar.
+The victims are then instructed to paste commands from their clipboard, which contain extensive whitespace padding using various Unicode space characters to push the actual malicious command far to the right, effectively hiding it from immediate view.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="3ae9974a-eb09-4044-8e70-8980a50c12c8, attack.execution, attack.stealth, attack.t1204.004, attack.t1027.010, process_creation, windows, rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1204.004, sigma-tag:attack.t1027.010">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1204.004, sigma-tag:attack.t1027.010">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/3ae9974a-eb09-4044-8e70-8980a50c12c8/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/3ae9974a-eb09-4044-8e70-8980a50c12c8/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule"><meta property="og:description" content="Sigma rule 3ae9974a-eb09-4044-8e70-8980a50c12c8. Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule. Detects process creation with suspicious whitespace padding followed by a &#39;#&#39; character, which may indicate ClickFix or FileFix techniques used to conceal malicious commands from visual inspection.
+ClickFix and FileFix are social engineering attack techniques where adversaries distribute phishing documents or malicious links that deceive users into opening the Windows Run dialog box or File Explorer search bar.
+The victims are then instructed to paste commands from their clipboard, which contain extensive whitespace padding using various Unicode space characters to push the actual malicious command far to the right, effectively hiding it from immediate view.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule"><meta name="twitter:description" content="Sigma rule 3ae9974a-eb09-4044-8e70-8980a50c12c8. Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule. Detects process creation with suspicious whitespace padding followed by a &#39;#&#39; character, which may indicate ClickFix or FileFix techniques used to conceal malicious commands from visual inspection.
+ClickFix and FileFix are social engineering attack techniques where adversaries distribute phishing documents or malicious links that deceive users into opening the Windows Run dialog box or File Explorer search bar.
+The victims are then instructed to paste commands from their clipboard, which contain extensive whitespace padding using various Unicode space characters to push the actual malicious command far to the right, effectively hiding it from immediate view.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/3ae9974a-eb09-4044-8e70-8980a50c12c8/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/3ae9974a-eb09-4044-8e70-8980a50c12c8/","name":"Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule","description":"Sigma rule 3ae9974a-eb09-4044-8e70-8980a50c12c8. Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule. Detects process creation with suspicious whitespace padding followed by a '#' character, which may indicate ClickFix or FileFix techniques used to conceal malicious commands from visual inspection.\nClickFix and FileFix are social engineering attack techniques where adversaries distribute phishing documents or malicious links that deceive users into opening the Windows Run dialog box or File Explorer search bar.\nThe victims are then instructed to paste commands from their clipboard, which contain extensive whitespace padding using various Unicode space characters to push the actual malicious command far to the right, effectively hiding it from immediate view.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule</h1><p class="lead">Sigma rule 3ae9974a-eb09-4044-8e70-8980a50c12c8. Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix — Sigma Rule. Detects process creation with suspicious whitespace padding followed by a &#39;#&#39; character, which may indicate ClickFix or FileFix techniques used to conceal malicious commands from visual inspection.
+ClickFix and FileFix are social engineering attack techniques where adversaries distribute phishing documents or malicious links that deceive users into opening the Windows Run dialog box or File Explorer search bar.
+The victims are then instructed to paste commands from their clipboard, which contain extensive whitespace padding using various Unicode space characters to push the actual malicious command far to the right, effectively hiding it from immediate view.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1204-004/">attack.t1204.004</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1027-010/">attack.t1027.010</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2025-11-04 / 2025-11-26.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_susp_clickfix_filefix_whitespace_padding.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 3068737e7dafcd6278b24d47f99ae18c78b5f857bae82b2a7fe981bc7c71cdcb</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Explorer Process with Whitespace Padding - ClickFix/FileFix
+id: 3ae9974a-eb09-4044-8e70-8980a50c12c8
+related:
+    - id: 8f2a5c3d-9e4b-4a7c-8d1f-2e5a6b9c3d7e
+      type: similar
+    - id: 7a1b4c5e-8f3d-4b9a-7c2e-1f4a5b8c6d9e
+      type: similar
+status: experimental
+description: |
+    Detects process creation with suspicious whitespace padding followed by a &#39;#&#39; character, which may indicate ClickFix or FileFix techniques used to conceal malicious commands from visual inspection.
+    ClickFix and FileFix are social engineering attack techniques where adversaries distribute phishing documents or malicious links that deceive users into opening the Windows Run dialog box or File Explorer search bar.
+    The victims are then instructed to paste commands from their clipboard, which contain extensive whitespace padding using various Unicode space characters to push the actual malicious command far to the right, effectively hiding it from immediate view.
+references:
+    - https://expel.com/blog/cache-smuggling-when-a-picture-isnt-a-thousand-words/
+    - https://mrd0x.com/filefix-clickfix-alternative/
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-11-04
+modified: 2025-11-26
+tags:
+    - attack.execution
+    - attack.stealth
+    - attack.t1204.004
+    - attack.t1027.010
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_explorer:
+        ParentImage|endswith: &#39;\explorer.exe&#39;
+        CommandLine|contains: &#39;#&#39;
+    selection_space_variation:
+        CommandLine|contains:
+            - &#39;            &#39; # En Quad (U+2000)
+            - &#39;            &#39; # Em Quad (U+2001)
+            - &#39;            &#39; # En Space (U+2002)
+            - &#39;            &#39; # Em Space (U+2003)
+            - &#39;            &#39; # Three-Per-Em Space (U+2004)
+            - &#39;            &#39; # Four-Per-Em Space (U+2005)
+            - &#39;            &#39; # Six-Per-Em Space (U+2006)
+            - &#39;            &#39; # Figure Space (U+2007)
+            - &#39;            &#39; # Punctuation Space (U+2008)
+            - &#39;            &#39; # Thin Space (U+2009)
+            - &#39;            &#39; # Hair Space (U+200A)
+            - &#39;            &#39; # No-Break Space (U+00A0)
+            - &#39;            &#39; # Normal space (0x20)
+    condition: all of selection_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/3ae9974a-eb09-4044-8e70-8980a50c12c8.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://expel.com/blog/cache-smuggling-when-a-picture-isnt-a-thousand-words/">https://expel.com/blog/cache-smuggling-when-a-picture-isnt-a-thousand-words/</a></li><li><a href="https://mrd0x.com/filefix-clickfix-alternative/">https://mrd0x.com/filefix-clickfix-alternative/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1027.010/">T1027.010 · Command Obfuscation</a> · <a href="/ttp-simulation/detections/enterprise/T1027.010/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1204.004/">T1204.004 · Malicious Copy and Paste</a> · <a href="/ttp-simulation/detections/enterprise/T1204.004/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

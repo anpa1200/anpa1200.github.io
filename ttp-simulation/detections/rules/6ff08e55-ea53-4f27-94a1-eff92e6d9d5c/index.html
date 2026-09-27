@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System Information Discovery Via Sysctl - MacOS — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 6ff08e55-ea53-4f27-94a1-eff92e6d9d5c. System Information Discovery Via Sysctl - MacOS — Sigma Rule. Detects the execution of &quot;sysctl&quot; with specific arguments that have been used by threat actors and malware. It provides system hardware information.
+This process is primarily used to detect and avoid virtualization and analysis environments.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="6ff08e55-ea53-4f27-94a1-eff92e6d9d5c, attack.stealth, attack.t1497.001, attack.discovery, attack.t1082, macos, process_creation, rule-status:test, severity:medium, logsource-product:macos, logsource-category:process_creation, sigma-tag:attack.stealth, sigma-tag:attack.t1497.001, sigma-tag:attack.discovery, sigma-tag:attack.t1082">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:macos, logsource-category:process_creation, sigma-tag:attack.stealth, sigma-tag:attack.t1497.001, sigma-tag:attack.discovery, sigma-tag:attack.t1082">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/6ff08e55-ea53-4f27-94a1-eff92e6d9d5c/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/6ff08e55-ea53-4f27-94a1-eff92e6d9d5c/">
+<meta property="og:type" content="website"><meta property="og:title" content="System Information Discovery Via Sysctl - MacOS — Sigma Rule"><meta property="og:description" content="Sigma rule 6ff08e55-ea53-4f27-94a1-eff92e6d9d5c. System Information Discovery Via Sysctl - MacOS — Sigma Rule. Detects the execution of &quot;sysctl&quot; with specific arguments that have been used by threat actors and malware. It provides system hardware information.
+This process is primarily used to detect and avoid virtualization and analysis environments.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="System Information Discovery Via Sysctl - MacOS — Sigma Rule"><meta name="twitter:description" content="Sigma rule 6ff08e55-ea53-4f27-94a1-eff92e6d9d5c. System Information Discovery Via Sysctl - MacOS — Sigma Rule. Detects the execution of &quot;sysctl&quot; with specific arguments that have been used by threat actors and malware. It provides system hardware information.
+This process is primarily used to detect and avoid virtualization and analysis environments.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/6ff08e55-ea53-4f27-94a1-eff92e6d9d5c/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/6ff08e55-ea53-4f27-94a1-eff92e6d9d5c/","name":"System Information Discovery Via Sysctl - MacOS — Sigma Rule","description":"Sigma rule 6ff08e55-ea53-4f27-94a1-eff92e6d9d5c. System Information Discovery Via Sysctl - MacOS — Sigma Rule. Detects the execution of \"sysctl\" with specific arguments that have been used by threat actors and malware. It provides system hardware information.\nThis process is primarily used to detect and avoid virtualization and analysis environments.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>System Information Discovery Via Sysctl - MacOS — Sigma Rule</h1><p class="lead">Sigma rule 6ff08e55-ea53-4f27-94a1-eff92e6d9d5c. System Information Discovery Via Sysctl - MacOS — Sigma Rule. Detects the execution of &quot;sysctl&quot; with specific arguments that have been used by threat actors and malware. It provides system hardware information.
+This process is primarily used to detect and avoid virtualization and analysis environments.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/macos/">macos</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1497-001/">attack.t1497.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1082/">attack.t1082</a></div><p>Author: Pratinav Chandra. Source status: test; severity: medium. Source dates: 2024-05-27 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;macos&quot;,
+  &quot;category&quot;: &quot;process_creation&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/macos/process_creation/proc_creation_macos_sysctl_discovery.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 0961e1175b64234d62ee898136dbde193840e4188b1ba276e68d4d031cb6106e</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: System Information Discovery Via Sysctl - MacOS
+id: 6ff08e55-ea53-4f27-94a1-eff92e6d9d5c
+status: test
+description: |
+    Detects the execution of &quot;sysctl&quot; with specific arguments that have been used by threat actors and malware. It provides system hardware information.
+    This process is primarily used to detect and avoid virtualization and analysis environments.
+references:
+    - https://www.loobins.io/binaries/sysctl/#
+    - https://evasions.checkpoint.com/techniques/macos.html
+    - https://www.welivesecurity.com/2019/04/09/oceanlotus-macos-malware-update/
+    - https://www.sentinelone.com/labs/20-common-tools-techniques-used-by-macos-threat-actors-malware/
+    - https://objective-see.org/blog/blog_0x1E.html
+    - https://www.virustotal.com/gui/file/1c547a064494a35d6b5e6b459de183ab2720a22725e082bed6f6629211f7abc1/behavior
+    - https://www.virustotal.com/gui/file/b4b1fc65f87b3dcfa35e2dbe8e0a34ad9d8a400bec332025c0a2e200671038aa/behavior
+author: Pratinav Chandra
+date: 2024-05-27
+tags:
+    - attack.stealth
+    - attack.t1497.001
+    - attack.discovery
+    - attack.t1082
+logsource:
+    product: macos
+    category: process_creation
+detection:
+    selection_img:
+        - Image|endswith: &#39;/sysctl&#39;
+        - CommandLine|contains: &#39;sysctl&#39;
+    selection_cmd:
+        CommandLine|contains:
+            - &#39;hw.&#39;
+            - &#39;kern.&#39;
+            - &#39;machdep.&#39;
+    condition: all of selection_*
+falsepositives:
+    - Legitimate administrative activities
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/6ff08e55-ea53-4f27-94a1-eff92e6d9d5c.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate administrative activities</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.loobins.io/binaries/sysctl/#">https://www.loobins.io/binaries/sysctl/#</a></li><li><a href="https://evasions.checkpoint.com/techniques/macos.html">https://evasions.checkpoint.com/techniques/macos.html</a></li><li><a href="https://www.welivesecurity.com/2019/04/09/oceanlotus-macos-malware-update/">https://www.welivesecurity.com/2019/04/09/oceanlotus-macos-malware-update/</a></li><li><a href="https://www.sentinelone.com/labs/20-common-tools-techniques-used-by-macos-threat-actors-malware/">https://www.sentinelone.com/labs/20-common-tools-techniques-used-by-macos-threat-actors-malware/</a></li><li><a href="https://objective-see.org/blog/blog_0x1E.html">https://objective-see.org/blog/blog_0x1E.html</a></li><li><a href="https://www.virustotal.com/gui/file/1c547a064494a35d6b5e6b459de183ab2720a22725e082bed6f6629211f7abc1/behavior">https://www.virustotal.com/gui/file/1c547a064494a35d6b5e6b459de183ab2720a22725e082bed6f6629211f7abc1/behavior</a></li><li><a href="https://www.virustotal.com/gui/file/b4b1fc65f87b3dcfa35e2dbe8e0a34ad9d8a400bec332025c0a2e200671038aa/behavior">https://www.virustotal.com/gui/file/b4b1fc65f87b3dcfa35e2dbe8e0a34ad9d8a400bec332025c0a2e200671038aa/behavior</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1082/">T1082 · System Information Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1082/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1497.001/">T1497.001 · System Checks</a> · <a href="/ttp-simulation/detections/enterprise/T1497.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

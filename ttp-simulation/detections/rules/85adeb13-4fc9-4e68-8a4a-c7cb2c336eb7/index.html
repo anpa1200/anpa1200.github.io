@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CobaltStrike Named Pipe Patterns — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7. CobaltStrike Named Pipe Patterns — Sigma Rule. Detects the creation of a named pipe with a pattern found in CobaltStrike malleable C2 profiles">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7, attack.privilege-escalation, attack.stealth, attack.t1055, stp.1k, windows, pipe_created, Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can always use Cobalt Strike, but also you can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575, rule-status:test, severity:high, logsource-product:windows, logsource-category:pipe_created, sigma-tag:attack.privilege-escalation, sigma-tag:attack.stealth, sigma-tag:attack.t1055, sigma-tag:stp.1k">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:windows, logsource-category:pipe_created, sigma-tag:attack.privilege-escalation, sigma-tag:attack.stealth, sigma-tag:attack.t1055, sigma-tag:stp.1k">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7/">
+<meta property="og:type" content="website"><meta property="og:title" content="CobaltStrike Named Pipe Patterns — Sigma Rule"><meta property="og:description" content="Sigma rule 85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7. CobaltStrike Named Pipe Patterns — Sigma Rule. Detects the creation of a named pipe with a pattern found in CobaltStrike malleable C2 profiles"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="CobaltStrike Named Pipe Patterns — Sigma Rule"><meta name="twitter:description" content="Sigma rule 85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7. CobaltStrike Named Pipe Patterns — Sigma Rule. Detects the creation of a named pipe with a pattern found in CobaltStrike malleable C2 profiles"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7/","name":"CobaltStrike Named Pipe Patterns — Sigma Rule","description":"Sigma rule 85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7. CobaltStrike Named Pipe Patterns — Sigma Rule. Detects the creation of a named pipe with a pattern found in CobaltStrike malleable C2 profiles","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>CobaltStrike Named Pipe Patterns — Sigma Rule</h1><p class="lead">Sigma rule 85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7. CobaltStrike Named Pipe Patterns — Sigma Rule. Detects the creation of a named pipe with a pattern found in CobaltStrike malleable C2 profiles</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/pipe-created/">pipe_created</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1055/">attack.t1055</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/stp-1k/">stp.1k</a></div><p>Author: Florian Roth (Nextron Systems), Christian Burkard (Nextron Systems). Source status: test; severity: high. Source dates: 2021-07-30 / 2024-01-26.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;pipe_created&quot;,
+  &quot;definition&quot;: &quot;Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can always use Cobalt Strike, but also you can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/pipe_created/pipe_created_hktl_cobaltstrike_susp_pipe_patterns.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: df71e2e571dc55ce3648db73da3a708948db011538ec39320fcde5e14503f6b3</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: CobaltStrike Named Pipe Patterns
+id: 85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7
+related:
+    - id: 0e7163d4-9e19-4fa7-9be6-000c61aad77a # Regex
+      type: similar
+    - id: d5601f8c-b26f-4ab0-9035-69e11a8d4ad2 # Generic
+      type: similar
+status: test
+description: Detects the creation of a named pipe with a pattern found in CobaltStrike malleable C2 profiles
+references:
+    - https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575
+    - https://gist.github.com/MHaggis/6c600e524045a6d49c35291a21e10752
+author: Florian Roth (Nextron Systems), Christian Burkard (Nextron Systems)
+date: 2021-07-30
+modified: 2024-01-26
+tags:
+    - attack.privilege-escalation
+    - attack.stealth
+    - attack.t1055
+    - stp.1k
+logsource:
+    product: windows
+    category: pipe_created
+    definition: &#39;Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can always use Cobalt Strike, but also you can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575&#39;
+detection:
+    selection_malleable_profile_generic:
+        - PipeName|startswith:
+              - &#39;\DserNamePipe&#39;
+              - &#39;\f4c3&#39;
+              - &#39;\f53f&#39;
+              - &#39;\fullduplex_&#39;
+              - &#39;\mojo.5688.8052.183894939787088877&#39;
+              - &#39;\mojo.5688.8052.35780273329370473&#39;
+              - &#39;\MsFteWds&#39;
+              - &#39;\msrpc_&#39;
+              - &#39;\mypipe-f&#39;
+              - &#39;\mypipe-h&#39;
+              - &#39;\ntsvcs&#39;
+              - &#39;\PGMessagePipe&#39;
+              - &#39;\rpc_&#39;
+              - &#39;\scerpc&#39;
+              - &#39;\SearchTextHarvester&#39;
+              - &#39;\spoolss&#39;
+              - &#39;\win_svc&#39;
+              - &#39;\win\msrpc_&#39;
+              - &#39;\windows.update.manager&#39;
+              - &#39;\wkssvc&#39;
+        - PipeName:
+              - &#39;\demoagent_11&#39;
+              - &#39;\demoagent_22&#39;
+    selection_malleable_profile_catalog_change_listener:
+        PipeName|startswith: &#39;\Winsock2\CatalogChangeListener-&#39;
+        PipeName|endswith: &#39;-0,&#39;
+    filter_main_generic:
+        PipeName:
+            - &#39;\wkssvc&#39;
+            - &#39;\spoolss&#39;
+            - &#39;\scerpc&#39;
+            - &#39;\ntsvcs&#39;
+            - &#39;\SearchTextHarvester&#39;
+            - &#39;\PGMessagePipe&#39;
+            - &#39;\MsFteWds&#39;
+    filter_optional_websense:
+        Image|contains:
+            - &#39;:\Program Files\Websense\&#39;
+            - &#39;:\Program Files (x86)\Websense\&#39;
+        PipeName|startswith:
+            - &#39;\DserNamePipeR&#39;
+            - &#39;\DserNamePipeW&#39;
+    condition: 1 of selection_malleable_profile_* and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Chrome instances using the exact same pipe name &quot;mojo.xxx&quot;
+    - Websense Endpoint using the pipe name &quot;DserNamePipe(R|W)\d{1,5}&quot;
+    - Some applications may just coincidentally use the pipe names which contain the same prefix as the ones used by CobaltStrike, e.g. &quot;f4c3&quot;
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/85adeb13-4fc9-4e68-8a4a-c7cb2c336eb7.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Chrome instances using the exact same pipe name &quot;mojo.xxx&quot;</li><li>Websense Endpoint using the pipe name &quot;DserNamePipe(R|W)\d{1,5}&quot;</li><li>Some applications may just coincidentally use the pipe names which contain the same prefix as the ones used by CobaltStrike, e.g. &quot;f4c3&quot;</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575">https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575</a></li><li><a href="https://gist.github.com/MHaggis/6c600e524045a6d49c35291a21e10752">https://gist.github.com/MHaggis/6c600e524045a6d49c35291a21e10752</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1055/">T1055 · Process Injection</a> · <a href="/ttp-simulation/detections/enterprise/T1055/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

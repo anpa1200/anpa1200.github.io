@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User Shell Folders Registry Modification via CommandLine — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 8f3ab69a-aa22-4943-aa58-e0a52fdf6818. User Shell Folders Registry Modification via CommandLine — Sigma Rule. Detects modifications to User Shell Folders registry values via reg.exe or PowerShell, which could indicate persistence attempts.
+Attackers may modify User Shell Folders registry values to point to malicious executables or scripts that will be executed during startup.
+This technique is often used to maintain persistence on a compromised system by ensuring that malicious payloads are executed automatically.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="8f3ab69a-aa22-4943-aa58-e0a52fdf6818, attack.persistence, attack.privilege-escalation, attack.defense-impairment, attack.t1547.001, attack.t1112, process_creation, windows, rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1547.001, sigma-tag:attack.t1112">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1547.001, sigma-tag:attack.t1112">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/8f3ab69a-aa22-4943-aa58-e0a52fdf6818/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/8f3ab69a-aa22-4943-aa58-e0a52fdf6818/">
+<meta property="og:type" content="website"><meta property="og:title" content="User Shell Folders Registry Modification via CommandLine — Sigma Rule"><meta property="og:description" content="Sigma rule 8f3ab69a-aa22-4943-aa58-e0a52fdf6818. User Shell Folders Registry Modification via CommandLine — Sigma Rule. Detects modifications to User Shell Folders registry values via reg.exe or PowerShell, which could indicate persistence attempts.
+Attackers may modify User Shell Folders registry values to point to malicious executables or scripts that will be executed during startup.
+This technique is often used to maintain persistence on a compromised system by ensuring that malicious payloads are executed automatically.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="User Shell Folders Registry Modification via CommandLine — Sigma Rule"><meta name="twitter:description" content="Sigma rule 8f3ab69a-aa22-4943-aa58-e0a52fdf6818. User Shell Folders Registry Modification via CommandLine — Sigma Rule. Detects modifications to User Shell Folders registry values via reg.exe or PowerShell, which could indicate persistence attempts.
+Attackers may modify User Shell Folders registry values to point to malicious executables or scripts that will be executed during startup.
+This technique is often used to maintain persistence on a compromised system by ensuring that malicious payloads are executed automatically.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/8f3ab69a-aa22-4943-aa58-e0a52fdf6818/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/8f3ab69a-aa22-4943-aa58-e0a52fdf6818/","name":"User Shell Folders Registry Modification via CommandLine — Sigma Rule","description":"Sigma rule 8f3ab69a-aa22-4943-aa58-e0a52fdf6818. User Shell Folders Registry Modification via CommandLine — Sigma Rule. Detects modifications to User Shell Folders registry values via reg.exe or PowerShell, which could indicate persistence attempts.\nAttackers may modify User Shell Folders registry values to point to malicious executables or scripts that will be executed during startup.\nThis technique is often used to maintain persistence on a compromised system by ensuring that malicious payloads are executed automatically.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>User Shell Folders Registry Modification via CommandLine — Sigma Rule</h1><p class="lead">Sigma rule 8f3ab69a-aa22-4943-aa58-e0a52fdf6818. User Shell Folders Registry Modification via CommandLine — Sigma Rule. Detects modifications to User Shell Folders registry values via reg.exe or PowerShell, which could indicate persistence attempts.
+Attackers may modify User Shell Folders registry values to point to malicious executables or scripts that will be executed during startup.
+This technique is often used to maintain persistence on a compromised system by ensuring that malicious payloads are executed automatically.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1547-001/">attack.t1547.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1112/">attack.t1112</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2026-01-05 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_user_shell_folders_registry_modification.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: fadd6a4a171e8a6e858a7853a6028f6ebb0b634777931287baaafaf3669bbfa0</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: User Shell Folders Registry Modification via CommandLine
+id: 8f3ab69a-aa22-4943-aa58-e0a52fdf6818
+related:
+    - id: 9c226817-8dc9-46c2-a58d-66655aafd7dc
+      type: similar
+status: experimental
+description: |
+    Detects modifications to User Shell Folders registry values via reg.exe or PowerShell, which could indicate persistence attempts.
+    Attackers may modify User Shell Folders registry values to point to malicious executables or scripts that will be executed during startup.
+    This technique is often used to maintain persistence on a compromised system by ensuring that malicious payloads are executed automatically.
+references:
+    - https://www.welivesecurity.com/en/eset-research/muddywater-snakes-riverbank/
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2026-01-05
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.defense-impairment
+    - attack.t1547.001
+    - attack.t1112
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith:
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+              - &#39;\reg.exe&#39;
+        - OriginalFileName:
+              - &#39;powershell.exe&#39;
+              - &#39;pwsh.dll&#39;
+              - &#39;reg.exe&#39;
+    selection_cli_action:
+        CommandLine|contains:
+            - &#39; add &#39; # reg.exe modification
+            - &#39;New-ItemProperty&#39;
+            - &#39;Set-ItemProperty&#39;
+            - &#39;si &#39; # short for Set-ItemProperty
+    selection_cli_paths_root:
+        CommandLine|contains:
+            - &#39;\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders&#39;
+            - &#39;\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders&#39;
+    selection_cli_paths_suffix:
+        CommandLine|contains: &#39;Startup&#39; # covers both &#39;Startup&#39; and &#39;Common Startup&#39;
+    condition: all of selection_*
+falsepositives:
+    - Usage of reg.exe or PowerShell to modify User Shell Folders for legitimate purposes; but rare.
+level: high
+regression_tests_path: regression_data/rules/windows/process_creation/proc_creation_win_user_shell_folders_registry_modification/info.yml
+simulation:
+    - type: atomic-red-team
+      name: Change Startup Folder - HKLM Modify User Shell Folders Common Startup Value
+      technique: T1547.001
+      atomic_guid: acfef903-7662-447e-a391-9c91c2f00f7b
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/8f3ab69a-aa22-4943-aa58-e0a52fdf6818.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Usage of reg.exe or PowerShell to modify User Shell Folders for legitimate purposes; but rare.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.welivesecurity.com/en/eset-research/muddywater-snakes-riverbank/">https://www.welivesecurity.com/en/eset-research/muddywater-snakes-riverbank/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1112/">T1112 · Modify Registry</a> · <a href="/ttp-simulation/detections/enterprise/T1112/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1547.001/">T1547.001 · Registry Run Keys / Startup Folder</a> · <a href="/ttp-simulation/detections/enterprise/T1547.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

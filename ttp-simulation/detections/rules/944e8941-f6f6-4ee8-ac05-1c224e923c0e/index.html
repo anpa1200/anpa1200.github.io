@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add Port Monitor Persistence in Registry — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 944e8941-f6f6-4ee8-ac05-1c224e923c0e. Add Port Monitor Persistence in Registry — Sigma Rule. Adversaries may use port monitors to run an attacker supplied DLL during system boot for persistence or privilege escalation.
+A port monitor can be set through the AddMonitor API call to set a DLL to be loaded at startup.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="944e8941-f6f6-4ee8-ac05-1c224e923c0e, attack.privilege-escalation, attack.persistence, attack.t1547.010, registry_set, windows, rule-status:test, severity:medium, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.t1547.010">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.t1547.010">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/944e8941-f6f6-4ee8-ac05-1c224e923c0e/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/944e8941-f6f6-4ee8-ac05-1c224e923c0e/">
+<meta property="og:type" content="website"><meta property="og:title" content="Add Port Monitor Persistence in Registry — Sigma Rule"><meta property="og:description" content="Sigma rule 944e8941-f6f6-4ee8-ac05-1c224e923c0e. Add Port Monitor Persistence in Registry — Sigma Rule. Adversaries may use port monitors to run an attacker supplied DLL during system boot for persistence or privilege escalation.
+A port monitor can be set through the AddMonitor API call to set a DLL to be loaded at startup.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Add Port Monitor Persistence in Registry — Sigma Rule"><meta name="twitter:description" content="Sigma rule 944e8941-f6f6-4ee8-ac05-1c224e923c0e. Add Port Monitor Persistence in Registry — Sigma Rule. Adversaries may use port monitors to run an attacker supplied DLL during system boot for persistence or privilege escalation.
+A port monitor can be set through the AddMonitor API call to set a DLL to be loaded at startup.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/944e8941-f6f6-4ee8-ac05-1c224e923c0e/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/944e8941-f6f6-4ee8-ac05-1c224e923c0e/","name":"Add Port Monitor Persistence in Registry — Sigma Rule","description":"Sigma rule 944e8941-f6f6-4ee8-ac05-1c224e923c0e. Add Port Monitor Persistence in Registry — Sigma Rule. Adversaries may use port monitors to run an attacker supplied DLL during system boot for persistence or privilege escalation.\nA port monitor can be set through the AddMonitor API call to set a DLL to be loaded at startup.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Add Port Monitor Persistence in Registry — Sigma Rule</h1><p class="lead">Sigma rule 944e8941-f6f6-4ee8-ac05-1c224e923c0e. Add Port Monitor Persistence in Registry — Sigma Rule. Adversaries may use port monitors to run an attacker supplied DLL during system boot for persistence or privilege escalation.
+A port monitor can be set through the AddMonitor API call to set a DLL to be loaded at startup.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/registry-set/">registry_set</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1547-010/">attack.t1547.010</a></div><p>Author: frack113. Source status: test; severity: medium. Source dates: 2021-12-30 / 2024-03-25.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;registry_set&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/registry/registry_set/registry_set_add_port_monitor.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 2ca72e54922ee915882348af50a0fe1ada94516e0d142e8015520087c2ef5e99</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Add Port Monitor Persistence in Registry
+id: 944e8941-f6f6-4ee8-ac05-1c224e923c0e
+status: test
+description: |
+    Adversaries may use port monitors to run an attacker supplied DLL during system boot for persistence or privilege escalation.
+    A port monitor can be set through the AddMonitor API call to set a DLL to be loaded at startup.
+references:
+    - https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1547.010/T1547.010.md
+author: frack113
+date: 2021-12-30
+modified: 2024-03-25
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.t1547.010
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains: &#39;\Control\Print\Monitors\&#39;
+        Details|endswith: &#39;.dll&#39;
+    filter_optional_cutepdf:
+        Image: &#39;C:\Windows\System32\spoolsv.exe&#39;
+        TargetObject|contains: &#39;\Control\Print\Monitors\CutePDF Writer Monitor v4.0\Driver&#39;
+        Details: &#39;cpwmon64_v40.dll&#39;
+        User|contains: # covers many language settings
+            - &#39;AUTHORI&#39;
+            - &#39;AUTORI&#39;
+    filter_optional_monvnc:
+        TargetObject|contains: &#39;\Control\Print\Monitors\MONVNC\Driver&#39;
+    filter_optional_vnc:
+        TargetObject|contains|all:
+            - &#39;Control\Print\Environments\&#39;
+            - &#39;\Drivers\&#39;
+            - &#39;\VNC Printer&#39;
+    condition: selection and not 1 of filter_optional_*
+falsepositives:
+    - Unknown
+level: medium
+regression_tests_path: regression_data/rules/windows/registry/registry_set/registry_set_add_port_monitor/info.yml
+simulation:
+    - type: atomic-red-team
+      name: Add Port Monitor persistence in Registry
+      technique: T1547.010
+      atomic_guid: d34ef297-f178-4462-871e-9ce618d44e50
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/944e8941-f6f6-4ee8-ac05-1c224e923c0e.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1547.010/T1547.010.md">https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1547.010/T1547.010.md</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1547.010/">T1547.010 · Port Monitors</a> · <a href="/ttp-simulation/detections/enterprise/T1547.010/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

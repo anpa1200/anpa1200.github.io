@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application Termination Attempt via Wmic.EXE — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 49d9671b-0a0a-4c09-8280-d215bfd30662. Application Termination Attempt via Wmic.EXE — Sigma Rule. Detects an attempt to terminate a process via &quot;wmic&quot; with the &quot;call terminate&quot; flag. Adversaries may
+use wmic to terminate security products or other applications on the compromised host. This event is
+triggered on on attempt and process creation can be either successful or unsuccessful.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="49d9671b-0a0a-4c09-8280-d215bfd30662, attack.execution, attack.t1047, process_creation, windows, rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1047">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1047">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/49d9671b-0a0a-4c09-8280-d215bfd30662/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/49d9671b-0a0a-4c09-8280-d215bfd30662/">
+<meta property="og:type" content="website"><meta property="og:title" content="Application Termination Attempt via Wmic.EXE — Sigma Rule"><meta property="og:description" content="Sigma rule 49d9671b-0a0a-4c09-8280-d215bfd30662. Application Termination Attempt via Wmic.EXE — Sigma Rule. Detects an attempt to terminate a process via &quot;wmic&quot; with the &quot;call terminate&quot; flag. Adversaries may
+use wmic to terminate security products or other applications on the compromised host. This event is
+triggered on on attempt and process creation can be either successful or unsuccessful.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Application Termination Attempt via Wmic.EXE — Sigma Rule"><meta name="twitter:description" content="Sigma rule 49d9671b-0a0a-4c09-8280-d215bfd30662. Application Termination Attempt via Wmic.EXE — Sigma Rule. Detects an attempt to terminate a process via &quot;wmic&quot; with the &quot;call terminate&quot; flag. Adversaries may
+use wmic to terminate security products or other applications on the compromised host. This event is
+triggered on on attempt and process creation can be either successful or unsuccessful.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/49d9671b-0a0a-4c09-8280-d215bfd30662/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/49d9671b-0a0a-4c09-8280-d215bfd30662/","name":"Application Termination Attempt via Wmic.EXE — Sigma Rule","description":"Sigma rule 49d9671b-0a0a-4c09-8280-d215bfd30662. Application Termination Attempt via Wmic.EXE — Sigma Rule. Detects an attempt to terminate a process via \"wmic\" with the \"call terminate\" flag. Adversaries may\nuse wmic to terminate security products or other applications on the compromised host. This event is\ntriggered on on attempt and process creation can be either successful or unsuccessful.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Application Termination Attempt via Wmic.EXE — Sigma Rule</h1><p class="lead">Sigma rule 49d9671b-0a0a-4c09-8280-d215bfd30662. Application Termination Attempt via Wmic.EXE — Sigma Rule. Detects an attempt to terminate a process via &quot;wmic&quot; with the &quot;call terminate&quot; flag. Adversaries may
+use wmic to terminate security products or other applications on the compromised host. This event is
+triggered on on attempt and process creation can be either successful or unsuccessful.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1047/">attack.t1047</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2023-09-11 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_wmic_terminate_application.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 9c5a17cdebc6c32ea6c49f13324c34a77d229d9e073ab9f5c9f87b1569b04904</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Application Termination Attempt via Wmic.EXE
+id: 49d9671b-0a0a-4c09-8280-d215bfd30662
+related:
+    - id: 847d5ff3-8a31-4737-a970-aeae8fe21765 # Uninstall Security Products
+      type: derived
+status: test
+description: |
+    Detects an attempt to terminate a process via &quot;wmic&quot; with the &quot;call terminate&quot; flag. Adversaries may
+    use wmic to terminate security products or other applications on the compromised host. This event is
+    triggered on on attempt and process creation can be either successful or unsuccessful.
+references:
+    - https://cyble.com/blog/lockfile-ransomware-using-proxyshell-attack-to-deploy-ransomware/
+    - https://www.bitdefender.com/files/News/CaseStudies/study/377/Bitdefender-Whitepaper-WMI-creat4871-en-EN-GenericUse.pdf
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2023-09-11
+tags:
+    - attack.execution
+    - attack.t1047
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: &#39;\WMIC.exe&#39;
+        - OriginalFileName: &#39;wmic.exe&#39;
+    selection_cli:
+        CommandLine|contains|all:
+            - &#39;call&#39;
+            - &#39;terminate&#39;
+    condition: all of selection_*
+falsepositives:
+    - Unknown
+level: medium
+regression_tests_path: regression_data/rules/windows/process_creation/proc_creation_win_wmic_terminate_application/info.yml
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/49d9671b-0a0a-4c09-8280-d215bfd30662.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://cyble.com/blog/lockfile-ransomware-using-proxyshell-attack-to-deploy-ransomware/">https://cyble.com/blog/lockfile-ransomware-using-proxyshell-attack-to-deploy-ransomware/</a></li><li><a href="https://www.bitdefender.com/files/News/CaseStudies/study/377/Bitdefender-Whitepaper-WMI-creat4871-en-EN-GenericUse.pdf">https://www.bitdefender.com/files/News/CaseStudies/study/377/Bitdefender-Whitepaper-WMI-creat4871-en-EN-GenericUse.pdf</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1047/">T1047 · Windows Management Instrumentation</a> · <a href="/ttp-simulation/detections/enterprise/T1047/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

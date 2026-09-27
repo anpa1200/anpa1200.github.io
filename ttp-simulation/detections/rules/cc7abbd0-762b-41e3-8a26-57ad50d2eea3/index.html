@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MSHTA Execution with Suspicious File Extensions — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule cc7abbd0-762b-41e3-8a26-57ad50d2eea3. MSHTA Execution with Suspicious File Extensions — Sigma Rule. Detects execution of mshta.exe with file types that looks like they do not typically represent HTA (HTML Application) content,
+such as .png, .jpg, .zip, .pdf, and others, which are often polyglots. MSHTA is a legitimate Windows utility for executing HTML Applications
+containing VBScript or JScript. Threat actors often abuse this lolbin utility to download and
+execute malicious scripts disguised as benign files or hosted under misleading extensions to evade detection.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="cc7abbd0-762b-41e3-8a26-57ad50d2eea3, attack.stealth, attack.t1140, attack.t1218.005, attack.execution, attack.t1059.007, cve.2020-1599, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1140, sigma-tag:attack.t1218.005, sigma-tag:attack.execution, sigma-tag:attack.t1059.007, sigma-tag:cve.2020-1599">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1140, sigma-tag:attack.t1218.005, sigma-tag:attack.execution, sigma-tag:attack.t1059.007, sigma-tag:cve.2020-1599">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/cc7abbd0-762b-41e3-8a26-57ad50d2eea3/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/cc7abbd0-762b-41e3-8a26-57ad50d2eea3/">
+<meta property="og:type" content="website"><meta property="og:title" content="MSHTA Execution with Suspicious File Extensions — Sigma Rule"><meta property="og:description" content="Sigma rule cc7abbd0-762b-41e3-8a26-57ad50d2eea3. MSHTA Execution with Suspicious File Extensions — Sigma Rule. Detects execution of mshta.exe with file types that looks like they do not typically represent HTA (HTML Application) content,
+such as .png, .jpg, .zip, .pdf, and others, which are often polyglots. MSHTA is a legitimate Windows utility for executing HTML Applications
+containing VBScript or JScript. Threat actors often abuse this lolbin utility to download and
+execute malicious scripts disguised as benign files or hosted under misleading extensions to evade detection.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="MSHTA Execution with Suspicious File Extensions — Sigma Rule"><meta name="twitter:description" content="Sigma rule cc7abbd0-762b-41e3-8a26-57ad50d2eea3. MSHTA Execution with Suspicious File Extensions — Sigma Rule. Detects execution of mshta.exe with file types that looks like they do not typically represent HTA (HTML Application) content,
+such as .png, .jpg, .zip, .pdf, and others, which are often polyglots. MSHTA is a legitimate Windows utility for executing HTML Applications
+containing VBScript or JScript. Threat actors often abuse this lolbin utility to download and
+execute malicious scripts disguised as benign files or hosted under misleading extensions to evade detection.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/cc7abbd0-762b-41e3-8a26-57ad50d2eea3/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/cc7abbd0-762b-41e3-8a26-57ad50d2eea3/","name":"MSHTA Execution with Suspicious File Extensions — Sigma Rule","description":"Sigma rule cc7abbd0-762b-41e3-8a26-57ad50d2eea3. MSHTA Execution with Suspicious File Extensions — Sigma Rule. Detects execution of mshta.exe with file types that looks like they do not typically represent HTA (HTML Application) content,\nsuch as .png, .jpg, .zip, .pdf, and others, which are often polyglots. MSHTA is a legitimate Windows utility for executing HTML Applications\ncontaining VBScript or JScript. Threat actors often abuse this lolbin utility to download and\nexecute malicious scripts disguised as benign files or hosted under misleading extensions to evade detection.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>MSHTA Execution with Suspicious File Extensions — Sigma Rule</h1><p class="lead">Sigma rule cc7abbd0-762b-41e3-8a26-57ad50d2eea3. MSHTA Execution with Suspicious File Extensions — Sigma Rule. Detects execution of mshta.exe with file types that looks like they do not typically represent HTA (HTML Application) content,
+such as .png, .jpg, .zip, .pdf, and others, which are often polyglots. MSHTA is a legitimate Windows utility for executing HTML Applications
+containing VBScript or JScript. Threat actors often abuse this lolbin utility to download and
+execute malicious scripts disguised as benign files or hosted under misleading extensions to evade detection.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1140/">attack.t1140</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1218-005/">attack.t1218.005</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-007/">attack.t1059.007</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/cve-2020-1599/">cve.2020-1599</a></div><p>Author: Diego Perez (@darkquassar), Markus Neis, Swisscom (Improve Rule), Swachchhanda Shrawan Poudel (Nextron Systems). Source status: test; severity: high. Source dates: 2019-02-22 / 2025-05-12.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_mshta_susp_execution.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 67d76c24526db9dadbacb2086115a62b5f6364a39a0d8197de96d6fb738b9774</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: MSHTA Execution with Suspicious File Extensions
+id: cc7abbd0-762b-41e3-8a26-57ad50d2eea3
+status: test
+description: |
+    Detects execution of mshta.exe with file types that looks like they do not typically represent HTA (HTML Application) content,
+    such as .png, .jpg, .zip, .pdf, and others, which are often polyglots. MSHTA is a legitimate Windows utility for executing HTML Applications
+    containing VBScript or JScript. Threat actors often abuse this lolbin utility to download and
+    execute malicious scripts disguised as benign files or hosted under misleading extensions to evade detection.
+references:
+    - http://blog.sevagas.com/?Hacking-around-HTA-files
+    - https://0x00sec.org/t/clientside-exploitation-in-2018-how-pentesting-has-changed/7356
+    - https://learn.microsoft.com/en-us/previous-versions/dotnet/framework/data/xml/xslt/xslt-stylesheet-scripting-using-msxsl-script
+    - https://medium.com/tsscyber/pentesting-and-hta-bypassing-powershell-constrained-language-mode-53a42856c997
+    - https://twitter.com/mattifestation/status/1326228491302563846
+    - https://www.virustotal.com/gui/file/c1f27d9795a2eba630db8a043580a0761798f06370fb1317067805f8a845b00c
+author: Diego Perez (@darkquassar), Markus Neis, Swisscom (Improve Rule), Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2019-02-22
+modified: 2025-05-12
+tags:
+    - attack.stealth
+    - attack.t1140
+    - attack.t1218.005
+    - attack.execution
+    - attack.t1059.007
+    - cve.2020-1599
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: &#39;\mshta.exe&#39;
+        - OriginalFileName: &#39;mshta.exe&#39;
+    selection_cli:
+        CommandLine|contains:
+            - &#39;.7z&#39;
+            - &#39;.avi&#39;
+            - &#39;.bat&#39;
+            - &#39;.bmp&#39;
+            - &#39;.conf&#39;
+            - &#39;.csv&#39;
+            - &#39;.dll&#39;
+            - &#39;.doc&#39;
+            - &#39;.gif&#39;
+            - &#39;.gz&#39;
+            - &#39;.ini&#39;
+            - &#39;.jpe&#39;
+            - &#39;.jpg&#39;
+            - &#39;.json&#39;
+            - &#39;.lnk&#39;
+            - &#39;.log&#39;
+            - &#39;.mkv&#39;
+            - &#39;.mp3&#39;
+            - &#39;.mp4&#39;
+            - &#39;.pdf&#39;
+            - &#39;.png&#39;
+            - &#39;.ppt&#39;
+            - &#39;.rar&#39;
+            - &#39;.rtf&#39;
+            - &#39;.svg&#39;
+            - &#39;.tar&#39;
+            - &#39;.tmp&#39;
+            - &#39;.txt&#39;
+            - &#39;.xls&#39;
+            - &#39;.xml&#39;
+            - &#39;.yaml&#39;
+            - &#39;.yml&#39;
+            - &#39;.zip&#39;
+            - &#39;vbscript&#39;
+            # - &#39;.chm&#39;  # could be prone to false positives
+            # - &#39;.exe&#39;
+    condition: all of selection_*
+falsepositives:
+    - False positives depend on scripts and administrative tools used in the monitored environment
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/cc7abbd0-762b-41e3-8a26-57ad50d2eea3.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>False positives depend on scripts and administrative tools used in the monitored environment</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="http://blog.sevagas.com/?Hacking-around-HTA-files">http://blog.sevagas.com/?Hacking-around-HTA-files</a></li><li><a href="https://0x00sec.org/t/clientside-exploitation-in-2018-how-pentesting-has-changed/7356">https://0x00sec.org/t/clientside-exploitation-in-2018-how-pentesting-has-changed/7356</a></li><li><a href="https://learn.microsoft.com/en-us/previous-versions/dotnet/framework/data/xml/xslt/xslt-stylesheet-scripting-using-msxsl-script">https://learn.microsoft.com/en-us/previous-versions/dotnet/framework/data/xml/xslt/xslt-stylesheet-scripting-using-msxsl-script</a></li><li><a href="https://medium.com/tsscyber/pentesting-and-hta-bypassing-powershell-constrained-language-mode-53a42856c997">https://medium.com/tsscyber/pentesting-and-hta-bypassing-powershell-constrained-language-mode-53a42856c997</a></li><li><a href="https://twitter.com/mattifestation/status/1326228491302563846">https://twitter.com/mattifestation/status/1326228491302563846</a></li><li><a href="https://www.virustotal.com/gui/file/c1f27d9795a2eba630db8a043580a0761798f06370fb1317067805f8a845b00c">https://www.virustotal.com/gui/file/c1f27d9795a2eba630db8a043580a0761798f06370fb1317067805f8a845b00c</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.007/">T1059.007 · JavaScript</a> · <a href="/ttp-simulation/detections/enterprise/T1059.007/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1140/">T1140 · Deobfuscate/Decode Files or Information</a> · <a href="/ttp-simulation/detections/enterprise/T1140/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1218.005/">T1218.005 · Mshta</a> · <a href="/ttp-simulation/detections/enterprise/T1218.005/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

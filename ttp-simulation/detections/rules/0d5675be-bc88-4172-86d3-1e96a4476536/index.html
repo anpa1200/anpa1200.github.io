@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 0d5675be-bc88-4172-86d3-1e96a4476536. Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule. Detects the execution of &quot;reg.exe&quot; for enabling/disabling the RDP service on the host by tampering with the &#39;CurrentControlSet\Control\Terminal Server&#39; values">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="0d5675be-bc88-4172-86d3-1e96a4476536, attack.persistence, attack.lateral-movement, attack.defense-impairment, attack.t1021.001, attack.t1112, windows, process_creation, rule-status:test, severity:high, logsource-product:windows, logsource-category:process_creation, sigma-tag:attack.persistence, sigma-tag:attack.lateral-movement, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1021.001, sigma-tag:attack.t1112">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:windows, logsource-category:process_creation, sigma-tag:attack.persistence, sigma-tag:attack.lateral-movement, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1021.001, sigma-tag:attack.t1112">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/0d5675be-bc88-4172-86d3-1e96a4476536/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/0d5675be-bc88-4172-86d3-1e96a4476536/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule"><meta property="og:description" content="Sigma rule 0d5675be-bc88-4172-86d3-1e96a4476536. Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule. Detects the execution of &quot;reg.exe&quot; for enabling/disabling the RDP service on the host by tampering with the &#39;CurrentControlSet\Control\Terminal Server&#39; values"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule"><meta name="twitter:description" content="Sigma rule 0d5675be-bc88-4172-86d3-1e96a4476536. Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule. Detects the execution of &quot;reg.exe&quot; for enabling/disabling the RDP service on the host by tampering with the &#39;CurrentControlSet\Control\Terminal Server&#39; values"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/0d5675be-bc88-4172-86d3-1e96a4476536/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/0d5675be-bc88-4172-86d3-1e96a4476536/","name":"Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule","description":"Sigma rule 0d5675be-bc88-4172-86d3-1e96a4476536. Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule. Detects the execution of \"reg.exe\" for enabling/disabling the RDP service on the host by tampering with the 'CurrentControlSet\\Control\\Terminal Server' values","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule</h1><p class="lead">Sigma rule 0d5675be-bc88-4172-86d3-1e96a4476536. Potential Tampering With RDP Related Registry Keys Via Reg.EXE — Sigma Rule. Detects the execution of &quot;reg.exe&quot; for enabling/disabling the RDP service on the host by tampering with the &#39;CurrentControlSet\Control\Terminal Server&#39; values</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1021-001/">attack.t1021.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1112/">attack.t1112</a></div><p>Author: pH-T (Nextron Systems), @Kostastsale, TheDFIRReport. Source status: test; severity: high. Source dates: 2022-02-12 / 2025-11-22.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;process_creation&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_reg_rdp_keys_tamper.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: f85d5f46de1f20db284d485f6d5dfe7101b45746051643b5a8364ce55d43cc8a</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Tampering With RDP Related Registry Keys Via Reg.EXE
+id: 0d5675be-bc88-4172-86d3-1e96a4476536
+status: test
+description: Detects the execution of &quot;reg.exe&quot; for enabling/disabling the RDP service on the host by tampering with the &#39;CurrentControlSet\Control\Terminal Server&#39; values
+references:
+    - https://thedfirreport.com/2022/02/21/qbot-and-zerologon-lead-to-full-domain-compromise/
+    - http://etutorials.org/Microsoft+Products/microsoft+windows+server+2003+terminal+services/Chapter+6+Registry/Registry+Keys+for+Terminal+Services/ # Contain description for most of the keys mentioned here (check it out if you want more information
+    - http://woshub.com/rds-shadow-how-to-connect-to-a-user-session-in-windows-server-2012-r2/ # Related to the Shadow RPD technique
+    - https://admx.help/HKLM/SOFTWARE/Policies/Microsoft/Windows%20NT/Terminal%20Services # Contain description for most of the keys mentioned here (check it out if you want more information)
+    - https://bazaar.abuse.ch/sample/6f3aa9362d72e806490a8abce245331030d1ab5ac77e400dd475748236a6cc81/
+    - https://blog.sekoia.io/darkgate-internals/
+    - https://blog.talosintelligence.com/understanding-the-phobos-affiliate-structure/
+    - https://github.com/redcanaryco/atomic-red-team/blob/02c7d02fe1f1feb0fc7944550408ea8224273994/atomics/T1112/T1112.md#atomic-test-63---disable-remote-desktop-anti-alias-setting-through-registry
+    - https://github.com/redcanaryco/atomic-red-team/blob/02c7d02fe1f1feb0fc7944550408ea8224273994/atomics/T1112/T1112.md#atomic-test-64---disable-remote-desktop-security-settings-through-registry
+    - https://github.com/redcanaryco/atomic-red-team/blob/dd526047b8c399c312fee47d1e6fb531164da54d/atomics/T1112/T1112.yaml#L790
+    - https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-terminalservices-rdp-winstationextensions-securitylayer
+    - https://threathunterplaybook.com/hunts/windows/190407-RegModEnableRDPConnections/notebook.html
+    - https://twitter.com/SagieSec/status/1469001618863624194?t=HRf0eA0W1YYzkTSHb-Ky1A&amp;s=03 # Related to the Shadow RPD technique
+    - https://web.archive.org/web/20200929062532/https://blog.menasec.net/2019/02/threat-hunting-rdp-hijacking-via.html # Related to RDP hijacking via the &quot;ServiceDll&quot; key
+    - https://www.trendmicro.com/en_us/research/25/i/unmasking-the-gentlemen-ransomware.html
+author: pH-T (Nextron Systems), @Kostastsale, TheDFIRReport
+date: 2022-02-12
+modified: 2025-11-22
+tags:
+    - attack.persistence
+    - attack.lateral-movement
+    - attack.defense-impairment
+    - attack.t1021.001
+    - attack.t1112
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    selection_main_img:
+        - Image|endswith: &#39;\reg.exe&#39;
+        - OriginalFileName: &#39;reg.exe&#39;
+    selection_main_cli:
+        CommandLine|contains|all:
+            - &#39; add &#39;
+            - &#39;\CurrentControlSet\Control\Terminal Server&#39;
+            - &#39;REG_DWORD&#39;
+            - &#39; /f&#39;
+    selection_values_1:
+        CommandLine|contains|all:
+            - &#39;Licensing Core&#39;
+            - &#39;EnableConcurrentSessions&#39;
+    selection_values_2:
+        CommandLine|contains:
+            - &#39;AllowTSConnections&#39;
+            - &#39;fDenyTSConnections&#39;
+            - &#39;fEnableWinStation&#39;
+            - &#39;fSingleSessionPerUser&#39;
+            - &#39;IdleWinStationPoolCount&#39;
+            - &#39;MaxInstanceCount&#39;
+            - &#39;SecurityLayer&#39;
+            - &#39;TSAdvertise&#39;
+            - &#39;TSAppCompat&#39;
+            - &#39;TSEnabled&#39;
+            - &#39;TSUserEnabled&#39;
+            - &#39;WinStations\RDP-Tcp&#39;
+    filter_main_values_tls:
+        CommandLine|contains|all:
+            - &#39;SecurityLayer&#39;
+            - &#39;02&#39;  # TLS Enabled
+    condition: all of selection_main_* and 1 of selection_values_* and not 1 of filter_main_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/0d5675be-bc88-4172-86d3-1e96a4476536.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://thedfirreport.com/2022/02/21/qbot-and-zerologon-lead-to-full-domain-compromise/">https://thedfirreport.com/2022/02/21/qbot-and-zerologon-lead-to-full-domain-compromise/</a></li><li><a href="http://etutorials.org/Microsoft+Products/microsoft+windows+server+2003+terminal+services/Chapter+6+Registry/Registry+Keys+for+Terminal+Services/">http://etutorials.org/Microsoft+Products/microsoft+windows+server+2003+terminal+services/Chapter+6+Registry/Registry+Keys+for+Terminal+Services/</a></li><li><a href="http://woshub.com/rds-shadow-how-to-connect-to-a-user-session-in-windows-server-2012-r2/">http://woshub.com/rds-shadow-how-to-connect-to-a-user-session-in-windows-server-2012-r2/</a></li><li><a href="https://admx.help/HKLM/SOFTWARE/Policies/Microsoft/Windows%20NT/Terminal%20Services">https://admx.help/HKLM/SOFTWARE/Policies/Microsoft/Windows%20NT/Terminal%20Services</a></li><li><a href="https://bazaar.abuse.ch/sample/6f3aa9362d72e806490a8abce245331030d1ab5ac77e400dd475748236a6cc81/">https://bazaar.abuse.ch/sample/6f3aa9362d72e806490a8abce245331030d1ab5ac77e400dd475748236a6cc81/</a></li><li><a href="https://blog.sekoia.io/darkgate-internals/">https://blog.sekoia.io/darkgate-internals/</a></li><li><a href="https://blog.talosintelligence.com/understanding-the-phobos-affiliate-structure/">https://blog.talosintelligence.com/understanding-the-phobos-affiliate-structure/</a></li><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/02c7d02fe1f1feb0fc7944550408ea8224273994/atomics/T1112/T1112.md#atomic-test-63---disable-remote-desktop-anti-alias-setting-through-registry">https://github.com/redcanaryco/atomic-red-team/blob/02c7d02fe1f1feb0fc7944550408ea8224273994/atomics/T1112/T1112.md#atomic-test-63---disable-remote-desktop-anti-alias-setting-through-registry</a></li><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/02c7d02fe1f1feb0fc7944550408ea8224273994/atomics/T1112/T1112.md#atomic-test-64---disable-remote-desktop-security-settings-through-registry">https://github.com/redcanaryco/atomic-red-team/blob/02c7d02fe1f1feb0fc7944550408ea8224273994/atomics/T1112/T1112.md#atomic-test-64---disable-remote-desktop-security-settings-through-registry</a></li><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/dd526047b8c399c312fee47d1e6fb531164da54d/atomics/T1112/T1112.yaml#L790">https://github.com/redcanaryco/atomic-red-team/blob/dd526047b8c399c312fee47d1e6fb531164da54d/atomics/T1112/T1112.yaml#L790</a></li><li><a href="https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-terminalservices-rdp-winstationextensions-securitylayer">https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-terminalservices-rdp-winstationextensions-securitylayer</a></li><li><a href="https://threathunterplaybook.com/hunts/windows/190407-RegModEnableRDPConnections/notebook.html">https://threathunterplaybook.com/hunts/windows/190407-RegModEnableRDPConnections/notebook.html</a></li><li><a href="https://twitter.com/SagieSec/status/1469001618863624194?t=HRf0eA0W1YYzkTSHb-Ky1A&amp;s=03">https://twitter.com/SagieSec/status/1469001618863624194?t=HRf0eA0W1YYzkTSHb-Ky1A&amp;s=03</a></li><li><a href="https://web.archive.org/web/20200929062532/https://blog.menasec.net/2019/02/threat-hunting-rdp-hijacking-via.html">https://web.archive.org/web/20200929062532/https://blog.menasec.net/2019/02/threat-hunting-rdp-hijacking-via.html</a></li><li><a href="https://www.trendmicro.com/en_us/research/25/i/unmasking-the-gentlemen-ransomware.html">https://www.trendmicro.com/en_us/research/25/i/unmasking-the-gentlemen-ransomware.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1021.001/">T1021.001 · Remote Desktop Protocol</a> · <a href="/ttp-simulation/detections/enterprise/T1021.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1112/">T1112 · Modify Registry</a> · <a href="/ttp-simulation/detections/enterprise/T1112/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hacktool - EDR-Freeze Execution — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule c598cc0c-9e70-4852-b9eb-8921af79f598. Hacktool - EDR-Freeze Execution — Sigma Rule. Detects execution of EDR-Freeze, a tool that exploits the MiniDumpWriteDump function and WerFaultSecure.exe to suspend EDR and Antivirus processes on Windows.
+EDR-Freeze leverages a race-condition attack to put security processes into a dormant state by suspending WerFaultSecure at the moment it freezes the target process.
+This technique does not require kernel-level exploits or BYOVD, but instead abuses user-mode functionality to temporarily disable monitoring by EDR or Antimalware solutions.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="c598cc0c-9e70-4852-b9eb-8921af79f598, attack.defense-impairment, attack.t1685, process_creation, windows, rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/c598cc0c-9e70-4852-b9eb-8921af79f598/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/c598cc0c-9e70-4852-b9eb-8921af79f598/">
+<meta property="og:type" content="website"><meta property="og:title" content="Hacktool - EDR-Freeze Execution — Sigma Rule"><meta property="og:description" content="Sigma rule c598cc0c-9e70-4852-b9eb-8921af79f598. Hacktool - EDR-Freeze Execution — Sigma Rule. Detects execution of EDR-Freeze, a tool that exploits the MiniDumpWriteDump function and WerFaultSecure.exe to suspend EDR and Antivirus processes on Windows.
+EDR-Freeze leverages a race-condition attack to put security processes into a dormant state by suspending WerFaultSecure at the moment it freezes the target process.
+This technique does not require kernel-level exploits or BYOVD, but instead abuses user-mode functionality to temporarily disable monitoring by EDR or Antimalware solutions.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Hacktool - EDR-Freeze Execution — Sigma Rule"><meta name="twitter:description" content="Sigma rule c598cc0c-9e70-4852-b9eb-8921af79f598. Hacktool - EDR-Freeze Execution — Sigma Rule. Detects execution of EDR-Freeze, a tool that exploits the MiniDumpWriteDump function and WerFaultSecure.exe to suspend EDR and Antivirus processes on Windows.
+EDR-Freeze leverages a race-condition attack to put security processes into a dormant state by suspending WerFaultSecure at the moment it freezes the target process.
+This technique does not require kernel-level exploits or BYOVD, but instead abuses user-mode functionality to temporarily disable monitoring by EDR or Antimalware solutions.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/c598cc0c-9e70-4852-b9eb-8921af79f598/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/c598cc0c-9e70-4852-b9eb-8921af79f598/","name":"Hacktool - EDR-Freeze Execution — Sigma Rule","description":"Sigma rule c598cc0c-9e70-4852-b9eb-8921af79f598. Hacktool - EDR-Freeze Execution — Sigma Rule. Detects execution of EDR-Freeze, a tool that exploits the MiniDumpWriteDump function and WerFaultSecure.exe to suspend EDR and Antivirus processes on Windows.\nEDR-Freeze leverages a race-condition attack to put security processes into a dormant state by suspending WerFaultSecure at the moment it freezes the target process.\nThis technique does not require kernel-level exploits or BYOVD, but instead abuses user-mode functionality to temporarily disable monitoring by EDR or Antimalware solutions.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Hacktool - EDR-Freeze Execution — Sigma Rule</h1><p class="lead">Sigma rule c598cc0c-9e70-4852-b9eb-8921af79f598. Hacktool - EDR-Freeze Execution — Sigma Rule. Detects execution of EDR-Freeze, a tool that exploits the MiniDumpWriteDump function and WerFaultSecure.exe to suspend EDR and Antivirus processes on Windows.
+EDR-Freeze leverages a race-condition attack to put security processes into a dormant state by suspending WerFaultSecure at the moment it freezes the target process.
+This technique does not require kernel-level exploits or BYOVD, but instead abuses user-mode functionality to temporarily disable monitoring by EDR or Antimalware solutions.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1685/">attack.t1685</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2025-09-24 / 2025-11-27.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_hktl_edr_freeze.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: c7c156456886c633baaa887908a61e8016c4e4dae23d1e8c5d59011b1ea00913</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Hacktool - EDR-Freeze Execution
+id: c598cc0c-9e70-4852-b9eb-8921af79f598
+status: experimental
+description: |
+    Detects execution of EDR-Freeze, a tool that exploits the MiniDumpWriteDump function and WerFaultSecure.exe to suspend EDR and Antivirus processes on Windows.
+    EDR-Freeze leverages a race-condition attack to put security processes into a dormant state by suspending WerFaultSecure at the moment it freezes the target process.
+    This technique does not require kernel-level exploits or BYOVD, but instead abuses user-mode functionality to temporarily disable monitoring by EDR or Antimalware solutions.
+references:
+    - https://www.zerosalarium.com/2025/09/EDR-Freeze-Puts-EDRs-Antivirus-Into-Coma.html
+    - https://github.com/TwoSevenOneT/EDR-Freeze
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-09-24
+modified: 2025-11-27
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        Image|contains:
+            - &#39;\EDR-Freeze&#39;
+            - &#39;\EDRFreeze&#39;
+        Image|endswith: &#39;.exe&#39;
+    selection_imphash:
+        Hashes|contains:
+            - &#39;IMPHASH=1195F7935954A2CD09157390C33F8E8C&#39;
+            - &#39;IMPHASH=129F58DE3D687FB7F012BF6C3D679997&#39;
+            - &#39;IMPHASH=2C617A175D0086251642C6619F7CC8BA&#39;
+            - &#39;IMPHASH=8828F0B906F7844358FB92A899E9520F&#39;
+            - &#39;IMPHASH=AF76D95157EC554DC1EF178E4E66D447&#39;
+            - &#39;IMPHASH=E1B04316B61ACA31DD52ABBEC0A37FD5&#39;
+            - &#39;IMPHASH=8B2D5B54AFCFEC60D54F6B31D80ED4A0&#39;
+            - &#39;IMPHASH=AB8BB31EDD91D2A05FE7B62A535E9EB7&#39;
+    condition: 1 of selection_*
+falsepositives:
+    - Unlikely
+level: high
+regression_tests_path: regression_data/rules/windows/process_creation/proc_creation_win_hktl_edr_freeze/info.yml
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/c598cc0c-9e70-4852-b9eb-8921af79f598.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unlikely</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.zerosalarium.com/2025/09/EDR-Freeze-Puts-EDRs-Antivirus-Into-Coma.html">https://www.zerosalarium.com/2025/09/EDR-Freeze-Puts-EDRs-Antivirus-Into-Coma.html</a></li><li><a href="https://github.com/TwoSevenOneT/EDR-Freeze">https://github.com/TwoSevenOneT/EDR-Freeze</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1685/">T1685 · Disable or Modify Tools</a> · <a href="/ttp-simulation/detections/enterprise/T1685/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>
