@@ -23,7 +23,7 @@ env:
 
 jobs:
   quality:
-    timeout-minutes: 20
+    timeout-minutes: 35
     runs-on: ubuntu-latest
     steps:
       # fetch-depth: 0 (full history) is required here, not cosmetic: both
@@ -148,6 +148,11 @@ jobs:
           npm run check-search:index -- --bundle "${RUNNER_TEMP}/site/pagefind" --remote
       - name: Browser smoke test search and autocomplete
         run: npm run check-search:browser -- --site "${RUNNER_TEMP}/site" --bundle "${RUNNER_TEMP}/site/pagefind"
+      - name: Validate attack and detection modules, tags and hydrated guide backlinks
+        run: >-
+          node scripts/check-ttp-browser.mjs
+          --site "${RUNNER_TEMP}/site"
+          --report-dir "${RUNNER_TEMP}/ttp-module-browser"
       - name: Browser mobile typography and overflow regression
         run: >-
           npm run check-layout:browser --
@@ -191,6 +196,7 @@ jobs:
           path: |
             ${{ runner.temp }}/mobile-layout
             ${{ runner.temp }}/browser-quality.json
+            ${{ runner.temp }}/ttp-module-browser
             ${{ runner.temp }}/site/pagefind/search-build.json
             ${{ runner.temp }}/site/pagefind/search-governance.json
             ${{ runner.temp }}/site/pagefind/pagefind-entry.json
