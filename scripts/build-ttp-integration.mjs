@@ -6,6 +6,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { tagPath } from '../ttp-simulation/assets/tag-links.mjs';
+import { atlasFamiliesForTechnique, atlasFamiliesForTelemetry } from './anomaly-atlas-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -79,6 +80,11 @@ function toolActors(id) {
   return rows.length ? section('Documented actor use', '<p>Explicit actor-to-software uses relationships in the pinned ATT&CK source. These links are historical behavior context, not attribution of current events.</p>' + list(rows.map(r => `${a(`/threat-matrix/actors/${r.actor_id}/`, `${r.actor_name} · ${r.actor_id}`)} · ${a(r.source_url, 'Pinned relationship source')} (${esc(r.relationship_id)})`))) : '';
 }
 function renderPage({ page, title, description, core, connections = '', interactive = {}, kind = 'reference', keywords = [] }) {
+  const familyLinks = interactive.telemetry && interactive.telemetry !== 'index'
+    ? atlasFamiliesForTelemetry(interactive.telemetry)
+    : atlasFamiliesForTechnique(interactive.detection || interactive.technique);
+  if (familyLinks.length) connections += section('Connected anomaly research', '<p>Curated research views reached through an exact source technique, a catalog model, or a reviewed collection reference. These are navigation associations, not claims of detector effectiveness or sensor equivalence.</p>' + list(familyLinks.map(f => a(f.url, f.title))) + `<p>${a('/anomaly-detection-atlas/research/telemetry/', 'Telemetry contracts')} · ${a('/anomaly-detection-atlas/research/queries/', 'Maintained query examples')} · ${a('/anomaly-detection-atlas/research/validation/', 'Validation and blind spots')}</p>`);
+  if (kind === 'detection') connections = connections.replace('Malicious Activity as a Statistical Signal</a>', 'Original publication snapshot</a>');
   // Rule descriptions repeat across upstream variants; keep the source text unchanged in YAML.
   // Prefix the page identity before SEO shortening so each result remains distinguishable.
   if (kind === 'sigma-rule') description = `Sigma rule ${page.split('/')[2]}. ${title}. ${description}`;

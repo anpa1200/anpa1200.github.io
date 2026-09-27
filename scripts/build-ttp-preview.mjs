@@ -20,6 +20,7 @@ const archiveCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:archive,encodin
 run('stage-article-archive-governance.mjs','--site',site,'--source',root,'--archive',archive,'--archive-commit',archiveCommit);
 run('build-site-shell.mjs','--site',site);
 run('build-ttp-integration.mjs','--site',site,'--require-archive');
+run('build-anomaly-atlas-integration.mjs','--site',site,'--require-archive');
 run('inject-search-loader.mjs','--site',site);
 run('build-site-artifacts.mjs','--site',site,'--source',root,'--remote');
 run('build-platform-sidebar.mjs','--site',site);

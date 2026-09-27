@@ -5,8 +5,21 @@
   let registry;
   let timer;
   const key = path => path.replace(/\/index\.html$/, '/').replace(/\/$/, '');
+  function snapshotNotice() {
+    const isSnapshot = key(location.pathname) === key(new URL(registry.article_url).pathname);
+    document.querySelectorAll('[data-atlas-publication-snapshot]').forEach(node => {if (!isSnapshot) node.remove();});
+    if (!isSnapshot || document.querySelector('[data-atlas-publication-snapshot]')) return;
+    const title = document.querySelector('main article h1, main h1');
+    if (!title) return;
+    const note = document.createElement('aside');
+    note.dataset.atlasPublicationSnapshot = 'true';
+    note.className = 'anomaly-atlas-notice';
+    note.innerHTML = '<strong>Publication snapshot.</strong> This edition and its anchors remain available for citations. Continue in the <a href="https://1200km.com/anomaly-detection-atlas/research/">unified Anomaly Detection Atlas</a> for research chapters, <a href="https://1200km.com/anomaly-detection-atlas/families/">family pages</a>, <a href="https://1200km.com/anomaly-detection-atlas/attack-statistical-anomaly-mapping/">models</a>, and the <a href="https://1200km.com/anomaly-detection-atlas/visuals/">visual index</a>. Integration does not imply a new incident audit or production validation.';
+    title.after(note);
+  }
   function render() {
     if (!registry) return;
+    snapshotNotice();
     const path = key(location.pathname);
     const ids = registry.pages[path] || [];
     document.querySelectorAll('[data-anomaly-topics]').forEach(node => {
@@ -43,7 +56,7 @@
       browse.textContent = tag.label;
       browse.title = tag.definition;
       const definition = document.createElement('a');
-      definition.href = registry.article_url + '#' + id;
+      definition.href = tag.definition_url || registry.article_url + '#' + id;
       definition.textContent = 'Definition';
       definition.setAttribute('aria-label', tag.label + ' definition');
       item.append(browse, document.createTextNode(' · '), definition);

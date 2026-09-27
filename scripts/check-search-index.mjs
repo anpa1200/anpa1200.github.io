@@ -67,6 +67,7 @@ try {
   if (governance.indexed_custom_record_count !== build?.indexedCustomRecords) failures.push(`search governance targets ${governance.indexed_custom_record_count} of ${build?.indexedCustomRecords} custom records`);
   if (governance.indexed_record_count !== build?.indexedRecords) failures.push(`search governance targets ${governance.indexed_record_count} of ${build?.indexedRecords} total records`);
   if (governance.expected_module_pages && governance.indexed_module_pages !== governance.expected_module_pages) failures.push('TTP module search coverage is incomplete');
+  if (remote && (governance.expected_atlas_research_pages !== 30 || governance.indexed_atlas_research_pages !== 30)) failures.push('Unified Atlas research search coverage is incomplete');
   if (governance.record_count < Math.floor((build?.indexedRecords || 0) * 0.95)) failures.push(`search governance has too few Pagefind fragment records: ${governance.record_count}`);
   if (Object.keys(governance.records || {}).length !== governance.record_count) failures.push('search governance record_count disagrees with its records');
 } catch (error) {

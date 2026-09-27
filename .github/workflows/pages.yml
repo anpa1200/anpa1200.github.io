@@ -50,7 +50,9 @@ jobs:
       - name: Validate search source
         run: npm run check-release-source
       - name: Validate reviewed anomaly navigation
-        run: npm run check-anomaly-tags
+        run: |
+          npm run check-anomaly-tags
+          node scripts/build-anomaly-atlas-integration.mjs --check
       - name: Stage publishable site
         run: |
           mkdir -p "${RUNNER_TEMP}/site"
@@ -99,6 +101,7 @@ jobs:
       - name: Integrate searchable TTP modules and article backlinks
         run: |
           node scripts/build-ttp-integration.mjs --site "${RUNNER_TEMP}/site" --require-archive
+          node scripts/build-anomaly-atlas-integration.mjs --site "${RUNNER_TEMP}/site" --require-archive
           node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
       - name: Build canonical metadata and release HTML
         run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"

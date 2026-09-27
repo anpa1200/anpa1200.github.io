@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import * as pagefind from 'pagefind';
 import { governanceBoost } from './search-governance-lib.mjs';
+import { atlas } from './anomaly-atlas-lib.mjs';
 import {
   LOCAL_SEARCH_MINIMUM_PAGES,
   REMOTE_SEARCH_MINIMUM_PAGES,
@@ -47,6 +48,7 @@ const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-
 const knowledgeSourcesPath = resolve(option('--knowledge-sources', join(siteRoot, 'data', 'knowledge-sources.json')));
 const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledge-sources', '165'), 10);
 const requiredIndexUrls = [
+  ...(remote ? ['https://1200km.com/anomaly-detection-atlas/', 'https://1200km.com/anomaly-detection-atlas/research/', 'https://1200km.com/anomaly-detection-atlas/families/', 'https://1200km.com/anomaly-detection-atlas/visuals/', 'https://1200km.com/anomaly-detection-atlas/research/provenance/', ...atlas.pages.map(p => p.url)] : []),
   `${SITE_ORIGIN}/ttp-simulation/`,
   `${SITE_ORIGIN}/ttp-simulation/tools/`,
   `${SITE_ORIGIN}/ttp-simulation/detections/`,
@@ -212,6 +214,7 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
   const records = {};
   const missing = [];
   const indexedModuleUrls = new Set();
+  const indexedAtlasUrls = new Set();
   let indexedPageRecords = 0;
   let indexedCustomRecords = 0;
   for (const filename of (await readdir(fragmentDirectory)).filter((name) => name.endsWith('.pf_fragment')).sort()) {
@@ -223,6 +226,7 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
     const rawUrl = fragment.raw_url || fragment.url;
     const canonical = normalizeCanonical(rawUrl);
     if (canonical?.startsWith(`${SITE_ORIGIN}/ttp-simulation/`)) indexedModuleUrls.add(canonical);
+    if (canonical?.startsWith(`${SITE_ORIGIN}/anomaly-detection-atlas/`)) indexedAtlasUrls.add(canonical);
     const customItem = customSearchGovernance.get(searchRecordKey(rawUrl));
     const item = customItem || (canonical ? catalogByUrl.get(canonical) : null);
     if (!item) {
@@ -258,6 +262,9 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
     const missingModulePages = manifest.pages.filter(page => !indexedModuleUrls.has(`${SITE_ORIGIN}/ttp-simulation/${page.page}`));
     if (missingModulePages.length) throw new Error(`Module search coverage is incomplete: ${missingModulePages.map(page => page.page).join(', ')}`);
   }
+  const expectedAtlasUrls = remote ? requiredIndexUrls.filter(url => url.startsWith(`${SITE_ORIGIN}/anomaly-detection-atlas/`)) : [];
+  const missingAtlasUrls = expectedAtlasUrls.filter(url => !indexedAtlasUrls.has(url));
+  if (missingAtlasUrls.length) throw new Error(`Atlas page-fragment coverage is incomplete: ${missingAtlasUrls.join(', ')}`);
   const governance = {
     schema_version: 1,
     content_catalog_version: catalog.catalog_version,
@@ -267,6 +274,8 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
     indexed_record_count: indexedRecordCount,
     expected_module_pages: expectedModulePages,
     indexed_module_pages: indexedModuleUrls.size,
+    expected_atlas_research_pages: expectedAtlasUrls.length,
+    indexed_atlas_research_pages: expectedAtlasUrls.filter(url => indexedAtlasUrls.has(url)).length,
     record_count: indexedRecordCount,
     records,
   };

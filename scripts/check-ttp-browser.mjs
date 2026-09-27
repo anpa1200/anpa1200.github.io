@@ -17,7 +17,7 @@ const server = createServer((req,res)=>{
   res.setHeader('Content-Type',mime[extname(path)]||'application/octet-stream');res.end(readFileSync(path));
 });
 await new Promise(done=>server.listen(0,'127.0.0.1',done));
-const base=`http://127.0.0.1:${server.address().port}`;
+const base=process.env.LIVE_ORIGIN||`http://127.0.0.1:${server.address().port}`;
 const profile=mkdtempSync('/tmp/ttp-release-chrome-');
 const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--disable-background-networking',`--user-data-dir=${profile}`,'--remote-debugging-port=0','about:blank'],{stdio:['ignore','ignore','pipe']});
 const results=[], errors=[];let socket;
@@ -50,6 +50,7 @@ try {
   if(route==='telemetry/DC0032/')assert.ok(await evaluate("document.querySelector('.telemetry-detection-link').href.includes('/detections/')"));
   if(route==='tools/nmap/')assert.ok(await evaluate("document.querySelector('.tool-detection-link').href.includes('/detections/')"));
   if(route==='detections/enterprise/T1059.001/'){
+   assert.ok(await evaluate("Boolean(document.querySelector('#ecosystem-connections a[href=\"https://1200km.com/anomaly-detection-atlas/families/parent-child/\"]'))"));
    await evaluate("document.querySelector('.sigma-source').open=true");
    await waitFor("document.querySelector('.sigma-source').dataset.loaded==='yes'");
    assert.ok(await evaluate("document.querySelector('.rule-content code').textContent.includes('title:')"));
@@ -87,6 +88,17 @@ try {
   await waitFor("document.querySelector('#ttp-ecosystem[data-ttp-guide-key] a[href=\"/ttp-simulation/tools/nmap/\"]')");
   assert.ok(await evaluate("document.querySelectorAll('main a[href=\"/ttp-simulation/tools/nmap/\"]').length>1"));
  }
+ // The publication snapshot keeps its original anchors and navigation after hydration.
+ const atlas=JSON.parse(readFileSync(resolve(project,'data/anomaly-atlas.json'),'utf8'));
+ const snapshot=new URL(atlas.publication_snapshot).pathname;
+ if(existsSync(resolve(site,'.'+snapshot,'index.html'))){
+  await call('Page.navigate',{url:base+snapshot});
+  await waitFor("document.readyState==='complete' && document.querySelector('[data-atlas-publication-snapshot] a')");
+  await waitFor("[...document.querySelectorAll('[data-anomaly-topics] a')].some(a=>a.href.includes('/anomaly-detection-atlas/families/'))");
+  assert.equal(await evaluate("document.querySelectorAll('[data-atlas-publication-snapshot]').length"),1);
+  await evaluate("document.querySelector('[data-atlas-publication-snapshot]').remove()");
+  await waitFor("document.querySelector('[data-atlas-publication-snapshot] a')");
+ }
  // Check readable static content with JavaScript disabled, separately from enhancement tests.
  await call('Emulation.setScriptExecutionDisabled',{value:true});
  for(const route of ['tools/','techniques/enterprise/T1059.001/','detections/enterprise/T1059.001/']){
@@ -94,6 +106,10 @@ try {
   await new Promise(done=>setTimeout(done,350));
   assert.ok(await evaluate("document.querySelector('#reference-copy h1') && !document.querySelector('#reference-copy').hidden"));
   assert.ok(await evaluate("document.querySelectorAll('#ecosystem-connections a').length>=3"));
+ }
+ if(existsSync(resolve(site,'.'+snapshot,'index.html'))){
+  await call('Page.navigate',{url:base+snapshot});await waitFor("document.readyState==='complete'");
+  assert.equal(await evaluate("document.querySelectorAll('[data-atlas-publication-snapshot]').length"),1);
  }
  assert.deepEqual(errors,[]);
  writeFileSync(resolve(reportDir,'browser.json'),JSON.stringify({checked_at:new Date().toISOString(),site,results,errors,no_js_routes:3,live_simulations_executed:0},null,2)+'\n');
