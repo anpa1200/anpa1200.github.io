@@ -61,6 +61,22 @@ try {
   }
   results.push({route,width,...result});
  }
+ // Preserve filter queries as URL data, including markup-like input, without parsing them as HTML.
+ const query='?q=T1059.001';
+ await call('Page.navigate',{url:base+'/ttp-simulation/'+query});
+ await waitFor("document.querySelectorAll('[data-technique-link]').length===1");
+ const techniqueHref=await evaluate("document.querySelector('[data-technique-link]').href");
+ assert.equal(new URL(techniqueHref).searchParams.get('q'),'T1059.001');
+ assert.equal(await evaluate("Boolean(document.querySelector('#ttp-query-probe') || window.ttpQueryExecuted)"),false);
+ const markup='\"><img id="ttp-query-probe" src="invalid" onerror="window.ttpQueryExecuted=true">';
+ const detailUrl=techniqueHref+'&note='+encodeURIComponent(markup);
+ await call('Page.navigate',{url:detailUrl});
+ await waitFor("document.querySelector('[data-return-to-catalog]')");
+ assert.equal(new URL(await evaluate("document.querySelector('[data-return-to-catalog]').href")).search,new URL(detailUrl).search);
+ assert.equal(await evaluate("Boolean(document.querySelector('#ttp-query-probe') || window.ttpQueryExecuted)"),false);
+ await call('Page.navigate',{url:base+'/ttp-simulation/?q='+encodeURIComponent(markup)});
+ await waitFor("document.querySelector('#cards .empty')");
+ assert.equal(await evaluate("Boolean(document.querySelector('#ttp-query-probe') || window.ttpQueryExecuted)"),false);
  // Staged article backlinks must survive hydration and removal/reconstruction of the main DOM.
  const guide='/articles/read/2024/2024-10-26-mastering-nmap-a-comprehensive-guide-to-network-exploration-and-security-auditing-part-1-f36d74d1b2c0/';
  if(existsSync(resolve(site,'.'+guide,'index.html'))){

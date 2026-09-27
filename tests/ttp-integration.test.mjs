@@ -90,6 +90,9 @@ test('interactive facet URLs have matching generated pages and preserve contexts
   assert.match(app, /chips\(row.environments, 'environment'\)/);
   assert.match(app, /chips\(row.tactics, 'tactic'\)/);
   assert.match(app, /reference.remove\(\)/);
+  assert.doesNotMatch(app, /\$\{location\.search\}/, 'Query strings must not flow into HTML templates');
+  assert.match(app, /link\.search = location\.search/);
+  assert.match(app, /\[data-return-to-catalog\]'\)\.search = location\.search/);
 });
 
 test('all three modules participate in global navigation and CI publication', () => {

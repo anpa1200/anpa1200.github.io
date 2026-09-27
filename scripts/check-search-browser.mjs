@@ -361,7 +361,7 @@ try {
     searchPage.sessionId,
     `Array.from(document.querySelectorAll('[data-site-search-filters] pagefind-filter-dropdown')).map((item) => item.getAttribute('filter'))`,
   );
-  const expectedFilters = ['primary_type', 'primary_domain', 'audience', 'status', 'lifecycle', 'evidence_level', 'collection_tier', 'version', 'source', 'updated_year', 'topic', 'anomaly', 'section'];
+  const expectedFilters = ['primary_type', 'primary_domain', 'audience', 'status', 'lifecycle', 'evidence_level', 'collection_tier', 'version', 'source', 'updated_year', 'topic', 'anomaly', 'ttp_module', 'ttp_tag', 'section'];
   if (JSON.stringify(searchFilters) !== JSON.stringify(expectedFilters)) {
     failures.push(`expected controlled search facets ${expectedFilters.join(', ')}, found ${searchFilters.join(', ')}`);
   }
@@ -482,7 +482,7 @@ try {
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'Courses', 'References', 'About', 'CV', 'External validation'])
+  if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'Courses', 'Attack Tools', 'Attack Simulations', 'Detection Rules', 'References', 'About', 'CV', 'External validation'])
     || staticMobileState.footerCount !== 8
     || !staticMobileState.privacy
     || staticMobileState.search !== '/search.html'
@@ -576,6 +576,9 @@ try {
     { label: 'AdversaryGraph', path: '/adversarygraph/', current: null },
     { label: 'Cyber Knowledge', path: '/cyber-knowledge/', current: null },
     { label: 'Courses', path: '/courses/', current: null },
+    { label: 'Attack Tools', path: '/ttp-simulation/tools/', current: null },
+    { label: 'Attack Simulations', path: '/ttp-simulation/', current: null },
+    { label: 'Detection Rules', path: '/ttp-simulation/detections/', current: null },
     { label: 'References', path: '/references/', current: null },
     { label: 'About', path: '/about.html', current: null },
     { label: 'CV', path: '/cv.html', current: null },
@@ -645,7 +648,7 @@ try {
   await waitForExpression(
     devtools,
     standardHome.sessionId,
-    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn')) && document.querySelectorAll('.site-header .nav-list a').length === 10`,
+    `Boolean(document.querySelector('.site-search-host--standalone .pf-trigger-btn')) && document.querySelectorAll('.site-header .nav-list a').length === 13`,
     'standard desktop header readiness'
   );
   const standardHeaderState = await evaluate(devtools, standardHome.sessionId, `(() => {
@@ -760,7 +763,7 @@ try {
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (mobileMenuState.count !== 5 || mobileMenuState.secondaryCount !== 6 || mobileMenuState.minTargetHeight < 44 || !mobileMenuState.withinViewport || mobileMenuState.overflow) {
+  if (mobileMenuState.count !== 5 || mobileMenuState.secondaryCount !== 9 || mobileMenuState.minTargetHeight < 44 || !mobileMenuState.withinViewport || mobileMenuState.overflow) {
     failures.push(`mobile navigation disclosure failed: ${JSON.stringify(mobileMenuState)}`);
   }
   await evaluate(devtools, homePage.sessionId, `document.querySelector('.nav-more > summary').click()`);
