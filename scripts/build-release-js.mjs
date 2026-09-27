@@ -10,7 +10,8 @@ if (index < 0 || !args[index + 1]) throw Error('Pass --site with a staged releas
 const site = resolve(args[index + 1]);
 if (site === root) throw Error('Do not minify the authoring checkout');
 let saved = 0;
-for (const path of ['assets/site-search.js', 'assets/platform-sidebar.js']) {
+const assets = ['assets/site-search.js', 'assets/platform-sidebar.js', 'assets/anomaly-tags.js', 'assets/docusaurus-ecosystem.js', 'assets/site-theme.js', 'assets/site-performance.js'];
+for (const path of assets) {
   const file = resolve(site, path), source = await readFile(file, 'utf8');
   // No statement compression or property mangling; preserve public names and licenses.
   const result = await minify(source, {
@@ -24,4 +25,4 @@ for (const path of ['assets/site-search.js', 'assets/platform-sidebar.js']) {
     await writeFile(file, output);
   }
 }
-console.log(`Compacted two shared UI scripts; saved ${saved} bytes. Research data unchanged.`);
+console.log(`Compacted ${assets.length} shared UI scripts; saved ${saved} bytes. Research data unchanged.`);

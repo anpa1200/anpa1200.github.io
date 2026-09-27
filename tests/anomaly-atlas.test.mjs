@@ -14,6 +14,9 @@ test('exact enterprise identities connect models without forcing other domains o
  const page=readFileSync(new URL('../ttp-simulation/detections/enterprise/T1059.001/index.html',import.meta.url),'utf8');assert.ok(page.includes('/families/parent-child/'));
 });
 test('publication compatibility notice is bounded and idempotent',()=>{
- const before='<main><article><h1 id="old">Research</h1><p id="preserved">Evidence.</p></article></main>';
+ const before='<html><head></head><body><div id="__docusaurus"><main><article><h1 id="old">Research</h1><p id="preserved">Evidence.</p></article></main></div></body></html>';
  const after=withAtlasSnapshotNotice(before);assert.ok(after.includes('id="preserved"'));assert.equal(withAtlasSnapshotNotice(after),after);assert.ok(after.includes('Publication snapshot.'));assert.ok(after.includes('/anomaly-detection-atlas/research/'));
+ assert.ok(after.indexOf('data-atlas-publication-snapshot')<after.indexOf('id="__docusaurus"'));
+ assert.ok(after.includes('<link rel="stylesheet" href="/assets/anomaly-tags.css'));
+ assert.throws(()=>withAtlasSnapshotNotice('<main>No hydration root</main>'));
 });

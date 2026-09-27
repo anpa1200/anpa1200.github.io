@@ -14,8 +14,10 @@
     const note = document.createElement('aside');
     note.dataset.atlasPublicationSnapshot = 'true';
     note.className = 'anomaly-atlas-notice';
+    note.setAttribute('aria-label', 'Publication snapshot');
     note.innerHTML = '<strong>Publication snapshot.</strong> This edition and its anchors remain available for citations. Continue in the <a href="https://1200km.com/anomaly-detection-atlas/research/">unified Anomaly Detection Atlas</a> for research chapters, <a href="https://1200km.com/anomaly-detection-atlas/families/">family pages</a>, <a href="https://1200km.com/anomaly-detection-atlas/attack-statistical-anomaly-mapping/">models</a>, and the <a href="https://1200km.com/anomaly-detection-atlas/visuals/">visual index</a>. Integration does not imply a new incident audit or production validation.';
-    title.after(note);
+    const root = document.querySelector('#__docusaurus');
+    if (root) root.before(note); else title.closest('main').append(note);
   }
   function render() {
     if (!registry) return;
@@ -72,10 +74,12 @@
       if (!response.ok) throw Error('HTTP ' + response.status);
       registry = await response.json();
       if (registry.schema_version !== 1) throw Error('Unknown schema');
-      const sheet = document.createElement('link');
-      sheet.rel = 'stylesheet';
-      sheet.href = '/assets/anomaly-tags.css?v=20260921-1';
-      document.head.append(sheet);
+      if (!document.querySelector('link[href*="/assets/anomaly-tags.css"]')) {
+        const sheet = document.createElement('link');
+        sheet.rel = 'stylesheet';
+        sheet.href = '/assets/anomaly-tags.css?v=20260927-1';
+        document.head.append(sheet);
+      }
       new MutationObserver(schedule).observe(document.body, {subtree: true, childList: true});
       window.addEventListener('popstate', schedule);
       schedule();

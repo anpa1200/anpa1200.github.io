@@ -9,4 +9,13 @@ export function atlasFamiliesForTechnique(key){
 }
 export function atlasFamiliesForTelemetry(id){return atlas.families.filter(f=>f.telemetry.includes(id));}
 export const snapshotNotice='<aside data-atlas-publication-snapshot="true" class="anomaly-atlas-notice"><strong>Publication snapshot.</strong> This full-length edition and its anchors remain available for citations. Continue in the <a href="https://1200km.com/anomaly-detection-atlas/research/">unified Anomaly Detection Atlas</a> for focused research chapters, <a href="https://1200km.com/anomaly-detection-atlas/families/">family pages</a>, <a href="https://1200km.com/anomaly-detection-atlas/attack-statistical-anomaly-mapping/">models</a>, and the <a href="https://1200km.com/anomaly-detection-atlas/visuals/">visual index</a>. Integration does not imply a new incident audit or production validation.</aside>';
-export function withAtlasSnapshotNotice(html){if(html.includes('data-atlas-publication-snapshot'))return html;return html.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i,'$1'+snapshotNotice);}
+export function withAtlasSnapshotNotice(html){
+ // Keep the notice outside React's hydration root so it is neither removed nor
+ // reinserted after first paint. Existing article markup and anchors stay intact.
+ const root=/(<div\b[^>]*\bid=["']__docusaurus["'][^>]*>)/i;
+ if(!root.test(html))throw Error('Snapshot hydration root is missing');
+ const notice=snapshotNotice.replace('<aside ', '<aside aria-label="Publication snapshot" ');
+ let result=html.replace(/<aside\b[^>]*data-atlas-publication-snapshot[^>]*>[\s\S]*?<\/aside>/g,'').replace(root,notice+'$1');
+ if(!/<link\b[^>]*href=["'][^"']*\/assets\/anomaly-tags\.css/.test(result))result=result.replace('</head>','<link rel="stylesheet" href="/assets/anomaly-tags.css?v=20260927-1"></head>');
+ return result;
+}
