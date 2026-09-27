@@ -33,7 +33,8 @@
         const note = document.createElement('p'); note.textContent = 'Explicit source relationships; documented procedures and detectors are not live-validation or attribution claims.'; section.append(note);
         const ul = document.createElement('ul');
         for (const row of records) { const li = document.createElement('li'); li.append(link(row.target, row.title), document.createTextNode(' — ' + row.basis)); ul.append(li); }
-        section.append(ul); main.append(section);
+        // Docusaurus main is a flex layout; insert within the article column.
+        section.append(ul); (main.querySelector('article') || main).append(section);
       }
       main.querySelector('#ttp-ecosystem').dataset.ttpGuideKey = key;
       const names = new Map(records.filter(r => r.title.endsWith(' tool reference')).map(r => [r.title.replace(/ tool reference$/, ''), r.target]));

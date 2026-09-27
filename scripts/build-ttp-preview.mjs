@@ -30,5 +30,6 @@ run('build-site-artifacts.mjs','--site',site,'--source',root,'--remote');
 run('build-platform-sidebar.mjs','--site',site);
 run('build-content-catalog.mjs','--site',site,'--source',root,'--sitemap',site+'/sitemap.xml','--remote');
 run('build-ai-discovery.mjs','--site',site);
+run('build-release-js.mjs','--site',site);
 run('build-search-index.mjs','--site',site,'--sitemap',site+'/sitemap.xml','--output',site+'/pagefind','--remote','--canonical-sitemap-output',site+'/sitemap.xml');
 console.log('PREVIEW_READY='+site);

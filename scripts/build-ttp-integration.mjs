@@ -209,8 +209,15 @@ for (const [path, links] of backlinks) {
   const original = readFileSync(file, 'utf8');
   const block = `${start}<section id="ttp-ecosystem" class="ttp-ecosystem-links"><h2>Attack tools, simulations and detection rules</h2><p>Follow explicit source relationships into the reference modules. Linked procedures and detectors are not claims of live validation or actor attribution.</p>${list([...links.values()].map((r) => `${a(r.target, r.title)} <small>— ${esc(r.basis)}</small>`))}</section>${end}`;
   let html = original.includes(start) ? original.replace(new RegExp(`${start}[\\s\\S]*?${end}`), block) : original.replace(/<\/main>/i, block + '\n</main>');
+  if (path.startsWith('/articles/read/')) {
+    // Keep static and hydrated backlinks inside the article column, not as a flex sibling.
+    html = html.replace(new RegExp(`${start}[\\s\\S]*?${end}\\n?`), '').replace(/<\/article>/i, block + '\n</article>');
+  }
+  if (!html.includes('/ttp-simulation/assets/guide-links.css')) {
+    html = html.replace(/<\/head>/i, '<link rel="stylesheet" href="/ttp-simulation/assets/guide-links.css"></head>');
+  }
   if (path.startsWith('/articles/read/') && !html.includes('/ttp-simulation/assets/guide-links.js')) {
-    html = html.replace(/<\/head>/i, '<link rel="stylesheet" href="/ttp-simulation/assets/guide-links.css"><script src="/ttp-simulation/assets/guide-links.js" defer></script></head>');
+    html = html.replace(/<\/head>/i, '<script src="/ttp-simulation/assets/guide-links.js" defer></script></head>');
   }
   // Inline links only in plain text nodes on reviewed guide/Atlas pages. Never modify code, existing links, scripts or navigation.
   if (/^\/(?:anomaly-detection-atlas|articles\/read)\//.test(path)) {

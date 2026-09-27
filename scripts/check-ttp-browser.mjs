@@ -82,6 +82,7 @@ try {
  if(existsSync(resolve(site,'.'+guide,'index.html'))){
   await call('Page.navigate',{url:base+guide});
   await waitFor("document.querySelector('#ttp-ecosystem[data-ttp-guide-key] a[href=\"/ttp-simulation/tools/nmap/\"]')");
+  assert.ok(await evaluate("Boolean(document.querySelector('#ttp-ecosystem').closest('article'))"));
   await evaluate("document.querySelector('#ttp-ecosystem').remove()");
   await waitFor("document.querySelector('#ttp-ecosystem[data-ttp-guide-key] a[href=\"/ttp-simulation/tools/nmap/\"]')");
   assert.ok(await evaluate("document.querySelectorAll('main a[href=\"/ttp-simulation/tools/nmap/\"]').length>1"));
