@@ -66,6 +66,7 @@ try {
   if (governance.indexed_page_count !== build?.indexedPageRecords) failures.push(`search governance targets ${governance.indexed_page_count} of ${build?.indexedPageRecords} searchable page records`);
   if (governance.indexed_custom_record_count !== build?.indexedCustomRecords) failures.push(`search governance targets ${governance.indexed_custom_record_count} of ${build?.indexedCustomRecords} custom records`);
   if (governance.indexed_record_count !== build?.indexedRecords) failures.push(`search governance targets ${governance.indexed_record_count} of ${build?.indexedRecords} total records`);
+  if (governance.expected_module_pages && governance.indexed_module_pages !== governance.expected_module_pages) failures.push('TTP module search coverage is incomplete');
   if (governance.record_count < Math.floor((build?.indexedRecords || 0) * 0.95)) failures.push(`search governance has too few Pagefind fragment records: ${governance.record_count}`);
   if (Object.keys(governance.records || {}).length !== governance.record_count) failures.push('search governance record_count disagrees with its records');
 } catch (error) {
@@ -128,6 +129,9 @@ async function checkQueries() {
     }
     for (const filter of ['knowledge_category', 'knowledge_tag', 'knowledge_access', 'knowledge_source_kind', 'knowledge_quality_tier', 'knowledge_maintenance', 'knowledge_evidence_use', 'knowledge_skill_level', 'knowledge_validation_status', 'knowledge_provenance', 'knowledge_audience', 'knowledge_format', 'knowledge_organization']) {
       if (!filters[filter] || Object.keys(filters[filter]).length < 2) failures.push(`knowledge-source search filter ${filter} is missing or incomplete`);
+    }
+    if (governance.expected_module_pages) {
+      for (const filter of ['ttp_module', 'ttp_tag']) if (!filters[filter] || Object.keys(filters[filter]).length < 5) failures.push(`Module filter ${filter} is incomplete`);
     }
     const checks = [
       { query: 'T1059.003', expectedPrefixes: ['/threat-matrix/techniques/T1059.003/'], first: true, matchedTier: 'reference', matchedSource: 'MITRE ATT&CK', matchedType: 'generated-reference', matchedLifecycle: 'stable-reference' },
