@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LSASS Access From Non System Account — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 962fe167-e48d-4fd6-9974-11e5b9a5d6d1. LSASS Access From Non System Account — Sigma Rule. Detects potential mimikatz-like tools accessing LSASS from non system account">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="962fe167-e48d-4fd6-9974-11e5b9a5d6d1, attack.credential-access, attack.t1003.001, windows, security, rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/962fe167-e48d-4fd6-9974-11e5b9a5d6d1/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/962fe167-e48d-4fd6-9974-11e5b9a5d6d1/">
+<meta property="og:type" content="website"><meta property="og:title" content="LSASS Access From Non System Account — Sigma Rule"><meta property="og:description" content="Sigma rule 962fe167-e48d-4fd6-9974-11e5b9a5d6d1. LSASS Access From Non System Account — Sigma Rule. Detects potential mimikatz-like tools accessing LSASS from non system account"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="LSASS Access From Non System Account — Sigma Rule"><meta name="twitter:description" content="Sigma rule 962fe167-e48d-4fd6-9974-11e5b9a5d6d1. LSASS Access From Non System Account — Sigma Rule. Detects potential mimikatz-like tools accessing LSASS from non system account"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/962fe167-e48d-4fd6-9974-11e5b9a5d6d1/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/962fe167-e48d-4fd6-9974-11e5b9a5d6d1/","name":"LSASS Access From Non System Account — Sigma Rule","description":"Sigma rule 962fe167-e48d-4fd6-9974-11e5b9a5d6d1. LSASS Access From Non System Account — Sigma Rule. Detects potential mimikatz-like tools accessing LSASS from non system account","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>LSASS Access From Non System Account — Sigma Rule</h1><p class="lead">Sigma rule 962fe167-e48d-4fd6-9974-11e5b9a5d6d1. LSASS Access From Non System Account — Sigma Rule. Detects potential mimikatz-like tools accessing LSASS from non system account</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/security/">security</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-001/">attack.t1003.001</a></div><p>Author: Roberto Rodriguez @Cyb3rWard0g. Source status: test; severity: medium. Source dates: 2019-06-20 / 2023-12-11.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;security&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/security/win_security_lsass_access_non_system_account.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 65863c05f45751125c9b61f051edf65bbebfb9d055a6dc695553bdc27dadda15</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: LSASS Access From Non System Account
+id: 962fe167-e48d-4fd6-9974-11e5b9a5d6d1
+status: test
+description: Detects potential mimikatz-like tools accessing LSASS from non system account
+references:
+    - https://threathunterplaybook.com/hunts/windows/170105-LSASSMemoryReadAccess/notebook.html
+author: Roberto Rodriguez @Cyb3rWard0g
+date: 2019-06-20
+modified: 2023-12-11
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID:
+            - 4663
+            - 4656
+        AccessMask:
+            - &#39;0x100000&#39;
+            - &#39;0x1010&#39;    # car.2019-04-004
+            - &#39;0x1400&#39;
+            - &#39;0x1410&#39;    # car.2019-04-004
+            - &#39;0x1418&#39;    # car.2019-04-004
+            - &#39;0x1438&#39;    # car.2019-04-004
+            - &#39;0x143a&#39;    # car.2019-04-004
+            - &#39;0x1f0fff&#39;
+            - &#39;0x1f1fff&#39;
+            - &#39;0x1f2fff&#39;
+            - &#39;0x1f3fff&#39;
+            - &#39;0x40&#39;
+            - &#39;143a&#39;    # car.2019-04-004
+            - &#39;1f0fff&#39;
+            - &#39;1f1fff&#39;
+            - &#39;1f2fff&#39;
+            - &#39;1f3fff&#39;
+            # - &#39;0x1000&#39;  # minimum access requirements to query basic info from service
+        ObjectType: &#39;Process&#39;
+        ObjectName|endswith: &#39;\lsass.exe&#39;
+    filter_main_service_account:
+        SubjectUserName|endswith: &#39;$&#39;
+    filter_main_generic:
+        ProcessName|contains:
+            # Legitimate AV and EDR solutions
+            - &#39;:\Program Files\&#39;
+            - &#39;:\Program Files (x86)\&#39;
+    filter_main_wmiprvse:
+        ProcessName: &#39;C:\Windows\System32\wbem\WmiPrvSE.exe&#39;
+        AccessMask: &#39;0x1410&#39;
+    filter_optional_steam:
+        ProcessName|contains: &#39;\SteamLibrary\steamapps\&#39;
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Unknown
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/962fe167-e48d-4fd6-9974-11e5b9a5d6d1.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://threathunterplaybook.com/hunts/windows/170105-LSASSMemoryReadAccess/notebook.html">https://threathunterplaybook.com/hunts/windows/170105-LSASSMemoryReadAccess/notebook.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003.001/">T1003.001 · LSASS Memory</a> · <a href="/ttp-simulation/detections/enterprise/T1003.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

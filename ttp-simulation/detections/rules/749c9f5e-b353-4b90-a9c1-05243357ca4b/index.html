@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 749c9f5e-b353-4b90-a9c1-05243357ca4b. Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule. Detects a suspicious local successful logon event where the Logon Package is Kerberos, the remote address is set to localhost, and the target user SID is the built-in local Administrator account.
+This may indicate an attempt to leverage a Kerberos relay attack variant that can be used to elevate privilege locally from a domain joined limited user to local System privileges.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="749c9f5e-b353-4b90-a9c1-05243357ca4b, attack.privilege-escalation, attack.credential-access, attack.t1548, windows, security, rule-status:test, severity:high, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.credential-access, sigma-tag:attack.t1548">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.credential-access, sigma-tag:attack.t1548">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/749c9f5e-b353-4b90-a9c1-05243357ca4b/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/749c9f5e-b353-4b90-a9c1-05243357ca4b/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule"><meta property="og:description" content="Sigma rule 749c9f5e-b353-4b90-a9c1-05243357ca4b. Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule. Detects a suspicious local successful logon event where the Logon Package is Kerberos, the remote address is set to localhost, and the target user SID is the built-in local Administrator account.
+This may indicate an attempt to leverage a Kerberos relay attack variant that can be used to elevate privilege locally from a domain joined limited user to local System privileges.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule"><meta name="twitter:description" content="Sigma rule 749c9f5e-b353-4b90-a9c1-05243357ca4b. Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule. Detects a suspicious local successful logon event where the Logon Package is Kerberos, the remote address is set to localhost, and the target user SID is the built-in local Administrator account.
+This may indicate an attempt to leverage a Kerberos relay attack variant that can be used to elevate privilege locally from a domain joined limited user to local System privileges.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/749c9f5e-b353-4b90-a9c1-05243357ca4b/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/749c9f5e-b353-4b90-a9c1-05243357ca4b/","name":"Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule","description":"Sigma rule 749c9f5e-b353-4b90-a9c1-05243357ca4b. Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule. Detects a suspicious local successful logon event where the Logon Package is Kerberos, the remote address is set to localhost, and the target user SID is the built-in local Administrator account.\nThis may indicate an attempt to leverage a Kerberos relay attack variant that can be used to elevate privilege locally from a domain joined limited user to local System privileges.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule</h1><p class="lead">Sigma rule 749c9f5e-b353-4b90-a9c1-05243357ca4b. Potential Privilege Escalation via Local Kerberos Relay over LDAP — Sigma Rule. Detects a suspicious local successful logon event where the Logon Package is Kerberos, the remote address is set to localhost, and the target user SID is the built-in local Administrator account.
+This may indicate an attempt to leverage a Kerberos relay attack variant that can be used to elevate privilege locally from a domain joined limited user to local System privileges.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/security/">security</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1548/">attack.t1548</a></div><p>Author: Elastic, @SBousseaden. Source status: test; severity: high. Source dates: 2022-04-27 / 2024-08-13.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;security&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/security/account_management/win_security_susp_privesc_kerberos_relay_over_ldap.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 360241bead399ee3e55e57776325e16a6833d78fadea76647a6187d33f1cbf79</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Privilege Escalation via Local Kerberos Relay over LDAP
+id: 749c9f5e-b353-4b90-a9c1-05243357ca4b
+status: test
+description: |
+    Detects a suspicious local successful logon event where the Logon Package is Kerberos, the remote address is set to localhost, and the target user SID is the built-in local Administrator account.
+    This may indicate an attempt to leverage a Kerberos relay attack variant that can be used to elevate privilege locally from a domain joined limited user to local System privileges.
+references:
+    - https://twitter.com/sbousseaden/status/1518976397364056071?s=12&amp;t=qKO5eKHvWhAP19a50FTZ7g
+    - https://github.com/elastic/detection-rules/blob/5fe7833312031a4787e07893e27e4ea7a7665745/rules/_deprecated/privilege_escalation_krbrelayup_suspicious_logon.toml#L38
+author: Elastic, @SBousseaden
+date: 2022-04-27
+modified: 2024-08-13
+tags:
+    - attack.privilege-escalation
+    - attack.credential-access
+    - attack.t1548
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 3
+        AuthenticationPackageName: &#39;Kerberos&#39;
+        IpAddress: &#39;127.0.0.1&#39;
+        TargetUserSid|startswith: &#39;S-1-5-21-&#39;
+        TargetUserSid|endswith: &#39;-500&#39;
+    filter_main_ip_null:
+        IpPort: &#39;0&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/749c9f5e-b353-4b90-a9c1-05243357ca4b.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://twitter.com/sbousseaden/status/1518976397364056071?s=12&amp;t=qKO5eKHvWhAP19a50FTZ7g">https://twitter.com/sbousseaden/status/1518976397364056071?s=12&amp;t=qKO5eKHvWhAP19a50FTZ7g</a></li><li><a href="https://github.com/elastic/detection-rules/blob/5fe7833312031a4787e07893e27e4ea7a7665745/rules/_deprecated/privilege_escalation_krbrelayup_suspicious_logon.toml#L38">https://github.com/elastic/detection-rules/blob/5fe7833312031a4787e07893e27e4ea7a7665745/rules/_deprecated/privilege_escalation_krbrelayup_suspicious_logon.toml#L38</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1548/">T1548 · Abuse Elevation Control Mechanism</a> · <a href="/ttp-simulation/detections/enterprise/T1548/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

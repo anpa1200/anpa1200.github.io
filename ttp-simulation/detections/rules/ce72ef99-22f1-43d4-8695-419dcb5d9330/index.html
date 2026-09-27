@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Windows Service Tampering — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule ce72ef99-22f1-43d4-8695-419dcb5d9330. Suspicious Windows Service Tampering — Sigma Rule. Detects the usage of binaries such as &#39;net&#39;, &#39;sc&#39; or &#39;powershell&#39; in order to stop, pause, disable or delete critical or important Windows services such as AV, Backup, etc. As seen being used in some ransomware scripts
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="ce72ef99-22f1-43d4-8695-419dcb5d9330, attack.impact, attack.defense-impairment, attack.t1489, attack.t1685, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.impact, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1489, sigma-tag:attack.t1685">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.impact, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1489, sigma-tag:attack.t1685">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/ce72ef99-22f1-43d4-8695-419dcb5d9330/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/ce72ef99-22f1-43d4-8695-419dcb5d9330/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Windows Service Tampering — Sigma Rule"><meta property="og:description" content="Sigma rule ce72ef99-22f1-43d4-8695-419dcb5d9330. Suspicious Windows Service Tampering — Sigma Rule. Detects the usage of binaries such as &#39;net&#39;, &#39;sc&#39; or &#39;powershell&#39; in order to stop, pause, disable or delete critical or important Windows services such as AV, Backup, etc. As seen being used in some ransomware scripts
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Windows Service Tampering — Sigma Rule"><meta name="twitter:description" content="Sigma rule ce72ef99-22f1-43d4-8695-419dcb5d9330. Suspicious Windows Service Tampering — Sigma Rule. Detects the usage of binaries such as &#39;net&#39;, &#39;sc&#39; or &#39;powershell&#39; in order to stop, pause, disable or delete critical or important Windows services such as AV, Backup, etc. As seen being used in some ransomware scripts
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/ce72ef99-22f1-43d4-8695-419dcb5d9330/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/ce72ef99-22f1-43d4-8695-419dcb5d9330/","name":"Suspicious Windows Service Tampering — Sigma Rule","description":"Sigma rule ce72ef99-22f1-43d4-8695-419dcb5d9330. Suspicious Windows Service Tampering — Sigma Rule. Detects the usage of binaries such as 'net', 'sc' or 'powershell' in order to stop, pause, disable or delete critical or important Windows services such as AV, Backup, etc. As seen being used in some ransomware scripts\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Windows Service Tampering — Sigma Rule</h1><p class="lead">Sigma rule ce72ef99-22f1-43d4-8695-419dcb5d9330. Suspicious Windows Service Tampering — Sigma Rule. Detects the usage of binaries such as &#39;net&#39;, &#39;sc&#39; or &#39;powershell&#39; in order to stop, pause, disable or delete critical or important Windows services such as AV, Backup, etc. As seen being used in some ransomware scripts
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-impact/">attack.impact</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1489/">attack.t1489</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1685/">attack.t1685</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems), frack113 , X__Junior (Nextron Systems). Source status: test; severity: high. Source dates: 2022-09-01 / 2025-08-27.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_susp_service_tamper.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 361d53bcc5cf038d24bfb86badb4247ceb5c3b8a94cba73b77c12862c866ea99</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Windows Service Tampering
+id: ce72ef99-22f1-43d4-8695-419dcb5d9330
+related:
+    - id: eb87818d-db5d-49cc-a987-d5da331fbd90
+      type: obsolete
+    - id: 6783aa9e-0dc3-49d4-a94a-8b39c5fd700b
+      type: obsolete
+    - id: 7fd4bb39-12d0-45ab-bb36-cebabc73dc7b
+      type: obsolete
+status: test
+description: |
+    Detects the usage of binaries such as &#39;net&#39;, &#39;sc&#39; or &#39;powershell&#39; in order to stop, pause, disable or delete critical or important Windows services such as AV, Backup, etc. As seen being used in some ransomware scripts
+references:
+    - https://www.trendmicro.com/content/dam/trendmicro/global/en/research/22/h/ransomware-actor-abuses-genshin-impact-anti-cheat-driver-to-kill-antivirus/Genshin%20Impact%20Figure%2010.jpg
+    - https://www.trellix.com/en-sg/about/newsroom/stories/threat-labs/lockergoga-ransomware-family-used-in-targeted-attacks.html
+    - https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1562.001/T1562.001.md
+    - https://research.nccgroup.com/2022/08/19/back-in-black-unlocking-a-lockbit-3-0-ransomware-attack/
+    - https://www.virustotal.com/gui/file/38283b775552da8981452941ea74191aa0d203edd3f61fb2dee7b0aea3514955
+    - https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/delete-method-in-class-win32-service
+author: Nasreddine Bencherchali (Nextron Systems), frack113 , X__Junior (Nextron Systems)
+date: 2022-09-01
+modified: 2025-08-27
+tags:
+    - attack.impact
+    - attack.defense-impairment
+    - attack.t1489
+    - attack.t1685
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_tools_img:
+        - OriginalFileName:
+              - &#39;net.exe&#39;
+              - &#39;net1.exe&#39;
+              - &#39;PowerShell_ISE.EXE&#39;
+              - &#39;PowerShell.EXE&#39;
+              - &#39;psservice.exe&#39;
+              - &#39;pwsh.dll&#39;
+              - &#39;sc.exe&#39;
+              - &#39;wmic.exe&#39;
+        - Image|endswith:
+              - &#39;\net.exe&#39;
+              - &#39;\net1.exe&#39;
+              - &#39;\PowerShell_ISE.EXE&#39;
+              - &#39;\powershell.exe&#39;
+              - &#39;\PsService.exe&#39;
+              - &#39;\PsService64.exe&#39;
+              - &#39;\pwsh.exe&#39;
+              - &#39;\sc.exe&#39;
+              - &#39;\wmic.exe&#39; # wmic process call win32_service where name=&#39;servicename&#39; delete
+    selection_tools_cli:
+        - CommandLine|contains:
+              - &#39; delete &#39;
+              - &#39;.delete()&#39; # Get-WmiObject win32_service -Filter &quot;name=&#39;$serviceName&#39;&quot; ).delete()
+              - &#39; pause &#39; # Covers flags from: PsService and Sc.EXE
+              - &#39; stop &#39; # Covers flags from: PsService.EXE, Net.EXE and Sc.EXE
+              - &#39;Stop-Service &#39;
+              - &#39;Remove-Service &#39;
+        - CommandLine|contains|all:
+              - &#39;config&#39;
+              - &#39;start=disabled&#39;
+    selection_services:
+        CommandLine|contains:
+            - &#39;143Svc&#39;
+            - &#39;Acronis VSS Provider&#39;
+            - &#39;AcronisAgent&#39;
+            - &#39;AcrSch2Svc&#39;
+            - &#39;AdobeARMservice&#39;
+            - &#39;AHS Service&#39;
+            - &#39;Antivirus&#39;
+            - &#39;Apache4&#39;
+            - &#39;ARSM&#39;
+            - &#39;aswBcc&#39;
+            - &#39;AteraAgent&#39;
+            - &#39;Avast Business Console Client Antivirus Service&#39;
+            - &#39;avast! Antivirus&#39;
+            - &#39;AVG Antivirus&#39;
+            - &#39;avgAdminClient&#39;
+            - &#39;AvgAdminServer&#39;
+            - &#39;AVP1&#39;
+            - &#39;BackupExec&#39;
+            - &#39;bedbg&#39;
+            - &#39;BITS&#39;
+            - &#39;BrokerInfrastructure&#39;
+            - &#39;CASLicenceServer&#39;
+            - &#39;CASWebServer&#39;
+            - &#39;Client Agent 7.60&#39;
+            - &#39;Core Browsing Protection&#39;
+            - &#39;Core Mail Protection&#39;
+            - &#39;Core Scanning Server&#39;
+            - &#39;DCAgent&#39;
+            - &#39;dwmrcs&#39;
+            - &#39;EhttpSr&#39;
+            - &#39;ekrn&#39;
+            - &#39;Enterprise Client Service&#39;
+            - &#39;epag&#39;
+            - &#39;EPIntegrationService&#39;
+            - &#39;EPProtectedService&#39;
+            - &#39;EPRedline&#39;
+            - &#39;EPSecurityService&#39;
+            - &#39;EPUpdateService&#39;
+            - &#39;EraserSvc11710&#39;
+            - &#39;EsgShKernel&#39;
+            - &#39;ESHASRV&#39;
+            - &#39;FA_Scheduler&#39;
+            - &#39;FirebirdGuardianDefaultInstance&#39;
+            - &#39;FirebirdServerDefaultInstance&#39;
+            - &#39;FontCache3.0.0.0&#39;
+            - &#39;HealthTLService&#39;
+            - &#39;hmpalertsvc&#39;
+            - &#39;HMS&#39;
+            - &#39;HostControllerService&#39;
+            - &#39;hvdsvc&#39;
+            - &#39;IAStorDataMgrSvc&#39;
+            - &#39;IBMHPS&#39;
+            - &#39;ibmspsvc&#39;
+            - &#39;IISAdmin&#39;
+            - &#39;IMANSVC&#39;
+            - &#39;IMAP4Svc&#39;
+            - &#39;instance2&#39;
+            - &#39;KAVFS&#39;
+            - &#39;KAVFSGT&#39;
+            - &#39;kavfsslp&#39;
+            - &#39;KeyIso&#39;
+            - &#39;klbackupdisk&#39;
+            - &#39;klbackupflt&#39;
+            - &#39;klflt&#39;
+            - &#39;klhk&#39;
+            - &#39;KLIF&#39;
+            - &#39;klim6&#39;
+            - &#39;klkbdflt&#39;
+            - &#39;klmouflt&#39;
+            - &#39;klnagent&#39;
+            - &#39;klpd&#39;
+            - &#39;kltap&#39;
+            - &#39;KSDE1.0.0&#39;
+            - &#39;LogProcessorService&#39;
+            - &#39;M8EndpointAgent&#39;
+            - &#39;macmnsvc&#39;
+            - &#39;masvc&#39;
+            - &#39;MBAMService&#39;
+            - &#39;MBCloudEA&#39;
+            - &#39;MBEndpointAgent&#39;
+            - &#39;McAfeeDLPAgentService&#39;
+            - &#39;McAfeeEngineService&#39;
+            - &#39;MCAFEEEVENTPARSERSRV&#39;
+            - &#39;McAfeeFramework&#39;
+            - &#39;MCAFEETOMCATSRV530&#39;
+            - &#39;McShield&#39;
+            - &#39;McTaskManager&#39;
+            - &#39;mfefire&#39;
+            - &#39;mfemms&#39;
+            - &#39;mfevto&#39;
+            - &#39;mfevtp&#39;
+            - &#39;mfewc&#39;
+            - &#39;MMS&#39;
+            - &#39;mozyprobackup&#39;
+            - &#39;mpssvc&#39;
+            - &#39;MSComplianceAudit&#39;
+            - &#39;MSDTC&#39;
+            - &#39;MsDtsServer&#39;
+            - &#39;MSExchange&#39;
+            - &#39;msftesq1SPROO&#39;
+            - &#39;msftesql$PROD&#39;
+            - &#39;msftesql$SQLEXPRESS&#39;
+            - &#39;MSOLAP$SQL_2008&#39;
+            - &#39;MSOLAP$SYSTEM_BGC&#39;
+            - &#39;MSOLAP$TPS&#39;
+            - &#39;MSOLAP$TPSAMA&#39;
+            - &#39;MSOLAPSTPS&#39;
+            - &#39;MSOLAPSTPSAMA&#39;
+            - &#39;mssecflt&#39;
+            - &#39;MSSQ!I.SPROFXENGAGEMEHT&#39;
+            - &#39;MSSQ0SHAREPOINT&#39;
+            - &#39;MSSQ0SOPHOS&#39;
+            - &#39;MSSQL&#39;
+            - &#39;MSSQLFDLauncher$&#39;
+            - &#39;MySQL&#39;
+            - &#39;NanoServiceMain&#39;
+            - &#39;NetMsmqActivator&#39;
+            - &#39;NetPipeActivator&#39;
+            - &#39;netprofm&#39;
+            - &#39;NetTcpActivator&#39;
+            - &#39;NetTcpPortSharing&#39;
+            - &#39;ntrtscan&#39;
+            - &#39;nvspwmi&#39;
+            - &#39;ofcservice&#39;
+            - &#39;Online Protection System&#39;
+            - &#39;OracleClientCache80&#39;
+            - &#39;OracleDBConsole&#39;
+            - &#39;OracleMTSRecoveryService&#39;
+            - &#39;OracleOraDb11g_home1&#39;
+            - &#39;OracleService&#39;
+            - &#39;OracleVssWriter&#39;
+            - &#39;osppsvc&#39;
+            - &#39;PandaAetherAgent&#39;
+            - &#39;PccNTUpd&#39;
+            - &#39;PDVFSService&#39;
+            - &#39;POP3Svc&#39;
+            - &#39;postgresql-x64-9.4&#39;
+            - &#39;POVFSService&#39;
+            - &#39;PSUAService&#39;
+            - &#39;Quick Update Service&#39;
+            - &#39;RepairService&#39;
+            - &#39;ReportServer&#39;
+            - &#39;ReportServer$&#39;
+            - &#39;RESvc&#39;
+            - &#39;RpcEptMapper&#39;
+            - &#39;sacsvr&#39;
+            - &#39;SamSs&#39;
+            - &#39;SAVAdminService&#39;
+            - &#39;SAVService&#39;
+            - &#39;ScSecSvc&#39;
+            - &#39;SDRSVC&#39;
+            - &#39;SearchExchangeTracing&#39;
+            - &#39;sense&#39;
+            - &#39;SentinelAgent&#39;
+            - &#39;SentinelHelperService&#39;
+            - &#39;SepMasterService&#39;
+            - &#39;ShMonitor&#39;
+            - &#39;Smcinst&#39;
+            - &#39;SmcService&#39;
+            - &#39;SMTPSvc&#39;
+            - &#39;SNAC&#39;
+            - &#39;SntpService&#39;
+            - &#39;Sophos&#39;
+            - &#39;SQ1SafeOLRService&#39;
+            - &#39;SQL Backups&#39;
+            - &#39;SQL Server&#39;
+            - &#39;SQLAgent&#39;
+            - &#39;SQLANYs_Sage_FAS_Fixed_Assets&#39;
+            - &#39;SQLBrowser&#39;
+            - &#39;SQLsafe&#39;
+            - &#39;SQLSERVERAGENT&#39;
+            - &#39;SQLTELEMETRY&#39;
+            - &#39;SQLWriter&#39;
+            - &#39;SSISTELEMETRY130&#39;
+            - &#39;SstpSvc&#39;
+            - &#39;storflt&#39;
+            - &#39;svcGenericHost&#39;
+            - &#39;swc_service&#39;
+            - &#39;swi_filter&#39;
+            - &#39;swi_service&#39;
+            - &#39;swi_update&#39;
+            - &#39;Symantec&#39;
+            - &#39;sysmon&#39;
+            - &#39;TeamViewer&#39;
+            - &#39;Telemetryserver&#39;
+            - &#39;ThreatLockerService&#39;
+            - &#39;TMBMServer&#39;
+            - &#39;TmCCSF&#39;
+            - &#39;TmFilter&#39;
+            - &#39;TMiCRCScanService&#39;
+            - &#39;tmlisten&#39;
+            - &#39;TMLWCSService&#39;
+            - &#39;TmPfw&#39;
+            - &#39;TmPreFilter&#39;
+            - &#39;TmProxy&#39;
+            - &#39;TMSmartRelayService&#39;
+            - &#39;tmusa&#39;
+            - &#39;Tomcat&#39;
+            - &#39;Trend Micro Deep Security Manager&#39;
+            - &#39;TrueKey&#39;
+            - &#39;UFNet&#39;
+            - &#39;UI0Detect&#39;
+            - &#39;UniFi&#39;
+            - &#39;UTODetect&#39;
+            - &#39;vds&#39;
+            - &#39;Veeam&#39;
+            - &#39;VeeamDeploySvc&#39;
+            - &#39;Veritas System Recovery&#39;
+            - &#39;vmic&#39;
+            - &#39;VMTools&#39;
+            - &#39;vmvss&#39;
+            - &#39;VSApiNt&#39;
+            - &#39;VSS&#39;
+            - &#39;W3Svc&#39;
+            - &#39;wbengine&#39;
+            - &#39;WdNisSvc&#39;
+            - &#39;WeanClOudSve&#39;
+            - &#39;Weems JY&#39;
+            - &#39;WinDefend&#39;
+            - &#39;wmms&#39;
+            - &#39;wozyprobackup&#39;
+            - &#39;WPFFontCache_v0400&#39;
+            - &#39;WRSVC&#39;
+            - &#39;wsbexchange&#39;
+            - &#39;WSearch&#39;
+            - &#39;wscsvc&#39;
+            - &#39;Zoolz 2 Service&#39;
+    condition: all of selection_*
+falsepositives:
+    - Administrators or tools shutting down the services due to upgrade or removal purposes. If you experience some false positive, please consider adding filters to the parent process launching this command and not removing the entry
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/ce72ef99-22f1-43d4-8695-419dcb5d9330.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Administrators or tools shutting down the services due to upgrade or removal purposes. If you experience some false positive, please consider adding filters to the parent process launching this command and not removing the entry</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.trendmicro.com/content/dam/trendmicro/global/en/research/22/h/ransomware-actor-abuses-genshin-impact-anti-cheat-driver-to-kill-antivirus/Genshin%20Impact%20Figure%2010.jpg">https://www.trendmicro.com/content/dam/trendmicro/global/en/research/22/h/ransomware-actor-abuses-genshin-impact-anti-cheat-driver-to-kill-antivirus/Genshin%20Impact%20Figure%2010.jpg</a></li><li><a href="https://www.trellix.com/en-sg/about/newsroom/stories/threat-labs/lockergoga-ransomware-family-used-in-targeted-attacks.html">https://www.trellix.com/en-sg/about/newsroom/stories/threat-labs/lockergoga-ransomware-family-used-in-targeted-attacks.html</a></li><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1562.001/T1562.001.md">https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1562.001/T1562.001.md</a></li><li><a href="https://research.nccgroup.com/2022/08/19/back-in-black-unlocking-a-lockbit-3-0-ransomware-attack/">https://research.nccgroup.com/2022/08/19/back-in-black-unlocking-a-lockbit-3-0-ransomware-attack/</a></li><li><a href="https://www.virustotal.com/gui/file/38283b775552da8981452941ea74191aa0d203edd3f61fb2dee7b0aea3514955">https://www.virustotal.com/gui/file/38283b775552da8981452941ea74191aa0d203edd3f61fb2dee7b0aea3514955</a></li><li><a href="https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/delete-method-in-class-win32-service">https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/delete-method-in-class-win32-service</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1489/">T1489 · Service Stop</a> · <a href="/ttp-simulation/detections/enterprise/T1489/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1685/">T1685 · Disable or Modify Tools</a> · <a href="/ttp-simulation/detections/enterprise/T1685/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

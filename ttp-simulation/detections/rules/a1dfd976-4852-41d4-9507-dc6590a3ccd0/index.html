@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious File Access to Browser Credential Storage — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule a1dfd976-4852-41d4-9507-dc6590a3ccd0. Suspicious File Access to Browser Credential Storage — Sigma Rule. Detects file access to browser credential storage paths by non-browser processes, which may indicate credential access attempts.
+Adversaries may attempt to access browser credential storage to extract sensitive information such as usernames and passwords or cookies.
+This behavior is often commonly observed in credential stealing malware.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="a1dfd976-4852-41d4-9507-dc6590a3ccd0, attack.credential-access, attack.t1555.003, attack.discovery, attack.t1217, file_access, windows, rule-status:experimental, severity:low, logsource-category:file_access, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1555.003, sigma-tag:attack.discovery, sigma-tag:attack.t1217">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:low, logsource-category:file_access, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1555.003, sigma-tag:attack.discovery, sigma-tag:attack.t1217">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/a1dfd976-4852-41d4-9507-dc6590a3ccd0/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/a1dfd976-4852-41d4-9507-dc6590a3ccd0/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious File Access to Browser Credential Storage — Sigma Rule"><meta property="og:description" content="Sigma rule a1dfd976-4852-41d4-9507-dc6590a3ccd0. Suspicious File Access to Browser Credential Storage — Sigma Rule. Detects file access to browser credential storage paths by non-browser processes, which may indicate credential access attempts.
+Adversaries may attempt to access browser credential storage to extract sensitive information such as usernames and passwords or cookies.
+This behavior is often commonly observed in credential stealing malware.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious File Access to Browser Credential Storage — Sigma Rule"><meta name="twitter:description" content="Sigma rule a1dfd976-4852-41d4-9507-dc6590a3ccd0. Suspicious File Access to Browser Credential Storage — Sigma Rule. Detects file access to browser credential storage paths by non-browser processes, which may indicate credential access attempts.
+Adversaries may attempt to access browser credential storage to extract sensitive information such as usernames and passwords or cookies.
+This behavior is often commonly observed in credential stealing malware.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/a1dfd976-4852-41d4-9507-dc6590a3ccd0/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/a1dfd976-4852-41d4-9507-dc6590a3ccd0/","name":"Suspicious File Access to Browser Credential Storage — Sigma Rule","description":"Sigma rule a1dfd976-4852-41d4-9507-dc6590a3ccd0. Suspicious File Access to Browser Credential Storage — Sigma Rule. Detects file access to browser credential storage paths by non-browser processes, which may indicate credential access attempts.\nAdversaries may attempt to access browser credential storage to extract sensitive information such as usernames and passwords or cookies.\nThis behavior is often commonly observed in credential stealing malware.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious File Access to Browser Credential Storage — Sigma Rule</h1><p class="lead">Sigma rule a1dfd976-4852-41d4-9507-dc6590a3ccd0. Suspicious File Access to Browser Credential Storage — Sigma Rule. Detects file access to browser credential storage paths by non-browser processes, which may indicate credential access attempts.
+Adversaries may attempt to access browser credential storage to extract sensitive information such as usernames and passwords or cookies.
+This behavior is often commonly observed in credential stealing malware.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/low/">low</a><a class="chip" href="/ttp-simulation/tags/logsource-category/file-access/">file_access</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1555-003/">attack.t1555.003</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1217/">attack.t1217</a></div><p>Author: frack113, X__Junior (Nextron Systems), Swachchhanda Shrawan Poudel (Nextron Systems), Parth-FourCore. Source status: experimental; severity: low. Source dates: 2025-05-22 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;file_access&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/file/file_access/file_access_win_susp_process_access_browser_cred_files.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 497cdabe84fa601014ccb8ece37736862b4b3d0b9f4fcfb281c2e72f7f26751e</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious File Access to Browser Credential Storage
+id: a1dfd976-4852-41d4-9507-dc6590a3ccd0
+status: experimental
+description: |
+    Detects file access to browser credential storage paths by non-browser processes, which may indicate credential access attempts.
+    Adversaries may attempt to access browser credential storage to extract sensitive information such as usernames and passwords or cookies.
+    This behavior is often commonly observed in credential stealing malware.
+references:
+    - https://github.com/splunk/security_content/blob/7283ba3723551f46b69dfeb23a63b358afb2cb0e/lookups/browser_app_list.csv?plain=1
+    - https://fourcore.io/blogs/threat-hunting-browser-credential-stealing
+author: frack113, X__Junior (Nextron Systems), Swachchhanda Shrawan Poudel (Nextron Systems), Parth-FourCore
+date: 2025-05-22
+tags:
+    - attack.credential-access
+    - attack.t1555.003
+    - attack.discovery
+    - attack.t1217
+logsource:
+    category: file_access
+    product: windows
+detection:
+    selection_browser_paths:
+        FileName|contains:
+            - &#39;\Sputnik\Sputnik&#39;
+            - &#39;\MapleStudio\ChromePlus&#39;
+            - &#39;\QIP Surf&#39;
+            - &#39;\BlackHawk&#39;
+            - &#39;\7Star\7Star&#39;
+            - &#39;\CatalinaGroup\Citrio&#39;
+            - &#39;\Google\Chrome&#39;
+            - &#39;\Coowon\Coowon&#39;
+            - &#39;\CocCoc\Browser&#39;
+            - &#39;\uCozMedia\Uran&#39;
+            - &#39;\Tencent\QQBrowser&#39;
+            - &#39;\Orbitum&#39;
+            - &#39;\Slimjet&#39;
+            - &#39;\Iridium&#39;
+            - &#39;\Vivaldi&#39;
+            - &#39;\Chromium&#39;
+            - &#39;\GhostBrowser&#39;
+            - &#39;\CentBrowser&#39;
+            - &#39;\Xvast&#39;
+            - &#39;\Chedot&#39;
+            - &#39;\SuperBird&#39;
+            - &#39;\360Browser\Browser&#39;
+            - &#39;\360Chrome\Chrome&#39;
+            - &#39;\Comodo\Dragon&#39;
+            - &#39;\BraveSoftware\Brave-Browser&#39;
+            - &#39;\Torch&#39;
+            - &#39;\UCBrowser\&#39;
+            - &#39;\Blisk&#39;
+            - &#39;\Epic Privacy Browser&#39;
+            - &#39;\Nichrome&#39;
+            - &#39;\Amigo&#39;
+            - &#39;\Kometa&#39;
+            - &#39;\Xpom&#39;
+            - &#39;\Microsoft\Edge&#39;
+            - &#39;\Liebao7Default\EncryptedStorage&#39;
+            - &#39;\AVAST Software\Browser&#39;
+            - &#39;\Kinza&#39;
+            - &#39;\Mozilla\SeaMonkey\&#39;
+            - &#39;\Comodo\IceDragon\&#39;
+            - &#39;\8pecxstudios\Cyberfox\&#39;
+            - &#39;\FlashPeak\SlimBrowser\&#39;
+            - &#39;\Moonchild Productions\Pale Moon\&#39;
+    selection_browser_subpaths:
+        FileName|contains:
+            - &#39;\Profiles\&#39;
+            - &#39;\User Data&#39;
+    selection_cred_files:
+        - FileName|contains:
+              - &#39;\Login Data&#39;
+              - &#39;\Cookies&#39;
+              - &#39;\EncryptedStorage&#39;
+              - &#39;\WebCache\&#39;
+        - FileName|endswith:
+              - &#39;cert9.db&#39;
+              - &#39;cookies.sqlite&#39;
+              - &#39;formhistory.sqlite&#39;
+              - &#39;key3.db&#39;
+              - &#39;key4.db&#39;
+              - &#39;Login Data.sqlite&#39;
+              - &#39;logins.json&#39;
+              - &#39;places.sqlite&#39;
+    filter_main_img:
+        Image|endswith:
+            - &#39;\Sputnik.exe&#39;
+            - &#39;\ChromePlus.exe&#39;
+            - &#39;\QIP Surf.exe&#39;
+            - &#39;\BlackHawk.exe&#39;
+            - &#39;\7Star.exe&#39;
+            - &#39;\Sleipnir5.exe&#39;
+            - &#39;\Citrio.exe&#39;
+            - &#39;\Chrome SxS.exe&#39;
+            - &#39;\Chrome.exe&#39;
+            - &#39;\Coowon.exe&#39;
+            - &#39;\CocCocBrowser.exe&#39;
+            - &#39;\Uran.exe&#39;
+            - &#39;\QQBrowser.exe&#39;
+            - &#39;\Orbitum.exe&#39;
+            - &#39;\Slimjet.exe&#39;
+            - &#39;\Iridium.exe&#39;
+            - &#39;\Vivaldi.exe&#39;
+            - &#39;\Chromium.exe&#39;
+            - &#39;\GhostBrowser.exe&#39;
+            - &#39;\CentBrowser.exe&#39;
+            - &#39;\Xvast.exe&#39;
+            - &#39;\Chedot.exe&#39;
+            - &#39;\SuperBird.exe&#39;
+            - &#39;\360Browser.exe&#39;
+            - &#39;\360Chrome.exe&#39;
+            - &#39;\dragon.exe&#39;
+            - &#39;\brave.exe&#39;
+            - &#39;\torch.exe&#39;
+            - &#39;\UCBrowser.exe&#39;
+            - &#39;\BliskBrowser.exe&#39;
+            - &#39;\Epic Privacy Browser.exe&#39;
+            - &#39;\nichrome.exe&#39;
+            - &#39;\AmigoBrowser.exe&#39;
+            - &#39;\KometaBrowser.exe&#39;
+            - &#39;\XpomBrowser.exe&#39;
+            - &#39;\msedge.exe&#39;
+            - &#39;\LiebaoBrowser.exe&#39;
+            - &#39;\AvastBrowser.exe&#39;
+            - &#39;\Kinza.exe&#39;
+            - &#39;\seamonkey.exe&#39;
+            - &#39;\icedragon.exe&#39;
+            - &#39;\cyberfox.exe&#39;
+            - &#39;\SlimBrowser.exe&#39;
+            - &#39;\palemoon.exe&#39;
+    filter_main_path:
+        Image|contains:
+            - &#39;\Sputnik\&#39;
+            - &#39;\MapleStudio\&#39;
+            - &#39;\QIP Surf\&#39;
+            - &#39;\BlackHawk\&#39;
+            - &#39;\7Star\&#39;
+            - &#39;\Fenrir Inc\&#39;
+            - &#39;\CatalinaGroup\&#39;
+            - &#39;\Google\&#39;
+            - &#39;\Coowon\&#39;
+            - &#39;\CocCoc\&#39;
+            - &#39;\uCozMedia\&#39;
+            - &#39;\Tencent\&#39;
+            - &#39;\Orbitum\&#39;
+            - &#39;\Slimjet\&#39;
+            - &#39;\Iridium\&#39;
+            - &#39;\Vivaldi\&#39;
+            - &#39;\Chromium\&#39;
+            - &#39;\GhostBrowser\&#39;
+            - &#39;\CentBrowser\&#39;
+            - &#39;\Xvast\&#39;
+            - &#39;\Chedot\&#39;
+            - &#39;\SuperBird\&#39;
+            - &#39;\360Browser\&#39;
+            - &#39;\360Chrome\&#39;
+            - &#39;\Comodo\&#39;
+            - &#39;\BraveSoftware\&#39;
+            - &#39;\Torch\&#39;
+            - &#39;\UCBrowser\&#39;
+            - &#39;\Blisk\&#39;
+            - &#39;\Epic Privacy Browser\&#39;
+            - &#39;\Nichrome\&#39;
+            - &#39;\Amigo\&#39;
+            - &#39;\Kometa\&#39;
+            - &#39;\Xpom\&#39;
+            - &#39;\Microsoft\&#39;
+            - &#39;\Liebao7\&#39;
+            - &#39;\AVAST Software\&#39;
+            - &#39;\Kinza\&#39;
+            - &#39;\Mozilla\&#39;
+            - &#39;\8pecxstudios\&#39;
+            - &#39;\FlashPeak\&#39;
+            - &#39;\Moonchild Productions\&#39;
+    filter_main_system:
+        Image: System
+        ParentImage: Idle
+    filter_main_generic:
+        Image|startswith:
+            - &#39;C:\Program Files\&#39;
+            - &#39;C:\Program Files (x86)\&#39;
+            - &#39;C:\Windows\System32\&#39;
+            - &#39;C:\Windows\SysWOW64\&#39;
+    filter_optional_defender:
+        Image|contains: &#39;\Microsoft\Windows Defender\&#39;
+        Image|endswith:
+            - &#39;\MpCopyAccelerator.exe&#39;
+            - &#39;\MsMpEng.exe&#39;
+    filter_optional_thor:
+        Image|endswith:
+            - &#39;\thor.exe&#39;
+            - &#39;\thor64.exe&#39;
+    filter_optional_msiexec:
+        ParentImage: &#39;C:\Windows\System32\msiexec.exe&#39;
+    filter_optional_other:
+        Image|endswith: &#39;\everything.exe&#39;
+    condition: all of selection_* and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Antivirus, Anti-Spyware, Anti-Malware Software
+    - Legitimate software accessing browser data for synchronization or backup purposes.
+    - Legitimate software installed on partitions other than &quot;C:\&quot;
+level: low
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/a1dfd976-4852-41d4-9507-dc6590a3ccd0.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Antivirus, Anti-Spyware, Anti-Malware Software</li><li>Legitimate software accessing browser data for synchronization or backup purposes.</li><li>Legitimate software installed on partitions other than &quot;C:\&quot;</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/splunk/security_content/blob/7283ba3723551f46b69dfeb23a63b358afb2cb0e/lookups/browser_app_list.csv?plain=1">https://github.com/splunk/security_content/blob/7283ba3723551f46b69dfeb23a63b358afb2cb0e/lookups/browser_app_list.csv?plain=1</a></li><li><a href="https://fourcore.io/blogs/threat-hunting-browser-credential-stealing">https://fourcore.io/blogs/threat-hunting-browser-credential-stealing</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1217/">T1217 · Browser Information Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1217/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1555.003/">T1555.003 · Credentials from Web Browsers</a> · <a href="/ttp-simulation/detections/enterprise/T1555.003/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

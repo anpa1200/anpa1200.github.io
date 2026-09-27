@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential ClickFix Execution Pattern - Registry — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule f5fe36cf-f1ec-4c23-903d-09a3110f6bbb. Potential ClickFix Execution Pattern - Registry — Sigma Rule. Detects potential ClickFix malware execution patterns by monitoring registry modifications in RunMRU keys containing HTTP/HTTPS links.
+ClickFix is known to be distributed through phishing campaigns and uses techniques like clipboard hijacking and fake CAPTCHA pages.
+Through the fakecaptcha pages, the adversary tricks users into opening the Run dialog box and pasting clipboard-hijacked content,
+such as one-liners that execute remotely hosted malicious files or scripts.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="f5fe36cf-f1ec-4c23-903d-09a3110f6bbb, attack.execution, attack.t1204.001, registry_set, windows, rule-status:experimental, severity:high, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1204.001">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1204.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/f5fe36cf-f1ec-4c23-903d-09a3110f6bbb/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/f5fe36cf-f1ec-4c23-903d-09a3110f6bbb/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential ClickFix Execution Pattern - Registry — Sigma Rule"><meta property="og:description" content="Sigma rule f5fe36cf-f1ec-4c23-903d-09a3110f6bbb. Potential ClickFix Execution Pattern - Registry — Sigma Rule. Detects potential ClickFix malware execution patterns by monitoring registry modifications in RunMRU keys containing HTTP/HTTPS links.
+ClickFix is known to be distributed through phishing campaigns and uses techniques like clipboard hijacking and fake CAPTCHA pages.
+Through the fakecaptcha pages, the adversary tricks users into opening the Run dialog box and pasting clipboard-hijacked content,
+such as one-liners that execute remotely hosted malicious files or scripts.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential ClickFix Execution Pattern - Registry — Sigma Rule"><meta name="twitter:description" content="Sigma rule f5fe36cf-f1ec-4c23-903d-09a3110f6bbb. Potential ClickFix Execution Pattern - Registry — Sigma Rule. Detects potential ClickFix malware execution patterns by monitoring registry modifications in RunMRU keys containing HTTP/HTTPS links.
+ClickFix is known to be distributed through phishing campaigns and uses techniques like clipboard hijacking and fake CAPTCHA pages.
+Through the fakecaptcha pages, the adversary tricks users into opening the Run dialog box and pasting clipboard-hijacked content,
+such as one-liners that execute remotely hosted malicious files or scripts.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/f5fe36cf-f1ec-4c23-903d-09a3110f6bbb/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/f5fe36cf-f1ec-4c23-903d-09a3110f6bbb/","name":"Potential ClickFix Execution Pattern - Registry — Sigma Rule","description":"Sigma rule f5fe36cf-f1ec-4c23-903d-09a3110f6bbb. Potential ClickFix Execution Pattern - Registry — Sigma Rule. Detects potential ClickFix malware execution patterns by monitoring registry modifications in RunMRU keys containing HTTP/HTTPS links.\nClickFix is known to be distributed through phishing campaigns and uses techniques like clipboard hijacking and fake CAPTCHA pages.\nThrough the fakecaptcha pages, the adversary tricks users into opening the Run dialog box and pasting clipboard-hijacked content,\nsuch as one-liners that execute remotely hosted malicious files or scripts.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential ClickFix Execution Pattern - Registry — Sigma Rule</h1><p class="lead">Sigma rule f5fe36cf-f1ec-4c23-903d-09a3110f6bbb. Potential ClickFix Execution Pattern - Registry — Sigma Rule. Detects potential ClickFix malware execution patterns by monitoring registry modifications in RunMRU keys containing HTTP/HTTPS links.
+ClickFix is known to be distributed through phishing campaigns and uses techniques like clipboard hijacking and fake CAPTCHA pages.
+Through the fakecaptcha pages, the adversary tricks users into opening the Run dialog box and pasting clipboard-hijacked content,
+such as one-liners that execute remotely hosted malicious files or scripts.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/registry-set/">registry_set</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1204-001/">attack.t1204.001</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2025-03-25 / 2025-11-19.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;registry_set&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/registry/registry_set/registry_set_potential_clickfix_execution.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 59bef70828d9164f819ea178c0391d6d01a4e469fff8342f2968971645664def</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential ClickFix Execution Pattern - Registry
+id: f5fe36cf-f1ec-4c23-903d-09a3110f6bbb
+related:
+    - id: d487ed4a-fd24-436d-a0b2-f4e95f7b2635
+      type: similar
+status: experimental
+description: |
+    Detects potential ClickFix malware execution patterns by monitoring registry modifications in RunMRU keys containing HTTP/HTTPS links.
+    ClickFix is known to be distributed through phishing campaigns and uses techniques like clipboard hijacking and fake CAPTCHA pages.
+    Through the fakecaptcha pages, the adversary tricks users into opening the Run dialog box and pasting clipboard-hijacked content,
+    such as one-liners that execute remotely hosted malicious files or scripts.
+references:
+    - https://github.com/JohnHammond/recaptcha-phish
+    - https://www.zscaler.com/blogs/security-research/deepseek-lure-using-captchas-spread-malware
+    - https://www.threatdown.com/blog/clipboard-hijacker-tries-to-install-a-trojan/
+    - https://app.any.run/tasks/5c16b4db-4b36-4039-a0ed-9b09abff8be2
+    - https://www.esentire.com/security-advisories/netsupport-rat-clickfix-distribution
+    - https://medium.com/@boutnaru/the-windows-foreniscs-journey-run-mru-run-dialog-box-most-recently-used-57375a02d724
+    - https://unit42.paloaltonetworks.com/preventing-clickfix-attack-vector/
+    - https://medium.com/@poudelswachchhanda123/preventing-lnk-and-fakecaptcha-threats-a-system-hardening-approach-2f7b7ed2e493
+    - https://www.scpx.com.au/2025/11/16/decades-old-finger-protocol-abused-in-clickfix-malware-attacks/
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-03-25
+modified: 2025-11-19
+tags:
+    - attack.execution
+    - attack.t1204.001
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry:
+        TargetObject|contains: &#39;\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU\&#39;
+    selection_details:
+        Details|contains:
+            - &#39;http://&#39;
+            - &#39;https://&#39;
+    selection_susp_pattern:
+        - Details|contains:
+              # Add more suspicious keywords
+              - &#39;account&#39;
+              - &#39;anti-bot&#39;
+              - &#39;botcheck&#39;
+              - &#39;captcha&#39;
+              - &#39;challenge&#39;
+              - &#39;confirmation&#39;
+              - &#39;fraud&#39;
+              - &#39;human&#39;
+              - &#39;identification&#39;
+              - &#39;identificator&#39;
+              - &#39;identity&#39;
+              - &#39;robot&#39;
+              - &#39;validation&#39;
+              - &#39;verification&#39;
+              - &#39;verify&#39;
+        - Details|contains:
+              - &#39;%comspec%&#39;
+              - &#39;bitsadmin&#39;
+              - &#39;certutil&#39;
+              - &#39;cmd&#39;
+              - &#39;cscript&#39;
+              - &#39;curl&#39;
+              - &#39;finger&#39;
+              - &#39;mshta&#39;
+              - &#39;powershell&#39;
+              - &#39;pwsh&#39;
+              - &#39;regsvr32&#39;
+              - &#39;rundll32&#39;
+              - &#39;schtasks&#39;
+              - &#39;wget&#39;
+              - &#39;wscript&#39;
+    condition: all of selection_*
+falsepositives:
+    - Legitimate applications using RunMRU with HTTP links
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/f5fe36cf-f1ec-4c23-903d-09a3110f6bbb.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate applications using RunMRU with HTTP links</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/JohnHammond/recaptcha-phish">https://github.com/JohnHammond/recaptcha-phish</a></li><li><a href="https://www.zscaler.com/blogs/security-research/deepseek-lure-using-captchas-spread-malware">https://www.zscaler.com/blogs/security-research/deepseek-lure-using-captchas-spread-malware</a></li><li><a href="https://www.threatdown.com/blog/clipboard-hijacker-tries-to-install-a-trojan/">https://www.threatdown.com/blog/clipboard-hijacker-tries-to-install-a-trojan/</a></li><li><a href="https://app.any.run/tasks/5c16b4db-4b36-4039-a0ed-9b09abff8be2">https://app.any.run/tasks/5c16b4db-4b36-4039-a0ed-9b09abff8be2</a></li><li><a href="https://www.esentire.com/security-advisories/netsupport-rat-clickfix-distribution">https://www.esentire.com/security-advisories/netsupport-rat-clickfix-distribution</a></li><li><a href="https://medium.com/@boutnaru/the-windows-foreniscs-journey-run-mru-run-dialog-box-most-recently-used-57375a02d724">https://medium.com/@boutnaru/the-windows-foreniscs-journey-run-mru-run-dialog-box-most-recently-used-57375a02d724</a></li><li><a href="https://unit42.paloaltonetworks.com/preventing-clickfix-attack-vector/">https://unit42.paloaltonetworks.com/preventing-clickfix-attack-vector/</a></li><li><a href="https://medium.com/@poudelswachchhanda123/preventing-lnk-and-fakecaptcha-threats-a-system-hardening-approach-2f7b7ed2e493">https://medium.com/@poudelswachchhanda123/preventing-lnk-and-fakecaptcha-threats-a-system-hardening-approach-2f7b7ed2e493</a></li><li><a href="https://www.scpx.com.au/2025/11/16/decades-old-finger-protocol-abused-in-clickfix-malware-attacks/">https://www.scpx.com.au/2025/11/16/decades-old-finger-protocol-abused-in-clickfix-malware-attacks/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1204.001/">T1204.001 · Malicious Link</a> · <a href="/ttp-simulation/detections/enterprise/T1204.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

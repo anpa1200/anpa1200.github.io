@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious PowerShell Encoded Command Patterns — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c. Suspicious PowerShell Encoded Command Patterns — Sigma Rule. Detects PowerShell command line patterns in combincation with encoded commands that often appear in malware infection chains">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c, attack.execution, attack.t1059.001, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious PowerShell Encoded Command Patterns — Sigma Rule"><meta property="og:description" content="Sigma rule b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c. Suspicious PowerShell Encoded Command Patterns — Sigma Rule. Detects PowerShell command line patterns in combincation with encoded commands that often appear in malware infection chains"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious PowerShell Encoded Command Patterns — Sigma Rule"><meta name="twitter:description" content="Sigma rule b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c. Suspicious PowerShell Encoded Command Patterns — Sigma Rule. Detects PowerShell command line patterns in combincation with encoded commands that often appear in malware infection chains"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c/","name":"Suspicious PowerShell Encoded Command Patterns — Sigma Rule","description":"Sigma rule b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c. Suspicious PowerShell Encoded Command Patterns — Sigma Rule. Detects PowerShell command line patterns in combincation with encoded commands that often appear in malware infection chains","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious PowerShell Encoded Command Patterns — Sigma Rule</h1><p class="lead">Sigma rule b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c. Suspicious PowerShell Encoded Command Patterns — Sigma Rule. Detects PowerShell command line patterns in combincation with encoded commands that often appear in malware infection chains</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Florian Roth (Nextron Systems). Source status: test; severity: high. Source dates: 2022-05-24 / 2023-01-05.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_base64_encoded_cmd_patterns.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 73510cf74d7c6445509f75194575e55ed6b8319260c1e0f631640f06ab5a9748</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious PowerShell Encoded Command Patterns
+id: b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c
+status: test
+description: Detects PowerShell command line patterns in combincation with encoded commands that often appear in malware infection chains
+references:
+    - https://app.any.run/tasks/b9040c63-c140-479b-ad59-f1bb56ce7a97/
+author: Florian Roth (Nextron Systems)
+date: 2022-05-24
+modified: 2023-01-05
+tags:
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith:
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+        - OriginalFileName:
+              - &#39;PowerShell.Exe&#39;
+              - &#39;pwsh.dll&#39;
+    selection_flags:
+        CommandLine|contains:
+            - &#39; -e &#39;
+            - &#39; -en &#39;
+            - &#39; -enc &#39;
+            - &#39; -enco&#39;
+    selection_encoded:
+        CommandLine|contains:
+            - &#39; JAB&#39;
+            - &#39; SUVYI&#39;
+            - &#39; SQBFAFgA&#39;
+            - &#39; aWV4I&#39;
+            - &#39; IAB&#39;
+            - &#39; PAA&#39;
+            - &#39; aQBlAHgA&#39;
+    filter_gcworker:
+        ParentImage|contains:
+            - &#39;C:\Packages\Plugins\Microsoft.GuestConfiguration.ConfigurationforWindows\&#39;
+            - &#39;\gc_worker.exe&#39;
+    condition: all of selection_* and not 1 of filter_*
+falsepositives:
+    - Other tools that work with encoded scripts in the command line instead of script files
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/b9d9cc83-380b-4ba3-8d8f-60c0e7e2930c.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Other tools that work with encoded scripts in the command line instead of script files</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://app.any.run/tasks/b9040c63-c140-479b-ad59-f1bb56ce7a97/">https://app.any.run/tasks/b9040c63-c140-479b-ad59-f1bb56ce7a97/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

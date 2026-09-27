@@ -29,6 +29,8 @@
     { key: 'updated_year', label: 'Updated year' },
     { key: 'topic', label: 'Topic' },
     { key: 'anomaly', label: 'Anomaly type' },
+    { key: 'ttp_module', label: 'Attack / detection module' },
+    { key: 'ttp_tag', label: 'Simulation / detection tag' },
     { key: 'section', label: 'Collection' },
   ];
   const compactNavigation = window.matchMedia('(max-width: 1180px)');

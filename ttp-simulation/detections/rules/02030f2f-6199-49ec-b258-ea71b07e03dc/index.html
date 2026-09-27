@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 02030f2f-6199-49ec-b258-ea71b07e03dc. Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule. Detects Commandlet names from well-known PowerShell exploitation frameworks">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="02030f2f-6199-49ec-b258-ea71b07e03dc, attack.execution, attack.discovery, attack.t1482, attack.t1087, attack.t1087.001, attack.t1087.002, attack.t1069.001, attack.t1069.002, attack.t1069, attack.t1059.001, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.discovery, sigma-tag:attack.t1482, sigma-tag:attack.t1087, sigma-tag:attack.t1087.001, sigma-tag:attack.t1087.002, sigma-tag:attack.t1069.001, sigma-tag:attack.t1069.002, sigma-tag:attack.t1069, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.discovery, sigma-tag:attack.t1482, sigma-tag:attack.t1087, sigma-tag:attack.t1087.001, sigma-tag:attack.t1087.002, sigma-tag:attack.t1069.001, sigma-tag:attack.t1069.002, sigma-tag:attack.t1069, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/02030f2f-6199-49ec-b258-ea71b07e03dc/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/02030f2f-6199-49ec-b258-ea71b07e03dc/">
+<meta property="og:type" content="website"><meta property="og:title" content="Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule"><meta property="og:description" content="Sigma rule 02030f2f-6199-49ec-b258-ea71b07e03dc. Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule. Detects Commandlet names from well-known PowerShell exploitation frameworks"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule"><meta name="twitter:description" content="Sigma rule 02030f2f-6199-49ec-b258-ea71b07e03dc. Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule. Detects Commandlet names from well-known PowerShell exploitation frameworks"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/02030f2f-6199-49ec-b258-ea71b07e03dc/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/02030f2f-6199-49ec-b258-ea71b07e03dc/","name":"Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule","description":"Sigma rule 02030f2f-6199-49ec-b258-ea71b07e03dc. Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule. Detects Commandlet names from well-known PowerShell exploitation frameworks","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule</h1><p class="lead">Sigma rule 02030f2f-6199-49ec-b258-ea71b07e03dc. Malicious PowerShell Commandlets - ProcessCreation — Sigma Rule. Detects Commandlet names from well-known PowerShell exploitation frameworks</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1482/">attack.t1482</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087/">attack.t1087</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087-001/">attack.t1087.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087-002/">attack.t1087.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1069-001/">attack.t1069.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1069-002/">attack.t1069.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1069/">attack.t1069</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: high. Source dates: 2023-01-02 / 2025-12-10.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_malicious_cmdlets.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: a156add6ef2c7581c8304fc4ca2123f762e3fff02de1aa25dad885e4f924f0a1</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Malicious PowerShell Commandlets - ProcessCreation
+id: 02030f2f-6199-49ec-b258-ea71b07e03dc
+related:
+    - id: 89819aa4-bbd6-46bc-88ec-c7f7fe30efa6
+      type: derived
+    - id: 7d0d0329-0ef1-4e84-a9f5-49500f9d7c6c
+      type: similar
+status: test
+description: Detects Commandlet names from well-known PowerShell exploitation frameworks
+references:
+    - https://adsecurity.org/?p=2921
+    - https://github.com/S3cur3Th1sSh1t/PowerSharpPack/tree/master/PowerSharpBinaries
+    - https://github.com/BC-SECURITY/Invoke-ZeroLogon/blob/111d17c7fec486d9bb23387e2e828b09a26075e4/Invoke-ZeroLogon.ps1
+    - https://github.com/xorrior/RandomPS-Scripts/blob/848c919bfce4e2d67b626cbcf4404341cfe3d3b6/Get-DXWebcamVideo.ps1
+    - https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/6f23bb41f9675d7e2d32bacccff75e931ae00554/OfficeMemScraper.ps1
+    - https://github.com/dafthack/DomainPasswordSpray/blob/b13d64a5834694aa73fd2aea9911a83027c465a7/DomainPasswordSpray.ps1
+    - https://unit42.paloaltonetworks.com/threat-assessment-black-basta-ransomware/ # Invoke-TotalExec
+    - https://research.nccgroup.com/2022/06/06/shining-the-light-on-black-basta/ # Invoke-TotalExec
+    - https://github.com/calebstewart/CVE-2021-1675 # Invoke-Nightmare
+    - https://github.com/BloodHoundAD/BloodHound/blob/0927441f67161cc6dc08a53c63ceb8e333f55874/Collectors/AzureHound.ps1
+    - https://bloodhound.readthedocs.io/en/latest/data-collection/azurehound.html
+    - https://github.com/HarmJ0y/DAMP
+    - https://github.com/samratashok/nishang
+    - https://github.com/DarkCoderSc/PowerRunAsSystem/
+    - https://github.com/besimorhino/powercat
+    - https://github.com/Kevin-Robertson/Powermad
+    - https://github.com/adrecon/ADRecon
+    - https://github.com/adrecon/AzureADRecon
+    - https://github.com/sadshade/veeam-creds/blob/6010eaf31ba41011b58d6af3950cffbf6f5cea32/Veeam-Get-Creds.ps1
+    - https://github.com/The-Viper-One/Invoke-PowerDPAPI/
+    - https://github.com/Arno0x/DNSExfiltrator/
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2023-01-02
+modified: 2025-12-10
+tags:
+    - attack.execution
+    - attack.discovery
+    - attack.t1482
+    - attack.t1087
+    - attack.t1087.001
+    - attack.t1087.002
+    - attack.t1069.001
+    - attack.t1069.002
+    - attack.t1069
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        # Note: Please ensure alphabetical order when adding new entries
+        CommandLine|contains:
+            - &#39;Add-Exfiltration&#39;
+            - &#39;Add-Persistence&#39;
+            - &#39;Add-RegBackdoor&#39;
+            - &#39;Add-RemoteRegBackdoor&#39;
+            - &#39;Add-ScrnSaveBackdoor&#39;
+            - &#39;Check-VM&#39;
+            - &#39;ConvertTo-Rc4ByteStream&#39;
+            - &#39;Decrypt-Hash&#39;
+            - &#39;Disable-ADIDNSNode&#39;
+            - &#39;Disable-MachineAccount&#39;
+            - &#39;Do-Exfiltration&#39;
+            - &#39;Enable-ADIDNSNode&#39;
+            - &#39;Enable-MachineAccount&#39;
+            - &#39;Enabled-DuplicateToken&#39;
+            - &#39;Exploit-Jboss&#39;
+            - &#39;Export-ADR&#39;
+            - &#39;Export-ADRCSV&#39;
+            - &#39;Export-ADRExcel&#39;
+            - &#39;Export-ADRHTML&#39;
+            - &#39;Export-ADRJSON&#39;
+            - &#39;Export-ADRXML&#39;
+            - &#39;Find-Fruit&#39;
+            - &#39;Find-GPOLocation&#39;
+            - &#39;Find-TrustedDocuments&#39;
+            - &#39;Get-ADIDNS&#39; # Covers: Get-ADIDNSNodeAttribute, Get-ADIDNSNodeOwner, Get-ADIDNSNodeTombstoned, Get-ADIDNSPermission, Get-ADIDNSZone
+            - &#39;Get-ApplicationHost&#39;
+            - &#39;Get-ChromeDump&#39;
+            - &#39;Get-ClipboardContents&#39;
+            - &#39;Get-FoxDump&#39;
+            - &#39;Get-GPPPassword&#39;
+            - &#39;Get-IndexedItem&#39;
+            - &#39;Get-KerberosAESKey&#39;
+            - &#39;Get-Keystrokes&#39;
+            - &#39;Get-LSASecret&#39;
+            - &#39;Get-MachineAccountAttribute&#39;
+            - &#39;Get-MachineAccountCreator&#39;
+            - &#39;Get-PassHashes&#39;
+            - &#39;Get-RegAlwaysInstallElevated&#39;
+            - &#39;Get-RegAutoLogon&#39;
+            - &#39;Get-RemoteBootKey&#39;
+            - &#39;Get-RemoteCachedCredential&#39;
+            - &#39;Get-RemoteLocalAccountHash&#39;
+            - &#39;Get-RemoteLSAKey&#39;
+            - &#39;Get-RemoteMachineAccountHash&#39;
+            - &#39;Get-RemoteNLKMKey&#39;
+            - &#39;Get-RickAstley&#39;
+            - &#39;Get-Screenshot&#39;
+            - &#39;Get-SecurityPackages&#39;
+            - &#39;Get-ServiceFilePermission&#39;
+            - &#39;Get-ServicePermission&#39;
+            - &#39;Get-ServiceUnquoted&#39;
+            - &#39;Get-SiteListPassword&#39;
+            - &#39;Get-System&#39;
+            - &#39;Get-TimedScreenshot&#39;
+            - &#39;Get-UnattendedInstallFile&#39;
+            - &#39;Get-Unconstrained&#39;
+            - &#39;Get-USBKeystrokes&#39;
+            - &#39;Get-VaultCredential&#39;
+            - &#39;Get-VulnAutoRun&#39;
+            - &#39;Get-VulnSchTask&#39;
+            - &#39;Grant-ADIDNSPermission&#39;
+            - &#39;Gupt-Backdoor&#39;
+            - &#39;HTTP-Login&#39;
+            - &#39;Install-ServiceBinary&#39;
+            - &#39;Install-SSP&#39;
+            - &#39;Invoke-ACLScanner&#39;
+            - &#39;Invoke-ADRecon&#39;
+            - &#39;Invoke-ADSBackdoor&#39;
+            - &#39;Invoke-AgentSmith&#39;
+            - &#39;Invoke-AllChecks&#39;
+            - &#39;Invoke-ARPScan&#39;
+            - &#39;Invoke-AzureHound&#39;
+            - &#39;Invoke-BackdoorLNK&#39;
+            - &#39;Invoke-BadPotato&#39;
+            - &#39;Invoke-BetterSafetyKatz&#39;
+            - &#39;Invoke-BypassUAC&#39;
+            - &#39;Invoke-Carbuncle&#39;
+            - &#39;Invoke-Certify&#39;
+            - &#39;Invoke-ConPtyShell&#39;
+            - &#39;Invoke-CredentialInjection&#39;
+            - &#39;Invoke-DAFT&#39;
+            - &#39;Invoke-DCSync&#39;
+            - &#39;Invoke-DinvokeKatz&#39;
+            - &#39;Invoke-DllInjection&#39;
+            - &#39;Invoke-DNSUpdate&#39;
+            - &#39;Invoke-DNSExfiltrator&#39;
+            - &#39;Invoke-DomainPasswordSpray&#39;
+            - &#39;Invoke-DowngradeAccount&#39;
+            - &#39;Invoke-EgressCheck&#39;
+            - &#39;Invoke-Eyewitness&#39;
+            - &#39;Invoke-FakeLogonScreen&#39;
+            - &#39;Invoke-Farmer&#39;
+            - &#39;Invoke-Get-RBCD-Threaded&#39;
+            - &#39;Invoke-Gopher&#39;
+            - &#39;Invoke-Grouper&#39; # Also Covers Invoke-GrouperX
+            - &#39;Invoke-HandleKatz&#39;
+            - &#39;Invoke-ImpersonatedProcess&#39;
+            - &#39;Invoke-ImpersonateSystem&#39;
+            - &#39;Invoke-InteractiveSystemPowerShell&#39;
+            - &#39;Invoke-Internalmonologue&#39;
+            - &#39;Invoke-Inveigh&#39;
+            - &#39;Invoke-InveighRelay&#39;
+            - &#39;Invoke-KrbRelay&#39;
+            - &#39;Invoke-LdapSignCheck&#39;
+            - &#39;Invoke-Lockless&#39;
+            - &#39;Invoke-MalSCCM&#39;
+            - &#39;Invoke-Mimikatz&#39;
+            - &#39;Invoke-Mimikittenz&#39;
+            - &#39;Invoke-MITM6&#39;
+            - &#39;Invoke-NanoDump&#39;
+            - &#39;Invoke-NetRipper&#39;
+            - &#39;Invoke-Nightmare&#39;
+            - &#39;Invoke-NinjaCopy&#39;
+            - &#39;Invoke-OfficeScrape&#39;
+            - &#39;Invoke-OxidResolver&#39;
+            - &#39;Invoke-P0wnedshell&#39;
+            - &#39;Invoke-Paranoia&#39;
+            - &#39;Invoke-PortScan&#39;
+            - &#39;Invoke-PoshRatHttp&#39; # Also Covers Invoke-PoshRatHttps
+            - &#39;Invoke-PostExfil&#39;
+            - &#39;Invoke-PowerDump&#39;
+            - &#39;Invoke-PowerDPAPI&#39;
+            - &#39;Invoke-PowerShellTCP&#39;
+            - &#39;Invoke-PowerShellWMI&#39;
+            - &#39;Invoke-PPLDump&#39;
+            - &#39;Invoke-PsExec&#39;
+            - &#39;Invoke-PSInject&#39;
+            - &#39;Invoke-PsUaCme&#39;
+            - &#39;Invoke-ReflectivePEInjection&#39;
+            - &#39;Invoke-ReverseDNSLookup&#39;
+            - &#39;Invoke-Rubeus&#39;
+            - &#39;Invoke-RunAs&#39;
+            - &#39;Invoke-SafetyKatz&#39;
+            - &#39;Invoke-SauronEye&#39;
+            - &#39;Invoke-SCShell&#39;
+            - &#39;Invoke-Seatbelt&#39;
+            - &#39;Invoke-ServiceAbuse&#39;
+            - &#39;Invoke-ShadowSpray&#39;
+            - &#39;Invoke-Sharp&#39; # Covers all &quot;Invoke-Sharp&quot; variants
+            - &#39;Invoke-Shellcode&#39;
+            - &#39;Invoke-SMBScanner&#39;
+            - &#39;Invoke-Snaffler&#39;
+            - &#39;Invoke-Spoolsample&#39;
+            - &#39;Invoke-SpraySinglePassword&#39;
+            - &#39;Invoke-SSHCommand&#39;
+            - &#39;Invoke-StandIn&#39;
+            - &#39;Invoke-StickyNotesExtract&#39;
+            - &#39;Invoke-SystemCommand&#39;
+            - &#39;Invoke-Tasksbackdoor&#39;
+            - &#39;Invoke-Tater&#39;
+            - &#39;Invoke-Thunderfox&#39;
+            - &#39;Invoke-ThunderStruck&#39;
+            - &#39;Invoke-TokenManipulation&#39;
+            - &#39;Invoke-Tokenvator&#39;
+            - &#39;Invoke-TotalExec&#39;
+            - &#39;Invoke-UrbanBishop&#39;
+            - &#39;Invoke-UserHunter&#39;
+            - &#39;Invoke-VoiceTroll&#39;
+            - &#39;Invoke-Whisker&#39;
+            - &#39;Invoke-WinEnum&#39;
+            - &#39;Invoke-winPEAS&#39;
+            - &#39;Invoke-WireTap&#39;
+            - &#39;Invoke-WmiCommand&#39;
+            - &#39;Invoke-WMIExec&#39;
+            - &#39;Invoke-WScriptBypassUAC&#39;
+            - &#39;Invoke-Zerologon&#39;
+            - &#39;MailRaider&#39;
+            - &#39;New-ADIDNSNode&#39;
+            - &#39;New-DNSRecordArray&#39;
+            - &#39;New-HoneyHash&#39;
+            - &#39;New-InMemoryModule&#39;
+            - &#39;New-MachineAccount&#39;
+            - &#39;New-SOASerialNumberArray&#39;
+            - &#39;Out-Minidump&#39;
+            - &#39;Port-Scan&#39;
+            - &#39;PowerBreach&#39;
+            - &#39;powercat &#39;
+            - &#39;PowerUp&#39;
+            - &#39;PowerView&#39;
+            - &#39;Remove-ADIDNSNode&#39;
+            - &#39;Remove-MachineAccount&#39;
+            - &#39;Remove-Update&#39;
+            - &#39;Rename-ADIDNSNode&#39;
+            - &#39;Revoke-ADIDNSPermission&#39;
+            - &#39;Set-ADIDNSNode&#39; # Covers: Set-ADIDNSNodeAttribute, Set-ADIDNSNodeOwner
+            - &#39;Set-MacAttribute&#39;
+            - &#39;Set-MachineAccountAttribute&#39;
+            - &#39;Set-Wallpaper&#39;
+            - &#39;Show-TargetScreen&#39;
+            - &#39;Start-CaptureServer&#39;
+            - &#39;Start-Dnscat2&#39;
+            - &#39;Start-WebcamRecorder&#39;
+            - &#39;Veeam-Get-Creds&#39;
+            - &#39;VolumeShadowCopyTools&#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/02030f2f-6199-49ec-b258-ea71b07e03dc.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://adsecurity.org/?p=2921">https://adsecurity.org/?p=2921</a></li><li><a href="https://github.com/S3cur3Th1sSh1t/PowerSharpPack/tree/master/PowerSharpBinaries">https://github.com/S3cur3Th1sSh1t/PowerSharpPack/tree/master/PowerSharpBinaries</a></li><li><a href="https://github.com/BC-SECURITY/Invoke-ZeroLogon/blob/111d17c7fec486d9bb23387e2e828b09a26075e4/Invoke-ZeroLogon.ps1">https://github.com/BC-SECURITY/Invoke-ZeroLogon/blob/111d17c7fec486d9bb23387e2e828b09a26075e4/Invoke-ZeroLogon.ps1</a></li><li><a href="https://github.com/xorrior/RandomPS-Scripts/blob/848c919bfce4e2d67b626cbcf4404341cfe3d3b6/Get-DXWebcamVideo.ps1">https://github.com/xorrior/RandomPS-Scripts/blob/848c919bfce4e2d67b626cbcf4404341cfe3d3b6/Get-DXWebcamVideo.ps1</a></li><li><a href="https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/6f23bb41f9675d7e2d32bacccff75e931ae00554/OfficeMemScraper.ps1">https://github.com/rvrsh3ll/Misc-Powershell-Scripts/blob/6f23bb41f9675d7e2d32bacccff75e931ae00554/OfficeMemScraper.ps1</a></li><li><a href="https://github.com/dafthack/DomainPasswordSpray/blob/b13d64a5834694aa73fd2aea9911a83027c465a7/DomainPasswordSpray.ps1">https://github.com/dafthack/DomainPasswordSpray/blob/b13d64a5834694aa73fd2aea9911a83027c465a7/DomainPasswordSpray.ps1</a></li><li><a href="https://unit42.paloaltonetworks.com/threat-assessment-black-basta-ransomware/">https://unit42.paloaltonetworks.com/threat-assessment-black-basta-ransomware/</a></li><li><a href="https://research.nccgroup.com/2022/06/06/shining-the-light-on-black-basta/">https://research.nccgroup.com/2022/06/06/shining-the-light-on-black-basta/</a></li><li><a href="https://github.com/calebstewart/CVE-2021-1675">https://github.com/calebstewart/CVE-2021-1675</a></li><li><a href="https://github.com/BloodHoundAD/BloodHound/blob/0927441f67161cc6dc08a53c63ceb8e333f55874/Collectors/AzureHound.ps1">https://github.com/BloodHoundAD/BloodHound/blob/0927441f67161cc6dc08a53c63ceb8e333f55874/Collectors/AzureHound.ps1</a></li><li><a href="https://bloodhound.readthedocs.io/en/latest/data-collection/azurehound.html">https://bloodhound.readthedocs.io/en/latest/data-collection/azurehound.html</a></li><li><a href="https://github.com/HarmJ0y/DAMP">https://github.com/HarmJ0y/DAMP</a></li><li><a href="https://github.com/samratashok/nishang">https://github.com/samratashok/nishang</a></li><li><a href="https://github.com/DarkCoderSc/PowerRunAsSystem/">https://github.com/DarkCoderSc/PowerRunAsSystem/</a></li><li><a href="https://github.com/besimorhino/powercat">https://github.com/besimorhino/powercat</a></li><li><a href="https://github.com/Kevin-Robertson/Powermad">https://github.com/Kevin-Robertson/Powermad</a></li><li><a href="https://github.com/adrecon/ADRecon">https://github.com/adrecon/ADRecon</a></li><li><a href="https://github.com/adrecon/AzureADRecon">https://github.com/adrecon/AzureADRecon</a></li><li><a href="https://github.com/sadshade/veeam-creds/blob/6010eaf31ba41011b58d6af3950cffbf6f5cea32/Veeam-Get-Creds.ps1">https://github.com/sadshade/veeam-creds/blob/6010eaf31ba41011b58d6af3950cffbf6f5cea32/Veeam-Get-Creds.ps1</a></li><li><a href="https://github.com/The-Viper-One/Invoke-PowerDPAPI/">https://github.com/The-Viper-One/Invoke-PowerDPAPI/</a></li><li><a href="https://github.com/Arno0x/DNSExfiltrator/">https://github.com/Arno0x/DNSExfiltrator/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1069/">T1069 · Permission Groups Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1069/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1069.001/">T1069.001 · Local Groups</a> · <a href="/ttp-simulation/detections/enterprise/T1069.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1069.002/">T1069.002 · Domain Groups</a> · <a href="/ttp-simulation/detections/enterprise/T1069.002/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1087/">T1087 · Account Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1087/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1087.001/">T1087.001 · Local Account</a> · <a href="/ttp-simulation/detections/enterprise/T1087.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1087.002/">T1087.002 · Domain Account</a> · <a href="/ttp-simulation/detections/enterprise/T1087.002/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1482/">T1482 · Domain Trust Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1482/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

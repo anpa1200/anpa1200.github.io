@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule a18dd26b-6450-46de-8c91-9659150cf088. Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule. Detects process access requests to LSASS process with potentially suspicious access flags">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="a18dd26b-6450-46de-8c91-9659150cf088, attack.credential-access, attack.t1003.001, attack.s0002, process_access, windows, rule-status:test, severity:medium, logsource-category:process_access, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001, sigma-tag:attack.s0002">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_access, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001, sigma-tag:attack.s0002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/a18dd26b-6450-46de-8c91-9659150cf088/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/a18dd26b-6450-46de-8c91-9659150cf088/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule"><meta property="og:description" content="Sigma rule a18dd26b-6450-46de-8c91-9659150cf088. Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule. Detects process access requests to LSASS process with potentially suspicious access flags"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule"><meta name="twitter:description" content="Sigma rule a18dd26b-6450-46de-8c91-9659150cf088. Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule. Detects process access requests to LSASS process with potentially suspicious access flags"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/a18dd26b-6450-46de-8c91-9659150cf088/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/a18dd26b-6450-46de-8c91-9659150cf088/","name":"Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule","description":"Sigma rule a18dd26b-6450-46de-8c91-9659150cf088. Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule. Detects process access requests to LSASS process with potentially suspicious access flags","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule</h1><p class="lead">Sigma rule a18dd26b-6450-46de-8c91-9659150cf088. Potentially Suspicious GrantedAccess Flags On LSASS — Sigma Rule. Detects process access requests to LSASS process with potentially suspicious access flags</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-access/">process_access</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-001/">attack.t1003.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-s0002/">attack.s0002</a></div><p>Author: Florian Roth, Roberto Rodriguez, Dimitrios Slamaris, Mark Russinovich, Thomas Patzke, Teymur Kheirkhabarov, Sherif Eldeeb, James Dickenson, Aleksey Potapov, oscd.community. Source status: test; severity: medium. Source dates: 2021-11-22 / 2023-11-29.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_access&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_access/proc_access_win_lsass_susp_access_flag.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 5372dcb3e84578cbb7afbf3b3fcafd3a0e701297c284b73c2925c390905ced82</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potentially Suspicious GrantedAccess Flags On LSASS
+id: a18dd26b-6450-46de-8c91-9659150cf088
+related:
+    - id: 32d0d3e2-e58d-4d41-926b-18b520b2b32d
+      type: similar
+status: test
+description: Detects process access requests to LSASS process with potentially suspicious access flags
+references:
+    - https://learn.microsoft.com/en-us/windows/win32/procthread/process-security-and-access-rights
+    - https://onedrive.live.com/view.aspx?resid=D026B4699190F1E6!2843&amp;ithint=file%2cpptx&amp;app=PowerPoint&amp;authkey=!AMvCRTKB_V1J5ow
+    - https://web.archive.org/web/20230208123920/https://cyberwardog.blogspot.com/2017/03/chronicles-of-threat-hunter-hunting-for_22.html
+    - https://www.slideshare.net/heirhabarov/hunting-for-credentials-dumping-in-windows-environment
+    - https://web.archive.org/web/20230420013146/http://security-research.dyndns.org/pub/slides/FIRST2017/FIRST-2017_Tom-Ueltschi_Sysmon_FINAL_notes.pdf
+author: Florian Roth, Roberto Rodriguez, Dimitrios Slamaris, Mark Russinovich, Thomas Patzke, Teymur Kheirkhabarov, Sherif Eldeeb, James Dickenson, Aleksey Potapov, oscd.community
+date: 2021-11-22
+modified: 2023-11-29
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+    - attack.s0002
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection_target:
+        TargetImage|endswith: &#39;\lsass.exe&#39;
+    selection_access:
+        - GrantedAccess|endswith:
+              # - &#39;10&#39;  # covered in rule 678dfc63-fefb-47a5-a04c-26bcf8cc9f65
+              - &#39;30&#39;
+              - &#39;50&#39;
+              - &#39;70&#39;
+              - &#39;90&#39;
+              - &#39;B0&#39;
+              - &#39;D0&#39;
+              - &#39;F0&#39;
+              - &#39;18&#39;
+              - &#39;38&#39;
+              - &#39;58&#39;
+              - &#39;78&#39;
+              - &#39;98&#39;
+              - &#39;B8&#39;
+              - &#39;D8&#39;
+              - &#39;F8&#39;
+              - &#39;1A&#39;
+              - &#39;3A&#39;
+              - &#39;5A&#39;
+              - &#39;7A&#39;
+              - &#39;9A&#39;
+              - &#39;BA&#39;
+              - &#39;DA&#39;
+              - &#39;FA&#39;
+              - &#39;0x14C2&#39;  # https://github.com/b4rtik/ATPMiniDump/blob/76304f93b390af3bb66e4f451ca16562a479bdc9/ATPMiniDump/ATPMiniDump.c
+        - GrantedAccess|startswith:
+              - &#39;0x100000&#39;
+              - &#39;0x1418&#39;    # car.2019-04-004
+              - &#39;0x1438&#39;    # car.2019-04-004
+              - &#39;0x143a&#39;    # car.2019-04-004
+              - &#39;0x1f0fff&#39;
+              - &#39;0x1f1fff&#39;
+              - &#39;0x1f2fff&#39;
+              - &#39;0x1f3fff&#39;
+              - &#39;0x40&#39;
+              # - &#39;0x1000&#39;  # minimum access requirements to query basic info from service
+              # - &#39;0x1010&#39;    # car.2019-04-004
+              # - &#39;0x1400&#39;
+              # - &#39;0x1410&#39;    # car.2019-04-004 # Covered by 678dfc63-fefb-47a5-a04c-26bcf8cc9f65
+    filter_main_generic:
+        # When using this rule. Remove this filter and replace it by the path of the specific AV you use
+        SourceImage|contains:
+            - &#39;:\Program Files (x86)\&#39;
+            - &#39;:\Program Files\&#39;
+            - &#39;:\Windows\System32\&#39;
+            - &#39;:\Windows\SysWOW64\&#39;
+    filter_optional_malwarebytes:
+        SourceImage|endswith: &#39;:\ProgramData\MALWAREBYTES\MBAMSERVICE\ctlrupdate\mbupdatr.exe&#39;
+    filter_optional_vscode:
+        SourceImage|endswith: &#39;\AppData\Local\Programs\Microsoft VS Code\Code.exe&#39;
+    filter_main_windefend_1:
+        SourceImage|contains: &#39;:\ProgramData\Microsoft\Windows Defender\&#39;
+        SourceImage|endswith: &#39;\MsMpEng.exe&#39;
+    filter_main_windefend_2:
+        CallTrace|contains|all:
+            - &#39;|?:\ProgramData\Microsoft\Windows Defender\Definition Updates\{&#39;
+            - &#39;}\mpengine.dll+&#39;
+        GrantedAccess: &#39;0x1418&#39;
+    filter_main_windefend_3:
+        CallTrace|contains:
+            - &#39;|c:\program files\windows defender\mprtp.dll&#39;
+            - &#39;|c:\program files\windows defender\MpClient.dll&#39;
+    filter_optional_vmwaretools:
+        SourceImage|contains: &#39;:\ProgramData\VMware\VMware Tools\&#39;
+        SourceImage|endswith: &#39;\vmtoolsd.exe&#39;
+    filter_optional_sysinternals_process_explorer:
+        SourceImage|endswith:
+            - &#39;\PROCEXP64.EXE&#39;
+            - &#39;\PROCEXP.EXE&#39;
+        GrantedAccess: &#39;0x40&#39;
+    filter_optional_mbami:
+        SourceImage|endswith: &#39;\MBAMInstallerService.exe&#39;
+        GrantedAccess: &#39;0x40&#39;
+    filter_optional_nextron:
+        SourceImage|endswith:
+            - &#39;\aurora-agent-64.exe&#39;
+            - &#39;\aurora-agent.exe&#39;
+            - &#39;\thor.exe&#39;
+            - &#39;\thor64.exe&#39;
+        GrantedAccess: &#39;0x40&#39;
+    filter_main_explorer:
+        SourceImage|endswith: &#39;\explorer.exe&#39;
+        GrantedAccess: &#39;0x401&#39;
+    filter_optional_sysinternals_handle:
+        SourceImage|endswith:
+            - &#39;\handle.exe&#39;
+            - &#39;\handle64.exe&#39;
+        GrantedAccess: &#39;0x40&#39;
+    filter_optional_webex:
+        SourceImage|endswith: &#39;\AppData\Local\WebEx\WebexHost.exe&#39;
+        GrantedAccess: &#39;0x401&#39;
+    filter_optional_steam_apps:
+        SourceImage|contains: &#39;\SteamLibrary\steamapps\&#39;
+    condition: all of selection_* and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Legitimate software such as AV and EDR
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/a18dd26b-6450-46de-8c91-9659150cf088.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate software such as AV and EDR</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://learn.microsoft.com/en-us/windows/win32/procthread/process-security-and-access-rights">https://learn.microsoft.com/en-us/windows/win32/procthread/process-security-and-access-rights</a></li><li><a href="https://onedrive.live.com/view.aspx?resid=D026B4699190F1E6!2843&amp;ithint=file%2cpptx&amp;app=PowerPoint&amp;authkey=!AMvCRTKB_V1J5ow">https://onedrive.live.com/view.aspx?resid=D026B4699190F1E6!2843&amp;ithint=file%2cpptx&amp;app=PowerPoint&amp;authkey=!AMvCRTKB_V1J5ow</a></li><li><a href="https://web.archive.org/web/20230208123920/https://cyberwardog.blogspot.com/2017/03/chronicles-of-threat-hunter-hunting-for_22.html">https://web.archive.org/web/20230208123920/https://cyberwardog.blogspot.com/2017/03/chronicles-of-threat-hunter-hunting-for_22.html</a></li><li><a href="https://www.slideshare.net/heirhabarov/hunting-for-credentials-dumping-in-windows-environment">https://www.slideshare.net/heirhabarov/hunting-for-credentials-dumping-in-windows-environment</a></li><li><a href="https://web.archive.org/web/20230420013146/http://security-research.dyndns.org/pub/slides/FIRST2017/FIRST-2017_Tom-Ueltschi_Sysmon_FINAL_notes.pdf">https://web.archive.org/web/20230420013146/http://security-research.dyndns.org/pub/slides/FIRST2017/FIRST-2017_Tom-Ueltschi_Sysmon_FINAL_notes.pdf</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003.001/">T1003.001 · LSASS Memory</a> · <a href="/ttp-simulation/detections/enterprise/T1003.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

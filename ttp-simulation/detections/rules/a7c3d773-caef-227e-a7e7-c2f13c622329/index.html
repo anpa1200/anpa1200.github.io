@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule a7c3d773-caef-227e-a7e7-c2f13c622329. Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule. Detects attackers using tooling with bad opsec defaults.
+E.g. spawning a sacrificial process to inject a capability into the process without taking into account how the process is normally run.
+One trivial example of this is using rundll32.exe without arguments as a sacrificial process (default in CS, now highlighted by c2lint), running WerFault without arguments (Kraken - credit am0nsec), and other examples.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="a7c3d773-caef-227e-a7e7-c2f13c622329, attack.stealth, attack.t1218.011, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1218.011">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1218.011">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/a7c3d773-caef-227e-a7e7-c2f13c622329/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/a7c3d773-caef-227e-a7e7-c2f13c622329/">
+<meta property="og:type" content="website"><meta property="og:title" content="Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule"><meta property="og:description" content="Sigma rule a7c3d773-caef-227e-a7e7-c2f13c622329. Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule. Detects attackers using tooling with bad opsec defaults.
+E.g. spawning a sacrificial process to inject a capability into the process without taking into account how the process is normally run.
+One trivial example of this is using rundll32.exe without arguments as a sacrificial process (default in CS, now highlighted by c2lint), running WerFault without arguments (Kraken - credit am0nsec), and other examples.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule"><meta name="twitter:description" content="Sigma rule a7c3d773-caef-227e-a7e7-c2f13c622329. Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule. Detects attackers using tooling with bad opsec defaults.
+E.g. spawning a sacrificial process to inject a capability into the process without taking into account how the process is normally run.
+One trivial example of this is using rundll32.exe without arguments as a sacrificial process (default in CS, now highlighted by c2lint), running WerFault without arguments (Kraken - credit am0nsec), and other examples.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/a7c3d773-caef-227e-a7e7-c2f13c622329/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/a7c3d773-caef-227e-a7e7-c2f13c622329/","name":"Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule","description":"Sigma rule a7c3d773-caef-227e-a7e7-c2f13c622329. Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule. Detects attackers using tooling with bad opsec defaults.\nE.g. spawning a sacrificial process to inject a capability into the process without taking into account how the process is normally run.\nOne trivial example of this is using rundll32.exe without arguments as a sacrificial process (default in CS, now highlighted by c2lint), running WerFault without arguments (Kraken - credit am0nsec), and other examples.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule</h1><p class="lead">Sigma rule a7c3d773-caef-227e-a7e7-c2f13c622329. Bad Opsec Defaults Sacrificial Processes With Improper Arguments — Sigma Rule. Detects attackers using tooling with bad opsec defaults.
+E.g. spawning a sacrificial process to inject a capability into the process without taking into account how the process is normally run.
+One trivial example of this is using rundll32.exe without arguments as a sacrificial process (default in CS, now highlighted by c2lint), running WerFault without arguments (Kraken - credit am0nsec), and other examples.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1218-011/">attack.t1218.011</a></div><p>Author: Oleg Kolesnikov @securonix invrep_de, oscd.community, Florian Roth (Nextron Systems), Christian Burkard (Nextron Systems). Source status: test; severity: high. Source dates: 2020-10-23 / 2024-08-15.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_susp_bad_opsec_sacrificial_processes.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 1d4559cda59ded2d2895b084b2f9e26fc04e5f7dc6f45c0dcd1ba5f54fbbac52</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Bad Opsec Defaults Sacrificial Processes With Improper Arguments
+id: a7c3d773-caef-227e-a7e7-c2f13c622329
+related:
+    - id: f5647edc-a7bf-4737-ab50-ef8c60dc3add
+      type: obsolete
+status: test
+description: |
+    Detects attackers using tooling with bad opsec defaults.
+    E.g. spawning a sacrificial process to inject a capability into the process without taking into account how the process is normally run.
+    One trivial example of this is using rundll32.exe without arguments as a sacrificial process (default in CS, now highlighted by c2lint), running WerFault without arguments (Kraken - credit am0nsec), and other examples.
+references:
+    - https://blog.malwarebytes.com/malwarebytes-news/2020/10/kraken-attack-abuses-wer-service/
+    - https://www.cobaltstrike.com/help-opsec
+    - https://twitter.com/CyberRaiju/status/1251492025678983169
+    - https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/regsvr32
+    - https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/rundll32
+    - https://learn.microsoft.com/en-us/dotnet/framework/tools/regasm-exe-assembly-registration-tool
+    - https://learn.microsoft.com/en-us/dotnet/framework/tools/regsvcs-exe-net-services-installation-tool
+author: Oleg Kolesnikov @securonix invrep_de, oscd.community, Florian Roth (Nextron Systems), Christian Burkard (Nextron Systems)
+date: 2020-10-23
+modified: 2024-08-15
+tags:
+    - attack.stealth
+    - attack.t1218.011
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_werfault:
+        Image|endswith: &#39;\WerFault.exe&#39;
+        CommandLine|endswith: &#39;WerFault.exe&#39;
+    selection_rundll32:
+        Image|endswith: &#39;\rundll32.exe&#39;
+        CommandLine|endswith: &#39;rundll32.exe&#39;
+    selection_regsvcs:
+        Image|endswith: &#39;\regsvcs.exe&#39;
+        CommandLine|endswith: &#39;regsvcs.exe&#39;
+    selection_regasm:
+        Image|endswith: &#39;\regasm.exe&#39;
+        CommandLine|endswith: &#39;regasm.exe&#39;
+    selection_regsvr32:
+        Image|endswith: &#39;\regsvr32.exe&#39;
+        CommandLine|endswith: &#39;regsvr32.exe&#39;
+    filter_optional_edge_update:
+        ParentImage|contains: &#39;\AppData\Local\Microsoft\EdgeUpdate\Install\{&#39;
+        Image|endswith: &#39;\rundll32.exe&#39;
+        CommandLine|endswith: &#39;rundll32.exe&#39;
+    filter_optional_chromium_installer:
+        # As reported in https://github.com/SigmaHQ/sigma/issues/4570 and others
+        ParentImage|contains:
+            - &#39;\AppData\Local\BraveSoftware\Brave-Browser\Application\&#39;
+            - &#39;\AppData\Local\Google\Chrome\Application\&#39;
+        ParentImage|endswith: &#39;\Installer\setup.exe&#39;
+        ParentCommandLine|contains: &#39;--uninstall &#39;
+        Image|endswith: &#39;\rundll32.exe&#39;
+        CommandLine|endswith: &#39;rundll32.exe&#39;
+    condition: 1 of selection_* and not 1 of filter_optional_*
+falsepositives:
+    - Unlikely
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/a7c3d773-caef-227e-a7e7-c2f13c622329.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unlikely</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://blog.malwarebytes.com/malwarebytes-news/2020/10/kraken-attack-abuses-wer-service/">https://blog.malwarebytes.com/malwarebytes-news/2020/10/kraken-attack-abuses-wer-service/</a></li><li><a href="https://www.cobaltstrike.com/help-opsec">https://www.cobaltstrike.com/help-opsec</a></li><li><a href="https://twitter.com/CyberRaiju/status/1251492025678983169">https://twitter.com/CyberRaiju/status/1251492025678983169</a></li><li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/regsvr32">https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/regsvr32</a></li><li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/rundll32">https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/rundll32</a></li><li><a href="https://learn.microsoft.com/en-us/dotnet/framework/tools/regasm-exe-assembly-registration-tool">https://learn.microsoft.com/en-us/dotnet/framework/tools/regasm-exe-assembly-registration-tool</a></li><li><a href="https://learn.microsoft.com/en-us/dotnet/framework/tools/regsvcs-exe-net-services-installation-tool">https://learn.microsoft.com/en-us/dotnet/framework/tools/regsvcs-exe-net-services-installation-tool</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1218.011/">T1218.011 · Rundll32</a> · <a href="/ttp-simulation/detections/enterprise/T1218.011/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

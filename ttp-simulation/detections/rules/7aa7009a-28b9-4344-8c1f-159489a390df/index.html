@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 7aa7009a-28b9-4344-8c1f-159489a390df. HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule. Detects the use of Windows Credential Editor (WCE), a popular post-exploitation tool used to extract plaintext passwords, hash, PIN code and Kerberos tickets from memory.
+It is often used by threat actors for credential dumping and lateral movement within compromised networks.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="7aa7009a-28b9-4344-8c1f-159489a390df, attack.credential-access, attack.t1003.001, attack.s0005, process_creation, windows, rule-status:test, severity:critical, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001, sigma-tag:attack.s0005">
+<meta name="ttp-module-tags" content="rule-status:test, severity:critical, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001, sigma-tag:attack.s0005">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/7aa7009a-28b9-4344-8c1f-159489a390df/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/7aa7009a-28b9-4344-8c1f-159489a390df/">
+<meta property="og:type" content="website"><meta property="og:title" content="HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule"><meta property="og:description" content="Sigma rule 7aa7009a-28b9-4344-8c1f-159489a390df. HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule. Detects the use of Windows Credential Editor (WCE), a popular post-exploitation tool used to extract plaintext passwords, hash, PIN code and Kerberos tickets from memory.
+It is often used by threat actors for credential dumping and lateral movement within compromised networks.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule"><meta name="twitter:description" content="Sigma rule 7aa7009a-28b9-4344-8c1f-159489a390df. HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule. Detects the use of Windows Credential Editor (WCE), a popular post-exploitation tool used to extract plaintext passwords, hash, PIN code and Kerberos tickets from memory.
+It is often used by threat actors for credential dumping and lateral movement within compromised networks.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/7aa7009a-28b9-4344-8c1f-159489a390df/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/7aa7009a-28b9-4344-8c1f-159489a390df/","name":"HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule","description":"Sigma rule 7aa7009a-28b9-4344-8c1f-159489a390df. HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule. Detects the use of Windows Credential Editor (WCE), a popular post-exploitation tool used to extract plaintext passwords, hash, PIN code and Kerberos tickets from memory.\nIt is often used by threat actors for credential dumping and lateral movement within compromised networks.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule</h1><p class="lead">Sigma rule 7aa7009a-28b9-4344-8c1f-159489a390df. HackTool - Windows Credential Editor (WCE) Execution — Sigma Rule. Detects the use of Windows Credential Editor (WCE), a popular post-exploitation tool used to extract plaintext passwords, hash, PIN code and Kerberos tickets from memory.
+It is often used by threat actors for credential dumping and lateral movement within compromised networks.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/critical/">critical</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-001/">attack.t1003.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-s0005/">attack.s0005</a></div><p>Author: Florian Roth (Nextron Systems). Source status: test; severity: critical. Source dates: 2019-12-31 / 2025-10-21.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_hktl_wce.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 9524ba6de84a8e5706f2ee8b347df6b934e71d8da9da15e61f7f2ec52dc4b805</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: HackTool - Windows Credential Editor (WCE) Execution
+id: 7aa7009a-28b9-4344-8c1f-159489a390df
+status: test
+description: |
+    Detects the use of Windows Credential Editor (WCE), a popular post-exploitation tool used to extract plaintext passwords, hash, PIN code and Kerberos tickets from memory.
+    It is often used by threat actors for credential dumping and lateral movement within compromised networks.
+references:
+    - https://www.ampliasecurity.com/research/windows-credentials-editor/
+author: Florian Roth (Nextron Systems)
+date: 2019-12-31
+modified: 2025-10-21
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+    - attack.s0005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        Image|endswith:
+            - &#39;\WCE.exe&#39;
+            - &#39;\WCE64.exe&#39;
+    selection_hash:
+        Hashes|contains:
+            - &#39;IMPHASH=136F0A8572C058A96436C82E541E4C41&#39;
+            - &#39;IMPHASH=589657C64DDE88533186C39F82FA1F50&#39;
+            - &#39;IMPHASH=6BFE09EFCB4FFDE061EBDBAFC4DB84CF&#39;
+            - &#39;IMPHASH=7D490037BF450877E6D0287BDCFF8D2E&#39;
+            - &#39;IMPHASH=8AB93B061287C79F3088C5BC7E7D97ED&#39;
+            - &#39;IMPHASH=A53A02B997935FD8EEDCB5F7ABAB9B9F&#39;
+            - &#39;IMPHASH=BA434A7A729EEC20E136CA4C32D6C740&#39;
+            - &#39;IMPHASH=BD1D1547DA13C0FCB6C15E86217D5EB8&#39;
+            - &#39;IMPHASH=E96A73C7BF33A464C510EDE582318BF2&#39;
+    condition: 1 of selection_*
+falsepositives:
+    - Unknown
+level: critical
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/7aa7009a-28b9-4344-8c1f-159489a390df.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.ampliasecurity.com/research/windows-credentials-editor/">https://www.ampliasecurity.com/research/windows-credentials-editor/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003.001/">T1003.001 · LSASS Memory</a> · <a href="/ttp-simulation/detections/enterprise/T1003.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

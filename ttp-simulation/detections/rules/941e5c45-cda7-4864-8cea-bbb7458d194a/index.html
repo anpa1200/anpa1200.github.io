@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Remote Logon with Explicit Credentials — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 941e5c45-cda7-4864-8cea-bbb7458d194a. Suspicious Remote Logon with Explicit Credentials — Sigma Rule. Detects suspicious processes logging on with explicit credentials">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="941e5c45-cda7-4864-8cea-bbb7458d194a, attack.privilege-escalation, attack.persistence, attack.initial-access, attack.stealth, attack.t1078, attack.lateral-movement, windows, security, rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.initial-access, sigma-tag:attack.stealth, sigma-tag:attack.t1078, sigma-tag:attack.lateral-movement">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.initial-access, sigma-tag:attack.stealth, sigma-tag:attack.t1078, sigma-tag:attack.lateral-movement">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/941e5c45-cda7-4864-8cea-bbb7458d194a/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/941e5c45-cda7-4864-8cea-bbb7458d194a/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Remote Logon with Explicit Credentials — Sigma Rule"><meta property="og:description" content="Sigma rule 941e5c45-cda7-4864-8cea-bbb7458d194a. Suspicious Remote Logon with Explicit Credentials — Sigma Rule. Detects suspicious processes logging on with explicit credentials"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Remote Logon with Explicit Credentials — Sigma Rule"><meta name="twitter:description" content="Sigma rule 941e5c45-cda7-4864-8cea-bbb7458d194a. Suspicious Remote Logon with Explicit Credentials — Sigma Rule. Detects suspicious processes logging on with explicit credentials"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/941e5c45-cda7-4864-8cea-bbb7458d194a/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/941e5c45-cda7-4864-8cea-bbb7458d194a/","name":"Suspicious Remote Logon with Explicit Credentials — Sigma Rule","description":"Sigma rule 941e5c45-cda7-4864-8cea-bbb7458d194a. Suspicious Remote Logon with Explicit Credentials — Sigma Rule. Detects suspicious processes logging on with explicit credentials","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Remote Logon with Explicit Credentials — Sigma Rule</h1><p class="lead">Sigma rule 941e5c45-cda7-4864-8cea-bbb7458d194a. Suspicious Remote Logon with Explicit Credentials — Sigma Rule. Detects suspicious processes logging on with explicit credentials</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/security/">security</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-initial-access/">attack.initial-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1078/">attack.t1078</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a></div><p>Author: oscd.community, Teymur Kheirkhabarov @HeirhabarovT, Zach Stanford @svch0st, Tim Shelton. Source status: test; severity: medium. Source dates: 2020-10-05 / 2022-08-03.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;security&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/security/win_security_susp_logon_explicit_credentials.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 4297249a4b2573cb0d3797b5ce9d04d7dc43927c8aca0d20f94966c4e7adeb13</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Remote Logon with Explicit Credentials
+id: 941e5c45-cda7-4864-8cea-bbb7458d194a
+status: test
+description: Detects suspicious processes logging on with explicit credentials
+references:
+    - https://drive.google.com/file/d/1lKya3_mLnR3UQuCoiYruO3qgu052_iS_/view
+author: oscd.community, Teymur Kheirkhabarov @HeirhabarovT, Zach Stanford @svch0st, Tim Shelton
+date: 2020-10-05
+modified: 2022-08-03
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.initial-access
+    - attack.stealth
+    - attack.t1078
+    - attack.lateral-movement
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4648
+        ProcessName|endswith:
+            - &#39;\cmd.exe&#39;
+            - &#39;\powershell.exe&#39;
+            - &#39;\pwsh.exe&#39;
+            - &#39;\winrs.exe&#39;
+            - &#39;\wmic.exe&#39;
+            - &#39;\net.exe&#39;
+            - &#39;\net1.exe&#39;
+            - &#39;\reg.exe&#39;
+    filter1:
+        TargetServerName: &#39;localhost&#39;
+    filter2:
+        SubjectUserName|endswith: &#39;$&#39;
+        TargetUserName|endswith: &#39;$&#39;
+    condition: selection and not 1 of filter*
+falsepositives:
+    - Administrators that use the RunAS command or scheduled tasks
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/941e5c45-cda7-4864-8cea-bbb7458d194a.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Administrators that use the RunAS command or scheduled tasks</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://drive.google.com/file/d/1lKya3_mLnR3UQuCoiYruO3qgu052_iS_/view">https://drive.google.com/file/d/1lKya3_mLnR3UQuCoiYruO3qgu052_iS_/view</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1078/">T1078 · Valid Accounts</a> · <a href="/ttp-simulation/detections/enterprise/T1078/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

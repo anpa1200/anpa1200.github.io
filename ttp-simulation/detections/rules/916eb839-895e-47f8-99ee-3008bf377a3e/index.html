@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 916eb839-895e-47f8-99ee-3008bf377a3e. NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule. Detects the use of curl with NTLM authentication and empty credentials (-u :), which can be abused to leak the currently logged-in user&#39;s NTLMv2 challenge-response to an
+attacker-controlled server, enabling offline cracking or relay attacks.
+When no credentials are provided, the Microsoft-shipped curl passes a NULL identity to Windows SSPI, which automatically falls back to the current user&#39;s logon session credentials
+stored in LSASS — without requiring a plaintext password.
+This behavior is exclusive to the curl binary shipped by Microsoft (available since Windows 10 / Windows Server 2019), which is built with SSPI support.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="916eb839-895e-47f8-99ee-3008bf377a3e, attack.credential-access, attack.t1187, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1187">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1187">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/916eb839-895e-47f8-99ee-3008bf377a3e/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/916eb839-895e-47f8-99ee-3008bf377a3e/">
+<meta property="og:type" content="website"><meta property="og:title" content="NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule"><meta property="og:description" content="Sigma rule 916eb839-895e-47f8-99ee-3008bf377a3e. NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule. Detects the use of curl with NTLM authentication and empty credentials (-u :), which can be abused to leak the currently logged-in user&#39;s NTLMv2 challenge-response to an
+attacker-controlled server, enabling offline cracking or relay attacks.
+When no credentials are provided, the Microsoft-shipped curl passes a NULL identity to Windows SSPI, which automatically falls back to the current user&#39;s logon session credentials
+stored in LSASS — without requiring a plaintext password.
+This behavior is exclusive to the curl binary shipped by Microsoft (available since Windows 10 / Windows Server 2019), which is built with SSPI support.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule"><meta name="twitter:description" content="Sigma rule 916eb839-895e-47f8-99ee-3008bf377a3e. NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule. Detects the use of curl with NTLM authentication and empty credentials (-u :), which can be abused to leak the currently logged-in user&#39;s NTLMv2 challenge-response to an
+attacker-controlled server, enabling offline cracking or relay attacks.
+When no credentials are provided, the Microsoft-shipped curl passes a NULL identity to Windows SSPI, which automatically falls back to the current user&#39;s logon session credentials
+stored in LSASS — without requiring a plaintext password.
+This behavior is exclusive to the curl binary shipped by Microsoft (available since Windows 10 / Windows Server 2019), which is built with SSPI support.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/916eb839-895e-47f8-99ee-3008bf377a3e/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/916eb839-895e-47f8-99ee-3008bf377a3e/","name":"NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule","description":"Sigma rule 916eb839-895e-47f8-99ee-3008bf377a3e. NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule. Detects the use of curl with NTLM authentication and empty credentials (-u :), which can be abused to leak the currently logged-in user's NTLMv2 challenge-response to an\nattacker-controlled server, enabling offline cracking or relay attacks.\nWhen no credentials are provided, the Microsoft-shipped curl passes a NULL identity to Windows SSPI, which automatically falls back to the current user's logon session credentials\nstored in LSASS — without requiring a plaintext password.\nThis behavior is exclusive to the curl binary shipped by Microsoft (available since Windows 10 / Windows Server 2019), which is built with SSPI support.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule</h1><p class="lead">Sigma rule 916eb839-895e-47f8-99ee-3008bf377a3e. NTLM Hash Leak Via Curl NTLM Authentication — Sigma Rule. Detects the use of curl with NTLM authentication and empty credentials (-u :), which can be abused to leak the currently logged-in user&#39;s NTLMv2 challenge-response to an
+attacker-controlled server, enabling offline cracking or relay attacks.
+When no credentials are provided, the Microsoft-shipped curl passes a NULL identity to Windows SSPI, which automatically falls back to the current user&#39;s logon session credentials
+stored in LSASS — without requiring a plaintext password.
+This behavior is exclusive to the curl binary shipped by Microsoft (available since Windows 10 / Windows Server 2019), which is built with SSPI support.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1187/">attack.t1187</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: test; severity: high. Source dates: 2026-06-04 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_curl_ntlm_hash_leak_attempt.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: c4e8ad87ccffbeeb5f36a4366cadb0dd6e08de35227813d9d58e7a4a2b56d0df</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: NTLM Hash Leak Via Curl NTLM Authentication
+id: 916eb839-895e-47f8-99ee-3008bf377a3e
+status: test
+description: |
+    Detects the use of curl with NTLM authentication and empty credentials (-u :), which can be abused to leak the currently logged-in user&#39;s NTLMv2 challenge-response to an
+    attacker-controlled server, enabling offline cracking or relay attacks.
+    When no credentials are provided, the Microsoft-shipped curl passes a NULL identity to Windows SSPI, which automatically falls back to the current user&#39;s logon session credentials
+    stored in LSASS — without requiring a plaintext password.
+    This behavior is exclusive to the curl binary shipped by Microsoft (available since Windows 10 / Windows Server 2019), which is built with SSPI support.
+references:
+    - https://github.com/curl/curl/blob/master/lib/vauth/ntlm_sspi.c#L128-L140
+    - https://learn.microsoft.com/en-us/windows/win32/secauthn/acquirecredentialshandle--ntlm
+    - https://curl.se/docs/manpage.html#--ntlm
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2026-06-04
+tags:
+    - attack.credential-access
+    - attack.t1187
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: &#39;\curl.exe&#39;
+        - OriginalFileName: &#39;curl.exe&#39;
+    selection_ntlm_flag:
+        CommandLine|contains: &#39;--ntlm&#39;
+    selection_empty_creds:
+        CommandLine|re: &#39;(?i)\s(-u|--user)\s*:&#39;
+    condition: all of selection_*
+falsepositives:
+    - Should be very rare as it&#39;s not widely known or used, but could occur in legitimate use cases where curl is used with NTLM authentication and empty credentials, such as in certain scripts or automation tasks.
+level: high
+regression_tests_path: regression_data/rules/windows/process_creation/proc_creation_win_curl_ntlm_hash_leak_attempt/info.yml
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/916eb839-895e-47f8-99ee-3008bf377a3e.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Should be very rare as it&#39;s not widely known or used, but could occur in legitimate use cases where curl is used with NTLM authentication and empty credentials, such as in certain scripts or automation tasks.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/curl/curl/blob/master/lib/vauth/ntlm_sspi.c#L128-L140">https://github.com/curl/curl/blob/master/lib/vauth/ntlm_sspi.c#L128-L140</a></li><li><a href="https://learn.microsoft.com/en-us/windows/win32/secauthn/acquirecredentialshandle--ntlm">https://learn.microsoft.com/en-us/windows/win32/secauthn/acquirecredentialshandle--ntlm</a></li><li><a href="https://curl.se/docs/manpage.html#--ntlm">https://curl.se/docs/manpage.html#--ntlm</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1187/">T1187 · Forced Authentication</a> · <a href="/ttp-simulation/detections/enterprise/T1187/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

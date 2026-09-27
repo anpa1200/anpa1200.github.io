@@ -314,6 +314,10 @@ function inferType(url, title, html, collection) {
   if (/^\/(?:references|cyber-knowledge\/knowledge-sources)\/(?:page\/\d+\/)?$/.test(path) || path === '/learning-paths/') return 'index';
   if (path === '/articles/trainsec-library.html'
     || /^\/articles\/trainsec\/(?:authors|domains)\.html$/i.test(path)) return 'index';
+  if (collection?.id === 'collection:ttp-reference-modules') {
+    if (/^\/ttp-simulation\/(?:tools\/|detections\/(?:rules\/)?|telemetry\/|tags\/)?$/.test(path)) return 'index';
+    return 'generated-reference';
+  }
   if (collection) {
     if (collection.id === 'collection:medium-export') {
       if (/^\/articles\/(?:read\/)?$/i.test(path)) return 'index';
@@ -556,6 +560,7 @@ export function createContentItem({ url: rawUrl, html, updatedAt = null, source 
     tags: [...new Set([
       ...topics,
       ...subjects,
+      ...findMetaContent(html, 'ttp-module-tags').split(',').map((s) => s.trim()).filter(Boolean),
       ...(isTrainsecMirror ? trainsecManifestTags(trainsecEntry) : []),
       ...(identifier ? [identifier] : []),
       ...(author ? [`author:${author}`] : []),

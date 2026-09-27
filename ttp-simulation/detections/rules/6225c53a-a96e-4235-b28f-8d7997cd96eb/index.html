@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 6225c53a-a96e-4235-b28f-8d7997cd96eb. Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule. Detects the tampering of Hypervisor-protected Code Integrity (HVCI) related registry values via command line tool reg.exe.
+HVCI uses virtualization-based security to protect code integrity by ensuring that only trusted code can run in kernel mode.
+Adversaries may tamper with HVCI to load malicious or unsigned drivers, which can be used to escalate privileges, maintain persistence, or evade security mechanisms.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="6225c53a-a96e-4235-b28f-8d7997cd96eb, attack.defense-impairment, attack.t1685, process_creation, windows, rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/6225c53a-a96e-4235-b28f-8d7997cd96eb/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/6225c53a-a96e-4235-b28f-8d7997cd96eb/">
+<meta property="og:type" content="website"><meta property="og:title" content="Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule"><meta property="og:description" content="Sigma rule 6225c53a-a96e-4235-b28f-8d7997cd96eb. Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule. Detects the tampering of Hypervisor-protected Code Integrity (HVCI) related registry values via command line tool reg.exe.
+HVCI uses virtualization-based security to protect code integrity by ensuring that only trusted code can run in kernel mode.
+Adversaries may tamper with HVCI to load malicious or unsigned drivers, which can be used to escalate privileges, maintain persistence, or evade security mechanisms.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule"><meta name="twitter:description" content="Sigma rule 6225c53a-a96e-4235-b28f-8d7997cd96eb. Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule. Detects the tampering of Hypervisor-protected Code Integrity (HVCI) related registry values via command line tool reg.exe.
+HVCI uses virtualization-based security to protect code integrity by ensuring that only trusted code can run in kernel mode.
+Adversaries may tamper with HVCI to load malicious or unsigned drivers, which can be used to escalate privileges, maintain persistence, or evade security mechanisms.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/6225c53a-a96e-4235-b28f-8d7997cd96eb/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/6225c53a-a96e-4235-b28f-8d7997cd96eb/","name":"Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule","description":"Sigma rule 6225c53a-a96e-4235-b28f-8d7997cd96eb. Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule. Detects the tampering of Hypervisor-protected Code Integrity (HVCI) related registry values via command line tool reg.exe.\nHVCI uses virtualization-based security to protect code integrity by ensuring that only trusted code can run in kernel mode.\nAdversaries may tamper with HVCI to load malicious or unsigned drivers, which can be used to escalate privileges, maintain persistence, or evade security mechanisms.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule</h1><p class="lead">Sigma rule 6225c53a-a96e-4235-b28f-8d7997cd96eb. Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine — Sigma Rule. Detects the tampering of Hypervisor-protected Code Integrity (HVCI) related registry values via command line tool reg.exe.
+HVCI uses virtualization-based security to protect code integrity by ensuring that only trusted code can run in kernel mode.
+Adversaries may tamper with HVCI to load malicious or unsigned drivers, which can be used to escalate privileges, maintain persistence, or evade security mechanisms.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1685/">attack.t1685</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2026-01-26 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_hvci_registry_tampering.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 54edac8b46adf24038fcff0ac0edc2289249febe0620cf2149ac888b4e6ec839</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Hypervisor-protected Code Integrity (HVCI) Related Registry Tampering Via CommandLine
+id: 6225c53a-a96e-4235-b28f-8d7997cd96eb
+related:
+    - id: 8b7273a4-ba5d-4d8a-b04f-11f2900d043a
+      type: similar
+status: experimental
+description: |
+    Detects the tampering of Hypervisor-protected Code Integrity (HVCI) related registry values via command line tool reg.exe.
+    HVCI uses virtualization-based security to protect code integrity by ensuring that only trusted code can run in kernel mode.
+    Adversaries may tamper with HVCI to load malicious or unsigned drivers, which can be used to escalate privileges, maintain persistence, or evade security mechanisms.
+references:
+    - https://www.sophos.com/en-us/blog/sharpening-the-knife-gold-blades-strategic-evolution
+    - https://learn.microsoft.com/en-us/windows/security/hardware-security/enable-virtualization-based-protection-of-code-integrity
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2026-01-26
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith:
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+              - &#39;\reg.exe&#39;
+        - OriginalFileName:
+              - &#39;PowerShell.EXE&#39;
+              - &#39;pwsh.dll&#39;
+              - &#39;reg.exe&#39;
+    selection_cli:
+        CommandLine|contains:
+            - &#39;add &#39;
+            - &#39;New-ItemProperty &#39;
+            - &#39;Set-ItemProperty &#39;
+            - &#39;si &#39;  # SetItem Alias
+    selection_cli_base:
+        CommandLine|contains: &#39;\DeviceGuard&#39;
+    selection_cli_key:
+        CommandLine|contains:
+            - &#39;EnableVirtualizationBasedSecurity&#39;
+            - &#39;HypervisorEnforcedCodeIntegrity&#39;
+    condition: all of selection_*
+falsepositives:
+    - Legitimate system administration tasks that require disabling HVCI for troubleshooting purposes when certain drivers or applications are incompatible with it.
+level: high
+regression_tests_path: regression_data/rules/windows/process_creation/proc_creation_win_hvci_registry_tampering/info.yml
+simulation:
+    - type: atomic-red-team
+      name: Disable Hypervisor-Enforced Code Integrity (HVCI)
+      technique: T1562.001
+      atomic_guid: 70bd71e6-eba4-4e00-92f7-617911dbe020
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/6225c53a-a96e-4235-b28f-8d7997cd96eb.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate system administration tasks that require disabling HVCI for troubleshooting purposes when certain drivers or applications are incompatible with it.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.sophos.com/en-us/blog/sharpening-the-knife-gold-blades-strategic-evolution">https://www.sophos.com/en-us/blog/sharpening-the-knife-gold-blades-strategic-evolution</a></li><li><a href="https://learn.microsoft.com/en-us/windows/security/hardware-security/enable-virtualization-based-protection-of-code-integrity">https://learn.microsoft.com/en-us/windows/security/hardware-security/enable-virtualization-based-protection-of-code-integrity</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1685/">T1685 · Disable or Modify Tools</a> · <a href="/ttp-simulation/detections/enterprise/T1685/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

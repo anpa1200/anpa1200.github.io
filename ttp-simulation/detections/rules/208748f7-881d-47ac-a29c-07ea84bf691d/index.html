@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Outlook Child Process — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 208748f7-881d-47ac-a29c-07ea84bf691d. Suspicious Outlook Child Process — Sigma Rule. Detects a suspicious process spawning from an Outlook process.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="208748f7-881d-47ac-a29c-07ea84bf691d, attack.execution, attack.t1204.002, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1204.002">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1204.002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/208748f7-881d-47ac-a29c-07ea84bf691d/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/208748f7-881d-47ac-a29c-07ea84bf691d/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Outlook Child Process — Sigma Rule"><meta property="og:description" content="Sigma rule 208748f7-881d-47ac-a29c-07ea84bf691d. Suspicious Outlook Child Process — Sigma Rule. Detects a suspicious process spawning from an Outlook process."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Outlook Child Process — Sigma Rule"><meta name="twitter:description" content="Sigma rule 208748f7-881d-47ac-a29c-07ea84bf691d. Suspicious Outlook Child Process — Sigma Rule. Detects a suspicious process spawning from an Outlook process."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/208748f7-881d-47ac-a29c-07ea84bf691d/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/208748f7-881d-47ac-a29c-07ea84bf691d/","name":"Suspicious Outlook Child Process — Sigma Rule","description":"Sigma rule 208748f7-881d-47ac-a29c-07ea84bf691d. Suspicious Outlook Child Process — Sigma Rule. Detects a suspicious process spawning from an Outlook process.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Outlook Child Process — Sigma Rule</h1><p class="lead">Sigma rule 208748f7-881d-47ac-a29c-07ea84bf691d. Suspicious Outlook Child Process — Sigma Rule. Detects a suspicious process spawning from an Outlook process.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1204-002/">attack.t1204.002</a></div><p>Author: Michael Haag, Florian Roth (Nextron Systems), Markus Neis, Elastic, FPT.EagleEye Team. Source status: test; severity: high. Source dates: 2022-02-28 / 2023-02-04.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_office_outlook_susp_child_processes.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: e29b56538de711aa8b082c6ffbe263dc39b2d839098eab4122c3d970e7c3890e</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Outlook Child Process
+id: 208748f7-881d-47ac-a29c-07ea84bf691d
+related:
+    - id: 438025f9-5856-4663-83f7-52f878a70a50 # Office Child Processes
+      type: derived
+    - id: e212d415-0e93-435f-9e1a-f29005bb4723 # Outlook Remote Child Process
+      type: derived
+status: test
+description: Detects a suspicious process spawning from an Outlook process.
+references:
+    - https://www.hybrid-analysis.com/sample/465aabe132ccb949e75b8ab9c5bda36d80cf2fd503d52b8bad54e295f28bbc21?environmentId=100
+    - https://mgreen27.github.io/posts/2018/04/02/DownloadCradle.html
+author: Michael Haag, Florian Roth (Nextron Systems), Markus Neis, Elastic, FPT.EagleEye Team
+date: 2022-02-28
+modified: 2023-02-04
+tags:
+    - attack.execution
+    - attack.t1204.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith: &#39;\OUTLOOK.EXE&#39;
+        Image|endswith:
+            - &#39;\AppVLP.exe&#39;
+            - &#39;\bash.exe&#39;
+            - &#39;\cmd.exe&#39;
+            - &#39;\cscript.exe&#39;
+            - &#39;\forfiles.exe&#39;
+            - &#39;\hh.exe&#39;
+            - &#39;\mftrace.exe&#39;
+            - &#39;\msbuild.exe&#39;        # https://github.com/elastic/detection-rules/blob/c76a39796972ecde44cb1da6df47f1b6562c9770/rules/windows/defense_evasion_execution_msbuild_started_by_office_app.toml
+            - &#39;\msdt.exe&#39;           # CVE-2022-30190
+            - &#39;\mshta.exe&#39;
+            - &#39;\msiexec.exe&#39;
+            - &#39;\powershell.exe&#39;
+            - &#39;\pwsh.exe&#39;
+            - &#39;\regsvr32.exe&#39;
+            - &#39;\schtasks.exe&#39;
+            - &#39;\scrcons.exe&#39;
+            - &#39;\scriptrunner.exe&#39;
+            - &#39;\sh.exe&#39;
+            - &#39;\svchost.exe&#39;        # https://www.vmray.com/analyses/2d2fa29185ad/report/overview.html
+            - &#39;\wmic.exe&#39;           # https://app.any.run/tasks/c903e9c8-0350-440c-8688-3881b556b8e0/
+            - &#39;\wscript.exe&#39;
+            # Several FPs with rundll32.exe
+            # We started excluding specific use cases and ended up commenting out the rundll32.exe sub processes completely
+            # - &#39;\rundll32.exe&#39;
+            # filter_outlook_photoviewer:  # https://twitter.com/Luke_Hamp/status/1495919717760237568
+            #   ParentImage|endswith: &#39;\OUTLOOK.EXE&#39;
+            #   Image|endswith: &#39;\rundll32.exe&#39;
+            #   CommandLine|contains: &#39;\PhotoViewer.dll&#39;
+            # filter_outlook_printattachments:  # https://twitter.com/KickaKamil/status/1496238278659485696
+            #   ParentImage|endswith: &#39;\OUTLOOK.EXE&#39;
+            #   Image|endswith: &#39;\rundll32.exe&#39;
+            #   CommandLine|contains|all:
+            #     - &#39;shell32.dll,Control_RunDLL&#39;
+            #     - &#39;\SYSTEM32\SPOOL\DRIVERS\&#39;
+    condition: selection # and not 1 of filter*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/208748f7-881d-47ac-a29c-07ea84bf691d.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.hybrid-analysis.com/sample/465aabe132ccb949e75b8ab9c5bda36d80cf2fd503d52b8bad54e295f28bbc21?environmentId=100">https://www.hybrid-analysis.com/sample/465aabe132ccb949e75b8ab9c5bda36d80cf2fd503d52b8bad54e295f28bbc21?environmentId=100</a></li><li><a href="https://mgreen27.github.io/posts/2018/04/02/DownloadCradle.html">https://mgreen27.github.io/posts/2018/04/02/DownloadCradle.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1204.002/">T1204.002 · Malicious File</a> · <a href="/ttp-simulation/detections/enterprise/T1204.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

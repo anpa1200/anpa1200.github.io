@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule b07e58cf-cacc-4135-8473-ccb2eba63dd2. Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule. Detects modifications to DNS records in Active Directory where the Distinguished Name (DN) contains a base64-encoded blob
+matching the pattern &quot;1UWhRCAAAAA...BAAAA&quot;. This pattern corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure,
+commonly used in Kerberos coercion attacks. Adversaries may exploit this to coerce victim systems into authenticating to
+attacker-controlled hosts by spoofing SPNs via DNS. It is one of the strong indicators of a Kerberos coercion attack,.
+where adversaries manipulate DNS records to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+Please investigate the user account that made the changes, as it is likely a low-privileged account that has been compromised.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="b07e58cf-cacc-4135-8473-ccb2eba63dd2, attack.collection, attack.credential-access, attack.t1557.003, attack.persistence, attack.privilege-escalation, windows, security, By default these events are not logged by default for MicrosoftDNS objects in Active Directory.
+To enable detection, configure an AuditRule on the DNS object container with the &quot;CreateChild&quot; permission for the &quot;Everyone&quot; principal.
+This can be accomplished using tools such as Set-AuditRule (see https://github.com/OTRF/Set-AuditRule).
+, rule-status:experimental, severity:high, logsource-product:windows, logsource-service:security, sigma-tag:attack.collection, sigma-tag:attack.credential-access, sigma-tag:attack.t1557.003, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-product:windows, logsource-service:security, sigma-tag:attack.collection, sigma-tag:attack.credential-access, sigma-tag:attack.t1557.003, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/b07e58cf-cacc-4135-8473-ccb2eba63dd2/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/b07e58cf-cacc-4135-8473-ccb2eba63dd2/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule"><meta property="og:description" content="Sigma rule b07e58cf-cacc-4135-8473-ccb2eba63dd2. Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule. Detects modifications to DNS records in Active Directory where the Distinguished Name (DN) contains a base64-encoded blob
+matching the pattern &quot;1UWhRCAAAAA...BAAAA&quot;. This pattern corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure,
+commonly used in Kerberos coercion attacks. Adversaries may exploit this to coerce victim systems into authenticating to
+attacker-controlled hosts by spoofing SPNs via DNS. It is one of the strong indicators of a Kerberos coercion attack,.
+where adversaries manipulate DNS records to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+Please investigate the user account that made the changes, as it is likely a low-privileged account that has been compromised.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule"><meta name="twitter:description" content="Sigma rule b07e58cf-cacc-4135-8473-ccb2eba63dd2. Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule. Detects modifications to DNS records in Active Directory where the Distinguished Name (DN) contains a base64-encoded blob
+matching the pattern &quot;1UWhRCAAAAA...BAAAA&quot;. This pattern corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure,
+commonly used in Kerberos coercion attacks. Adversaries may exploit this to coerce victim systems into authenticating to
+attacker-controlled hosts by spoofing SPNs via DNS. It is one of the strong indicators of a Kerberos coercion attack,.
+where adversaries manipulate DNS records to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+Please investigate the user account that made the changes, as it is likely a low-privileged account that has been compromised.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/b07e58cf-cacc-4135-8473-ccb2eba63dd2/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/b07e58cf-cacc-4135-8473-ccb2eba63dd2/","name":"Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule","description":"Sigma rule b07e58cf-cacc-4135-8473-ccb2eba63dd2. Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule. Detects modifications to DNS records in Active Directory where the Distinguished Name (DN) contains a base64-encoded blob\nmatching the pattern \"1UWhRCAAAAA...BAAAA\". This pattern corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure,\ncommonly used in Kerberos coercion attacks. Adversaries may exploit this to coerce victim systems into authenticating to\nattacker-controlled hosts by spoofing SPNs via DNS. It is one of the strong indicators of a Kerberos coercion attack,.\nwhere adversaries manipulate DNS records to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.\nPlease investigate the user account that made the changes, as it is likely a low-privileged account that has been compromised.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule</h1><p class="lead">Sigma rule b07e58cf-cacc-4135-8473-ccb2eba63dd2. Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation — Sigma Rule. Detects modifications to DNS records in Active Directory where the Distinguished Name (DN) contains a base64-encoded blob
+matching the pattern &quot;1UWhRCAAAAA...BAAAA&quot;. This pattern corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure,
+commonly used in Kerberos coercion attacks. Adversaries may exploit this to coerce victim systems into authenticating to
+attacker-controlled hosts by spoofing SPNs via DNS. It is one of the strong indicators of a Kerberos coercion attack,.
+where adversaries manipulate DNS records to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+Please investigate the user account that made the changes, as it is likely a low-privileged account that has been compromised.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/security/">security</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-collection/">attack.collection</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1557-003/">attack.t1557.003</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: high. Source dates: 2025-06-20 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;security&quot;,
+  &quot;definition&quot;: &quot;By default these events are not logged by default for MicrosoftDNS objects in Active Directory.\nTo enable detection, configure an AuditRule on the DNS object container with the \&quot;CreateChild\&quot; permission for the \&quot;Everyone\&quot; principal.\nThis can be accomplished using tools such as Set-AuditRule (see https://github.com/OTRF/Set-AuditRule).\n&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/security/win_security_kerberos_coercion_via_dns_object.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 0ef61cfa37bd698b5c7db966bbb146420026443c20731702e2fc97008b4e4619</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Kerberos Coercion by Spoofing SPNs via DNS Manipulation
+id: b07e58cf-cacc-4135-8473-ccb2eba63dd2
+related:
+    - id: e7a21b5f-d8c4-4ae5-b8d9-93c5d3f28e1c # Suspicious DNS Query Indicating Kerberos Coercion via DNS Object Spoofing
+      type: similar
+    - id: 5588576c-5898-4fac-bcdd-7475a60e8f43 # Suspicious DNS Query Indicating Kerberos Coercion via DNS Object Spoofing - Network
+      type: similar
+    - id: 0ed99dda-6a35-11ef-8c99-0242ac120002 # Kerberos Coercion Via DNS SPN Spoofing Attempt
+      type: similar
+status: experimental
+description: |
+    Detects modifications to DNS records in Active Directory where the Distinguished Name (DN) contains a base64-encoded blob
+    matching the pattern &quot;1UWhRCAAAAA...BAAAA&quot;. This pattern corresponds to a marshaled CREDENTIAL_TARGET_INFORMATION structure,
+    commonly used in Kerberos coercion attacks. Adversaries may exploit this to coerce victim systems into authenticating to
+    attacker-controlled hosts by spoofing SPNs via DNS. It is one of the strong indicators of a Kerberos coercion attack,.
+    where adversaries manipulate DNS records to spoof Service Principal Names (SPNs) and redirect authentication requests like CVE-2025-33073.
+    Please investigate the user account that made the changes, as it is likely a low-privileged account that has been compromised.
+references:
+    - https://googleprojectzero.blogspot.com/2021/10/using-kerberos-for-authentication-relay.html
+    - https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-06-20
+tags:
+    - attack.collection
+    - attack.credential-access
+    - attack.t1557.003
+    - attack.persistence
+    - attack.privilege-escalation
+logsource:
+    product: windows
+    service: security
+    definition: |
+      By default these events are not logged by default for MicrosoftDNS objects in Active Directory.
+      To enable detection, configure an AuditRule on the DNS object container with the &quot;CreateChild&quot; permission for the &quot;Everyone&quot; principal.
+      This can be accomplished using tools such as Set-AuditRule (see https://github.com/OTRF/Set-AuditRule).
+detection:
+    selection_directory_service_changes:
+        EventID:
+            - 5136
+            - 5137
+        ObjectClass: &#39;dnsNode&#39;
+        ObjectDN|contains|all: # ObjectDN&quot;&gt;DC=foo-11UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA,DC=domain.com,CN=MicrosoftDNS,DC=DomainDnsZones,DC=domain,DC=com&lt;/Data&gt;
+            - &#39;UWhRCA&#39;
+            - &#39;BAAAA&#39;
+            - &#39;CN=MicrosoftDNS&#39;
+    selection_directory_service_access:
+        EventID: 4662
+        AdditionalInfo|contains|all: # AdditionalInfo&quot;&gt;DC=foo-11UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA,DC=domain.com,CN=MicrosoftDNS,DC=DomainDnsZones,DC=domain,DC=com&lt;/Data&gt;
+            - &#39;UWhRCA&#39;
+            - &#39;BAAAA&#39;
+            - &#39;CN=MicrosoftDNS&#39;
+    condition: 1 of selection_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/b07e58cf-cacc-4135-8473-ccb2eba63dd2.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://googleprojectzero.blogspot.com/2021/10/using-kerberos-for-authentication-relay.html">https://googleprojectzero.blogspot.com/2021/10/using-kerberos-for-authentication-relay.html</a></li><li><a href="https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025">https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1557.003/">T1557.003 · DHCP Spoofing</a> · <a href="/ttp-simulation/detections/enterprise/T1557.003/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

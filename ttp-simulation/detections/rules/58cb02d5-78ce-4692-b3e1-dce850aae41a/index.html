@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alternate PowerShell Hosts Pipe — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 58cb02d5-78ce-4692-b3e1-dce850aae41a. Alternate PowerShell Hosts Pipe — Sigma Rule. Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="58cb02d5-78ce-4692-b3e1-dce850aae41a, attack.execution, attack.t1059.001, windows, pipe_created, Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575, rule-status:test, severity:medium, logsource-product:windows, logsource-category:pipe_created, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-category:pipe_created, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/58cb02d5-78ce-4692-b3e1-dce850aae41a/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/58cb02d5-78ce-4692-b3e1-dce850aae41a/">
+<meta property="og:type" content="website"><meta property="og:title" content="Alternate PowerShell Hosts Pipe — Sigma Rule"><meta property="og:description" content="Sigma rule 58cb02d5-78ce-4692-b3e1-dce850aae41a. Alternate PowerShell Hosts Pipe — Sigma Rule. Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Alternate PowerShell Hosts Pipe — Sigma Rule"><meta name="twitter:description" content="Sigma rule 58cb02d5-78ce-4692-b3e1-dce850aae41a. Alternate PowerShell Hosts Pipe — Sigma Rule. Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/58cb02d5-78ce-4692-b3e1-dce850aae41a/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/58cb02d5-78ce-4692-b3e1-dce850aae41a/","name":"Alternate PowerShell Hosts Pipe — Sigma Rule","description":"Sigma rule 58cb02d5-78ce-4692-b3e1-dce850aae41a. Alternate PowerShell Hosts Pipe — Sigma Rule. Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Alternate PowerShell Hosts Pipe — Sigma Rule</h1><p class="lead">Sigma rule 58cb02d5-78ce-4692-b3e1-dce850aae41a. Alternate PowerShell Hosts Pipe — Sigma Rule. Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/pipe-created/">pipe_created</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Roberto Rodriguez @Cyb3rWard0g, Tim Shelton. Source status: test; severity: medium. Source dates: 2019-09-12 / 2025-10-07.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;pipe_created&quot;,
+  &quot;definition&quot;: &quot;Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/pipe_created/pipe_created_powershell_alternate_host_pipe.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 0a76adb129502772fd4d80866fe52b750d44b3b57f7296be0cf0570cf5a81329</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Alternate PowerShell Hosts Pipe
+id: 58cb02d5-78ce-4692-b3e1-dce850aae41a
+related:
+    - id: ac7102b4-9e1e-4802-9b4f-17c5524c015c
+      type: derived
+status: test
+description: Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe
+references:
+    - https://threathunterplaybook.com/hunts/windows/190610-PwshAlternateHosts/notebook.html
+    - https://threathunterplaybook.com/hunts/windows/190410-LocalPwshExecution/notebook.html
+author: Roberto Rodriguez @Cyb3rWard0g, Tim Shelton
+date: 2019-09-12
+modified: 2025-10-07
+tags:
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    product: windows
+    category: pipe_created
+    definition: &#39;Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575&#39;
+detection:
+    selection:
+        PipeName|startswith: &#39;\PSHost&#39;
+    filter_main_generic:
+        - Image|contains:
+              - &#39;:\Program Files\PowerShell\7-preview\pwsh.exe&#39; # Powershell 7
+              - &#39;:\Program Files\PowerShell\7\pwsh.exe&#39; # Powershell 7
+              - &#39;:\Windows\system32\dsac.exe&#39;
+              - &#39;:\Windows\system32\inetsrv\w3wp.exe&#39;   # this is sad :,( but it triggers FPs on Exchange servers
+              - &#39;:\Windows\System32\sdiagnhost.exe&#39;
+              - &#39;:\Windows\system32\ServerManager.exe&#39;
+              - &#39;:\Windows\system32\wbem\wmiprvse.exe&#39;
+              - &#39;:\Windows\System32\WindowsPowerShell\v1.0\powershell_ise.exe&#39;
+              - &#39;:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe&#39;
+              - &#39;:\Windows\System32\wsmprovhost.exe&#39;
+              - &#39;:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell_ise.exe&#39;
+              - &#39;:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe&#39;
+        - Image|contains|all:
+              - &#39;C:\Program Files\WindowsApps\Microsoft.PowerShellPreview&#39;
+              - &#39;\pwsh.exe&#39;
+        - Image|contains|all:
+              - &#39;\AppData\Local\Microsoft\WindowsApps\Microsoft.PowerShellPreview&#39;
+              - &#39;\pwsh.exe&#39;
+    filter_optional_sqlserver: # Microsoft SQL Server\130\Tools\
+        Image|startswith:
+            - &#39;C:\Program Files (x86)\&#39;
+            - &#39;C:\Program Files\&#39;
+        Image|contains: &#39;\Microsoft SQL Server\&#39;
+        Image|endswith: &#39;\Tools\Binn\SQLPS.exe&#39;
+    filter_optional_azure_connected_machine_agent:
+        # Azure Connected Machine Agent (https://devblogs.microsoft.com/powershell/azure-policy-guest-configuration-client/)
+        Image|startswith: &#39;C:\Program Files\AzureConnectedMachineAgent\GCArcService&#39;
+        Image|endswith: &#39;\GC\gc_worker.exe&#39;
+    filter_optional_citrix:
+        Image|startswith: &#39;C:\Program Files\Citrix\&#39;
+    filter_optional_exchange:
+        Image|startswith: &#39;C:\Program Files\Microsoft\Exchange Server\&#39;
+    filter_main_null:
+        Image: null
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Programs using PowerShell directly without invocation of a dedicated interpreter.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/58cb02d5-78ce-4692-b3e1-dce850aae41a.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Programs using PowerShell directly without invocation of a dedicated interpreter.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://threathunterplaybook.com/hunts/windows/190610-PwshAlternateHosts/notebook.html">https://threathunterplaybook.com/hunts/windows/190610-PwshAlternateHosts/notebook.html</a></li><li><a href="https://threathunterplaybook.com/hunts/windows/190410-LocalPwshExecution/notebook.html">https://threathunterplaybook.com/hunts/windows/190410-LocalPwshExecution/notebook.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

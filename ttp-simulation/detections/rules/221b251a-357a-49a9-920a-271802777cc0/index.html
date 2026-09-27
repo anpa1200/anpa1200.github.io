@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Process Reconnaissance via Wmic.EXE — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 221b251a-357a-49a9-920a-271802777cc0. Potential Process Reconnaissance via Wmic.EXE — Sigma Rule. Detects the execution of &quot;wmic&quot; with the &quot;process&quot; flag, which might indicate an attempt to perform reconnaissance on running processes.
+Adversaries may use wmic to query for running processes and their details as part of their reconnaissance efforts.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="221b251a-357a-49a9-920a-271802777cc0, attack.execution, attack.t1047, attack.discovery, attack.t1057, process_creation, windows, rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1047, sigma-tag:attack.discovery, sigma-tag:attack.t1057">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1047, sigma-tag:attack.discovery, sigma-tag:attack.t1057">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/221b251a-357a-49a9-920a-271802777cc0/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/221b251a-357a-49a9-920a-271802777cc0/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Process Reconnaissance via Wmic.EXE — Sigma Rule"><meta property="og:description" content="Sigma rule 221b251a-357a-49a9-920a-271802777cc0. Potential Process Reconnaissance via Wmic.EXE — Sigma Rule. Detects the execution of &quot;wmic&quot; with the &quot;process&quot; flag, which might indicate an attempt to perform reconnaissance on running processes.
+Adversaries may use wmic to query for running processes and their details as part of their reconnaissance efforts.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Process Reconnaissance via Wmic.EXE — Sigma Rule"><meta name="twitter:description" content="Sigma rule 221b251a-357a-49a9-920a-271802777cc0. Potential Process Reconnaissance via Wmic.EXE — Sigma Rule. Detects the execution of &quot;wmic&quot; with the &quot;process&quot; flag, which might indicate an attempt to perform reconnaissance on running processes.
+Adversaries may use wmic to query for running processes and their details as part of their reconnaissance efforts.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/221b251a-357a-49a9-920a-271802777cc0/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/221b251a-357a-49a9-920a-271802777cc0/","name":"Potential Process Reconnaissance via Wmic.EXE — Sigma Rule","description":"Sigma rule 221b251a-357a-49a9-920a-271802777cc0. Potential Process Reconnaissance via Wmic.EXE — Sigma Rule. Detects the execution of \"wmic\" with the \"process\" flag, which might indicate an attempt to perform reconnaissance on running processes.\nAdversaries may use wmic to query for running processes and their details as part of their reconnaissance efforts.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Process Reconnaissance via Wmic.EXE — Sigma Rule</h1><p class="lead">Sigma rule 221b251a-357a-49a9-920a-271802777cc0. Potential Process Reconnaissance via Wmic.EXE — Sigma Rule. Detects the execution of &quot;wmic&quot; with the &quot;process&quot; flag, which might indicate an attempt to perform reconnaissance on running processes.
+Adversaries may use wmic to query for running processes and their details as part of their reconnaissance efforts.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1047/">attack.t1047</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1057/">attack.t1057</a></div><p>Author: frack113. Source status: test; severity: medium. Source dates: 2022-01-01 / 2025-12-15.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_wmic_recon_process.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: a2de36a81c89e9a4665ee479585bc049171d92dca392ef248f59bcea4937c238</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Process Reconnaissance via Wmic.EXE
+id: 221b251a-357a-49a9-920a-271802777cc0
+status: test
+description: |
+    Detects the execution of &quot;wmic&quot; with the &quot;process&quot; flag, which might indicate an attempt to perform reconnaissance on running processes.
+    Adversaries may use wmic to query for running processes and their details as part of their reconnaissance efforts.
+references:
+    - https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1047/T1047.md
+    - https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wmic
+author: frack113
+date: 2022-01-01
+modified: 2025-12-15
+tags:
+    - attack.execution
+    - attack.t1047
+    - attack.discovery
+    - attack.t1057
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: &#39;\WMIC.exe&#39;
+        - OriginalFileName: &#39;wmic.exe&#39;
+    selection_cli:
+        CommandLine|contains: &#39;process&#39;
+    filter_main_creation:
+        CommandLine|contains|all:
+            # Rule id 526be59f-a573-4eea-b5f7-f0973207634d for `wmic process call create #{process_to_execute}`
+            - &#39;call&#39;
+            - &#39;create&#39;
+    filter_main_terminate:
+        CommandLine|contains|all:
+            # Rule id 49d9671b-0a0a-4c09-8280-d215bfd30662 for `wmic path win32_process where processid=#{processid_to_terminate} call terminate`
+            - &#39;call&#39;
+            - &#39;terminate&#39;
+    condition: all of selection* and not 1 of filter_main_*
+falsepositives:
+    - Unknown
+level: medium
+simulation:
+    - type: atomic-red-team
+      name: WMI Reconnaissance Processes
+      technique: T1047
+      atomic_guid: 5750aa16-0e59-4410-8b9a-8a47ca2788e2
+regression_tests_path: regression_data/rules/windows/process_creation/proc_creation_win_wmic_recon_process/info.yml
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/221b251a-357a-49a9-920a-271802777cc0.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1047/T1047.md">https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1047/T1047.md</a></li><li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wmic">https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wmic</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1047/">T1047 · Windows Management Instrumentation</a> · <a href="/ttp-simulation/detections/enterprise/T1047/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1057/">T1057 · Process Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1057/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

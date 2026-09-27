@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 48bfd177-7cf2-412b-ad77-baf923489e82. Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule. Detects the image load of VSS DLL by uncommon executables">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="48bfd177-7cf2-412b-ad77-baf923489e82, attack.impact, attack.t1490, image_load, windows, rule-status:test, severity:medium, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.impact, sigma-tag:attack.t1490">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.impact, sigma-tag:attack.t1490">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/48bfd177-7cf2-412b-ad77-baf923489e82/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/48bfd177-7cf2-412b-ad77-baf923489e82/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule"><meta property="og:description" content="Sigma rule 48bfd177-7cf2-412b-ad77-baf923489e82. Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule. Detects the image load of VSS DLL by uncommon executables"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule"><meta name="twitter:description" content="Sigma rule 48bfd177-7cf2-412b-ad77-baf923489e82. Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule. Detects the image load of VSS DLL by uncommon executables"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/48bfd177-7cf2-412b-ad77-baf923489e82/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/48bfd177-7cf2-412b-ad77-baf923489e82/","name":"Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule","description":"Sigma rule 48bfd177-7cf2-412b-ad77-baf923489e82. Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule. Detects the image load of VSS DLL by uncommon executables","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule</h1><p class="lead">Sigma rule 48bfd177-7cf2-412b-ad77-baf923489e82. Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load — Sigma Rule. Detects the image load of VSS DLL by uncommon executables</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/image-load/">image_load</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-impact/">attack.impact</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1490/">attack.t1490</a></div><p>Author: frack113. Source status: test; severity: medium. Source dates: 2023-02-17 / 2025-12-03.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;image_load&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/image_load/image_load_dll_vsstrace_susp_load.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: fdbd0c5b79c34a8e6a7e02e95f903ca3441cee1bef5b43187938a94acb4f7f7d</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potentially Suspicious Volume Shadow Copy Vsstrace.dll Load
+id: 48bfd177-7cf2-412b-ad77-baf923489e82
+related:
+    - id: 333cdbe8-27bb-4246-bf82-b41a0dca4b70 # vss_ps.dll
+      type: similar
+    - id: 37774c23-25a1-4adb-bb6d-8bb9fd59c0f8 # vssapi.dll
+      type: similar
+status: test
+description: Detects the image load of VSS DLL by uncommon executables
+references:
+    - https://github.com/ORCx41/DeleteShadowCopies
+author: frack113
+date: 2023-02-17
+modified: 2025-12-03
+tags:
+    - attack.impact
+    - attack.t1490
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection:
+        ImageLoaded|endswith: &#39;\vsstrace.dll&#39;
+    filter_main_windows:
+        - Image:
+              - &#39;C:\Windows\explorer.exe&#39;
+              - &#39;C:\Windows\ImmersiveControlPanel\SystemSettings.exe&#39;
+        - Image|startswith:
+              - &#39;C:\Windows\System32\&#39;
+              - &#39;C:\Windows\SysWOW64\&#39;
+              - &#39;C:\Windows\Temp\{&#39; # Installers
+              - &#39;C:\Windows\WinSxS\&#39;
+              - &#39;C:\ProgramData\Package Cache\{&#39;  # Microsoft Visual Redistributable installer  VC_redist/vcredist EXE
+    filter_main_program_files:
+        # When using this rule in your environment replace the &quot;Program Files&quot; folder by the exact applications you know use this. Examples would be software such as backup solutions
+        Image|startswith:
+            - &#39;C:\Program Files\&#39;
+            - &#39;C:\Program Files (x86)\&#39;
+    filter_optional_recovery:
+        Image|startswith: &#39;C:\$WinREAgent\Scratch\&#39;
+    filter_main_null_image:
+        Image: null # Observed through Aurora
+    filter_optional_avira:
+        Image|contains|all:
+            - &#39;\temp\is-&#39;
+            - &#39;\avira_system_speedup.tmp&#39;
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Unknown
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/48bfd177-7cf2-412b-ad77-baf923489e82.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/ORCx41/DeleteShadowCopies">https://github.com/ORCx41/DeleteShadowCopies</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1490/">T1490 · Inhibit System Recovery</a> · <a href="/ttp-simulation/detections/enterprise/T1490/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

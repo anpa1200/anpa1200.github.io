@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Office Application Initiated Network Connection To Non-Local IP — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84. Office Application Initiated Network Connection To Non-Local IP — Sigma Rule. Detects an office application (Word, Excel, PowerPoint)  that initiate a network connection to a non-private IP addresses.
+This rule aims to detect traffic similar to one seen exploited in CVE-2021-42292.
+This rule will require an initial baseline and tuning that is specific to your organization.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84, attack.execution, attack.t1203, network_connection, windows, rule-status:test, severity:medium, logsource-category:network_connection, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1203">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:network_connection, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1203">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84/">
+<meta property="og:type" content="website"><meta property="og:title" content="Office Application Initiated Network Connection To Non-Local IP — Sigma Rule"><meta property="og:description" content="Sigma rule 75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84. Office Application Initiated Network Connection To Non-Local IP — Sigma Rule. Detects an office application (Word, Excel, PowerPoint)  that initiate a network connection to a non-private IP addresses.
+This rule aims to detect traffic similar to one seen exploited in CVE-2021-42292.
+This rule will require an initial baseline and tuning that is specific to your organization.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Office Application Initiated Network Connection To Non-Local IP — Sigma Rule"><meta name="twitter:description" content="Sigma rule 75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84. Office Application Initiated Network Connection To Non-Local IP — Sigma Rule. Detects an office application (Word, Excel, PowerPoint)  that initiate a network connection to a non-private IP addresses.
+This rule aims to detect traffic similar to one seen exploited in CVE-2021-42292.
+This rule will require an initial baseline and tuning that is specific to your organization.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84/","name":"Office Application Initiated Network Connection To Non-Local IP — Sigma Rule","description":"Sigma rule 75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84. Office Application Initiated Network Connection To Non-Local IP — Sigma Rule. Detects an office application (Word, Excel, PowerPoint)  that initiate a network connection to a non-private IP addresses.\nThis rule aims to detect traffic similar to one seen exploited in CVE-2021-42292.\nThis rule will require an initial baseline and tuning that is specific to your organization.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Office Application Initiated Network Connection To Non-Local IP — Sigma Rule</h1><p class="lead">Sigma rule 75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84. Office Application Initiated Network Connection To Non-Local IP — Sigma Rule. Detects an office application (Word, Excel, PowerPoint)  that initiate a network connection to a non-private IP addresses.
+This rule aims to detect traffic similar to one seen exploited in CVE-2021-42292.
+This rule will require an initial baseline and tuning that is specific to your organization.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/network-connection/">network_connection</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1203/">attack.t1203</a></div><p>Author: Christopher Peacock &#39;@securepeacock&#39;, SCYTHE &#39;@scythe_io&#39;, Florian Roth (Nextron Systems), Tim Shelton, Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2021-11-10 / 2025-10-17.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;network_connection&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/network_connection/net_connection_win_office_outbound_non_local_ip.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: d68cc47e3090ba9840363b03a45bc4faa5a9d01fe25b3abae60c7c0fa7d57738</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Office Application Initiated Network Connection To Non-Local IP
+id: 75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84
+status: test
+description: |
+    Detects an office application (Word, Excel, PowerPoint)  that initiate a network connection to a non-private IP addresses.
+    This rule aims to detect traffic similar to one seen exploited in CVE-2021-42292.
+    This rule will require an initial baseline and tuning that is specific to your organization.
+references:
+    - https://corelight.com/blog/detecting-cve-2021-42292
+    - https://learn.microsoft.com/de-de/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide
+author: Christopher Peacock &#39;@securepeacock&#39;, SCYTHE &#39;@scythe_io&#39;, Florian Roth (Nextron Systems), Tim Shelton, Nasreddine Bencherchali (Nextron Systems)
+date: 2021-11-10
+modified: 2025-10-17
+tags:
+    - attack.execution
+    - attack.t1203
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        Image|endswith:
+            - &#39;\excel.exe&#39;
+            - &#39;\outlook.exe&#39;
+            - &#39;\powerpnt.exe&#39;
+            - &#39;\winword.exe&#39;
+            - &#39;\wordview.exe&#39;
+        Initiated: &#39;true&#39;
+    filter_main_local_ranges:
+        DestinationIp|cidr:
+            - &#39;127.0.0.0/8&#39;
+            - &#39;10.0.0.0/8&#39;
+            - &#39;172.16.0.0/12&#39;
+            - &#39;192.168.0.0/16&#39;
+            - &#39;169.254.0.0/16&#39;
+            - &#39;::1/128&#39;  # IPv6 loopback
+            - &#39;fe80::/10&#39;  # IPv6 link-local addresses
+            - &#39;fc00::/7&#39;  # IPv6 private addresses
+    filter_main_msrange_generic:
+        DestinationIp|cidr:
+            - &#39;2.16.56.0/23&#39; # Akamai International B.V.
+            - &#39;2.17.248.0/21&#39; # Akamai International B.V.
+            - &#39;13.107.240.0/21&#39; # Microsoft Corporation
+            - &#39;20.184.0.0/13&#39; # Microsoft Corporation
+            - &#39;23.61.224.0/20&#39; # Akamai-AS
+            - &#39;20.192.0.0/10&#39; # Microsoft Corporation
+            - &#39;23.72.0.0/13&#39; # Akamai International B.V.
+            - &#39;23.3.88.0/22&#39; # Akamai-AS
+            - &#39;23.216.132.0/22&#39; # Akamai-AS
+            - &#39;40.76.0.0/14&#39; # Microsoft Corporation
+            - &#39;51.10.0.0/15&#39; # Microsoft Corporation
+            - &#39;51.103.0.0/16&#39; # Microsoft Corporation
+            - &#39;51.104.0.0/15&#39; # Microsoft Corporation
+            - &#39;51.142.136.0/22&#39; # Microsoft Corporation - https://ipinfo.io/AS8075/51.140.0.0/14-51.142.136.0/22
+            - &#39;52.160.0.0/11&#39; # Microsoft Corporation - https://ipinfo.io/AS8075/52.160.0.0/11
+            - &#39;95.101.96.0/21&#39; # Akamai-As
+            - &#39;204.79.197.0/24&#39; # Microsoft Corporation
+    filter_main_msrange_exchange_1:
+        # Exchange Online
+        # &quot;urls&quot;: [
+        #       &quot;outlook.cloud.microsoft&quot;,
+        #       &quot;outlook.office.com&quot;,
+        #       &quot;outlook.office365.com&quot;
+        # ]
+        DestinationIp|cidr:
+            - &#39;13.107.4.0/22&#39;
+            - &#39;13.107.6.152/31&#39;
+            - &#39;13.107.18.10/31&#39;
+            - &#39;13.107.42.0/23&#39;
+            - &#39;13.107.128.0/22&#39;
+            - &#39;23.35.224.0/20&#39;
+            - &#39;23.53.40.0/22&#39;
+            - &#39;23.103.160.0/20&#39;
+            - &#39;23.216.76.0/22&#39;
+            - &#39;40.96.0.0/13&#39;
+            - &#39;40.104.0.0/15&#39;
+            - &#39;52.96.0.0/14&#39;
+            - &#39;131.253.33.215/32&#39;
+            - &#39;132.245.0.0/16&#39;
+            - &#39;150.171.32.0/22&#39;
+            - &#39;204.79.197.215/32&#39;
+            - &#39;2603:1006::/40&#39;
+            - &#39;2603:1016::/36&#39;
+            - &#39;2603:1026::/36&#39;
+            - &#39;2603:1036::/36&#39;
+            - &#39;2603:1046::/36&#39;
+            - &#39;2603:1056::/36&#39;
+            - &#39;2620:1ec:4::152/128&#39;
+            - &#39;2620:1ec:4::153/128&#39;
+            - &#39;2620:1ec:c::10/128&#39;
+            - &#39;2620:1ec:c::11/128&#39;
+            - &#39;2620:1ec:d::10/128&#39;
+            - &#39;2620:1ec:d::11/128&#39;
+            - &#39;2620:1ec:8f0::/46&#39;
+            - &#39;2620:1ec:900::/46&#39;
+            - &#39;2620:1ec:a92::152/128&#39;
+            - &#39;2620:1ec:a92::153/128&#39;
+        DestinationPort:
+            - 80
+            - 443
+    filter_main_msrange_exchange_2:
+        # Exchange Online
+        # &quot;urls&quot;: [
+        #       &quot;outlook.office365.com&quot;,
+        #       &quot;smtp.office365.com&quot;
+        # ]
+        DestinationIp|cidr:
+            - &#39;13.107.6.152/31&#39;
+            - &#39;13.107.18.10/31&#39;
+            - &#39;13.107.128.0/22&#39;
+            - &#39;23.103.160.0/20&#39;
+            - &#39;40.96.0.0/13&#39;
+            - &#39;40.104.0.0/15&#39;
+            - &#39;52.96.0.0/14&#39;
+            - &#39;131.253.33.215/32&#39;
+            - &#39;132.245.0.0/16&#39;
+            - &#39;150.171.32.0/22&#39;
+            - &#39;204.79.197.215/32&#39;
+            - &#39;2603:1006::/40&#39;
+            - &#39;2603:1016::/36&#39;
+            - &#39;2603:1026::/36&#39;
+            - &#39;2603:1036::/36&#39;
+            - &#39;2603:1046::/36&#39;
+            - &#39;2603:1056::/36&#39;
+            - &#39;2620:1ec:4::152/128&#39;
+            - &#39;2620:1ec:4::153/128&#39;
+            - &#39;2620:1ec:c::10/128&#39;
+            - &#39;2620:1ec:c::11/128&#39;
+            - &#39;2620:1ec:d::10/128&#39;
+            - &#39;2620:1ec:d::11/128&#39;
+            - &#39;2620:1ec:8f0::/46&#39;
+            - &#39;2620:1ec:900::/46&#39;
+            - &#39;2620:1ec:a92::152/128&#39;
+            - &#39;2620:1ec:a92::153/128&#39;
+        DestinationPort:
+            - 143
+            - 587
+            - 993
+            - 995
+        Protocol: &#39;tcp&#39;
+    filter_main_msrange_exchange_3:
+        # Exchange Online
+        # &quot;urls&quot;: [
+        #       &quot;*.protection.outlook.com&quot;
+        #  ]
+        DestinationIp|cidr:
+            - &#39;40.92.0.0/15&#39;
+            - &#39;40.107.0.0/16&#39;
+            - &#39;52.100.0.0/14&#39;
+            - &#39;52.238.78.88/32&#39;
+            - &#39;104.47.0.0/17&#39;
+            - &#39;2a01:111:f400::/48&#39;
+            - &#39;2a01:111:f403::/48&#39;
+        DestinationPort: 443
+    filter_main_msrange_exchange_4:
+        # Exchange Online
+        # &quot;urls&quot;: [
+        #       &quot;*.mail.protection.outlook.com&quot;,
+        #       &quot;*.mx.microsoft&quot;
+        #  ]
+        DestinationIp|cidr:
+            - &#39;40.92.0.0/15&#39;
+            - &#39;40.107.0.0/16&#39;
+            - &#39;52.100.0.0/14&#39;
+            - &#39;52.238.78.88/32&#39;
+            - &#39;104.47.0.0/17&#39;
+            - &#39;2a01:111:f400::/48&#39;
+            - &#39;2a01:111:f403::/48&#39;
+        DestinationPort: 25
+    filter_main_msrange_sharepoint_1:
+        # SharePoint Online and OneDrive for Business&quot;,
+        # &quot;urls&quot;: [
+        #       &quot;*.sharepoint.com&quot;
+        # ]
+        DestinationIp|cidr:
+            - &#39;13.107.136.0/22&#39;
+            - &#39;40.108.128.0/17&#39;
+            - &#39;52.104.0.0/14&#39;
+            - &#39;104.146.128.0/17&#39;
+            - &#39;150.171.40.0/22&#39;
+            - &#39;2603:1061:1300::/40&#39;
+            - &#39;2620:1ec:8f8::/46&#39;
+            - &#39;2620:1ec:908::/46&#39;
+            - &#39;2a01:111:f402::/48&#39;
+        DestinationPort:
+            - 80
+            - 443
+        Protocol: &#39;tcp&#39;
+    filter_main_msrange_office_1:
+        # Microsoft 365 Common and Office Online&quot;,
+        # &quot;urls&quot;: [
+        #       &quot;*.officeapps.live.com&quot;,
+        #       &quot;*.online.office.com&quot;,
+        #       &quot;office.live.com&quot;,
+        #       &quot;office.com.akadns.net&quot;
+        # ],
+        DestinationIp|cidr:
+            - &#39;13.107.6.171/32&#39;
+            - &#39;13.107.18.15/32&#39;
+            - &#39;13.107.140.6/32&#39;
+            - &#39;20.64.0.0/10&#39;
+            - &#39;52.108.0.0/14&#39;
+            - &#39;52.244.37.168/32&#39;
+            - &#39;2603:1006:1400::/40&#39;
+            - &#39;2603:1016:2400::/40&#39;
+            - &#39;2603:1026:2400::/40&#39;
+            - &#39;2603:1036:2400::/40&#39;
+            - &#39;2603:1046:1400::/40&#39;
+            - &#39;2603:1056:1400::/40&#39;
+            - &#39;2603:1063:2000::/38&#39;
+            - &#39;2620:1ec:c::15/128&#39;
+            - &#39;2620:1ec:8fc::6/128&#39;
+            - &#39;2620:1ec:a92::171/128&#39;
+            - &#39;2a01:111:f100:2000::a83e:3019/128&#39;
+            - &#39;2a01:111:f100:2002::8975:2d79/128&#39;
+            - &#39;2a01:111:f100:2002::8975:2da8/128&#39;
+            - &#39;2a01:111:f100:7000::6fdd:6cd5/128&#39;
+            - &#39;2a01:111:f100:a004::bfeb:88cf/128&#39;
+        DestinationPort:
+            - 80
+            - 443
+        Protocol: &#39;tcp&#39;
+    filter_main_msrange_office_2:
+        # Microsoft 365 Common and Office Online
+        # &quot;urls&quot;: [
+        #       &quot;*.auth.microsoft.com&quot;,
+        #       &quot;*.msftidentity.com&quot;,
+        #       &quot;*.msidentity.com&quot;,
+        #       &quot;account.activedirectory.windowsazure.com&quot;,
+        #       &quot;accounts.accesscontrol.windows.net&quot;,
+        #       &quot;adminwebservice.microsoftonline.com&quot;,
+        #       &quot;api.passwordreset.microsoftonline.com&quot;,
+        #       &quot;autologon.microsoftazuread-sso.com&quot;,
+        #       &quot;becws.microsoftonline.com&quot;,
+        #       &quot;ccs.login.microsoftonline.com&quot;,
+        #       &quot;clientconfig.microsoftonline-p.net&quot;,
+        #       &quot;cloudapp.azure.com&quot;,
+        #       &quot;companymanager.microsoftonline.com&quot;,
+        #       &quot;device.login.microsoftonline.com&quot;,
+        #       &quot;graph.microsoft.com&quot;,
+        #       &quot;graph.windows.net&quot;,
+        #       &quot;login-us.microsoftonline.com&quot;,
+        #       &quot;login.microsoft.com&quot;,
+        #       &quot;login.microsoftonline-p.com&quot;,
+        #       &quot;login.microsoftonline.com&quot;,
+        #       &quot;login.windows.net&quot;,
+        #       &quot;logincert.microsoftonline.com&quot;,
+        #       &quot;loginex.microsoftonline.com&quot;,
+        #       &quot;nexus.microsoftonline-p.com&quot;,
+        #       &quot;passwordreset.microsoftonline.com&quot;,
+        #       &quot;provisioningapi.microsoftonline.com&quot;,
+        #       &quot;web.core.windows.net&quot;,
+        # ]
+        DestinationIp|cidr:
+            - &#39;172.128.0.0/10&#39;
+            - &#39;20.20.32.0/19&#39;
+            - &#39;20.103.156.88/32&#39; # msn.com
+            - &#39;20.190.128.0/18&#39;
+            - &#39;20.231.128.0/19&#39;
+            - &#39;40.126.0.0/18&#39;
+            - &#39;57.150.0.0/15&#39;
+            - &#39;2603:1006:2000::/48&#39;
+            - &#39;2603:1007:200::/48&#39;
+            - &#39;2603:1016:1400::/48&#39;
+            - &#39;2603:1017::/48&#39;
+            - &#39;2603:1026:3000::/48&#39;
+            - &#39;2603:1027:1::/48&#39;
+            - &#39;2603:1036:3000::/48&#39;
+            - &#39;2603:1037:1::/48&#39;
+            - &#39;2603:1046:2000::/48&#39;
+            - &#39;2603:1047:1::/48&#39;
+            - &#39;2603:1056:2000::/48&#39;
+            - &#39;2603:1057:2::/48&#39;
+        DestinationPort:
+            - 80
+            - 443
+        Protocol: &#39;tcp&#39;
+    filter_main_msrange_office_3:
+        # Microsoft 365 Common and Office Online
+        #  &quot;urls&quot;: [
+        #       &quot;*.compliance.microsoft.com&quot;,
+        #       &quot;*.data.microsoft.com&quot;,
+        #       &quot;*.protection.office.com&quot;,
+        #       &quot;*.security.microsoft.com&quot;,
+        #       &quot;compliance.microsoft.com&quot;,
+        #       &quot;defender.microsoft.com&quot;,
+        #       &quot;protection.office.com&quot;,
+        #       &quot;security.microsoft.com&quot;,
+        #       &quot;teams.microsoft.com&quot;,
+        #  ]
+        DestinationIp|cidr:
+            - &#39;13.64.0.0/11&#39;
+            - &#39;13.107.6.192/32&#39;
+            - &#39;13.107.9.192/32&#39;
+            - &#39;13.89.179.14/32&#39;
+            - &#39;20.40.0.0/14&#39;
+            - &#39;20.48.0.0/12&#39;
+            - &#39;20.64.0.0/12&#39;
+            - &#39;52.123.0.0/16&#39;
+            - &#39;52.108.0.0/14&#39;
+            - &#39;52.136.0.0/13&#39;
+            - &#39;57.150.0.0/15&#39;
+            - &#39;80.239.150.67/32&#39; # Arelion Sweden AB
+            - &#39;2620:1ec:4::192/128&#39;
+            - &#39;2620:1ec:a92::192/128&#39;
+        DestinationPort: 443
+        Protocol: &#39;tcp&#39;
+    filter_main_destination_host:
+        DestinationHostname|endswith: &#39;.deploy.static.akamaitechnologies.com&#39;
+        DestinationPort: 443
+        Protocol: &#39;tcp&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - You may have to tune certain domains out that Excel may call out to, such as microsoft or other business use case domains.
+    - Office documents commonly have templates that refer to external addresses, like &quot;sharepoint.ourcompany.com&quot; may have to be tuned.
+    - It is highly recommended to baseline your activity and tune out common business use cases.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/75e33ce3-ae32-4dcc-9aa8-a2a3029d6f84.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>You may have to tune certain domains out that Excel may call out to, such as microsoft or other business use case domains.</li><li>Office documents commonly have templates that refer to external addresses, like &quot;sharepoint.ourcompany.com&quot; may have to be tuned.</li><li>It is highly recommended to baseline your activity and tune out common business use cases.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://corelight.com/blog/detecting-cve-2021-42292">https://corelight.com/blog/detecting-cve-2021-42292</a></li><li><a href="https://learn.microsoft.com/de-de/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide">https://learn.microsoft.com/de-de/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1203/">T1203 · Exploitation for Client Execution</a> · <a href="/ttp-simulation/detections/enterprise/T1203/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

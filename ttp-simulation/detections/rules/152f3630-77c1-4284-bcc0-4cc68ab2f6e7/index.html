@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shell Open Registry Keys Manipulation — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 152f3630-77c1-4284-bcc0-4cc68ab2f6e7. Shell Open Registry Keys Manipulation — Sigma Rule. Detects the shell open key manipulation (exefile and ms-settings) used for persistence and the pattern of UAC Bypass using fodhelper.exe, computerdefaults.exe, slui.exe via registry keys (e.g. UACMe 33 or 62)">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="152f3630-77c1-4284-bcc0-4cc68ab2f6e7, attack.persistence, attack.privilege-escalation, attack.t1548.002, attack.t1546.001, registry_event, windows, rule-status:test, severity:high, logsource-category:registry_event, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1548.002, sigma-tag:attack.t1546.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:registry_event, logsource-product:windows, sigma-tag:attack.persistence, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1548.002, sigma-tag:attack.t1546.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/152f3630-77c1-4284-bcc0-4cc68ab2f6e7/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/152f3630-77c1-4284-bcc0-4cc68ab2f6e7/">
+<meta property="og:type" content="website"><meta property="og:title" content="Shell Open Registry Keys Manipulation — Sigma Rule"><meta property="og:description" content="Sigma rule 152f3630-77c1-4284-bcc0-4cc68ab2f6e7. Shell Open Registry Keys Manipulation — Sigma Rule. Detects the shell open key manipulation (exefile and ms-settings) used for persistence and the pattern of UAC Bypass using fodhelper.exe, computerdefaults.exe, slui.exe via registry keys (e.g. UACMe 33 or 62)"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Shell Open Registry Keys Manipulation — Sigma Rule"><meta name="twitter:description" content="Sigma rule 152f3630-77c1-4284-bcc0-4cc68ab2f6e7. Shell Open Registry Keys Manipulation — Sigma Rule. Detects the shell open key manipulation (exefile and ms-settings) used for persistence and the pattern of UAC Bypass using fodhelper.exe, computerdefaults.exe, slui.exe via registry keys (e.g. UACMe 33 or 62)"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/152f3630-77c1-4284-bcc0-4cc68ab2f6e7/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/152f3630-77c1-4284-bcc0-4cc68ab2f6e7/","name":"Shell Open Registry Keys Manipulation — Sigma Rule","description":"Sigma rule 152f3630-77c1-4284-bcc0-4cc68ab2f6e7. Shell Open Registry Keys Manipulation — Sigma Rule. Detects the shell open key manipulation (exefile and ms-settings) used for persistence and the pattern of UAC Bypass using fodhelper.exe, computerdefaults.exe, slui.exe via registry keys (e.g. UACMe 33 or 62)","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Shell Open Registry Keys Manipulation — Sigma Rule</h1><p class="lead">Sigma rule 152f3630-77c1-4284-bcc0-4cc68ab2f6e7. Shell Open Registry Keys Manipulation — Sigma Rule. Detects the shell open key manipulation (exefile and ms-settings) used for persistence and the pattern of UAC Bypass using fodhelper.exe, computerdefaults.exe, slui.exe via registry keys (e.g. UACMe 33 or 62)</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/registry-event/">registry_event</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1548-002/">attack.t1548.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1546-001/">attack.t1546.001</a></div><p>Author: Christian Burkard (Nextron Systems). Source status: test; severity: high. Source dates: 2021-08-30 / 2022-01-13.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;registry_event&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/registry/registry_event/registry_event_shell_open_keys_manipulation.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: dad24734711d2b2d78103c57e3cb12cd468e02c758989b5b0896f37803e5cdad</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Shell Open Registry Keys Manipulation
+id: 152f3630-77c1-4284-bcc0-4cc68ab2f6e7
+related:
+    - id: dd3ee8cc-f751-41c9-ba53-5a32ed47e563
+      type: similar
+status: test
+description: Detects the shell open key manipulation (exefile and ms-settings) used for persistence and the pattern of UAC Bypass using fodhelper.exe, computerdefaults.exe, slui.exe via registry keys (e.g. UACMe 33 or 62)
+references:
+    - https://github.com/hfiref0x/UACME
+    - https://winscripting.blog/2017/05/12/first-entry-welcome-and-uac-bypass/
+    - https://github.com/RhinoSecurityLabs/Aggressor-Scripts/tree/master/UACBypass
+    - https://tria.ge/211119-gs7rtshcfr/behavioral2 [Lokibot sample from Nov 2021]
+author: Christian Burkard (Nextron Systems)
+date: 2021-08-30
+modified: 2022-01-13
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1548.002
+    - attack.t1546.001
+logsource:
+    category: registry_event
+    product: windows
+detection:
+    selection1:
+        EventType: SetValue
+        TargetObject|endswith: &#39;Classes\ms-settings\shell\open\command\SymbolicLinkValue&#39;
+        Details|contains: &#39;\Software\Classes\{&#39;
+    selection2:
+        TargetObject|endswith: &#39;Classes\ms-settings\shell\open\command\DelegateExecute&#39;
+    selection3:
+        EventType: SetValue
+        TargetObject|endswith:
+            - &#39;Classes\ms-settings\shell\open\command\(Default)&#39;
+            - &#39;Classes\exefile\shell\open\command\(Default)&#39;
+    filter_sel3:
+        Details: &#39;(Empty)&#39;
+    condition: selection1 or selection2 or (selection3 and not filter_sel3)
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/152f3630-77c1-4284-bcc0-4cc68ab2f6e7.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/hfiref0x/UACME">https://github.com/hfiref0x/UACME</a></li><li><a href="https://winscripting.blog/2017/05/12/first-entry-welcome-and-uac-bypass/">https://winscripting.blog/2017/05/12/first-entry-welcome-and-uac-bypass/</a></li><li><a href="https://github.com/RhinoSecurityLabs/Aggressor-Scripts/tree/master/UACBypass">https://github.com/RhinoSecurityLabs/Aggressor-Scripts/tree/master/UACBypass</a></li><li><a href="https://tria.ge/211119-gs7rtshcfr/behavioral2 [Lokibot sample from Nov 2021]">https://tria.ge/211119-gs7rtshcfr/behavioral2 [Lokibot sample from Nov 2021]</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1546.001/">T1546.001 · Change Default File Association</a> · <a href="/ttp-simulation/detections/enterprise/T1546.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1548.002/">T1548.002 · Bypass User Account Control</a> · <a href="/ttp-simulation/detections/enterprise/T1548.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

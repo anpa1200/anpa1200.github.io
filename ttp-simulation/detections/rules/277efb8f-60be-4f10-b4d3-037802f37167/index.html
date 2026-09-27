@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registry Persistence Mechanisms in Recycle Bin — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 277efb8f-60be-4f10-b4d3-037802f37167. Registry Persistence Mechanisms in Recycle Bin — Sigma Rule. Detects persistence registry keys for Recycle Bin">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="277efb8f-60be-4f10-b4d3-037802f37167, attack.privilege-escalation, attack.persistence, attack.t1547, registry_event, windows, rule-status:test, severity:high, logsource-category:registry_event, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.t1547">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:registry_event, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.t1547">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/277efb8f-60be-4f10-b4d3-037802f37167/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/277efb8f-60be-4f10-b4d3-037802f37167/">
+<meta property="og:type" content="website"><meta property="og:title" content="Registry Persistence Mechanisms in Recycle Bin — Sigma Rule"><meta property="og:description" content="Sigma rule 277efb8f-60be-4f10-b4d3-037802f37167. Registry Persistence Mechanisms in Recycle Bin — Sigma Rule. Detects persistence registry keys for Recycle Bin"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Registry Persistence Mechanisms in Recycle Bin — Sigma Rule"><meta name="twitter:description" content="Sigma rule 277efb8f-60be-4f10-b4d3-037802f37167. Registry Persistence Mechanisms in Recycle Bin — Sigma Rule. Detects persistence registry keys for Recycle Bin"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/277efb8f-60be-4f10-b4d3-037802f37167/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/277efb8f-60be-4f10-b4d3-037802f37167/","name":"Registry Persistence Mechanisms in Recycle Bin — Sigma Rule","description":"Sigma rule 277efb8f-60be-4f10-b4d3-037802f37167. Registry Persistence Mechanisms in Recycle Bin — Sigma Rule. Detects persistence registry keys for Recycle Bin","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Registry Persistence Mechanisms in Recycle Bin — Sigma Rule</h1><p class="lead">Sigma rule 277efb8f-60be-4f10-b4d3-037802f37167. Registry Persistence Mechanisms in Recycle Bin — Sigma Rule. Detects persistence registry keys for Recycle Bin</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/registry-event/">registry_event</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1547/">attack.t1547</a></div><p>Author: frack113. Source status: test; severity: high. Source dates: 2021-11-18 / 2022-12-06.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;registry_event&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/registry/registry_event/registry_event_persistence_recycle_bin.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 2f736f148b7faebdfc7ec60f4cc7e4775aa604afd24de43cd97add403171f06e</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Registry Persistence Mechanisms in Recycle Bin
+id: 277efb8f-60be-4f10-b4d3-037802f37167
+status: test
+description: Detects persistence registry keys for Recycle Bin
+references:
+    - https://github.com/vxunderground/VXUG-Papers/blob/751edb8d50f95bd7baa730adf2c6c3bb1b034276/The%20Persistence%20Series/Persistence%20via%20Recycle%20Bin/Persistence_via_Recycle_Bin.pdf
+    - https://persistence-info.github.io/Data/recyclebin.html
+    - https://www.hexacorn.com/blog/2018/05/28/beyond-good-ol-run-key-part-78-2/
+author: frack113
+date: 2021-11-18
+modified: 2022-12-06
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.t1547
+logsource:
+    category: registry_event
+    product: windows
+detection:
+    selection_create:
+        EventType: RenameKey
+        NewName|contains: &#39;\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}\shell\open&#39;
+    selection_set:
+        EventType: SetValue
+        TargetObject|contains: &#39;\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}\shell\open\command\(Default)&#39;
+    condition: 1 of selection_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/277efb8f-60be-4f10-b4d3-037802f37167.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/vxunderground/VXUG-Papers/blob/751edb8d50f95bd7baa730adf2c6c3bb1b034276/The%20Persistence%20Series/Persistence%20via%20Recycle%20Bin/Persistence_via_Recycle_Bin.pdf">https://github.com/vxunderground/VXUG-Papers/blob/751edb8d50f95bd7baa730adf2c6c3bb1b034276/The%20Persistence%20Series/Persistence%20via%20Recycle%20Bin/Persistence_via_Recycle_Bin.pdf</a></li><li><a href="https://persistence-info.github.io/Data/recyclebin.html">https://persistence-info.github.io/Data/recyclebin.html</a></li><li><a href="https://www.hexacorn.com/blog/2018/05/28/beyond-good-ol-run-key-part-78-2/">https://www.hexacorn.com/blog/2018/05/28/beyond-good-ol-run-key-part-78-2/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1547/">T1547 · Boot or Logon Autostart Execution</a> · <a href="/ttp-simulation/detections/enterprise/T1547/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

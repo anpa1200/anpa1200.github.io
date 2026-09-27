@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remote Thread Creation By Uncommon Source Image — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 66d31e5f-52d6-40a4-9615-002d3789a119. Remote Thread Creation By Uncommon Source Image — Sigma Rule. Detects uncommon processes creating remote threads.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="66d31e5f-52d6-40a4-9615-002d3789a119, attack.privilege-escalation, attack.stealth, attack.t1055, windows, create_remote_thread, rule-status:test, severity:medium, logsource-product:windows, logsource-category:create_remote_thread, sigma-tag:attack.privilege-escalation, sigma-tag:attack.stealth, sigma-tag:attack.t1055">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-category:create_remote_thread, sigma-tag:attack.privilege-escalation, sigma-tag:attack.stealth, sigma-tag:attack.t1055">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/66d31e5f-52d6-40a4-9615-002d3789a119/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/66d31e5f-52d6-40a4-9615-002d3789a119/">
+<meta property="og:type" content="website"><meta property="og:title" content="Remote Thread Creation By Uncommon Source Image — Sigma Rule"><meta property="og:description" content="Sigma rule 66d31e5f-52d6-40a4-9615-002d3789a119. Remote Thread Creation By Uncommon Source Image — Sigma Rule. Detects uncommon processes creating remote threads."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Remote Thread Creation By Uncommon Source Image — Sigma Rule"><meta name="twitter:description" content="Sigma rule 66d31e5f-52d6-40a4-9615-002d3789a119. Remote Thread Creation By Uncommon Source Image — Sigma Rule. Detects uncommon processes creating remote threads."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/66d31e5f-52d6-40a4-9615-002d3789a119/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/66d31e5f-52d6-40a4-9615-002d3789a119/","name":"Remote Thread Creation By Uncommon Source Image — Sigma Rule","description":"Sigma rule 66d31e5f-52d6-40a4-9615-002d3789a119. Remote Thread Creation By Uncommon Source Image — Sigma Rule. Detects uncommon processes creating remote threads.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Remote Thread Creation By Uncommon Source Image — Sigma Rule</h1><p class="lead">Sigma rule 66d31e5f-52d6-40a4-9615-002d3789a119. Remote Thread Creation By Uncommon Source Image — Sigma Rule. Detects uncommon processes creating remote threads.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/create-remote-thread/">create_remote_thread</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1055/">attack.t1055</a></div><p>Author: Perez Diego (@darkquassar), oscd.community. Source status: test; severity: medium. Source dates: 2019-10-27 / 2025-07-08.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;create_remote_thread&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/create_remote_thread/create_remote_thread_win_susp_uncommon_source_image.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 4c8698c874eb4d9efad1fa20ce8df7bb99f5410295517e00b04a274eb236d6a2</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Remote Thread Creation By Uncommon Source Image
+id: 66d31e5f-52d6-40a4-9615-002d3789a119
+related:
+    - id: 02d1d718-dd13-41af-989d-ea85c7fab93f
+      type: derived
+status: test
+description: Detects uncommon processes creating remote threads.
+references:
+    - Personal research, statistical analysis
+    - https://lolbas-project.github.io
+author: Perez Diego (@darkquassar), oscd.community
+date: 2019-10-27
+modified: 2025-07-08
+tags:
+    - attack.privilege-escalation
+    - attack.stealth
+    - attack.t1055
+logsource:
+    product: windows
+    category: create_remote_thread
+detection:
+    selection:
+        SourceImage|endswith:
+            - &#39;\explorer.exe&#39;
+            - &#39;\iexplore.exe&#39;
+            - &#39;\msiexec.exe&#39;
+            - &#39;\powerpnt.exe&#39;
+            - &#39;\schtasks.exe&#39;
+            - &#39;\winlogon.exe&#39;
+    filter_main_winlogon_1:
+        SourceImage: &#39;C:\Windows\System32\winlogon.exe&#39;
+        TargetImage:
+            - &#39;C:\Windows\System32\services.exe&#39; # happens on Windows 7
+            - &#39;C:\Windows\System32\wininit.exe&#39; # happens on Windows 7
+            - &#39;C:\Windows\System32\csrss.exe&#39; # multiple OS
+            - &#39;C:\Windows\System32\LogonUI.exe&#39; # multiple OS
+            - &#39;C:\Windows\System32\wlrmdr.exe&#39;
+            - &#39;C:\Windows\System32\AtBroker.exe&#39;
+            - &#39;C:\Windows\System32\dwm.exe&#39;
+            - &#39;C:\Windows\System32\fontdrvhost.exe&#39;
+            - &#39;C:\Windows\System32\userinit.exe&#39;
+    filter_main_winlogon_2:
+        SourceImage: &#39;C:\Windows\System32\winlogon.exe&#39;
+        TargetParentProcessId: 4
+    filter_main_schtasks_conhost:
+        SourceImage:
+            - &#39;C:\Windows\System32\schtasks.exe&#39;
+            - &#39;C:\Windows\SysWOW64\schtasks.exe&#39;
+        TargetImage: &#39;C:\Windows\System32\conhost.exe&#39;
+    filter_main_explorer:
+        SourceImage: &#39;C:\Windows\explorer.exe&#39;
+        TargetImage|startswith:
+            - &#39;C:\Program Files (x86)\&#39;
+            - &#39;C:\Program Files\&#39;
+            - &#39;C:\Windows\System32\&#39;
+            - &#39;C:\Windows\SysWOW64\&#39;
+    filter_main_system:
+        TargetImage: &#39;System&#39;
+    filter_main_msiexec_1:
+        # Note: MSI installers will trigger this
+        SourceImage|endswith: &#39;\msiexec.exe&#39;
+        TargetImage|contains:
+            - &#39;\AppData\Local\&#39;
+            - &#39;C:\Program Files (x86)\&#39;
+            - &#39;C:\Program Files\&#39;
+            - &#39;C:\Windows\Microsoft.NET\Framework64\&#39; # C:\Windows\Microsoft.NET\Framework\v4.0.30319\ngen.exe
+    filter_main_msiexec_2:
+        SourceImage|endswith: &#39;\msiexec.exe&#39;
+        TargetImage:
+            - &#39;C:\Windows\System32\msiexec.exe&#39;
+            - &#39;C:\Windows\SysWOW64\msiexec.exe&#39;
+    filter_main_iexplore:
+        SourceImage: &#39;C:\Program Files\Internet Explorer\iexplore.exe&#39;
+        TargetImage:
+            - &#39;C:\Program Files (x86)\Internet Explorer\iexplore.exe&#39;
+            - &#39;C:\Windows\System32\rundll32.exe&#39;
+    filter_main_powerpnt:
+        SourceImage|endswith: &#39;\POWERPNT.EXE&#39;
+        TargetImage|contains:
+            - &#39;C:\Program Files\Microsoft Office\&#39; # C:\Program Files\Microsoft Office\root\vfs\ProgramFilesCommonX64\Microsoft Shared\Office16\AI\ai.exe
+            - &#39;C:\Program Files (x86)\Microsoft Office\&#39;
+    filter_optional_aurora_smartconsole1:
+        SourceImage: &#39;C:\Program Files\internet explorer\iexplore.exe&#39;
+        SourceCommandLine|contains|all:
+            - &#39;https://&#39;
+            - &#39;.checkpoint.com/documents/&#39;
+            - &#39;SmartConsole_OLH/&#39;
+            - &#39;default.htm#cshid=&#39;
+    filter_optional_aurora_smartconsole2:
+        SourceImage: &#39;C:\Program Files\internet explorer\iexplore.exe&#39;
+        SourceParentImage|startswith:
+            - &#39;C:\Program Files\&#39;
+            - &#39;C:\Program Files (x86)\&#39;
+        SourceParentImage|contains|all:
+            - &#39;\CheckPoint\SmartConsole\&#39;
+            - &#39;\SmartConsole.exe&#39;
+    filter_optional_powerpnt:
+        # Raised by the following issue: https://github.com/SigmaHQ/sigma/issues/2479
+        SourceImage|contains: &#39;\Microsoft Office\&#39;
+        SourceImage|endswith: &#39;\POWERPNT.EXE&#39;
+        TargetImage: &#39;C:\Windows\System32\csrss.exe&#39;
+    filter_main_null:
+        TargetImage: null
+    filter_main_empty:
+        TargetImage: &#39;&#39;
+    filter_optional_onedrive:
+        SourceImage: &#39;C:\Windows\explorer.exe&#39;
+        TargetImage|endswith: &#39;\AppData\Local\Microsoft\OneDrive\OneDrive.exe&#39;
+    filter_optional_aurora:
+        SourceImage: &#39;C:\Windows\explorer.exe&#39;
+        TargetImage|endswith: &#39;\aurora-dashboard.exe&#39;
+    filter_optional_officesetup:
+        SourceImage: &#39;C:\Windows\explorer.exe&#39;
+        TargetImage|endswith: &#39;\OfficeSetup.exe&#39;
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - This rule is best put in testing first in order to create a baseline that reflects the data in your environment.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/66d31e5f-52d6-40a4-9615-002d3789a119.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>This rule is best put in testing first in order to create a baseline that reflects the data in your environment.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li>Personal research, statistical analysis (source note; no public URL supplied)</li><li><a href="https://lolbas-project.github.io">https://lolbas-project.github.io</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1055/">T1055 · Process Injection</a> · <a href="/ttp-simulation/detections/enterprise/T1055/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

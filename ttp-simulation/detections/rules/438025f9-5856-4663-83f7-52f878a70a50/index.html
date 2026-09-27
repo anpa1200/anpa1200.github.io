@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Microsoft Office Child Process — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 438025f9-5856-4663-83f7-52f878a70a50. Suspicious Microsoft Office Child Process — Sigma Rule. Detects a suspicious process spawning from one of the Microsoft Office suite products (Word, Excel, PowerPoint, Publisher, Visio, etc.)">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="438025f9-5856-4663-83f7-52f878a70a50, attack.execution, attack.stealth, attack.t1047, attack.t1204.002, attack.t1218.010, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1047, sigma-tag:attack.t1204.002, sigma-tag:attack.t1218.010">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.stealth, sigma-tag:attack.t1047, sigma-tag:attack.t1204.002, sigma-tag:attack.t1218.010">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/438025f9-5856-4663-83f7-52f878a70a50/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/438025f9-5856-4663-83f7-52f878a70a50/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Microsoft Office Child Process — Sigma Rule"><meta property="og:description" content="Sigma rule 438025f9-5856-4663-83f7-52f878a70a50. Suspicious Microsoft Office Child Process — Sigma Rule. Detects a suspicious process spawning from one of the Microsoft Office suite products (Word, Excel, PowerPoint, Publisher, Visio, etc.)"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Microsoft Office Child Process — Sigma Rule"><meta name="twitter:description" content="Sigma rule 438025f9-5856-4663-83f7-52f878a70a50. Suspicious Microsoft Office Child Process — Sigma Rule. Detects a suspicious process spawning from one of the Microsoft Office suite products (Word, Excel, PowerPoint, Publisher, Visio, etc.)"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/438025f9-5856-4663-83f7-52f878a70a50/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/438025f9-5856-4663-83f7-52f878a70a50/","name":"Suspicious Microsoft Office Child Process — Sigma Rule","description":"Sigma rule 438025f9-5856-4663-83f7-52f878a70a50. Suspicious Microsoft Office Child Process — Sigma Rule. Detects a suspicious process spawning from one of the Microsoft Office suite products (Word, Excel, PowerPoint, Publisher, Visio, etc.)","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Microsoft Office Child Process — Sigma Rule</h1><p class="lead">Sigma rule 438025f9-5856-4663-83f7-52f878a70a50. Suspicious Microsoft Office Child Process — Sigma Rule. Detects a suspicious process spawning from one of the Microsoft Office suite products (Word, Excel, PowerPoint, Publisher, Visio, etc.)</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1047/">attack.t1047</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1204-002/">attack.t1204.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1218-010/">attack.t1218.010</a></div><p>Author: Florian Roth (Nextron Systems), Markus Neis, FPT.EagleEye Team, Vadim Khrykov, Cyb3rEng, Michael Haag, Christopher Peacock @securepeacock, @scythe_io. Source status: test; severity: high. Source dates: 2018-04-06 / 2023-04-24.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_office_susp_child_processes.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 346e43a68093c87fc0350a1021fd8b22887e928bf6dd9c9caa72ffd37521fca9</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Microsoft Office Child Process
+id: 438025f9-5856-4663-83f7-52f878a70a50
+related:
+    - id: c27515df-97a9-4162-8a60-dc0eeb51b775 # Speicifc OneNote rule due to its recent usage in phishing attacks
+      type: derived
+    - id: e1693bc8-7168-4eab-8718-cdcaa68a1738
+      type: derived
+    - id: 23daeb52-e6eb-493c-8607-c4f0246cb7d8
+      type: obsolete
+    - id: 518643ba-7d9c-4fa5-9f37-baed36059f6a
+      type: obsolete
+    - id: 04f5363a-6bca-42ff-be70-0d28bf629ead
+      type: obsolete
+status: test
+description: Detects a suspicious process spawning from one of the Microsoft Office suite products (Word, Excel, PowerPoint, Publisher, Visio, etc.)
+references:
+    - https://www.hybrid-analysis.com/sample/465aabe132ccb949e75b8ab9c5bda36d80cf2fd503d52b8bad54e295f28bbc21?environmentId=100
+    - https://mgreen27.github.io/posts/2018/04/02/DownloadCradle.html
+    - https://thedfirreport.com/2021/03/29/sodinokibi-aka-revil-ransomware/
+    - https://doublepulsar.com/follina-a-microsoft-office-code-execution-vulnerability-1a47fce5629e
+    - https://github.com/vadim-hunter/Detection-Ideas-Rules/blob/02bcbfc2bfb8b4da601bb30de0344ae453aa1afe/Threat%20Intelligence/The%20DFIR%20Report/20210329_Sodinokibi_(aka_REvil)_Ransomware.yaml
+    - https://github.com/splunk/security_content/blob/300af51b88ad5d5b27ce4f5f54e4d6e6a3a2c06d/detections/endpoint/office_spawning_control.yml
+    - https://twitter.com/andythevariable/status/1576953781581144064?s=20&amp;t=QiJILvK4ZiBdR8RJe24u-A
+    - https://www.elastic.co/security-labs/exploring-the-ref2731-intrusion-set
+    - https://github.com/elastic/detection-rules/blob/c76a39796972ecde44cb1da6df47f1b6562c9770/rules/windows/defense_evasion_execution_msbuild_started_by_office_app.toml
+    - https://www.vmray.com/analyses/2d2fa29185ad/report/overview.html
+    - https://app.any.run/tasks/c903e9c8-0350-440c-8688-3881b556b8e0/
+author: Florian Roth (Nextron Systems), Markus Neis, FPT.EagleEye Team, Vadim Khrykov, Cyb3rEng, Michael Haag, Christopher Peacock @securepeacock, @scythe_io
+date: 2018-04-06
+modified: 2023-04-24
+tags:
+    - attack.execution
+    - attack.stealth
+    - attack.t1047
+    - attack.t1204.002
+    - attack.t1218.010
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - &#39;\EQNEDT32.EXE&#39;
+            - &#39;\EXCEL.EXE&#39;
+            - &#39;\MSACCESS.EXE&#39;
+            - &#39;\MSPUB.exe&#39;
+            - &#39;\ONENOTE.EXE&#39;
+            - &#39;\POWERPNT.exe&#39;
+            - &#39;\VISIO.exe&#39;
+            - &#39;\WINWORD.EXE&#39;
+            - &#39;\wordpad.exe&#39;
+            - &#39;\wordview.exe&#39;
+    selection_child_processes:
+        - OriginalFileName:
+              - &#39;bitsadmin.exe&#39;
+              - &#39;CertOC.exe&#39;
+              - &#39;CertUtil.exe&#39;
+              - &#39;Cmd.Exe&#39;
+              - &#39;CMSTP.EXE&#39;
+              - &#39;cscript.exe&#39;
+              - &#39;curl.exe&#39;
+              - &#39;HH.exe&#39;
+              - &#39;IEExec.exe&#39;
+              - &#39;InstallUtil.exe&#39;
+              - &#39;javaw.exe&#39;
+              - &#39;Microsoft.Workflow.Compiler.exe&#39;
+              - &#39;msdt.exe&#39;
+              - &#39;MSHTA.EXE&#39;
+              - &#39;msiexec.exe&#39;
+              - &#39;Msxsl.exe&#39;
+              - &#39;odbcconf.exe&#39;
+              - &#39;pcalua.exe&#39;
+              - &#39;PowerShell.EXE&#39;
+              - &#39;RegAsm.exe&#39;
+              - &#39;RegSvcs.exe&#39;
+              - &#39;REGSVR32.exe&#39;
+              - &#39;RUNDLL32.exe&#39;
+              - &#39;schtasks.exe&#39;
+              - &#39;ScriptRunner.exe&#39;
+              - &#39;wmic.exe&#39;
+              - &#39;WorkFolders.exe&#39;
+              - &#39;wscript.exe&#39;
+        - Image|endswith:
+              - &#39;\AppVLP.exe&#39;
+              - &#39;\bash.exe&#39;
+              - &#39;\bitsadmin.exe&#39;
+              - &#39;\certoc.exe&#39;
+              - &#39;\certutil.exe&#39;
+              - &#39;\cmd.exe&#39;
+              - &#39;\cmstp.exe&#39;
+              - &#39;\control.exe&#39;
+              - &#39;\cscript.exe&#39;
+              - &#39;\curl.exe&#39;
+              - &#39;\forfiles.exe&#39;
+              - &#39;\hh.exe&#39;
+              - &#39;\ieexec.exe&#39;
+              - &#39;\installutil.exe&#39;
+              - &#39;\javaw.exe&#39;
+              - &#39;\mftrace.exe&#39;
+              - &#39;\Microsoft.Workflow.Compiler.exe&#39;
+              - &#39;\msbuild.exe&#39;
+              - &#39;\msdt.exe&#39;
+              - &#39;\mshta.exe&#39;
+              - &#39;\msidb.exe&#39;
+              - &#39;\msiexec.exe&#39;
+              - &#39;\msxsl.exe&#39;
+              - &#39;\odbcconf.exe&#39;
+              - &#39;\pcalua.exe&#39;
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+              - &#39;\regasm.exe&#39;
+              - &#39;\regsvcs.exe&#39;
+              - &#39;\regsvr32.exe&#39;
+              - &#39;\rundll32.exe&#39;
+              - &#39;\schtasks.exe&#39;
+              - &#39;\scrcons.exe&#39;
+              - &#39;\scriptrunner.exe&#39;
+              - &#39;\sh.exe&#39;
+              - &#39;\svchost.exe&#39;
+              - &#39;\verclsid.exe&#39;
+              - &#39;\wmic.exe&#39;
+              - &#39;\workfolders.exe&#39;
+              - &#39;\wscript.exe&#39;
+    selection_child_susp_paths: # Idea: Laiali Kazalbach, Mohamed Elsayed (#4142)
+        Image|contains:
+            - &#39;\AppData\&#39;
+            - &#39;\Users\Public\&#39;
+            - &#39;\ProgramData\&#39;
+            - &#39;\Windows\Tasks\&#39;
+            - &#39;\Windows\Temp\&#39;
+            - &#39;\Windows\System32\Tasks\&#39;
+    condition: selection_parent and 1 of selection_child_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/438025f9-5856-4663-83f7-52f878a70a50.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.hybrid-analysis.com/sample/465aabe132ccb949e75b8ab9c5bda36d80cf2fd503d52b8bad54e295f28bbc21?environmentId=100">https://www.hybrid-analysis.com/sample/465aabe132ccb949e75b8ab9c5bda36d80cf2fd503d52b8bad54e295f28bbc21?environmentId=100</a></li><li><a href="https://mgreen27.github.io/posts/2018/04/02/DownloadCradle.html">https://mgreen27.github.io/posts/2018/04/02/DownloadCradle.html</a></li><li><a href="https://thedfirreport.com/2021/03/29/sodinokibi-aka-revil-ransomware/">https://thedfirreport.com/2021/03/29/sodinokibi-aka-revil-ransomware/</a></li><li><a href="https://doublepulsar.com/follina-a-microsoft-office-code-execution-vulnerability-1a47fce5629e">https://doublepulsar.com/follina-a-microsoft-office-code-execution-vulnerability-1a47fce5629e</a></li><li><a href="https://github.com/vadim-hunter/Detection-Ideas-Rules/blob/02bcbfc2bfb8b4da601bb30de0344ae453aa1afe/Threat%20Intelligence/The%20DFIR%20Report/20210329_Sodinokibi_(aka_REvil)_Ransomware.yaml">https://github.com/vadim-hunter/Detection-Ideas-Rules/blob/02bcbfc2bfb8b4da601bb30de0344ae453aa1afe/Threat%20Intelligence/The%20DFIR%20Report/20210329_Sodinokibi_(aka_REvil)_Ransomware.yaml</a></li><li><a href="https://github.com/splunk/security_content/blob/300af51b88ad5d5b27ce4f5f54e4d6e6a3a2c06d/detections/endpoint/office_spawning_control.yml">https://github.com/splunk/security_content/blob/300af51b88ad5d5b27ce4f5f54e4d6e6a3a2c06d/detections/endpoint/office_spawning_control.yml</a></li><li><a href="https://twitter.com/andythevariable/status/1576953781581144064?s=20&amp;t=QiJILvK4ZiBdR8RJe24u-A">https://twitter.com/andythevariable/status/1576953781581144064?s=20&amp;t=QiJILvK4ZiBdR8RJe24u-A</a></li><li><a href="https://www.elastic.co/security-labs/exploring-the-ref2731-intrusion-set">https://www.elastic.co/security-labs/exploring-the-ref2731-intrusion-set</a></li><li><a href="https://github.com/elastic/detection-rules/blob/c76a39796972ecde44cb1da6df47f1b6562c9770/rules/windows/defense_evasion_execution_msbuild_started_by_office_app.toml">https://github.com/elastic/detection-rules/blob/c76a39796972ecde44cb1da6df47f1b6562c9770/rules/windows/defense_evasion_execution_msbuild_started_by_office_app.toml</a></li><li><a href="https://www.vmray.com/analyses/2d2fa29185ad/report/overview.html">https://www.vmray.com/analyses/2d2fa29185ad/report/overview.html</a></li><li><a href="https://app.any.run/tasks/c903e9c8-0350-440c-8688-3881b556b8e0/">https://app.any.run/tasks/c903e9c8-0350-440c-8688-3881b556b8e0/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1047/">T1047 · Windows Management Instrumentation</a> · <a href="/ttp-simulation/detections/enterprise/T1047/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1204.002/">T1204.002 · Malicious File</a> · <a href="/ttp-simulation/detections/enterprise/T1204.002/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1218.010/">T1218.010 · Regsvr32</a> · <a href="/ttp-simulation/detections/enterprise/T1218.010/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

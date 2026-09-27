@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule bdc64095-d59a-42a2-8588-71fd9c9d9abc. Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule. Detects the load of dbghelp/dbgcore DLL (used to make memory dumps) by suspicious processes.
+Tools like ProcessHacker and some attacker tradecract use MiniDumpWriteDump API found in dbghelp.dll or dbgcore.dll.
+As an example, SilentTrynity C2 Framework has a module that leverages this API to dump the contents of Lsass.exe and transfer it over the network back to the attacker&#39;s machine.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="bdc64095-d59a-42a2-8588-71fd9c9d9abc, attack.credential-access, attack.t1003.001, image_load, windows, rule-status:test, severity:high, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/bdc64095-d59a-42a2-8588-71fd9c9d9abc/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/bdc64095-d59a-42a2-8588-71fd9c9d9abc/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule"><meta property="og:description" content="Sigma rule bdc64095-d59a-42a2-8588-71fd9c9d9abc. Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule. Detects the load of dbghelp/dbgcore DLL (used to make memory dumps) by suspicious processes.
+Tools like ProcessHacker and some attacker tradecract use MiniDumpWriteDump API found in dbghelp.dll or dbgcore.dll.
+As an example, SilentTrynity C2 Framework has a module that leverages this API to dump the contents of Lsass.exe and transfer it over the network back to the attacker&#39;s machine.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule"><meta name="twitter:description" content="Sigma rule bdc64095-d59a-42a2-8588-71fd9c9d9abc. Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule. Detects the load of dbghelp/dbgcore DLL (used to make memory dumps) by suspicious processes.
+Tools like ProcessHacker and some attacker tradecract use MiniDumpWriteDump API found in dbghelp.dll or dbgcore.dll.
+As an example, SilentTrynity C2 Framework has a module that leverages this API to dump the contents of Lsass.exe and transfer it over the network back to the attacker&#39;s machine.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/bdc64095-d59a-42a2-8588-71fd9c9d9abc/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/bdc64095-d59a-42a2-8588-71fd9c9d9abc/","name":"Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule","description":"Sigma rule bdc64095-d59a-42a2-8588-71fd9c9d9abc. Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule. Detects the load of dbghelp/dbgcore DLL (used to make memory dumps) by suspicious processes.\nTools like ProcessHacker and some attacker tradecract use MiniDumpWriteDump API found in dbghelp.dll or dbgcore.dll.\nAs an example, SilentTrynity C2 Framework has a module that leverages this API to dump the contents of Lsass.exe and transfer it over the network back to the attacker's machine.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule</h1><p class="lead">Sigma rule bdc64095-d59a-42a2-8588-71fd9c9d9abc. Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded — Sigma Rule. Detects the load of dbghelp/dbgcore DLL (used to make memory dumps) by suspicious processes.
+Tools like ProcessHacker and some attacker tradecract use MiniDumpWriteDump API found in dbghelp.dll or dbgcore.dll.
+As an example, SilentTrynity C2 Framework has a module that leverages this API to dump the contents of Lsass.exe and transfer it over the network back to the attacker&#39;s machine.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/image-load/">image_load</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003-001/">attack.t1003.001</a></div><p>Author: Perez Diego (@darkquassar), oscd.community, Ecco. Source status: test; severity: high. Source dates: 2019-10-27 / 2022-12-09.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;image_load&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/image_load/image_load_dll_dbghelp_dbgcore_unsigned_load.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 91c335e203d93842e7dc0c811724b4c812e1887afd5d83cae167bcb4375babb3</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious Unsigned Dbghelp/Dbgcore DLL Loaded
+id: bdc64095-d59a-42a2-8588-71fd9c9d9abc
+related:
+    - id: 0e277796-5f23-4e49-a490-483131d4f6e1 # Suspicious Loading
+      type: similar
+status: test
+description: |
+    Detects the load of dbghelp/dbgcore DLL (used to make memory dumps) by suspicious processes.
+    Tools like ProcessHacker and some attacker tradecract use MiniDumpWriteDump API found in dbghelp.dll or dbgcore.dll.
+    As an example, SilentTrynity C2 Framework has a module that leverages this API to dump the contents of Lsass.exe and transfer it over the network back to the attacker&#39;s machine.
+references:
+    - https://learn.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump
+    - https://www.pinvoke.net/default.aspx/dbghelp/MiniDumpWriteDump.html
+    - https://medium.com/@fsx30/bypass-edrs-memory-protection-introduction-to-hooking-2efb21acffd6
+author: Perez Diego (@darkquassar), oscd.community, Ecco
+date: 2019-10-27
+modified: 2022-12-09
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection:
+        ImageLoaded|endswith:
+            - &#39;\dbghelp.dll&#39;
+            - &#39;\dbgcore.dll&#39;
+        Signed: &#39;false&#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/bdc64095-d59a-42a2-8588-71fd9c9d9abc.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://learn.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump">https://learn.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump</a></li><li><a href="https://www.pinvoke.net/default.aspx/dbghelp/MiniDumpWriteDump.html">https://www.pinvoke.net/default.aspx/dbghelp/MiniDumpWriteDump.html</a></li><li><a href="https://medium.com/@fsx30/bypass-edrs-memory-protection-introduction-to-hooking-2efb21acffd6">https://medium.com/@fsx30/bypass-edrs-memory-protection-introduction-to-hooking-2efb21acffd6</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003.001/">T1003.001 · LSASS Memory</a> · <a href="/ttp-simulation/detections/enterprise/T1003.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

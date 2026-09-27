@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 31d68132-4038-47c7-8f8e-635a39a7c174. Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule. Detects potential Active Directory enumeration via LDAP">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="31d68132-4038-47c7-8f8e-635a39a7c174, attack.discovery, attack.t1069.002, attack.t1087.002, attack.t1482, windows, ldap, Requirements: Microsoft-Windows-LDAP-Client/Debug ETW logging, rule-status:test, severity:medium, logsource-product:windows, logsource-service:ldap, sigma-tag:attack.discovery, sigma-tag:attack.t1069.002, sigma-tag:attack.t1087.002, sigma-tag:attack.t1482">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-service:ldap, sigma-tag:attack.discovery, sigma-tag:attack.t1069.002, sigma-tag:attack.t1087.002, sigma-tag:attack.t1482">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/31d68132-4038-47c7-8f8e-635a39a7c174/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/31d68132-4038-47c7-8f8e-635a39a7c174/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule"><meta property="og:description" content="Sigma rule 31d68132-4038-47c7-8f8e-635a39a7c174. Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule. Detects potential Active Directory enumeration via LDAP"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule"><meta name="twitter:description" content="Sigma rule 31d68132-4038-47c7-8f8e-635a39a7c174. Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule. Detects potential Active Directory enumeration via LDAP"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/31d68132-4038-47c7-8f8e-635a39a7c174/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/31d68132-4038-47c7-8f8e-635a39a7c174/","name":"Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule","description":"Sigma rule 31d68132-4038-47c7-8f8e-635a39a7c174. Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule. Detects potential Active Directory enumeration via LDAP","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule</h1><p class="lead">Sigma rule 31d68132-4038-47c7-8f8e-635a39a7c174. Potential Active Directory Reconnaissance/Enumeration Via LDAP — Sigma Rule. Detects potential Active Directory enumeration via LDAP</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/ldap/">ldap</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-discovery/">attack.discovery</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1069-002/">attack.t1069.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1087-002/">attack.t1087.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1482/">attack.t1482</a></div><p>Author: Adeem Mawani. Source status: test; severity: medium. Source dates: 2021-06-22 / 2025-07-04.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;ldap&quot;,
+  &quot;definition&quot;: &quot;Requirements: Microsoft-Windows-LDAP-Client/Debug ETW logging&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/ldap/win_ldap_recon.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: f4e58a8b7e35104eca0ee7592129bfb796b84145552871634cea75b785c440af</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential Active Directory Reconnaissance/Enumeration Via LDAP
+id: 31d68132-4038-47c7-8f8e-635a39a7c174
+status: test
+description: Detects potential Active Directory enumeration via LDAP
+references:
+    - https://techcommunity.microsoft.com/t5/microsoft-defender-for-endpoint/hunting-for-reconnaissance-activities-using-ldap-search-filters/ba-p/824726
+    - https://github.com/PowerShellMafia/PowerSploit/blob/d943001a7defb5e0d1657085a77a0e78609be58f/Recon/PowerView.ps1
+    - https://github.com/BloodHoundAD/SharpHound3/blob/7d96b991b1887ff50349ce59c80980bc0d95c86a/SharpHound3/LdapBuilder.cs
+    - https://medium.com/falconforce/falconfriday-detecting-active-directory-data-collection-0xff21-c22d1a57494c
+    - https://github.com/fox-it/BloodHound.py/blob/d65eb614831cd30f26028ccb072f5e77ca287e0b/bloodhound/ad/domain.py#L427
+    - https://ipurple.team/2024/07/15/sharphound-detection/
+author: Adeem Mawani
+date: 2021-06-22
+modified: 2025-07-04
+tags:
+    - attack.discovery
+    - attack.t1069.002
+    - attack.t1087.002
+    - attack.t1482
+logsource:
+    product: windows
+    service: ldap
+    definition: &#39;Requirements: Microsoft-Windows-LDAP-Client/Debug ETW logging&#39;
+detection:
+    generic_search:
+        EventID: 30
+        SearchFilter|contains:
+            - &#39;(groupType:1.2.840.113556.1.4.803:=2147483648)&#39;
+            - &#39;(groupType:1.2.840.113556.1.4.803:=2147483656)&#39;
+            - &#39;(groupType:1.2.840.113556.1.4.803:=2147483652)&#39;
+            - &#39;(groupType:1.2.840.113556.1.4.803:=2147483650)&#39;
+            - &#39;(sAMAccountType=805306369)&#39;
+            - &#39;(sAMAccountType=805306368)&#39;
+            - &#39;(sAMAccountType=536870913)&#39;
+            - &#39;(sAMAccountType=536870912)&#39;
+            - &#39;(sAMAccountType=268435457)&#39;
+            - &#39;(sAMAccountType=268435456)&#39;
+            - &#39;(objectCategory=groupPolicyContainer)&#39;
+            - &#39;(objectCategory=organizationalUnit)&#39;
+            # - &#39;(objectCategory=Computer)&#39; Prone to false positives
+            - &#39;(objectCategory=nTDSDSA)&#39;
+            - &#39;(objectCategory=server)&#39;
+            - &#39;(objectCategory=domain)&#39;
+            - &#39;(objectCategory=person)&#39;
+            - &#39;(objectCategory=group)&#39;
+            - &#39;(objectCategory=user)&#39;
+            - &#39;(objectClass=trustedDomain)&#39;
+            - &#39;(objectClass=computer)&#39;
+            - &#39;(objectClass=server)&#39;
+            - &#39;(objectClass=group)&#39;
+            - &#39;(objectClass=user)&#39;
+            - &#39;(primaryGroupID=521)&#39;
+            - &#39;(primaryGroupID=516)&#39;
+            - &#39;(primaryGroupID=515)&#39;
+            - &#39;(primaryGroupID=512)&#39;
+            - &#39;Domain Admins&#39;
+            - &#39;objectGUID=\*&#39;
+            - &#39;(schemaIDGUID=\*)&#39;
+            - &#39;admincount=1&#39;
+    distinguished_name_enumeration:
+        EventID: 30
+        SearchFilter: &#39;(objectclass=\*)&#39;
+        DistinguishedName|contains:
+            - &#39;CN=Domain Admins&#39;
+            - &#39;CN=Enterprise Admins&#39;
+            - &#39;CN=Group Policy Creator Owners&#39;
+    suspicious_flag:
+        EventID: 30
+        SearchFilter|contains:
+            - &#39;(userAccountControl:1.2.840.113556.1.4.803:=4194304)&#39;
+            - &#39;(userAccountControl:1.2.840.113556.1.4.803:=2097152)&#39;
+            - &#39;!(userAccountControl:1.2.840.113556.1.4.803:=1048574)&#39;
+            - &#39;(userAccountControl:1.2.840.113556.1.4.803:=524288)&#39;
+            - &#39;(userAccountControl:1.2.840.113556.1.4.803:=65536)&#39;
+            - &#39;(userAccountControl:1.2.840.113556.1.4.803:=8192)&#39;
+            - &#39;(userAccountControl:1.2.840.113556.1.4.803:=544)&#39;
+            - &#39;!(UserAccountControl:1.2.840.113556.1.4.803:=2)&#39;
+            - &#39;msDS-AllowedToActOnBehalfOfOtherIdentity&#39;
+            - &#39;msDS-AllowedToDelegateTo&#39;
+            - &#39;msDS-GroupManagedServiceAccount&#39;
+            - &#39;(accountExpires=9223372036854775807)&#39;
+            - &#39;(accountExpires=0)&#39;
+            - &#39;(adminCount=1)&#39;
+            - &#39;ms-MCS-AdmPwd&#39;
+    narrow_down_filter:
+        EventID: 30
+        SearchFilter|contains:
+            - &#39;(domainSid=*)&#39;
+            - &#39;(objectSid=*)&#39;
+    condition: (generic_search and not narrow_down_filter) or suspicious_flag or distinguished_name_enumeration
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/31d68132-4038-47c7-8f8e-635a39a7c174.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><p>No reviewed association in this snapshot.</p></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://techcommunity.microsoft.com/t5/microsoft-defender-for-endpoint/hunting-for-reconnaissance-activities-using-ldap-search-filters/ba-p/824726">https://techcommunity.microsoft.com/t5/microsoft-defender-for-endpoint/hunting-for-reconnaissance-activities-using-ldap-search-filters/ba-p/824726</a></li><li><a href="https://github.com/PowerShellMafia/PowerSploit/blob/d943001a7defb5e0d1657085a77a0e78609be58f/Recon/PowerView.ps1">https://github.com/PowerShellMafia/PowerSploit/blob/d943001a7defb5e0d1657085a77a0e78609be58f/Recon/PowerView.ps1</a></li><li><a href="https://github.com/BloodHoundAD/SharpHound3/blob/7d96b991b1887ff50349ce59c80980bc0d95c86a/SharpHound3/LdapBuilder.cs">https://github.com/BloodHoundAD/SharpHound3/blob/7d96b991b1887ff50349ce59c80980bc0d95c86a/SharpHound3/LdapBuilder.cs</a></li><li><a href="https://medium.com/falconforce/falconfriday-detecting-active-directory-data-collection-0xff21-c22d1a57494c">https://medium.com/falconforce/falconfriday-detecting-active-directory-data-collection-0xff21-c22d1a57494c</a></li><li><a href="https://github.com/fox-it/BloodHound.py/blob/d65eb614831cd30f26028ccb072f5e77ca287e0b/bloodhound/ad/domain.py#L427">https://github.com/fox-it/BloodHound.py/blob/d65eb614831cd30f26028ccb072f5e77ca287e0b/bloodhound/ad/domain.py#L427</a></li><li><a href="https://ipurple.team/2024/07/15/sharphound-detection/">https://ipurple.team/2024/07/15/sharphound-detection/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1069.002/">T1069.002 · Domain Groups</a> · <a href="/ttp-simulation/detections/enterprise/T1069.002/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1087.002/">T1087.002 · Domain Account</a> · <a href="/ttp-simulation/detections/enterprise/T1087.002/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1482/">T1482 · Domain Trust Discovery</a> · <a href="/ttp-simulation/detections/enterprise/T1482/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

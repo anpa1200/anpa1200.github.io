@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 089fc3d2-71e8-4763-a8a5-c97fbb0a403e. Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule. Detects the execution of REGSVR32.exe with DLL files masquerading as other files">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="089fc3d2-71e8-4763-a8a5-c97fbb0a403e, attack.stealth, attack.t1218.010, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1218.010">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1218.010">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/089fc3d2-71e8-4763-a8a5-c97fbb0a403e/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/089fc3d2-71e8-4763-a8a5-c97fbb0a403e/">
+<meta property="og:type" content="website"><meta property="og:title" content="Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule"><meta property="og:description" content="Sigma rule 089fc3d2-71e8-4763-a8a5-c97fbb0a403e. Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule. Detects the execution of REGSVR32.exe with DLL files masquerading as other files"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule"><meta name="twitter:description" content="Sigma rule 089fc3d2-71e8-4763-a8a5-c97fbb0a403e. Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule. Detects the execution of REGSVR32.exe with DLL files masquerading as other files"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/089fc3d2-71e8-4763-a8a5-c97fbb0a403e/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/089fc3d2-71e8-4763-a8a5-c97fbb0a403e/","name":"Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule","description":"Sigma rule 089fc3d2-71e8-4763-a8a5-c97fbb0a403e. Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule. Detects the execution of REGSVR32.exe with DLL files masquerading as other files","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule</h1><p class="lead">Sigma rule 089fc3d2-71e8-4763-a8a5-c97fbb0a403e. Regsvr32 DLL Execution With Suspicious File Extension — Sigma Rule. Detects the execution of REGSVR32.exe with DLL files masquerading as other files</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1218-010/">attack.t1218.010</a></div><p>Author: Florian Roth (Nextron Systems), frack113. Source status: test; severity: high. Source dates: 2021-11-29 / 2025-08-27.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_regsvr32_susp_extensions.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 785c363779a2379ec33fefe2ee631e87460f61e0e579a813e9dfa81915bdbb4e</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Regsvr32 DLL Execution With Suspicious File Extension
+id: 089fc3d2-71e8-4763-a8a5-c97fbb0a403e
+related:
+    - id: 8e2b24c9-4add-46a0-b4bb-0057b4e6187d
+      type: obsolete
+status: test
+description: Detects the execution of REGSVR32.exe with DLL files masquerading as other files
+references:
+    - https://thedfirreport.com/2021/11/29/continuing-the-bazar-ransomware-story/
+    - https://blog.talosintelligence.com/2021/10/threat-hunting-in-large-datasets-by.html
+    - https://guides.lib.umich.edu/c.php?g=282942&amp;p=1885348
+    - https://harfanglab.io/insidethelab/uac-0057-pressure-ukraine-poland/
+author: Florian Roth (Nextron Systems), frack113
+date: 2021-11-29
+modified: 2025-08-27
+tags:
+    - attack.stealth
+    - attack.t1218.010
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: &#39;\regsvr32.exe&#39;
+        - OriginalFileName: &#39;REGSVR32.EXE&#39;
+    selection_cli:
+        CommandLine|endswith:
+            # Add more image extensions
+            # https://twitter.com/Max_Mal_/status/1542461200797163522/photo/3
+            - &#39;.bin&#39;
+            - &#39;.bmp&#39;
+            - &#39;.cr2&#39;
+            - &#39;.dat&#39;
+            - &#39;.eps&#39;
+            - &#39;.gif&#39;
+            - &#39;.ico&#39;
+            - &#39;.jpeg&#39;
+            - &#39;.jpg&#39;
+            - &#39;.log&#39;
+            - &#39;.nef&#39;
+            - &#39;.orf&#39;
+            - &#39;.png&#39;
+            - &#39;.raw&#39;
+            - &#39;.rtf&#39;
+            - &#39;.sr2&#39;
+            - &#39;.temp&#39;
+            - &#39;.tif&#39;
+            - &#39;.tiff&#39;
+            - &#39;.tmp&#39;
+            - &#39;.txt&#39;
+    condition: all of selection_*
+falsepositives:
+    - Unlikely
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/089fc3d2-71e8-4763-a8a5-c97fbb0a403e.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unlikely</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://thedfirreport.com/2021/11/29/continuing-the-bazar-ransomware-story/">https://thedfirreport.com/2021/11/29/continuing-the-bazar-ransomware-story/</a></li><li><a href="https://blog.talosintelligence.com/2021/10/threat-hunting-in-large-datasets-by.html">https://blog.talosintelligence.com/2021/10/threat-hunting-in-large-datasets-by.html</a></li><li><a href="https://guides.lib.umich.edu/c.php?g=282942&amp;p=1885348">https://guides.lib.umich.edu/c.php?g=282942&amp;p=1885348</a></li><li><a href="https://harfanglab.io/insidethelab/uac-0057-pressure-ukraine-poland/">https://harfanglab.io/insidethelab/uac-0057-pressure-ukraine-poland/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1218.010/">T1218.010 · Regsvr32</a> · <a href="/ttp-simulation/detections/enterprise/T1218.010/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

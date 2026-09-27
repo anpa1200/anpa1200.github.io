@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS Console GetSigninToken Potential Abuse — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule f8103686-e3e8-46f3-be72-65f7fcb4aa53. AWS Console GetSigninToken Potential Abuse — Sigma Rule. Detects potentially suspicious events involving &quot;GetSigninToken&quot;.
+An adversary using the &quot;aws_consoler&quot; tool can leverage this console API to create temporary federated credential that help obfuscate which AWS credential is compromised (the original access key) and enables the adversary to pivot from the AWS CLI to console sessions without the need for MFA using the new access key issued in this request.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="f8103686-e3e8-46f3-be72-65f7fcb4aa53, attack.lateral-movement, attack.t1021.007, attack.t1550.001, aws, cloudtrail, rule-status:test, severity:medium, logsource-product:aws, logsource-service:cloudtrail, sigma-tag:attack.lateral-movement, sigma-tag:attack.t1021.007, sigma-tag:attack.t1550.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:aws, logsource-service:cloudtrail, sigma-tag:attack.lateral-movement, sigma-tag:attack.t1021.007, sigma-tag:attack.t1550.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/f8103686-e3e8-46f3-be72-65f7fcb4aa53/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/f8103686-e3e8-46f3-be72-65f7fcb4aa53/">
+<meta property="og:type" content="website"><meta property="og:title" content="AWS Console GetSigninToken Potential Abuse — Sigma Rule"><meta property="og:description" content="Sigma rule f8103686-e3e8-46f3-be72-65f7fcb4aa53. AWS Console GetSigninToken Potential Abuse — Sigma Rule. Detects potentially suspicious events involving &quot;GetSigninToken&quot;.
+An adversary using the &quot;aws_consoler&quot; tool can leverage this console API to create temporary federated credential that help obfuscate which AWS credential is compromised (the original access key) and enables the adversary to pivot from the AWS CLI to console sessions without the need for MFA using the new access key issued in this request.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="AWS Console GetSigninToken Potential Abuse — Sigma Rule"><meta name="twitter:description" content="Sigma rule f8103686-e3e8-46f3-be72-65f7fcb4aa53. AWS Console GetSigninToken Potential Abuse — Sigma Rule. Detects potentially suspicious events involving &quot;GetSigninToken&quot;.
+An adversary using the &quot;aws_consoler&quot; tool can leverage this console API to create temporary federated credential that help obfuscate which AWS credential is compromised (the original access key) and enables the adversary to pivot from the AWS CLI to console sessions without the need for MFA using the new access key issued in this request.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/f8103686-e3e8-46f3-be72-65f7fcb4aa53/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/f8103686-e3e8-46f3-be72-65f7fcb4aa53/","name":"AWS Console GetSigninToken Potential Abuse — Sigma Rule","description":"Sigma rule f8103686-e3e8-46f3-be72-65f7fcb4aa53. AWS Console GetSigninToken Potential Abuse — Sigma Rule. Detects potentially suspicious events involving \"GetSigninToken\".\nAn adversary using the \"aws_consoler\" tool can leverage this console API to create temporary federated credential that help obfuscate which AWS credential is compromised (the original access key) and enables the adversary to pivot from the AWS CLI to console sessions without the need for MFA using the new access key issued in this request.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>AWS Console GetSigninToken Potential Abuse — Sigma Rule</h1><p class="lead">Sigma rule f8103686-e3e8-46f3-be72-65f7fcb4aa53. AWS Console GetSigninToken Potential Abuse — Sigma Rule. Detects potentially suspicious events involving &quot;GetSigninToken&quot;.
+An adversary using the &quot;aws_consoler&quot; tool can leverage this console API to create temporary federated credential that help obfuscate which AWS credential is compromised (the original access key) and enables the adversary to pivot from the AWS CLI to console sessions without the need for MFA using the new access key issued in this request.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/aws/">aws</a><a class="chip" href="/ttp-simulation/tags/logsource-service/cloudtrail/">cloudtrail</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1021-007/">attack.t1021.007</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1550-001/">attack.t1550.001</a></div><p>Author: Chester Le Bron (@123Le_Bron). Source status: test; severity: medium. Source dates: 2024-02-26 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;aws&quot;,
+  &quot;service&quot;: &quot;cloudtrail&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/cloud/aws/cloudtrail/aws_console_getsignintoken.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: c924ecf34bed246d1729a72104656c75242c8497251717b83b47f8e1dc7ee1cb</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: AWS Console GetSigninToken Potential Abuse
+id: f8103686-e3e8-46f3-be72-65f7fcb4aa53
+status: test
+description: |
+    Detects potentially suspicious events involving &quot;GetSigninToken&quot;.
+    An adversary using the &quot;aws_consoler&quot; tool can leverage this console API to create temporary federated credential that help obfuscate which AWS credential is compromised (the original access key) and enables the adversary to pivot from the AWS CLI to console sessions without the need for MFA using the new access key issued in this request.
+references:
+    - https://github.com/NetSPI/aws_consoler
+    - https://www.crowdstrike.com/blog/analysis-of-intrusion-campaign-targeting-telecom-and-bpo-companies/
+author: Chester Le Bron (@123Le_Bron)
+date: 2024-02-26
+tags:
+    - attack.lateral-movement
+    - attack.t1021.007
+    - attack.t1550.001
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection:
+        eventSource: &#39;signin.amazonaws.com&#39;
+        eventName: &#39;GetSigninToken&#39;
+    filter_main_console_ua:
+        userAgent|contains: &#39;Jersey/${project.version}&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - GetSigninToken events will occur when using AWS SSO portal to login and will generate false positives if you do not filter for the expected user agent(s), see filter. Non-SSO configured roles would be abnormal and should be investigated.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/f8103686-e3e8-46f3-be72-65f7fcb4aa53.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>GetSigninToken events will occur when using AWS SSO portal to login and will generate false positives if you do not filter for the expected user agent(s), see filter. Non-SSO configured roles would be abnormal and should be investigated.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/NetSPI/aws_consoler">https://github.com/NetSPI/aws_consoler</a></li><li><a href="https://www.crowdstrike.com/blog/analysis-of-intrusion-campaign-targeting-telecom-and-bpo-companies/">https://www.crowdstrike.com/blog/analysis-of-intrusion-campaign-targeting-telecom-and-bpo-companies/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1021.007/">T1021.007 · Cloud Services</a> · <a href="/ttp-simulation/detections/enterprise/T1021.007/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1550.001/">T1550.001 · Application Access Token</a> · <a href="/ttp-simulation/detections/enterprise/T1550.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspicious PowerShell In Registry Run Keys — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 8d85cf08-bf97-4260-ba49-986a2a65129c. Suspicious PowerShell In Registry Run Keys — Sigma Rule. Detects potential PowerShell commands or code within registry run keys">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="8d85cf08-bf97-4260-ba49-986a2a65129c, attack.privilege-escalation, attack.persistence, attack.t1547.001, registry_set, windows, rule-status:test, severity:medium, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.t1547.001">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:registry_set, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.t1547.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/8d85cf08-bf97-4260-ba49-986a2a65129c/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/8d85cf08-bf97-4260-ba49-986a2a65129c/">
+<meta property="og:type" content="website"><meta property="og:title" content="Suspicious PowerShell In Registry Run Keys — Sigma Rule"><meta property="og:description" content="Sigma rule 8d85cf08-bf97-4260-ba49-986a2a65129c. Suspicious PowerShell In Registry Run Keys — Sigma Rule. Detects potential PowerShell commands or code within registry run keys"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Suspicious PowerShell In Registry Run Keys — Sigma Rule"><meta name="twitter:description" content="Sigma rule 8d85cf08-bf97-4260-ba49-986a2a65129c. Suspicious PowerShell In Registry Run Keys — Sigma Rule. Detects potential PowerShell commands or code within registry run keys"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/8d85cf08-bf97-4260-ba49-986a2a65129c/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/8d85cf08-bf97-4260-ba49-986a2a65129c/","name":"Suspicious PowerShell In Registry Run Keys — Sigma Rule","description":"Sigma rule 8d85cf08-bf97-4260-ba49-986a2a65129c. Suspicious PowerShell In Registry Run Keys — Sigma Rule. Detects potential PowerShell commands or code within registry run keys","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Suspicious PowerShell In Registry Run Keys — Sigma Rule</h1><p class="lead">Sigma rule 8d85cf08-bf97-4260-ba49-986a2a65129c. Suspicious PowerShell In Registry Run Keys — Sigma Rule. Detects potential PowerShell commands or code within registry run keys</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/registry-set/">registry_set</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1547-001/">attack.t1547.001</a></div><p>Author: frack113, Florian Roth (Nextron Systems). Source status: test; severity: medium. Source dates: 2022-03-17 / 2025-07-18.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;registry_set&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/registry/registry_set/registry_set_powershell_in_run_keys.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 9f29e0402317857f75798afa28f725c2d7211243c2eb71115bd8461d70947c3e</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Suspicious PowerShell In Registry Run Keys
+id: 8d85cf08-bf97-4260-ba49-986a2a65129c
+status: test
+description: Detects potential PowerShell commands or code within registry run keys
+references:
+    - https://github.com/frack113/atomic-red-team/blob/a9051c38de8a5320b31c7039efcbd3b56cf2d65a/atomics/T1547.001/T1547.001.md#atomic-test-9---systembc-malware-as-a-service-registry
+    - https://www.trendmicro.com/en_us/research/22/j/lv-ransomware-exploits-proxyshell-in-attack.html
+    - https://github.com/HackTricks-wiki/hacktricks/blob/e4c7b21b8f36c97c35b7c622732b38a189ce18f7/src/windows-hardening/windows-local-privilege-escalation/privilege-escalation-with-autorun-binaries.md
+author: frack113, Florian Roth (Nextron Systems)
+date: 2022-03-17
+modified: 2025-07-18
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.t1547.001
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - &#39;\Software\Microsoft\Windows\CurrentVersion\Run&#39; # Also covers &quot;RunOnce&quot; and &quot;RunOnceEx&quot;
+            - &#39;\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run&#39;
+            - &#39;\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run&#39;
+        Details|contains:
+            - &#39;powershell&#39;
+            - &#39;pwsh &#39;
+            - &#39;FromBase64String&#39;
+            - &#39;.DownloadFile(&#39;
+            - &#39;.DownloadString(&#39;
+            - &#39; -w hidden &#39;
+            - &#39; -w 1 &#39;
+            - &#39;-windowstyle hidden&#39;
+            - &#39;-window hidden&#39;
+            - &#39; -nop &#39;
+            - &#39; -encodedcommand &#39;
+            - &#39;-ExecutionPolicy Bypass&#39;
+            - &#39;Invoke-Expression&#39;
+            - &#39;IEX (&#39;
+            - &#39;Invoke-Command&#39;
+            - &#39;ICM -&#39;
+            - &#39;Invoke-WebRequest&#39;
+            - &#39;IWR &#39;
+            - &#39;Invoke-RestMethod&#39;
+            - &#39;IRM &#39;
+            - &#39; -noni &#39;
+            - &#39; -noninteractive &#39;
+    condition: selection
+falsepositives:
+    - Legitimate admin or third party scripts. Baseline according to your environment
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/8d85cf08-bf97-4260-ba49-986a2a65129c.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate admin or third party scripts. Baseline according to your environment</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/frack113/atomic-red-team/blob/a9051c38de8a5320b31c7039efcbd3b56cf2d65a/atomics/T1547.001/T1547.001.md#atomic-test-9---systembc-malware-as-a-service-registry">https://github.com/frack113/atomic-red-team/blob/a9051c38de8a5320b31c7039efcbd3b56cf2d65a/atomics/T1547.001/T1547.001.md#atomic-test-9---systembc-malware-as-a-service-registry</a></li><li><a href="https://www.trendmicro.com/en_us/research/22/j/lv-ransomware-exploits-proxyshell-in-attack.html">https://www.trendmicro.com/en_us/research/22/j/lv-ransomware-exploits-proxyshell-in-attack.html</a></li><li><a href="https://github.com/HackTricks-wiki/hacktricks/blob/e4c7b21b8f36c97c35b7c622732b38a189ce18f7/src/windows-hardening/windows-local-privilege-escalation/privilege-escalation-with-autorun-binaries.md">https://github.com/HackTricks-wiki/hacktricks/blob/e4c7b21b8f36c97c35b7c622732b38a189ce18f7/src/windows-hardening/windows-local-privilege-escalation/privilege-escalation-with-autorun-binaries.md</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1547.001/">T1547.001 · Registry Run Keys / Startup Folder</a> · <a href="/ttp-simulation/detections/enterprise/T1547.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

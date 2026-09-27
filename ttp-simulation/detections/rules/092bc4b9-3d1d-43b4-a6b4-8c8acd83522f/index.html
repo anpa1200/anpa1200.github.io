@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 092bc4b9-3d1d-43b4-a6b4-8c8acd83522f. PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule. Detects loading of essential DLLs used by PowerShell by non-PowerShell process.
+Detects behavior similar to meterpreter&#39;s &quot;load powershell&quot; extension.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="092bc4b9-3d1d-43b4-a6b4-8c8acd83522f, attack.t1059.001, attack.execution, image_load, windows, rule-status:test, severity:medium, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.t1059.001, sigma-tag:attack.execution">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:image_load, logsource-product:windows, sigma-tag:attack.t1059.001, sigma-tag:attack.execution">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/092bc4b9-3d1d-43b4-a6b4-8c8acd83522f/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/092bc4b9-3d1d-43b4-a6b4-8c8acd83522f/">
+<meta property="og:type" content="website"><meta property="og:title" content="PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule"><meta property="og:description" content="Sigma rule 092bc4b9-3d1d-43b4-a6b4-8c8acd83522f. PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule. Detects loading of essential DLLs used by PowerShell by non-PowerShell process.
+Detects behavior similar to meterpreter&#39;s &quot;load powershell&quot; extension.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule"><meta name="twitter:description" content="Sigma rule 092bc4b9-3d1d-43b4-a6b4-8c8acd83522f. PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule. Detects loading of essential DLLs used by PowerShell by non-PowerShell process.
+Detects behavior similar to meterpreter&#39;s &quot;load powershell&quot; extension.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/092bc4b9-3d1d-43b4-a6b4-8c8acd83522f/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/092bc4b9-3d1d-43b4-a6b4-8c8acd83522f/","name":"PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule","description":"Sigma rule 092bc4b9-3d1d-43b4-a6b4-8c8acd83522f. PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule. Detects loading of essential DLLs used by PowerShell by non-PowerShell process.\nDetects behavior similar to meterpreter's \"load powershell\" extension.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule</h1><p class="lead">Sigma rule 092bc4b9-3d1d-43b4-a6b4-8c8acd83522f. PowerShell Core DLL Loaded By Non PowerShell Process — Sigma Rule. Detects loading of essential DLLs used by PowerShell by non-PowerShell process.
+Detects behavior similar to meterpreter&#39;s &quot;load powershell&quot; extension.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/image-load/">image_load</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a></div><p>Author: Tom Kern, oscd.community, Natalia Shornikova, Tim Shelton, Roberto Rodriguez (Cyb3rWard0g), OTR (Open Threat Research). Source status: test; severity: medium. Source dates: 2019-11-14 / 2025-10-07.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;image_load&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/image_load/image_load_dll_system_management_automation_susp_load.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 414446e48dd1c816f4d22776d68eabd0a96e235c4a4071b41158d9e6cc567da8</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: PowerShell Core DLL Loaded By Non PowerShell Process
+id: 092bc4b9-3d1d-43b4-a6b4-8c8acd83522f
+related:
+    - id: 867613fb-fa60-4497-a017-a82df74a172c
+      type: obsolete
+    - id: fe6e002f-f244-4278-9263-20e4b593827f
+      type: obsolete
+status: test
+description: |
+    Detects loading of essential DLLs used by PowerShell by non-PowerShell process.
+    Detects behavior similar to meterpreter&#39;s &quot;load powershell&quot; extension.
+references:
+    - https://adsecurity.org/?p=2921
+    - https://github.com/p3nt4/PowerShdll
+author: Tom Kern, oscd.community, Natalia Shornikova, Tim Shelton, Roberto Rodriguez (Cyb3rWard0g), OTR (Open Threat Research)
+date: 2019-11-14
+modified: 2025-10-07
+tags:
+    - attack.t1059.001
+    - attack.execution
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection:
+        - Description: &#39;System.Management.Automation&#39;
+        - OriginalFileName: &#39;System.Management.Automation.dll&#39;
+        - ImageLoaded|endswith:
+              - &#39;\System.Management.Automation.dll&#39;
+              - &#39;\System.Management.Automation.ni.dll&#39;
+    filter_main_powershell:
+        Image:
+            - &#39;C:\Program Files\PowerShell\7-preview\pwsh.exe&#39; # PowerShell 7 preview
+            - &#39;C:\Program Files\PowerShell\7\pwsh.exe&#39; # PowerShell 7
+            - &#39;C:\Windows\System32\WindowsPowerShell\v1.0\powershell_ise.exe&#39;
+            - &#39;C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe&#39;
+            - &#39;C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell_ise.exe&#39;
+            - &#39;C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe&#39;
+    filter_main_pwsh_preview:
+        Image|contains:
+            - &#39;C:\Program Files\WindowsApps\Microsoft.PowerShellPreview&#39;
+            - &#39;\AppData\Local\Microsoft\WindowsApps\Microsoft.PowerShellPreview&#39;
+        Image|endswith: &#39;\pwsh.exe&#39;
+    filter_main_generic:
+        Image:
+            - &#39;C:\Windows\System32\dsac.exe&#39;
+            - &#39;C:\WINDOWS\System32\RemoteFXvGPUDisablement.exe&#39;
+            - &#39;C:\Windows\System32\runscripthelper.exe&#39;
+            - &#39;C:\WINDOWS\System32\sdiagnhost.exe&#39;
+            - &#39;C:\Windows\System32\ServerManager.exe&#39;
+            - &#39;C:\Windows\System32\SyncAppvPublishingServer.exe&#39;
+            - &#39;C:\Windows\System32\winrshost.exe&#39;
+            - &#39;C:\Windows\System32\wsmprovhost.exe&#39;
+            - &#39;C:\Windows\SysWOW64\winrshost.exe&#39;
+            - &#39;C:\Windows\SysWOW64\wsmprovhost.exe&#39;
+    filter_main_dotnet:
+        Image|startswith:
+            - &#39;C:\Windows\Microsoft.NET\Framework\&#39;
+            - &#39;C:\Windows\Microsoft.NET\FrameworkArm\&#39;
+            - &#39;C:\Windows\Microsoft.NET\FrameworkArm64\&#39;
+            - &#39;C:\Windows\Microsoft.NET\Framework64\&#39;
+        Image|endswith: &#39;\mscorsvw.exe&#39;
+    filter_optional_sql_server_mgmt:
+        Image|startswith:
+            - &#39;C:\Program Files (x86)\Microsoft SQL Server Management Studio&#39;
+            - &#39;C:\Program Files\Microsoft SQL Server Management Studio&#39;
+        Image|endswith: &#39;\IDE\Ssms.exe&#39;
+    filter_optional_sql_server_tools:
+        Image|startswith:
+            - &#39;C:\Program Files (x86)\Microsoft SQL Server\&#39;
+            - &#39;C:\Program Files\Microsoft SQL Server\&#39;
+        Image|endswith: &#39;\Tools\Binn\SQLPS.exe&#39;
+    filter_optional_citrix:
+        Image|endswith: &#39;\Citrix\ConfigSync\ConfigSyncRun.exe&#39;
+    filter_optional_vs:
+        Image|startswith:
+            - &#39;C:\Program Files (x86)\Microsoft Visual Studio\&#39;
+            - &#39;C:\Program Files\Microsoft Visual Studio\&#39;
+    filter_optional_chocolatey:
+        Image|startswith: &#39;C:\ProgramData\chocolatey\choco.exe&#39;
+    filter_optional_nextron:
+        Image|startswith: &#39;C:\Windows\Temp\asgard2-agent\&#39;
+        Image|endswith:
+            - &#39;\thor64.exe&#39;
+            - &#39;\thor.exe&#39;
+        # User: &#39;NT AUTHORITY\SYSTEM&#39;   # if set, matches all powershell processes not launched by SYSTEM
+    filter_optional_aurora:
+        # This filter is to avoid a race condition FP with this specific ETW provider in aurora
+        Image: null
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Used by some .NET binaries, minimal on user workstation.
+    - Used by Microsoft SQL Server Management Studio
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/092bc4b9-3d1d-43b4-a6b4-8c8acd83522f.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Used by some .NET binaries, minimal on user workstation.</li><li>Used by Microsoft SQL Server Management Studio</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://adsecurity.org/?p=2921">https://adsecurity.org/?p=2921</a></li><li><a href="https://github.com/p3nt4/PowerShdll">https://github.com/p3nt4/PowerShdll</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

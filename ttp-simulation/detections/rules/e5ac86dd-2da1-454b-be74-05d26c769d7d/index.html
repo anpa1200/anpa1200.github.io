@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows Default Domain GPO Modification — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule e5ac86dd-2da1-454b-be74-05d26c769d7d. Windows Default Domain GPO Modification — Sigma Rule. Detects modifications to Default Domain or Default Domain Controllers Group Policy Objects (GPOs).
+Adversaries may modify these default GPOs to deploy malicious configurations across the domain.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="e5ac86dd-2da1-454b-be74-05d26c769d7d, attack.privilege-escalation, attack.defense-impairment, attack.t1484.001, windows, security, Enable &#39;Audit Directory Service Changes&#39; in the Default Domain Controllers Policy under:
+Computer Configuration -&gt; Policies -&gt; Windows Settings -&gt; Security Settings -&gt; Advanced Audit Policy Configuration -&gt; Audit Policies -&gt; DS Access -&gt; Audit Directory Service Changes (Success).
+Additionally, proper SACL needs to be configured on the &#39;CN=Policies,CN=System,DC=&lt;domain&gt;,DC=&lt;tld&gt;&#39; container in Active Directory to capture changes to Group Policy Objects.
+, rule-status:experimental, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1484.001">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1484.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/e5ac86dd-2da1-454b-be74-05d26c769d7d/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/e5ac86dd-2da1-454b-be74-05d26c769d7d/">
+<meta property="og:type" content="website"><meta property="og:title" content="Windows Default Domain GPO Modification — Sigma Rule"><meta property="og:description" content="Sigma rule e5ac86dd-2da1-454b-be74-05d26c769d7d. Windows Default Domain GPO Modification — Sigma Rule. Detects modifications to Default Domain or Default Domain Controllers Group Policy Objects (GPOs).
+Adversaries may modify these default GPOs to deploy malicious configurations across the domain.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Windows Default Domain GPO Modification — Sigma Rule"><meta name="twitter:description" content="Sigma rule e5ac86dd-2da1-454b-be74-05d26c769d7d. Windows Default Domain GPO Modification — Sigma Rule. Detects modifications to Default Domain or Default Domain Controllers Group Policy Objects (GPOs).
+Adversaries may modify these default GPOs to deploy malicious configurations across the domain.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/e5ac86dd-2da1-454b-be74-05d26c769d7d/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/e5ac86dd-2da1-454b-be74-05d26c769d7d/","name":"Windows Default Domain GPO Modification — Sigma Rule","description":"Sigma rule e5ac86dd-2da1-454b-be74-05d26c769d7d. Windows Default Domain GPO Modification — Sigma Rule. Detects modifications to Default Domain or Default Domain Controllers Group Policy Objects (GPOs).\nAdversaries may modify these default GPOs to deploy malicious configurations across the domain.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Windows Default Domain GPO Modification — Sigma Rule</h1><p class="lead">Sigma rule e5ac86dd-2da1-454b-be74-05d26c769d7d. Windows Default Domain GPO Modification — Sigma Rule. Detects modifications to Default Domain or Default Domain Controllers Group Policy Objects (GPOs).
+Adversaries may modify these default GPOs to deploy malicious configurations across the domain.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/security/">security</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1484-001/">attack.t1484.001</a></div><p>Author: Swachchhanda Shrawan Poudel (Nextron Systems). Source status: experimental; severity: medium. Source dates: 2025-11-22 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;security&quot;,
+  &quot;definition&quot;: &quot;Enable &#39;Audit Directory Service Changes&#39; in the Default Domain Controllers Policy under:\nComputer Configuration -&gt; Policies -&gt; Windows Settings -&gt; Security Settings -&gt; Advanced Audit Policy Configuration -&gt; Audit Policies -&gt; DS Access -&gt; Audit Directory Service Changes (Success).\nAdditionally, proper SACL needs to be configured on the &#39;CN=Policies,CN=System,DC=&lt;domain&gt;,DC=&lt;tld&gt;&#39; container in Active Directory to capture changes to Group Policy Objects.\n&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/security/win_security_default_domain_gpo_modification.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 913d4786fdb9cf6b05d9e1a5724064ac2d3e5e55f19674ff43a33c5f42e7c769</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Windows Default Domain GPO Modification
+id: e5ac86dd-2da1-454b-be74-05d26c769d7d
+related:
+    - id: dcff7e85-d01f-4eb5-badd-84e2e6be8294
+      type: similar
+status: experimental
+description: |
+    Detects modifications to Default Domain or Default Domain Controllers Group Policy Objects (GPOs).
+    Adversaries may modify these default GPOs to deploy malicious configurations across the domain.
+references:
+    - https://www.trendmicro.com/en_us/research/25/i/unmasking-the-gentlemen-ransomware.html
+    - https://adsecurity.org/?p=3377
+    - https://www.pentestpartners.com/security-blog/living-off-the-land-gpo-style/
+    - https://jgspiers.com/audit-group-policy-changes/
+author: Swachchhanda Shrawan Poudel (Nextron Systems)
+date: 2025-11-22
+tags:
+    - attack.privilege-escalation
+    - attack.defense-impairment
+    - attack.t1484.001
+logsource:
+    product: windows
+    service: security
+    definition: |
+        Enable &#39;Audit Directory Service Changes&#39; in the Default Domain Controllers Policy under:
+        Computer Configuration -&gt; Policies -&gt; Windows Settings -&gt; Security Settings -&gt; Advanced Audit Policy Configuration -&gt; Audit Policies -&gt; DS Access -&gt; Audit Directory Service Changes (Success).
+        Additionally, proper SACL needs to be configured on the &#39;CN=Policies,CN=System,DC=&lt;domain&gt;,DC=&lt;tld&gt;&#39; container in Active Directory to capture changes to Group Policy Objects.
+detection:
+    selection:
+        EventID: 5136
+        ObjectClass: &#39;groupPolicyContainer&#39;
+        ObjectDN|startswith:
+            - &#39;CN={31B2F340-016D-11D2-945F-00C04FB984F9},CN=POLICIES,CN=SYSTEM&#39; # Default Domain Policy
+            - &#39;CN={6AC1786C-016F-11D2-945F-00C04FB984F9},CN=POLICIES,CN=SYSTEM&#39; # Default Domain Controllers Policy
+    condition: selection
+falsepositives:
+    - Legitimate modifications to Default Domain or Default Domain Controllers GPOs
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/e5ac86dd-2da1-454b-be74-05d26c769d7d.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate modifications to Default Domain or Default Domain Controllers GPOs</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.trendmicro.com/en_us/research/25/i/unmasking-the-gentlemen-ransomware.html">https://www.trendmicro.com/en_us/research/25/i/unmasking-the-gentlemen-ransomware.html</a></li><li><a href="https://adsecurity.org/?p=3377">https://adsecurity.org/?p=3377</a></li><li><a href="https://www.pentestpartners.com/security-blog/living-off-the-land-gpo-style/">https://www.pentestpartners.com/security-blog/living-off-the-land-gpo-style/</a></li><li><a href="https://jgspiers.com/audit-group-policy-changes/">https://jgspiers.com/audit-group-policy-changes/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1484.001/">T1484.001 · Group Policy Modification</a> · <a href="/ttp-simulation/detections/enterprise/T1484.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

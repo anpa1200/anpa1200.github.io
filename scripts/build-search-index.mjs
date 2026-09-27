@@ -47,6 +47,12 @@ const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-
 const knowledgeSourcesPath = resolve(option('--knowledge-sources', join(siteRoot, 'data', 'knowledge-sources.json')));
 const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledge-sources', '165'), 10);
 const requiredIndexUrls = [
+  `${SITE_ORIGIN}/ttp-simulation/`,
+  `${SITE_ORIGIN}/ttp-simulation/tools/`,
+  `${SITE_ORIGIN}/ttp-simulation/detections/`,
+  `${SITE_ORIGIN}/ttp-simulation/telemetry/`,
+  `${SITE_ORIGIN}/ttp-simulation/techniques/enterprise/T1059.001/`,
+  `${SITE_ORIGIN}/ttp-simulation/detections/enterprise/T1059.001/`,
   `${SITE_ORIGIN}/`,
   `${SITE_ORIGIN}/search.html`,
   `${SITE_ORIGIN}/references/`,

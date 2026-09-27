@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule f8c1e80b-c73a-476a-ae24-6c72528b1521. DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule. Detects DNS queries to domains commonly used by threat actors to host malware payloads or redirect through URL shorteners.
+These include platforms like Cloudflare Workers, TryCloudflare, InfinityFree, and URL shorteners such as tinyurl and lihi.cc.
+Such DNS activity can indicate potential delivery or command-and-control communication attempts.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="f8c1e80b-c73a-476a-ae24-6c72528b1521, attack.command-and-control, attack.t1071.004, windows, dns_query, rule-status:experimental, severity:medium, logsource-product:windows, logsource-category:dns_query, sigma-tag:attack.command-and-control, sigma-tag:attack.t1071.004">
+<meta name="ttp-module-tags" content="rule-status:experimental, severity:medium, logsource-product:windows, logsource-category:dns_query, sigma-tag:attack.command-and-control, sigma-tag:attack.t1071.004">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/f8c1e80b-c73a-476a-ae24-6c72528b1521/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/f8c1e80b-c73a-476a-ae24-6c72528b1521/">
+<meta property="og:type" content="website"><meta property="og:title" content="DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule"><meta property="og:description" content="Sigma rule f8c1e80b-c73a-476a-ae24-6c72528b1521. DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule. Detects DNS queries to domains commonly used by threat actors to host malware payloads or redirect through URL shorteners.
+These include platforms like Cloudflare Workers, TryCloudflare, InfinityFree, and URL shorteners such as tinyurl and lihi.cc.
+Such DNS activity can indicate potential delivery or command-and-control communication attempts.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule"><meta name="twitter:description" content="Sigma rule f8c1e80b-c73a-476a-ae24-6c72528b1521. DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule. Detects DNS queries to domains commonly used by threat actors to host malware payloads or redirect through URL shorteners.
+These include platforms like Cloudflare Workers, TryCloudflare, InfinityFree, and URL shorteners such as tinyurl and lihi.cc.
+Such DNS activity can indicate potential delivery or command-and-control communication attempts.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/f8c1e80b-c73a-476a-ae24-6c72528b1521/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/f8c1e80b-c73a-476a-ae24-6c72528b1521/","name":"DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule","description":"Sigma rule f8c1e80b-c73a-476a-ae24-6c72528b1521. DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule. Detects DNS queries to domains commonly used by threat actors to host malware payloads or redirect through URL shorteners.\nThese include platforms like Cloudflare Workers, TryCloudflare, InfinityFree, and URL shorteners such as tinyurl and lihi.cc.\nSuch DNS activity can indicate potential delivery or command-and-control communication attempts.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule</h1><p class="lead">Sigma rule f8c1e80b-c73a-476a-ae24-6c72528b1521. DNS Query To Common Malware Hosting and Shortener Services — Sigma Rule. Detects DNS queries to domains commonly used by threat actors to host malware payloads or redirect through URL shorteners.
+These include platforms like Cloudflare Workers, TryCloudflare, InfinityFree, and URL shorteners such as tinyurl and lihi.cc.
+Such DNS activity can indicate potential delivery or command-and-control communication attempts.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/experimental/">experimental</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/dns-query/">dns_query</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-command-and-control/">attack.command-and-control</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1071-004/">attack.t1071.004</a></div><p>Author: Ahmed Nosir (@egycondor). Source status: experimental; severity: medium. Source dates: 2025-06-02 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;dns_query&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/dns_query/dns_query_win_common_malware_hosting_services.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: da06f5d24bbb5be6cd11c9ecdcc7de064cc18b1131c1f6aad5384ac716d35c9f</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: DNS Query To Common Malware Hosting and Shortener Services
+id: f8c1e80b-c73a-476a-ae24-6c72528b1521
+status: experimental
+description: |
+    Detects DNS queries to domains commonly used by threat actors to host malware payloads or redirect through URL shorteners.
+    These include platforms like Cloudflare Workers, TryCloudflare, InfinityFree, and URL shorteners such as tinyurl and lihi.cc.
+    Such DNS activity can indicate potential delivery or command-and-control communication attempts.
+references:
+    - https://cloud.google.com/blog/topics/threat-intelligence/apt41-innovative-tactics
+author: Ahmed Nosir (@egycondor)
+date: 2025-06-02
+tags:
+    - attack.command-and-control
+    - attack.t1071.004
+logsource:
+    product: windows
+    category: dns_query
+detection:
+    selection:
+        QueryName|contains:
+            - &#39;msapp.workers.dev&#39;
+            - &#39;trycloudflare.com&#39;
+            - &#39;infinityfreeapp.com&#39;
+            - &#39;my5353.com&#39;
+            - &#39;reurl.cc&#39;
+            - &#39;lihi.cc&#39;
+            - &#39;tinyurl.com&#39;
+    condition: selection
+falsepositives:
+    - Legitimate use of these services is possible but rare in enterprise environments
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/f8c1e80b-c73a-476a-ae24-6c72528b1521.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate use of these services is possible but rare in enterprise environments</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://cloud.google.com/blog/topics/threat-intelligence/apt41-innovative-tactics">https://cloud.google.com/blog/topics/threat-intelligence/apt41-innovative-tactics</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1071.004/">T1071.004 · DNS</a> · <a href="/ttp-simulation/detections/enterprise/T1071.004/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

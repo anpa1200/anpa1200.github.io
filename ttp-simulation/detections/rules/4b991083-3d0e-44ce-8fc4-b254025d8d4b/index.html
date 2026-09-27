@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unusual Parent Process For Cmd.EXE — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 4b991083-3d0e-44ce-8fc4-b254025d8d4b. Unusual Parent Process For Cmd.EXE — Sigma Rule. Detects suspicious parent process for cmd.exe">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="4b991083-3d0e-44ce-8fc4-b254025d8d4b, attack.execution, attack.t1059, process_creation, windows, rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/4b991083-3d0e-44ce-8fc4-b254025d8d4b/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/4b991083-3d0e-44ce-8fc4-b254025d8d4b/">
+<meta property="og:type" content="website"><meta property="og:title" content="Unusual Parent Process For Cmd.EXE — Sigma Rule"><meta property="og:description" content="Sigma rule 4b991083-3d0e-44ce-8fc4-b254025d8d4b. Unusual Parent Process For Cmd.EXE — Sigma Rule. Detects suspicious parent process for cmd.exe"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Unusual Parent Process For Cmd.EXE — Sigma Rule"><meta name="twitter:description" content="Sigma rule 4b991083-3d0e-44ce-8fc4-b254025d8d4b. Unusual Parent Process For Cmd.EXE — Sigma Rule. Detects suspicious parent process for cmd.exe"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/4b991083-3d0e-44ce-8fc4-b254025d8d4b/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/4b991083-3d0e-44ce-8fc4-b254025d8d4b/","name":"Unusual Parent Process For Cmd.EXE — Sigma Rule","description":"Sigma rule 4b991083-3d0e-44ce-8fc4-b254025d8d4b. Unusual Parent Process For Cmd.EXE — Sigma Rule. Detects suspicious parent process for cmd.exe","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Unusual Parent Process For Cmd.EXE — Sigma Rule</h1><p class="lead">Sigma rule 4b991083-3d0e-44ce-8fc4-b254025d8d4b. Unusual Parent Process For Cmd.EXE — Sigma Rule. Detects suspicious parent process for cmd.exe</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059/">attack.t1059</a></div><p>Author: Tim Rauch, Elastic (idea). Source status: test; severity: medium. Source dates: 2022-09-21 / 2023-12-05.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_cmd_unusual_parent.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: d71f842397675e466f86dbd93c57e6771a29e9b1e9407afd6d78f72b18ac0f3a</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Unusual Parent Process For Cmd.EXE
+id: 4b991083-3d0e-44ce-8fc4-b254025d8d4b
+status: test
+description: Detects suspicious parent process for cmd.exe
+references:
+    - https://www.elastic.co/guide/en/security/current/unusual-parent-process-for-cmd.exe.html
+author: Tim Rauch, Elastic (idea)
+date: 2022-09-21
+modified: 2023-12-05
+tags:
+    - attack.execution
+    - attack.t1059
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: &#39;\cmd.exe&#39;
+        ParentImage|endswith:
+            - &#39;\csrss.exe&#39;
+            - &#39;\ctfmon.exe&#39;
+            - &#39;\dllhost.exe&#39;
+            - &#39;\epad.exe&#39;
+            - &#39;\FlashPlayerUpdateService.exe&#39;
+            - &#39;\GoogleUpdate.exe&#39;
+            - &#39;\jucheck.exe&#39;
+            - &#39;\jusched.exe&#39;
+            - &#39;\LogonUI.exe&#39;
+            - &#39;\lsass.exe&#39;
+            - &#39;\regsvr32.exe&#39;
+            - &#39;\SearchIndexer.exe&#39;
+            - &#39;\SearchProtocolHost.exe&#39;
+            - &#39;\SIHClient.exe&#39;
+            - &#39;\sihost.exe&#39;
+            - &#39;\slui.exe&#39;
+            - &#39;\spoolsv.exe&#39;
+            - &#39;\sppsvc.exe&#39;
+            - &#39;\taskhostw.exe&#39;
+            - &#39;\unsecapp.exe&#39;
+            - &#39;\WerFault.exe&#39;
+            - &#39;\wermgr.exe&#39;
+            - &#39;\wlanext.exe&#39;
+            - &#39;\WUDFHost.exe&#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/4b991083-3d0e-44ce-8fc4-b254025d8d4b.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.elastic.co/guide/en/security/current/unusual-parent-process-for-cmd.exe.html">https://www.elastic.co/guide/en/security/current/unusual-parent-process-for-cmd.exe.html</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059/">T1059 · Command and Scripting Interpreter</a> · <a href="/ttp-simulation/detections/enterprise/T1059/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

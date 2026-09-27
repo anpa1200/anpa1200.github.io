@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc. Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule. Detects successful authentication from potential clients using legacy authentication via user agent strings. This could be a sign of MFA bypass using a password spray attack.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc, attack.privilege-escalation, attack.persistence, attack.initial-access, attack.credential-access, attack.stealth, attack.t1078.004, attack.t1110, azure, signinlogs, rule-status:test, severity:high, logsource-product:azure, logsource-service:signinlogs, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.initial-access, sigma-tag:attack.credential-access, sigma-tag:attack.stealth, sigma-tag:attack.t1078.004, sigma-tag:attack.t1110">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-product:azure, logsource-service:signinlogs, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.initial-access, sigma-tag:attack.credential-access, sigma-tag:attack.stealth, sigma-tag:attack.t1078.004, sigma-tag:attack.t1110">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule"><meta property="og:description" content="Sigma rule 53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc. Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule. Detects successful authentication from potential clients using legacy authentication via user agent strings. This could be a sign of MFA bypass using a password spray attack."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule"><meta name="twitter:description" content="Sigma rule 53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc. Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule. Detects successful authentication from potential clients using legacy authentication via user agent strings. This could be a sign of MFA bypass using a password spray attack."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc/","name":"Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule","description":"Sigma rule 53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc. Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule. Detects successful authentication from potential clients using legacy authentication via user agent strings. This could be a sign of MFA bypass using a password spray attack.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule</h1><p class="lead">Sigma rule 53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc. Potential MFA Bypass Using Legacy Client Authentication — Sigma Rule. Detects successful authentication from potential clients using legacy authentication via user agent strings. This could be a sign of MFA bypass using a password spray attack.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-product/azure/">azure</a><a class="chip" href="/ttp-simulation/tags/logsource-service/signinlogs/">signinlogs</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-initial-access/">attack.initial-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1078-004/">attack.t1078.004</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1110/">attack.t1110</a></div><p>Author: Harjot Singh, &#39;@cyb3rjy0t&#39;. Source status: test; severity: high. Source dates: 2023-03-20 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;azure&quot;,
+  &quot;service&quot;: &quot;signinlogs&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/cloud/azure/signin_logs/azure_ad_suspicious_signin_bypassing_mfa.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: ddb6668f7a6b2c5549c163d98efc020aa981b2ad058d2def4cba9d338438d09f</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential MFA Bypass Using Legacy Client Authentication
+id: 53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc
+status: test
+description: Detects successful authentication from potential clients using legacy authentication via user agent strings. This could be a sign of MFA bypass using a password spray attack.
+references:
+    - https://web.archive.org/web/20230217071802/https://blooteem.com/march-2022
+    - https://www.microsoft.com/en-us/security/blog/2021/10/26/protect-your-business-from-password-sprays-with-microsoft-dart-recommendations/
+author: Harjot Singh, &#39;@cyb3rjy0t&#39;
+date: 2023-03-20
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.initial-access
+    - attack.credential-access
+    - attack.stealth
+    - attack.t1078.004
+    - attack.t1110
+logsource:
+    product: azure
+    service: signinlogs
+detection:
+    selection:
+        Status: &#39;Success&#39;
+        userAgent|contains:
+            - &#39;BAV2ROPC&#39;
+            - &#39;CBAinPROD&#39;
+            - &#39;CBAinTAR&#39;
+    condition: selection
+falsepositives:
+    - Known Legacy Accounts
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/53bb4f7f-48a8-4475-ac30-5a82ddfdf6fc.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Known Legacy Accounts</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://web.archive.org/web/20230217071802/https://blooteem.com/march-2022">https://web.archive.org/web/20230217071802/https://blooteem.com/march-2022</a></li><li><a href="https://www.microsoft.com/en-us/security/blog/2021/10/26/protect-your-business-from-password-sprays-with-microsoft-dart-recommendations/">https://www.microsoft.com/en-us/security/blog/2021/10/26/protect-your-business-from-password-sprays-with-microsoft-dart-recommendations/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1078.004/">T1078.004 · Cloud Accounts</a> · <a href="/ttp-simulation/detections/enterprise/T1078.004/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1110/">T1110 · Brute Force</a> · <a href="/ttp-simulation/detections/enterprise/T1110/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

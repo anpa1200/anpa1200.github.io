@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrustedPath UAC Bypass Pattern — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 4ac47ed3-44c2-4b1f-9d51-bf46e8914126. TrustedPath UAC Bypass Pattern — Sigma Rule. Detects indicators of a UAC bypass method by mocking directories">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="4ac47ed3-44c2-4b1f-9d51-bf46e8914126, attack.privilege-escalation, attack.t1548.002, process_creation, windows, rule-status:test, severity:critical, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1548.002">
+<meta name="ttp-module-tags" content="rule-status:test, severity:critical, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.privilege-escalation, sigma-tag:attack.t1548.002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/4ac47ed3-44c2-4b1f-9d51-bf46e8914126/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/4ac47ed3-44c2-4b1f-9d51-bf46e8914126/">
+<meta property="og:type" content="website"><meta property="og:title" content="TrustedPath UAC Bypass Pattern — Sigma Rule"><meta property="og:description" content="Sigma rule 4ac47ed3-44c2-4b1f-9d51-bf46e8914126. TrustedPath UAC Bypass Pattern — Sigma Rule. Detects indicators of a UAC bypass method by mocking directories"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="TrustedPath UAC Bypass Pattern — Sigma Rule"><meta name="twitter:description" content="Sigma rule 4ac47ed3-44c2-4b1f-9d51-bf46e8914126. TrustedPath UAC Bypass Pattern — Sigma Rule. Detects indicators of a UAC bypass method by mocking directories"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/4ac47ed3-44c2-4b1f-9d51-bf46e8914126/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/4ac47ed3-44c2-4b1f-9d51-bf46e8914126/","name":"TrustedPath UAC Bypass Pattern — Sigma Rule","description":"Sigma rule 4ac47ed3-44c2-4b1f-9d51-bf46e8914126. TrustedPath UAC Bypass Pattern — Sigma Rule. Detects indicators of a UAC bypass method by mocking directories","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>TrustedPath UAC Bypass Pattern — Sigma Rule</h1><p class="lead">Sigma rule 4ac47ed3-44c2-4b1f-9d51-bf46e8914126. TrustedPath UAC Bypass Pattern — Sigma Rule. Detects indicators of a UAC bypass method by mocking directories</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/critical/">critical</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1548-002/">attack.t1548.002</a></div><p>Author: Florian Roth (Nextron Systems). Source status: test; severity: critical. Source dates: 2021-08-27 / 2025-06-17.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_uac_bypass_trustedpath.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 4d432a87e46c12f517b9d9ad25daa07f1db15a73b2891342a4818c58c1997327</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: TrustedPath UAC Bypass Pattern
+id: 4ac47ed3-44c2-4b1f-9d51-bf46e8914126
+related:
+    - id: 0cbe38c0-270c-41d9-ab79-6e5a9a669290
+      type: similar
+status: test
+description: Detects indicators of a UAC bypass method by mocking directories
+references:
+    - https://medium.com/tenable-techblog/uac-bypass-by-mocking-trusted-directories-24a96675f6e
+    - https://www.wietzebeukema.nl/blog/hijacking-dlls-in-windows
+    - https://github.com/netero1010/TrustedPath-UACBypass-BOF
+    - https://x.com/Wietze/status/1933495426952421843
+author: Florian Roth (Nextron Systems)
+date: 2021-08-27
+modified: 2025-06-17
+tags:
+    - attack.privilege-escalation
+    - attack.t1548.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|contains:
+            - &#39;C:\Windows \System32\&#39;
+            - &#39;C:\Windows \SysWOW64\&#39;
+    condition: selection
+falsepositives:
+    - Unknown
+level: critical
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/4ac47ed3-44c2-4b1f-9d51-bf46e8914126.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://medium.com/tenable-techblog/uac-bypass-by-mocking-trusted-directories-24a96675f6e">https://medium.com/tenable-techblog/uac-bypass-by-mocking-trusted-directories-24a96675f6e</a></li><li><a href="https://www.wietzebeukema.nl/blog/hijacking-dlls-in-windows">https://www.wietzebeukema.nl/blog/hijacking-dlls-in-windows</a></li><li><a href="https://github.com/netero1010/TrustedPath-UACBypass-BOF">https://github.com/netero1010/TrustedPath-UACBypass-BOF</a></li><li><a href="https://x.com/Wietze/status/1933495426952421843">https://x.com/Wietze/status/1933495426952421843</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1548.002/">T1548.002 · Bypass User Account Control</a> · <a href="/ttp-simulation/detections/enterprise/T1548.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

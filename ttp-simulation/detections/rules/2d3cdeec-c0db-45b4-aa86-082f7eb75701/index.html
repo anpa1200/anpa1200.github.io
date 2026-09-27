@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microsoft IIS Service Account Password Dumped — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 2d3cdeec-c0db-45b4-aa86-082f7eb75701. Microsoft IIS Service Account Password Dumped — Sigma Rule. Detects the Internet Information Services (IIS) command-line tool, AppCmd, being used to list passwords">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="2d3cdeec-c0db-45b4-aa86-082f7eb75701, attack.credential-access, attack.t1003, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.credential-access, sigma-tag:attack.t1003">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/2d3cdeec-c0db-45b4-aa86-082f7eb75701/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/2d3cdeec-c0db-45b4-aa86-082f7eb75701/">
+<meta property="og:type" content="website"><meta property="og:title" content="Microsoft IIS Service Account Password Dumped — Sigma Rule"><meta property="og:description" content="Sigma rule 2d3cdeec-c0db-45b4-aa86-082f7eb75701. Microsoft IIS Service Account Password Dumped — Sigma Rule. Detects the Internet Information Services (IIS) command-line tool, AppCmd, being used to list passwords"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Microsoft IIS Service Account Password Dumped — Sigma Rule"><meta name="twitter:description" content="Sigma rule 2d3cdeec-c0db-45b4-aa86-082f7eb75701. Microsoft IIS Service Account Password Dumped — Sigma Rule. Detects the Internet Information Services (IIS) command-line tool, AppCmd, being used to list passwords"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/2d3cdeec-c0db-45b4-aa86-082f7eb75701/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/2d3cdeec-c0db-45b4-aa86-082f7eb75701/","name":"Microsoft IIS Service Account Password Dumped — Sigma Rule","description":"Sigma rule 2d3cdeec-c0db-45b4-aa86-082f7eb75701. Microsoft IIS Service Account Password Dumped — Sigma Rule. Detects the Internet Information Services (IIS) command-line tool, AppCmd, being used to list passwords","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Microsoft IIS Service Account Password Dumped — Sigma Rule</h1><p class="lead">Sigma rule 2d3cdeec-c0db-45b4-aa86-082f7eb75701. Microsoft IIS Service Account Password Dumped — Sigma Rule. Detects the Internet Information Services (IIS) command-line tool, AppCmd, being used to list passwords</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1003/">attack.t1003</a></div><p>Author: Tim Rauch, Janantha Marasinghe, Elastic (original idea). Source status: test; severity: high. Source dates: 2022-11-08 / 2023-01-22.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_iis_appcmd_service_account_password_dumped.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 5abefddd79de2632166d22181b560b6038181696604d8ff84a7d3c78b8a9fe01</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Microsoft IIS Service Account Password Dumped
+id: 2d3cdeec-c0db-45b4-aa86-082f7eb75701
+status: test
+description: Detects the Internet Information Services (IIS) command-line tool, AppCmd, being used to list passwords
+references:
+    - https://www.elastic.co/guide/en/security/current/microsoft-iis-service-account-password-dumped.html
+    - https://twitter.com/0gtweet/status/1588815661085917186?cxt=HHwWhIDUyaDbzYwsAAAA
+    - https://www.netspi.com/blog/technical/network-penetration-testing/decrypting-iis-passwords-to-break-out-of-the-dmz-part-2/
+author: Tim Rauch, Janantha Marasinghe, Elastic (original idea)
+date: 2022-11-08
+modified: 2023-01-22
+tags:
+    - attack.credential-access
+    - attack.t1003
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_base_name:
+        - Image|endswith: &#39;\appcmd.exe&#39;
+        - OriginalFileName: &#39;appcmd.exe&#39;
+    selection_base_list:
+        CommandLine|contains: &#39;list &#39;
+    selection_standalone:
+        CommandLine|contains:
+            - &#39; /config&#39; # https://pbs.twimg.com/media/FgydDAJWIAEio34?format=png&amp;name=900x900
+            - &#39; /xml&#39;
+            # We cover the &quot;-&quot; version just in case :)
+            - &#39; -config&#39;
+            - &#39; -xml&#39;
+    selection_cmd_flags:
+        CommandLine|contains:
+            - &#39; /@t&#39; # Covers both &quot;/@text:*&quot; and &quot;/@t:*&quot;
+            - &#39; /text&#39;
+            - &#39; /show&#39;
+            # We cover the &quot;-&quot; version just in case :)
+            - &#39; -@t&#39;
+            - &#39; -text&#39;
+            - &#39; -show&#39;
+    selection_cmd_grep:
+        CommandLine|contains:
+            - &#39;:\*&#39;
+            - &#39;password&#39;
+    condition: all of selection_base_* and (selection_standalone or all of selection_cmd_*)
+falsepositives:
+    - Unknown
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/2d3cdeec-c0db-45b4-aa86-082f7eb75701.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.elastic.co/guide/en/security/current/microsoft-iis-service-account-password-dumped.html">https://www.elastic.co/guide/en/security/current/microsoft-iis-service-account-password-dumped.html</a></li><li><a href="https://twitter.com/0gtweet/status/1588815661085917186?cxt=HHwWhIDUyaDbzYwsAAAA">https://twitter.com/0gtweet/status/1588815661085917186?cxt=HHwWhIDUyaDbzYwsAAAA</a></li><li><a href="https://www.netspi.com/blog/technical/network-penetration-testing/decrypting-iis-passwords-to-break-out-of-the-dmz-part-2/">https://www.netspi.com/blog/technical/network-penetration-testing/decrypting-iis-passwords-to-break-out-of-the-dmz-part-2/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1003/">T1003 · OS Credential Dumping</a> · <a href="/ttp-simulation/detections/enterprise/T1003/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

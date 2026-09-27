@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Script Interpreter Execution From Suspicious Folder — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 1228c958-e64e-4e71-92ad-7d429f4138ba. Script Interpreter Execution From Suspicious Folder — Sigma Rule. Detects suspicious script execution from suspicious directories or folders accessible by environment variables that may indicate malware activity.
+Script interpreters (cscript, wscript, mshta, powershell) executing from folders like Temp, Public, or user profile directories may suggest attempts to evade detection or execute malicious scripts.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="1228c958-e64e-4e71-92ad-7d429f4138ba, attack.execution, attack.t1059, process_creation, windows, rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:process_creation, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1059">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/1228c958-e64e-4e71-92ad-7d429f4138ba/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/1228c958-e64e-4e71-92ad-7d429f4138ba/">
+<meta property="og:type" content="website"><meta property="og:title" content="Script Interpreter Execution From Suspicious Folder — Sigma Rule"><meta property="og:description" content="Sigma rule 1228c958-e64e-4e71-92ad-7d429f4138ba. Script Interpreter Execution From Suspicious Folder — Sigma Rule. Detects suspicious script execution from suspicious directories or folders accessible by environment variables that may indicate malware activity.
+Script interpreters (cscript, wscript, mshta, powershell) executing from folders like Temp, Public, or user profile directories may suggest attempts to evade detection or execute malicious scripts.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Script Interpreter Execution From Suspicious Folder — Sigma Rule"><meta name="twitter:description" content="Sigma rule 1228c958-e64e-4e71-92ad-7d429f4138ba. Script Interpreter Execution From Suspicious Folder — Sigma Rule. Detects suspicious script execution from suspicious directories or folders accessible by environment variables that may indicate malware activity.
+Script interpreters (cscript, wscript, mshta, powershell) executing from folders like Temp, Public, or user profile directories may suggest attempts to evade detection or execute malicious scripts.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/1228c958-e64e-4e71-92ad-7d429f4138ba/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/1228c958-e64e-4e71-92ad-7d429f4138ba/","name":"Script Interpreter Execution From Suspicious Folder — Sigma Rule","description":"Sigma rule 1228c958-e64e-4e71-92ad-7d429f4138ba. Script Interpreter Execution From Suspicious Folder — Sigma Rule. Detects suspicious script execution from suspicious directories or folders accessible by environment variables that may indicate malware activity.\nScript interpreters (cscript, wscript, mshta, powershell) executing from folders like Temp, Public, or user profile directories may suggest attempts to evade detection or execute malicious scripts.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Script Interpreter Execution From Suspicious Folder — Sigma Rule</h1><p class="lead">Sigma rule 1228c958-e64e-4e71-92ad-7d429f4138ba. Script Interpreter Execution From Suspicious Folder — Sigma Rule. Detects suspicious script execution from suspicious directories or folders accessible by environment variables that may indicate malware activity.
+Script interpreters (cscript, wscript, mshta, powershell) executing from folders like Temp, Public, or user profile directories may suggest attempts to evade detection or execute malicious scripts.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1059/">attack.t1059</a></div><p>Author: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: high. Source dates: 2022-02-08 / 2026-02-17.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_susp_script_exec_from_env_folder.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 4bc9d5c0b23c4e04f80c9238ea1fc20340d795a7d750dbc5154e85ab5749af16</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Script Interpreter Execution From Suspicious Folder
+id: 1228c958-e64e-4e71-92ad-7d429f4138ba
+status: test
+description: |
+    Detects suspicious script execution from suspicious directories or folders accessible by environment variables that may indicate malware activity.
+    Script interpreters (cscript, wscript, mshta, powershell) executing from folders like Temp, Public, or user profile directories may suggest attempts to evade detection or execute malicious scripts.
+references:
+    - https://www.virustotal.com/gui/file/91ba814a86ddedc7a9d546e26f912c541205b47a853d227756ab1334ade92c3f
+    - https://symantec-enterprise-blogs.security.com/blogs/threat-intelligence/shuckworm-russia-ukraine-military
+    - https://learn.microsoft.com/en-us/windows/win32/shell/csidl
+author: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems)
+date: 2022-02-08
+modified: 2026-02-17
+tags:
+    - attack.execution
+    - attack.t1059
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_proc_image:
+        Image|endswith:
+            - &#39;\cscript.exe&#39;
+            - &#39;\mshta.exe&#39;
+            - &#39;\wscript.exe&#39;
+    selection_proc_flags:
+        CommandLine|contains:
+            - &#39; -ep bypass &#39;
+            - &#39; -ExecutionPolicy bypass &#39;
+            - &#39; -w hidden &#39;
+            - &#39;/e:javascript &#39;
+            - &#39;/e:Jscript &#39;
+            - &#39;/e:vbscript &#39;
+    selection_proc_original:
+        OriginalFileName:
+            - &#39;cscript.exe&#39;
+            - &#39;mshta.exe&#39;
+            - &#39;wscript.exe&#39;
+    selection_folders_1:
+        CommandLine|contains:
+            - &#39;:\Perflogs\&#39;
+            - &#39;:\Users\Public\&#39;
+            - &#39;\%Public%&#39;
+            - &#39;\AppData\Local\Temp&#39;
+            - &#39;\AppData\Roaming\Temp&#39;
+            - &#39;\Temporary Internet&#39;
+            - &#39;\Windows\Temp&#39;
+            - &#39;\Start Menu\Programs\Startup\&#39;
+            - &#39;%TEMP%&#39;
+            - &#39;%TMP%&#39;
+            - &#39;%LocalAppData%\Temp&#39;
+    selection_folders_2:
+        - CommandLine|contains|all:
+              - &#39;:\Users\&#39;
+              - &#39;\Favorites\&#39;
+        - CommandLine|contains|all:
+              - &#39;:\Users\&#39;
+              - &#39;\Favourites\&#39;
+        - CommandLine|contains|all:
+              - &#39;:\Users\&#39;
+              - &#39;\Contacts\&#39;
+        - CommandLine|contains|all:
+              - &#39;:\Users\&#39;
+              - &#39;\Documents\&#39;
+        - CommandLine|contains|all:
+              - &#39;:\Users\&#39;
+              - &#39;\Music\&#39;
+        - CommandLine|contains|all:
+              - &#39;:\Users\&#39;
+              - &#39;\Pictures\&#39;
+        - CommandLine|contains|all:
+              - &#39;:\Users\&#39;
+              - &#39;\Videos\&#39;
+    filter_optional_chocolatey_installer:
+        ParentImage:
+            - &#39;C:\Windows\System32\Msiexec.exe&#39;
+            - &#39;C:\Windows\SysWOW64\Msiexec.exe&#39;
+        Image|endswith: &#39;\powershell.exe&#39;
+        CommandLine|contains|all:
+            - &#39;-NoProfile -ExecutionPolicy Bypass -Command&#39;
+            - &#39;AppData\Local\Temp\&#39;
+            - &#39;Install-Chocolatey.ps1&#39;
+    condition: 1 of selection_proc_* and 1 of selection_folders_* and not 1 of filter_optional_*
+falsepositives:
+    - Various legitimate software have been observed to use similar techniques for installation or update purposes;thus, it is recommended to review and tune filters for your environment to reduce false positives before deploying to production.
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/1228c958-e64e-4e71-92ad-7d429f4138ba.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Various legitimate software have been observed to use similar techniques for installation or update purposes;thus, it is recommended to review and tune filters for your environment to reduce false positives before deploying to production.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.virustotal.com/gui/file/91ba814a86ddedc7a9d546e26f912c541205b47a853d227756ab1334ade92c3f">https://www.virustotal.com/gui/file/91ba814a86ddedc7a9d546e26f912c541205b47a853d227756ab1334ade92c3f</a></li><li><a href="https://symantec-enterprise-blogs.security.com/blogs/threat-intelligence/shuckworm-russia-ukraine-military">https://symantec-enterprise-blogs.security.com/blogs/threat-intelligence/shuckworm-russia-ukraine-military</a></li><li><a href="https://learn.microsoft.com/en-us/windows/win32/shell/csidl">https://learn.microsoft.com/en-us/windows/win32/shell/csidl</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1059/">T1059 · Command and Scripting Interpreter</a> · <a href="/ttp-simulation/detections/enterprise/T1059/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

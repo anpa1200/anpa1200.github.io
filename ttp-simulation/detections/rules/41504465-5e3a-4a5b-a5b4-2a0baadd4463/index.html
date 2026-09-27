@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 41504465-5e3a-4a5b-a5b4-2a0baadd4463. PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule. Detects PsExec default pipe creation where the image executed is located in a suspicious location. Which could indicate that the tool is being used in an attack">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="41504465-5e3a-4a5b-a5b4-2a0baadd4463, attack.execution, attack.t1569.002, attack.s0029, pipe_created, windows, Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575, rule-status:test, severity:medium, logsource-category:pipe_created, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1569.002, sigma-tag:attack.s0029">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:pipe_created, logsource-product:windows, sigma-tag:attack.execution, sigma-tag:attack.t1569.002, sigma-tag:attack.s0029">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/41504465-5e3a-4a5b-a5b4-2a0baadd4463/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/41504465-5e3a-4a5b-a5b4-2a0baadd4463/">
+<meta property="og:type" content="website"><meta property="og:title" content="PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule"><meta property="og:description" content="Sigma rule 41504465-5e3a-4a5b-a5b4-2a0baadd4463. PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule. Detects PsExec default pipe creation where the image executed is located in a suspicious location. Which could indicate that the tool is being used in an attack"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule"><meta name="twitter:description" content="Sigma rule 41504465-5e3a-4a5b-a5b4-2a0baadd4463. PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule. Detects PsExec default pipe creation where the image executed is located in a suspicious location. Which could indicate that the tool is being used in an attack"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/41504465-5e3a-4a5b-a5b4-2a0baadd4463/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/41504465-5e3a-4a5b-a5b4-2a0baadd4463/","name":"PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule","description":"Sigma rule 41504465-5e3a-4a5b-a5b4-2a0baadd4463. PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule. Detects PsExec default pipe creation where the image executed is located in a suspicious location. Which could indicate that the tool is being used in an attack","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule</h1><p class="lead">Sigma rule 41504465-5e3a-4a5b-a5b4-2a0baadd4463. PsExec Tool Execution From Suspicious Locations - PipeName — Sigma Rule. Detects PsExec default pipe creation where the image executed is located in a suspicious location. Which could indicate that the tool is being used in an attack</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/pipe-created/">pipe_created</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1569-002/">attack.t1569.002</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-s0029/">attack.s0029</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2022-08-04 / 2023-09-20.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;pipe_created&quot;,
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;definition&quot;: &quot;Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/pipe_created/pipe_created_sysinternals_psexec_default_pipe_susp_location.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: c097cd5facb6e79504635b658ba8b169680a75c6a03ddd2a744f310d32cae932</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: PsExec Tool Execution From Suspicious Locations - PipeName
+id: 41504465-5e3a-4a5b-a5b4-2a0baadd4463
+related:
+    - id: f3f3a972-f982-40ad-b63c-bca6afdfad7c
+      type: derived
+status: test
+description: Detects PsExec default pipe creation where the image executed is located in a suspicious location. Which could indicate that the tool is being used in an attack
+references:
+    - https://www.jpcert.or.jp/english/pub/sr/ir_research.html
+    - https://jpcertcc.github.io/ToolAnalysisResultSheet
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2022-08-04
+modified: 2023-09-20
+tags:
+    - attack.execution
+    - attack.t1569.002
+    - attack.s0029
+logsource:
+    category: pipe_created
+    product: windows
+    definition: &#39;Note that you have to configure logging for Named Pipe Events in Sysmon config (Event ID 17 and Event ID 18). The basic configuration is in popular sysmon configuration (https://github.com/SwiftOnSecurity/sysmon-config), but it is worth verifying. You can also use other repo, e.g. https://github.com/Neo23x0/sysmon-config, https://github.com/olafhartong/sysmon-modular. How to test detection? You can check powershell script from this site https://svch0st.medium.com/guide-to-named-pipes-and-hunting-for-cobalt-strike-pipes-dc46b2c5f575&#39;
+detection:
+    selection:
+        PipeName: &#39;\PSEXESVC&#39;
+        Image|contains: # Add or remove locations depending on how and if you execute Psexec in your env
+            - &#39;:\Users\Public\&#39;
+            - &#39;:\Windows\Temp\&#39;
+            - &#39;\AppData\Local\Temp\&#39;
+            - &#39;\Desktop\&#39;
+            - &#39;\Downloads\&#39;
+    condition: selection
+falsepositives:
+    - Rare legitimate use of psexec from the locations mentioned above. This will require initial tuning based on your environment.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/41504465-5e3a-4a5b-a5b4-2a0baadd4463.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Rare legitimate use of psexec from the locations mentioned above. This will require initial tuning based on your environment.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.jpcert.or.jp/english/pub/sr/ir_research.html">https://www.jpcert.or.jp/english/pub/sr/ir_research.html</a></li><li><a href="https://jpcertcc.github.io/ToolAnalysisResultSheet">https://jpcertcc.github.io/ToolAnalysisResultSheet</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1569.002/">T1569.002 · Service Execution</a> · <a href="/ttp-simulation/detections/enterprise/T1569.002/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

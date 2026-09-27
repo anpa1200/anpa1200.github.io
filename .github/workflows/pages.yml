@@ -96,6 +96,10 @@ jobs:
           --source "${GITHUB_WORKSPACE}"
           --archive "${GITHUB_WORKSPACE}/.article-archive-source"
           --archive-commit "${ARTICLE_ARCHIVE_COMMIT}"
+      - name: Integrate searchable TTP modules and article backlinks
+        run: |
+          node scripts/build-ttp-integration.mjs --site "${RUNNER_TEMP}/site" --require-archive
+          node scripts/inject-search-loader.mjs --site "${RUNNER_TEMP}/site"
       - name: Build canonical metadata and release HTML
         run: npm run build-metadata:remote -- --site "${RUNNER_TEMP}/site" --source "${GITHUB_WORKSPACE}"
       - name: Integrate governed platform sidebar

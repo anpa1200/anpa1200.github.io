@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outbound RDP Connections Over Non-Standard Tools — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule ed74fe75-7594-4b4b-ae38-e38e3fd2eb23. Outbound RDP Connections Over Non-Standard Tools — Sigma Rule. Detects Non-Standard tools initiating a connection over port 3389 indicating possible lateral movement.
+An initial baseline is required before using this utility to exclude third party RDP tooling that you might use.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="ed74fe75-7594-4b4b-ae38-e38e3fd2eb23, attack.lateral-movement, attack.t1021.001, car.2013-07-002, network_connection, windows, rule-status:test, severity:high, logsource-category:network_connection, logsource-product:windows, sigma-tag:attack.lateral-movement, sigma-tag:attack.t1021.001, sigma-tag:car.2013-07-002">
+<meta name="ttp-module-tags" content="rule-status:test, severity:high, logsource-category:network_connection, logsource-product:windows, sigma-tag:attack.lateral-movement, sigma-tag:attack.t1021.001, sigma-tag:car.2013-07-002">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/ed74fe75-7594-4b4b-ae38-e38e3fd2eb23/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/ed74fe75-7594-4b4b-ae38-e38e3fd2eb23/">
+<meta property="og:type" content="website"><meta property="og:title" content="Outbound RDP Connections Over Non-Standard Tools — Sigma Rule"><meta property="og:description" content="Sigma rule ed74fe75-7594-4b4b-ae38-e38e3fd2eb23. Outbound RDP Connections Over Non-Standard Tools — Sigma Rule. Detects Non-Standard tools initiating a connection over port 3389 indicating possible lateral movement.
+An initial baseline is required before using this utility to exclude third party RDP tooling that you might use.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Outbound RDP Connections Over Non-Standard Tools — Sigma Rule"><meta name="twitter:description" content="Sigma rule ed74fe75-7594-4b4b-ae38-e38e3fd2eb23. Outbound RDP Connections Over Non-Standard Tools — Sigma Rule. Detects Non-Standard tools initiating a connection over port 3389 indicating possible lateral movement.
+An initial baseline is required before using this utility to exclude third party RDP tooling that you might use.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/ed74fe75-7594-4b4b-ae38-e38e3fd2eb23/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/ed74fe75-7594-4b4b-ae38-e38e3fd2eb23/","name":"Outbound RDP Connections Over Non-Standard Tools — Sigma Rule","description":"Sigma rule ed74fe75-7594-4b4b-ae38-e38e3fd2eb23. Outbound RDP Connections Over Non-Standard Tools — Sigma Rule. Detects Non-Standard tools initiating a connection over port 3389 indicating possible lateral movement.\nAn initial baseline is required before using this utility to exclude third party RDP tooling that you might use.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Outbound RDP Connections Over Non-Standard Tools — Sigma Rule</h1><p class="lead">Sigma rule ed74fe75-7594-4b4b-ae38-e38e3fd2eb23. Outbound RDP Connections Over Non-Standard Tools — Sigma Rule. Detects Non-Standard tools initiating a connection over port 3389 indicating possible lateral movement.
+An initial baseline is required before using this utility to exclude third party RDP tooling that you might use.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/high/">high</a><a class="chip" href="/ttp-simulation/tags/logsource-category/network-connection/">network_connection</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-lateral-movement/">attack.lateral-movement</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1021-001/">attack.t1021.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/car-2013-07-002/">car.2013-07-002</a></div><p>Author: Markus Neis. Source status: test; severity: high. Source dates: 2019-05-15 / 2024-02-09.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;network_connection&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/network_connection/net_connection_win_rdp_outbound_over_non_standard_tools.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 412709e0797b76fc0cdfa6dc73b94aed6ddb09593d1dc867c230021a7c040635</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Outbound RDP Connections Over Non-Standard Tools
+id: ed74fe75-7594-4b4b-ae38-e38e3fd2eb23
+status: test
+description: |
+    Detects Non-Standard tools initiating a connection over port 3389 indicating possible lateral movement.
+    An initial baseline is required before using this utility to exclude third party RDP tooling that you might use.
+references:
+    - https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2019-0708
+author: Markus Neis
+date: 2019-05-15
+modified: 2024-02-09
+tags:
+    - attack.lateral-movement
+    - attack.t1021.001
+    - car.2013-07-002
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        DestinationPort: 3389
+        Initiated: &#39;true&#39;
+    filter_main_mstsc:
+        Image:
+            - &#39;C:\Windows\System32\mstsc.exe&#39;
+            - &#39;C:\Windows\SysWOW64\mstsc.exe&#39;
+    filter_optional_dns:
+        # Note: https://github.com/SigmaHQ/sigma/pull/2249
+        Image: &#39;C:\Windows\System32\dns.exe&#39;
+        SourcePort: 53
+        Protocol: &#39;udp&#39;
+    filter_optional_avast:
+        Image|endswith:
+            - &#39;\Avast Software\Avast\AvastSvc.exe&#39;
+            - &#39;\Avast\AvastSvc.exe&#39;
+    filter_optional_sysinternals_rdcman:
+        Image|endswith: &#39;\RDCMan.exe&#39;
+    filter_optional_chrome:
+        Image: &#39;C:\Program Files\Google\Chrome\Application\chrome.exe&#39;
+    filter_optional_third_party:
+        Image|endswith:
+            - &#39;\FSAssessment.exe&#39;
+            - &#39;\FSDiscovery.exe&#39;
+            - &#39;\MobaRTE.exe&#39;
+            - &#39;\mRemote.exe&#39;
+            - &#39;\mRemoteNG.exe&#39;
+            - &#39;\Passwordstate.exe&#39;
+            - &#39;\RemoteDesktopManager.exe&#39;
+            - &#39;\RemoteDesktopManager64.exe&#39;
+            - &#39;\RemoteDesktopManagerFree.exe&#39;
+            - &#39;\RSSensor.exe&#39;
+            - &#39;\RTS2App.exe&#39;
+            - &#39;\RTSApp.exe&#39;
+            - &#39;\spiceworks-finder.exe&#39;
+            - &#39;\Terminals.exe&#39;
+            - &#39;\ws_TunnelService.exe&#39;
+    filter_optional_thor:
+        Image|endswith:
+            - &#39;\thor.exe&#39;
+            - &#39;\thor64.exe&#39;
+    filter_optional_splunk:
+        Image|startswith: &#39;C:\Program Files\SplunkUniversalForwarder\bin\&#39;
+    filter_optional_sentinel_one:
+        Image|endswith: &#39;\Ranger\SentinelRanger.exe&#39;
+    filter_optional_firefox:
+        Image: &#39;C:\Program Files\Mozilla Firefox\firefox.exe&#39;
+    filter_optional_tsplus:  # Some RAS
+        Image:
+            - &#39;C:\Program Files\TSplus\Java\bin\HTML5service.exe&#39;
+            - &#39;C:\Program Files (x86)\TSplus\Java\bin\HTML5service.exe&#39;
+    filter_optional_null:
+        Image: null
+    filter_optional_empty:
+        Image: &#39;&#39;
+    filter_optional_unknown:
+        Image: &#39;&lt;unknown process&gt;&#39;
+    condition: selection and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Third party RDP tools
+level: high
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/ed74fe75-7594-4b4b-ae38-e38e3fd2eb23.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Third party RDP tools</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2019-0708">https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2019-0708</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1021.001/">T1021.001 · Remote Desktop Protocol</a> · <a href="/ttp-simulation/detections/enterprise/T1021.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

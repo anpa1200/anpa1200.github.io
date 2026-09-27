@@ -14,6 +14,13 @@
       ['Articles', '/articles/', ['/articles/']],
       ['Projects', '/projects.html', ['/projects.html']]
     ] },
+    { label: 'Attack & detection modules', links: [
+      ['Attack Tools', '/ttp-simulation/tools/', ['/ttp-simulation/tools/']],
+      ['Attack Simulations', '/ttp-simulation/', ['/ttp-simulation/index.html', '/ttp-simulation/techniques/']],
+      ['Detection Rules', '/ttp-simulation/detections/', ['/ttp-simulation/detections/']],
+      ['Telemetry Library', '/ttp-simulation/telemetry/', ['/ttp-simulation/telemetry/']],
+      ['Simulation & detection tags', '/ttp-simulation/tags/', ['/ttp-simulation/tags/']]
+    ] },
     { label: 'Tools & proof', links: [
       ['HexStrike', '/hexstrike.html', ['/hexstrike.html']],
       ['Offensive research', '/ai-offensive.html', ['/ai-offensive.html']],

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential AMSI Bypass Using NULL Bits — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 92a974db-ab84-457f-9ec0-55db83d7a825. Potential AMSI Bypass Using NULL Bits — Sigma Rule. Detects usage of special strings/null bits in order to potentially bypass AMSI functionalities">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="92a974db-ab84-457f-9ec0-55db83d7a825, attack.defense-impairment, attack.t1685, windows, process_creation, rule-status:test, severity:medium, logsource-product:windows, logsource-category:process_creation, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-category:process_creation, sigma-tag:attack.defense-impairment, sigma-tag:attack.t1685">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/92a974db-ab84-457f-9ec0-55db83d7a825/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/92a974db-ab84-457f-9ec0-55db83d7a825/">
+<meta property="og:type" content="website"><meta property="og:title" content="Potential AMSI Bypass Using NULL Bits — Sigma Rule"><meta property="og:description" content="Sigma rule 92a974db-ab84-457f-9ec0-55db83d7a825. Potential AMSI Bypass Using NULL Bits — Sigma Rule. Detects usage of special strings/null bits in order to potentially bypass AMSI functionalities"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Potential AMSI Bypass Using NULL Bits — Sigma Rule"><meta name="twitter:description" content="Sigma rule 92a974db-ab84-457f-9ec0-55db83d7a825. Potential AMSI Bypass Using NULL Bits — Sigma Rule. Detects usage of special strings/null bits in order to potentially bypass AMSI functionalities"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/92a974db-ab84-457f-9ec0-55db83d7a825/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/92a974db-ab84-457f-9ec0-55db83d7a825/","name":"Potential AMSI Bypass Using NULL Bits — Sigma Rule","description":"Sigma rule 92a974db-ab84-457f-9ec0-55db83d7a825. Potential AMSI Bypass Using NULL Bits — Sigma Rule. Detects usage of special strings/null bits in order to potentially bypass AMSI functionalities","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Potential AMSI Bypass Using NULL Bits — Sigma Rule</h1><p class="lead">Sigma rule 92a974db-ab84-457f-9ec0-55db83d7a825. Potential AMSI Bypass Using NULL Bits — Sigma Rule. Detects usage of special strings/null bits in order to potentially bypass AMSI functionalities</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-defense-impairment/">attack.defense-impairment</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1685/">attack.t1685</a></div><p>Author: Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2023-01-04 / 2023-05-09.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;category&quot;: &quot;process_creation&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/process_creation/proc_creation_win_powershell_amsi_null_bits_bypass.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 489dceaf494b8b183e29cae4eabc3d28adc919bb8ae1db28613dbafa8161f653</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Potential AMSI Bypass Using NULL Bits
+id: 92a974db-ab84-457f-9ec0-55db83d7a825
+related:
+    - id: fa2559c8-1197-471d-9cdd-05a0273d4522
+      type: similar
+status: test
+description: Detects usage of special strings/null bits in order to potentially bypass AMSI functionalities
+references:
+    - https://github.com/r00t-3xp10it/hacking-material-books/blob/43cb1e1932c16ff1f58b755bc9ab6b096046853f/obfuscation/simple_obfuscation.md#amsi-bypass-using-null-bits-satoshi
+author: Nasreddine Bencherchali (Nextron Systems)
+date: 2023-01-04
+modified: 2023-05-09
+tags:
+    - attack.defense-impairment
+    - attack.t1685
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    selection:
+        CommandLine|contains:
+            - &quot;if(0){{{0}}}&#39; -f $(0 -as [char]) +&quot;
+            - &quot;#&lt;NULL&gt;&quot;
+    condition: selection
+falsepositives:
+    - Unknown
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/92a974db-ab84-457f-9ec0-55db83d7a825.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Unknown</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/r00t-3xp10it/hacking-material-books/blob/43cb1e1932c16ff1f58b755bc9ab6b096046853f/obfuscation/simple_obfuscation.md#amsi-bypass-using-null-bits-satoshi">https://github.com/r00t-3xp10it/hacking-material-books/blob/43cb1e1932c16ff1f58b755bc9ab6b096046853f/obfuscation/simple_obfuscation.md#amsi-bypass-using-null-bits-satoshi</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1685/">T1685 · Disable or Modify Tools</a> · <a href="/ttp-simulation/detections/enterprise/T1685/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>External Remote RDP Logon from Public IP — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule 259a9cdf-c4dd-4fa2-b243-2269e5ab18a2. External Remote RDP Logon from Public IP — Sigma Rule. Detects successful logon from public IP address via RDP. This can indicate a publicly-exposed RDP port.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="259a9cdf-c4dd-4fa2-b243-2269e5ab18a2, attack.privilege-escalation, attack.persistence, attack.initial-access, attack.credential-access, attack.stealth, attack.t1133, attack.t1078, attack.t1110, windows, security, rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.initial-access, sigma-tag:attack.credential-access, sigma-tag:attack.stealth, sigma-tag:attack.t1133, sigma-tag:attack.t1078, sigma-tag:attack.t1110">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-product:windows, logsource-service:security, sigma-tag:attack.privilege-escalation, sigma-tag:attack.persistence, sigma-tag:attack.initial-access, sigma-tag:attack.credential-access, sigma-tag:attack.stealth, sigma-tag:attack.t1133, sigma-tag:attack.t1078, sigma-tag:attack.t1110">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/259a9cdf-c4dd-4fa2-b243-2269e5ab18a2/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/259a9cdf-c4dd-4fa2-b243-2269e5ab18a2/">
+<meta property="og:type" content="website"><meta property="og:title" content="External Remote RDP Logon from Public IP — Sigma Rule"><meta property="og:description" content="Sigma rule 259a9cdf-c4dd-4fa2-b243-2269e5ab18a2. External Remote RDP Logon from Public IP — Sigma Rule. Detects successful logon from public IP address via RDP. This can indicate a publicly-exposed RDP port."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="External Remote RDP Logon from Public IP — Sigma Rule"><meta name="twitter:description" content="Sigma rule 259a9cdf-c4dd-4fa2-b243-2269e5ab18a2. External Remote RDP Logon from Public IP — Sigma Rule. Detects successful logon from public IP address via RDP. This can indicate a publicly-exposed RDP port."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/259a9cdf-c4dd-4fa2-b243-2269e5ab18a2/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/259a9cdf-c4dd-4fa2-b243-2269e5ab18a2/","name":"External Remote RDP Logon from Public IP — Sigma Rule","description":"Sigma rule 259a9cdf-c4dd-4fa2-b243-2269e5ab18a2. External Remote RDP Logon from Public IP — Sigma Rule. Detects successful logon from public IP address via RDP. This can indicate a publicly-exposed RDP port.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>External Remote RDP Logon from Public IP — Sigma Rule</h1><p class="lead">Sigma rule 259a9cdf-c4dd-4fa2-b243-2269e5ab18a2. External Remote RDP Logon from Public IP — Sigma Rule. Detects successful logon from public IP address via RDP. This can indicate a publicly-exposed RDP port.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/logsource-service/security/">security</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-initial-access/">attack.initial-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-credential-access/">attack.credential-access</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1133/">attack.t1133</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1078/">attack.t1078</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1110/">attack.t1110</a></div><p>Author: Micah Babinski (@micahbabinski), Zach Mathis (@yamatosecurity). Source status: test; severity: medium. Source dates: 2023-01-19 / 2024-03-11.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;product&quot;: &quot;windows&quot;,
+  &quot;service&quot;: &quot;security&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/builtin/security/account_management/win_security_successful_external_remote_rdp_login.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 39e0573c1af9fbdb767afe001b512e9f55bde300dc04e9bb5f3f1f3a5c140d3d</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: External Remote RDP Logon from Public IP
+id: 259a9cdf-c4dd-4fa2-b243-2269e5ab18a2
+related:
+    - id: 78d5cab4-557e-454f-9fb9-a222bd0d5edc
+      type: derived
+status: test
+description: Detects successful logon from public IP address via RDP. This can indicate a publicly-exposed RDP port.
+references:
+    - https://www.inversecos.com/2020/04/successful-4624-anonymous-logons-to.html
+    - https://twitter.com/Purp1eW0lf/status/1616144561965002752
+author: Micah Babinski (@micahbabinski), Zach Mathis (@yamatosecurity)
+date: 2023-01-19
+modified: 2024-03-11
+tags:
+    - attack.privilege-escalation
+    - attack.persistence
+    - attack.initial-access
+    - attack.credential-access
+    - attack.stealth
+    - attack.t1133
+    - attack.t1078
+    - attack.t1110
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 10
+    filter_main_local_ranges:
+        IpAddress|cidr:
+            - &#39;::1/128&#39;  # IPv6 loopback
+            - &#39;10.0.0.0/8&#39;
+            - &#39;127.0.0.0/8&#39;
+            - &#39;172.16.0.0/12&#39;
+            - &#39;192.168.0.0/16&#39;
+            - &#39;169.254.0.0/16&#39;
+            - &#39;fc00::/7&#39;  # IPv6 private addresses
+            - &#39;fe80::/10&#39;  # IPv6 link-local addresses
+    filter_main_empty:
+        IpAddress: &#39;-&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - Legitimate or intentional inbound connections from public IP addresses on the RDP port.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/259a9cdf-c4dd-4fa2-b243-2269e5ab18a2.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate or intentional inbound connections from public IP addresses on the RDP port.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://www.inversecos.com/2020/04/successful-4624-anonymous-logons-to.html">https://www.inversecos.com/2020/04/successful-4624-anonymous-logons-to.html</a></li><li><a href="https://twitter.com/Purp1eW0lf/status/1616144561965002752">https://twitter.com/Purp1eW0lf/status/1616144561965002752</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1078/">T1078 · Valid Accounts</a> · <a href="/ttp-simulation/detections/enterprise/T1078/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1110/">T1110 · Brute Force</a> · <a href="/ttp-simulation/detections/enterprise/T1110/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1133/">T1133 · External Remote Services</a> · <a href="/ttp-simulation/detections/enterprise/T1133/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

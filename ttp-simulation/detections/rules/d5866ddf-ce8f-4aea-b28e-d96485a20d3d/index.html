@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Files With System Process Name In Unsuspected Locations — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule d5866ddf-ce8f-4aea-b28e-d96485a20d3d. Files With System Process Name In Unsuspected Locations — Sigma Rule. Detects the creation of an executable with a system process name in folders other than the system ones (System32, SysWOW64, etc.).
+It is highly recommended to perform an initial baseline before using this rule in production.
+">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="d5866ddf-ce8f-4aea-b28e-d96485a20d3d, attack.stealth, attack.t1036.005, file_event, windows, rule-status:test, severity:medium, logsource-category:file_event, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1036.005">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:file_event, logsource-product:windows, sigma-tag:attack.stealth, sigma-tag:attack.t1036.005">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/d5866ddf-ce8f-4aea-b28e-d96485a20d3d/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/d5866ddf-ce8f-4aea-b28e-d96485a20d3d/">
+<meta property="og:type" content="website"><meta property="og:title" content="Files With System Process Name In Unsuspected Locations — Sigma Rule"><meta property="og:description" content="Sigma rule d5866ddf-ce8f-4aea-b28e-d96485a20d3d. Files With System Process Name In Unsuspected Locations — Sigma Rule. Detects the creation of an executable with a system process name in folders other than the system ones (System32, SysWOW64, etc.).
+It is highly recommended to perform an initial baseline before using this rule in production.
+"><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Files With System Process Name In Unsuspected Locations — Sigma Rule"><meta name="twitter:description" content="Sigma rule d5866ddf-ce8f-4aea-b28e-d96485a20d3d. Files With System Process Name In Unsuspected Locations — Sigma Rule. Detects the creation of an executable with a system process name in folders other than the system ones (System32, SysWOW64, etc.).
+It is highly recommended to perform an initial baseline before using this rule in production.
+"><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/d5866ddf-ce8f-4aea-b28e-d96485a20d3d/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/d5866ddf-ce8f-4aea-b28e-d96485a20d3d/","name":"Files With System Process Name In Unsuspected Locations — Sigma Rule","description":"Sigma rule d5866ddf-ce8f-4aea-b28e-d96485a20d3d. Files With System Process Name In Unsuspected Locations — Sigma Rule. Detects the creation of an executable with a system process name in folders other than the system ones (System32, SysWOW64, etc.).\nIt is highly recommended to perform an initial baseline before using this rule in production.\n","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Files With System Process Name In Unsuspected Locations — Sigma Rule</h1><p class="lead">Sigma rule d5866ddf-ce8f-4aea-b28e-d96485a20d3d. Files With System Process Name In Unsuspected Locations — Sigma Rule. Detects the creation of an executable with a system process name in folders other than the system ones (System32, SysWOW64, etc.).
+It is highly recommended to perform an initial baseline before using this rule in production.
+</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/file-event/">file_event</a><a class="chip" href="/ttp-simulation/tags/logsource-product/windows/">windows</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-stealth/">attack.stealth</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1036-005/">attack.t1036.005</a></div><p>Author: Sander Wiebing, Tim Shelton, Nasreddine Bencherchali (Nextron Systems). Source status: test; severity: medium. Source dates: 2020-05-26 / 2026-02-04.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;file_event&quot;,
+  &quot;product&quot;: &quot;windows&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/windows/file/file_event/file_event_win_creation_system_file.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: a27d7a59a4e852a95784333dc29367ea5d6214ff3b9da016e32ee9e31d4215e5</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Files With System Process Name In Unsuspected Locations
+id: d5866ddf-ce8f-4aea-b28e-d96485a20d3d
+status: test
+description: |
+    Detects the creation of an executable with a system process name in folders other than the system ones (System32, SysWOW64, etc.).
+    It is highly recommended to perform an initial baseline before using this rule in production.
+references:
+    - Internal Research
+author: Sander Wiebing, Tim Shelton, Nasreddine Bencherchali (Nextron Systems)
+date: 2020-05-26
+modified: 2026-02-04
+tags:
+    - attack.stealth
+    - attack.t1036.005
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection:
+        TargetFilename|endswith:
+            - &#39;\AtBroker.exe&#39;
+            - &#39;\audiodg.exe&#39;
+            - &#39;\backgroundTaskHost.exe&#39;
+            - &#39;\bcdedit.exe&#39;
+            - &#39;\bitsadmin.exe&#39;
+            - &#39;\cmdl32.exe&#39;
+            - &#39;\cmstp.exe&#39;
+            - &#39;\conhost.exe&#39;
+            - &#39;\csrss.exe&#39;
+            - &#39;\dasHost.exe&#39;
+            - &#39;\dfrgui.exe&#39;
+            - &#39;\dllhost.exe&#39;
+            - &#39;\dwm.exe&#39;
+            - &#39;\eventcreate.exe&#39;
+            - &#39;\eventvwr.exe&#39;
+            - &#39;\explorer.exe&#39;
+            - &#39;\extrac32.exe&#39;
+            - &#39;\fontdrvhost.exe&#39;
+            - &#39;\fsquirt.exe&#39; # was seen used by sidewinder APT - https://securelist.com/sidewinder-apt/114089/
+            - &#39;\ipconfig.exe&#39;
+            - &#39;\iscsicli.exe&#39;
+            - &#39;\iscsicpl.exe&#39;
+            - &#39;\logman.exe&#39;
+            - &#39;\LogonUI.exe&#39;
+            - &#39;\LsaIso.exe&#39;
+            - &#39;\lsass.exe&#39;
+            - &#39;\lsm.exe&#39;
+            - &#39;\msiexec.exe&#39;
+            - &#39;\msinfo32.exe&#39;
+            - &#39;\mstsc.exe&#39;
+            - &#39;\nbtstat.exe&#39;
+            - &#39;\odbcconf.exe&#39;
+            - &#39;\powershell.exe&#39;
+            - &#39;\pwsh.exe&#39;
+            - &#39;\regini.exe&#39;
+            - &#39;\regsvr32.exe&#39;
+            - &#39;\rundll32.exe&#39;
+            - &#39;\RuntimeBroker.exe&#39;
+            - &#39;\schtasks.exe&#39;
+            - &#39;\SearchFilterHost.exe&#39;
+            - &#39;\SearchIndexer.exe&#39;
+            - &#39;\SearchProtocolHost.exe&#39;
+            - &#39;\SecurityHealthService.exe&#39;
+            - &#39;\SecurityHealthSystray.exe&#39;
+            - &#39;\services.exe&#39;
+            - &#39;\ShellAppRuntime.exe&#39;
+            - &#39;\sihost.exe&#39;
+            - &#39;\smartscreen.exe&#39;
+            - &#39;\smss.exe&#39;
+            - &#39;\spoolsv.exe&#39;
+            - &#39;\svchost.exe&#39;
+            - &#39;\SystemSettingsBroker.exe&#39;
+            - &#39;\taskhost.exe&#39;
+            - &#39;\taskhostw.exe&#39;
+            - &#39;\Taskmgr.exe&#39;
+            - &#39;\TiWorker.exe&#39;
+            - &#39;\vssadmin.exe&#39;
+            - &#39;\w32tm.exe&#39;
+            - &#39;\WerFault.exe&#39;
+            - &#39;\WerFaultSecure.exe&#39;
+            - &#39;\wermgr.exe&#39;
+            - &#39;\wevtutil.exe&#39;
+            - &#39;\wininit.exe&#39;
+            - &#39;\winlogon.exe&#39;
+            - &#39;\winrshost.exe&#39;
+            - &#39;\WinRTNetMUAHostServer.exe&#39;
+            - &#39;\wlanext.exe&#39;
+            - &#39;\wlrmdr.exe&#39;
+            - &#39;\WmiPrvSE.exe&#39;
+            - &#39;\wslhost.exe&#39;
+            - &#39;\WSReset.exe&#39;
+            - &#39;\WUDFHost.exe&#39;
+            - &#39;\WWAHost.exe&#39;
+    filter_main_generic:
+        # Note: It is recommended to use a more robust filter instead of this generic one, to avoid false negatives.
+        TargetFilename|contains:
+            # - &#39;\SystemRoot\System32\&#39;
+            - &#39;C:\$WINDOWS.~BT\&#39;
+            - &#39;C:\$WinREAgent\&#39;
+            - &#39;C:\Windows\SoftwareDistribution\&#39;
+            - &#39;C:\Windows\System32\&#39;
+            - &#39;C:\Windows\SysWOW64\&#39;
+            - &#39;C:\Windows\WinSxS\&#39;
+            - &#39;C:\Windows\uus\&#39;
+    filter_main_tiworker:
+        Image|endswith:
+            - &#39;\TiWorker.exe&#39;
+            - &#39;\wuaucltcore.exe&#39;
+        TargetFilename|startswith: &#39;C:\Windows\Temp\&#39;
+    filter_main_svchost:
+        Image|endswith:
+            - &#39;C:\Windows\system32\svchost.exe&#39;
+            - &#39;C:\Windows\SysWOW64\svchost.exe&#39;
+        TargetFilename|contains:
+            - &#39;C:\Program Files\WindowsApps\&#39;
+            - &#39;C:\Program Files (x86)\WindowsApps\&#39;
+            - &#39;\AppData\Local\Microsoft\WindowsApps\&#39;
+    filter_main_wuauclt:
+        Image:
+            - &#39;C:\Windows\System32\wuauclt.exe&#39;
+            - &#39;C:\Windows\SysWOW64\wuauclt.exe&#39;
+            - &#39;C:\Windows\UUS\arm64\wuaucltcore.exe&#39;
+    filter_main_explorer:
+        TargetFilename|endswith: &#39;C:\Windows\explorer.exe&#39;
+    filter_main_msiexec:
+        # This filter handles system processes who are updated/installed using misexec.
+        Image|endswith:
+            - &#39;C:\WINDOWS\system32\msiexec.exe&#39;
+            - &#39;C:\WINDOWS\SysWOW64\msiexec.exe&#39;
+        # Add more processes if you find them or simply filter msiexec on its own. If the list grows big
+        TargetFilename|startswith:
+            - &#39;C:\Program Files\PowerShell\7\pwsh.exe&#39;
+            - &#39;C:\Program Files\PowerShell\7-preview\pwsh.exe&#39;
+            - &#39;C:\Program Files\WindowsApps\Microsoft.PowerShellPreview\&#39;
+    filter_main_healtray:
+        TargetFilename|contains: &#39;C:\Windows\System32\SecurityHealth\&#39;
+        TargetFilename|endswith: &#39;\SecurityHealthSystray.exe&#39;
+        Image|endswith: &#39;\SecurityHealthSetup.exe&#39;
+    condition: selection and not 1 of filter_main_*
+falsepositives:
+    - System processes copied outside their default folders for testing purposes
+    - Third party software naming their software with the same names as the processes mentioned here
+# Note: Upgrade to high after an initial baseline to your environement.
+level: medium
+regression_tests_path: regression_data/rules/windows/file/file_event/file_event_win_creation_system_file/info.yml
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/d5866ddf-ce8f-4aea-b28e-d96485a20d3d.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>System processes copied outside their default folders for testing purposes</li><li>Third party software naming their software with the same names as the processes mentioned here</li></ul></section><section class="panel"><h2>Source references</h2><ul><li>Internal Research (source note; no public URL supplied)</li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1036.005/">T1036.005 · Match Legitimate Resource Name or Location</a> · <a href="/ttp-simulation/detections/enterprise/T1036.005/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>

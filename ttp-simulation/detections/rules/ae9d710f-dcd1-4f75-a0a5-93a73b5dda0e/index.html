@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launch Agent/Daemon Execution Via Launchctl — Sigma Rule | 1200km</title><meta name="description" content="Sigma rule ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e. Launch Agent/Daemon Execution Via Launchctl — Sigma Rule. Detects the execution of programs as Launch Agents or Launch Daemons using launchctl on macOS.">
+<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="keywords" content="ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e, attack.privilege-escalation, attack.execution, attack.persistence, attack.t1569.001, attack.t1543.001, attack.t1543.004, process_creation, macos, rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:macos, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.t1569.001, sigma-tag:attack.t1543.001, sigma-tag:attack.t1543.004">
+<meta name="ttp-module-tags" content="rule-status:test, severity:medium, logsource-category:process_creation, logsource-product:macos, sigma-tag:attack.privilege-escalation, sigma-tag:attack.execution, sigma-tag:attack.persistence, sigma-tag:attack.t1569.001, sigma-tag:attack.t1543.001, sigma-tag:attack.t1543.004">
+<link rel="canonical" href="https://1200km.com/ttp-simulation/detections/rules/ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e/"><meta property="og:url" content="https://1200km.com/ttp-simulation/detections/rules/ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e/">
+<meta property="og:type" content="website"><meta property="og:title" content="Launch Agent/Daemon Execution Via Launchctl — Sigma Rule"><meta property="og:description" content="Sigma rule ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e. Launch Agent/Daemon Execution Via Launchctl — Sigma Rule. Detects the execution of programs as Launch Agents or Launch Daemons using launchctl on macOS."><meta property="og:image" content="https://1200km.com/assets/ap-logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Launch Agent/Daemon Execution Via Launchctl — Sigma Rule"><meta name="twitter:description" content="Sigma rule ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e. Launch Agent/Daemon Execution Via Launchctl — Sigma Rule. Detects the execution of programs as Launch Agents or Launch Daemons using launchctl on macOS."><meta name="twitter:image" content="https://1200km.com/assets/ap-logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://1200km.com/ttp-simulation/detections/rules/ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e/#webpage","url":"https://1200km.com/ttp-simulation/detections/rules/ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e/","name":"Launch Agent/Daemon Execution Via Launchctl — Sigma Rule","description":"Sigma rule ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e. Launch Agent/Daemon Execution Via Launchctl — Sigma Rule. Detects the execution of programs as Launch Agents or Launch Daemons using launchctl on macOS.","datePublished":"2026-09-27","dateModified":"2026-09-27","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"},"isPartOf":{"@type":"WebSite","@id":"https://1200km.com/#website","name":"1200km","url":"https://1200km.com/"}}</script>
+<link rel="stylesheet" href="/ttp-simulation/assets/catalog.css"><link rel="stylesheet" href="/ttp-simulation/assets/integration.css">
+
+</head><body data-root="/ttp-simulation/" id="top">
+<a class="skip" href="#main">Skip to module</a>
+<header class="topbar" data-pagefind-ignore><a class="brand" href="/">1200<span>km</span><small>SECURITY RESEARCH</small></a><nav aria-label="Ecosystem"><a href="/ttp-simulation/tools/">Attack Tools</a><a href="/ttp-simulation/">Attack Simulations</a><a href="/ttp-simulation/detections/">Detection Rules</a><a href="/ttp-simulation/telemetry/">Telemetry</a><a href="/ttp-simulation/tags/">Tags</a><a href="/threat-matrix/">Threat Matrix</a><a href="https://1200km.com/anomaly-detection-atlas/">Anomaly Atlas</a><a href="/guides.html">Guides</a><a href="/search.html">Search</a></nav></header>
+<main id="main" tabindex="-1" data-pagefind-body>
+
+<div id="reference-copy"><section class="hero"><div><p class="eyebrow">1200KM / sigma-rule</p><h1>Launch Agent/Daemon Execution Via Launchctl — Sigma Rule</h1><p class="lead">Sigma rule ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e. Launch Agent/Daemon Execution Via Launchctl — Sigma Rule. Detects the execution of programs as Launch Agents or Launch Daemons using launchctl on macOS.</p></div></section><section class="panel"><h2>Rule metadata and linked tags</h2><div class="tags"><a class="chip" href="/ttp-simulation/tags/rule-status/test/">test</a><a class="chip" href="/ttp-simulation/tags/severity/medium/">medium</a><a class="chip" href="/ttp-simulation/tags/logsource-category/process-creation/">process_creation</a><a class="chip" href="/ttp-simulation/tags/logsource-product/macos/">macos</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-privilege-escalation/">attack.privilege-escalation</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-execution/">attack.execution</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-persistence/">attack.persistence</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1569-001/">attack.t1569.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1543-001/">attack.t1543.001</a><a class="chip" href="/ttp-simulation/tags/sigma-tag/attack-t1543-004/">attack.t1543.004</a></div><p>Author: Pratinav Chandra. Source status: test; severity: medium. Source dates: 2024-05-13 / not supplied.</p><pre class="code-sample" tabindex="0" aria-label="Original logsource"><code>{
+  &quot;category&quot;: &quot;process_creation&quot;,
+  &quot;product&quot;: &quot;macos&quot;
+}</code></pre><p><a href="https://github.com/anpa1200/sigma/blob/b249e9683190cffdcaf188ccbfb90bf4759844e1/rules/macos/process_creation/proc_creation_macos_launchctl_execution.yml">Pinned original Sigma rule</a> · <a href="https://github.com/SigmaHQ/Detection-Rule-License/blob/main/LICENSE.Detection.Rules.md">Detection Rule License 1.1</a></p><p>Source SHA-256: 335a4a0f8b2dd50193c6c7c96e3c75e13fcc74b40c6a0c6377653619fe9587dc</p></section><section class="panel"><h2>Detection logic</h2><p>Original source YAML. Source-tag agreement is not proof of complete semantic coverage. This rule has not been compiled for a SIEM backend or validated against live telemetry here.</p><pre class="code-sample" tabindex="0" aria-label="Original Sigma rule YAML, scroll horizontally if needed"><code>title: Launch Agent/Daemon Execution Via Launchctl
+id: ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e
+status: test
+description: Detects the execution of programs as Launch Agents or Launch Daemons using launchctl on macOS.
+references:
+    - https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1569.001/T1569.001.md
+    - https://www.sentinelone.com/labs/20-common-tools-techniques-used-by-macos-threat-actors-malware/
+    - https://www.welivesecurity.com/2020/07/16/mac-cryptocurrency-trading-application-rebranded-bundled-malware/
+    - https://www.trendmicro.com/en_us/research/18/d/new-macos-backdoor-linked-to-oceanlotus-found.html
+    - https://www.loobins.io/binaries/launchctl/
+author: Pratinav Chandra
+date: 2024-05-13
+tags:
+    - attack.privilege-escalation
+    - attack.execution
+    - attack.persistence
+    - attack.t1569.001
+    - attack.t1543.001
+    - attack.t1543.004
+logsource:
+    category: process_creation
+    product: macos
+detection:
+    selection:
+        Image|endswith: &#39;/launchctl&#39;
+        CommandLine|contains:
+            - &#39;submit&#39;
+            - &#39;load&#39;
+            - &#39;start&#39;
+    condition: selection
+falsepositives:
+    - Legitimate administration activities is expected to trigger false positives. Investigate the command line being passed to determine if the service or launch agent are suspicious.
+level: medium
+</code></pre><p><a href="/ttp-simulation/data/detection-rules/ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e.json">Original YAML and metadata in JSON</a></p></section><section class="panel"><h2>False positives</h2><ul><li>Legitimate administration activities is expected to trigger false positives. Investigate the command line being passed to determine if the service or launch agent are suspicious.</li></ul></section><section class="panel"><h2>Source references</h2><ul><li><a href="https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1569.001/T1569.001.md">https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1569.001/T1569.001.md</a></li><li><a href="https://www.sentinelone.com/labs/20-common-tools-techniques-used-by-macos-threat-actors-malware/">https://www.sentinelone.com/labs/20-common-tools-techniques-used-by-macos-threat-actors-malware/</a></li><li><a href="https://www.welivesecurity.com/2020/07/16/mac-cryptocurrency-trading-application-rebranded-bundled-malware/">https://www.welivesecurity.com/2020/07/16/mac-cryptocurrency-trading-application-rebranded-bundled-malware/</a></li><li><a href="https://www.trendmicro.com/en_us/research/18/d/new-macos-backdoor-linked-to-oceanlotus-found.html">https://www.trendmicro.com/en_us/research/18/d/new-macos-backdoor-linked-to-oceanlotus-found.html</a></li><li><a href="https://www.loobins.io/binaries/launchctl/">https://www.loobins.io/binaries/launchctl/</a></li></ul></section></div>
+<section id="ecosystem-connections"><h2>Connected ecosystem references</h2><section class="panel"><h2>Exact source-tagged techniques</h2><ul><li><a href="/ttp-simulation/techniques/enterprise/T1543.001/">T1543.001 · Launch Agent</a> · <a href="/ttp-simulation/detections/enterprise/T1543.001/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1543.004/">T1543.004 · Launch Daemon</a> · <a href="/ttp-simulation/detections/enterprise/T1543.004/">Detection rules &amp; anomalies</a></li><li><a href="/ttp-simulation/techniques/enterprise/T1569.001/">T1569.001 · Launchctl</a> · <a href="/ttp-simulation/detections/enterprise/T1569.001/">Detection rules &amp; anomalies</a></li></ul></section><section class="panel"><h2>Telemetry review</h2><p>Read the original logsource above, then inspect the linked detection workspaces for technique-level sensor context. No per-rule telemetry equivalence is inferred.</p></section></section>
+<p class="muted">Pinned research references. No browser attack runner, live simulation result or validated detector is asserted. Source mappings and validation limits are preserved. <a href="/ttp-simulation/data/catalog.json">ATT&amp;CK / Atomic provenance</a> · <a href="/ttp-simulation/data/detections.json">Detection provenance</a>.</p>
+</main><footer data-pagefind-ignore><span>1200km · Andrey Pautov</span><a href="/ttp-simulation/detection-rules-notice.txt">Sigma attribution &amp; license</a><a href="/privacy.html">Privacy</a><a href="/search.html">Search the ecosystem</a></footer></body></html>
