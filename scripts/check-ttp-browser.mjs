@@ -20,7 +20,7 @@ await new Promise(done=>server.listen(0,'127.0.0.1',done));
 const base=process.env.LIVE_ORIGIN||`http://127.0.0.1:${server.address().port}`;
 const profile=mkdtempSync('/tmp/ttp-release-chrome-');
 const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--disable-background-networking',`--user-data-dir=${profile}`,'--remote-debugging-port=0','about:blank'],{stdio:['ignore','ignore','pipe']});
-const results=[], errors=[];let socket;
+const results=[], errors=[], fragments=[];let socket;
 try {
  const endpoint=await new Promise((done,reject)=>{let out='';const timer=setTimeout(()=>reject(Error('Chrome startup timeout')),15000);chrome.stderr.on('data',data=>{out+=data;const m=out.match(/DevTools listening on (ws:\/\/\S+)/);if(m){clearTimeout(timer);done(m[1]);}});chrome.on('error',reject);});
  socket=new WebSocket(endpoint);await new Promise(done=>socket.addEventListener('open',done,{once:true}));
@@ -31,7 +31,7 @@ try {
  const {sessionId}=await send('Target.attachToTarget',{targetId,flatten:true});
  const call=(m,p={})=>send(m,p,sessionId);
  const evaluate=async expression=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
- const waitFor=async expression=>{const start=Date.now();while(!await evaluate(expression)){assert.ok(Date.now()-start<20000,expression);await new Promise(done=>setTimeout(done,100));}};
+ const waitFor=async expression=>{const start=Date.now();while(!await evaluate(expression)){if(Date.now()-start>=20000){const state=await evaluate("({url:location.href,ready:document.readyState,fonts:document.fonts.status,scrollY,targetTop:document.getElementById(location.hash.slice(1))?.getBoundingClientRect().top})");assert.fail(expression+' '+JSON.stringify(state));}await new Promise(done=>setTimeout(done,100));}};
  await call('Page.enable');await call('Runtime.enable');
  const routes=['','tools/','detections/','telemetry/','techniques/enterprise/T1059.001/','techniques/ics/T0880/','techniques/mobile/T1423/','tools/nmap/','tools/S0002/','telemetry/DC0032/','detections/enterprise/T1059.001/','detections/enterprise/T1593/','detections/mobile/T1423/','detections/ics/T0880/','detections/rules/1ab3c5ed-5baf-417b-bb6b-78ca33f6c3df/','tags/environment/onprem/','tags/'];
  for(const width of [390,1440])for(const route of routes){
@@ -62,6 +62,19 @@ try {
   }
   results.push({route,width,...result});
  }
+ // Initial fragments must survive replacement of the static reference by fetched content.
+ await call('Network.enable');
+ await call('Network.emulateNetworkConditions',{offline:false,latency:150,downloadThroughput:-1,uploadThroughput:-1});
+ for(const width of [390,1440])for(const fragment of ['attack-tools','anomalies','simulation','constraints']){
+  await call('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false});
+  const query=`?fragment-check=${width}-${fragment}`;
+  await call('Page.navigate',{url:base+'/ttp-simulation/techniques/enterprise/T1595/'+query+'#'+fragment});
+  await waitFor(`location.search===${JSON.stringify(query)} && document.readyState==='complete' && document.querySelector('#app') && !document.querySelector('#app').hidden && !document.querySelector('#reference-copy')`);
+  // scrollY is pixel-rounded while element rectangles can retain fractional pixels.
+  await waitFor(`(()=>{const y=document.getElementById(${JSON.stringify(fragment)})?.getBoundingClientRect().top;return y>=-1 && y<=160;})()`);
+  fragments.push({width,fragment,top:await evaluate(`document.getElementById(${JSON.stringify(fragment)}).getBoundingClientRect().top`)});
+ }
+ await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
  // Preserve filter queries as URL data, including markup-like input, without parsing them as HTML.
  const query='?q=T1059.001';
  await call('Page.navigate',{url:base+'/ttp-simulation/'+query});
@@ -112,6 +125,6 @@ try {
   assert.equal(await evaluate("document.querySelectorAll('[data-atlas-publication-snapshot]').length"),1);
  }
  assert.deepEqual(errors,[]);
- writeFileSync(resolve(reportDir,'browser.json'),JSON.stringify({checked_at:new Date().toISOString(),site,results,errors,no_js_routes:3,live_simulations_executed:0},null,2)+'\n');
- console.log(`Passed ${results.length} route/viewport configurations and three no-JavaScript pages; no accessibility, overflow or runtime failures.`);
+ writeFileSync(resolve(reportDir,'browser.json'),JSON.stringify({checked_at:new Date().toISOString(),site,results,fragments,errors,no_js_routes:3,live_simulations_executed:0},null,2)+'\n');
+ console.log(`Passed ${results.length} route/viewport configurations, ${fragments.length} delayed-hydration fragment checks and three no-JavaScript pages; no accessibility, overflow or runtime failures.`);
 }finally{socket?.close();chrome.kill('SIGTERM');server.close();}
