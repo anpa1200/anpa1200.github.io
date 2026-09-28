@@ -170,6 +170,8 @@ browser checks still run after readiness; their assertions are not relaxed.
    nameservers, and GitHub Pages remain unchanged. During DNS propagation,
    visitors may reach either the preserved old release or the validated new
    release. Both must remain healthy. Snapshot and checks are retained as artifacts.
+   The preflight accepts the apex's unrelated verification TXT record but
+   requires exactly one address-bearing apex record: the pinned CNAME ID.
 6. The workflow verifies the live Cloudflare build, complete HTTP contract and
    browser search and all companion browser probes. It automatically restores
    `proxied:false` on verification failure. Observe the completed production
