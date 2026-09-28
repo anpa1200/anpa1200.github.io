@@ -70,7 +70,8 @@ try {
   const query=`?fragment-check=${width}-${fragment}`;
   await call('Page.navigate',{url:base+'/ttp-simulation/techniques/enterprise/T1595/'+query+'#'+fragment});
   await waitFor(`location.search===${JSON.stringify(query)} && document.readyState==='complete' && document.querySelector('#app') && !document.querySelector('#app').hidden && !document.querySelector('#reference-copy')`);
-  await waitFor(`(()=>{const y=document.getElementById(${JSON.stringify(fragment)})?.getBoundingClientRect().top;return y>=0 && y<=160;})()`);
+  // scrollY is pixel-rounded while element rectangles can retain fractional pixels.
+  await waitFor(`(()=>{const y=document.getElementById(${JSON.stringify(fragment)})?.getBoundingClientRect().top;return y>=-1 && y<=160;})()`);
   fragments.push({width,fragment,top:await evaluate(`document.getElementById(${JSON.stringify(fragment)}).getBoundingClientRect().top`)});
  }
  await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
