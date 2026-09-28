@@ -94,6 +94,13 @@ node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin https://12
 node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin https://1200km-site.ACCOUNT_SUBDOMAIN.workers.dev
 ```
 
+The independent `--hosting-search-only` mode checks the complete search-page
+flow and browser fragment inheritance without the unrelated embedded-theme
+integration cases. It captures Pagefind Web Worker traffic before execution,
+including same-origin WASM/index/fragment responses. CI runs this focused
+check **and** the full browser suite; the focused pass cannot hide a full-suite
+CSP or integration failure.
+
 The parity report separates exact-artifact failures from live-production
 differences. It checks status, body SHA-256, identity, canonical URLs, redirects,
 query handling, MIME, security/CORS/Link headers, Markdown, sitemap/robots/llms,
@@ -127,9 +134,21 @@ ASSETS-only origin cannot reproduce missing external project content. The report
 must remain explicit about missing pages and body/canonical differences. Do not
 hide these by proxying requests back to the old origin or relaxing the checks.
 
+The exact production artifact inventory found **430 missing same-origin sitemap
+URLs across 11 path roots**. The local full-artifact run, after MIME corrections,
+passed all 100 Worker-contract cases but retained production-parity blockers.
+Some hydrated Docusaurus themes request absolute `https://1200km.com` stylesheets;
+the preserved `style-src 'self'` blocks these on a workers.dev or localhost
+hostname. This is a preview-origin integration difference, not a reason to weaken
+CSP or modify the downloaded artifact. It remains visible in the full browser
+check. Focused Pagefind search passed with 674 same-origin resources observed.
+
 At initial inspection, GitHub reported no repository Actions secrets and no
 `github-pages` environment secrets. Local Wrangler OAuth was present. Recheck
 the repository secrets before considering automated deployment validated.
+The local Cloudflare account also reported both Worker names absent before this
+change; public A records pointed directly to GitHub Pages. Do not assume that
+the root Wrangler route configuration describes deployed zone state.
 
 ## Final cutover runbook — future, separately authorized change
 

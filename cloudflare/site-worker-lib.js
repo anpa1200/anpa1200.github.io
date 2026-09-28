@@ -81,6 +81,9 @@ export function responseHeaders(original, pathname, rules) {
   if (/\.(?:js|mjs)$/.test(pathname) && !headers.get('Content-Type')?.startsWith('text/html')) {
     headers.set('Content-Type', 'application/javascript; charset=utf-8');
   }
+  if (pathname.endsWith('.json') && !headers.get('Content-Type')?.startsWith('text/html')) {
+    headers.set('Content-Type', 'application/json; charset=utf-8');
+  }
   return headers;
 }
 
@@ -105,6 +108,9 @@ export function createSiteWorker(headerText) {
   const rules = parseHeaderPolicy(headerText);
   const finish = (response, pathname, request, status = response.status) => {
     const headers = responseHeaders(response.headers, pathname, rules);
+    // Wrangler cannot infer MIME for Pagefind's .pf_* / .pagefind binaries.
+    // GitHub Pages uses octet-stream for unknown extensions; match that default.
+    if (!headers.has('Content-Type') && ![204, 205, 304].includes(status)) headers.set('Content-Type', 'application/octet-stream');
     if (new URL(request.url).hostname.endsWith('.workers.dev')) headers.set('X-Robots-Tag', 'noindex');
     return new Response(request.method === 'HEAD' || [204, 205, 304].includes(status) ? null : response.body, { status, headers });
   };
@@ -153,7 +159,7 @@ export function createSiteWorker(headerText) {
           // Keep the incoming host and browser fragment inheritance. An explicit
           // origin also prevents a //-prefixed path becoming an open redirect.
           const location = `${url.origin}${pathname}/${url.search}`;
-          return finish(new Response(null, { status: 301, headers: { Location: location } }), pathname, request);
+          return finish(new Response(null, { status: 301, headers: { Location: location, 'Content-Type': 'text/html' } }), pathname, request);
         }
       }
       response = await env.ASSETS.fetch(assetRequest(request, '/404.html', { markdown: true }));

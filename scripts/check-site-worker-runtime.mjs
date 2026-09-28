@@ -23,6 +23,7 @@ const fixtures = {
   '.well-known/api-catalog': '{"linkset":[]}', '.well-known/openapi.json': '{}',
   '.well-known/oauth-protected-resource': '{}', 'data/example.json': '{}',
   'assets/example.js': 'console.log("fixture");', 'pagefind/test.wasm': Buffer.from([0, 97, 115, 109, 1, 0, 0, 0]),
+  'pagefind/example.pf_fragment': Buffer.from([1, 2, 3]), 'build.json': '{}',
   '_headers': await readFile(join(root, '_headers'), 'utf8'),
 };
 for (const [path, body] of Object.entries(fixtures)) {
@@ -90,7 +91,7 @@ try {
   const json = await request('/.well-known/api-catalog');
   assert.equal(json.headers.get('Content-Type'), 'application/linkset+json; charset=utf-8');
   assert.equal(await json.text(), fixtures['.well-known/api-catalog']);
-  for (const path of ['/.well-known/openapi.json', '/.well-known/oauth-protected-resource', '/data/example.json']) {
+  for (const path of ['/.well-known/openapi.json', '/.well-known/oauth-protected-resource', '/data/example.json', '/build.json']) {
     const response = await request(path);
     assert.equal(response.headers.get('Content-Type'), 'application/json; charset=utf-8');
     assert.equal(await response.text(), '{}');
@@ -101,6 +102,9 @@ try {
   const wasm = await request('/pagefind/test.wasm');
   assert.equal(wasm.headers.get('Content-Type'), 'application/wasm');
   await wasm.body?.cancel();
+  const binary = await request('/pagefind/example.pf_fragment');
+  assert.equal(binary.headers.get('Content-Type'), 'application/octet-stream');
+  assert.deepEqual(Buffer.from(await binary.arrayBuffer()), fixtures['pagefind/example.pf_fragment']);
   const asset = await request('/about.html');
   const etag = asset.headers.get('ETag');
   assert.ok(etag);

@@ -131,8 +131,8 @@ report.production_before = JSON.parse(baseline.body);
 const cases = new Set([
   '/', '/index.html', '/index', '/about.html', '/about', '/about/', '/projects.html', '/projects/',
   '/articles/', '/articles/index.html', '/articles?query=a%20b&tag=T1595',
-  '/ttp-simulation/', '/ttp-simulation/techniques/enterprise/T1595/', '/attack-tools/', '/detection-rules/',
-  '/cyber-knowledge/', '/courses/', '/ai-security-course/module-00/chapter-04.html',
+  '/ttp-simulation/', '/ttp-simulation/techniques/enterprise/T1595/', '/ttp-simulation/tools/', '/ttp-simulation/detections/',
+  '/cyber-knowledge/', '/cyber-knowledge/cti.html', '/courses/', '/ai-security-course/module-00/chapter-04.html',
   '/threat-matrix/', '/threat-matrix/techniques/T1059.003/', '/attack-matrix/',
   '/anomaly-detection-atlas/', '/anomaly-detection-atlas/attack-statistical-anomaly-mapping/',
   '/build.json', '/sitemap.xml', '/sitemap-all.xml', '/robots.txt', '/llms.txt', '/llms-full.txt',
@@ -149,6 +149,11 @@ cases.add(`/${article.slice(0, -'index.html'.length)}`);
 const knowledge = [...paths].find((path) => /^cyber-knowledge\/[^/]+\/index.html$/.test(path));
 assert.ok(knowledge, 'Cyber Knowledge field guide missing');
 cases.add(`/${knowledge.slice(0, -'index.html'.length)}`);
+for (const required of ['/', '/about.html', '/projects.html', '/articles/', '/ttp-simulation/techniques/enterprise/T1595/',
+  '/ttp-simulation/tools/', '/ttp-simulation/detections/', '/cyber-knowledge/cti.html',
+  '/ai-security-course/module-00/chapter-04.html', '/threat-matrix/', '/attack-matrix/', '/pagefind/pagefind.js']) {
+  assert.equal(localAsset(required, paths).status, 200, `Required representative URL is absent: ${required}`);
+}
 for (const expression of [/^assets\/.*\.css$/, /^assets\/.*\.png$/, /^assets\/.*\.webp$/, /\.woff2$/, /^pagefind\/.*\.wasm$/, /^pagefind\/.*\.pagefind$/, /^pagefind\/fragment\//, /^pagefind\/index\//]) {
   const path = [...paths].find((entry) => expression.test(entry));
   if (path) cases.add(`/${path}`);

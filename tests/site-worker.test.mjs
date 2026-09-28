@@ -118,6 +118,16 @@ test('extensionless well-known endpoint is fetched as a file and has correct MIM
   assert.equal(response.headers.get('Access-Control-Allow-Origin'), '*');
 });
 
+test('untyped Pagefind binaries and JSON retain Pages MIME types', async () => {
+  for (const path of ['/pagefind/wasm.en.pagefind', '/pagefind/fragment/test.pf_fragment', '/pagefind/index/test.pf_index']) {
+    const response = await get(path, {}, { ASSETS: { fetch: async () => new Response(new Uint8Array([1, 2, 3])) } });
+    assert.equal(response.headers.get('Content-Type'), 'application/octet-stream');
+    assert.deepEqual(new Uint8Array(await response.arrayBuffer()), new Uint8Array([1, 2, 3]));
+  }
+  const response = await get('/build.json', {}, { ASSETS: { fetch: async () => new Response('{}', { headers: { 'Content-Type': 'application/json' } }) } });
+  assert.equal(response.headers.get('Content-Type'), 'application/json; charset=utf-8');
+});
+
 test('every _headers declaration is enforced independently of the binding', () => {
   // Independent reference interpreter, tested at a witness for every rule and
   // nested wildcard. No generated copy of the policy can silently become stale.

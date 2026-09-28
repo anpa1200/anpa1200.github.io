@@ -311,7 +311,14 @@ jobs:
           --site ./dist
           --preview-origin "$PREVIEW_URL"
           --report "${RUNNER_TEMP}/cloudflare-parity.json"
-      - name: Verify actual Pagefind search and browser fragment navigation
+      - name: Verify hosted Pagefind engine, search UI, and fragment navigation
+        if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
+        env:
+          PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
+        run: |
+          set -o pipefail
+          node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin "$PREVIEW_URL" --hosting-search-only 2>&1 | tee "${RUNNER_TEMP}/cloudflare-hosting-search.log"
+      - name: Verify full browser integrations without relaxing CSP
         if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
         env:
           PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
@@ -325,6 +332,7 @@ jobs:
           name: cloudflare-preview-verification-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/cloudflare-parity.json
+            ${{ runner.temp }}/cloudflare-hosting-search.log
             ${{ runner.temp }}/cloudflare-search-browser.log
           if-no-files-found: warn
           retention-days: 30
