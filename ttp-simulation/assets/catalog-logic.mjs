@@ -1,6 +1,6 @@
 export const classificationLabels = {
-  can_simulate: 'Can simulate · documented procedure',
-  cannot_simulate_yet: 'Cannot simulate yet · support gap',
+  can_simulate: 'Atomic candidate documented · not lab-validated',
+  cannot_simulate_yet: 'No Atomic candidate · feasibility not ruled out',
 };
 
 export function filterRecords(records, filters = {}) {

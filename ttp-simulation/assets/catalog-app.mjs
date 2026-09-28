@@ -3,6 +3,7 @@ import { tagLinks } from './tag-links.mjs';
 import { renderTelemetryLibrary, renderTelemetryReference } from './telemetry-pages.mjs';
 import { renderToolLibrary, renderToolReference, toolChips, techniqueToolsHtml } from './tool-pages.mjs';
 import { renderDetectionLibrary, renderDetectionPage, detectionSummary, detectionLabels } from './detection-pages.mjs';
+import { renderWorkbook } from './workbook-render.mjs';
 
 const root = new URL(document.body.dataset.root, location.href);
 const key = document.body.dataset.technique;
@@ -41,9 +42,9 @@ function renderInventory(catalog) {
       <div><strong>${catalog.counts.by_classification.cannot_simulate_yet || 0}</strong><span>Unsupported in current evidence set</span></div>
       <div><strong>${catalog.counts.telemetry_mapped}</strong><span>With upstream telemetry mappings</span></div>
     </section>
-    <aside class="notice"><strong>Availability is not readiness.</strong> “Can simulate” means a compatible procedure exists in the pinned Atomic index. It does not mean safe, integrated, or validated. “Cannot simulate yet” means a support gap—not technical impossibility. <strong>0 browser runners · 0 live-validated techniques.</strong></aside>
+    <aside class="notice"><strong>Procedure availability is not feasibility or validation.</strong> The filter below describes the pinned Atomic index only. A missing Atomic candidate does not mean a technique cannot be simulated. Each page includes a full definition, detection guidance, collection contracts, anomaly-design worksheet and explicit gaps. <a href="/ttp-simulation/data/workbooks.json">All-page evidence inventory</a>. Imported procedures are not live-validated.</aside>
     <div class="workspace"><aside class="filters"><form id="filters"><h2>Filter inventory</h2><label>Search<input name="q" type="search" placeholder="ID, behavior, platform, telemetry…" autocomplete="off"></label>
-      <label>Simulation feasibility<select name="classification"><option value="">Both groups</option value="can_simulate">Can simulate · procedure exists</option><option value="cannot_simulate_yet">Cannot simulate yet · support gap</option></select></label>
+      <label>Atomic procedure evidence<select name="classification"><option value="">Both groups</option><option value="can_simulate">Compatible Atomic candidate</option><option value="cannot_simulate_yet">No Atomic candidate in snapshot</option></select></label>
       ${select('domain', 'Domain', ['enterprise', 'mobile', 'ics'])}
       ${select('environment', 'Environment', facets('environments'))}
       ${select('platform', 'Platform', facets('platforms'))}
@@ -98,7 +99,14 @@ function renderInventory(catalog) {
   update();
 }
 
-function renderTechnique(row) {
+function renderTechnique(row, workbook) {
+  if (workbook) {
+    app.innerHTML = `<nav class="breadcrumb" aria-label="Breadcrumb"><a data-return-to-catalog href="${escape(root.href)}">← All techniques</a><span>${escape(row.domain)}</span><span>${escape(row.id)}</span></nav>
+      <section class="hero detail-hero"><div><p class="eyebrow">TECHNIQUE ENGINEERING WORKBOOK</p><h1><span class="mono">${escape(row.id)}</span> ${escape(row.name)}</h1><p class="lead compact">${escape(row.summary)}</p><p>Detection guidance, anomaly design, collection contracts and simulation evidence—each with its own validation status.</p></div></section>
+      <div class="detail-metadata"><div><h2>Environment</h2><div class="tags">${chips(row.environments, 'environment')}</div></div><div><h2>Platforms</h2><div class="tags">${chips(row.platforms)}</div></div><div><h2>Tactics</h2><div class="tags">${chips(row.tactics, 'tactic')}</div></div></div>${renderWorkbook(workbook)}`;
+    document.querySelector('[data-return-to-catalog]').search = location.search;
+    return;
+  }
   const telemetry = row.telemetry;
   const simulation = row.simulation;
   const sameDomain = (id) => url(`techniques/${row.domain}/${id}/`);
@@ -130,7 +138,7 @@ try {
   else if (toolKey) renderToolReference(await fetchJson(`data/tools/${toolKey}.json`), context);
   else if (telemetryKey === 'index') renderTelemetryLibrary(await fetchJson('data/telemetry.json'), context);
   else if (telemetryKey) renderTelemetryReference(await fetchJson(`data/telemetry/${telemetryKey}.json`), context);
-  else if (key) renderTechnique(await fetchJson(`data/techniques/${key}.json`));
+  else if (key) renderTechnique(...await Promise.all([fetchJson(`data/techniques/${key}.json`), fetchJson(`data/workbooks/${key}.json`)]));
   else renderInventory(await fetchJson('data/catalog.json'));
   loading.hidden = true;
   app.hidden = false;

@@ -25,7 +25,7 @@ test('all technique, telemetry, tool and original rule pages are published refer
     assert.doesNotMatch(body, /content="noindex/, page.page);
     assert.equal((body.match(/<h1\b/g) || []).length, 1, page.page);
     assert.match(body, new RegExp(`rel="canonical" href="https://1200km.com/ttp-simulation/${quote(page.page)}"`));
-    assert.match(body, /No browser attack runner, live simulation result or validated detector is asserted/);
+    assert.match(body, /No browser attack runner or production-validated detector is asserted/);
   }
 });
 

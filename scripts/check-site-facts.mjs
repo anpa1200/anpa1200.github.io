@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { htmlTextContent, transformHtmlElements } from './html-token-utils.mjs';
+import { textForPhoneScan } from './privacy-check-lib.mjs';
 
 const sourceRoot = path.resolve(new URL('.', import.meta.url).pathname, '..');
 const siteFlag = process.argv.indexOf('--site');
@@ -272,7 +273,7 @@ for (const absolute of allHtml) {
   const relativePath = path.relative(siteRoot, absolute);
   if (phoneNumberAllowed.has(relativePath)) continue;
   const html = readFileSync(absolute, 'utf8');
-  if (phonePatterns.some(pattern => pattern.test(html))) {
+  if (phonePatterns.some(pattern => pattern.test(textForPhoneScan(html)))) {
     fail(`${relativePath}: public HTML contains a phone number or tel link.`);
   }
 }
