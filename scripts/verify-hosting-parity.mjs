@@ -184,6 +184,19 @@ for (const path of absent.slice(0, 12)) cases.add(new URL(path).pathname);
 if (absent.length) difference('sitemap.xml', 'same-origin URLs absent from artifact', `${absent.length} published sitemap URLs`, 'not served by this ASSETS-only deployment');
 
 const jobs = [...cases].map((path) => [path, '*/*', 'GET']);
+const legacy=JSON.parse(await readFile(join(ROOT,'cloudflare/legacy-assets/legacy-assets.json'),'utf8'));
+const legacyMissing=legacy.files.filter(entry=>!paths.has(entry.path)).map(entry=>entry.path);
+report.legacy_inventory={total_urls:legacy.files.length,missing_from_artifact:legacyMissing};
+if(legacyMissing.length)fail('legacy assets','cached-client compatibility',legacyMissing.slice(0,12));
+const legacyProvenance=JSON.parse(await readFile(join(site,'data/legacy-assets-provenance.json'),'utf8'));
+check(legacyProvenance.snapshot_sha256===legacy.archive_sha256,'legacy assets','pinned snapshot provenance',legacyProvenance.snapshot_sha256);
+// Exercise previously published bootstraps and search chunks that the current
+// build would otherwise omit. Their exact bytes still must match the artifact.
+const retained=legacyProvenance.added.map(entry=>entry.path);
+for(const path of retained.filter(path=>/\/assets\/js\/(?:runtime~main|main)\.[a-f0-9]+\.js$/.test(path)))jobs.push(['/'+path,'*/*','GET']);
+for(const pattern of [/^pagefind\/fragment\//,/^pagefind\/index\//]){
+  const path=retained.find(path=>pattern.test(path));if(path)jobs.push(['/'+path,'*/*','GET']);
+}
 for (const path of MARKDOWN_ROUTES.keys()) jobs.push([`${path}?format=markdown`, 'text/markdown', 'GET']);
 for (const path of ['/', '/about.html', '/articles', '/__hosting_migration_not_found__']) jobs.push([path, '*/*', 'HEAD']);
 let cursor = 0;

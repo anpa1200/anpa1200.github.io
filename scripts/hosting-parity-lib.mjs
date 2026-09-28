@@ -19,8 +19,12 @@ export function comparableHeader(name, value = '') {
 
 export function canonicalUrls(html) {
   return [...html.matchAll(/<link\b[^>]*>/gi)].flatMap(([tag]) => {
-    if (!/\brel=["']canonical["']/i.test(tag)) return [];
-    return [tag.match(/\bhref=["']([^"']+)["']/i)?.[1].replaceAll('&amp;', '&') || ''];
+    // Published Docusaurus pages can legally omit attribute quotes. Detect
+    // their canonical links too, instead of reporting a false missing URL.
+    const attributes = Object.fromEntries([...tag.matchAll(/\s([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+))/g)]
+      .map((match) => [match[1].toLowerCase(), match[2] ?? match[3] ?? match[4]]));
+    if (!attributes.rel?.toLowerCase().split(/\s+/).includes('canonical')) return [];
+    return [attributes.href?.replaceAll('&amp;', '&') || ''];
   });
 }
 

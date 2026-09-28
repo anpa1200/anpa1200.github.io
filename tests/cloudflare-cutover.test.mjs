@@ -8,7 +8,7 @@ import { sha256 } from '../scripts/hosting-parity-lib.mjs';
 const commit = 'a'.repeat(40), digest = `sha256:${'b'.repeat(64)}`;
 const rollback = {site_commit:'d'.repeat(40),artifact_digest:`sha256:${'e'.repeat(64)}`};
 
-function scenario(mode, { ready = true, failAfterSwitch = false, wrongRecord = false, wrongRollback = false, staleDns = false, certificateHosts = ['1200km.com','*.1200km.com'] } = {}) {
+function scenario(mode, { ready = true, failAfterSwitch = false, wrongRecord = false, wrongRollback = false, staleDns = false, missingLegacy = false, certificateHosts = ['1200km.com','*.1200km.com'] } = {}) {
   const temp = mkdtempSync(join(tmpdir(), '1200km-cutover-test-'));
   try {
     const parity = join(temp, 'parity.json'), evidence = join(temp, 'evidence.json'), mutations = join(temp, 'mutations.json');
@@ -18,7 +18,7 @@ function scenario(mode, { ready = true, failAfterSwitch = false, wrongRecord = f
     writeFileSync(parity, JSON.stringify({ generated_at: new Date().toISOString(), preview_origin: 'https://1200km-site.1200km.workers.dev',
       production_before:rollback,production_after:rollback,production_unchanged:true,migration_review:{sha256:sha256(baselineText),rollback_identity:rollback},
       summary: { ready_for_cutover: ready, cutover_blockers: ready ? 0 : 1, preview_contract_failures: 0 },
-      sitemap_inventory: { missing_from_artifact: [] }, artifact: { identity: { site_commit: commit, artifact_digest: digest } } }));
+      sitemap_inventory: { missing_from_artifact: [] }, legacy_inventory:{total_urls:10095,missing_from_artifact:missingLegacy ? ['articles/assets/js/main.old.js'] : []}, artifact: { identity: { site_commit: commit, artifact_digest: digest } } }));
     const preload = join(temp, 'mock.mjs');
     writeFileSync(preload, `
       import {writeFileSync} from 'node:fs';
@@ -61,7 +61,7 @@ test('cutover changes only the exact existing apex CNAME proxy flag', () => {
   assert.deepEqual(result.changes, [{path:'/client/v4/zones/3b7d60bc8ed435424d085603a583bd2f/dns_records/9409b2009ec9d703a294ec93c5461d3d',method:'PATCH',body:{proxied:true}}]);
 });
 test('failed parity or unexpected DNS prevents all mutations', () => {
-  for (const options of [{ ready: false }, { wrongRecord: true }, { wrongRollback:true },
+  for (const options of [{ ready: false }, { wrongRecord: true }, { wrongRollback:true }, { missingLegacy:true },
     {certificateHosts:'1200km.com'}, {certificateHosts:['1200km.com.example.org']}, {certificateHosts:['prefix1200km.com']}]) {
     const result = scenario('cutover', options); assert.notEqual(result.status, 0); assert.deepEqual(result.changes, []);
   }

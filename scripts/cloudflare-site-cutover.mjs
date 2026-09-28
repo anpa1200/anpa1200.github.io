@@ -72,6 +72,8 @@ if (mode === 'status') {
   assert.equal(parity.summary.cutover_blockers, 0);
   assert.equal(parity.summary.preview_contract_failures, 0);
   assert.equal(parity.sitemap_inventory.missing_from_artifact.length, 0);
+  assert.ok(parity.legacy_inventory.total_urls > 0);
+  assert.equal(parity.legacy_inventory.missing_from_artifact.length, 0, 'Cached-client compatibility incomplete');
   assert.equal(parity.artifact.identity.site_commit, expected);
   assert.equal(parity.production_unchanged, true);
   assert.deepEqual(parity.production_before, baseline.rollback_identity);

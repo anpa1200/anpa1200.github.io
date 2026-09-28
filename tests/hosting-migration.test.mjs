@@ -87,6 +87,8 @@ test('parity normalization cannot hide non-build changes', () => {
   assert.equal(comparableHeader('content-type', 'text/javascript; charset=utf-8'), comparableHeader('content-type', 'application/javascript;charset=utf-8'));
   assert.notEqual(comparableHeader('content-security-policy', "default-src 'self'"), comparableHeader('content-security-policy', "default-src *"));
   assert.deepEqual(canonicalUrls('<link href="https://1200km.com/about.html" rel="canonical">'), ['https://1200km.com/about.html']);
+  assert.deepEqual(canonicalUrls('<link data-rh=true rel=canonical href=https://1200km.com/opencti-intelligent-shield/>'), ['https://1200km.com/opencti-intelligent-shield/']);
+  assert.deepEqual(canonicalUrls('<link data-rel=canonical href=https://example.org>'), []);
 });
 
 test('migration exceptions bind exact before/after differences to the frozen rollback', () => {

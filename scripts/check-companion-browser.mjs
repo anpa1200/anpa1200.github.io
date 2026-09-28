@@ -80,7 +80,9 @@ try {
 } finally {
   socket?.close(); chrome.kill('SIGTERM');
   await new Promise((done) => chrome.exitCode === null ? chrome.once('exit', done) : done());
-  await rm(profile, { recursive: true, force: true });
+  // Chrome subprocesses may briefly finish writing after the parent exits.
+  // Retry removal of only this mkdtemp-owned profile; never ignore failures.
+  await rm(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 }
 const report = { origin, results, failures };
 await writeFile(resolve(option('--report', '/tmp/1200km-companion-browser.json')), `${JSON.stringify(report, null, 2)}\n`);

@@ -9,6 +9,10 @@ Pages deployment unchanged as rollback. The combined artifact is approximately
 1.9 GB, above GitHub Pages' documented 1 GB published-site limit. The dormant
 Pages upload/deploy jobs and legacy proxy Worker job are explicitly disabled.
 
+The final artifact also retains the previously published hashed assets described
+below. It therefore exceeds the initial 1.9 GB preview in size; its exact file
+count, bytes, and digest are recorded by each release's artifact validation.
+
 ## Release architecture
 
 `quality` builds and validates `${RUNNER_TEMP}/site`, including the pinned article
@@ -33,6 +37,32 @@ and verify its full digest before deploying. No post-download rewrite occurs.
 Wrangler 4.142.0 is lockfile-pinned; deployment actions use full commit pins.
 Repository secrets contain the scoped Cloudflare token and account ID. Tokens
 are never included in source, artifacts, or diagnostics.
+
+## Cached-client continuity
+
+`cloudflare/legacy-assets/legacy-assets.json` inventories 10,095 previously
+published asset URLs. Its SHA-256-pinned 57.6 MB archive contains old companion
+runtime and lazy JavaScript chunks, CSS/fonts, article bundles, and Pagefind
+engine/index/fragments. Existing current media is required rather than duplicated.
+The one-time capture parses literal runtime filename maps without evaluating
+downloaded JavaScript. No HTML, server control files, links, or traversal paths
+are accepted in the archive.
+
+After building the new search index, `stage-legacy-assets.mjs` validates the
+archive and adds missing assets only. Current validated assets take precedence.
+This occurs before final validation, build identity, and artifact upload.
+`data/legacy-assets-provenance.json` records every added/reused URL. Parity checks
+require the full inventory and probe old bootstrap and search assets over HTTP.
+Thus a client holding pre-cutover HTML can still load its old hashed bundles;
+there is no request-time fallback to GitHub.
+
+Keep this snapshot through the rollback window. Before changing companion pins
+or retiring old assets in future releases, capture the preceding validated
+release's versioned assets again, review the inventory and hashes, and update
+the snapshot deliberately. `capture-legacy-assets.mjs --baseline OLD_ARTIFACT
+--site NEW_ARTIFACT --output REVIEW_DIRECTORY` is the read-only capture helper;
+its date and provenance are explicitly tied to this migration and must be updated
+for a later capture. Do not overwrite the active snapshot without reviewing it.
 
 ## Response and URL contract
 
@@ -77,6 +107,9 @@ HTML serialization handles valid unquoted
 attributes without changing the DOM. Exact metadata overrides disambiguate
 companion titles/descriptions. Source commit dates provide a documented fallback
 for companion pages that have no authored/git-derived modification date.
+The Atlas retains its original research and receives the existing TTP generator's
+additional tool/simulation/detection backlinks and evidence caveats. These are
+reviewed additions, not a claim that the Atlas HTML is byte-identical.
 
 ## Validation
 
@@ -88,6 +121,7 @@ npm run check-site-worker
 npm run check-site-worker:runtime
 node scripts/check-companion-coverage.mjs --site ./dist
 node scripts/check-static-artifact.mjs --site ./dist --site-commit EXPECTED_SHA
+node scripts/wait-static-deployment.mjs --site ./dist --origin WORKERS_DEV_URL
 node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin WORKERS_DEV_URL
 node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin WORKERS_DEV_URL
 node scripts/check-companion-browser.mjs --site ./dist --origin WORKERS_DEV_URL
@@ -102,6 +136,10 @@ dates, citations, or arbitrary hashes. Unlisted or changed differences block
 strict production Worker verification. The review applies only against that
 exact unchanged rollback baseline. Once the domain serves the new release,
 ordinary strict parity compares production against its immutable artifact.
+The deployment readiness gate waits up to five minutes for the exact new build
+identity from Cloudflare, allowing initial provider propagation without treating
+an old build or temporary provider 404 as a successful deployment. All HTTP and
+browser checks still run after readiness; their assertions are not relaxed.
 
 ## Initial cutover
 

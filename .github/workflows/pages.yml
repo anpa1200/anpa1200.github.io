@@ -158,6 +158,8 @@ jobs:
           --output "${RUNNER_TEMP}/site/pagefind"
           --canonical-sitemap-output "${RUNNER_TEMP}/site/sitemap.xml"
           --max-stale-pages 0
+      - name: Retain hash-pinned assets for clients cached before migration
+        run: node scripts/stage-legacy-assets.mjs --site "${RUNNER_TEMP}/site"
       - name: Validate search coverage and ranking
         run: |
           node scripts/check-content-schema.mjs --site "${RUNNER_TEMP}/site"
@@ -314,12 +316,9 @@ jobs:
       - name: Compare preview against artifact and existing production
         env:
           PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
-        run: >-
-          node scripts/verify-hosting-parity.mjs
-          --site ./dist
-          --preview-origin "$PREVIEW_URL"
-          --report-only-differences
-          --report "${RUNNER_TEMP}/cloudflare-parity.json"
+        run: |
+          node scripts/wait-static-deployment.mjs --site ./dist --origin "$PREVIEW_URL"
+          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$PREVIEW_URL" --report-only-differences --report "${RUNNER_TEMP}/cloudflare-parity.json"
       - name: Verify hosted Pagefind engine, search UI, and fragment navigation
         if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
         env:
@@ -418,6 +417,7 @@ jobs:
         env:
           WORKER_URL: ${{ steps.site-deployment.outputs.deployment-url }}
         run: |
+          node scripts/wait-static-deployment.mjs --site ./dist --origin "$WORKER_URL"
           node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --migration-baseline cloudflare/migration-baseline.json --report "${RUNNER_TEMP}/production-worker-parity.json"
           node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin "$WORKER_URL"
       - name: Preserve production Worker evidence
