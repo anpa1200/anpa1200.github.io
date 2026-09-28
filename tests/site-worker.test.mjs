@@ -131,7 +131,7 @@ test('every _headers declaration is enforced independently of the binding', () =
       declarations.push({ pattern, name: line.slice(0, separator).trim(), value: line.slice(separator + 1).trim() });
     }
   }
-  for (const path of [...new Set(declarations.map(({ pattern }) => pattern.replace('*', 'nested/sample'))), '/index.html', '/missing']) {
+  for (const path of [...new Set(declarations.map(({ pattern }) => pattern.replaceAll('*', 'nested/sample'))), '/index.html', '/missing']) {
     const output = responseHeaders({}, path, parseHeaderPolicy(policy));
     for (const { pattern, name, value } of declarations) {
       const [prefix, suffix] = pattern.split('*');
