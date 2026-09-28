@@ -12,7 +12,7 @@ test('legacy runtime filename maps are parsed as literals without executing code
   assert.throws(()=>webpackChunks('r.u=e=>executeArbitraryCode(e)','docs'));
 });
 test('legacy snapshots cannot introduce HTML, control files, or path traversal',()=>{
-  for(const path of ['docs/assets/js/runtime~main.abcd.js','pagefind/fragment/en_abcd.pf_fragment'])assert.equal(safeLegacyAsset(path),true);
+  for(const path of ['docs/assets/js/runtime~main.abcd.js','pagefind/fragment/en_abcd.pf_fragment','pagefind/filter/en_abcd.pf_filter'])assert.equal(safeLegacyAsset(path),true);
   for(const path of ['../index.html','docs/assets/js/../../x.js','/docs/assets/js/a.js','docs/assets/js/%2e%2e/x.js','_headers','docs/assets/js/x.html'])assert.equal(safeLegacyAsset(path),false);
 });
 test('committed compatibility blob and complete inventory are hash-pinned',()=>{
@@ -20,6 +20,7 @@ test('committed compatibility blob and complete inventory are hash-pinned',()=>{
   const manifest=JSON.parse(readFileSync(new URL('legacy-assets.json',base),'utf8'));
   assert.equal(manifest.schema_version,1);assert.ok(manifest.files.length>9000&&manifest.files.length<20000);
   assert.ok(manifest.files.some(entry=>entry.path==='articles/assets/js/main.bee4d950.js'));
+  assert.equal(manifest.files.filter(entry=>entry.path.startsWith('pagefind/filter/')&&entry.path.endsWith('.pf_filter')).length,29,'Every frozen-production search filter must be retained');
   assert.equal(new Set(manifest.files.map(entry=>entry.path)).size,manifest.files.length);
   assert.ok(manifest.files.every(entry=>safeLegacyAsset(entry.path)&&/^[a-f0-9]{64}$/.test(entry.sha256)&&typeof entry.archived==='boolean'));
   assert.equal(createHash('sha256').update(readFileSync(new URL(manifest.archive,base))).digest('hex'),manifest.archive_sha256);

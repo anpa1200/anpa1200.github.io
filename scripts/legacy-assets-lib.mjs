@@ -40,5 +40,5 @@ export function webpackChunks(source, mount) {
 export function safeLegacyAsset(path) {
   return /^(?:[A-Za-z0-9_-]+\/assets\/(?:js|css|images|media)\/|pagefind\/)[A-Za-z0-9_.~/-]+$/.test(path)
     && !path.split('/').some((part) => part === '..' || part === '.')
-    && /\.(?:js|css|png|jpg|jpeg|gif|svg|webp|avif|woff2?|ttf|otf|wasm|pagefind|pf_fragment|pf_index|pf_meta)$/.test(path);
+    && /\.(?:js|css|png|jpg|jpeg|gif|svg|webp|avif|woff2?|ttf|otf|wasm|pagefind|pf_fragment|pf_index|pf_meta|pf_filter)$/.test(path);
 }

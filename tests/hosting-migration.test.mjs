@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { sha256, canonicalUrls, comparableHeader, withoutBuildIdentity, localAsset } from '../scripts/hosting-parity-lib.mjs';
 import { artifactFiles } from '../scripts/check-static-artifact.mjs';
-import { applyMigrationReview, comparisonHash } from '../scripts/migration-review-lib.mjs';
+import { applyMigrationReview, comparisonHash, companionBuildComparison, pagefindBuildComparison } from '../scripts/migration-review-lib.mjs';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
@@ -117,6 +117,29 @@ test('artifact routing expectations distinguish missing companion content from v
   assert.deepEqual(localAsset('/articles', paths), { status: 301, asset: null });
   assert.deepEqual(localAsset('/.well-known/api-catalog', paths), { status: 200, asset: '.well-known/api-catalog' });
   assert.deepEqual(localAsset('/companion/', paths), { status: 404, asset: '404.html' });
+});
+
+test('companion generation review varies only two bootstrap src IDs and binds source pins', () => {
+  const entry = {mount:'example-guide',commit:'a'.repeat(40)};
+  const html = '<script src="/example-guide/assets/js/runtime~main.1234abcd.js" defer></script><script src="/example-guide/assets/js/main.6789abcd.js" defer></script><p>Research 2026-09-28</p>';
+  const original = companionBuildComparison(html,entry);
+  assert.deepEqual(original.assets,['example-guide/assets/js/runtime~main.1234abcd.js','example-guide/assets/js/main.6789abcd.js']);
+  assert.deepEqual(original.comparison,companionBuildComparison(html.replaceAll('abcd','ffff'),entry).comparison);
+  for(const changed of [html.replace('Research','Changed'),html.replace('2026-09-28','2026-09-29'),html.replace(' defer',' async'),html+'<script src="/evil.js"></script>'])
+    assert.notDeepEqual(original.comparison,companionBuildComparison(changed,entry).comparison);
+  assert.notDeepEqual(original.comparison,companionBuildComparison(html,{...entry,commit:'b'.repeat(40)}).comparison);
+  assert.throws(()=>companionBuildComparison(html.replace('/example-guide/assets/js/main.','https://evil.example/main.'),entry));
+  assert.throws(()=>companionBuildComparison(html.replace('runtime~main','main'),entry));
+});
+
+test('Pagefind generation review preserves version, languages, counts and all other fields', () => {
+  const manifest = {version:'1.5.2',languages:{en:{hash:'en_1234567890',wasm:'en',page_count:8005}},include_characters:['_']};
+  const original = pagefindBuildComparison(JSON.stringify(manifest));
+  assert.deepEqual(original.assets,['pagefind/pagefind.en_1234567890.pf_meta']);
+  assert.deepEqual(original.comparison,pagefindBuildComparison(JSON.stringify(manifest).replace('1234567890','abcdef1234')).comparison);
+  for(const changed of [{...manifest,version:'other'},{...manifest,include_characters:[]},{...manifest,languages:{en:{...manifest.languages.en,page_count:1}}}])
+    assert.notDeepEqual(original.comparison,pagefindBuildComparison(JSON.stringify(changed)).comparison);
+  assert.throws(()=>pagefindBuildComparison(JSON.stringify(manifest).replace('en_1234567890','../../secret')));
 });
 
 test('artifact enumeration includes hidden discovery assets', async () => {

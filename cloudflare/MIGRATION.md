@@ -40,10 +40,10 @@ are never included in source, artifacts, or diagnostics.
 
 ## Cached-client continuity
 
-`cloudflare/legacy-assets/legacy-assets.json` inventories 10,095 previously
-published asset URLs. Its SHA-256-pinned 57.6 MB archive contains old companion
+`cloudflare/legacy-assets/legacy-assets.json` inventories 10,124 previously
+published asset URLs. Its SHA-256-pinned 57.9 MB archive contains old companion
 runtime and lazy JavaScript chunks, CSS/fonts, article bundles, and Pagefind
-engine/index/fragments. Existing current media is required rather than duplicated.
+engine/index/fragments and all 29 old search filters. Existing current media is required rather than duplicated.
 The one-time capture parses literal runtime filename maps without evaluating
 downloaded JavaScript. No HTML, server control files, links, or traversal paths
 are accepted in the archive.
@@ -131,8 +131,18 @@ The preview reports differences from the older production release without
 claiming byte identity. Its artifact/header/routing and complete companion
 coverage checks remain mandatory. `migration-baseline.json` pins the complete
 frozen Pages build identity and explicitly reviewed before/after differences.
-HTML comparison hashes remove only the build marker, never research text,
-dates, citations, or arbitrary hashes. Unlisted or changed differences block
+Ordinary HTML comparison hashes remove only the build marker, never research
+text, dates, citations, or arbitrary hashes. Ten explicitly pinned companion
+home pages use a typed comparison that permits only the generated eight-digit
+IDs in their two exact same-origin bootstrap script filenames. All remaining
+HTML bytes, attributes, and each companion's source commit stay in the review.
+Referenced bootstraps are fetched and compared byte-for-byte to the artifact.
+The Pagefind manifest similarly permits only its generated metadata identifier;
+version, language configuration, record counts, and every other field remain
+exact. Its referenced metadata asset, index coverage/ranking, and hosted search
+are independently checked. These narrow rules address observed variability
+between two independently validated builds, not unknown publication changes.
+Unlisted or changed differences block
 strict production Worker verification. The review applies only against that
 exact unchanged rollback baseline. Once the domain serves the new release,
 ordinary strict parity compares production against its immutable artifact.

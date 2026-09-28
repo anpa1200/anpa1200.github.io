@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { checkStaticArtifact, artifactFiles } from './check-static-artifact.mjs';
 import { canonicalUrls, CHECKED_HEADERS, comparableHeader, expectedMime, localAsset, sha256, withoutBuildIdentity } from './hosting-parity-lib.mjs';
 import { MARKDOWN_ROUTES, parseHeaderPolicy, responseHeaders } from '../cloudflare/site-worker-lib.js';
-import { applyMigrationReview, comparisonHash } from './migration-review-lib.mjs';
+import { applyMigrationReview, comparisonHash, companionBuildComparison, pagefindBuildComparison } from './migration-review-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -29,6 +29,16 @@ const report = {
   note: 'HTTP GET/HEAD only. No production mutations. Build identity is compared exactly to the downloaded artifact, not assumed equal to another release. Browser search is a separate check.',
 };
 const nonce = `${Date.now()}-${artifact.identity.site_commit.slice(0, 8)}`;
+const companions = JSON.parse(await readFile(join(ROOT, 'cloudflare/companion-sites.json'), 'utf8'));
+const companionBuilds = JSON.parse(await readFile(join(site, 'data/companion-builds.json'), 'utf8'));
+const generatedReviews = new Map();
+for (const entry of companions.filter(entry => entry.kind === 'docusaurus')) {
+  assert.ok(companionBuilds.sites.some(built => built.mount === entry.mount && built.commit === entry.commit), 'Companion source pin drift');
+  generatedReviews.set(`/${entry.mount}/`, companionBuildComparison(await readFile(join(site, entry.mount, 'index.html'), 'utf8'), entry));
+}
+generatedReviews.set('/pagefind/pagefind-entry.json', pagefindBuildComparison(await readFile(join(site, 'pagefind/pagefind-entry.json'))));
+const generatedAssets = new Set([...generatedReviews.values()].flatMap(entry => entry.assets));
+for (const path of generatedAssets) assert.ok(paths.has(path), `Generated asset missing: ${path}`);
 
 async function fetchRecord(origin, path, accept = '*/*', method = 'GET', extraHeaders = {}) {
   const url = new URL(path, origin);
@@ -98,7 +108,9 @@ async function compare(path, accept = '*/*', method = 'GET') {
       check(location.origin === preview.origin && location.pathname === `${pathname}/` && location.search === requested.search && !location.hash, label, 'directory redirect URL/query', next.headers.location);
     } else check(!next.headers.location, label, 'no unwanted redirect', next.headers.location);
 
-    if (old.status !== next.status) difference(label, 'HTTP status', old.status, next.status);
+    const newGeneratedAsset = generatedAssets.has(pathname.slice(1)) && old.status === 404 && next.status === 200
+      && expectedBody && next.sha256 === sha256(expectedBody);
+    if (old.status !== next.status) difference(label, 'HTTP status', old.status, next.status, newGeneratedAsset ? 'validated-new-generated-asset' : 'cutover-blocker');
     const oldLocation = old.headers.location ? new URL(old.headers.location, old.requested_url) : null;
     const nextLocation = next.headers.location ? new URL(next.headers.location, next.requested_url) : null;
     const relativeLocation = (url) => url ? `${url.pathname}${url.search}${url.hash}` : null;
@@ -110,7 +122,11 @@ async function compare(path, accept = '*/*', method = 'GET') {
       else if (old.status === next.status && [301, 302, 307, 308].includes(next.status)) classification = 'provider-redirect-body';
       else if (markdown && old.status === 200 && old.headers['content-type']?.startsWith('text/html')) classification = 'configured-agent-policy-not-live';
       else if (withoutBuildIdentity(old.body.toString()) === withoutBuildIdentity(next.body.toString())) classification = 'expected-HTML-build-marker';
-      difference(label, 'response body SHA-256', old.sha256, next.sha256, classification, { production: old.comparison_sha256, preview: next.comparison_sha256 });
+      // Alternate generation comparison is usable only after the returned body
+      // has matched the immutable artifact exactly. No arbitrary hash stripping.
+      const generation = expectedBody && next.sha256 === sha256(expectedBody) ? generatedReviews.get(pathname)?.comparison : null;
+      if (newGeneratedAsset) classification = 'validated-new-generated-asset';
+      difference(label, 'response body SHA-256', old.sha256, next.sha256, classification, { production: old.comparison_sha256, preview: generation || next.comparison_sha256 });
     }
     if (!markdown && next.headers['content-type']?.startsWith('text/html') && old.status === next.status) {
       const before = canonicalUrls(old.body.toString());
@@ -126,6 +142,7 @@ async function compare(path, accept = '*/*', method = 'GET') {
       else if (name === 'vary') classification = 'provider-cache-variation';
       else if (!before && ['content-security-policy', 'strict-transport-security', 'x-content-type-options', 'referrer-policy', 'permissions-policy', 'x-frame-options', 'link'].includes(name)) classification = 'configured-edge-policy-not-live';
       else if (name === 'content-type' && (markdown || pathname.startsWith('/.well-known/') || pathname.endsWith('.md'))) classification = 'configured-agent-policy-not-live';
+      else if (name === 'content-type' && newGeneratedAsset) classification = 'validated-new-generated-asset';
       difference(label, name, old.headers[name] || null, next.headers[name] || null, classification);
     }
     report.responses.push({ path, accept, method, asset: expected.asset, preview: publicRecord(next), production: publicRecord(old) });
@@ -148,6 +165,7 @@ const cases = new Set([
   '/articles/__hosting_migration_not_found__/', '/__hosting_migration_not_found__.json',
 ]);
 for (const path of paths) if (path.startsWith('.well-known/')) cases.add(`/${path}`);
+for (const path of generatedAssets) cases.add(`/${path}`);
 const article = [...paths].find((path) => path.startsWith('articles/read/') && path.includes('big-pharma') && path.endsWith('/index.html'))
   || [...paths].find((path) => path.startsWith('articles/read/') && path.endsWith('/index.html'));
 assert.ok(article, 'Representative article must be present in complete artifact');
@@ -194,7 +212,7 @@ check(legacyProvenance.snapshot_sha256===legacy.archive_sha256,'legacy assets','
 // build would otherwise omit. Their exact bytes still must match the artifact.
 const retained=legacyProvenance.added.map(entry=>entry.path);
 for(const path of retained.filter(path=>/\/assets\/js\/(?:runtime~main|main)\.[a-f0-9]+\.js$/.test(path)))jobs.push(['/'+path,'*/*','GET']);
-for(const pattern of [/^pagefind\/fragment\//,/^pagefind\/index\//]){
+for(const pattern of [/^pagefind\/fragment\//,/^pagefind\/index\//,/^pagefind\/filter\//]){
   const path=retained.find(path=>pattern.test(path));if(path)jobs.push(['/'+path,'*/*','GET']);
 }
 for (const path of MARKDOWN_ROUTES.keys()) jobs.push([`${path}?format=markdown`, 'text/markdown', 'GET']);
