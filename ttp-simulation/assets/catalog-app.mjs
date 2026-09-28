@@ -144,6 +144,24 @@ try {
   app.hidden = false;
   const reference = document.querySelector('#reference-copy');
   if (reference) reference.remove();
+  // Native fragment navigation can target the static copy before async fetches
+  // finish. Restore it against the final DOM after that copy has been removed.
+  if (location.hash.length > 1) {
+    const restoreFragment = () => {
+      let fragment = location.hash.slice(1);
+      try { fragment = decodeURIComponent(fragment); } catch { /* Keep a literal malformed fragment harmless. */ }
+      const target = document.getElementById(fragment);
+      for (let parent = target?.parentElement; parent; parent = parent.parentElement) {
+        if (parent.tagName === 'DETAILS') parent.open = true;
+      }
+      target?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    };
+    // Fonts and the shared shell can still change section offsets after fetches
+    // finish. Wait for final initial layout without holding the module/load event.
+    const afterLayout = () => { document.fonts.ready.then(() => requestAnimationFrame(restoreFragment)); };
+    if (document.readyState === 'complete') afterLayout();
+    else window.addEventListener('load', afterLayout, { once: true });
+  }
 } catch (error) {
   loading.setAttribute('role', 'alert');
   loading.textContent = `${error.message}. Serve this module over HTTP; use the data exports if interactive loading is unavailable.`;

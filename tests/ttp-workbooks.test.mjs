@@ -9,7 +9,7 @@ import {textForPhoneScan} from '../scripts/privacy-check-lib.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url)),read=p=>JSON.parse(readFileSync(root+p,'utf8'));
 const raw=read('data/ttp-workbook-sources.json'),catalog=read('ttp-simulation/data/catalog.json'),audit=read('ttp-simulation/data/workbooks.json');
 const full=new Map(raw.records.map(r=>[r.key,r]));
-const sections=['technique-description','telemetry','detection-rules','anomalies','anomaly-design','attack-tools','simulation','synthetic-logs','validation','sources'];
+const sections=['technique-description','telemetry','detection-rules','anomalies','anomaly-design','attack-tools','simulation','constraints','synthetic-logs','validation','sources'];
 
 test('all 1126 matrix destinations receive source-aware engineering sections',()=>{
   assert.equal(audit.records.length,1126);
