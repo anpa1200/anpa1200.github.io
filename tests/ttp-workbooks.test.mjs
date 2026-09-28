@@ -90,8 +90,11 @@ test('untrusted source HTML, script URLs and retirement/cross-domain links canno
   const w={domain:'enterprise',references:[],technique_links:{T1059:'/ttp-simulation/techniques/enterprise/T1059/'}};
   const html=sourceText('<img src=x onerror=alert(1)> [bad](javascript:alert(1)) [retired](/techniques/T9999/) [local](/techniques/T1059/)',w);
   assert.doesNotMatch(html,/<img|href="javascript:/);
-  assert.ok(html.includes('https://attack.mitre.org/techniques/T9999/'));
-  assert.ok(html.includes('/ttp-simulation/techniques/enterprise/T1059/'));
+  const hrefs=[...html.matchAll(/href="([^"]+)"/g)].map(match=>match[1]);
+  assert.deepEqual(hrefs,[
+    'https://attack.mitre.org/techniques/T9999/',
+    '/ttp-simulation/techniques/enterprise/T1059/',
+  ]);
 });
 
 test('historic advisory IDs do not bypass real phone/contact privacy checks',()=>{
