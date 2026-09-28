@@ -4,6 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { enrichReference } from './reference-metadata-lib.mjs';
+import { localFileForUrl } from './search-index-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -51,10 +52,7 @@ function normalizeUrl(value) {
 }
 
 function localPath(canonicalUrl) {
-  const url = new URL(canonicalUrl);
-  let path = decodeURIComponent(url.pathname).replace(/^\//, '');
-  if (!path || path.endsWith('/')) path += 'index.html';
-  return join(SITE_ROOT, path);
+  return localFileForUrl(SITE_ROOT, canonicalUrl);
 }
 
 function tag(facet, value, type) {

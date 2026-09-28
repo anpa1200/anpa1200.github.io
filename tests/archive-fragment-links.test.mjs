@@ -9,6 +9,8 @@ test('archive fragments are deferred in source and strictly validated in the ass
  const root=mkdtempSync(join(tmpdir(),'1200km-fragment-test-'));
  try{
   mkdirSync(join(root,'scripts'));
+  mkdirSync(join(root,'cloudflare'));
+  copyFileSync(new URL('../cloudflare/evidence-documents.js',import.meta.url),join(root,'cloudflare/evidence-documents.js'));
   copyFileSync(new URL('../scripts/check-links.mjs',import.meta.url),join(root,'scripts/check-links.mjs'));
   writeFileSync(join(root,'index.html'),'<a href="/articles/read/2026/example/#evidence">Research</a>');
   const check=(...args)=>spawnSync(process.execPath,[join(root,'scripts/check-links.mjs'),...args],{encoding:'utf8'});
@@ -26,6 +28,8 @@ test('Atlas sidebar routes use the separately published project without masking 
  const root=mkdtempSync(join(tmpdir(),'1200km-sidebar-project-test-'));
  try{
   mkdirSync(join(root,'scripts'));
+  mkdirSync(join(root,'cloudflare'));
+  copyFileSync(new URL('../cloudflare/evidence-documents.js',import.meta.url),join(root,'cloudflare/evidence-documents.js'));
   copyFileSync(new URL('../scripts/check-links.mjs',import.meta.url),join(root,'scripts/check-links.mjs'));
   const check=(...args)=>spawnSync(process.execPath,[join(root,'scripts/check-links.mjs'),...args],{encoding:'utf8'});
   writeFileSync(join(root,'index.html'),'<a href="/anomaly-detection-atlas/">Atlas</a><a href="/anomaly-detection-atlas/research/">Research</a>');

@@ -3,6 +3,9 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { textForPhoneScan } from './privacy-check-lib.mjs';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
+import { EVIDENCE_DOCUMENTS } from '../cloudflare/evidence-documents.js';
+import { createHash } from 'node:crypto';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -39,8 +42,16 @@ for (const file of walk(site)) {
   if (forbiddenNames.some((pattern) => pattern.test(basename(file)))) failures.push(`${rel}: forbidden private or temporary filename`);
   if (!textExtensions.has(extname(file).toLowerCase()) || statSync(file).size > 15_000_000) continue;
   const text = readFileSync(file, 'utf8');
-  for (const [label, pattern] of secretPatterns) if (pattern.test(text)) failures.push(`${rel}: possible ${label}`);
-  if (extname(file).toLowerCase() === '.html' && !phoneNumberAllowed.has(rel) && (israeliMobile.test(textForPhoneScan(text)) || /href=["']tel:/i.test(text))) {
+  for (const [label, pattern] of secretPatterns) if (pattern.test(text)) {
+    // Captured public Google/Mandiant HTML contains a public browser API key.
+    // This exception is exact-file AND exact-byte pinned; changed captures and
+    // every other credential pattern still fail. No credential is logged.
+    const pinnedPublicCapture = label === 'Google API key'
+      && rel === 'anomaly-detection-atlas/reports/cti-ir/mandiant-sunburst-supply-chain.html'
+      && createHash('sha256').update(text).digest('hex') === EVIDENCE_DOCUMENTS.get(rel);
+    if (!pinnedPublicCapture) failures.push(`${rel}: possible ${label}`);
+  }
+  if (extname(file).toLowerCase() === '.html' && !isEvidenceDocument(rel) && !phoneNumberAllowed.has(rel) && (israeliMobile.test(textForPhoneScan(text)) || /href=["']tel:/i.test(text))) {
     failures.push(`${rel}: public HTML contains a phone number or telephone link`);
   }
   if (extname(file).toLowerCase() === '.json') {

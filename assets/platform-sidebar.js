@@ -109,7 +109,7 @@
       sidebar.setAttribute('aria-label', 'Platform navigation');
       sidebar.setAttribute('data-pagefind-ignore', '');
       sidebar.innerHTML = '<a class="sidenav-brand" href="/">' +
-        '<img src="/assets/ap-logo.png" alt="" width="32" height="32" loading="lazy" decoding="async">' +
+        '<img src="/assets/ap-logo-72.png" alt="" width="32" height="32" loading="lazy" decoding="async">' +
         '<span class="sidenav-brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span></a>' +
         '<nav class="sidenav-scroll" aria-label="Page contents and platform sections"></nav>' +
         '<div class="sidenav-footer"><span>1200km.com</span><a href="#top" title="Back to top">↑ top</a></div>';

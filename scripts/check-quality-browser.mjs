@@ -140,6 +140,7 @@ class DevTools {
       if (!message.id || !this.pending.has(message.id)) return;
       const pending = this.pending.get(message.id);
       this.pending.delete(message.id);
+      clearTimeout(pending.timer);
       if (message.error) pending.reject(new Error(`${pending.method}: ${message.error.message}`));
       else pending.resolve(message.result);
     });
@@ -147,7 +148,11 @@ class DevTools {
   send(method, params = {}, sessionId) {
     const id = this.nextId++;
     return new Promise((resolvePromise, reject) => {
-      this.pending.set(id, { method, resolve: resolvePromise, reject });
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`Browser protocol timed out after 120s: ${method}`));
+      }, 120_000);
+      this.pending.set(id, { method, resolve: resolvePromise, reject, timer });
       this.socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
     });
   }
@@ -158,6 +163,18 @@ async function evaluate(devtools, sessionId, expression) {
   const result = await devtools.send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }, sessionId);
   if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text || 'Browser evaluation failed');
   return result.result?.value;
+}
+
+async function navigateReady(devtools, sessionId, url) {
+  await devtools.send('Page.navigate', { url }, sessionId);
+  const deadline = Date.now() + 15_000;
+  while (Date.now() < deadline) {
+    // A previous document can still report "complete" immediately after
+    // Page.navigate. Never inject axe into that outgoing execution context.
+    if (await evaluate(devtools, sessionId, `location.href === ${JSON.stringify(url)} && document.readyState === 'complete' && document.body?.textContent?.trim().length > 100`)) return;
+    await wait(100);
+  }
+  throw new Error(`Browser-quality page did not become ready: ${url}`);
 }
 
 await mkdir(dirname(reportPath), { recursive: true });
@@ -241,18 +258,13 @@ try {
       width: viewport.width, height: viewport.height, screenWidth: viewport.width,
       screenHeight: viewport.height, deviceScaleFactor: 1, mobile: viewport.mobile,
     }, sessionId);
-    await devtools.send('Page.navigate', { url: origin }, sessionId);
-    await wait(150);
+    await navigateReady(devtools, sessionId, `${origin}/`);
     await evaluate(devtools, sessionId, `localStorage.setItem('theme', ${JSON.stringify(viewport.theme)})`);
     for (const [name, path, budgetClass] of pages) {
+      console.log(`Auditing ${name}@${viewport.label}`);
       const budget = budgetFor(budgetClass);
       await devtools.send('Network.clearBrowserCache', {}, sessionId);
-      await devtools.send('Page.navigate', { url: `${origin}${path}` }, sessionId);
-      const deadline = Date.now() + 15_000;
-      while (Date.now() < deadline) {
-        if (await evaluate(devtools, sessionId, `document.readyState === 'complete' && document.body?.textContent?.trim().length > 100`)) break;
-        await wait(100);
-      }
+      await navigateReady(devtools, sessionId, `${origin}${path}`);
       await wait(450);
       await evaluate(devtools, sessionId, axeSource);
       const state = await evaluate(devtools, sessionId, `(async () => {
@@ -280,11 +292,11 @@ try {
           transfer_bytes: Math.round(resources.reduce((total, entry) => total + (entry.transferSize || 0), 0)),
           largest_resources: resources
             .map((entry) => ({
-              url: new URL(entry.name, location.href).pathname,
+              url: new URL(entry.name, location.href).pathname + new URL(entry.name, location.href).search,
               transfer_bytes: Math.round(entry.transferSize || 0),
             }))
             .sort((left, right) => right.transfer_bytes - left.transfer_bytes)
-            .slice(0, 8),
+            .slice(0, 30),
           violations: audit.violations.map((item) => ({
             id: item.id, impact: item.impact, description: item.description,
             targets: item.nodes.slice(0, 5).map((node) => node.target.join(' ')),

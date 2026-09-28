@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { htmlTextContent, transformHtmlElements } from './html-token-utils.mjs';
 import { textForPhoneScan } from './privacy-check-lib.mjs';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const sourceRoot = path.resolve(new URL('.', import.meta.url).pathname, '..');
 const siteFlag = process.argv.indexOf('--site');
@@ -206,7 +207,9 @@ for (const relativePath of requiredSurfaces) {
   const text = visibleText(html);
   currentTexts.push([relativePath, html, text]);
   for (const match of text.matchAll(/\b(?:current(?: merged, CI-validated)? source release|latest published immutable(?: GitHub)? release|latest published tag|stable release|current release|current version)\b[^.!?]{0,40}\b(v\d+(?:\.\d+){0,2})\b/gi)) {
-    if (![sourceRelease, stableTag].includes(match[1])) {
+    const versions = [sourceRelease, stableTag];
+    const matchingMinor = /^v\d+\.\d+$/.test(match[1]) && versions.some((version) => version.startsWith(`${match[1]}.`));
+    if (!versions.includes(match[1]) && !matchingMinor) {
       fail(`${relativePath}: current release/version statement contains unauthorized historical value ${match[1]}.`);
     }
   }
@@ -271,7 +274,7 @@ const phonePatterns = [
 const phoneNumberAllowed = new Set(['cv.html', 'cover-letter.html']);
 for (const absolute of allHtml) {
   const relativePath = path.relative(siteRoot, absolute);
-  if (phoneNumberAllowed.has(relativePath)) continue;
+  if (phoneNumberAllowed.has(relativePath) || isEvidenceDocument(relativePath)) continue;
   const html = readFileSync(absolute, 'utf8');
   if (phonePatterns.some(pattern => pattern.test(textForPhoneScan(html)))) {
     fail(`${relativePath}: public HTML contains a phone number or tel link.`);

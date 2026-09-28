@@ -13,6 +13,9 @@ const bundleIndex = args.indexOf('--bundle');
 const bundle = resolve(bundleIndex >= 0 ? args[bundleIndex + 1] : 'pagefind');
 const siteIndex = args.indexOf('--site');
 const site = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
+const originIndex = args.indexOf('--origin');
+const liveOrigin = originIndex >= 0 ? new URL(args[originIndex + 1]).origin : '';
+const hostingSearchOnly = args.includes('--hosting-search-only');
 const chrome = process.env.CHROME_PATH || 'google-chrome';
 
 if (!existsSync(join(bundle, 'pagefind.js'))) throw new Error(`Pagefind bundle not found at ${bundle}`);
@@ -68,6 +71,14 @@ class DevTools {
       const message = JSON.parse(event.data);
       if (!message.id) {
         this.events.push(message);
+        // Pagefind performs WASM/index fetches inside a Web Worker. Attach
+        // before execution so hosted-resource evidence includes those requests.
+        if (message.method === 'Target.attachedToTarget' && message.params.waitingForDebugger) {
+          const childSession = message.params.sessionId;
+          this.send('Network.enable', {}, childSession)
+            .then(() => this.send('Runtime.runIfWaitingForDebugger', {}, childSession))
+            .catch((error) => this.events.push({ method: 'Hosting.workerAttachError', params: { message: error.message } }));
+        }
         return;
       }
       const pending = this.pending.get(message.id);
@@ -148,8 +159,8 @@ async function activateLazySearch(devtools, sessionId) {
   await waitForExpression(
     devtools,
     sessionId,
-    `Boolean(document.querySelector('.site-search-host, [data-site-search-hero]'))`,
-    'progressive search fallback',
+    `Boolean(document.querySelector('.site-search-host, [data-site-search-hero]')) && window.__1200kmSiteSearch === true && document.readyState !== 'loading'`,
+    'progressive search fallback and deferred search initialization',
   );
   await evaluate(devtools, sessionId, `(() => {
     const target = document.querySelector('.site-search-host, [data-site-search-hero]');
@@ -165,6 +176,7 @@ async function attachPage(devtools, url, metrics = null, options = {}) {
   await devtools.send('Page.enable', {}, sessionId);
   await devtools.send('Log.enable', {}, sessionId);
   await devtools.send('Network.enable', {}, sessionId);
+  if (liveOrigin) await devtools.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true }, sessionId);
   await devtools.send('Network.setBlockedURLs', {
     urls: [
       'https://www.googletagmanager.com/*',
@@ -178,11 +190,17 @@ async function attachPage(devtools, url, metrics = null, options = {}) {
   if (metrics) await devtools.send('Emulation.setDeviceMetricsOverride', metrics, sessionId);
   if (options.disableScripts) await devtools.send('Emulation.setScriptExecutionDisabled', { value: true }, sessionId);
   await devtools.send('Page.navigate', { url }, sessionId);
+  const target = new URL(url);
+  // Native disclosure hit-testing must wait for CSS/fonts, not merely parsed
+  // HTML. Also never accept the previous about:blank document as navigation.
+  const ready = options.disableScripts
+    ? "document.readyState === 'complete' && document.fonts.status === 'loaded'"
+    : "document.readyState === 'interactive' || document.readyState === 'complete'";
   await waitForExpression(
     devtools,
     sessionId,
-    `document.readyState === 'interactive' || document.readyState === 'complete'`,
-    `navigation to ${new URL(url).pathname}`
+    `location.origin === ${JSON.stringify(target.origin)} && ${JSON.stringify([target.pathname, `${target.pathname}/`])}.includes(location.pathname) && (${ready})`,
+    `navigation to ${target.pathname}`
   );
   return { targetId, sessionId };
 }
@@ -192,7 +210,7 @@ await new Promise((resolvePromise, reject) => {
   server.listen(0, '127.0.0.1', resolvePromise);
 });
 const address = server.address();
-const origin = `http://127.0.0.1:${address.port}`;
+const origin = liveOrigin || `http://127.0.0.1:${address.port}`;
 const profile = await mkdtemp(join(tmpdir(), '1200km-search-chrome-'));
 const browser = spawn(chrome, [
   '--headless=new',
@@ -240,6 +258,15 @@ const devtools = new DevTools(socket);
 const failures = [];
 
 try {
+  if (liveOrigin) {
+    // The server cannot receive fragments. Check browser inheritance through
+    // the directory redirect and preservation of the query at the real edge.
+    const fragmentPath = hostingSearchOnly ? '/ttp-simulation' : '/articles';
+    const fragmentPage = await attachPage(devtools, `${origin}${fragmentPath}?migration=parity#hosting-fragment`);
+    const location = await evaluate(devtools, fragmentPage.sessionId, 'location.href');
+    if (location !== `${origin}${fragmentPath}/?migration=parity#hosting-fragment`) failures.push(`directory redirect lost URL state: ${location}`);
+    await devtools.send('Target.closeTarget', { targetId: fragmentPage.targetId });
+  }
   const searchPage = await attachPage(devtools, `${origin}/search.html?q=T1059.003`, {
     width: 390,
     height: 844,
@@ -262,8 +289,8 @@ try {
   await waitForExpression(
     devtools,
     searchPage.sessionId,
-    `Boolean(document.querySelector('[data-site-search-results] .pf-result-link[href]')) && document.querySelector('[data-site-search-results] .pf-results')?.getAttribute('aria-busy') !== 'true'`,
-    'live full-page results'
+    `new URL(document.querySelector('[data-site-search-results] .pf-result-link[href]')?.href || location.href).pathname === '/threat-matrix/techniques/T1059.003/' && document.querySelector('[data-site-search-results] .pf-results')?.getAttribute('aria-busy') !== 'true'`,
+    'live full-page results with settled governed entity ranking'
   );
 
   const searchState = await evaluate(devtools, searchPage.sessionId, `(() => ({
@@ -428,6 +455,7 @@ try {
     failures.push(`section deep link is not resolvable: ${JSON.stringify(deepLinkState)}`);
   }
 
+  if (!hostingSearchOnly) {
   const desktopMetrics = {
     width: 1880,
     height: 950,
@@ -1044,6 +1072,20 @@ try {
     await devtools.send('Target.closeTarget', { targetId: pointerPage.targetId });
   }
 
+  await devtools.send('Target.closeTarget', { targetId: desktopHome.targetId });
+  await devtools.send('Target.closeTarget', { targetId: homePage.targetId });
+  }
+
+  if (liveOrigin) {
+    for (const event of devtools.events.filter((item) => item.method === 'Hosting.workerAttachError')) failures.push(`Worker network evidence unavailable: ${event.params.message}`);
+    const resources = devtools.events.filter((event) => event.method === 'Network.responseReceived')
+      .map((event) => event.params.response)
+      .filter((response) => response.url.startsWith(`${origin}/pagefind/`) && response.status < 400);
+    for (const pattern of [/\/pagefind\.js(?:\?|$)/, /\/wasm\.[^/]+\.pagefind/, /\/index\/.*\.pf_index/, /\/fragment\/.*\.pf_fragment/]) {
+      if (!resources.some((response) => pattern.test(response.url))) failures.push(`Missing successful preview-origin Pagefind resource: ${pattern}`);
+    }
+    console.log(`Observed ${new Set(resources.map((response) => new URL(response.url).pathname)).size} successful same-origin Pagefind resources (engine, WASM, indexes, fragments).`);
+  }
   const browserErrors = devtools.events.filter((event) =>
     event.method === 'Runtime.exceptionThrown'
     || (event.method === 'Log.entryAdded' && ['error', 'warning'].includes(event.params?.entry?.level))
@@ -1052,8 +1094,6 @@ try {
   if (relevantErrors.length) failures.push(`browser console errors: ${JSON.stringify(relevantErrors.slice(0, 5))}`);
 
   await devtools.send('Target.closeTarget', { targetId: searchPage.targetId });
-  await devtools.send('Target.closeTarget', { targetId: desktopHome.targetId });
-  await devtools.send('Target.closeTarget', { targetId: homePage.targetId });
 } finally {
   socket.close();
   if (browser.exitCode === null) {
@@ -1071,4 +1111,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('Browser search smoke test passed (fallback, facets, active filters, counts, Load More, section links, ranking, responsive layout, keyboard flow, and standalone/Docusaurus/Threat Matrix integrations).');
+console.log(hostingSearchOnly
+  ? 'Hosting search browser test passed (same-origin Pagefind engine/WASM/index/fragments, mobile results, keyboard flow, query hydration, ranking, zero-result recovery, facets, counts, pagination, section links, and redirect fragment inheritance).'
+  : 'Browser search smoke test passed (fallback, facets, active filters, counts, Load More, section links, ranking, responsive layout, keyboard flow, and standalone/Docusaurus/Threat Matrix integrations).');

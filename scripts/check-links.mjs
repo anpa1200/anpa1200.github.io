@@ -20,6 +20,7 @@
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, resolve, normalize, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const siteFlag = process.argv.indexOf('--site');
@@ -48,7 +49,7 @@ function walkHtml(dir = ROOT) {
   return files.sort();
 }
 
-const htmlFiles = walkHtml();
+const htmlFiles = walkHtml().filter((path) => !isEvidenceDocument(path));
 
 const linkedTagRe = /<[a-z][\w:-]*\b[^>]*(?:href|src)\s*=\s*"[^"]+"[^>]*>/gi;
 const urlAttributeRe = /(?:href|src)\s*=\s*"([^"]+)"/i;
@@ -76,8 +77,8 @@ function localPathExists(rel) {
   if (!checkingAssembledSite && BUILD_TIME_LOCAL_ROOTS.some(root => clean.startsWith(root))) return true;
   const p = normalize(join(ROOT, decodeURIComponent(clean.replace(/^\//, ''))));
   if (!p.startsWith(ROOT)) return false;
-  if (!existsSync(p)) return false;
-  if (statSync(p).isDirectory()) return existsSync(join(p, 'index.html'));
+  if (!existsSync(p)) return !clean.endsWith('/') && existsSync(`${p}.html`);
+  if (statSync(p).isDirectory()) return existsSync(join(p, 'index.html')) || (!clean.endsWith('/') && existsSync(`${p}.html`));
   return true;
 }
 
@@ -91,8 +92,10 @@ function localHtmlFile(pathname) {
   const clean = pathname.split('#')[0].split('?')[0];
   const relativePath = clean.replace(/^\//, '');
   let candidate = join(ROOT, relativePath);
-  if (!candidate.startsWith(ROOT) || !existsSync(candidate)) return '';
-  if (statSync(candidate).isDirectory()) candidate = join(candidate, 'index.html');
+  if (!candidate.startsWith(ROOT)) return '';
+  if (!existsSync(candidate) && !clean.endsWith('/') && existsSync(`${candidate}.html`)) candidate += '.html';
+  if (!existsSync(candidate)) return '';
+  if (statSync(candidate).isDirectory()) candidate = !clean.endsWith('/') && existsSync(`${candidate}.html`) ? `${candidate}.html` : join(candidate, 'index.html');
   if (!candidate.endsWith('.html') || !existsSync(candidate)) return '';
   return relative(ROOT, candidate).replace(/\\/g, '/');
 }
