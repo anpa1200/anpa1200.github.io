@@ -8,7 +8,7 @@ import { sha256 } from '../scripts/hosting-parity-lib.mjs';
 const commit = 'a'.repeat(40), digest = `sha256:${'b'.repeat(64)}`;
 const rollback = {site_commit:'d'.repeat(40),artifact_digest:`sha256:${'e'.repeat(64)}`};
 
-function scenario(mode, { ready = true, failAfterSwitch = false, wrongRecord = false, wrongRollback = false, staleDns = false, missingLegacy = false, certificateHosts = ['1200km.com','*.1200km.com'] } = {}) {
+function scenario(mode, { ready = true, failAfterSwitch = false, wrongRecord = false, wrongRollback = false, staleDns = false, missingLegacy = false, extraAddress = false, certificateHosts = ['1200km.com','*.1200km.com'] } = {}) {
   const temp = mkdtempSync(join(tmpdir(), '1200km-cutover-test-'));
   try {
     const parity = join(temp, 'parity.json'), evidence = join(temp, 'evidence.json'), mutations = join(temp, 'mutations.json');
@@ -35,7 +35,11 @@ function scenario(mode, { ready = true, failAfterSwitch = false, wrongRecord = f
           return new Response(JSON.stringify(build), {headers:isNew ? {'cf-ray':'test',server:'cloudflare'} : {server:'GitHub.com'}});
         }
         let result;
-        if (path.endsWith('/dns_records')) result = [{id:'9409b2009ec9d703a294ec93c5461d3d',type:'CNAME',name:'1200km.com',content:${JSON.stringify(wrongRecord ? 'unexpected.example' : 'anpa1200.github.io')},ttl:1,proxied}];
+        if (path.endsWith('/dns_records')) result = [
+          {id:'9409b2009ec9d703a294ec93c5461d3d',type:'CNAME',name:'1200km.com',content:${JSON.stringify(wrongRecord ? 'unexpected.example' : 'anpa1200.github.io')},ttl:1,proxied},
+          {id:'google-verification',type:'TXT',name:'1200km.com',content:'google-site-verification=test',ttl:1},
+          ...(${JSON.stringify(extraAddress)} ? [{id:'unexpected-address',type:'A',name:'1200km.com',content:'203.0.113.1',ttl:1}] : [])
+        ];
         else if (path.endsWith('/workers/routes')) result = [{id:'route-id',pattern:'1200km.com/*',script:'1200km-site'}];
         else if (path.endsWith('/ssl/certificate_packs')) result = [{id:'cert-id',status:'active',hosts:${JSON.stringify(certificateHosts)}}];
         else if (path.endsWith('/settings/ssl')) result = {value:'full'};
@@ -61,7 +65,7 @@ test('cutover changes only the exact existing apex CNAME proxy flag', () => {
   assert.deepEqual(result.changes, [{path:'/client/v4/zones/3b7d60bc8ed435424d085603a583bd2f/dns_records/9409b2009ec9d703a294ec93c5461d3d',method:'PATCH',body:{proxied:true}}]);
 });
 test('failed parity or unexpected DNS prevents all mutations', () => {
-  for (const options of [{ ready: false }, { wrongRecord: true }, { wrongRollback:true }, { missingLegacy:true },
+  for (const options of [{ ready: false }, { wrongRecord: true }, { wrongRollback:true }, { missingLegacy:true }, { extraAddress:true },
     {certificateHosts:'1200km.com'}, {certificateHosts:['1200km.com.example.org']}, {certificateHosts:['prefix1200km.com']}]) {
     const result = scenario('cutover', options); assert.notEqual(result.status, 0); assert.deepEqual(result.changes, []);
   }

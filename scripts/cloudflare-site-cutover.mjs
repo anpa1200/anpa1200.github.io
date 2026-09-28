@@ -38,14 +38,19 @@ const [zone, records, routes, certificates, ssl, subdomain] = await Promise.all(
 assert.equal(zone.name, '1200km.com');
 assert.equal(zone.account.id, ACCOUNT);
 assert.equal(zone.status, 'active');
-assert.equal(records.length, 1, 'Unexpected apex record topology; stop for review');
-const record = records[0];
+// The apex also has a Google verification TXT record. Only address-bearing
+// records compete with the rollback CNAME; preserve every other record.
+const apexRecords = records.filter((entry) => entry.name === '1200km.com');
+const addressRecords = apexRecords.filter((entry) => ['A', 'AAAA', 'CNAME'].includes(entry.type));
+assert.equal(addressRecords.length, 1, 'Unexpected apex address record topology; stop for review');
+const record = addressRecords[0];
 assert.equal(record.id, RECORD);
 assert.equal(record.type, 'CNAME');
 assert.equal(record.name, '1200km.com');
 assert.equal(record.content, 'anpa1200.github.io');
 assert.equal(record.ttl, 1);
-const snapshot = { checked_at: new Date().toISOString(), mode, zone: zone.id, record, routes, ssl: ssl.value,
+const snapshot = { checked_at: new Date().toISOString(), mode, zone: zone.id, record,
+  apex_record_inventory: apexRecords.map(({id,type,name}) => ({id,type,name})), routes, ssl: ssl.value,
   certificates: certificates.map(({ id, status, hosts }) => ({ id, status, hosts })) };
 await writeFile(evidence, `${JSON.stringify(snapshot, null, 2)}\n`);
 if (mode === 'status') {
