@@ -55,6 +55,23 @@ test('directory redirect retains host and query and leaves fragment inheritance 
   assert.equal((await get('//foreign.example')).headers.get('Location'), 'https://1200km-site.test.workers.dev//foreign.example/');
 });
 
+test('production HTTP redirects to HTTPS without dropping path or query', async () => {
+  calls.length = 0;
+  const response = await worker.fetch(new Request('http://1200km.com/about.html?q=a%20b'), environment());
+  assert.equal(response.status, 301);
+  assert.equal(response.headers.get('Location'), 'https://1200km.com/about.html?q=a%20b');
+  assert.equal(calls.length, 0);
+});
+
+test('third-party source captures are unmodified downloads and never executable indexed pages', async () => {
+  const path = '/anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html';
+  const response = await get(path, {}, environment(new Map([[path, ['SOURCE CAPTURE', 'text/html']]])));
+  assert.equal(await response.text(), 'SOURCE CAPTURE');
+  assert.equal(response.headers.get('Content-Disposition'), 'attachment');
+  assert.match(response.headers.get('Content-Security-Policy'), /sandbox/);
+  assert.match(response.headers.get('X-Robots-Tag'), /noindex/);
+});
+
 test('unknown requests serve root 404 with 404 status, even nested and conditional requests', async () => {
   for (const path of ['/missing', '/articles/missing/', '/missing.md', '/missing.json', '/about/']) {
     const response = await get(path, { headers: { 'If-None-Match': '"fixture"', Range: 'bytes=0-1' } });

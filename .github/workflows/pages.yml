@@ -23,7 +23,7 @@ env:
 
 jobs:
   quality:
-    timeout-minutes: 35
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     outputs:
       static-artifact-id: ${{ steps.static-artifact.outputs.artifact-id }}
@@ -106,6 +106,10 @@ jobs:
           --source "${GITHUB_WORKSPACE}"
           --archive "${GITHUB_WORKSPACE}/.article-archive-source"
           --archive-commit "${ARTICLE_ARCHIVE_COMMIT}"
+      - name: Build and stage pinned companion publications
+        run: |
+          node scripts/stage-companion-sites.mjs --site "${RUNNER_TEMP}/site"
+          node scripts/normalize-platform-assets.mjs --site "${RUNNER_TEMP}/site"
       - name: Integrate searchable TTP modules and article backlinks
         run: |
           node scripts/build-ttp-integration.mjs --site "${RUNNER_TEMP}/site" --require-archive
@@ -203,6 +207,7 @@ jobs:
           npm run check-links -- --site "${RUNNER_TEMP}/site"
       - name: Emit and validate immutable build identity
         run: |
+          node scripts/check-companion-coverage.mjs --site "${RUNNER_TEMP}/site"
           npm run build-identity -- \
             --site "${RUNNER_TEMP}/site" \
             --site-commit "${GITHUB_SHA}" \
@@ -285,6 +290,7 @@ jobs:
         run: |
           npm run check-site-worker
           node scripts/check-static-artifact.mjs --site ./dist --site-commit "${GITHUB_SHA}"
+          node scripts/check-companion-coverage.mjs --site ./dist
       - name: Install locked deployment tooling
         run: npm ci --prefix cloudflare
       - name: Require existing deployment secrets
@@ -302,7 +308,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: cloudflare
           wranglerVersion: 4.142.0
-          command: deploy --config wrangler.site.json
+          command: deploy --config wrangler.preview.json
       - name: Compare preview against artifact and existing production
         env:
           PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
@@ -310,6 +316,7 @@ jobs:
           node scripts/verify-hosting-parity.mjs
           --site ./dist
           --preview-origin "$PREVIEW_URL"
+          --report-only-differences
           --report "${RUNNER_TEMP}/cloudflare-parity.json"
       - name: Verify hosted Pagefind engine, search UI, and fragment navigation
         if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
@@ -337,6 +344,70 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      - name: Verify every companion publication in real browsers
+        if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
+        env:
+          PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
+        run: node scripts/check-companion-browser.mjs --site ./dist --origin "$PREVIEW_URL" --report "${RUNNER_TEMP}/companion-browser.json"
+      - name: Preserve companion browser evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: companion-browser-${{ github.run_id }}
+          path: ${{ runner.temp }}/companion-browser.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  cloudflare-production:
+    # PRs can only update 1200km-site-preview. Only reviewed main can deploy
+    # the live Worker, and only after the same artifact passes hosted checks.
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.CLOUDFLARE_SITE_DEPLOY_ENABLED == 'true' }}
+    needs: [quality, cloudflare-preview, deploy]
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cloudflare-1200km-site-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          artifact-ids: ${{ needs.quality.outputs.static-artifact-id }}
+          path: ./dist
+          merge-multiple: true
+      - name: Verify immutable release artifact
+        run: |
+          node scripts/check-static-artifact.mjs --site ./dist --site-commit "${GITHUB_SHA}"
+          node scripts/check-companion-coverage.mjs --site ./dist
+          npm ci --prefix cloudflare
+      - name: Deploy validated main release
+        id: site-deployment
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare
+          wranglerVersion: 4.142.0
+          command: deploy --config wrangler.site.json
+      - name: Verify production Worker before DNS cutover
+        env:
+          WORKER_URL: ${{ steps.site-deployment.outputs.deployment-url }}
+        run: |
+          node scripts/verify-production.mjs --site-commit "${GITHUB_SHA}" --archive-commit "${ARTICLE_ARCHIVE_COMMIT}" --report "${RUNNER_TEMP}/pre-cutover-pages-identity.json"
+          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --report "${RUNNER_TEMP}/production-worker-parity.json"
+          node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin "$WORKER_URL"
+      - name: Preserve production Worker evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: production-worker-verification-${{ github.run_id }}
+          path: ${{ runner.temp }}/production-worker-parity.json
+          if-no-files-found: error
+          retention-days: 90
+
   deploy:
     if: ${{ github.event_name != 'pull_request' }}
     needs: quality
@@ -354,8 +425,8 @@ jobs:
         id: deployment
 
   production-verification:
-    if: ${{ github.event_name != 'pull_request' }}
-    needs: deploy
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.deploy.result == 'success' && (needs.cloudflare-production.result == 'success' || needs.cloudflare-production.result == 'skipped') }}
+    needs: [deploy, cloudflare-production]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:

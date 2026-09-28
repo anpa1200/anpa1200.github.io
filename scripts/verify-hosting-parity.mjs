@@ -14,7 +14,8 @@ const site = resolve(option('--site', 'dist'));
 const preview = new URL(option('--preview-origin'));
 const production = new URL(option('--production-origin', 'https://1200km.com'));
 assert.ok((preview.protocol === 'https:' && preview.hostname.endsWith('.workers.dev'))
-  || (preview.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(preview.hostname)), 'Preview must be workers.dev or a loopback test server');
+  || (preview.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(preview.hostname))
+  || (args.includes('--verify-production') && preview.origin === 'https://1200km.com'), 'Target must be workers.dev, loopback, or explicitly verified production');
 assert.equal(preview.pathname, '/', 'Preview URL must be an origin, not a path');
 assert.equal(preview.search, '');
 const reportPath = resolve(option('--report', '/tmp/1200km-hosting-parity.json'));
@@ -86,6 +87,10 @@ async function compare(path, accept = '*/*', method = 'GET') {
       check(next.headers['x-markdown-tokens'] === String(Math.ceil(expectedBody.toString().split(/\s+/).filter(Boolean).length * 1.33)), label, 'Markdown token estimate', next.headers['x-markdown-tokens']);
     }
     if (preview.hostname.endsWith('.workers.dev')) check(next.headers['x-robots-tag'] === 'noindex', label, 'preview not indexed', next.headers['x-robots-tag']);
+    if (args.includes('--verify-production')) {
+      check(!next.headers['x-robots-tag']?.includes('noindex'), label, 'production remains indexable', next.headers['x-robots-tag']);
+      check(next.headers.server === 'cloudflare' && Boolean(next.headers['cf-ray']), label, 'Cloudflare production response', next.headers.server);
+    }
     if (expected.status === 301) {
       const location = new URL(next.headers.location || '', next.requested_url);
       const requested = new URL(next.requested_url);
@@ -200,9 +205,9 @@ report.summary = {
   http_cases: jobs.length, preview_contract_failures: report.preview_failures.length,
   production_differences: report.production_differences.length,
   cutover_blockers: report.production_differences.filter((entry) => entry.classification === 'cutover-blocker').length,
-  deployment_scope: 'workers.dev only; no custom-domain cutover',
+  deployment_scope: args.includes('--verify-production') ? 'Read-only production verification' : 'Read-only workers.dev comparison',
 };
-report.summary.ready_for_cutover = report.summary.preview_contract_failures === 0 && report.summary.production_differences === 0;
+report.summary.ready_for_cutover = report.summary.preview_contract_failures === 0 && report.summary.cutover_blockers === 0;
 await mkdir(dirname(reportPath), { recursive: true });
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({ ...report.summary, report: reportPath }, null, 2));

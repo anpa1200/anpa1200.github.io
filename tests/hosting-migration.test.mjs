@@ -9,7 +9,7 @@ import { artifactFiles } from '../scripts/check-static-artifact.mjs';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('phase one cannot change existing production configuration or deployment jobs', () => {
+test('migration preserves GitHub Pages and the retired edge configuration for rollback', () => {
   const protectedFiles = {
     'wrangler.toml': 'dc34c12ea4e50a4390a3b6fa84ecba3422a4b69dc10795c009fb184f74f0e3ec',
     'cloudflare/agent-readiness-worker.js': '2c3b81557a3affe377815e614654556e1fb5e5efb42a0f4da7098b92d560c49a',
@@ -18,12 +18,16 @@ test('phase one cannot change existing production configuration or deployment jo
   };
   for (const [path, digest] of Object.entries(protectedFiles)) assert.equal(sha256(read(path)), digest, `${path}: production change requires a separate authorized cutover`);
   const workflow = read('.github/workflows/pages.yml');
-  assert.equal(sha256(workflow.slice(workflow.indexOf('\n  deploy:\n'))), '80ac8e297a7d94a983c5caae328fdd539fa9d4d27bc79ac7e4225993b0ee1cec', 'Existing Pages deploy and verification jobs must remain byte-identical');
+  const pages = workflow.slice(workflow.indexOf('\n  deploy:\n'), workflow.indexOf('\n  production-verification:'));
+  assert.match(pages, /needs: quality/);
+  assert.match(pages, /actions\/deploy-pages@/);
+  assert.match(pages, /name: github-pages/);
+  assert.match(workflow, /needs: \[deploy, cloudflare-production\]/);
 });
 
-test('new Worker has no production route, custom domain, or Cloudflare site build', () => {
-  const config = JSON.parse(read('cloudflare/wrangler.site.json'));
-  assert.equal(config.name, '1200km-site');
+test('preview Worker has no production route, custom domain, or Cloudflare site build', () => {
+  const config = JSON.parse(read('cloudflare/wrangler.preview.json'));
+  assert.equal(config.name, '1200km-site-preview');
   assert.equal(config.main, './site-worker.js');
   assert.equal(config.workers_dev, true);
   assert.deepEqual(config.routes, []);
@@ -40,20 +44,35 @@ test('deployment uses exact same-run artifact, locked dependencies, and no fork 
   assert.match(upload, /path: \$\{\{ runner.temp \}\}\/site/);
   assert.match(upload, /include-hidden-files: true/);
   assert.match(upload, /if-no-files-found: error/);
-  const preview = workflow.slice(workflow.indexOf('\n  cloudflare-preview:'), workflow.indexOf('\n  deploy:'));
+  const preview = workflow.slice(workflow.indexOf('\n  cloudflare-preview:'), workflow.indexOf('\n  cloudflare-production:'));
   assert.match(preview, /needs: quality/);
   assert.match(preview, /github\.event\.pull_request\.head\.repo\.full_name == github\.repository/);
   assert.doesNotMatch(workflow, /^\s*pull_request_target:/m);
   assert.match(preview, /artifact-ids: \$\{\{ needs.quality.outputs.static-artifact-id \}\}/);
   assert.match(preview, /path: \.\/dist/);
   assert.match(preview, /check-static-artifact.mjs --site \.\/dist --site-commit/);
-  assert.match(preview, /command: deploy --config wrangler.site.json/);
+  assert.match(preview, /command: deploy --config wrangler.preview.json/);
   assert.doesNotMatch(preview, /--route|custom.domain|npm run build|deploy-pages|upsert-dns/);
   for (const match of workflow.matchAll(/uses:\s*([^\s]+)@([^\s]+)/g)) assert.match(match[2], /^[a-f0-9]{40}$/, `Floating action ${match[1]}`);
   const version = JSON.parse(read('cloudflare/package.json')).devDependencies.wrangler;
   assert.match(version, /^\d+\.\d+\.\d+$/);
   assert.match(preview, new RegExp(`wranglerVersion: ${version.replaceAll('.', '\\.')}`));
   assert.equal(JSON.parse(read('cloudflare/package-lock.json')).packages['node_modules/wrangler'].version, version);
+});
+
+test('production is main-only and cannot run before preview validation', () => {
+  const workflow = read('.github/workflows/pages.yml');
+  const production = workflow.slice(workflow.indexOf('\n  cloudflare-production:'), workflow.indexOf('\n  deploy:'));
+  assert.match(production, /github.ref == 'refs\/heads\/main'/);
+  assert.match(production, /github.event_name != 'pull_request'/);
+  assert.match(production, /vars.CLOUDFLARE_SITE_DEPLOY_ENABLED == 'true'/);
+  assert.match(production, /needs: \[quality, cloudflare-preview, deploy\]/);
+  assert.match(production, /artifact-ids: \$\{\{ needs.quality.outputs.static-artifact-id \}\}/);
+  assert.doesNotMatch(production, /--report-only-differences/);
+  const config = JSON.parse(read('cloudflare/wrangler.site.json'));
+  assert.equal(config.name, '1200km-site');
+  assert.deepEqual(config.routes, [{ pattern: '1200km.com/*', zone_id: '3b7d60bc8ed435424d085603a583bd2f' }]);
+  assert.deepEqual(config.assets, JSON.parse(read('cloudflare/wrangler.preview.json')).assets);
 });
 
 test('parity normalization cannot hide non-build changes', () => {

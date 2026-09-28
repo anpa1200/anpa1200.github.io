@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import process from 'node:process';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const ROOT = resolve(new URL('..', import.meta.url).pathname);
 const args = process.argv.slice(2);
@@ -42,10 +43,12 @@ function localFragment(href) {
 const files = walk().sort();
 for (const path of files) {
   const name = relative(site, path).replace(/\\/g, '/');
+  if (isEvidenceDocument(name)) continue;
   const html = readFileSync(path, 'utf8');
   const ids = new Map();
-  for (const match of html.matchAll(/\bid\s*=\s*(?:"([^"]+)"|'([^']+)')/gi)) {
-    const id = match[1] || match[2];
+  for (const match of html.matchAll(/<[a-z][^>]*>/gi)) {
+    const id = attributes(match[0]).id;
+    if (!id) continue;
     ids.set(id, (ids.get(id) || 0) + 1);
   }
   for (const [id, count] of ids) {

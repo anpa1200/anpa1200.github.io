@@ -1,12 +1,14 @@
 // Reproducible source overlay for the pinned, separately built archive.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { sameOriginPlatformAssets } from './companion-sites-lib.mjs';
 const args = process.argv.slice(2),
   i = args.indexOf('--archive');
 if (i < 0 || !args[i + 1]) throw Error('--archive source checkout required');
 const path = resolve(args[i + 1], 'docusaurus.config.js');
-let source = readFileSync(path, 'utf8');
+let source = sameOriginPlatformAssets(readFileSync(path, 'utf8'));
 if (/\btrailingSlash:\s*true\b/.test(source)) {
+  writeFileSync(path, source);
   console.log('Archive slash policy already explicit');
   process.exit(0);
 }

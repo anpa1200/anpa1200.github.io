@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import { addHeadingIds, markPagefindContent } from './release-html-lib.mjs';
 import { topicsFromText } from './content-topic-lib.mjs';
 import {anomalyTagsForUrl} from './anomaly-tags-lib.mjs';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 import {
   isAuthorizedTrainsecCanonical,
   trainsecCanonicalForLocalUrl,
@@ -183,6 +184,7 @@ export function shouldExcludeUrl(value) {
 export function validatePage(urlValue, html) {
   const url = normalizeSiteUrl(urlValue);
   if (!url) return { indexable: false, reason: 'off-origin-or-invalid-url' };
+  if (isEvidenceDocument(url.pathname)) return { indexable: false, reason: 'archived-source-document' };
   if (shouldExcludeUrl(url.href)) return { indexable: false, reason: 'excluded-path' };
   if (!/<html\b/i.test(html) || !/<body\b/i.test(html)) return { indexable: false, reason: 'not-html' };
 

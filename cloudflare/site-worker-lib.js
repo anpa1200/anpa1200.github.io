@@ -1,5 +1,6 @@
 // This is deliberately separate from the currently configured production Worker.
 // Regression tests compare its agent behavior with agent-readiness-worker.js.
+import { isEvidenceDocument } from './evidence-documents.js';
 export const MARKDOWN_ROUTES = new Map([
   ['/', '/index.md'],
   ['/projects/', '/projects.md'],
@@ -84,6 +85,11 @@ export function responseHeaders(original, pathname, rules) {
   if (pathname.endsWith('.json') && !headers.get('Content-Type')?.startsWith('text/html')) {
     headers.set('Content-Type', 'application/json; charset=utf-8');
   }
+  if (isEvidenceDocument(pathname)) {
+    headers.set('X-Robots-Tag', 'noindex, nofollow');
+    headers.set('Content-Disposition', 'attachment');
+    headers.set('Content-Security-Policy', "default-src 'none'; sandbox; frame-ancestors 'none'");
+  }
   return headers;
 }
 
@@ -125,6 +131,10 @@ export function createSiteWorker(headerText) {
     async fetch(request, env) {
       const url = new URL(request.url);
       const pathname = url.pathname;
+      if (url.hostname === '1200km.com' && url.protocol === 'http:') {
+        url.protocol = 'https:';
+        return finish(new Response(null, { status: 301, headers: { Location: url.href, 'Content-Type': 'text/html' } }), pathname, request);
+      }
       if (!['GET', 'HEAD'].includes(request.method)) {
         return finish(new Response(null, { status: 405, headers: { Allow: 'GET, HEAD' } }), pathname, request);
       }

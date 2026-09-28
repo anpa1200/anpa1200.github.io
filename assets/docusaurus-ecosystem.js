@@ -3,13 +3,13 @@
     if (!document.querySelector('link[href*="/assets/platform-sidebar.css"]')) {
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = 'https://1200km.com/assets/platform-sidebar.css?v=20260830-1';
+      stylesheet.href = '/assets/platform-sidebar.css?v=20260830-1';
       stylesheet.dataset.platformSidebarAsset = 'true';
       document.head.appendChild(stylesheet);
     }
     if (!document.querySelector('script[src*="/assets/platform-sidebar.js"]')) {
       const script = document.createElement('script');
-      script.src = 'https://1200km.com/assets/platform-sidebar.js?v=20260830-1';
+      script.src = '/assets/platform-sidebar.js?v=20260830-1';
       script.defer = true;
       script.dataset.platformSidebarLoader = 'true';
       document.head.appendChild(script);
@@ -19,7 +19,7 @@
   function loadSiteSearch() {
     if (document.querySelector('script[data-site-search-loader], script[src*="/assets/site-search.js"]')) return;
     const script = document.createElement('script');
-    script.src = 'https://1200km.com/assets/site-search.js?v=20260722-3';
+    script.src = '/assets/site-search.js?v=20260722-3';
     script.defer = true;
     script.dataset.siteSearchLoader = 'true';
     document.head.appendChild(script);

@@ -34,6 +34,8 @@ const transformHtml = !args.includes('--metadata-only');
 const remoteConfigPath = resolve(option('--remote-config', join(ROOT, 'seo', 'remote-sitemaps.json')));
 const remotePagesPath = resolve(option('--remote-pages', join(ROOT, 'seo', 'remote-pages.json')));
 const skippedDirectories = new Set(['.build', '.git', 'node_modules', 'pagefind']);
+const companionBuildPath = join(siteRoot, 'data/companion-builds.json');
+const companionBuilds = existsSync(companionBuildPath) ? JSON.parse(await readFile(companionBuildPath, 'utf8')).sites : [];
 
 function xmlEscape(value = '') {
   return String(value)
@@ -197,7 +199,10 @@ async function collectRemoteSitemap(sourceUrl, entries, visited = new Set()) {
   const normalized = normalizeCanonical(sourceUrl);
   if (!normalized || visited.has(normalized)) return;
   visited.add(normalized);
-  const xml = await fetchText(normalized);
+  const localSitemap = new URL(normalized).origin === 'https://1200km.com'
+    ? join(siteRoot, new URL(normalized).pathname) : '';
+  const xml = localSitemap && existsSync(localSitemap)
+    ? await readFile(localSitemap, 'utf8') : await fetchText(normalized);
   const parsed = parseSitemapEntries(xml, normalized);
   if (parsed.isIndex) {
     for (const entry of parsed.entries) await collectRemoteSitemap(entry.loc, entries, visited);
@@ -305,7 +310,8 @@ for (const page of pages) {
   const dates = contentDates(page.html);
   const archiveDates = archiveDatesForUrl(page.canonical, archiveCatalog);
   const published = dates.published || archiveDates.published || archiveDate(page.canonical);
-  const lastmod = dates.modified || archiveDates.modified || published || gitDate(page.path);
+  const companion = companionBuilds.find((entry) => rel.startsWith(`${entry.mount}/`));
+  const lastmod = dates.modified || archiveDates.modified || published || gitDate(page.path) || companion?.source_committed_at || '';
   localEntries.set(page.canonical, { loc: page.canonical, ...(lastmod ? { lastmod } : {}) });
 
   const parsed = parseJsonLd(page.html);

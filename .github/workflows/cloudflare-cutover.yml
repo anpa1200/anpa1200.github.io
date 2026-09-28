@@ -1,0 +1,114 @@
+name: Cloudflare production cutover or rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Cut over only after a successful complete main release, or restore GitHub Pages
+        type: choice
+        options: [status, cutover, rollback]
+        default: status
+        required: true
+      release_run_id:
+        description: Successful main pages.yml run ID (required for cutover)
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: cloudflare-1200km-site-production
+  cancel-in-progress: false
+
+jobs:
+  cutover:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+      - name: Validate release provenance before downloading evidence
+        if: ${{ inputs.mode == 'cutover' }}
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_RUN_ID: ${{ inputs.release_run_id }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { execFileSync } from 'node:child_process';
+          import { appendFileSync } from 'node:fs';
+          const id = process.env.RELEASE_RUN_ID;
+          assert.match(id, /^\d+$/);
+          const api = (path) => JSON.parse(execFileSync('gh', ['api', `repos/${process.env.GITHUB_REPOSITORY}/${path}`], { encoding: 'utf8' }));
+          const run = api(`actions/runs/${id}`);
+          assert.equal(run.head_branch, 'main');
+          assert.equal(run.conclusion, 'success');
+          assert.equal(run.path, '.github/workflows/pages.yml');
+          assert.equal(run.head_sha, process.env.GITHUB_SHA, 'Cutover must use current reviewed main');
+          const artifacts = api(`actions/runs/${id}/artifacts`).artifacts;
+          const site = artifacts.filter((a) => a.name.startsWith(`validated-static-site-${id}-`) && !a.expired).sort((a,b) => b.id-a.id)[0];
+          const parity = artifacts.find((a) => a.name === `production-worker-verification-${id}` && !a.expired);
+          assert.ok(site && parity, 'Successful production Worker evidence and exact quality artifact required');
+          appendFileSync(process.env.GITHUB_OUTPUT, `site=${site.id}\nparity=${parity.id}\ncommit=${run.head_sha}\n`);
+          JS
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: ${{ inputs.mode == 'cutover' }}
+        with:
+          artifact-ids: ${{ steps.release.outputs.site }}
+          run-id: ${{ inputs.release_run_id }}
+          github-token: ${{ github.token }}
+          path: ./dist
+          merge-multiple: true
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: ${{ inputs.mode == 'cutover' }}
+        with:
+          artifact-ids: ${{ steps.release.outputs.parity }}
+          run-id: ${{ inputs.release_run_id }}
+          github-token: ${{ github.token }}
+          path: ./evidence
+          merge-multiple: true
+      - name: Revalidate release bytes before traffic changes
+        if: ${{ inputs.mode == 'cutover' }}
+        run: |
+          node scripts/check-static-artifact.mjs --site ./dist --site-commit "${GITHUB_SHA}"
+          node scripts/check-companion-coverage.mjs --site ./dist
+      - name: Apply scoped operation with snapshot and automatic rollback
+        id: traffic
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OPERATION: ${{ inputs.mode }}
+        run: >-
+          node scripts/cloudflare-site-cutover.mjs
+          --mode "$OPERATION"
+          --site-commit "${GITHUB_SHA}"
+          --parity ./evidence/production-worker-parity.json
+          --evidence "${RUNNER_TEMP}/cloudflare-cutover.json"
+      - name: Verify live production contract and browser search
+        if: ${{ inputs.mode == 'cutover' }}
+        id: production
+        run: |
+          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin https://1200km.com --verify-production --report "${RUNNER_TEMP}/cutover-production-verification.json"
+          node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin https://1200km.com
+      - name: Restore GitHub Pages if post-cutover verification fails
+        if: ${{ !cancelled() && inputs.mode == 'cutover' && steps.traffic.outcome == 'success' && steps.production.outcome == 'failure' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/cloudflare-site-cutover.mjs --mode rollback --evidence "${RUNNER_TEMP}/cloudflare-rollback.json"
+      - name: Preserve traffic snapshot and verification
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: cloudflare-cutover-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/cloudflare-cutover.json
+            ${{ runner.temp }}/cloudflare-rollback.json
+            ${{ runner.temp }}/cutover-production-verification.json
+          if-no-files-found: warn
+          retention-days: 90
