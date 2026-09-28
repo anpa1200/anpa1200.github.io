@@ -63,7 +63,7 @@ try {
       await new Promise((done) => setTimeout(done, 150));
     }
     await new Promise((done) => setTimeout(done, 500));
-    const state = await evaluate(`({title:document.title,h1:document.querySelector('h1')?.textContent,overflow:document.documentElement.scrollWidth > innerWidth + 1,brokenImages:[...document.images].filter(i=>i.complete && i.currentSrc && i.naturalWidth===0).map(i=>i.currentSrc)})`);
+    const state = await evaluate(`({title:document.title,h1:document.querySelector('h1')?.textContent,h1Count:document.querySelectorAll('h1').length,mainCount:document.querySelectorAll('main,[role="main"]').length,overflow:document.documentElement.scrollWidth > innerWidth + 1,brokenImages:[...document.images].filter(i=>i.complete && i.currentSrc && i.naturalWidth===0).map(i=>i.currentSrc)})`);
     const problems = events.flatMap((event) => {
       if (event.method === 'Runtime.exceptionThrown') return [`JavaScript: ${event.params.exceptionDetails.text}`];
       if (event.method === 'Log.entryAdded' && /Content Security Policy|Refused to (?:load|execute|connect)/i.test(event.params.entry.text)) return [event.params.entry.text];
@@ -72,6 +72,8 @@ try {
     });
     if (state.brokenImages.length) problems.push(`Broken images: ${state.brokenImages.join(', ')}`);
     if (state.overflow) problems.push('Horizontal viewport overflow');
+    if (state.h1Count !== 1) problems.push(`Expected one hydrated H1, found ${state.h1Count}`);
+    if (state.mainCount !== 1) problems.push(`Expected one hydrated main landmark, found ${state.mainCount}`);
     if (problems.length) failures.push({ route, width, problems });
     results.push({ route, width, ...state });
   }

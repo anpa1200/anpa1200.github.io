@@ -44,4 +44,8 @@ test('heading overlay preserves Docusaurus content titles and handles synthetic 
   const body = {children:[{type:'heading',depth:2},{type:'heading',depth:1}]};
   migrationBodyHeadings()(body, {data:{}});
   assert.deepEqual(body.children.map((node)=>node.depth), [2,2]);
+  const gaps = {children:[1,3,4,3,4,2,3].map((depth,index)=>({type:'heading',depth,data:{id:`anchor-${index}`}}))};
+  migrationBodyHeadings()(gaps, {data:{contentTitle:'Preserved title'}});
+  assert.deepEqual(gaps.children.map((node)=>node.depth), [1,2,3,2,3,2,3]);
+  assert.deepEqual(gaps.children.map((node)=>node.data.id), [0,1,2,3,4,5,6].map(index=>`anchor-${index}`));
 });

@@ -45,7 +45,7 @@ function localPathForUrl(value) {
   const rel = decodeURIComponent(url.pathname).replace(/^\/+/, '');
   const candidates = rel === '' ? ['index.html']
     : rel.endsWith('/') ? [`${rel}index.html`]
-      : [rel, `${rel}/index.html`];
+      : [rel, `${rel}.html`, `${rel}/index.html`];
   return candidates.map((candidate) => join(siteRoot, candidate)).find((path) => existsSync(path) && statSync(path).isFile()) || null;
 }
 

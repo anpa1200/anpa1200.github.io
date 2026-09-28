@@ -8,10 +8,17 @@ export function migrationBodyHeadings() {
     // Docusaurus retains a recognized content title inside an MDX <header>.
     // If it did not recognize one, DocItem supplies its own synthetic H1.
     let preserveTitle = typeof file.data.contentTitle === 'string';
+    const outline = [{ original: 1, depth: 1 }];
     const visit = (node) => {
       if (node.type === 'heading' && node.depth === 1) {
         if (preserveTitle) preserveTitle = false;
         else node.depth = 2;
+      }
+      if (node.type === 'heading') {
+        const original = node.depth;
+        while (outline.length && outline.at(-1).original >= original) outline.pop();
+        node.depth = Math.min(original, (outline.at(-1)?.depth || 0) + 1);
+        outline.push({ original, depth: node.depth });
       }
       for (const child of node.children || []) visit(child);
     };

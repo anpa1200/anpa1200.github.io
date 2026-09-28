@@ -59,7 +59,8 @@ Platform JS/CSS URLs follow the current origin, including serialized hydration
 configuration. CSP is not relaxed. The CTI field manual uses its authored system
 font fallback instead of a CSP-blocked Google Fonts import. Source overlays fix
 body H1s, missing main landmarks, and narrow-screen intake controls before both
-server and client bundles are built. HTML serialization handles valid unquoted
+server and client bundles are built. Skipped heading levels are closed while
+preserving heading IDs and peer/child relationships. HTML serialization handles valid unquoted
 attributes without changing the DOM. Exact metadata overrides disambiguate
 companion titles/descriptions. Source commit dates provide a documented fallback
 for companion pages that have no authored/git-derived modification date.
