@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { sha256, canonicalUrls, comparableHeader, withoutBuildIdentity, localAsset } from '../scripts/hosting-parity-lib.mjs';
 import { artifactFiles } from '../scripts/check-static-artifact.mjs';
+import { applyMigrationReview, comparisonHash } from '../scripts/migration-review-lib.mjs';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
@@ -13,7 +14,6 @@ test('migration preserves GitHub Pages and the retired edge configuration for ro
   const protectedFiles = {
     'wrangler.toml': 'dc34c12ea4e50a4390a3b6fa84ecba3422a4b69dc10795c009fb184f74f0e3ec',
     'cloudflare/agent-readiness-worker.js': '2c3b81557a3affe377815e614654556e1fb5e5efb42a0f4da7098b92d560c49a',
-    '.github/workflows/cloudflare-worker.yml': '3c035844771cbcca0b1e6cd47c4c732c7fd8182b05bb4818af717f9a4daf0b71',
     'CNAME': '20858abe23a3060bacf7ba49c7eae8609af158460ba05b14ce7a460fff91fb5a',
   };
   for (const [path, digest] of Object.entries(protectedFiles)) assert.equal(sha256(read(path)), digest, `${path}: production change requires a separate authorized cutover`);
@@ -22,7 +22,11 @@ test('migration preserves GitHub Pages and the retired edge configuration for ro
   assert.match(pages, /needs: quality/);
   assert.match(pages, /actions\/deploy-pages@/);
   assert.match(pages, /name: github-pages/);
-  assert.match(workflow, /needs: \[deploy, cloudflare-production\]/);
+  assert.match(pages, /if: \$\{\{ false \}\}/);
+  assert.match(read('.github/workflows/cloudflare-worker.yml'), /if: \$\{\{ false \}\}/);
+  assert.match(workflow, /needs: \[quality, cloudflare-production\]/);
+  assert.match(workflow, /needs.cloudflare-production.outputs.live == 'true'/);
+  assert.match(workflow, /upload-pages-artifact@[\s\S]*?if: \$\{\{ false \}\}/);
 });
 
 test('preview Worker has no production route, custom domain, or Cloudflare site build', () => {
@@ -66,7 +70,8 @@ test('production is main-only and cannot run before preview validation', () => {
   assert.match(production, /github.ref == 'refs\/heads\/main'/);
   assert.match(production, /github.event_name != 'pull_request'/);
   assert.match(production, /vars.CLOUDFLARE_SITE_DEPLOY_ENABLED == 'true'/);
-  assert.match(production, /needs: \[quality, cloudflare-preview, deploy\]/);
+  assert.match(production, /needs: \[quality, cloudflare-preview\]/);
+  assert.match(production, /--migration-baseline cloudflare\/migration-baseline.json/);
   assert.match(production, /artifact-ids: \$\{\{ needs.quality.outputs.static-artifact-id \}\}/);
   assert.doesNotMatch(production, /--report-only-differences/);
   const config = JSON.parse(read('cloudflare/wrangler.site.json'));
@@ -82,6 +87,24 @@ test('parity normalization cannot hide non-build changes', () => {
   assert.equal(comparableHeader('content-type', 'text/javascript; charset=utf-8'), comparableHeader('content-type', 'application/javascript;charset=utf-8'));
   assert.notEqual(comparableHeader('content-security-policy', "default-src 'self'"), comparableHeader('content-security-policy', "default-src *"));
   assert.deepEqual(canonicalUrls('<link href="https://1200km.com/about.html" rel="canonical">'), ['https://1200km.com/about.html']);
+});
+
+test('migration exceptions bind exact before/after differences to the frozen rollback', () => {
+  const identity = { site_commit: 'a'.repeat(40), artifact_digest: `sha256:${'b'.repeat(64)}` };
+  const change = { path: 'GET /about.html', check: 'response body SHA-256', production: 'old', preview: 'new', reason: 'Reviewed release markup and same-origin asset correction.' };
+  const review = { schema_version: 1, rollback_identity: identity, approved_changes: [change] };
+  const report = () => ({ production_before: identity, production_unchanged: true, production_differences: [{...change, classification:'cutover-blocker'}] });
+  const valid = report(); assert.equal(applyMigrationReview(valid, review), 1);
+  assert.equal(valid.production_differences[0].classification, 'reviewed-migration-difference');
+  const drift = report(); drift.production_differences[0].preview = 'unexpected';
+  assert.equal(applyMigrationReview(drift, review), 0);
+  assert.equal(drift.production_differences[0].classification, 'cutover-blocker');
+  assert.throws(() => applyMigrationReview({...report(), production_before:{...identity, site_commit:'c'.repeat(40)}}, review));
+  assert.throws(() => applyMigrationReview({...report(), production_unchanged:false}, review));
+  assert.throws(() => applyMigrationReview(report(), {...review, approved_changes:[change,change]}));
+  const html = `<meta name="1200km-build" content="${'a'.repeat(40)}"><p>Preserved research</p>`;
+  assert.equal(comparisonHash(Buffer.from(html), 'text/html'), comparisonHash(Buffer.from(html.replace('a'.repeat(40), 'c'.repeat(40))), 'text/html'));
+  assert.notEqual(comparisonHash(Buffer.from(html), 'text/html'), comparisonHash(Buffer.from(html.replace('Preserved', 'Changed')), 'text/html'));
 });
 
 test('artifact routing expectations distinguish missing companion content from valid pages', () => {

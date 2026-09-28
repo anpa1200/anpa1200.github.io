@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Validate and deploy Cloudflare Static Assets
 
 on:
   pull_request:
@@ -249,6 +249,8 @@ jobs:
           if-no-files-found: error
           retention-days: 90
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        # User-approved freeze: retain the existing Pages deployment as rollback.
+        if: ${{ false }}
         with:
           path: ${{ runner.temp }}/site
           include-hidden-files: true
@@ -362,9 +364,11 @@ jobs:
     # PRs can only update 1200km-site-preview. Only reviewed main can deploy
     # the live Worker, and only after the same artifact passes hosted checks.
     if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.CLOUDFLARE_SITE_DEPLOY_ENABLED == 'true' }}
-    needs: [quality, cloudflare-preview, deploy]
+    needs: [quality, cloudflare-preview]
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    outputs:
+      live: ${{ steps.routing.outputs.proxied }}
     concurrency:
       group: cloudflare-1200km-site-production
       cancel-in-progress: false
@@ -392,24 +396,46 @@ jobs:
           workingDirectory: cloudflare
           wranglerVersion: 4.142.0
           command: deploy --config wrangler.site.json
+      - name: Read current routing state without changing DNS
+        id: routing
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          node scripts/cloudflare-site-cutover.mjs --mode status --evidence "${RUNNER_TEMP}/cloudflare-routing.json"
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const snapshot = JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/cloudflare-routing.json`, 'utf8'));
+          appendFileSync(process.env.GITHUB_OUTPUT, `proxied=${snapshot.record.proxied}\n`);
+          JS
+      - name: Wait for the new custom-domain identity on subsequent releases
+        if: ${{ steps.routing.outputs.proxied == 'true' }}
+        run: >-
+          node scripts/verify-production.mjs --custom-only
+          --site-commit "${GITHUB_SHA}" --archive-commit "${ARTICLE_ARCHIVE_COMMIT}"
+          --report "${RUNNER_TEMP}/live-release-identity.json"
       - name: Verify production Worker before DNS cutover
         env:
           WORKER_URL: ${{ steps.site-deployment.outputs.deployment-url }}
         run: |
-          node scripts/verify-production.mjs --site-commit "${GITHUB_SHA}" --archive-commit "${ARTICLE_ARCHIVE_COMMIT}" --report "${RUNNER_TEMP}/pre-cutover-pages-identity.json"
-          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --report "${RUNNER_TEMP}/production-worker-parity.json"
+          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --migration-baseline cloudflare/migration-baseline.json --report "${RUNNER_TEMP}/production-worker-parity.json"
           node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin "$WORKER_URL"
       - name: Preserve production Worker evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: production-worker-verification-${{ github.run_id }}
-          path: ${{ runner.temp }}/production-worker-parity.json
+          path: |
+            ${{ runner.temp }}/production-worker-parity.json
+            ${{ runner.temp }}/cloudflare-routing.json
+            ${{ runner.temp }}/live-release-identity.json
           if-no-files-found: error
           retention-days: 90
 
   deploy:
-    if: ${{ github.event_name != 'pull_request' }}
+    # Do not publish the combined artifact to Pages. Its last release is frozen
+    # as rollback; reactivation requires an explicit reviewed source change.
+    if: ${{ false }}
     needs: quality
     timeout-minutes: 10
     permissions:
@@ -425,8 +451,8 @@ jobs:
         id: deployment
 
   production-verification:
-    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.deploy.result == 'success' && (needs.cloudflare-production.result == 'success' || needs.cloudflare-production.result == 'skipped') }}
-    needs: [deploy, cloudflare-production]
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && needs.cloudflare-production.result == 'success' && needs.cloudflare-production.outputs.live == 'true' }}
+    needs: [quality, cloudflare-production]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -437,6 +463,7 @@ jobs:
       - name: Verify custom-domain production identity and fingerprints
         run: >-
           node scripts/verify-production.mjs
+          --custom-only
           --site-commit "${GITHUB_SHA}"
           --archive-commit "${ARTICLE_ARCHIVE_COMMIT}"
           --report "${RUNNER_TEMP}/production-verification.json"

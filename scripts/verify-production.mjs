@@ -17,7 +17,7 @@ const maxAttempts = Number(valueAfter('--attempts', '6'));
 const origins = [
   { id: 'custom-domain', url: valueAfter('--custom-origin', 'https://1200km.com') },
   { id: 'github-pages', url: valueAfter('--pages-origin', 'https://anpa1200.github.io') },
-];
+].filter((origin) => !args.includes('--custom-only') || origin.id === 'custom-domain');
 const knowledgeModel = JSON.parse(await readFile(resolve(ROOT, 'data/cyber-knowledge.json'), 'utf8'));
 
 if (!/^[0-9a-f]{40}$/i.test(expectedCommit)) throw new Error(`Expected full site commit, received ${expectedCommit || '(missing)'}`);
@@ -231,5 +231,5 @@ if (!report.pass) {
   for (const result of finalResults) result.failures?.forEach((failure) => console.error(`- ${result.id}: ${failure}`));
   process.exit(1);
 }
-console.log(`Production verification passed for ${expectedCommit} on both configured entry points.`);
+console.log(`Production verification passed for ${expectedCommit} on ${origins.map((origin) => origin.id).join(', ')}.`);
 console.log(`Report: ${reportPath}`);

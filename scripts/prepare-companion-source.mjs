@@ -53,6 +53,16 @@ for (const preset of config.presets || []) {
     // font policy. No new font/style origin is added to the existing CSP.
     await writeFile(file, css.replace(/@import url\(['"]https:\/\/fonts\.googleapis\.com\/[^'"\n]+['"]\);/g, ''));
   }
+  if (mount === 'adversarygraph-docs') {
+    const file = join(source, 'src/css/custom.css');
+    const css = await readFile(file, 'utf8');
+    // The upstream optimizer sorts media rules after base rules. Explicit
+    // priority keeps prose natural at every width; child URLs/code retain
+    // their own wrapping declarations instead of inheriting this value.
+    const rule = '/* 1200km migration: preserve natural prose wrapping. */\n.theme-doc-markdown p, .theme-doc-markdown li { overflow-wrap: normal !important; word-break: normal !important; }';
+    const marker = /\/\* 1200km migration: preserve natural prose wrapping\. \*\/\n\.theme-doc-markdown p, \.theme-doc-markdown li \{[^}]+\}/;
+    await writeFile(file, marker.test(css) ? css.replace(marker, rule) : `${css}\n${rule}\n`);
+  }
   if (mount === 'insider-threat-detection') {
     const file = join(source, 'src/pages/index.js');
     await writeFile(file, (await readFile(file, 'utf8')).replace(/<h3>/g, '<h2>').replace(/<\/h3>/g, '</h2>'));

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { checkStaticArtifact, artifactFiles } from './check-static-artifact.mjs';
 import { canonicalUrls, CHECKED_HEADERS, comparableHeader, expectedMime, localAsset, sha256, withoutBuildIdentity } from './hosting-parity-lib.mjs';
 import { MARKDOWN_ROUTES, parseHeaderPolicy, responseHeaders } from '../cloudflare/site-worker-lib.js';
+import { applyMigrationReview, comparisonHash } from './migration-review-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -39,14 +40,14 @@ async function fetchRecord(origin, path, accept = '*/*', method = 'GET', extraHe
         headers: { Accept: accept, 'Cache-Control': 'no-cache', Pragma: 'no-cache', ...extraHeaders }, signal: AbortSignal.timeout(25_000) });
       if (response.status >= 500 && attempt < 2) { await response.body?.cancel(); continue; }
       const body = Buffer.from(await response.arrayBuffer());
-      return { requested_url: url.href, status: response.status, headers: Object.fromEntries(response.headers), bytes: body.length, sha256: sha256(body), body };
+      return { requested_url: url.href, status: response.status, headers: Object.fromEntries(response.headers), bytes: body.length, sha256: sha256(body), comparison_sha256: comparisonHash(body, response.headers.get('content-type')), body };
     } catch (error) { lastError = error; }
   }
   throw lastError;
 }
 const publicRecord = ({ body, ...record }) => record;
 const fail = (path, check, detail) => report.preview_failures.push({ path, check, detail });
-const difference = (path, check, expected, actual, classification = 'cutover-blocker') => report.production_differences.push({ path, check, production: expected, preview: actual, classification });
+const difference = (path, check, expected, actual, classification = 'cutover-blocker', comparison) => report.production_differences.push({ path, check, production: expected, preview: actual, classification, ...(comparison ? { comparison } : {}) });
 function check(condition, path, label, detail) { if (!condition) fail(path, label, detail); }
 
 async function compare(path, accept = '*/*', method = 'GET') {
@@ -109,7 +110,7 @@ async function compare(path, accept = '*/*', method = 'GET') {
       else if (old.status === next.status && [301, 302, 307, 308].includes(next.status)) classification = 'provider-redirect-body';
       else if (markdown && old.status === 200 && old.headers['content-type']?.startsWith('text/html')) classification = 'configured-agent-policy-not-live';
       else if (withoutBuildIdentity(old.body.toString()) === withoutBuildIdentity(next.body.toString())) classification = 'expected-HTML-build-marker';
-      difference(label, 'response body SHA-256', old.sha256, next.sha256, classification);
+      difference(label, 'response body SHA-256', old.sha256, next.sha256, classification, { production: old.comparison_sha256, preview: next.comparison_sha256 });
     }
     if (!markdown && next.headers['content-type']?.startsWith('text/html') && old.status === next.status) {
       const before = canonicalUrls(old.body.toString());
@@ -201,6 +202,16 @@ const about = await readFile(join(site, 'about.html'));
 check([200, 206].includes(previewRange.status), 'Range /about.html', 'valid range response status', previewRange.status);
 check(previewRange.sha256 === sha256(previewRange.status === 206 ? about.subarray(0, 10) : about), 'Range /about.html', 'range body versus artifact', previewRange.sha256);
 if (previewRange.status !== productionRange.status) difference('Range /about.html', 'partial-response support', productionRange.status, previewRange.status, 'provider-range-full-body-fallback');
+if (args.includes('--migration-baseline')) {
+  const reviewText = await readFile(resolve(option('--migration-baseline')), 'utf8');
+  const review = JSON.parse(reviewText);
+  // Once production is Cloudflare and already serves this artifact, ordinary
+  // strict parity applies. Frozen-origin exceptions are not needed or applied.
+  if (report.production_before.site_commit !== artifact.identity.site_commit) {
+    const applied = applyMigrationReview(report, review);
+    report.migration_review = { sha256: sha256(reviewText), rollback_identity: review.rollback_identity, applied };
+  }
+}
 report.summary = {
   http_cases: jobs.length, preview_contract_failures: report.preview_failures.length,
   production_differences: report.production_differences.length,

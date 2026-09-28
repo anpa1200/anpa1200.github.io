@@ -4,6 +4,8 @@
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { sha256 } from './hosting-parity-lib.mjs';
+import { validateMigrationReview } from './migration-review-lib.mjs';
 const ACCOUNT = '7a79808a203a002faa892a5363c9fa2c';
 const ZONE = '3b7d60bc8ed435424d085603a583bd2f';
 const RECORD = '9409b2009ec9d703a294ec93c5461d3d';
@@ -63,20 +65,30 @@ if (mode === 'status') {
   const expected = option('--site-commit');
   assert.match(expected, /^[a-f0-9]{40}$/);
   const parity = JSON.parse(await readFile(resolve(option('--parity')), 'utf8'));
+  const baselineText = await readFile(resolve(option('--baseline', new URL('../cloudflare/migration-baseline.json', import.meta.url).pathname)), 'utf8');
+  const baseline = validateMigrationReview(JSON.parse(baselineText));
   assert.equal(parity.summary.ready_for_cutover, true, 'Main-release strict parity has not passed');
   assert.equal(parity.summary.cutover_blockers, 0);
   assert.equal(parity.summary.preview_contract_failures, 0);
   assert.equal(parity.sitemap_inventory.missing_from_artifact.length, 0);
   assert.equal(parity.artifact.identity.site_commit, expected);
+  assert.equal(parity.production_unchanged, true);
+  assert.deepEqual(parity.production_before, baseline.rollback_identity);
+  assert.deepEqual(parity.production_after, baseline.rollback_identity);
+  assert.equal(parity.migration_review?.sha256, sha256(baselineText), 'Wrong reviewed migration baseline');
+  assert.deepEqual(parity.migration_review.rollback_identity, baseline.rollback_identity);
   const age = Date.now() - Date.parse(parity.generated_at);
   assert.ok(age >= 0 && age < 3_600_000, 'Parity evidence must be less than one hour old');
   const workerOrigin = `https://1200km-site.${subdomain.subdomain}.workers.dev`;
   assert.equal(parity.preview_origin, workerOrigin);
   const [worker, production] = await Promise.all([identity(workerOrigin), identity('https://1200km.com')]);
   assert.equal(worker.identity.site_commit, expected);
-  assert.equal(worker.identity.artifact_digest, parity.artifact.identity.artifact_digest);
-  assert.deepEqual(worker.identity, production.identity, 'GitHub rollback and Worker must serve the identical release');
+  assert.deepEqual(worker.identity, parity.artifact.identity, 'Worker differs from the validated release');
+  assert.deepEqual(production.identity, baseline.rollback_identity, 'Frozen GitHub rollback changed before cutover');
+  assert.equal(production.cloudflare, false, 'Production unexpectedly already traverses Cloudflare');
   snapshot.build = worker.identity;
+  snapshot.rollback_build = production.identity;
+  snapshot.review_sha256 = sha256(baselineText);
   // Snapshot is persisted BEFORE the only traffic-changing mutation.
   await writeFile(evidence, `${JSON.stringify(snapshot, null, 2)}\n`);
   try {
@@ -84,10 +96,14 @@ if (mode === 'status') {
     snapshot.changed_at = new Date().toISOString();
     await writeFile(evidence, `${JSON.stringify(snapshot, null, 2)}\n`);
     let observed = false;
-    for (let attempt = 0; attempt < 36; attempt++) {
+    for (let attempt = 0; attempt < 120; attempt++) {
       const current = await identity('https://1200km.com');
-      assert.deepEqual(current.identity, worker.identity, 'Build identity changed during cutover');
-      if (current.cloudflare && current.server === 'cloudflare') { observed = true; break; }
+      if (current.cloudflare && current.server === 'cloudflare') {
+        assert.deepEqual(current.identity, worker.identity, 'Cloudflare serves an unexpected release');
+        observed = true; break;
+      }
+      // Cached DNS can still reach the healthy old origin during propagation.
+      assert.deepEqual(current.identity, baseline.rollback_identity, 'Rollback origin changed during propagation');
       await new Promise((done) => setTimeout(done, 5000));
     }
     assert.ok(observed, 'Cloudflare production response not observed within propagation window');

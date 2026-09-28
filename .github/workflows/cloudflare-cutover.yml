@@ -88,13 +88,16 @@ jobs:
           --mode "$OPERATION"
           --site-commit "${GITHUB_SHA}"
           --parity ./evidence/production-worker-parity.json
+          --baseline cloudflare/migration-baseline.json
           --evidence "${RUNNER_TEMP}/cloudflare-cutover.json"
       - name: Verify live production contract and browser search
         if: ${{ inputs.mode == 'cutover' }}
         id: production
         run: |
           node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin https://1200km.com --verify-production --report "${RUNNER_TEMP}/cutover-production-verification.json"
+          node scripts/verify-production.mjs --custom-only --site-commit "${GITHUB_SHA}" --archive-commit "$(node -p 'JSON.parse(require("node:fs").readFileSync("./dist/build.json", "utf8")).archive_source_commit')" --report "${RUNNER_TEMP}/cutover-production-identity.json"
           node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin https://1200km.com
+          node scripts/check-companion-browser.mjs --site ./dist --origin https://1200km.com --report "${RUNNER_TEMP}/cutover-companion-browser.json"
       - name: Restore GitHub Pages if post-cutover verification fails
         if: ${{ !cancelled() && inputs.mode == 'cutover' && steps.traffic.outcome == 'success' && steps.production.outcome == 'failure' }}
         env:
@@ -110,5 +113,7 @@ jobs:
             ${{ runner.temp }}/cloudflare-cutover.json
             ${{ runner.temp }}/cloudflare-rollback.json
             ${{ runner.temp }}/cutover-production-verification.json
+            ${{ runner.temp }}/cutover-production-identity.json
+            ${{ runner.temp }}/cutover-companion-browser.json
           if-no-files-found: warn
           retention-days: 90

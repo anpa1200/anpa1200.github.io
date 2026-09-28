@@ -4,12 +4,10 @@ The user authorized the production migration after the phase-one preview.
 GitHub remains source of truth; GitHub Actions builds the site. Cloudflare does
 not rebuild it or proxy missing content to GitHub at request time.
 
-**Cutover hold:** the complete combined artifact is approximately 1.9 GB, above
-GitHub Pages' documented 1 GB published-site limit. The user must choose between
-retaining the current Pages deployment as a frozen rollback (recommended) or
-first reducing the artifact for continued dual publishing. Until that choice is
-resolved and reflected in the workflow, parity guards, and tests, do not merge
-or execute the dual-publishing cutover sequence below. Production is unchanged.
+The user approved Cloudflare-only publishing and keeping the current GitHub
+Pages deployment unchanged as rollback. The combined artifact is approximately
+1.9 GB, above GitHub Pages' documented 1 GB published-site limit. The dormant
+Pages upload/deploy jobs and legacy proxy Worker job are explicitly disabled.
 
 ## Release architecture
 
@@ -20,16 +18,17 @@ uses its pinned published Git revision. Only published output is staged. Existin
 main-owned Atlas content and Markdown alternates take precedence over imported
 historical files. `data/companion-builds.json` records provenance and source dates.
 
-The exact artifact, including `.well-known`, is uploaded to GitHub Pages and to
-generic Actions storage. Deployment jobs download it by immutable artifact ID
+The exact artifact, including `.well-known`, is uploaded to generic Actions
+storage. Deployment jobs download it by immutable artifact ID
 and verify its full digest before deploying. No post-download rewrite occurs.
 
 - `1200km-site-preview`: route-free workers.dev Worker for PRs and main builds.
 - `1200km-site`: main-only production Worker, behind the explicit repository
   variable `CLOUDFLARE_SITE_DEPLOY_ENABLED=true` and successful preview validation.
-- GitHub Pages: kept publishing the same artifact as the rollback origin.
-- The historical edge Worker files are retained, but its deployment workflow
-  must not be run after cutover: it would compete for the same production route.
+- GitHub Pages: the existing release remains unchanged as the rollback origin;
+  future complete releases publish only to Cloudflare.
+- The historical edge Worker files are retained, but its deployment job is
+  disabled so it cannot compete for the production route.
 
 Wrangler 4.142.0 is lockfile-pinned; deployment actions use full commit pins.
 Repository secrets contain the scoped Cloudflare token and account ID. Tokens
@@ -67,7 +66,9 @@ configuration. CSP is not relaxed. The CTI field manual uses its authored system
 font fallback instead of a CSP-blocked Google Fonts import. Source overlays fix
 body H1s, missing main landmarks, and narrow-screen intake controls before both
 server and client bundles are built. Skipped heading levels are closed while
-preserving heading IDs and peer/child relationships. HTML serialization handles valid unquoted
+preserving heading IDs and peer/child relationships. Ordinary prose retains
+natural wrapping; URLs and code retain their separate overflow handling.
+HTML serialization handles valid unquoted
 attributes without changing the DOM. Exact metadata overrides disambiguate
 companion titles/descriptions. Source commit dates provide a documented fallback
 for companion pages that have no authored/git-derived modification date.
@@ -87,31 +88,39 @@ node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --o
 node scripts/check-companion-browser.mjs --site ./dist --origin WORKERS_DEV_URL
 ```
 
-The preview reports differences from the older production release, but does not
-claim those releases are byte-identical. Its artifact/header/routing and complete
-companion coverage checks remain mandatory. Main-release production Worker
-verification uses strict parity after Pages publishes the same artifact.
-Unknown differences block cutover. Known policy additions absent from current
-GitHub responses are classified explicitly, not silently discarded.
+The preview reports differences from the older production release without
+claiming byte identity. Its artifact/header/routing and complete companion
+coverage checks remain mandatory. `migration-baseline.json` pins the complete
+frozen Pages build identity and explicitly reviewed before/after differences.
+HTML comparison hashes remove only the build marker, never research text,
+dates, citations, or arbitrary hashes. Unlisted or changed differences block
+strict production Worker verification. The review applies only against that
+exact unchanged rollback baseline. Once the domain serves the new release,
+ordinary strict parity compares production against its immutable artifact.
 
 ## Initial cutover
 
 1. Require all PR source, full-artifact, hosted-browser, and CodeQL checks green.
+   Review the actual preview parity report and pin its justified differences in
+   `migration-baseline.json`; unknown differences must remain blocking.
 2. Merge reviewed main and enable `CLOUDFLARE_SITE_DEPLOY_ENABLED`. The release
-   publishes the same artifact to Pages and the main-only Worker. Its exact apex
+   publishes only to Cloudflare; Pages remains frozen. The Worker's exact apex
    route is staged while the DNS record is still unproxied.
 3. Require the complete main release and strict production Worker parity green.
 4. Run `cloudflare-cutover.yml` from main with `mode=cutover` and that main
    `release_run_id`. It checks successful run provenance, exact artifact identity,
-   parity evidence less than an hour old, active apex TLS, SSL mode, account,
+   parity evidence less than an hour old, the exact pinned rollback identity
+   and review hash, active apex TLS, SSL mode, account,
    zone, the exact CNAME record ID/value, and the single expected Worker route.
 5. The only traffic switch is `proxied: false -> true` on the existing
    `1200km.com -> anpa1200.github.io` CNAME. Target, TTL, www, TXT records,
-   nameservers, and GitHub Pages remain unchanged. Both origins serve the same
-   build during DNS propagation. Snapshot and checks are retained as artifacts.
+   nameservers, and GitHub Pages remain unchanged. During DNS propagation,
+   visitors may reach either the preserved old release or the validated new
+   release. Both must remain healthy. Snapshot and checks are retained as artifacts.
 6. The workflow verifies the live Cloudflare build, complete HTTP contract and
-   browser search. It automatically restores `proxied:false` on verification
-   failure. Follow with real-browser companion checks and observation.
+   browser search and all companion browser probes. It automatically restores
+   `proxied:false` on verification failure. Observe the completed production
+   release before any later retirement of the rollback origin.
 
 ## Rollback
 
