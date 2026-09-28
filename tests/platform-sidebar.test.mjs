@@ -86,7 +86,8 @@ test('runtime sidebar exposes and classifies the Courses module', () => {
 
 test('Anomaly Detection Atlas belongs between detection rules and telemetry', () => {
   const modules = shell.sidebar.sections.find(section => section.id === 'detection-lab');
-  assert.deepEqual(modules.links.slice(2, 5).map(link => link.label), [
+  const detectionIndex = modules.links.findIndex(link => link.label === 'Detection Rules');
+  assert.deepEqual(modules.links.slice(detectionIndex, detectionIndex + 3).map(link => link.label), [
     'Detection Rules', 'Anomaly Detection Atlas', 'Telemetry Library',
   ]);
   for (const pathname of ['/anomaly-detection-atlas/', '/anomaly-detection-atlas/research/', '/anomaly-detection-atlas/families/parent-child/']) {

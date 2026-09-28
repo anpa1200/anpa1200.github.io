@@ -258,6 +258,8 @@ function extractAliases(html) {
 
 export function classifyUrl(urlValue) {
   const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
+  if (/^\/attack-matrix\/atlas\//i.test(pathname)) return 'ATLAS techniques';
+  if (pathname === '/attack-matrix/') return 'Attack & detection modules';
   if (pathname === KNOWLEDGE_SOURCES_PATHNAME) return 'Cyber Knowledge';
   if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actors';
   if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK techniques';
@@ -273,6 +275,8 @@ export function classifyUrl(urlValue) {
 
 export function classifyContentType(urlValue) {
   const pathname = normalizeSiteUrl(urlValue)?.pathname || '/';
+  if (/^\/attack-matrix\/atlas\//i.test(pathname)) return 'ATLAS technique';
+  if (pathname === '/attack-matrix/') return 'Tool';
   if (pathname === KNOWLEDGE_SOURCES_PATHNAME) return 'Knowledge source collection';
   if (/^\/threat-matrix\/actors\//i.test(pathname)) return 'Threat actor profile';
   if (/^\/threat-matrix\/techniques\//i.test(pathname)) return 'ATT&CK technique';
