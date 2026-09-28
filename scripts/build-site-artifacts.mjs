@@ -9,6 +9,7 @@ import {
   normalizeCanonical,
   parseSitemapEntries,
   validatePage,
+  pageUrlForRelativePath,
 } from './search-index-lib.mjs';
 import {
   parseJsonLd,
@@ -59,9 +60,7 @@ async function walk(directory = siteRoot) {
 
 function urlForFile(path) {
   const rel = relative(siteRoot, path).replace(/\\/g, '/');
-  if (rel === 'index.html') return 'https://1200km.com/';
-  if (rel.endsWith('/index.html')) return `https://1200km.com/${rel.slice(0, -'index.html'.length)}`;
-  return `https://1200km.com/${rel}`;
+  return pageUrlForRelativePath(rel);
 }
 
 function metaContent(html, key) {

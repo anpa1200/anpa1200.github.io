@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -57,7 +58,7 @@ function addBuildMeta(html) {
   return replaceVisibleBuild(html.replace(/<\/head>/i, `${meta}  </head>`));
 }
 
-const htmlFiles = (await walk()).filter((path) => path.endsWith('.html')).sort();
+const htmlFiles = (await walk()).filter((path) => path.endsWith('.html') && !isEvidenceDocument(relative(site, path))).sort();
 for (const path of htmlFiles) {
   const html = await readFile(path, 'utf8');
   await writeFile(path, addBuildMeta(html));

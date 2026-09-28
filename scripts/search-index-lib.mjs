@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { addHeadingIds, markPagefindContent } from './release-html-lib.mjs';
 import { topicsFromText } from './content-topic-lib.mjs';
@@ -114,9 +114,23 @@ export function normalizeSiteUrl(value, base = SITE_ORIGIN) {
   let pathname = url.pathname.replace(/\/{2,}/g, '/');
   if (pathname.endsWith('/index.html')) pathname = pathname.slice(0, -'index.html'.length);
   const finalSegment = pathname.split('/').pop() || '';
-  if (pathname !== '/' && !finalSegment.includes('.') && !pathname.endsWith('/')) pathname += '/';
+  if (pathname !== '/' && !finalSegment.includes('.') && !pathname.endsWith('/') && !fileStyleCompanion(pathname)) pathname += '/';
   url.pathname = pathname;
   return url;
+}
+
+// These pinned Docusaurus publications deliberately use trailingSlash:false.
+// Preserve their public canonicals instead of inventing nonexistent /foo/ URLs.
+export function fileStyleCompanion(pathname) {
+  return /^\/(?:Hexstrike-AI-guide|ai-vs-defense)\//.test(pathname);
+}
+
+export function pageUrlForRelativePath(relativePath) {
+  const path = relativePath.replaceAll('\\', '/');
+  if (path === 'index.html') return SITE_ORIGIN + '/';
+  if (path.endsWith('/index.html')) return SITE_ORIGIN + '/' + path.slice(0, -'index.html'.length);
+  if (fileStyleCompanion('/' + path) && path.endsWith('.html') && !path.endsWith('/404.html')) return SITE_ORIGIN + '/' + path.slice(0, -5);
+  return SITE_ORIGIN + '/' + path;
 }
 
 export function normalizeCanonical(value, base = SITE_ORIGIN) {
@@ -163,12 +177,12 @@ export function localFileForUrl(root, value) {
   else if (relativePath.endsWith('/')) candidates.push(`${relativePath}index.html`);
   else {
     candidates.push(relativePath);
-    if (!relativePath.split('/').pop()?.includes('.')) candidates.push(`${relativePath}/index.html`);
+    if (!relativePath.split('/').pop()?.includes('.')) candidates.push(`${relativePath}.html`, `${relativePath}/index.html`);
   }
   for (const candidate of candidates) {
     const path = resolve(root, candidate);
     if (!path.startsWith(`${resolve(root)}/`) && path !== resolve(root, 'index.html')) continue;
-    if (existsSync(path)) return path;
+    if (existsSync(path) && statSync(path).isFile()) return path;
   }
   return null;
 }

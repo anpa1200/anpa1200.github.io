@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { SITE_ORIGIN, normalizeSiteUrl, validatePage } from './search-index-lib.mjs';
+import { pageUrlForRelativePath, normalizeSiteUrl, validatePage } from './search-index-lib.mjs';
 import { withAnomalyTopicLoader } from './anomaly-tags-lib.mjs';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const args = process.argv.slice(2);
 const siteIndex = args.indexOf('--site');
@@ -24,9 +25,10 @@ let injected = 0;
 let topicInjected = 0;
 for (const file of await walk(site)) {
   const relative = file.slice(site.length).replace(/\\/g, '/');
+  if (isEvidenceDocument(relative)) continue;
   let html = await readFile(file, 'utf8');
   if (relative === '/threat-matrix/index.html') continue;
-  const pageUrl = normalizeSiteUrl(new URL(relative, SITE_ORIGIN).href);
+  const pageUrl = normalizeSiteUrl(pageUrlForRelativePath(relative.slice(1)));
   if (!pageUrl) continue;
   const withTopics = withAnomalyTopicLoader(html, pageUrl.href);
   if (withTopics !== html) {

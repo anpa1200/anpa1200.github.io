@@ -3,22 +3,30 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-export async function prepareCompanionSource(source, mount, configPath) {
-  let config = await readFile(configPath, 'utf8');
-  // Docusaurus removes the document title before user remark plugins run. Any
-  // remaining H1 is a body section, not a second page title. Keeping IDs means
-  // existing fragment links and the already calculated TOC remain valid.
-  const overlay = `
-// 1200km migration: apply the same heading hierarchy in SSR and client output.
-function migrationBodyHeadings() {
-  return (tree) => {
+export function migrationBodyHeadings() {
+  return (tree, file) => {
+    // Docusaurus retains a recognized content title inside an MDX <header>.
+    // If it did not recognize one, DocItem supplies its own synthetic H1.
+    let preserveTitle = typeof file.data.contentTitle === 'string';
     const visit = (node) => {
-      if (node.type === 'heading' && node.depth === 1) node.depth = 2;
+      if (node.type === 'heading' && node.depth === 1) {
+        if (preserveTitle) preserveTitle = false;
+        else node.depth = 2;
+      }
       for (const child of node.children || []) visit(child);
     };
     visit(tree);
   };
 }
+
+export async function prepareCompanionSource(source, mount, configPath) {
+  let config = await readFile(configPath, 'utf8');
+  config = config.replace(/\n\/\/ 1200km migration:[\s\S]*?(?=\n(?:export default config;|module\.exports\s*=\s*config;))/, '\n');
+  // Preserve Docusaurus's content-title H1 or synthetic DocItem title. Only
+  // extra body H1s become H2s, keeping IDs and the precomputed TOC intact.
+  const overlay = `
+// 1200km migration: apply the same heading hierarchy in SSR and client output.
+${migrationBodyHeadings.toString()}
 for (const preset of config.presets || []) {
   if (!Array.isArray(preset) || !preset[1] || preset[1].docs === false) continue;
   preset[1].docs ||= {};

@@ -2,6 +2,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -47,6 +48,7 @@ if (expectedCommit && identity.site_commit !== expectedCommit) failures.push(`ex
 
 const pages = await walk();
 for (const path of pages) {
+  if (isEvidenceDocument(relative(site, path))) continue;
   const html = await readFile(path, 'utf8');
   const matches = [...html.matchAll(/<meta\b[^>]*name=["']1200km-build["'][^>]*>/gi)];
   if (matches.length !== 1) failures.push(`${relative(site, path)} has ${matches.length} build identity tags`);

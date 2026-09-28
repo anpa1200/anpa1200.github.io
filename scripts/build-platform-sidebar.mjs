@@ -4,6 +4,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadSiteShell } from './site-shell-lib.mjs';
 import { applyPlatformSidebar, isSidebarEligible } from './platform-sidebar-lib.mjs';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -33,6 +34,7 @@ const shell = loadSiteShell(siteRoot);
 let integrated = 0;
 let excluded = 0;
 for (const path of (await walk()).sort()) {
+  if (isEvidenceDocument(relative(siteRoot, path))) { excluded += 1; continue; }
   const html = await readFile(path, 'utf8');
   if (!isSidebarEligible(html)) {
     excluded += 1;

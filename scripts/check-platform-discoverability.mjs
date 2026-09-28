@@ -6,8 +6,9 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { parseJsonLd } from './release-html-lib.mjs';
-import { canonicalFromHtml, findMetaContent, normalizeCanonical, validatePage } from './search-index-lib.mjs';
+import { canonicalFromHtml, findMetaContent, normalizeCanonical, validatePage, pageUrlForRelativePath } from './search-index-lib.mjs';
 import { isSidebarEligible } from './platform-sidebar-lib.mjs';
+import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -32,9 +33,7 @@ async function walk(directory = siteRoot) {
 
 function urlForFile(path) {
   const rel = relative(siteRoot, path).replace(/\\/g, '/');
-  if (rel === 'index.html') return 'https://1200km.com/';
-  if (rel.endsWith('/index.html')) return `https://1200km.com/${rel.slice(0, -'index.html'.length)}`;
-  return `https://1200km.com/${rel}`;
+  return pageUrlForRelativePath(rel);
 }
 
 function count(pattern, value) {
@@ -44,6 +43,7 @@ function count(pattern, value) {
 const pages = [];
 const violations = [];
 for (const path of (await walk()).sort()) {
+  if (isEvidenceDocument(relative(siteRoot, path))) continue;
   const html = await readFile(path, 'utf8');
   const rel = relative(siteRoot, path).replace(/\\/g, '/');
   const url = urlForFile(path);

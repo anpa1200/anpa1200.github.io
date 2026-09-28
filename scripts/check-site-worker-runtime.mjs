@@ -31,7 +31,7 @@ for (const [path, body] of Object.entries(fixtures)) {
   await writeFile(join(temporary, path), body);
 }
 const child = spawn(process.execPath, [join(root, 'cloudflare/node_modules/wrangler/bin/wrangler.js'),
-  'dev', '--local', '--config', 'cloudflare/wrangler.site.json', '--assets', temporary,
+  'dev', '--local', '--config', 'cloudflare/wrangler.preview.json', '--assets', temporary,
   '--ip', '127.0.0.1', '--port', String(port), '--inspector-port', '0'], {
   cwd: root, env: { ...process.env, WRANGLER_SEND_METRICS: 'false', CHOKIDAR_USEPOLLING: 'true', CI: 'true' }, stdio: ['ignore', 'pipe', 'pipe'],
 });
