@@ -4,6 +4,13 @@ The user authorized the production migration after the phase-one preview.
 GitHub remains source of truth; GitHub Actions builds the site. Cloudflare does
 not rebuild it or proxy missing content to GitHub at request time.
 
+**Cutover hold:** the complete combined artifact is approximately 1.9 GB, above
+GitHub Pages' documented 1 GB published-site limit. The user must choose between
+retaining the current Pages deployment as a frozen rollback (recommended) or
+first reducing the artifact for continued dual publishing. Until that choice is
+resolved and reflected in the workflow, parity guards, and tests, do not merge
+or execute the dual-publishing cutover sequence below. Production is unchanged.
+
 ## Release architecture
 
 `quality` builds and validates `${RUNNER_TEMP}/site`, including the pinned article
@@ -123,3 +130,4 @@ explicitly approved retirement of the old hosting.
 - [Header policy](https://developers.cloudflare.com/workers/static-assets/headers/)
 - [Worker routes](https://developers.cloudflare.com/workers/configuration/routing/routes/)
 - [Static Assets limits](https://developers.cloudflare.com/workers/platform/limits/#static-assets)
+- [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits)

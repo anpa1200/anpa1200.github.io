@@ -190,11 +190,17 @@ async function attachPage(devtools, url, metrics = null, options = {}) {
   if (metrics) await devtools.send('Emulation.setDeviceMetricsOverride', metrics, sessionId);
   if (options.disableScripts) await devtools.send('Emulation.setScriptExecutionDisabled', { value: true }, sessionId);
   await devtools.send('Page.navigate', { url }, sessionId);
+  const target = new URL(url);
+  // Native disclosure hit-testing must wait for CSS/fonts, not merely parsed
+  // HTML. Also never accept the previous about:blank document as navigation.
+  const ready = options.disableScripts
+    ? "document.readyState === 'complete' && document.fonts.status === 'loaded'"
+    : "document.readyState === 'interactive' || document.readyState === 'complete'";
   await waitForExpression(
     devtools,
     sessionId,
-    `document.readyState === 'interactive' || document.readyState === 'complete'`,
-    `navigation to ${new URL(url).pathname}`
+    `location.origin === ${JSON.stringify(target.origin)} && ${JSON.stringify([target.pathname, `${target.pathname}/`])}.includes(location.pathname) && (${ready})`,
+    `navigation to ${target.pathname}`
   );
   return { targetId, sessionId };
 }
