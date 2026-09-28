@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { sameOriginPlatformAssets, validateCompanions } from '../scripts/companion-sites-lib.mjs';
+import { sameOriginPlatformAssets, validateCompanions, rightSizeShellLogos } from '../scripts/companion-sites-lib.mjs';
 import { normalizeSiteUrl, pageUrlForRelativePath } from '../scripts/search-index-lib.mjs';
 import { migrationBodyHeadings } from '../scripts/prepare-companion-source.mjs';
 
@@ -25,6 +25,8 @@ test('CSP overlay rewrites platform assets only and survives serialized configur
   assert.equal(sameOriginPlatformAssets(transformed), transformed);
   assert.equal(sameOriginPlatformAssets('https://1200km.com/assets/unrelated.js'), 'https://1200km.com/assets/unrelated.js');
   assert.equal(sameOriginPlatformAssets(JSON.stringify({ asset: 'https://1200km.com/assets/site-theme.css?v=1' })), '{"asset":"/assets/site-theme.css?v=1"}');
+  assert.equal(sameOriginPlatformAssets('@import url(/assets/site-theme.css?v=20260721-shell);'), '@import url(/assets/site-theme.css?v=20260904-light-default);');
+  assert.equal(sameOriginPlatformAssets('https://example.org/assets/site-theme.css?v=20260721-shell'), 'https://example.org/assets/site-theme.css?v=20260721-shell');
 });
 
 test('file-style companion canonicals remain extensionless without an invented slash', () => {
@@ -32,6 +34,14 @@ test('file-style companion canonicals remain extensionless without an invented s
   assert.equal(normalizeSiteUrl('https://1200km.com/Hexstrike-AI-guide/docs/about').pathname, '/Hexstrike-AI-guide/docs/about');
   assert.equal(pageUrlForRelativePath('about.html'), 'https://1200km.com/about.html');
   assert.equal(pageUrlForRelativePath('cti-analyst-field-manual/docs/intro/index.html'), 'https://1200km.com/cti-analyst-field-manual/docs/intro/');
+});
+
+test('staged small decorative shell logos use the existing 2x rendition only', () => {
+  const small = '<img src="/assets/ap-logo.png" alt="" width="36" height="36">';
+  assert.equal(rightSizeShellLogos(small), small.replace('ap-logo.png', 'ap-logo-72.png'));
+  for (const retained of [small.replace('alt=""', 'alt="Research evidence"'), small.replace('width="36"', 'width="720"'), '<img src="/evidence.png" alt="" width="32" height="32">']) {
+    assert.equal(rightSizeShellLogos(retained), retained);
+  }
 });
 
 test('heading overlay preserves Docusaurus content titles and handles synthetic titles', () => {

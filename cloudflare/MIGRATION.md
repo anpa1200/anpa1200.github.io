@@ -68,6 +68,11 @@ body H1s, missing main landmarks, and narrow-screen intake controls before both
 server and client bundles are built. Skipped heading levels are closed while
 preserving heading IDs and peer/child relationships. Ordinary prose retains
 natural wrapping; URLs and code retain their separate overflow handling.
+Staged 32/36-pixel decorative shell logos use the existing 72-pixel rendition;
+research images and the full-size logo URL are preserved. Historical theme CSS
+cache keys are aligned with the current authored key. The existing performance
+budgets are unchanged. Browser audits verify the destination before injecting
+accessibility checks and fail explicitly on protocol timeouts.
 HTML serialization handles valid unquoted
 attributes without changing the DOM. Exact metadata overrides disambiguate
 companion titles/descriptions. Source commit dates provide a documented fallback

@@ -58,7 +58,8 @@ if (mode === 'status') {
 } else {
   assert.equal(record.proxied, false, 'Already proxied; do not repeat a cutover blindly');
   assert.ok(['full', 'strict'].includes(ssl.value), 'TLS must not use Flexible mode');
-  assert.ok(certificates.some((cert) => cert.status === 'active' && cert.hosts.includes('1200km.com')), 'Active apex TLS certificate required');
+  assert.ok(certificates.some((cert) => cert.status === 'active'
+    && Array.isArray(cert.hosts) && cert.hosts.some((host) => host === '1200km.com')), 'Active apex TLS certificate required');
   assert.equal(routes.length, 1, 'Unexpected route topology; stop for review');
   assert.equal(routes[0].pattern, '1200km.com/*');
   assert.equal(routes[0].script, '1200km-site');
