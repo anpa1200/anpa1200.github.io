@@ -108,6 +108,12 @@ export function createSiteWorker(headerText) {
   const rules = parseHeaderPolicy(headerText);
   const finish = (response, pathname, request, status = response.status) => {
     const headers = responseHeaders(response.headers, pathname, rules);
+    // Production ASSETS omits these charsets even though local workerd adds
+    // them. Preserve Pages' UTF-8 declaration without changing redirect MIME.
+    const mime = headers.get('Content-Type') || '';
+    if (![301, 302, 303, 307, 308].includes(status) && /^text\/(?:html|css|plain)$/i.test(mime)) {
+      headers.set('Content-Type', `${mime}; charset=utf-8`);
+    }
     // Wrangler cannot infer MIME for Pagefind's .pf_* / .pagefind binaries.
     // GitHub Pages uses octet-stream for unknown extensions; match that default.
     if (!headers.has('Content-Type') && ![204, 205, 304].includes(status)) headers.set('Content-Type', 'application/octet-stream');

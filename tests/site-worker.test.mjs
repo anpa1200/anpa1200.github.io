@@ -128,6 +128,15 @@ test('untyped Pagefind binaries and JSON retain Pages MIME types', async () => {
   assert.equal(response.headers.get('Content-Type'), 'application/json; charset=utf-8');
 });
 
+test('live ASSETS text MIME without charset retains the Pages UTF-8 declaration', async () => {
+  for (const [path, mime] of [['/about.html', 'text/html'], ['/assets/test.css', 'text/css'], ['/robots.txt', 'text/plain']]) {
+    const response = await get(path, {}, { ASSETS: { fetch: async () => new Response('UTF-8 evidence', { headers: { 'Content-Type': mime } }) } });
+    assert.equal(response.headers.get('Content-Type'), `${mime}; charset=utf-8`);
+  }
+  const redirect = await get('/articles');
+  assert.equal(redirect.headers.get('Content-Type'), 'text/html');
+});
+
 test('every _headers declaration is enforced independently of the binding', () => {
   // Independent reference interpreter, tested at a witness for every rule and
   // nested wildcard. No generated copy of the policy can silently become stale.
