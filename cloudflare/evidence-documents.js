@@ -9,3 +9,12 @@ export const EVIDENCE_DOCUMENTS = new Map([
   ['anomaly-detection-atlas/reports/cti-ir/sysdig-teamtnt-kubelet.html', '5199bdb28501783aec36e9cb98658d0e97138ad9721e89c58a799423427a8cc4'],
 ]);
 export const isEvidenceDocument = (path) => EVIDENCE_DOCUMENTS.has(path.replace(/^\//, ''));
+
+// Public requests may use the same extensionless aliases as every other HTML
+// asset. Apply the download boundary to those aliases too; source-file checks
+// above deliberately continue to match only the exact pinned filenames.
+export function isEvidenceRequest(pathname) {
+  let path;
+  try { path = decodeURIComponent(pathname); } catch { return false; }
+  return isEvidenceDocument(path) || isEvidenceDocument(`${path}.html`);
+}

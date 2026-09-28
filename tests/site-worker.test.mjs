@@ -65,11 +65,14 @@ test('production HTTP redirects to HTTPS without dropping path or query', async 
 
 test('third-party source captures are unmodified downloads and never executable indexed pages', async () => {
   const path = '/anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html';
-  const response = await get(path, {}, environment(new Map([[path, ['SOURCE CAPTURE', 'text/html']]])));
-  assert.equal(await response.text(), 'SOURCE CAPTURE');
-  assert.equal(response.headers.get('Content-Disposition'), 'attachment');
-  assert.match(response.headers.get('Content-Security-Policy'), /sandbox/);
-  assert.match(response.headers.get('X-Robots-Tag'), /noindex/);
+  for (const requestPath of [path, path.slice(0, -5)]) {
+    const response = await get(requestPath, {}, environment(new Map([[path, ['SOURCE CAPTURE', 'text/html']]])));
+    assert.equal(await response.text(), 'SOURCE CAPTURE');
+    assert.equal(response.headers.get('Content-Disposition'), 'attachment');
+    assert.match(response.headers.get('Content-Security-Policy'), /sandbox/);
+    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+  }
+  assert.equal(responseHeaders({}, path.replace('/f5-', '/%665-'), parseHeaderPolicy(policy)).get('Content-Disposition'), 'attachment');
 });
 
 test('unknown requests serve root 404 with 404 status, even nested and conditional requests', async () => {

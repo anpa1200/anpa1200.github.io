@@ -1,6 +1,6 @@
 // This is deliberately separate from the currently configured production Worker.
 // Regression tests compare its agent behavior with agent-readiness-worker.js.
-import { isEvidenceDocument } from './evidence-documents.js';
+import { isEvidenceRequest } from './evidence-documents.js';
 export const MARKDOWN_ROUTES = new Map([
   ['/', '/index.md'],
   ['/projects/', '/projects.md'],
@@ -85,7 +85,7 @@ export function responseHeaders(original, pathname, rules) {
   if (pathname.endsWith('.json') && !headers.get('Content-Type')?.startsWith('text/html')) {
     headers.set('Content-Type', 'application/json; charset=utf-8');
   }
-  if (isEvidenceDocument(pathname)) {
+  if (isEvidenceRequest(pathname)) {
     headers.set('X-Robots-Tag', 'noindex, nofollow');
     headers.set('Content-Disposition', 'attachment');
     headers.set('Content-Security-Policy', "default-src 'none'; sandbox; frame-ancestors 'none'");
@@ -123,7 +123,7 @@ export function createSiteWorker(headerText) {
     // Wrangler cannot infer MIME for Pagefind's .pf_* / .pagefind binaries.
     // GitHub Pages uses octet-stream for unknown extensions; match that default.
     if (!headers.has('Content-Type') && ![204, 205, 304].includes(status)) headers.set('Content-Type', 'application/octet-stream');
-    if (new URL(request.url).hostname.endsWith('.workers.dev')) headers.set('X-Robots-Tag', 'noindex');
+    if (new URL(request.url).hostname.endsWith('.workers.dev')) appendUnique(headers, 'X-Robots-Tag', 'noindex');
     return new Response(request.method === 'HEAD' || [204, 205, 304].includes(status) ? null : response.body, { status, headers });
   };
 
