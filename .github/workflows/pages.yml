@@ -25,6 +25,8 @@ jobs:
   quality:
     timeout-minutes: 35
     runs-on: ubuntu-latest
+    outputs:
+      static-artifact-id: ${{ steps.static-artifact.outputs.artifact-id }}
     steps:
       # fetch-depth: 0 (full history) is required here, not cosmetic: both
       # build-content-catalog.mjs and build-site-artifacts.mjs date pages via
@@ -49,6 +51,12 @@ jobs:
         run: npm audit --package-lock-only --audit-level=high
       - name: Validate search source
         run: npm run check-release-source
+      - name: Validate isolated Static Assets Worker and hosting invariants
+        run: |
+          npm run check-site-worker
+          npm ci --prefix cloudflare
+          npm audit --prefix cloudflare --package-lock-only --audit-level=high
+          npm run check-site-worker:runtime
       - name: Validate reviewed anomaly navigation
         run: |
           npm run check-anomaly-tags
@@ -239,6 +247,87 @@ jobs:
         with:
           path: ${{ runner.temp }}/site
           include-hidden-files: true
+      - name: Preserve exact validated site for parallel Cloudflare preview
+        id: static-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: validated-static-site-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/site
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  cloudflare-preview:
+    # Never expose deployment credentials to a fork PR. Using pull_request,
+    # not pull_request_target, also keeps the existing production deploy skipped.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    needs: quality
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    concurrency:
+      group: cloudflare-1200km-site-preview
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+      - name: Download this run's immutable quality artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          artifact-ids: ${{ needs.quality.outputs.static-artifact-id }}
+          path: ./dist
+          merge-multiple: true
+      - name: Verify exact artifact bytes and isolated deployment configuration
+        run: |
+          npm run check-site-worker
+          node scripts/check-static-artifact.mjs --site ./dist --site-commit "${GITHUB_SHA}"
+      - name: Install locked deployment tooling
+        run: npm ci --prefix cloudflare
+      - name: Require existing deployment secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo '::error::Missing repository Actions secret CLOUDFLARE_API_TOKEN'; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo '::error::Missing repository Actions secret CLOUDFLARE_ACCOUNT_ID'; exit 1; }
+      - name: Deploy separate workers.dev site without production routes
+        id: cloudflare-deployment
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare
+          wranglerVersion: 4.142.0
+          command: deploy --config wrangler.site.json
+      - name: Compare preview against artifact and existing production
+        env:
+          PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
+        run: >-
+          node scripts/verify-hosting-parity.mjs
+          --site ./dist
+          --preview-origin "$PREVIEW_URL"
+          --report "${RUNNER_TEMP}/cloudflare-parity.json"
+      - name: Verify actual Pagefind search and browser fragment navigation
+        if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
+        env:
+          PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
+        run: |
+          set -o pipefail
+          node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin "$PREVIEW_URL" 2>&1 | tee "${RUNNER_TEMP}/cloudflare-search-browser.log"
+      - name: Preserve preview parity and browser evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: cloudflare-preview-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/cloudflare-parity.json
+            ${{ runner.temp }}/cloudflare-search-browser.log
+          if-no-files-found: warn
+          retention-days: 30
 
   deploy:
     if: ${{ github.event_name != 'pull_request' }}

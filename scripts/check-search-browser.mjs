@@ -13,6 +13,8 @@ const bundleIndex = args.indexOf('--bundle');
 const bundle = resolve(bundleIndex >= 0 ? args[bundleIndex + 1] : 'pagefind');
 const siteIndex = args.indexOf('--site');
 const site = resolve(siteIndex >= 0 ? args[siteIndex + 1] : ROOT);
+const originIndex = args.indexOf('--origin');
+const liveOrigin = originIndex >= 0 ? new URL(args[originIndex + 1]).origin : '';
 const chrome = process.env.CHROME_PATH || 'google-chrome';
 
 if (!existsSync(join(bundle, 'pagefind.js'))) throw new Error(`Pagefind bundle not found at ${bundle}`);
@@ -192,7 +194,7 @@ await new Promise((resolvePromise, reject) => {
   server.listen(0, '127.0.0.1', resolvePromise);
 });
 const address = server.address();
-const origin = `http://127.0.0.1:${address.port}`;
+const origin = liveOrigin || `http://127.0.0.1:${address.port}`;
 const profile = await mkdtemp(join(tmpdir(), '1200km-search-chrome-'));
 const browser = spawn(chrome, [
   '--headless=new',
@@ -240,6 +242,14 @@ const devtools = new DevTools(socket);
 const failures = [];
 
 try {
+  if (liveOrigin) {
+    // The server cannot receive fragments. Check browser inheritance through
+    // the directory redirect and preservation of the query at the real edge.
+    const fragmentPage = await attachPage(devtools, `${origin}/articles?migration=parity#hosting-fragment`);
+    const location = await evaluate(devtools, fragmentPage.sessionId, 'location.href');
+    if (location !== `${origin}/articles/?migration=parity#hosting-fragment`) failures.push(`directory redirect lost URL state: ${location}`);
+    await devtools.send('Target.closeTarget', { targetId: fragmentPage.targetId });
+  }
   const searchPage = await attachPage(devtools, `${origin}/search.html?q=T1059.003`, {
     width: 390,
     height: 844,
