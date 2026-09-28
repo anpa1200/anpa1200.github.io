@@ -48,6 +48,8 @@ const catalogPath = resolve(option('--catalog', join(siteRoot, 'data', 'content-
 const knowledgeSourcesPath = resolve(option('--knowledge-sources', join(siteRoot, 'data', 'knowledge-sources.json')));
 const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledge-sources', '165'), 10);
 const requiredIndexUrls = [
+  `${SITE_ORIGIN}/attack-matrix/`,
+  `${SITE_ORIGIN}/attack-matrix/atlas/AML.T0051/`,
   ...(remote ? ['https://1200km.com/anomaly-detection-atlas/', 'https://1200km.com/anomaly-detection-atlas/research/', 'https://1200km.com/anomaly-detection-atlas/families/', 'https://1200km.com/anomaly-detection-atlas/visuals/', 'https://1200km.com/anomaly-detection-atlas/research/provenance/', ...atlas.pages.map(p => p.url)] : []),
   `${SITE_ORIGIN}/ttp-simulation/`,
   `${SITE_ORIGIN}/ttp-simulation/tools/`,
