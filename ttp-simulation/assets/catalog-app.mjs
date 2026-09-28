@@ -34,6 +34,7 @@ function renderInventory(catalog) {
   const facets = (field) => [...new Set(catalog.records.flatMap((row) => row[field]))].sort();
   const select = (name, label, values) => `<label>${label}<select name="${name}"><option value="">All ${label.toLowerCase()}</option>${values.map((value) => `<option value="${escape(value)}">${escape(value)}</option>`).join('')}</select></label>`;
   app.innerHTML = `<section class="hero"><div><p class="eyebrow">DETECTION ENGINEERING / SIMULATION CATALOG</p><h1>Attack Simulations</h1><p class="lead">Find the behavior. Check the telemetry. Build the right lab.</p><p>Every active Enterprise, Mobile, and ICS technique has its own workspace. Start by filtering the inventory—not by running an unreviewed command.</p></div><div class="version">ATT&CK ${escape(catalog.attack_version)}<small>Pinned source snapshot</small></div></section>
+    <p><a href="/attack-matrix/">Explore the interactive ATT&amp;CK &amp; ATLAS matrix →</a></p>
     <section class="metrics" aria-label="Inventory totals">
       <div><strong>${catalog.counts.total}</strong><span>Techniques + sub-techniques</span></div>
       <div><strong>${catalog.counts.by_classification.can_simulate || 0}</strong><span>Documented simulation candidates</span></div>

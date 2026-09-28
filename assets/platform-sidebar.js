@@ -15,6 +15,7 @@
       ['Projects', '/projects.html', ['/projects.html']]
     ] },
     { label: 'Attack & detection modules', links: [
+      ['ATT&CK & ATLAS Matrix', '/attack-matrix/', ['/attack-matrix/']],
       ['Attack Tools', '/ttp-simulation/tools/', ['/ttp-simulation/tools/']],
       ['Attack Simulations', '/ttp-simulation/', ['/ttp-simulation/index.html', '/ttp-simulation/techniques/']],
       ['Detection Rules', '/ttp-simulation/detections/', ['/ttp-simulation/detections/']],

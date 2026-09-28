@@ -330,6 +330,7 @@ function inferType(url, title, html, collection) {
     if (/\/labs?\//i.test(path) || /\/simulations\/scenarios\//i.test(path)) return 'lab';
     return collection.primary_type;
   }
+  if (/^\/attack-matrix\/atlas\//i.test(path)) return 'generated-reference';
   if (/^\/threat-matrix\/actors\//i.test(path)) return 'reference-entity';
   if (/^\/threat-matrix\/techniques\//i.test(path)) return 'generated-reference';
   if (path === '/threat-matrix/') return 'tool';
@@ -349,6 +350,8 @@ function inferType(url, title, html, collection) {
 function inferDomain(url, title, html, collection) {
   const path = new URL(url).pathname;
   const text = `${path} ${title} ${findMetaContent(html, 'description')}`;
+  if (/^\/attack-matrix\/atlas\//i.test(path)) return 'ai-security';
+  if (path === '/attack-matrix/') return 'threat-intelligence';
   if (/^\/threat-matrix\//i.test(path)) return 'threat-intelligence';
   if (collection?.id === 'collection:trainsec-library') {
     if (/\/career-guides-(?:cybersecurity-salaries|is-malware-analysis-right-for-you)/i.test(path)) return 'professional-profile';

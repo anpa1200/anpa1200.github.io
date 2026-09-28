@@ -163,7 +163,9 @@ const libraryPages = [
   ['telemetry/', 'Telemetry Library', 'Detection inputs, common providers, configuration guidance, synthetic event examples and links to relevant simulations, tools and detection workspaces.', telemetry, { telemetry: 'index' }],
 ];
 for (const [page, title, description, rows, interactive] of libraryPages) {
-  renderPage({ page, title, description, kind: 'index', interactive, core: section('Complete reference directory', list(rows.map((r) => a(r.page, r.title || r.name)))), connections: section('Explore the three modules', `<p>${NAV.slice(0, 5).map(([u, l]) => a(u, l)).join(' · ')}</p>`) + (page === 'detections/' ? section('Individual rule sources', `<p>${a('detections/rules/', `Browse all ${rules.length} original Sigma rules`)}</p>`) : '') });
+  // A reciprocal navigation route, not an inferred technique/control mapping.
+  const matrixEntry = section('Explore the matrix', `<p>${a('/attack-matrix/', 'Interactive ATT&CK & ATLAS Matrix')} — browse Enterprise, Mobile, ICS and AI technique pages by tactic.</p>`);
+  renderPage({ page, title, description, kind: 'index', interactive, core: matrixEntry + section('Complete reference directory', list(rows.map((r) => a(r.page, r.title || r.name)))), connections: section('Explore the three modules', `<p>${NAV.slice(0, 5).map(([u, l]) => a(u, l)).join(' · ')}</p>`) + (page === 'detections/' ? section('Individual rule sources', `<p>${a('detections/rules/', `Browse all ${rules.length} original Sigma rules`)}</p>`) : '') });
 }
 renderPage({ page: 'detections/rules/', title: 'Sigma Rule Source Index', description: `${rules.length} original source rules with stable pages, exact TTP links, logsource tags and source attribution.`, kind: 'index', core: section('Complete Sigma rule directory', list(rules.map((r) => a(rulePage(r.id), r.title)))) });
 
