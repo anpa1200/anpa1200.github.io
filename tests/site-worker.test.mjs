@@ -248,3 +248,12 @@ test('asset caching is immutable only for content-hashed filenames', async () =>
   const missing = await get('/assets/missing.js');
   assert.equal(missing.headers.get('Cache-Control'), null);
 });
+
+test('cover-letter HTML and PDF remain crawlable but non-indexable', () => {
+  const robots = readFileSync(new URL('../robots.txt', import.meta.url), 'utf8');
+  assert.doesNotMatch(robots, /Disallow:\s*\/cover-letter\.(?:html|pdf)/i);
+  for (const path of ['/cover-letter.html', '/cover-letter.pdf']) {
+    const headers = responseHeaders({}, path, parseHeaderPolicy(policy));
+    assert.equal(headers.get('X-Robots-Tag'), 'noindex, nofollow');
+  }
+});
