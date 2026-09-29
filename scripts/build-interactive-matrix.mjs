@@ -54,25 +54,54 @@ function descriptionHtml(text){
     for(const match of paragraph.matchAll(/\[([^\]]+)\]\(([^\s)]+)\)/g)){
       out+=h(paragraph.slice(last,match.index));let url=match[2];
       if(/^\/techniques\/AML\.T\d{4}(?:\.\d{3})?\/?$/.test(url)) {const id=url.split('/')[2];url=sources.atlas.techniques.some(r=>r.id===id)?local(id):'https://atlas.mitre.org'+url;}
+      else if(/^\/mitigations\/AML\.M\d{4}\/?$/.test(url)) url='/attack-matrix/atlas/mitigations/#'+url.split('/')[2];
+      else if(/^\/studies\/AML\.CS\d{4}\/?$/.test(url)) url='/attack-matrix/atlas/case-studies/#'+url.split('/')[2];
+      else if(/^\/tactics\/AML\.TA\d{4}\/?$/.test(url)) url='/attack-matrix/?view=atlas&tactic='+url.split('/')[2]+'#matrix';
       else if(url.startsWith('/'))url='https://atlas.mitre.org'+url;
-      out+=/^https:\/\//.test(url)?a(url,match[1]):h(match[0]);last=match.index+match[0].length;
+      else if(url.startsWith('https://atlas.mitre.org/'))url=atlasSourceUrl(url);
+      out+=/^(?:https:\/\/|\/(?!\/))/.test(url)?a(url,match[1]):h(match[0]);last=match.index+match[0].length;
     }
     return '<p>'+out+h(paragraph.slice(last))+'</p>';
   }).join('');
 }
 const ul=items=>items.length?'<ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p>No explicit relationship in this pinned source.</p>';
+function atlasSourceUrl(url) {
+  const parsed=new URL(url);
+  if(parsed.origin!=='https://atlas.mitre.org')return url;
+  const path=parsed.pathname;
+  if(/^\/techniques\/AML\.T\d{4}(?:\.\d{3})?\/?$/.test(path))return local(path.split('/')[2]);
+  if(/^\/mitigations\/AML\.M\d{4}\/?$/.test(path))return '/attack-matrix/atlas/mitigations/#'+path.split('/')[2];
+  if(/^\/studies\/AML\.CS\d{4}\/?$/.test(path))return '/attack-matrix/atlas/case-studies/#'+path.split('/')[2];
+  if(/^\/tactics\/AML\.TA\d{4}\/?$/.test(path))return '/attack-matrix/?view=atlas&tactic='+path.split('/')[2]+'#matrix';
+  return url;
+}
+function atlasRelationshipIndex(key, path, title, description) {
+  const entries=new Map();
+  for(const technique of sources.atlas.techniques) for(const relation of technique[key]) {
+    const current=entries.get(relation.id)||{...relation,techniques:[]};
+    current.techniques.push(technique);
+    entries.set(relation.id,current);
+  }
+  page(path,title,description,`
+  <section class="im-hero"><p class="im-eyebrow">MITRE ATLAS ${h(sources.atlas.version)} / source relationships</p><h1>${h(title)}</h1><p>${h(description)}</p><p>${a('/attack-matrix/?view=atlas#matrix','← ATLAS matrix')} · ${a(sources.atlas.source.url,'Pinned MITRE source')} · ${a('https://atlas.mitre.org/','Current MITRE ATLAS site')}</p></section>
+  <section class="im-detail"><h2>Relationship index</h2><p>Names and technique relationships below come from the pinned MITRE release. This index does not reproduce full mitigation or case-study records, prove control effectiveness, or imply a live incident.</p>
+  ${[...entries.values()].sort((a,b)=>a.id.localeCompare(b.id)).map(relation=>`<section id="${h(relation.id)}"><h3>${h(relation.id)} — ${h(relation.name)}</h3>${relation.type?`<p>Source type: ${h(relation.type)}.</p>`:''}<p>Related ATLAS techniques:</p>${ul(relation.techniques.map(technique=>a(local(technique.id),`${technique.id} ${technique.name}`)))}</section>`).join('')}</section>${related}`,
+  {keywords:['MITRE ATLAS',title]});
+}
+atlasRelationshipIndex('mitigations','attack-matrix/atlas/mitigations/','ATLAS mitigation relationships','Source-linked mitigation IDs and their related ATLAS techniques.');
+atlasRelationshipIndex('case_studies','attack-matrix/atlas/case-studies/','ATLAS case-study relationships','Source-linked case-study IDs and their related ATLAS techniques.');
 for(const row of sources.atlas.techniques){
   const peers=sources.atlas.techniques.filter(r=>r.parent_id===row.id),parent=sources.atlas.techniques.find(r=>r.id===row.parent_id);
   const attack=inventory.records.filter(r=>r.id===row.attack_reference?.id);
   const scopeLink=(key,value,label)=>a('/attack-matrix/?'+new URLSearchParams({view:'atlas',[key]:value})+'#matrix',label);
   page(`attack-matrix/atlas/${row.id}/`,`${row.id} ${row.name} — ATLAS technique`,`${row.id} ${row.name}: MITRE ATLAS source definition, tactics, platforms, related techniques, mitigations and case studies.`,`
-  <section class="im-hero"><p class="im-eyebrow">MITRE ATLAS ${h(sources.atlas.version)} / technique reference</p><h1>${h(row.id)}<br>${h(row.name)}</h1><p>${a('/attack-matrix/?view=atlas#matrix','← Back to the ATLAS matrix')} · ${a('https://atlas.mitre.org/techniques/'+row.id,'Official MITRE definition')}</p><div class="im-tags">${row.platforms.map(p=>scopeLink('platform',p,p)).join('')}${row.tactics.map(id=>scopeLink('tactic',id,sources.atlas.tactics.find(t=>t.id===id).name)).join('')}<span>Source maturity: ${h(row.maturity||'not supplied')}</span></div></section>
+  <section class="im-hero"><p class="im-eyebrow">MITRE ATLAS ${h(sources.atlas.version)} / technique reference</p><h1>${h(row.id)}<br>${h(row.name)}</h1><p>${a('/attack-matrix/?view=atlas#matrix','← Back to the ATLAS matrix')} · ${a(sources.atlas.source.url,'Pinned MITRE source')} · ${a('https://atlas.mitre.org/','Current MITRE ATLAS site')}</p><div class="im-tags">${row.platforms.map(p=>scopeLink('platform',p,p)).join('')}${row.tactics.map(id=>scopeLink('tactic',id,sources.atlas.tactics.find(t=>t.id===id).name)).join('')}<span>Source maturity: ${h(row.maturity||'not supplied')}</span></div></section>
   <section class="im-detail"><h2 id="definition">MITRE source definition</h2>${descriptionHtml(row.description)}<p>Source modified ${h(row.modified)}. Reproduced from the pinned ATLAS release; inline technique links resolve to local reference pages.</p></section>
   <section class="im-detail"><h2 id="related-techniques">Parent, sub-techniques and ATT&amp;CK references</h2>${ul([...(parent?[a(local(parent.id),`${parent.id} ${parent.name} — parent`)]:[]),...peers.map(r=>a(local(r.id),`${r.id} ${r.name}`)),...attack.map(r=>a('/ttp-simulation/'+r.page,`${r.id} ${r.name} — explicit ATLAS ATT&CK reference`))])}</section>
-  <section class="im-detail"><h2 id="source-evidence">Source-backed defensive context</h2><h3>MITRE mitigations</h3>${ul(row.mitigations.map(r=>a('https://atlas.mitre.org/mitigations/'+r.id,`${r.id} ${r.name}`)))}<h3>MITRE case studies</h3>${ul(row.case_studies.map(r=>a('https://atlas.mitre.org/studies/'+r.id,`${r.id} ${r.name} · ${r.type}`)))}<p>These are explicit source relationships, not independently reproduced incidents or validated detection coverage.</p></section>
+  <section class="im-detail"><h2 id="source-evidence">Source-backed defensive context</h2><h3>MITRE mitigations</h3>${ul(row.mitigations.map(r=>a('/attack-matrix/atlas/mitigations/#'+r.id,`${r.id} ${r.name}`)))}<h3>MITRE case studies</h3>${ul(row.case_studies.map(r=>a('/attack-matrix/atlas/case-studies/#'+r.id,`${r.id} ${r.name} · ${r.type}`)))}<p>These are explicit source relationships, not independently reproduced incidents or validated detection coverage. The local relationship indexes link back to the pinned MITRE source.</p></section>
   ${renderAtlasEngineering(row)}
   <section class="im-detail"><h2 id="validation-boundary">Simulation and telemetry boundary</h2><p>This is a technique reference page, not a runnable simulation. No ATLAS-specific telemetry mapping, local attack execution or detector validation is asserted. MITRE maturity describes its source evidence, not a 1200km lab result.</p><p>For broader context—not technique-specific control mappings—see ${a('/cyber-knowledge/ai-security.html','AI Security')}, ${a('/ai-security-course.html','AI Security Course')}, and ${a('https://1200km.com/anomaly-detection-atlas/research/validation/','detection-validation methodology')}.</p>${related}</section>
-  <section class="im-detail"><h2 id="provenance">Provenance and attribution</h2><p>${a(sources.atlas.source.url,'Immutable MITRE ATLAS source')} · ${a('/attack-matrix/provenance.json','Import provenance')} · ${a('/attack-matrix/atlas-notice.txt','Attribution and transformation notice')} · ${a('/attack-matrix/LICENSE-ATLAS.txt','Apache License 2.0')}</p><p>${h(sources.atlas.copyright)}. Source text and explicit relationships are retained; navigation, formatting and local links are provided by 1200km.</p>${ul(row.references.filter(r=>r.url&&/^https:\/\//.test(r.url)).map(r=>a(r.url,r.title||r.name||r.url)))}</section>`,{keywords:[row.id,row.name,'MITRE ATLAS','AI security',...row.platforms]});
+  <section class="im-detail"><h2 id="provenance">Provenance and attribution</h2><p>${a(sources.atlas.source.url,'Immutable MITRE ATLAS source')} · ${a('/attack-matrix/provenance.json','Import provenance')} · ${a('/attack-matrix/atlas-notice.txt','Attribution and transformation notice')} · ${a('/attack-matrix/LICENSE-ATLAS.txt','Apache License 2.0')}</p><p>${h(sources.atlas.copyright)}. Source text and explicit relationships are retained; navigation, formatting and local links are provided by 1200km.</p>${ul(row.references.filter(r=>r.url&&/^https:\/\//.test(r.url)).map(r=>a(atlasSourceUrl(r.url),r.title||r.name||r.url)))}</section>`,{keywords:[row.id,row.name,'MITRE ATLAS','AI security',...row.platforms]});
 }
 output('attack-matrix/matrix-data.json',JSON.stringify(model)+'\n');
 output('attack-matrix/provenance.json',JSON.stringify({imported_on:sources.imported_on,attack:sources.attack,atlas:{...sources.atlas,techniques:undefined,tactics:undefined}},null,2)+'\n');

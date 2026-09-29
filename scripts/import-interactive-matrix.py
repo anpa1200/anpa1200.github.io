@@ -60,7 +60,10 @@ model = {
         "source": {"commit": ATLAS_COMMIT, "url": f"https://raw.githubusercontent.com/mitre-atlas/atlas-data/{ATLAS_COMMIT}/{ATLAS_FILE}",
                    "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)},
         "license": "Apache-2.0", "copyright": "Copyright 2021-2026 MITRE",
-        "tactics": [{"id": r["id"], "name": r["name"], "slug": r["id"], "url": "https://atlas.mitre.org/tactics/" + r["id"]} for r in tactics],
+        # MITRE's current site no longer serves these tactic deep links. Keep
+        # the pinned tactic IDs and order, but navigate within our local matrix.
+        "tactics": [{"id": r["id"], "name": r["name"], "slug": r["id"],
+                     "url": "/attack-matrix/?view=atlas&tactic=" + r["id"] + "#matrix"} for r in tactics],
         "techniques": sorted(techniques, key=lambda r: r["id"]),
     },
 }

@@ -32,3 +32,15 @@ test('deployment readiness rejects provider 404s and older builds before accepti
   assert.deepEqual(await waitForStaticDeployment({origin:'https://1200km-site-preview.1200km.workers.dev',identity,fetcher,pause:async()=>{},attempts:3}),identity);assert.equal(calls,3);
   await assert.rejects(waitForStaticDeployment({origin:'https://1200km-site-preview.1200km.workers.dev',identity,fetcher:async()=>new Response('no',{status:404}),pause:async()=>{},attempts:2}),/readiness window/);
 });
+test('deployment readiness waits for representative asset bytes after build identity changes',async()=>{
+  const identity={site_commit:'a'.repeat(40),artifact_digest:'sha256:'+ 'b'.repeat(64)};
+  const headers={'server':'cloudflare','cf-ray':'test'};
+  let assetCalls=0;
+  const fetcher=async(url)=>url.pathname==='/build.json'
+    ?new Response(JSON.stringify(identity),{headers})
+    :new Response(++assetCalls===1?'old page':'new page',{headers});
+  const assets=[{path:'/about.html',body:Buffer.from('new page')}];
+  assert.deepEqual(await waitForStaticDeployment({origin:'https://1200km-site-preview.1200km.workers.dev',identity,assets,fetcher,pause:async()=>{},attempts:3}),identity);
+  assert.equal(assetCalls,2);
+  await assert.rejects(waitForStaticDeployment({origin:'https://1200km-site-preview.1200km.workers.dev',identity,assets,fetcher:async(url)=>url.pathname==='/build.json'?new Response(JSON.stringify(identity),{headers}):new Response('old page',{headers}),pause:async()=>{},attempts:2}),/Asset not ready: \/about.html/);
+});

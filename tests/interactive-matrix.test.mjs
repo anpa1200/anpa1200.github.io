@@ -92,6 +92,31 @@ test('ATLAS local descriptions retain source-backed crosslinks and explicit vali
   assert.match(html,/Apache License 2.0/);
   assert.match(html,/canonical" href="https:\/\/1200km.com\/attack-matrix\/atlas\/AML.T0051\/"/);
 });
+test('ATLAS relationships remain navigable when upstream MITRE deep links are unavailable',()=>{
+  const mitigations=readFileSync(resolve(root,'attack-matrix/atlas/mitigations/index.html'),'utf8');
+  const studies=readFileSync(resolve(root,'attack-matrix/atlas/case-studies/index.html'),'utf8');
+  const mitigationIds=new Set(sources.atlas.techniques.flatMap(r=>r.mitigations.map(m=>m.id)));
+  const studyIds=new Set(sources.atlas.techniques.flatMap(r=>r.case_studies.map(s=>s.id)));
+  assert.equal(mitigationIds.size,40);
+  assert.equal(studyIds.size,73);
+  for(const id of mitigationIds)assert.ok(mitigations.includes(`id="${id}"`),id);
+  for(const id of studyIds)assert.ok(studies.includes(`id="${id}"`),id);
+  for(const technique of sources.atlas.techniques){
+    const html=readFileSync(resolve(root,`attack-matrix/atlas/${technique.id}/index.html`),'utf8');
+    assert.doesNotMatch(html,/href="https:\/\/atlas\.mitre\.org\/(?:techniques|mitigations|studies|tactics)\//);
+    for(const relation of technique.mitigations)assert.ok(html.includes(`/attack-matrix/atlas/mitigations/#${relation.id}`),technique.id+' '+relation.id);
+    for(const relation of technique.case_studies)assert.ok(html.includes(`/attack-matrix/atlas/case-studies/#${relation.id}`),technique.id+' '+relation.id);
+  }
+});
+test('ATLAS tactic headings link to local filtered matrix views, not unavailable upstream deep links',()=>{
+  const tactics=sources.atlas.tactics;
+  assert.equal(tactics.length,16);
+  for(const tactic of tactics)assert.equal(tactic.url,`/attack-matrix/?view=atlas&tactic=${tactic.id}#matrix`);
+  assert.deepEqual(data.domains.find(domain=>domain.id==='atlas').tactics,tactics);
+  const html=readFileSync(resolve(root,'attack-matrix/index.html'),'utf8');
+  assert.doesNotMatch(html,/href="https:\/\/atlas\.mitre\.org\/tactics\//);
+  for(const tactic of tactics)assert.ok(html.includes(`href="/attack-matrix/?view=atlas&amp;tactic=${tactic.id}#matrix"`),tactic.id);
+});
 test('matrix is first in the attack module sidebar and highlighted throughout ATLAS references',()=>{
   const shell=loadSiteShell(root),group=shell.sidebar.sections.find(s=>s.id==='detection-lab');
   assert.equal(group.links[0].href,'/attack-matrix/');

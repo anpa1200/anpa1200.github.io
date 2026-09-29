@@ -1,6 +1,18 @@
 // This is deliberately separate from the currently configured production Worker.
 // Regression tests compare its agent behavior with agent-readiness-worker.js.
 import { isEvidenceRequest } from './evidence-documents.js';
+import crosslinkManifest from './crosslink-rewrites.json' with { type: 'json' };
+export const LEGACY_CROSSLINK_REDIRECTS = new Map(crosslinkManifest.rewrites.map(({ from, to }) => {
+  const source = new URL(from, 'https://1200km.com');
+  const target = new URL(to, 'https://1200km.com');
+  if (source.origin !== 'https://1200km.com' || target.origin !== 'https://1200km.com') {
+    throw new Error('Crosslink redirects must remain on 1200km.com');
+  }
+  return [source.pathname, target.pathname];
+}));
+if (LEGACY_CROSSLINK_REDIRECTS.size !== crosslinkManifest.rewrites.length) {
+  throw new Error('Duplicate legacy crosslink redirect path');
+}
 export const MARKDOWN_ROUTES = new Map([
   ['/', '/index.md'],
   ['/projects/', '/projects.md'],
@@ -137,6 +149,10 @@ export function createSiteWorker(headerText) {
       }
       if (!['GET', 'HEAD'].includes(request.method)) {
         return finish(new Response(null, { status: 405, headers: { Allow: 'GET, HEAD' } }), pathname, request);
+      }
+      if (LEGACY_CROSSLINK_REDIRECTS.has(pathname)) {
+        const target = `${url.origin}${LEGACY_CROSSLINK_REDIRECTS.get(pathname)}${url.search}`;
+        return finish(new Response(null, { status: 301, headers: { Location: target, 'Content-Type': 'text/html' } }), pathname, request);
       }
       if (request.method === 'GET' && (request.headers.get('Accept') || '').toLowerCase().includes('text/markdown')) {
         const alternate = MARKDOWN_ROUTES.get(pathname);

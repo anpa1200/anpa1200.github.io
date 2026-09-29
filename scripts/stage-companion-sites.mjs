@@ -91,6 +91,13 @@ for (const entry of entries) {
     await mkdir(dirname(join(site, image)), { recursive: true });
     assert.ok(!existsSync(join(site, image)), 'Unexpected image alias collision');
     await cp(join(output, image), join(site, image));
+    // The pinned investigation links directly to its ATT&CK Navigator layer,
+    // which lives outside docs-site and is not emitted by Docusaurus.
+    const navigator = 'investigations/lifetech-2024-11/03-analysis/attck-mapping/attck-navigator-layer.json';
+    const publishedNavigator = join(site, entry.mount, navigator);
+    await mkdir(dirname(publishedNavigator), { recursive: true });
+    assert.ok(!existsSync(publishedNavigator), 'Unexpected Navigator-layer alias collision');
+    await cp(join(checkout, navigator), publishedNavigator);
   }
   console.log(`Staged ${entry.mount}: ${files.length} files from ${entry.commit}`);
 }

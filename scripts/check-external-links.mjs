@@ -2,8 +2,12 @@
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { lookup } from 'node:dns/promises';
+import { isIP } from 'node:net';
 import {
   allowlistMatch,
+  isNonPublicIpAddress,
+  isNonPublicLinkTarget,
   stableTerminalFailures,
   updateLinkState,
 } from './external-link-health-lib.mjs';
@@ -23,6 +27,19 @@ const contractsOnly = args.includes('--contracts-only');
 const timeoutMs = Number(option('--timeout-ms', '15000'));
 const concurrency = Math.max(1, Number(option('--concurrency', '8')));
 const skipped = new Set(['.git', 'node_modules', 'pagefind', 'materials']);
+const resolvedHosts = new Map();
+
+async function publicTarget(url) {
+  if (isNonPublicLinkTarget(url)) return false;
+  if (isIP(url.hostname.replace(/^\[|\]$/g, ''))) return true;
+  const host = url.hostname;
+  if (!resolvedHosts.has(host)) {
+    resolvedHosts.set(host, lookup(host, { all: true })
+      .then((addresses) => addresses.length > 0 && addresses.every(({ address }) => !isNonPublicIpAddress(address)))
+      .catch(() => false));
+  }
+  return resolvedHosts.get(host);
+}
 
 async function json(path, fallback) {
   try {
@@ -66,20 +83,35 @@ async function probe(url) {
     return { status: 0, method: null, error: `malformed URL: ${error.message}` };
   }
 
+  if (!await publicTarget(parsed)) {
+    return { status: 0, method: null, error: 'non-public or unresolved target not probed' };
+  }
+
   const request = async (method) => {
     const headers = {
       accept: 'text/html,application/xhtml+xml,application/json;q=0.8,*/*;q=0.2',
       'user-agent': '1200km-link-health/1.0 (+https://1200km.com/.well-known/security.txt)',
     };
     if (method === 'GET') headers.range = 'bytes=0-2047';
-    const response = await fetch(parsed, {
-      method,
-      headers,
-      redirect: 'follow',
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (response.body) await response.body.cancel();
-    return { status: response.status, method, error: '' };
+    let current = parsed;
+    for (let hop = 0; hop <= 8; hop++) {
+      if (!await publicTarget(current)) {
+        return { status: 0, method, error: 'non-public or unresolved redirect target not probed' };
+      }
+      const response = await fetch(current, {
+        method,
+        headers,
+        redirect: 'manual',
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      if (response.body) await response.body.cancel();
+      if (response.status >= 300 && response.status < 400 && response.headers.has('location')) {
+        current = new URL(response.headers.get('location'), current);
+        continue;
+      }
+      return { status: response.status, method, error: '' };
+    }
+    return { status: 0, method, error: 'redirect count exceeded' };
   };
 
   try {
