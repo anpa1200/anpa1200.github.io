@@ -17,7 +17,6 @@ const port = listener.address().port;
 await new Promise((resolvePromise) => listener.close(resolvePromise));
 const html = '<!doctype html><html><head><title>Fixture</title></head><body>Evidence fixture</body></html>';
 const fixtures = {
-  'anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html': '<html>Archived source capture fixture</html>',
   'index.html': html, 'about.html': html, 'projects.html': html,
   'articles/index.html': html, '404.html': '<h1>Custom 404 fixture</h1>',
   'index.md': '# Research\n\nMarkdown fixture.', 'projects.md': '# Projects',
@@ -82,14 +81,13 @@ try {
   assert.equal(links.length, new Set(links).size, 'Discovery links are duplicated');
   assert.ok(links.some((link) => link.startsWith('</feed.xml>')));
   await home.body?.cancel();
-  const capture = '/anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html';
-  for (const path of [capture, capture.slice(0, -5)]) {
+  const retired = '/anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html';
+  for (const path of [retired, retired.slice(0, -5)]) {
     const response = await request(path);
-    assert.equal(response.status, 200);
-    assert.equal(await response.text(), fixtures[capture.slice(1)]);
-    assert.equal(response.headers.get('Content-Disposition'), 'attachment');
-    assert.equal(response.headers.get('Content-Security-Policy'), "default-src 'none'; sandbox; frame-ancestors 'none'");
-    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get('Location'), 'https://www.f5.com/fr_fr/labs/articles/2024-ddos-attack-trends');
+    assert.equal(response.headers.get('Content-Disposition'), null);
+    assert.equal(await response.text(), '');
   }
   for (const path of ['/?q=kept', '/projects.html', '/projects/']) {
     const response = await request(path, { headers: { Accept: 'text/markdown', Range: 'bytes=0-1' } });

@@ -5,8 +5,7 @@ import { join, relative, resolve } from 'node:path';
 import { artifactFiles } from './check-static-artifact.mjs';
 import { localAsset } from './hosting-parity-lib.mjs';
 import { validateCompanions } from './companion-sites-lib.mjs';
-import { EVIDENCE_DOCUMENTS, isEvidenceDocument } from '../cloudflare/evidence-documents.js';
-import { sha256 } from './hosting-parity-lib.mjs';
+import { RETIRED_VENDOR_REPORTS, isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 
 const args = process.argv.slice(2);
 assert.ok(args.includes('--site'), '--site required');
@@ -16,8 +15,8 @@ const manifest = validateCompanions(JSON.parse(await readFile(new URL('../cloudf
 const builds = JSON.parse(await readFile(join(site, 'data/companion-builds.json'), 'utf8'));
 const failures = [];
 let sitemapUrls = 0, assetReferences = 0;
-for (const [path, hash] of EVIDENCE_DOCUMENTS) {
-  assert.equal(sha256(await readFile(join(site, path))), hash, `Source capture bytes changed: ${path}`);
+for (const path of RETIRED_VENDOR_REPORTS.keys()) {
+  assert.ok(!paths.has(path.slice(1)), `Retired vendor capture must not be staged: ${path}`);
 }
 for (const entry of manifest) {
   assert.ok(builds.sites.some((built) => built.mount === entry.mount && built.commit === entry.commit && built.files > 0), `Missing pinned build identity: ${entry.mount}`);

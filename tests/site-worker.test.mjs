@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import legacy from '../cloudflare/agent-readiness-worker.js';
 import { createSiteWorker, LEGACY_CROSSLINK_REDIRECTS, MARKDOWN_ROUTES, parseHeaderPolicy, responseHeaders } from '../cloudflare/site-worker-lib.js';
+import { RETIRED_VENDOR_REPORTS } from '../cloudflare/evidence-documents.js';
 
 const policy = readFileSync(new URL('../_headers', import.meta.url), 'utf8');
 const worker = createSiteWorker(policy);
@@ -75,16 +76,20 @@ test('production HTTP redirects to HTTPS without dropping path or query', async 
   assert.equal(calls.length, 0);
 });
 
-test('third-party source captures are unmodified downloads and never executable indexed pages', async () => {
-  const path = '/anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html';
-  for (const requestPath of [path, path.slice(0, -5)]) {
-    const response = await get(requestPath, {}, environment(new Map([[path, ['SOURCE CAPTURE', 'text/html']]])));
-    assert.equal(await response.text(), 'SOURCE CAPTURE');
-    assert.equal(response.headers.get('Content-Disposition'), 'attachment');
-    assert.match(response.headers.get('Content-Security-Policy'), /sandbox/);
-    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+test('retired vendor captures redirect to an exact reviewed publisher URL', async () => {
+  assert.equal(RETIRED_VENDOR_REPORTS.size, 6);
+  for (const [path, publisher] of RETIRED_VENDOR_REPORTS) {
+    assert.equal(new URL(publisher).protocol, 'https:');
+    assert.ok(['www.f5.com', 'cloud.google.com', 'www.sysdig.com'].includes(new URL(publisher).hostname));
+    for (const requestPath of [path, path.slice(0, -5)]) {
+      const response = await get(requestPath);
+      assert.equal(response.status, 301, requestPath);
+      assert.equal(response.headers.get('Location'), publisher, requestPath);
+      assert.equal(response.headers.get('Content-Disposition'), null);
+      assert.equal(calls.length, 0, 'Redirect must not fetch the retired asset');
+    }
   }
-  assert.equal(responseHeaders({}, path.replace('/f5-', '/%665-'), parseHeaderPolicy(policy)).get('Content-Disposition'), 'attachment');
+  assert.equal((await get('/anomaly-detection-atlas/reports/cti-ir/unknown.html')).status, 404);
 });
 
 test('unknown requests serve root 404 with 404 status, even nested and conditional requests', async () => {
@@ -247,4 +252,13 @@ test('asset caching is immutable only for content-hashed filenames', async () =>
   assert.equal((await get('/about.html')).headers.get('Cache-Control'), null);
   const missing = await get('/assets/missing.js');
   assert.equal(missing.headers.get('Cache-Control'), null);
+});
+
+test('cover-letter HTML and PDF remain crawlable but non-indexable', () => {
+  const robots = readFileSync(new URL('../robots.txt', import.meta.url), 'utf8');
+  assert.doesNotMatch(robots, /Disallow:\s*\/cover-letter\.(?:html|pdf)/i);
+  for (const path of ['/cover-letter.html', '/cover-letter.pdf']) {
+    const headers = responseHeaders({}, path, parseHeaderPolicy(policy));
+    assert.equal(headers.get('X-Robots-Tag'), 'noindex, nofollow');
+  }
 });

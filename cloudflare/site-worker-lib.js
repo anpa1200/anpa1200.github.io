@@ -1,6 +1,6 @@
 // This is deliberately separate from the currently configured production Worker.
 // Regression tests compare its agent behavior with agent-readiness-worker.js.
-import { isEvidenceRequest } from './evidence-documents.js';
+import { retiredVendorReportTarget } from './evidence-documents.js';
 import crosslinkManifest from './crosslink-rewrites.json' with { type: 'json' };
 export const LEGACY_CROSSLINK_REDIRECTS = new Map(crosslinkManifest.rewrites.map(({ from, to }) => {
   const source = new URL(from, 'https://1200km.com');
@@ -97,11 +97,6 @@ export function responseHeaders(original, pathname, rules) {
   if (pathname.endsWith('.json') && !headers.get('Content-Type')?.startsWith('text/html')) {
     headers.set('Content-Type', 'application/json; charset=utf-8');
   }
-  if (isEvidenceRequest(pathname)) {
-    headers.set('X-Robots-Tag', 'noindex, nofollow');
-    headers.set('Content-Disposition', 'attachment');
-    headers.set('Content-Security-Policy', "default-src 'none'; sandbox; frame-ancestors 'none'");
-  }
   return headers;
 }
 
@@ -159,6 +154,10 @@ export function createSiteWorker(headerText) {
       }
       if (!['GET', 'HEAD'].includes(request.method)) {
         return finish(new Response(null, { status: 405, headers: { Allow: 'GET, HEAD' } }), pathname, request);
+      }
+      const publisher = retiredVendorReportTarget(pathname);
+      if (publisher) {
+        return finish(new Response(null, { status: 301, headers: { Location: publisher, 'Content-Type': 'text/html' } }), pathname, request);
       }
       if (LEGACY_CROSSLINK_REDIRECTS.has(pathname)) {
         const target = `${url.origin}${LEGACY_CROSSLINK_REDIRECTS.get(pathname)}${url.search}`;
