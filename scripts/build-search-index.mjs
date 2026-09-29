@@ -259,8 +259,10 @@ async function writeGovernanceMap(bundlePath, acceptedPageCount, expectedCustomR
   let expectedModulePages = 0;
   if (existsSync(moduleManifestPath)) {
     const manifest = JSON.parse(await readFile(moduleManifestPath, 'utf8'));
-    expectedModulePages = manifest.pages.length;
-    const missingModulePages = manifest.pages.filter(page => !indexedModuleUrls.has(`${SITE_ORIGIN}/ttp-simulation/${page.page}`));
+    // Tag archives remain navigable, but are deliberately noindex and absent from search.
+    const searchableModulePages = manifest.pages.filter(page => page.kind !== 'tag');
+    expectedModulePages = searchableModulePages.length;
+    const missingModulePages = searchableModulePages.filter(page => !indexedModuleUrls.has(`${SITE_ORIGIN}/ttp-simulation/${page.page}`));
     if (missingModulePages.length) throw new Error(`Module search coverage is incomplete: ${missingModulePages.map(page => page.page).join(', ')}`);
   }
   const expectedAtlasUrls = remote ? requiredIndexUrls.filter(url => url.startsWith(`${SITE_ORIGIN}/anomaly-detection-atlas/`)) : [];
