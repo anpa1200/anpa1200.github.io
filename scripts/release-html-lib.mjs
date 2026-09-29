@@ -150,7 +150,16 @@ export function normalizeMetaDescriptions(html) {
   const current = metaContent(html, 'description');
   if (!current) return html;
   const curated = canonical ? CURATED_META_DESCRIPTIONS[canonical] : '';
-  const decodedCurrent = decodeEntities(current);
+  let decodedCurrent = decodeEntities(current);
+  if (canonical?.includes('/ITDR/') && title) {
+    // Older release passes repeated an ITDR title before the source summary.
+    // Only remove exact leading title sentences when another title follows.
+    const repeatedTitle = `${title}. `;
+    while (decodedCurrent.startsWith(repeatedTitle)
+      && decodedCurrent.slice(repeatedTitle.length).startsWith(title)) {
+      decodedCurrent = decodedCurrent.slice(repeatedTitle.length);
+    }
+  }
   // Preserve complete authored descriptions, but make generated fallbacks
   // uniquely page-specific. Earlier release passes could prepend the title
   // repeatedly and a later pass could then remove it entirely; normalize both
@@ -187,14 +196,22 @@ export function curatedMetaDescription(canonical = '') {
 
 export function normalizeSocialImages(html) {
   const fallback = factValue('site.default_social_image');
-  const image = metaContent(html, 'og:image') || fallback.url;
+  const originalImage = metaContent(html, 'og:image') || fallback.url;
+  const unsuitableImage = /\.svg(?:[?#]|$)/i.test(originalImage)
+    || [
+      'https://1200km.com/ITDR/img/logo.png',
+      'https://1200km.com/cti-analyst-field-manual/img/infographic-field-manual-cover.png',
+      'https://1200km.com/assets/ap-logo.png',
+    ].includes(originalImage);
+  const image = unsuitableImage ? fallback.url : originalImage;
   const title = pageTitle(html);
   const usingFallback = image === fallback.url;
   let transformed = html;
   transformed = upsertMeta(transformed, 'property', 'og:image', image);
-  transformed = upsertMeta(transformed, 'name', 'twitter:image', metaContent(transformed, 'twitter:image') || image);
-  transformed = upsertMeta(transformed, 'property', 'og:image:alt', metaContent(transformed, 'og:image:alt') || (usingFallback ? fallback.alt : title));
-  transformed = upsertMeta(transformed, 'name', 'twitter:image:alt', metaContent(transformed, 'twitter:image:alt') || (usingFallback ? fallback.alt : title));
+  transformed = upsertMeta(transformed, 'name', 'twitter:image', unsuitableImage ? image : (metaContent(transformed, 'twitter:image') || image));
+  transformed = upsertMeta(transformed, 'name', 'twitter:card', unsuitableImage ? 'summary_large_image' : (metaContent(transformed, 'twitter:card') || 'summary_large_image'));
+  transformed = upsertMeta(transformed, 'property', 'og:image:alt', unsuitableImage ? fallback.alt : (metaContent(transformed, 'og:image:alt') || (usingFallback ? fallback.alt : title)));
+  transformed = upsertMeta(transformed, 'name', 'twitter:image:alt', unsuitableImage ? fallback.alt : (metaContent(transformed, 'twitter:image:alt') || (usingFallback ? fallback.alt : title)));
   if (usingFallback) {
     transformed = upsertMeta(transformed, 'property', 'og:image:width', String(fallback.width));
     transformed = upsertMeta(transformed, 'property', 'og:image:height', String(fallback.height));
@@ -938,6 +955,11 @@ export function transformReleaseHtml(html, options) {
   transformed = normalizeDocumentTitles(transformed);
   transformed = normalizeMetaDescriptions(transformed);
   transformed = normalizeSocialImages(transformed);
+  const hasIcon = [...transformed.matchAll(/<link\b[^>]*>/gi)]
+    .some(([tag]) => (tagAttributes(tag).rel || '').toLowerCase().split(/\s+/).includes('icon'));
+  if (!hasIcon) {
+    transformed = transformed.replace(/<\/head>/i, '<link rel="icon" href="/favicon.ico">\n</head>');
+  }
   // Keep release-owned browser enhancements on the same origin. Checked-in
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
