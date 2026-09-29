@@ -5,13 +5,13 @@
   window.__ttpGuideLinks = true;
   let routes;
   const cache = new Map();
-  let timer, running = false;
+  let timer, running = false, ready = false;
   const base = '/ttp-simulation/';
   const path = () => location.pathname.replace(/index\.html$/, '').replace(/\/?$/, '/');
   const allowed = (target) => /^(?:tools\/[^/]+\/|techniques\/(?:enterprise|mobile|ics)\/T\d{4}(?:\.\d{3})?\/|detections\/(?:enterprise|mobile|ics)\/T\d{4}(?:\.\d{3})?\/)$/.test(target);
   function link(target, text) { const a = document.createElement('a'); a.href = base + target; a.textContent = text; return a; }
   async function update() {
-    if (running || !routes) return;
+    if (!ready || running || !routes) return;
     const current = path(), key = routes[current];
     const main = document.querySelector('main');
     if (!main) return;
@@ -51,4 +51,11 @@
   fetch(`${base}data/guide-backlinks.json`).then(r => { if (!r.ok) throw Error('No guide manifest'); return r.json(); }).then(data => { routes=data.routes; schedule(); }).catch(()=>{});
   new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
   addEventListener('popstate',schedule);
+  // Never rewrite React-owned article text while Docusaurus is hydrating.
+  const begin = () => {
+    const run = () => { ready = true; schedule(); };
+    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1500 });
+    else setTimeout(run, 0);
+  };
+  if (document.readyState === 'complete') begin(); else addEventListener('load', begin, { once: true });
 })();

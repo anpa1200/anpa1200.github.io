@@ -100,6 +100,13 @@ try {
   await evaluate("document.querySelector('#ttp-ecosystem').remove()");
   await waitFor("document.querySelector('#ttp-ecosystem[data-ttp-guide-key] a[href=\"/ttp-simulation/tools/nmap/\"]')");
   assert.ok(await evaluate("document.querySelectorAll('main a[href=\"/ttp-simulation/tools/nmap/\"]').length>1"));
+  await call('Network.setBlockedURLs',{urls:['*/assets/docusaurus-ecosystem.js*']});
+  const beforeBlockedBridge=errors.length;
+  await call('Page.navigate',{url:base+guide+'?bridge-blocked=1'});
+  await waitFor("document.readyState==='complete' && Boolean(document.querySelector('#__docusaurus article'))");
+  await new Promise(done=>setTimeout(done,1800));
+  assert.deepEqual(errors.slice(beforeBlockedBridge),[],'Article hydration must not depend on the ecosystem bridge script');
+  await call('Network.setBlockedURLs',{urls:[]});
  }
  // The publication snapshot keeps its original anchors and navigation after hydration.
  const atlas=JSON.parse(readFileSync(resolve(project,'data/anomaly-atlas.json'),'utf8'));

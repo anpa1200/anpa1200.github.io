@@ -16,6 +16,7 @@ import {
   SOFTWARE_ID,
   WEBSITE_ID,
   curatedMetaDescription,
+  isUpstreamReferencePath,
   editorialArticleDocument,
   parseJsonLd,
   stripHtml,
@@ -159,6 +160,13 @@ function checkGraph(rel, canonical, html, expectedLastmod = '') {
   const visibleTitle = stripHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1]
     || html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1]
     || '');
+  const upstreamReference = isUpstreamReferencePath(new URL(canonical).pathname);
+  if (upstreamReference) {
+    if (page?.author) failures.push(`${rel}: imported reference page must not claim site authorship`);
+    if (!page?.isBasedOn) failures.push(`${rel}: imported reference page is missing an upstream source`);
+    if (!page?.publisher) failures.push(`${rel}: imported reference page is missing the local publisher`);
+  }
+
   if (page?.url !== canonical) failures.push(`${rel}: WebPage.url does not match the canonical URL`);
   if (page?.name !== visibleTitle) failures.push(`${rel}: WebPage.name does not match the visible H1`);
   if (referenceId(page?.isPartOf) !== WEBSITE_ID) failures.push(`${rel}: WebPage.isPartOf does not reference the site WebSite`);
@@ -202,7 +210,12 @@ function checkGraph(rel, canonical, html, expectedLastmod = '') {
     if (article.url !== canonical) failures.push(`${rel}: article URL does not match canonical`);
     if (article.headline !== visibleTitle) failures.push(`${rel}: article headline does not match the visible H1`);
     if (referenceId(article.mainEntityOfPage) !== `${canonical}#webpage`) failures.push(`${rel}: article mainEntityOfPage does not reference the WebPage`);
-    if (referenceId(article.author) !== PERSON_ID) failures.push(`${rel}: article author does not reference the site Person`);
+    if (upstreamReference) {
+      if (article.author) failures.push(`${rel}: imported article entity must not claim site authorship`);
+      if (!article.isBasedOn) failures.push(`${rel}: imported article entity is missing an upstream source`);
+    } else if (referenceId(article.author) !== PERSON_ID) {
+      failures.push(`${rel}: article author does not reference the site Person`);
+    }
     if (!article.publisher) failures.push(`${rel}: article publisher is missing`);
     if (articleExpected && !validIsoDate(article.datePublished)) failures.push(`${rel}: article datePublished is missing or invalid`);
     if (article.datePublished && !validIsoDate(article.datePublished)) failures.push(`${rel}: article datePublished is invalid`);

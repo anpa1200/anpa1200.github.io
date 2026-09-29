@@ -46,8 +46,8 @@ test('homepage emits a WebPage connected to the current AdversaryGraph source en
   assert.equal(software.softwareVersion, '7.0.0');
   assert.equal(software.codeRepository, 'https://github.com/anpa1200/adversarygraph');
   assert.equal(software.license, 'https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/LICENSE');
-  assert.equal(person.email, 'mailto:1200km@gmail.com');
-  assert.equal(person.contactPoint.email, 'mailto:1200km@gmail.com');
+  assert.equal(person.email, '1200km@gmail.com');
+  assert.equal(person.contactPoint.email, '1200km@gmail.com');
   assert.ok(person.sameAs.includes('https://infosecwriteups.com/@1200km'));
   assert.equal(website.name, '1200km Security Research');
   assert.equal(Object.hasOwn(website, 'potentialAction'), false);
@@ -115,6 +115,21 @@ test('ATT&CK technique pages do not receive editorial archive navigation', () =>
   const output = transformReleaseHtml(input, { canonical, dateModified: '2026-07-22' });
   assert.doesNotMatch(output, /data-article-discovery/);
   assert.doesNotMatch(output, /data-content-freshness/);
+  const page = objectById(connectedGraphFromHtml(output), `${canonical}#webpage`);
+  assert.equal(Object.hasOwn(page, 'author'), false);
+  assert.equal(page.isBasedOn, 'https://attack.mitre.org/techniques/T1059/');
+  assert.equal(page.publisher.name, '1200km');
+});
+
+test('Sigma rule pages credit their upstream source without assigning site authorship', () => {
+  const canonical = 'https://1200km.com/ttp-simulation/detections/rules/12345678-1234-1234-1234-123456789abc/';
+  const source = 'https://github.com/SigmaHQ/sigma/blob/master/rules/example.yml';
+  const input = `<html><head><title>Example rule</title><script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', isBasedOn: source, creditText: 'Original Sigma author' })}</script></head><body><main><h1>Example rule</h1></main></body></html>`;
+  const output = transformReleaseHtml(input, { canonical });
+  const page = objectById(connectedGraphFromHtml(output), `${canonical}#webpage`);
+  assert.equal(Object.hasOwn(page, 'author'), false);
+  assert.equal(page.isBasedOn, source);
+  assert.equal(page.publisher.name, '1200km');
 });
 
 test('Docusaurus archive articles receive discovery outside the hydration root', () => {
