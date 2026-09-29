@@ -43,13 +43,22 @@ test('email controls have a working no-JavaScript mailto fallback', () => {
 
 test('homepage gives each primary audience one clear action', () => {
   const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
-  const actions = html.match(/<div class="actions audience-actions"[\s\S]*?<\/div>/i)?.[0] || '';
+  const actions = html.match(/<nav class="actions audience-actions"[\s\S]*?<\/nav>/i)?.[0] || '';
   assert.equal((actions.match(/class="button[^"']*audience-cta"/g) || []).length, 3);
   assert.match(actions, /href="\/threat-matrix\/#\/techniques\/T1059.003"/);
   assert.match(actions, /href="\/learning-paths\/#cti-to-detection"/);
   assert.match(actions, /href="\/learning-paths\/#malware-triage"/);
   assert.match(html, /href="cv.html"/);
 });
+
+test('homepage evidence cards use block containers for headings and prose', () => {
+  const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const captions = [...html.matchAll(/<div class="evidence-caption">([\s\S]*?)<\/div>/g)];
+  assert.equal(captions.length, 6);
+  assert.doesNotMatch(html, /<span class="evidence-caption">/);
+  for (const [, caption] of captions) assert.match(caption, /<h3\b[\s\S]*?<p>/);
+});
+
 
 test('nested 404 recovery links are root-relative and resolve locally', async (context) => {
   const notFoundHtml = readFileSync(join(ROOT, '404.html'), 'utf8');

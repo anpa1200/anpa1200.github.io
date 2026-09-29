@@ -1,5 +1,10 @@
 (function () {
   'use strict';
+  // Analytics is disabled until an explicit opt-in control is implemented.
+  // Keep this legacy asset inert for visitors with cached HTML that still
+  // references it. The release build also removes new script references.
+  const analyticsConsentReady = false;
+  if (!analyticsConsentReady) return;
 
   const script = document.currentScript;
   const analyticsId = script?.dataset.googleAnalyticsId || '';

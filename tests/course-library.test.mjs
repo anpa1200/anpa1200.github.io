@@ -184,16 +184,10 @@ test('client provides progressive filtering, URL restoration, sorting, reset, an
   ]) assert.match(client, new RegExp(escapeRegex(token)), token);
 });
 
-test('affiliate destination queues a dedicated analytics event before lazy GA loading completes', () => {
-  const affiliateUrl = 'https://training.trainsec.net/malware-analyst-professional-level-1/v6dfz';
+test('analytics asset registers no listeners or external scripts before opt-in', () => {
   const listeners = new Map();
   const appendedScripts = [];
-  class MockElement {
-    constructor(anchor) { this.anchor = anchor; }
-    closest(selector) { return selector === 'a[href]' ? this.anchor : null; }
-  }
   const context = {
-    Element: MockElement,
     URL,
     document: {
       currentScript: { dataset: { googleAnalyticsId: 'G-TEST' } },
@@ -209,20 +203,9 @@ test('affiliate destination queues a dedicated analytics event before lazy GA lo
   };
 
   runInNewContext(sitePerformance, context);
-  const click = listeners.get('document:click');
-  assert.ok(click);
-  assert.equal(click.options.capture, true);
-  click.handler({ target: new MockElement({ href: affiliateUrl }) });
-
-  const queued = Array.from(context.window.dataLayer, (entry) => Array.from(entry));
-  assert.deepEqual(queued.map((entry) => entry[0]), ['js', 'config', 'event']);
-  assert.equal(queued[1][1], 'G-TEST');
-  assert.equal(queued[2][1], 'affiliate_click');
-  assert.equal(queued[2][2].affiliate_id, 'trainsec-malware-analyst-professional-level-1');
-  assert.equal(queued[2][2].link_domain, 'training.trainsec.net');
-  assert.equal(queued[2][2].link_url, affiliateUrl);
-  assert.equal(appendedScripts.length, 1);
-  assert.match(appendedScripts[0].src, /^https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-TEST$/);
+  assert.equal(listeners.size, 0);
+  assert.equal(context.window.dataLayer, undefined);
+  assert.equal(appendedScripts.length, 0);
 });
 
 test('AI Security Course Chapter 3 completion remains synchronized and evidence-closed', () => {
