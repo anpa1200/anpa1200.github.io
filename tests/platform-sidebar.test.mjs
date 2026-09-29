@@ -52,6 +52,15 @@ test('standalone shell skip link precedes every sidebar link in focus order', ()
   assert.ok(generated.indexOf('<!-- site-shell:header:end -->') < generated.indexOf('<!-- platform-sidebar:start -->'));
   assert.equal(applyPlatformSidebar(generated, shell, { pathname: '/ai-security-course/module-00/chapter-03.html' }), generated);
 });
+test('an older sidebar-before-header page is normalized to skip-link-first order', () => {
+  const seededSidebar = renderPlatformSidebar(shell, { pathname: '/about.html' });
+  const legacy = fixture.replace('<body>', `<body>${seededSidebar}<header><!-- site-shell:header:start --><a class="skip-link" href="#main-content">Skip to main content</a><!-- site-shell:header:end --></header>`);
+  const output = applyPlatformSidebar(legacy, shell, { pathname: '/about.html' });
+  assert.ok(output.indexOf('class="skip-link"') < output.indexOf('id="platform-sidenav"'));
+  assert.equal(applyPlatformSidebar(output, shell, { pathname: '/about.html' }), output);
+});
+
+
 
 test('redirect documents are not converted into navigable duplicate pages', () => {
   const redirect = '<html><head><title>Redirecting</title><meta http-equiv="refresh" content="0;url=/maintained/"></head><body></body></html>';

@@ -154,9 +154,8 @@ export function isSidebarEligible(html) {
 
 export function applyPlatformSidebar(html, shell, { pathname = '/' } = {}) {
   if (!isSidebarEligible(html)) return html;
-  const existingSidebar = html.indexOf(SIDEBAR_START);
   const existingHeaderEnd = html.indexOf(HEADER_END);
-  const preserveHeaderFirst = existingHeaderEnd >= 0 && existingSidebar > existingHeaderEnd;
+  const preserveHeaderFirst = existingHeaderEnd >= 0;
   const withoutSidebar = stripExistingSidebar(html);
   const pageLinks = extractPageLinks(withoutSidebar, shell.sidebar.max_page_links);
   const sidebar = renderPlatformSidebar(shell, { pathname, pageLinks });

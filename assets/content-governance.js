@@ -1,5 +1,5 @@
-// Restore lifecycle notices only after Docusaurus has hydrated its React root.
-// The build emits a crawlable fallback outside that root for no-JavaScript users.
+// Keep lifecycle notices outside the Docusaurus React root, including after navigation.
+// The build emits the initial crawlable fallback for no-JavaScript users.
 (() => {
   if (window.__articleLifecycleReady) return;
   window.__articleLifecycleReady = true;
@@ -19,17 +19,11 @@
   function update() {
     if (!ready) return;
     const pathname = route();
-    const article = root.querySelector('main .theme-doc-markdown.markdown');
-    if (!article) return;
-    const existing = root.querySelector('[data-governance-runtime]');
+    const existing = document.querySelector('body > [data-governance-runtime]');
     if (existing?.dataset.articleRoute === pathname) return;
     existing?.remove();
     const fallback = document.querySelector('body > [data-governance-fallback]');
     if (fallback && pathname === initialRoute) {
-      fallback.removeAttribute('data-governance-fallback');
-      fallback.dataset.articleRoute = pathname;
-      fallback.dataset.governanceRuntime = '';
-      article.append(fallback);
       return;
     }
     fallback?.remove();
@@ -54,7 +48,7 @@
       paragraph.append(link, '.');
     }
     aside.append(strong, paragraph);
-    article.append(aside);
+    root.after(aside);
   }
   const schedule = () => { clearTimeout(timer); timer = setTimeout(update, 120); };
   const begin = () => {
@@ -64,6 +58,16 @@
   };
   if (document.readyState === 'complete') begin();
   else addEventListener('load', begin, { once: true });
-  new MutationObserver(schedule).observe(root, { childList: true, subtree: true });
+  // Route changes are cheap to observe; a whole-root MutationObserver on large
+  // syntax-highlighted articles caused repeated layout work.
+  for (const method of ['pushState', 'replaceState']) {
+    const original = history[method];
+    history[method] = function (...args) {
+      const result = original.apply(this, args);
+      schedule();
+      return result;
+    };
+  }
+  addEventListener('pageshow', schedule);
   addEventListener('popstate', schedule);
 })();

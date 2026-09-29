@@ -403,6 +403,16 @@ export function buildBreadcrumb(canonical, title, titleMap = new Map()) {
   };
 }
 
+export function isUpstreamReferencePath(pathname) {
+  return [
+    /^\/ttp-simulation\/detections\/rules\/[^/]+\/?$/i,
+    /^\/ttp-simulation\/techniques\/(?:enterprise|mobile|ics)\/T\d{4}(?:\.\d{3})?\/?$/i,
+    /^\/threat-matrix\/actors\/G\d{4}\/?$/i,
+    /^\/threat-matrix\/techniques\/T\d{4}(?:\.\d{3})?\/?$/i,
+  ].some((pattern) => pattern.test(pathname));
+}
+
+
 export function buildConnectedGraph(html, {
   canonical,
   datePublished = '',
@@ -440,11 +450,11 @@ export function buildConnectedGraph(html, {
       addressCountry: location.country,
     },
     knowsAbout: factValue('identity.knows_about'),
-    email: `mailto:${publicEmail}`,
+    email: publicEmail,
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'professional inquiries',
-      email: `mailto:${publicEmail}`,
+      email: publicEmail,
     },
     sameAs: factValue('identity.same_as'),
   };
@@ -472,6 +482,13 @@ export function buildConnectedGraph(html, {
       || pageSource.mainEntity?.['@id'] === PERSON_ID)
   ));
   const breadcrumb = buildBreadcrumb(canonical, title, titleMap);
+  const pathname = new URL(canonical).pathname;
+  const upstreamReference = isUpstreamReferencePath(pathname);
+  const mitreTechnique = pathname.match(/^\/(?:ttp-simulation\/techniques\/(?:enterprise|mobile|ics)\/|threat-matrix\/techniques\/)(T\d{4}(?:\.\d{3})?)\/?$/i);
+  const mitreActor = pathname.match(/^\/threat-matrix\/actors\/(G\d{4})\/?$/i);
+  const upstreamSource = mitreTechnique ? `https://attack.mitre.org/techniques/${mitreTechnique[1]}/`
+    : mitreActor ? `https://attack.mitre.org/groups/${mitreActor[1]}/`
+      : pageSource.isBasedOn;
   const page = {
     ...normalizeReferences(cloneWithoutContext(pageSource)),
     '@type': specializedPageType || 'WebPage',
@@ -481,10 +498,14 @@ export function buildConnectedGraph(html, {
     ...(description ? { description } : {}),
     isPartOf: { '@id': WEBSITE_ID },
     breadcrumb: { '@id': breadcrumb['@id'] },
-    author: { '@id': PERSON_ID },
+    ...(!upstreamReference ? { author: { '@id': PERSON_ID } } : {
+      publisher: { '@type': 'Organization', name: '1200km', url: siteUrl },
+      ...(upstreamSource ? { isBasedOn: upstreamSource } : {}),
+    }),
     inLanguage: pageSource.inLanguage || 'en',
     ...(about.length ? { about, keywords: topics.join(', ') } : {}),
   };
+  if (upstreamReference) delete page.author;
   if (image && !page.primaryImageOfPage) page.primaryImageOfPage = { '@type': 'ImageObject', url: image };
   if (dateModified) page.dateModified = dateModified;
   if (specializedPageType !== 'FAQPage' && schemaTypes(pageSource).includes('FAQPage')) delete page.mainEntity;
@@ -539,8 +560,14 @@ export function buildConnectedGraph(html, {
       });
     }
     if (types.some((type) => PRIMARY_ENTITY_TYPES.has(type))) {
-      normalized.author = normalized.author || { '@id': PERSON_ID };
-      normalized.publisher = normalized.publisher || { '@id': PERSON_ID };
+      if (upstreamReference) {
+        delete normalized.author;
+        if (upstreamSource && !normalized.isBasedOn) normalized.isBasedOn = upstreamSource;
+        normalized.publisher = { '@type': 'Organization', name: '1200km', url: siteUrl };
+      } else {
+        normalized.author = normalized.author || { '@id': PERSON_ID };
+        normalized.publisher = normalized.publisher || { '@id': PERSON_ID };
+      }
       normalized.mainEntityOfPage = { '@id': page['@id'] };
       if (dateModified) normalized.dateModified = dateModified;
     }
