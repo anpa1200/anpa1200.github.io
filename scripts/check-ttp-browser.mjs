@@ -103,7 +103,7 @@ try {
   await call('Network.setBlockedURLs',{urls:['*/assets/docusaurus-ecosystem.js*']});
   const beforeBlockedBridge=errors.length;
   await call('Page.navigate',{url:base+guide+'?bridge-blocked=1'});
-  await waitFor("document.readyState==='complete' && document.querySelector('#__docusaurus article')");
+  await waitFor("document.readyState==='complete' && Boolean(document.querySelector('#__docusaurus article'))");
   await new Promise(done=>setTimeout(done,1800));
   assert.deepEqual(errors.slice(beforeBlockedBridge),[],'Article hydration must not depend on the ecosystem bridge script');
   await call('Network.setBlockedURLs',{urls:[]});
