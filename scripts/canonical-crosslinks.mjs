@@ -32,9 +32,10 @@ export function rewriteCrosslinks(input, rewrites = crosslinkRewrites) {
   const counts = {};
   for (const { from, to } of rewrites) {
     const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // A stale route must be a complete URL token. Do not rewrite the prefix
-    // of an already-valid child page such as /actor-research/actor-profile-template/.
-    const pattern = new RegExp(`${escaped}(?![A-Za-z0-9_./%~-])`, 'g');
+    // A stale route must be a complete URL token on both sides. In particular,
+    // /investigations/... inside a GitHub blob URL belongs to that external
+    // URL and must not be replaced with our site's absolute route.
+    const pattern = new RegExp(`(?<![A-Za-z0-9_./:%~-])${escaped}(?![A-Za-z0-9_./%~-])`, 'g');
     const occurrences = [...output.matchAll(pattern)].length;
     if (!occurrences) continue;
     output = output.replace(pattern, to);
