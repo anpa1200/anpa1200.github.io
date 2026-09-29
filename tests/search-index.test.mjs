@@ -472,6 +472,13 @@ test('remote index builds prefer release files and require stable ranking fixtur
   const builder = readFileSync(join(ROOT, 'scripts', 'build-search-index.mjs'), 'utf8');
   assert.match(builder, /pageSource\(url, !remote, remote\)/);
   assert.match(builder, /requiredIndexUrls/);
+  const requiredFixtures = builder.slice(builder.indexOf('const requiredIndexUrls'), builder.indexOf('];', builder.indexOf('const requiredIndexUrls')));
+  assert.doesNotMatch(requiredFixtures, /search\.html/,
+    'the noindex search utility must not be a required indexed page');
+  const moduleManifest = JSON.parse(readFileSync(join(ROOT, 'ttp-simulation', 'data', 'integration.json'), 'utf8'));
+  assert.ok(moduleManifest.pages.some((page) => page.kind === 'tag'));
+  assert.ok(moduleManifest.pages.some((page) => page.kind !== 'tag'));
+  assert.match(builder, /manifest\.pages\.filter\(page => page\.kind !== 'tag'\)/);
   assert.match(builder, /missing required release fixtures/);
   assert.match(builder, /maxStalePages/);
   assert.match(builder, /canonicalSitemapOutput/);

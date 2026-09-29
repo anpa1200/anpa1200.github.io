@@ -52,6 +52,7 @@
   let typingEntry = false;
   let urlTimer = 0;
   let hydrated = false;
+  let docusaurusReady = false;
   let knownFilters = '';
 
   function readSearchAddress() {
@@ -325,6 +326,7 @@
   }
 
   function mount() {
+    if (document.getElementById('__docusaurus') && !docusaurusReady) return;
     if (searchPage) {
       syncTheme();
       return;
@@ -675,7 +677,16 @@
 
   function initialize() {
     addStylesheet('site-search-styles', `/assets/site-search.css?v=${ASSET_VERSION}`);
-    mount();
+    const docusaurusRoot = document.getElementById('__docusaurus');
+    if (docusaurusRoot) {
+      const afterLoad = () => {
+        const activate = () => { docusaurusReady = true; mount(); };
+        if ('requestIdleCallback' in window) window.requestIdleCallback(activate, { timeout: 3000 });
+        else window.setTimeout(activate, 1000);
+      };
+      if (document.readyState === 'complete') afterLoad();
+      else window.addEventListener('load', afterLoad, { once: true });
+    } else mount();
     if (searchPage) {
       const workspace = document.querySelector('.site-search-workspace');
       workspace.addEventListener('input', event => {
@@ -744,7 +755,6 @@
       document.addEventListener('pointerover', eagerLoad, { passive: true });
     }
 
-    const docusaurusRoot = document.getElementById('__docusaurus');
     if (docusaurusRoot) {
       new MutationObserver(scheduleMount).observe(docusaurusRoot, { childList: true, subtree: true });
     }

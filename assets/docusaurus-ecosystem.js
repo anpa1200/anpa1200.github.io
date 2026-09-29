@@ -29,8 +29,8 @@
   loadSiteSearch();
 
   function addGateway() {
-    const footer = document.querySelector('.footer');
-    if (!footer) return;
+    const root = document.getElementById('__docusaurus');
+    if (!root || !root.parentNode) return;
 
     let gateway = document.querySelector('.ecosystem-project-bar');
     if (!gateway) {
@@ -56,17 +56,13 @@
       `;
     }
 
-    // Docusaurus/React may reorder injected root siblings during client-side
-    // navigation. Keep the gateway anchored directly before the current footer.
-    if (gateway.parentNode !== footer.parentNode || gateway.nextElementSibling !== footer) {
-      footer.parentNode.insertBefore(gateway, footer);
+    // Keep the gateway outside React's hydration root, across route changes.
+    // The old pre-hydration insertion before .footer caused a React mismatch.
+    if (gateway.parentNode !== root.parentNode || gateway.previousElementSibling !== root) {
+      root.parentNode.insertBefore(gateway, root.nextSibling);
     }
   }
 
-  function integrate() {
-    addGateway();
-  }
-
-  integrate();
-  new MutationObserver(integrate).observe(document.documentElement, { childList: true, subtree: true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addGateway, { once: true });
+  else addGateway();
 })();

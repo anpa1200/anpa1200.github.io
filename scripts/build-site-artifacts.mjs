@@ -343,10 +343,6 @@ for (const page of pages) {
 }
 
 const factModel = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
-localEntries.set('https://1200km.com/llms.txt', {
-  loc: 'https://1200km.com/llms.txt',
-  lastmod: isoDate(factModel.facts['site.description']?.verified_at),
-});
 const stableTag = factModel.facts['adversarygraph.latest_release_tag'];
 const stablePublished = factModel.facts['adversarygraph.release_published_at'];
 const sourceRelease = factModel.facts['adversarygraph.current_source_release'];

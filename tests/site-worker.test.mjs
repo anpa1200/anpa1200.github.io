@@ -56,7 +56,7 @@ test('directory redirect retains host and query and leaves fragment inheritance 
 });
 
 test('all broken legacy crosslinks redirect to reviewed current routes without origin escape', async () => {
-  assert.equal(LEGACY_CROSSLINK_REDIRECTS.size, 35);
+  assert.equal(LEGACY_CROSSLINK_REDIRECTS.size, 63);
   for (const [oldPath, newPath] of LEGACY_CROSSLINK_REDIRECTS) {
     const response = await get(`${oldPath}?source=old#section`);
     assert.equal(response.status, 301, oldPath);
@@ -211,9 +211,12 @@ test('new Worker preserves legacy security, discovery, MIME and Markdown semanti
       const request = new Request(`https://example.test${path}`);
       const old = await legacy.fetch(request);
       const next = await worker.fetch(request, environment());
-      for (const name of ['Content-Security-Policy', 'Permissions-Policy', 'Referrer-Policy', 'Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options']) {
+      for (const name of ['Permissions-Policy', 'Referrer-Policy', 'Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options']) {
         assert.equal(next.headers.get(name), old.headers.get(name), `${path} ${name}`);
       }
+      assert.match(old.headers.get('Content-Security-Policy'), /frame-src 'none'/);
+      assert.match(next.headers.get('Content-Security-Policy'), /frame-src https:\/\/www\.youtube-nocookie\.com/);
+      assert.equal(next.headers.get('Content-Security-Policy').replace('frame-src https://www.youtube-nocookie.com', "frame-src 'none'"), old.headers.get('Content-Security-Policy'));
       for (const link of (old.headers.get('Link') || '').split(/,\s*(?=<)/).filter(Boolean)) {
         assert.ok(next.headers.get('Link')?.includes(link), `${path}: lost ${link}`);
       }
@@ -226,4 +229,19 @@ test('new Worker preserves legacy security, discovery, MIME and Markdown semanti
       for (const name of ['Content-Type', 'X-Markdown-Tokens', 'Vary']) assert.equal(next.headers.get(name), old.headers.get(name));
     }
   } finally { globalThis.fetch = original; }
+});
+
+test('asset caching is immutable only for content-hashed filenames', async () => {
+  for (const [path, expected] of [
+    ['/articles/assets/js/main.85f2a5eb.js', 'public, max-age=31536000, immutable'],
+    ['/assets/site-theme.js?v=20260721-shell', 'public, max-age=86400'],
+    ['/assets/cover.png', 'public, max-age=86400'],
+    ['/pagefind/fragment/test.pf_fragment', 'public, max-age=86400'],
+  ]) {
+    const response = await get(path, {}, { ASSETS: { fetch: async () => new Response('asset') } });
+    assert.equal(response.headers.get('Cache-Control'), expected, path);
+  }
+  assert.equal((await get('/about.html')).headers.get('Cache-Control'), null);
+  const missing = await get('/assets/missing.js');
+  assert.equal(missing.headers.get('Cache-Control'), null);
 });

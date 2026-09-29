@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { dirname, extname, resolve } from 'node:path';
 import { transformHtmlElements } from './html-token-utils.mjs';
 import { topicsFromText } from './content-topic-lib.mjs';
@@ -864,9 +865,15 @@ export function hardenStandaloneHead(html) {
   // Keep frames disabled by default, but allow the explicitly supported
   // YouTube embeds used by course articles. This preserves the restrictive
   // policy for every page that does not embed external media.
-  const standaloneCsp = /<iframe\b[^>]*\bsrc=["']https:\/\/(?:www\.)?youtube-nocookie\.com\//i.test(transformed)
+  let standaloneCsp = /<iframe\b[^>]*\bsrc=["']https:\/\/(?:www\.)?youtube-nocookie\.com\//i.test(transformed)
     ? STANDALONE_CSP.replace("frame-src 'none'", 'frame-src https://www.youtube-nocookie.com https://www.youtube.com')
     : STANDALONE_CSP;
+  // Authorize the glossary's exact script bytes, not arbitrary inline code.
+  const glossaryScript = transformed.match(/<script>(\s*const TERMS = [\s\S]*?)<\/script>/i)?.[1];
+  if (glossaryScript) {
+    const digest = createHash('sha256').update(glossaryScript, 'utf8').digest('base64');
+    standaloneCsp = standaloneCsp.replace("script-src 'self'", `script-src 'self' 'sha256-${digest}'`);
+  }
   const securityMeta = [
     `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(standaloneCsp)}">`,
     /<meta\b[^>]*name=["']referrer["'][^>]*content=["']no-referrer["']/i.test(html)

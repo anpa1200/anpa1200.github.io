@@ -3,6 +3,7 @@
   if (window.__1200kmAnomalyTags) return;
   window.__1200kmAnomalyTags = true;
   let registry;
+  let ready = false;
   let timer;
   const key = path => path.replace(/\/index\.html$/, '/').replace(/\/$/, '');
   function snapshotNotice() {
@@ -20,7 +21,7 @@
     if (root) root.before(note); else title.closest('main').append(note);
   }
   function render() {
-    if (!registry) return;
+    if (!registry || !ready) return;
     snapshotNotice();
     const path = key(location.pathname);
     const ids = registry.pages[path] || [];
@@ -82,7 +83,16 @@
       }
       new MutationObserver(schedule).observe(document.body, {subtree: true, childList: true});
       window.addEventListener('popstate', schedule);
-      schedule();
+      const reactRoot = document.getElementById('__docusaurus');
+      if (reactRoot) {
+        const afterLoad = () => {
+          const activate = () => { ready = true; schedule(); };
+          if ('requestIdleCallback' in window) window.requestIdleCallback(activate, { timeout: 3000 });
+          else window.setTimeout(activate, 1000);
+        };
+        if (document.readyState === 'complete') afterLoad();
+        else window.addEventListener('load', afterLoad, { once: true });
+      } else { ready = true; schedule(); }
     } catch (error) {
       console.warn('Anomaly navigation unavailable; page content is unaffected.', error.message);
     }
