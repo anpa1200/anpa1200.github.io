@@ -3,8 +3,9 @@ import test from 'node:test';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import {
-  crosslinkRewrites, ctiSourceRewrites, missingCrosslinkTargets, rewriteCrosslinks, rewriteCrosslinksInDirectory,
+  archiveSourceRewrites, crosslinkRewrites, ctiSourceRewrites, missingCrosslinkTargets, rewriteCrosslinks, rewriteCrosslinksInDirectory,
 } from '../scripts/canonical-crosslinks.mjs';
 
 test('all reviewed crosslink targets are unique same-origin paths', () => {
@@ -32,6 +33,22 @@ test('pinned Markdown and JSX links are rewritten before the hydration build', a
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('archive preparation rewrites authored links even when the slash policy is already set', () => {
+  const root = mkdtempSync(join(tmpdir(), '1200km-archive-crosslinks-'));
+  try {
+    mkdirSync(join(root, 'docs'));
+    writeFileSync(join(root, 'docusaurus.config.js'), 'const config = { trailingSlash: true };\n');
+    const source = join(root, 'docs', 'article.md');
+    writeFileSync(source, '<a href="https://1200km.com/adversarygraph-docs/get-started.html">/adversarygraph-docs/get-started.html</a>');
+    for (let run = 0; run < 2; run++) {
+      const result = spawnSync(process.execPath, [new URL('../scripts/prepare-article-archive.mjs', import.meta.url).pathname, '--archive', root], { encoding: 'utf8' });
+      assert.equal(result.status, 0, result.stderr);
+    }
+    assert.match(readFileSync(source, 'utf8'), /adversarygraph-docs\/getting-started\//);
+    assert.doesNotMatch(readFileSync(source, 'utf8'), /get-started\.html/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('rewrite never corrupts a valid child route sharing a stale parent prefix', () => {
   const valid = 'https://1200km.com/cti-analyst-field-manual/docs/actor-research/actor-profile-template/';
   const stale = 'https://1200km.com/cti-analyst-field-manual/docs/actor-research/';
@@ -47,6 +64,12 @@ test('Docusaurus CTI source routes are normalized before its base URL is applied
   const { output, counts } = rewriteCrosslinks(input, ctiSourceRewrites);
   assert.equal(output, '[Assignment](/CTI_as_a_Code/training/proactive-celltronx/) [Catalog](/CTI_as_a_Code/training/)');
   assert.equal(Object.values(counts).reduce((sum, count) => sum + count, 0), 2);
+});
+
+test('archive source overlay also updates labels that display retired paths', () => {
+  assert.equal(archiveSourceRewrites.length, 2);
+  const { output } = rewriteCrosslinks('<span>/adversarygraph-docs/capabilities.html</span>', archiveSourceRewrites);
+  assert.equal(output, '<span>/adversarygraph-docs/capabilities/</span>');
 });
 
 test('every canonical destination must be emitted into the static artifact', () => {

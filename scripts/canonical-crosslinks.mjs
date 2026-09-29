@@ -24,6 +24,8 @@ export const crosslinkRewrites = manifest.rewrites
   .sort((a, b) => b.from.length - a.from.length);
 export const ctiSourceRewrites = manifest.source_rewrites.CTI_as_a_Code
   .sort((a, b) => b.from.length - a.from.length);
+export const archiveSourceRewrites = manifest.source_rewrites.MediumArticleArchive
+  .sort((a, b) => b.from.length - a.from.length);
 
 export function rewriteCrosslinks(input, rewrites = crosslinkRewrites) {
   let output = input;
