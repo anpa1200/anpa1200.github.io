@@ -109,6 +109,16 @@ test('migration exceptions bind exact before/after differences to the frozen rol
   assert.notEqual(comparisonHash(Buffer.from(html), 'text/html'), comparisonHash(Buffer.from(html.replace('Preserved', 'Changed')), 'text/html'));
 });
 
+test('range parity uses fresh cache keys and still requires exact artifact bytes', () => {
+  const verifier = read('scripts/verify-hosting-parity.mjs');
+  assert.match(verifier, /__range_probe=\$\{encodeURIComponent\(nonce\)\}-\$\{attempt\}/);
+  assert.match(verifier, /attempt < 3/);
+  assert.match(verifier, /previewRange\.sha256 === expected/);
+  assert.match(verifier, /range body versus artifact/);
+  assert.match(verifier, /recovered_after_retry/);
+});
+
+
 test('artifact routing expectations distinguish missing companion content from valid pages', () => {
   const paths = new Set(['index.html', 'about.html', 'articles/index.html', '404.html', '.well-known/api-catalog']);
   assert.deepEqual(localAsset('/', paths), { status: 200, asset: 'index.html' });

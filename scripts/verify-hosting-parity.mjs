@@ -227,9 +227,21 @@ const after = await fetchRecord(production, '/build.json');
 report.production_after = JSON.parse(after.body);
 report.production_unchanged = baseline.sha256 === after.sha256;
 if (!report.production_unchanged) difference('/build.json', 'production changed during comparison; rerun on stable baseline', report.production_before, report.production_after);
-const [previewRange, productionRange] = await Promise.all([preview, production].map((origin) => fetchRecord(origin, '/about.html', '*/*', 'GET', { Range: 'bytes=0-9', 'Accept-Encoding': 'identity' })));
-report.range_probe = { preview: publicRecord(previewRange), production: publicRecord(productionRange) };
 const about = await readFile(join(site, 'about.html'));
+const rangeHeaders = { Range: 'bytes=0-9', 'Accept-Encoding': 'identity' };
+let previewRange, productionRange;
+let rangeAttempts = 0;
+// Identity and compressed asset variants can propagate independently after a
+// deploy. Probe a fresh cache key and retry only an exact-byte mismatch.
+for (let attempt = 0; attempt < 3; attempt += 1) {
+  rangeAttempts += 1;
+  const rangePath = `/about.html?__range_probe=${encodeURIComponent(nonce)}-${attempt}`;
+  [previewRange, productionRange] = await Promise.all([preview, production].map((origin) => fetchRecord(origin, rangePath, '*/*', 'GET', rangeHeaders)));
+  const expected = sha256(previewRange.status === 206 ? about.subarray(0, 10) : about);
+  if ([200, 206].includes(previewRange.status) && previewRange.sha256 === expected) break;
+  if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 1_000));
+}
+report.range_probe = { preview: publicRecord(previewRange), production: publicRecord(productionRange), attempts: rangeAttempts, recovered_after_retry: rangeAttempts > 1 };
 check([200, 206].includes(previewRange.status), 'Range /about.html', 'valid range response status', previewRange.status);
 check(previewRange.sha256 === sha256(previewRange.status === 206 ? about.subarray(0, 10) : about), 'Range /about.html', 'range body versus artifact', previewRange.sha256);
 if (previewRange.status !== productionRange.status) difference('Range /about.html', 'partial-response support', productionRange.status, previewRange.status, 'provider-range-full-body-fallback');
