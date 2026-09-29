@@ -9,6 +9,8 @@ test('all independently hosted companion roots are pinned', () => {
   const read = (path) => JSON.parse(readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'));
   const entries = validateCompanions(read('cloudflare/companion-sites.json'));
   const mounts = new Set(entries.map((entry) => entry.mount));
+  // The Atlas pin is a source commit on main; only gh-pages has a root index.html.
+  assert.equal(entries.find((entry) => entry.mount === 'anomaly-detection-atlas')?.kind, 'docusaurus');
   for (const source of [...read('seo/remote-sitemaps.json'), ...read('seo/remote-pages.json')]) {
     assert.ok(mounts.has(new URL(source.url).pathname.split('/')[1]), source.url);
   }
