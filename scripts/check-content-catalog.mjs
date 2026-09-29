@@ -311,6 +311,12 @@ for (const item of catalog.items || []) {
   }
 }
 
+const searchUtilityUrl = 'https://1200km.com/search.html';
+const searchUtility = read(join(siteRoot, 'search.html'));
+if (!/<meta name="robots" content="noindex,follow"/.test(searchUtility) || sitemapSet.has(searchUtilityUrl)) {
+  fail('search.html must remain a navigable noindex utility outside the content sitemap.');
+}
+
 for (const relativePath of config.major_indexes || []) {
   const path = join(siteRoot, relativePath);
   const html = read(path);
@@ -321,7 +327,7 @@ for (const relativePath of config.major_indexes || []) {
     if (parsedUrl.hostname === 'github.com' || parsedUrl.hostname === 'pypi.org' || parsedUrl.hostname === 'linkedin.com') continue;
     if (/\.(?:json|xml|txt|pdf|png|jpe?g|webp|svg)$/i.test(parsedUrl.pathname)) continue;
     if (url === 'https://medium.com/@1200km') continue;
-    if (itemByAnyUrl.has(url) || aliasUrls.has(url)) continue;
+    if (itemByAnyUrl.has(url) || aliasUrls.has(url) || url === searchUtilityUrl) continue;
     const declared = (catalog.declared_collections || []).some((collection) => url.startsWith(collection.canonical_prefix));
     if (declared && catalog.scope === 'local-source-catalog') continue;
     if (parsedUrl.hostname === '1200km.com' || /(?:medium\.com|infosecwriteups\.com)$/.test(parsedUrl.hostname)) {

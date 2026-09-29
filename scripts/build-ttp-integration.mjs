@@ -41,6 +41,7 @@ const tools = read('data/tools.json').records.map((r) => read(`data/tools/${r.id
 const telemetry = read('data/telemetry.json').records.map((r) => read(`data/telemetry/${r.id}.json`));
 const detections = inventory.records.map((r) => read(`data/detections/${r.key}.json`));
 const rules = read('data/detection-rules.json').records.map((r) => read(r.data_path));
+const ruleById = new Map(rules.map((row) => [row.id, row]));
 const actorTools = read('data/actor-tool-links.json');
 const matrix = JSON.parse(readFileSync(join(site, 'threat-matrix/mitre-data.json'), 'utf8'));
 const matrixIds = new Set(matrix.techniques.map((r) => r.id));
@@ -96,21 +97,22 @@ function renderPage({ page, title, description, core, connections = '', interact
   const seoTitle = title.length > 103 ? title.slice(0, 100).trimEnd() + '…' : title;
   const seoDescription = kind === 'sigma-rule' ? description : `${title}. ${description}`;
   const canonical = ORIGIN + BASE + page;
+  const sigmaRule = kind === 'sigma-rule' ? ruleById.get(page.split('/')[2]) : null;
   const active = Object.keys(interactive).length > 0;
   const bodyData = Object.entries(interactive).map(([k, v]) => ` data-${k}="${esc(v)}"`).join('');
-  const schema = { '@context': 'https://schema.org', '@type': 'WebPage', '@id': canonical + '#webpage', url: canonical, name: title, description, datePublished: kind === 'lab' ? '2026-09-28' : '2026-09-27', dateModified: '2026-09-28', author: { '@type': 'Person', name: 'Andrey Pautov', url: ORIGIN + '/about.html' }, isPartOf: { '@type': 'WebSite', '@id': ORIGIN + '/#website', name: '1200km', url: ORIGIN + '/' } };
+  const schema = { '@context': 'https://schema.org', '@type': 'WebPage', '@id': canonical + '#webpage', url: canonical, name: title, description, datePublished: kind === 'lab' ? '2026-09-28' : '2026-09-27', dateModified: '2026-09-28', ...(sigmaRule ? { creditText: sigmaRule.author, isBasedOn: sigmaRule.source_url } : { author: { '@type': 'Person', name: 'Andrey Pautov', url: ORIGIN + '/about.html' } }), isPartOf: { '@type': 'WebSite', '@id': ORIGIN + '/#website', name: '1200km', url: ORIGIN + '/' } };
   const ownTags = [...(pageTags.get(page) || [])];
   pages.push({ page, title, kind, tags: ownTags });
   output(BASE.slice(1) + page + 'index.html', `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(seoTitle)} | 1200km</title><meta name="description" content="${esc(seoDescription)}">
-<meta name="author" content="Andrey Pautov"><meta name="robots" content="index,follow">
+<meta name="author" content="${esc(sigmaRule?.author || 'Andrey Pautov')}"><meta name="robots" content="${kind === 'tag' ? 'noindex,follow' : 'index,follow'}">
 <meta name="keywords" content="${esc([...new Set([...keywords, ...ownTags])].join(', '))}">
 <meta name="ttp-module-tags" content="${esc(ownTags.join(', '))}">
-<link rel="canonical" href="${canonical}"><meta property="og:url" content="${canonical}">
-<meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:image" content="${ORIGIN}/assets/ap-logo.png">
-<meta name="twitter:card" content="summary"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}"><meta name="twitter:image" content="${ORIGIN}/assets/ap-logo.png">
+<link rel="canonical" href="${canonical}"><link rel="icon" href="/favicon.ico" type="image/x-icon"><meta property="og:url" content="${canonical}">
+<meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:image" content="${ORIGIN}/assets/site-og-v2.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}"><meta name="twitter:image" content="${ORIGIN}/assets/site-og-v2.png">
 <script type="application/ld+json">${JSON.stringify(schema).replaceAll('<', '\\u003c')}</script>
 <link rel="stylesheet" href="${BASE}assets/catalog.css"><link rel="stylesheet" href="${BASE}assets/integration.css">
 ${interactive.technique ? `<script type="module" src="${BASE}assets/workbook-app.mjs"></script>` : ''}
@@ -230,10 +232,15 @@ for (const [path, links] of backlinks) {
   if (!existsSync(file)) { pending.push(path); continue; } // Article archive may be staged later in CI.
   const original = readFileSync(file, 'utf8');
   const block = `${start}<section id="ttp-ecosystem" class="ttp-ecosystem-links"><h2>Attack tools, simulations and detection rules</h2><p>Follow explicit source relationships into the reference modules. Linked procedures and detectors are not claims of live validation or actor attribution.</p>${list([...links.values()].map((r) => `${a(r.target, r.title)} <small>— ${esc(r.basis)}</small>`))}</section>${end}`;
-  let html = original.includes(start) ? original.replace(new RegExp(`${start}[\\s\\S]*?${end}`), block) : original.replace(/<\/main>/i, block + '\n</main>');
-  if (path.startsWith('/articles/read/')) {
-    // Keep static and hydrated backlinks inside the article column, not as a flex sibling.
-    html = html.replace(new RegExp(`${start}[\\s\\S]*?${end}\\n?`), '').replace(/<\/article>/i, block + '\n</article>');
+  const docusaurus = original.includes('id="__docusaurus"');
+  // Post-build edits inside the React root invalidate SSR hydration.
+  // Crawlable fallback links remain outside it until the client has hydrated.
+  let html;
+  if (docusaurus) {
+    html = original.replace(new RegExp(`${start}[\\s\\S]*?${end}\\n?`), '');
+    html = html.replace(/<\/body>/i, block + '\n</body>');
+  } else {
+    html = original.includes(start) ? original.replace(new RegExp(`${start}[\\s\\S]*?${end}`), block) : original.replace(/<\/main>/i, block + '\n</main>');
   }
   if (!html.includes('/ttp-simulation/assets/guide-links.css')) {
     html = html.replace(/<\/head>/i, '<link rel="stylesheet" href="/ttp-simulation/assets/guide-links.css"></head>');
@@ -241,8 +248,8 @@ for (const [path, links] of backlinks) {
   if (path.startsWith('/articles/read/') && !html.includes('/ttp-simulation/assets/guide-links.js')) {
     html = html.replace(/<\/head>/i, '<script src="/ttp-simulation/assets/guide-links.js" defer></script></head>');
   }
-  // Inline links only in plain text nodes on reviewed guide/Atlas pages. Never modify code, existing links, scripts or navigation.
-  if (/^\/(?:anomaly-detection-atlas|articles\/read)\//.test(path)) {
+  // Never post-process Docusaurus-rendered text; that also invalidates hydration.
+  if (!docusaurus && /^\/(?:anomaly-detection-atlas|articles\/read)\//.test(path)) {
     const inline = new Map();
     for (const r of links.values()) {
       const tid = r.title.match(/^T\d{4}(?:\.\d{3})?/);

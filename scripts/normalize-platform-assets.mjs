@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { sameOriginPlatformAssets } from './companion-sites-lib.mjs';
 import { parse, serialize } from 'parse5';
@@ -26,10 +26,12 @@ async function walk(directory) {
         // Standard HTML parsing preserves the DOM while making valid unquoted
         // attributes readable by the existing release metadata transformations.
         const document = parse(after);
+        const socialMeta = [];
         const visit = (node) => {
           const title = metadata.titles[relativePath], description = metadata.descriptions[relativePath];
           if (node.tagName === 'title' && title) node.childNodes = [{ nodeName: '#text', value: title, parentNode: node }];
           if (node.tagName === 'meta') {
+            socialMeta.push(node);
             const key = node.attrs.find((attr) => ['name', 'property'].includes(attr.name))?.value;
             const value = ['og:title', 'twitter:title'].includes(key) ? title : ['description', 'og:description', 'twitter:description'].includes(key) ? description : '';
             const content = node.attrs.find((attr) => attr.name === 'content');
@@ -38,6 +40,31 @@ async function walk(directory) {
           for (const child of node.childNodes || []) visit(child);
         };
         visit(document);
+        const socialKey = (node) => node.attrs.find((attr) => ['name', 'property'].includes(attr.name))?.value;
+        const socialContent = (node) => node.attrs.find((attr) => attr.name === 'content');
+        const replaced = new Set();
+        for (const node of socialMeta) {
+          const key = socialKey(node);
+          const content = socialContent(node);
+          if (!['og:image', 'twitter:image'].includes(key) || !content) continue;
+          let oversized = false;
+          try {
+            const image = new URL(content.value, 'https://1200km.com');
+            if (image.origin === 'https://1200km.com') {
+              oversized = (await stat(join(site, image.pathname.replace(/^\/+/, '')))).size > 5 * 1024 * 1024;
+            }
+          } catch { /* Missing or external media is handled by the link audit. */ }
+          if (!/\.svg(?:[?#]|$)/i.test(content.value) && !oversized) continue;
+          content.value = 'https://1200km.com/assets/site-og-v2.png';
+          replaced.add(key.split(':')[0]);
+        }
+        for (const node of socialMeta) {
+          const key = socialKey(node);
+          if (['og:image:alt', 'twitter:image:alt'].includes(key) && replaced.has(key.split(':')[0])) {
+            const content = socialContent(node);
+            if (content) content.value = '1200km Security Research — threat intelligence and detection engineering';
+          }
+        }
         after = serialize(document);
       }
       if (after !== before) { await writeFile(path, after); changed++; }

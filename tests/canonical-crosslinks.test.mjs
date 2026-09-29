@@ -9,7 +9,8 @@ import {
 } from '../scripts/canonical-crosslinks.mjs';
 
 test('all reviewed crosslink targets are unique same-origin paths', () => {
-  assert.equal(crosslinkRewrites.length, 35);
+  assert.equal(crosslinkRewrites.length, 63);
+  assert.equal(crosslinkRewrites.filter(({ from }) => from.startsWith('/israel-government-threat-actors-cti/docs/actors/')).length, 15);
   assert.equal(new Set(crosslinkRewrites.map(({ from }) => from)).size, crosslinkRewrites.length);
   for (const { from, to } of crosslinkRewrites) {
     assert.equal(new URL(from, 'https://1200km.com').origin, 'https://1200km.com');
@@ -80,7 +81,7 @@ test('every canonical destination must be emitted into the static artifact', () 
       if (to === navigator) continue;
       const pathname = new URL(to, 'https://1200km.com').pathname;
       const relative = decodeURIComponent(pathname).replace(/^\//, '');
-      const file = join(root, relative, 'index.html');
+      const file = pathname.endsWith('/') ? join(root, relative, 'index.html') : join(root, relative);
       mkdirSync(dirname(file), { recursive: true });
       writeFileSync(file, 'target');
     }

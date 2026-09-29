@@ -381,8 +381,7 @@ for (const page of pages) {
 }
 
 const canonicalUrls = new Set(pages.map((page) => page.canonical));
-const auxiliarySitemapUrls = new Set(['https://1200km.com/llms.txt']);
-const expectedLocalSitemapUrls = new Set([...canonicalUrls, ...auxiliarySitemapUrls]);
+const expectedLocalSitemapUrls = canonicalUrls;
 const sitemapAllPath = join(siteRoot, 'sitemap-all.xml');
 const sitemapPath = join(siteRoot, 'sitemap.xml');
 if (!existsSync(sitemapAllPath) || !existsSync(sitemapPath)) failures.push('sitemap files are missing');

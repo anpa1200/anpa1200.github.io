@@ -36,6 +36,7 @@ const messages = Object.freeze({
 });
 
 let updated = 0;
+const routes = {};
 for (const item of catalog.items || []) {
   if (!/^https:\/\/1200km\.com\/articles\/read\/\d{4}\//.test(item.canonical_url)) continue;
   const message = messages[item.lifecycle];
@@ -52,10 +53,15 @@ for (const item of catalog.items || []) {
   const docsLink = item.lifecycle === 'historical' && /adversarygraph/i.test(item.title)
     ? ' <a href="/adversarygraph-docs/">Open current AdversaryGraph documentation</a>.'
     : '';
-  const banner = `<aside class="content-lifecycle-banner" data-content-lifecycle="${item.lifecycle}" aria-label="Content lifecycle"><strong>${message.label}</strong><p>${message.text}${docsLink}</p></aside>`;
-  html = html.replace(marker, `${marker}${banner}`);
+  if (!html.includes('/assets/content-governance.js')) {
+    html = html.replace(/<\/head>/i, '<script src="/assets/content-governance.js" defer></script>\n</head>');
+  }
+  routes[new URL(item.canonical_url).pathname] = { lifecycle: item.lifecycle, ...message, docsLink: Boolean(docsLink) };
+  const banner = `<aside class="content-lifecycle-banner" data-content-lifecycle="${item.lifecycle}" data-governance-fallback aria-label="Content lifecycle"><strong>${message.label}</strong><p>${message.text}${docsLink}</p></aside>`;
+  html = html.replace(/<\/body>/i, `${banner}\n</body>`);
   await writeFile(path, html);
   updated += 1;
 }
 
+await writeFile(join(siteRoot, 'data', 'article-lifecycle.json'), `${JSON.stringify({ routes }, null, 2)}\n`);
 console.log(`Applied static lifecycle banners to ${updated} governed article page(s).`);

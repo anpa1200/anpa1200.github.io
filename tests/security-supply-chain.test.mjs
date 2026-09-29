@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
@@ -124,6 +125,22 @@ test('all third-party workflow actions are pinned to full commit SHAs', () => {
     }
   }
   assert.deepEqual(unpinned, []);
+});
+
+test('glossary script has an exact CSP hash and print controls use external delegation', () => {
+  const glossary = readFileSync(join(ROOT, 'ai-security-course/glossary.html'), 'utf8');
+  const script = glossary.match(/<script>(\s*const TERMS = [\s\S]*?)<\/script>/i)?.[1];
+  assert.ok(script, 'authored glossary script exists');
+  const hash = createHash('sha256').update(script, 'utf8').digest('base64');
+  const hardened = hardenStandaloneHead(glossary);
+  assert.ok(hardened.includes(`'sha256-${hash}'`));
+  assert.doesNotMatch(hardened, /script-src[^;]*'unsafe-inline'/);
+  assert.equal((hardenStandaloneHead(hardened).match(/Content-Security-Policy/g) || []).length, 1);
+  for (const file of ['cv.html', ...['module-00', 'module-01', 'module-00-instructor', 'module-01-instructor', 'module-00-workbook', 'module-01-workbook'].map(name => `ai-security-course/${name}.html`)]) {
+    const page = readFileSync(join(ROOT, file), 'utf8');
+    assert.doesNotMatch(page, /onclick="window\.print\(\)"/);
+    assert.match(page, /data-print-page/);
+  }
 });
 
 test('RFC 9116 endpoint has canonical contact, policy, and future expiry', () => {

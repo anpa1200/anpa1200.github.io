@@ -126,6 +126,16 @@ export function createSiteWorker(headerText) {
   const rules = parseHeaderPolicy(headerText);
   const finish = (response, pathname, request, status = response.status) => {
     const headers = responseHeaders(response.headers, pathname, rules);
+    // Static Assets defaults to revalidation on every visit. Cache asset URLs
+    // in browsers; reserve immutable for names with an embedded content hash.
+    // Query-string versions are not assumed immutable because some are stale.
+    if (status === 200 && (pathname.startsWith('/pagefind/') || /\.(?:avif|css|gif|ico|jpe?g|js|mjs|mp4|png|svg|ttf|wasm|webm|webp|woff2?)$/i.test(pathname))) {
+      const fingerprinted = /\.[a-f0-9]{8,}\.(?:css|js|mjs|avif|gif|jpe?g|png|svg|webp|woff2?)$/i.test(pathname);
+      headers.set('Cache-Control', fingerprinted
+        ? 'public, max-age=31536000, immutable'
+        : 'public, max-age=86400');
+    }
+
     // Production ASSETS omits these charsets even though local workerd adds
     // them. Preserve Pages' UTF-8 declaration without changing redirect MIME.
     const mime = headers.get('Content-Type') || '';
