@@ -166,6 +166,9 @@ export function normalizeMetaDescriptions(html) {
   let decodedCurrent = decodeEntities(current);
   if (canonical?.includes('/ITDR/') && title) {
     // Older release passes repeated an ITDR title before the source summary.
+    const repeatedLead = /^([^.!?]{3,100}\.)\s+\1(?=\s|$)/i;
+    while (repeatedLead.test(decodedCurrent)) decodedCurrent = decodedCurrent.replace(repeatedLead, '$1');
+
     // Only remove exact leading title sentences when another title follows.
     const repeatedTitle = `${title}. `;
     while (decodedCurrent.toLowerCase().startsWith(repeatedTitle.toLowerCase())

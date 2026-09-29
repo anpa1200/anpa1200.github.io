@@ -201,6 +201,19 @@ test('ITDR descriptions collapse only repeated leading title sentences', () => {
   assert.doesNotMatch(acronymOutput, /Dcsync\. Dcsync/);
 });
 
+test('real ITDR detection and Linux pages no longer repeat their lead sentences', () => {
+  for (const path of [
+    'ITDR/docs/detection/ad-attack-detection/detect-asrep-roasting/index.html',
+    'ITDR/docs/protocols/linux-identity/linux-sssd/index.html',
+  ]) {
+    const canonical = `https://1200km.com/${path.replace(/index\.html$/, '')}`;
+    const source = readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+    const output = transformReleaseHtml(source, { canonical });
+    const description = output.match(/<meta\b[^>]*name="description"[^>]*content="([^"]+)"/i)?.[1] || '';
+    assert.doesNotMatch(description, /^(.+?)\.\s+\1(?:\.|\s|\b)/i, canonical);
+  }
+});
+
 test('pages without a bespoke share image receive the governed social fallback', () => {
   const input = '<html><head><title>Research Note | 1200km</title></head><body><main><h1>Research Note</h1></main></body></html>';
   const output = normalizeSocialImages(input);
