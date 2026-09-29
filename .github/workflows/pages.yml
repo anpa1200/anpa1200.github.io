@@ -319,7 +319,11 @@ jobs:
           PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
         run: |
           node scripts/wait-static-deployment.mjs --site ./dist --origin "$PREVIEW_URL"
-          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$PREVIEW_URL" --report-only-differences --report "${RUNNER_TEMP}/cloudflare-parity.json"
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$PREVIEW_URL" --report-only-differences --report "${RUNNER_TEMP}/cloudflare-parity.json"; then break; fi
+            if [ "$attempt" -eq 6 ]; then exit 1; fi
+            sleep 20
+          done
       - name: Verify hosted Pagefind engine, search UI, and fragment navigation
         if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
         env:
@@ -419,7 +423,11 @@ jobs:
           WORKER_URL: ${{ steps.site-deployment.outputs.deployment-url }}
         run: |
           node scripts/wait-static-deployment.mjs --site ./dist --origin "$WORKER_URL"
-          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --migration-baseline cloudflare/migration-baseline.json --report "${RUNNER_TEMP}/production-worker-parity.json"
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --migration-baseline cloudflare/migration-baseline.json --report "${RUNNER_TEMP}/production-worker-parity.json"; then break; fi
+            if [ "$attempt" -eq 6 ]; then exit 1; fi
+            sleep 20
+          done
           node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin "$WORKER_URL"
       - name: Preserve production Worker evidence
         if: ${{ always() }}
