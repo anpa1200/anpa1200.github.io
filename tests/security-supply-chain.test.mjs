@@ -81,12 +81,13 @@ test('release transforms remove only selected complete script elements', () => {
     '<script src="https://www.googletagmanager.com/gtag/js?id=G-TEST123"></script >',
     '<script>gtag("config", "G-TEST123");</script >',
     '<script src="/assets/site-theme.js"></script >',
+    '<script src="/assets/site-performance.js" data-google-analytics-id="G-TEST123" defer></script >',
     '</head><body><main><h1>Test</h1></main></body></html>',
   ].join('');
   const withoutThirdParty = deferThirdPartyBoot(input);
   assert.doesNotMatch(withoutThirdParty, /googletagmanager|gtag\("config"/);
   assert.match(withoutThirdParty, /src="\/assets\/site-theme\.js"/);
-  assert.match(withoutThirdParty, /data-google-analytics-id="G-TEST123"/);
+  assert.doesNotMatch(withoutThirdParty, /site-performance\.js|data-google-analytics-id/);
 
   const output = replaceStructuredData(withoutThirdParty, {
     canonical: 'https://1200km.com/test.html',
@@ -111,6 +112,14 @@ test('edge worker declares all response security headers', () => {
     assert.ok(worker.includes(`'${name}'`), `${name} is missing`);
   }
   assert.match(worker, /frame-ancestors 'none'/);
+});
+
+test('no release security policy authorizes Google Analytics before opt-in', () => {
+  const headerPolicy = readFileSync(join(ROOT, '_headers'), 'utf8');
+  const standalone = hardenStandaloneHead('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>');
+  for (const policy of [headerPolicy, standalone]) {
+    assert.doesNotMatch(policy, /googletagmanager\.com|google-analytics\.com|analytics\.google\.com/i);
+  }
 });
 
 test('all third-party workflow actions are pinned to full commit SHAs', () => {

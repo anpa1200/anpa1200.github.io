@@ -216,7 +216,10 @@ test('new Worker preserves legacy security, discovery, MIME and Markdown semanti
       }
       assert.match(old.headers.get('Content-Security-Policy'), /frame-src 'none'/);
       assert.match(next.headers.get('Content-Security-Policy'), /frame-src https:\/\/www\.youtube-nocookie\.com/);
-      assert.equal(next.headers.get('Content-Security-Policy').replace('frame-src https://www.youtube-nocookie.com', "frame-src 'none'"), old.headers.get('Content-Security-Policy'));
+      const nextCsp = next.headers.get('Content-Security-Policy').replace('frame-src https://www.youtube-nocookie.com', "frame-src 'none'");
+      const oldCspWithoutAnalytics = old.headers.get('Content-Security-Policy').replace(/ https:\/\/(?:www\.googletagmanager\.com|www\.google-analytics\.com|analytics\.google\.com|region1\.google-analytics\.com)/g, '');
+      assert.doesNotMatch(nextCsp, /googletagmanager|google-analytics|analytics\.google/);
+      assert.equal(nextCsp, oldCspWithoutAnalytics);
       for (const link of (old.headers.get('Link') || '').split(/,\s*(?=<)/).filter(Boolean)) {
         assert.ok(next.headers.get('Link')?.includes(link), `${path}: lost ${link}`);
       }

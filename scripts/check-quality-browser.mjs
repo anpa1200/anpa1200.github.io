@@ -126,7 +126,13 @@ const server = createServer((request, response) => {
     response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }).end('Not found');
     return;
   }
-  response.writeHead(200, { 'cache-control': 'no-store', 'content-type': contentTypes[extname(file)] || 'application/octet-stream' });
+  // Every page starts with Network.clearBrowserCache. Within that cold page,
+  // mirror production's asset caching so duplicate Docusaurus chunk requests
+  // are not counted as two network transfers only in this local test server.
+  const pathname = new URL(request.url || '/', 'http://127.0.0.1').pathname;
+  const asset = pathname.startsWith('/pagefind/') || /\.(?:avif|css|gif|ico|jpe?g|js|mjs|mp4|png|svg|ttf|wasm|webm|webp|woff2?)$/i.test(pathname);
+  const fingerprinted = /\.[a-f0-9]{8,}\.(?:css|js|mjs|avif|gif|jpe?g|png|svg|webp|woff2?)$/i.test(pathname);
+  response.writeHead(200, { 'cache-control': asset ? (fingerprinted ? 'public, max-age=31536000, immutable' : 'public, max-age=86400') : 'no-store', 'content-type': contentTypes[extname(file)] || 'application/octet-stream' });
   response.end(readFileSync(file));
 });
 

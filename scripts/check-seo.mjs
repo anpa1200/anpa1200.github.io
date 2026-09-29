@@ -370,7 +370,8 @@ for (const page of pages) {
 
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(releaseHtml);
   if (/<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: release HTML still blocks on an external web font`);
-  if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: analytics was not deferred to user interaction`);
+  if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: Google Analytics boot script remains enabled`);
+  if (/<script\b[^>]*\bsrc=["'][^"']*\/assets\/site-performance\.js(?:[?#][^"']*)?["']/i.test(releaseHtml)) failures.push(`${page.rel}: legacy analytics loader remains in release HTML`);
   if (!isDocusaurus && !/<main\b[^>]*data-pagefind-body/i.test(releaseHtml)) failures.push(`${page.rel}: main is not marked as Pagefind content`);
   // H1 is already addressable by the canonical page URL. Never mutate a
   // hydrated Docusaurus tree just to add anchors; its generated document pages

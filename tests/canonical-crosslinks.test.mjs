@@ -67,6 +67,16 @@ test('Docusaurus CTI source routes are normalized before its base URL is applied
   assert.equal(Object.values(counts).reduce((sum, count) => sum + count, 0), 2);
 });
 
+test('CTI source rewrite leaves a GitHub blob URL intact', () => {
+  const path = '/investigations/lifetech-2024-11/03-analysis/attck-mapping/attck-navigator-layer.json';
+  const external = `https://github.com/anpa1200/CTI_as_a_Code/blob/main${path}`;
+  const input = `[Source](${external}) [Local](${path})`;
+  const { output, counts } = rewriteCrosslinks(input, ctiSourceRewrites);
+  assert.ok(output.includes(`[Source](${external})`));
+  assert.ok(output.includes(`[Local](https://1200km.com/CTI_as_a_Code${path})`));
+  assert.equal(counts[path], 1);
+});
+
 test('archive source overlay also updates labels that display retired paths', () => {
   assert.equal(archiveSourceRewrites.length, 2);
   const { output } = rewriteCrosslinks('<span>/adversarygraph-docs/capabilities.html</span>', archiveSourceRewrites);

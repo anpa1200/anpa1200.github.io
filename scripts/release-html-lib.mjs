@@ -852,14 +852,13 @@ export function addArticleDiscovery(html, {
 }
 
 export function deferThirdPartyBoot(html) {
-  let analyticsId = '';
   let transformed = transformHtmlElements(html, 'script', (element) => {
     const attributes = tagAttributes(element.openTag);
     if (attributes.src) {
+      if (/^(?:https:\/\/1200km\.com)?\/assets\/site-performance\.js(?:[?#]|$)/i.test(attributes.src)) return '';
       try {
         const source = new URL(attributes.src);
         if (source.origin === 'https://www.googletagmanager.com' && source.pathname === '/gtag/js') {
-          analyticsId ||= source.searchParams.get('id') || '';
           return '';
         }
       } catch {
@@ -870,7 +869,6 @@ export function deferThirdPartyBoot(html) {
 
     const config = element.content.match(/\bgtag\s*\(\s*["']config["']\s*,\s*["'](G-[A-Z0-9]+)["']/i);
     if (!config) return element.full;
-    analyticsId ||= config[1];
     return '';
   });
 
@@ -881,21 +879,17 @@ export function deferThirdPartyBoot(html) {
     .replace(/\s*<link\b[^>]*rel=["']preconnect["'][^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com[^"']*["'][^>]*>/gi, '')
     .replace(/\s*<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com[^"']*["'][^>]*rel=["']preconnect["'][^>]*>/gi, '');
 
-  if (analyticsId && !/site-performance\.js/i.test(transformed)) {
-    const performanceScript = `    <script src="/assets/site-performance.js"${analyticsId ? ` data-google-analytics-id="${escapeAttribute(analyticsId)}"` : ''} defer></script>\n`;
-    transformed = transformed.replace(/<\/head>/i, () => `${performanceScript}</head>`);
-  }
   return transformed;
 }
 
 const STANDALONE_CSP = [
   "default-src 'self'",
-  "script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com",
+  "script-src 'self' 'wasm-unsafe-eval'",
   "worker-src 'self' blob:",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com",
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
+  "connect-src 'self'",
   "frame-src 'none'",
   "object-src 'none'",
   "base-uri 'self'",

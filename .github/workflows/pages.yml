@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTICLE_ARCHIVE_COMMIT: 6d51490ee32a382a92f350d6bd90703f8c42ef17
+  ARTICLE_ARCHIVE_COMMIT: 761376a6caef1495be16a35660b658ba1db063e2
 
 jobs:
   quality:
@@ -312,14 +312,18 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: cloudflare
-          wranglerVersion: 4.142.0
+          wranglerVersion: 4.144.0
           command: deploy --config wrangler.preview.json
       - name: Compare preview against artifact and existing production
         env:
           PREVIEW_URL: ${{ steps.cloudflare-deployment.outputs.deployment-url }}
         run: |
           node scripts/wait-static-deployment.mjs --site ./dist --origin "$PREVIEW_URL"
-          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$PREVIEW_URL" --report-only-differences --report "${RUNNER_TEMP}/cloudflare-parity.json"
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$PREVIEW_URL" --report-only-differences --report "${RUNNER_TEMP}/cloudflare-parity.json"; then break; fi
+            if [ "$attempt" -eq 6 ]; then exit 1; fi
+            sleep 20
+          done
       - name: Verify hosted Pagefind engine, search UI, and fragment navigation
         if: ${{ !cancelled() && steps.cloudflare-deployment.outcome == 'success' }}
         env:
@@ -394,7 +398,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: cloudflare
-          wranglerVersion: 4.142.0
+          wranglerVersion: 4.144.0
           command: deploy --config wrangler.site.json
       - name: Read current routing state without changing DNS
         id: routing
@@ -419,7 +423,11 @@ jobs:
           WORKER_URL: ${{ steps.site-deployment.outputs.deployment-url }}
         run: |
           node scripts/wait-static-deployment.mjs --site ./dist --origin "$WORKER_URL"
-          node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --migration-baseline cloudflare/migration-baseline.json --report "${RUNNER_TEMP}/production-worker-parity.json"
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/verify-hosting-parity.mjs --site ./dist --preview-origin "$WORKER_URL" --migration-baseline cloudflare/migration-baseline.json --report "${RUNNER_TEMP}/production-worker-parity.json"; then break; fi
+            if [ "$attempt" -eq 6 ]; then exit 1; fi
+            sleep 20
+          done
           node scripts/check-search-browser.mjs --site ./dist --bundle ./dist/pagefind --origin "$WORKER_URL"
       - name: Preserve production Worker evidence
         if: ${{ always() }}

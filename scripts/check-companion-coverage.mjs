@@ -35,6 +35,15 @@ for (const path of paths) {
   }
   if (!path.endsWith('.html') || isEvidenceDocument(path) || !manifest.some((entry) => path.startsWith(`${entry.mount}/`))) continue;
   const html = await readFile(join(site, path), 'utf8');
+  if (/^CTI_as_a_Code\/intake-(?:form|proactive|fullcycle)\/index\.html$/.test(path)) {
+    const textareas = [...html.matchAll(/<textarea\b[^>]*>/gi)];
+    if (!textareas.length) failures.push(`${path}: no intake textareas found`);
+    for (const [tag] of textareas) {
+      if (!/\baria-label=["'][^"']+["']|\baria-labelledby=["'][^"']+["']/i.test(tag)) {
+        failures.push(`${path}: intake textarea has no accessible name`);
+      }
+    }
+  }
   for (const [tag] of html.matchAll(/<(?:script|link|img|source)\b[^>]*>/gi)) {
     if (/^<link/i.test(tag) && !/\brel=["'](?:stylesheet|preload|modulepreload|icon)["']/i.test(tag)) continue;
     const value = tag.match(/\b(?:src|href)=["']([^"']+)["']/i)?.[1];
