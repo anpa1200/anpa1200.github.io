@@ -108,6 +108,15 @@ test('ATLAS relationships remain navigable when upstream MITRE deep links are un
     for(const relation of technique.case_studies)assert.ok(html.includes(`/attack-matrix/atlas/case-studies/#${relation.id}`),technique.id+' '+relation.id);
   }
 });
+test('ATLAS tactic headings link to local filtered matrix views, not unavailable upstream deep links',()=>{
+  const tactics=sources.atlas.tactics;
+  assert.equal(tactics.length,16);
+  for(const tactic of tactics)assert.equal(tactic.url,`/attack-matrix/?view=atlas&tactic=${tactic.id}#matrix`);
+  assert.deepEqual(data.domains.find(domain=>domain.id==='atlas').tactics,tactics);
+  const html=readFileSync(resolve(root,'attack-matrix/index.html'),'utf8');
+  assert.doesNotMatch(html,/href="https:\/\/atlas\.mitre\.org\/tactics\//);
+  for(const tactic of tactics)assert.ok(html.includes(`href="/attack-matrix/?view=atlas&amp;tactic=${tactic.id}#matrix"`),tactic.id);
+});
 test('matrix is first in the attack module sidebar and highlighted throughout ATLAS references',()=>{
   const shell=loadSiteShell(root),group=shell.sidebar.sections.find(s=>s.id==='detection-lab');
   assert.equal(group.links[0].href,'/attack-matrix/');
