@@ -82,7 +82,7 @@ function referenceCard(record) {
             <p class="reference-context">${escapeHtml(record.kind || 'bibliographic')} · ${escapeHtml(record.metadata_status || 'authored-metadata')}${inert ? ` · <code>${escapeHtml(record.url.replace(/^https/, 'hxxps').replaceAll('.', '[.]'))}</code>` : ''}</p>
             <p>${escapeHtml(record.description)}</p>${assessedSource ? `
             <p class="reference-assessed-source"><a data-knowledge-source-id="${escapeHtml(assessedSource.id)}" href="/cyber-knowledge/knowledge-sources/#source-${escapeHtml(assessedSource.id)}">Read assessed profile<span class="visually-hidden"> for ${escapeHtml(assessedSource.name)}</span> →</a></p>` : ''}
-            <div class="reference-tags" aria-label="Reference tags">${visible.map(tagButton).join('')}</div>
+            <div class="reference-tags" role="group" aria-label="Reference tags">${visible.map(tagButton).join('')}</div>
 ${remaining.length ? `            <details class="reference-more-tags"><summary>Show ${remaining.length} more tags</summary><div class="reference-tags"><p><a href="/data/reference-library.json">Complete tag metadata in JSON export</a></p><button type="button" class="button" data-load-reference-tags>Show all tags here</button></div></details>` : ''}
 ${usedIn.length ? `            <details class="reference-used-in"><summary>Used in ${record.used_in.length} ${record.used_in.length === 1 ? 'page' : 'pages'}</summary><ul>${usedIn.map((source) => `<li><a href="${escapeHtml(new URL(source.url).pathname)}">${escapeHtml(source.title)}</a> <span>${escapeHtml(source.type)}</span></li>`).join('')}</ul>${record.used_in.length > usedIn.length ? `<p>Showing 8 of ${record.used_in.length} internal crosslinks.</p>` : ''}</details>` : ''}
           </article>`;
