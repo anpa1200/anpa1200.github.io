@@ -112,6 +112,14 @@ export function normalizeSeoTitle(value = '') {
     .replace(/^(ITDR\s*[–—-]\s*Identity Threat Detection\s*&\s*Response)\s*\|\s*ITDR$/i, '$1')
     .replace(/\s+/g, ' ')
     .trim();
+  if (/\| ITDR$/i.test(title)) {
+    for (const [pattern, acronym] of [
+      [/\bMfa\b/gi, 'MFA'], [/\bOauth\b/gi, 'OAuth'],
+      [/\bSaml\b/gi, 'SAML'], [/\bDcsync\b/gi, 'DCSync'],
+      [/\bAsrep\b/gi, 'AS-REP'], [/\bPrt\b/gi, 'PRT'],
+      [/\bAcl\b/gi, 'ACL'], [/\bSid\b/gi, 'SID'],
+    ]) title = title.replace(pattern, acronym);
+  }
   return title;
 }
 
@@ -142,11 +150,16 @@ function conciseDescription(value, limit = 160) {
 }
 
 export function normalizeMetaDescriptions(html) {
-  const title = pageTitle(html).replace(/\s+\|\s+(?:1200km|AdversaryGraph Docs|ITDR)$/i, '');
+  let title = pageTitle(html).replace(/\s+\|\s+(?:1200km|AdversaryGraph Docs|ITDR)$/i, '');
   const canonical = [...html.matchAll(/<link\b[^>]*>/gi)]
     .map((match) => tagAttributes(match[0]))
     .find((attributes) => attributes.rel?.toLowerCase() === 'canonical')
     ?.href;
+  if (canonical?.includes('/ITDR/')) {
+    const documentTitle = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1];
+    if (documentTitle) title = normalizeSeoTitle(documentTitle).replace(/\s+\|\s+ITDR$/i, '');
+  }
+
   const current = metaContent(html, 'description');
   if (!current) return html;
   const curated = canonical ? CURATED_META_DESCRIPTIONS[canonical] : '';
@@ -155,10 +168,12 @@ export function normalizeMetaDescriptions(html) {
     // Older release passes repeated an ITDR title before the source summary.
     // Only remove exact leading title sentences when another title follows.
     const repeatedTitle = `${title}. `;
-    while (decodedCurrent.startsWith(repeatedTitle)
-      && decodedCurrent.slice(repeatedTitle.length).startsWith(title)) {
+    while (decodedCurrent.toLowerCase().startsWith(repeatedTitle.toLowerCase())
+      && decodedCurrent.slice(repeatedTitle.length).toLowerCase().startsWith(title.toLowerCase())) {
       decodedCurrent = decodedCurrent.slice(repeatedTitle.length);
     }
+    if (decodedCurrent.slice(0, title.length).toLowerCase() === title.toLowerCase())
+      decodedCurrent = title + decodedCurrent.slice(title.length);
   }
   // Preserve complete authored descriptions, but make generated fallbacks
   // uniquely page-specific. Earlier release passes could prepend the title

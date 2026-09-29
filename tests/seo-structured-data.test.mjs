@@ -195,6 +195,10 @@ test('ITDR descriptions collapse only repeated leading title sentences', () => {
   assert.equal(normalizeMetaDescriptions(once), once);
   const authored = '<html><head><title>Kerberoasting | ITDR</title><link rel="canonical" href="https://1200km.com/ITDR/docs/attacks/active-directory/kerberoasting/"><meta name="description" content="Kerberoasting. Detection requires domain-controller event collection."></head></html>';
   assert.match(normalizeMetaDescriptions(authored), /Kerberoasting\. Detection requires/);
+  const acronymInput = '<html><head><title>Dcsync | ITDR</title><link rel="canonical" href="https://1200km.com/ITDR/docs/attacks/active-directory/dcsync/"><meta name="description" content="Dcsync. Dcsync. Dcsync — replication abuse."></head><body><main><h1>Dcsync</h1></main></body></html>';
+  const acronymOutput = transformReleaseHtml(acronymInput, { canonical: 'https://1200km.com/ITDR/docs/attacks/active-directory/dcsync/' });
+  assert.match(acronymOutput, /name="description" content="DCSync — replication abuse\./);
+  assert.doesNotMatch(acronymOutput, /Dcsync\. Dcsync/);
 });
 
 test('pages without a bespoke share image receive the governed social fallback', () => {
@@ -267,6 +271,9 @@ test('known generated title suffixes are shortened without truncating the conten
     normalizeSeoTitle('A deliberately long article title that must remain complete | 1200km'),
     'A deliberately long article title that must remain complete | 1200km',
   );
+  assert.equal(normalizeSeoTitle('Detecting Mfa Fatigue and Oauth Abuse | ITDR'), 'Detecting MFA Fatigue and OAuth Abuse | ITDR');
+  assert.equal(normalizeSeoTitle('Dcsync, Asrep, Saml, Prt, Acl and Sid | ITDR'), 'DCSync, AS-REP, SAML, PRT, ACL and SID | ITDR');
+  assert.equal(normalizeSeoTitle('Mfa research outside ITDR | 1200km'), 'Mfa research outside ITDR | 1200km');
 });
 
 test('Docusaurus brand logos are decorative when adjacent title text names the site', () => {
