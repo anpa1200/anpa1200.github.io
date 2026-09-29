@@ -94,7 +94,7 @@ const rows = [
   ['OWASP Top 10','https://owasp.org/www-project-top-ten/','application-security'],
   ['OWASP ASVS','https://owasp.org/www-project-application-security-verification-standard/','application-security'],
   ['OWASP Web Security Testing Guide','https://owasp.org/www-project-web-security-testing-guide/','web-security'],
-  ['OWASP API Security Project','https://owasp.org/www-project-api-security/','api-security'],
+  ['OWASP API Security Project','https://owasp.org/projects/api-security-project','api-security'],
   ['OWASP Cheat Sheet Series','https://cheatsheetseries.owasp.org/','application-security'],
   ['PortSwigger Web Security Academy','https://portswigger.net/web-security','training'],
   ['PortSwigger Research','https://portswigger.net/research','web-security'],

@@ -1010,7 +1010,7 @@ The OWASP API Security Project publishes community guidance focused on risks tha
 **Best for:** API threat awareness; API design reviews; developer training; test-plan prioritization.
 
 - Organization: OWASP Foundation
-- Canonical source: [https://owasp.org/www-project-api-security/](https://owasp.org/www-project-api-security/)
+- Canonical source: [https://owasp.org/projects/api-security-project](https://owasp.org/projects/api-security-project)
 - Quality: Tier A (94/100)
 - Quality dimensions: authority 5/5; originality 5/5; maintenance 4/5; practical value 4.68/5; transparency 4.5/5
 - Evidence use: Primary Authoritative
@@ -1025,7 +1025,7 @@ The OWASP API Security Project publishes community guidance focused on risks tha
 - Related sources: [OWASP Top 10](#owasp-top-10) · [OWASP ASVS](#owasp-asvs) · [OWASP Web Security Testing Guide](#owasp-web-security-testing-guide) · [PortSwigger Web Security Academy](#portswigger-web-security-academy)
 - Research provenance: Openai
 - URL validation: Reachable (HTTP 200)
-- Checked: 2026-09-07
+- Checked: 2026-09-29
 
 <a id="category-application-security"></a>
 ## Application Security
