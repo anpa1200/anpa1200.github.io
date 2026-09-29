@@ -58,7 +58,6 @@ const requiredIndexUrls = [
   `${SITE_ORIGIN}/ttp-simulation/techniques/enterprise/T1059.001/`,
   `${SITE_ORIGIN}/ttp-simulation/detections/enterprise/T1059.001/`,
   `${SITE_ORIGIN}/`,
-  `${SITE_ORIGIN}/search.html`,
   `${SITE_ORIGIN}/references/`,
   `${SITE_ORIGIN}/courses/`,
   `${SITE_ORIGIN}/courses/trainsec-malware-analyst-professional-level-1/`,
