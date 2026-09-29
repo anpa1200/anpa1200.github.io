@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import legacy from '../cloudflare/agent-readiness-worker.js';
-import { createSiteWorker, MARKDOWN_ROUTES, parseHeaderPolicy, responseHeaders } from '../cloudflare/site-worker-lib.js';
+import { createSiteWorker, LEGACY_CROSSLINK_REDIRECTS, MARKDOWN_ROUTES, parseHeaderPolicy, responseHeaders } from '../cloudflare/site-worker-lib.js';
 
 const policy = readFileSync(new URL('../_headers', import.meta.url), 'utf8');
 const worker = createSiteWorker(policy);
@@ -53,6 +53,18 @@ test('directory redirect retains host and query and leaves fragment inheritance 
   assert.equal(response.headers.get('Location'), 'https://1200km-site.test.workers.dev/articles/?q=a%20b');
   assert.equal(calls.at(-1).method, 'HEAD');
   assert.equal((await get('//foreign.example')).headers.get('Location'), 'https://1200km-site.test.workers.dev//foreign.example/');
+});
+
+test('all broken legacy crosslinks redirect to reviewed current routes without origin escape', async () => {
+  assert.equal(LEGACY_CROSSLINK_REDIRECTS.size, 35);
+  for (const [oldPath, newPath] of LEGACY_CROSSLINK_REDIRECTS) {
+    const response = await get(`${oldPath}?source=old#section`);
+    assert.equal(response.status, 301, oldPath);
+    assert.equal(response.headers.get('Location'), `https://1200km-site.test.workers.dev${newPath}?source=old`, oldPath);
+    assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
+    assert.equal(calls.length, 0, 'Redirect must not fetch an origin or asset');
+  }
+  assert.equal((await get('/about.html')).status, 200, 'Existing explicit HTML remains valid');
 });
 
 test('production HTTP redirects to HTTPS without dropping path or query', async () => {

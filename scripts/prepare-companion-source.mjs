@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { ctiSourceRewrites, rewriteCrosslinksInDirectory } from './canonical-crosslinks.mjs';
 
 export function migrationBodyHeadings() {
   return (tree, file) => {
@@ -86,4 +87,30 @@ for (const preset of config.presets || []) {
     const file = join(source, 'src/pages/intake-form.module.css');
     await writeFile(file, `${await readFile(file, 'utf8')}\n/* Keep the existing intake controls usable on narrow screens. */\n@media (max-width: 600px) {\n  .headerGrid { grid-template-columns: minmax(0, 1fr); }\n  .toolbar, .toolbarActions, .logRow { flex-wrap: wrap; }\n  .logSrc { min-width: 0; overflow-wrap: anywhere; }\n  .regTable, .actionsTable { display: block; max-width: 100%; overflow-x: auto; }\n  input, select, textarea { max-width: 100%; box-sizing: border-box; }\n}\n`);
   }
+  let rewritten = 0;
+  if (mount === 'CTI_as_a_Code') {
+    for (const directory of ['docs', 'src']) {
+      const result = await rewriteCrosslinksInDirectory(join(source, directory), ['.md', '.mdx', '.js', '.jsx', '.ts', '.tsx'], ctiSourceRewrites);
+      rewritten += result.replacements;
+    }
+  }
+  for (const directory of ['docs', 'src', 'static']) {
+    const result = await rewriteCrosslinksInDirectory(join(source, directory), ['.md', '.mdx', '.js', '.jsx', '.ts', '.tsx', '.html']);
+    rewritten += result.replacements;
+  }
+  if (mount === 'CTI_as_a_Code') {
+    const labels = [
+      ['docs/ecosystem.md', 'Field Manual — Actor Research', 'Field Manual — Actor Profile Template'],
+      ['docs/methodology.md', 'Field Manual — Analysis of Competing Hypotheses', 'Field Manual — Alternative Hypotheses'],
+      ['docs/methodology.md', 'Field Manual — Intelligence Production', 'Field Manual — Finished Intelligence vs. Research Notes'],
+      ['docs/training/07-full-cycle-ndsa.md', 'Field Manual — Collection Planning', 'Field Manual — Collection Gap Register'],
+    ];
+    for (const [relative, before, after] of labels) {
+      const file = join(source, relative);
+      const text = await readFile(file, 'utf8');
+      assert.ok(text.includes(before), `${mount}: expected crosslink label is missing in ${relative}`);
+      await writeFile(file, text.replaceAll(before, after));
+    }
+  }
+  if (rewritten) console.log(`Normalized ${rewritten} pinned crosslink(s) in ${mount} source before Docusaurus hydration build.`);
 }

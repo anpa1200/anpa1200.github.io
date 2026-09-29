@@ -51,8 +51,8 @@ function walkHtml(dir = ROOT) {
 
 const htmlFiles = walkHtml().filter((path) => !isEvidenceDocument(path));
 
-const linkedTagRe = /<[a-z][\w:-]*\b[^>]*(?:href|src)\s*=\s*"[^"]+"[^>]*>/gi;
-const urlAttributeRe = /(?:href|src)\s*=\s*"([^"]+)"/i;
+const linkedTagRe = /<[a-z][\w:-]*\b[^>]*(?:href|src|srcset|poster)\s*=\s*(?:"[^"]+"|'[^']+')[^>]*>/gi;
+const urlAttributeRe = /\b(href|src|srcset|poster)\s*=\s*(?:"([^"]+)"|'([^']+)')/gi;
 const relAttributeRe = /\brel\s*=\s*"([^"]+)"/i;
 const idRe = /\sid\s*=\s*"([^"]+)"/gi;
 
@@ -135,6 +135,31 @@ function decodeHtmlAttribute(value) {
     .replace(/&#(?:0*58|x0*3a);/gi, ':');
 }
 
+function srcsetUrls(value) {
+  const urls = [];
+  let cursor = 0;
+  while (cursor < value.length) {
+    while (/[\s,]/.test(value[cursor] || '') && cursor < value.length) cursor++;
+    if (cursor >= value.length) break;
+    let url = '';
+    while (cursor < value.length && !/\s/.test(value[cursor])) url += value[cursor++];
+    const endedWithComma = url.endsWith(',');
+    url = url.replace(/,+$/, '');
+    if (url) urls.push(url);
+    if (endedWithComma) continue;
+    // Descriptors may contain parentheses; commas inside them are not
+    // candidate separators. Data-URL commas remain inside the URL token.
+    let parentheses = 0;
+    while (cursor < value.length) {
+      const char = value[cursor++];
+      if (char === '(') parentheses++;
+      else if (char === ')') parentheses = Math.max(0, parentheses - 1);
+      else if (char === ',' && parentheses === 0) break;
+    }
+  }
+  return urls;
+}
+
 function isDiscoveryMetadata(tag) {
   if (!/^<link\b/i.test(tag)) return false;
   const rel = relAttributeRe.exec(tag)?.[1]?.toLowerCase().split(/\s+/) || [];
@@ -147,41 +172,54 @@ for (const f of htmlFiles) {
   while ((m = linkedTagRe.exec(fileText[f]))) {
     const tag = m[0];
     if (isDiscoveryMetadata(tag)) continue;
-    const url = decodeHtmlAttribute(urlAttributeRe.exec(tag)?.[1] || '').trim();
-    if (!url) continue;
-    if (/^(mailto:|tel:|data:|javascript:)/i.test(url)) continue;
-    if (/anpa1200\.github\.io/i.test(url)) results.oldDomain.push(`${f}: ${url}`);
+    urlAttributeRe.lastIndex = 0;
+    let attribute;
+    while ((attribute = urlAttributeRe.exec(tag))) {
+      const value = decodeHtmlAttribute(attribute[2] || attribute[3]).trim();
+      const urls = attribute[1].toLowerCase() === 'srcset'
+        ? srcsetUrls(value)
+        : [value];
+      for (const url of urls) {
+        if (!url || /^(mailto:|tel:|data:|javascript:|blob:)/i.test(url)) continue;
 
-    if (url.startsWith('#')) {
-      const id = url.slice(1);
-      if (validateLocalFragment(f, f, id, url)) results.ok++;
-      continue;
-    }
-
-    if (/^https?:\/\//i.test(url)) {
-      let u;
-      try { u = new URL(url); } catch { continue; }
-      if (u.hostname === '1200km.com') {
-        if (isLive1200kmSiblingPath(u.pathname)) externalToProbe.add(url);
-        else if (localPathExists(u.pathname)) {
-          if (validateLocalFragment(f, u.pathname, u.hash, url)) results.ok++;
+        if (url.startsWith('#')) {
+          if (validateLocalFragment(f, f, url.slice(1), url)) results.ok++;
+          continue;
         }
-        else externalToProbe.add(url);
-      } else {
-        externalToProbe.add(url);
+
+        if (/^https?:\/\//i.test(url)) {
+          let u;
+          try { u = new URL(url); } catch { continue; }
+          if (u.hostname === 'anpa1200.github.io') results.oldDomain.push(`${f}: ${url}`);
+          if (u.hostname === '1200km.com') {
+            if (!checkingAssembledSite && isLive1200kmSiblingPath(u.pathname)) externalToProbe.add(url);
+            else if (localPathExists(u.pathname)) {
+              if (validateLocalFragment(f, u.pathname, u.hash, url)) results.ok++;
+            }
+            else if (checkingAssembledSite) results.broken.push(`${f}: ${url}`);
+            else externalToProbe.add(url);
+          } else {
+            externalToProbe.add(url);
+          }
+          continue;
+        }
+
+        if (url.startsWith('//')) {
+          const absolute = 'https:' + url;
+          if (new URL(absolute).hostname === 'anpa1200.github.io') results.oldDomain.push(`${f}: ${url}`);
+          externalToProbe.add(absolute);
+          continue;
+        }
+        if (!checkingAssembledSite && url.startsWith('/') && isLive1200kmSiblingPath(url.split('#')[0].split('?')[0])) {
+          externalToProbe.add('https://1200km.com' + url);
+          continue;
+        }
+
+        const resolved = resolveLocalRef(f, url);
+        if (!localPathExists(resolved)) results.broken.push(`${f}: ${url}`);
+        else if (validateLocalFragment(f, resolved, url.includes('#') ? `#${url.split('#')[1]}` : '', url)) results.ok++;
       }
-      continue;
     }
-
-    if (url.startsWith('//')) { externalToProbe.add('https:' + url); continue; }
-    if (url.startsWith('/') && isLive1200kmSiblingPath(url.split('#')[0].split('?')[0])) {
-      externalToProbe.add('https://1200km.com' + url);
-      continue;
-    }
-
-    const resolved = resolveLocalRef(f, url);
-    if (!localPathExists(resolved)) results.broken.push(`${f}: ${url}`);
-    else if (validateLocalFragment(f, resolved, url.includes('#') ? `#${url.split('#')[1]}` : '', url)) results.ok++;
   }
 }
 
