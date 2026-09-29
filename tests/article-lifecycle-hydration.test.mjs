@@ -28,6 +28,13 @@ test('article lifecycle fallback remains outside React root and has a route mani
     assert.match(html, /data-governance-fallback/);
     assert.match(html, /src="\/assets\/content-governance\.js" defer/);
     const manifest = JSON.parse(readFileSync(join(site, 'data/article-lifecycle.json'), 'utf8'));
+    const runtime = readFileSync(join(root, 'assets/content-governance.js'), 'utf8');
+    assert.match(runtime, /article\.append\(fallback\)/);
+    assert.match(runtime, /if \(!routes\) \{ loadRoutes\(\); return; \}/);
+    assert.doesNotMatch(runtime, /article\.prepend\(aside\)/);
+    const backlinkBuilder = readFileSync(join(root, 'scripts/build-ttp-integration.mjs'), 'utf8');
+    assert.match(backlinkBuilder, /docusaurus \? '<aside id="ttp-ecosystem"/);
+    assert.match(backlinkBuilder, /aria-label="Related attack tools, simulations and detection rules"/);
     assert.equal(manifest.routes['/articles/read/2024/sample/'].lifecycle, 'preserved');
   } finally {
     rmSync(site, { recursive: true, force: true });

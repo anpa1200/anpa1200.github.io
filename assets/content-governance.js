@@ -5,17 +5,35 @@
   window.__articleLifecycleReady = true;
   const root = document.querySelector('#__docusaurus');
   if (!root) return;
-  let routes, ready = false, timer;
+  let routes, loading = false, ready = false, timer;
   const route = () => location.pathname.replace(/index\.html$/, '').replace(/\/?$/, '/');
+  const initialRoute = route();
+  function loadRoutes() {
+    if (routes || loading) return;
+    loading = true;
+    fetch('/data/article-lifecycle.json').then(response => {
+      if (!response.ok) throw Error('Article lifecycle manifest unavailable');
+      return response.json();
+    }).then(data => { routes = data.routes; schedule(); }).catch(() => { loading = false; });
+  }
   function update() {
-    if (!ready || !routes) return;
+    if (!ready) return;
     const pathname = route();
     const article = root.querySelector('main .theme-doc-markdown.markdown');
     if (!article) return;
     const existing = root.querySelector('[data-governance-runtime]');
     if (existing?.dataset.articleRoute === pathname) return;
     existing?.remove();
-    document.querySelector('body > [data-governance-fallback]')?.remove();
+    const fallback = document.querySelector('body > [data-governance-fallback]');
+    if (fallback && pathname === initialRoute) {
+      fallback.removeAttribute('data-governance-fallback');
+      fallback.dataset.articleRoute = pathname;
+      fallback.dataset.governanceRuntime = '';
+      article.append(fallback);
+      return;
+    }
+    fallback?.remove();
+    if (!routes) { loadRoutes(); return; }
     const record = routes[pathname];
     if (!record) return;
     const aside = document.createElement('aside');
@@ -36,13 +54,9 @@
       paragraph.append(link, '.');
     }
     aside.append(strong, paragraph);
-    article.prepend(aside);
+    article.append(aside);
   }
   const schedule = () => { clearTimeout(timer); timer = setTimeout(update, 120); };
-  fetch('/data/article-lifecycle.json').then(response => {
-    if (!response.ok) throw Error('Article lifecycle manifest unavailable');
-    return response.json();
-  }).then(data => { routes = data.routes; schedule(); }).catch(() => {});
   const begin = () => {
     const run = () => { ready = true; schedule(); };
     if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1000 });

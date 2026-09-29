@@ -231,8 +231,10 @@ for (const [path, links] of backlinks) {
   const file = join(site, path);
   if (!existsSync(file)) { pending.push(path); continue; } // Article archive may be staged later in CI.
   const original = readFileSync(file, 'utf8');
-  const block = `${start}<section id="ttp-ecosystem" class="ttp-ecosystem-links"><h2>Attack tools, simulations and detection rules</h2><p>Follow explicit source relationships into the reference modules. Linked procedures and detectors are not claims of live validation or actor attribution.</p>${list([...links.values()].map((r) => `${a(r.target, r.title)} <small>— ${esc(r.basis)}</small>`))}</section>${end}`;
   const docusaurus = original.includes('id="__docusaurus"');
+  const openingTag = docusaurus ? '<aside id="ttp-ecosystem" class="ttp-ecosystem-links" aria-label="Related attack tools, simulations and detection rules">' : '<section id="ttp-ecosystem" class="ttp-ecosystem-links">';
+  const closingTag = docusaurus ? '</aside>' : '</section>';
+  const block = `${start}${openingTag}<h2>Attack tools, simulations and detection rules</h2><p>Follow explicit source relationships into the reference modules. Linked procedures and detectors are not claims of live validation or actor attribution.</p>${list([...links.values()].map((r) => `${a(r.target, r.title)} <small>— ${esc(r.basis)}</small>`))}${closingTag}${end}`;
   // Post-build edits inside the React root invalidate SSR hydration.
   // Crawlable fallback links remain outside it until the client has hydrated.
   let html;
