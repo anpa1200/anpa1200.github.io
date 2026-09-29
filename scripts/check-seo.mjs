@@ -360,6 +360,14 @@ for (const page of pages) {
   }
   if (!findMetaContent(releaseHtml, 'og:image:alt')) failures.push(`${page.rel}: og:image:alt is missing`);
   if (!findMetaContent(releaseHtml, 'twitter:image:alt')) failures.push(`${page.rel}: twitter:image:alt is missing`);
+  if (!findMetaContent(releaseHtml, 'twitter:card')) failures.push(`${page.rel}: twitter:card is missing`);
+  if (/\.svg(?:[?#]|$)/i.test(findMetaContent(releaseHtml, 'og:image'))) {
+    failures.push(`${page.rel}: SVG cannot be used as the social preview image`);
+  }
+  const hasIcon = [...releaseHtml.matchAll(/<link\b[^>]*>/gi)]
+    .some(([tag]) => (tagAttributes(tag).rel || '').toLowerCase().split(/\s+/).includes('icon'));
+  if (!hasIcon) failures.push(`${page.rel}: explicit favicon link is missing`);
+
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(releaseHtml);
   if (/<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: release HTML still blocks on an external web font`);
   if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: analytics was not deferred to user interaction`);

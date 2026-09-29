@@ -187,6 +187,33 @@ test('archive series descriptions remain page-specific without truncation ellips
   assert.doesNotMatch(second, /name="description" content="[^"]*…"/);
 });
 
+test('ITDR descriptions collapse only repeated leading title sentences', () => {
+  const input = '<html><head><title>AS-REP Roasting | ITDR</title><link rel="canonical" href="https://1200km.com/ITDR/docs/attacks/active-directory/asrep-roasting/"><meta name="description" content="AS-REP Roasting. AS-REP Roasting. AS-REP Roasting — targeting accounts with pre-authentication disabled."></head></html>';
+  const once = normalizeMetaDescriptions(input);
+  assert.match(once, /name="description" content="AS-REP Roasting — targeting accounts/);
+  assert.doesNotMatch(once, /AS-REP Roasting\. AS-REP Roasting/);
+  assert.equal(normalizeMetaDescriptions(once), once);
+  const authored = '<html><head><title>Kerberoasting | ITDR</title><link rel="canonical" href="https://1200km.com/ITDR/docs/attacks/active-directory/kerberoasting/"><meta name="description" content="Kerberoasting. Detection requires domain-controller event collection."></head></html>';
+  assert.match(normalizeMetaDescriptions(authored), /Kerberoasting\. Detection requires/);
+  const acronymInput = '<html><head><title>Dcsync | ITDR</title><link rel="canonical" href="https://1200km.com/ITDR/docs/attacks/active-directory/dcsync/"><meta name="description" content="Dcsync. Dcsync. Dcsync — replication abuse."></head><body><main><h1>Dcsync</h1></main></body></html>';
+  const acronymOutput = transformReleaseHtml(acronymInput, { canonical: 'https://1200km.com/ITDR/docs/attacks/active-directory/dcsync/' });
+  assert.match(acronymOutput, /name="description" content="DCSync — replication abuse\./);
+  assert.doesNotMatch(acronymOutput, /Dcsync\. Dcsync/);
+});
+
+test('real ITDR detection and Linux pages no longer repeat their lead sentences', () => {
+  for (const path of [
+    'ITDR/docs/detection/ad-attack-detection/detect-asrep-roasting/index.html',
+    'ITDR/docs/protocols/linux-identity/linux-sssd/index.html',
+  ]) {
+    const canonical = `https://1200km.com/${path.replace(/index\.html$/, '')}`;
+    const source = readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+    const output = transformReleaseHtml(source, { canonical });
+    const description = output.match(/<meta\b[^>]*name="description"[^>]*content="([^"]+)"/i)?.[1] || '';
+    assert.doesNotMatch(description, /^(.+?)\.\s+\1(?:\.|\s|\b)/i, canonical);
+  }
+});
+
 test('pages without a bespoke share image receive the governed social fallback', () => {
   const input = '<html><head><title>Research Note | 1200km</title></head><body><main><h1>Research Note</h1></main></body></html>';
   const output = normalizeSocialImages(input);
@@ -194,6 +221,32 @@ test('pages without a bespoke share image receive the governed social fallback',
   assert.match(output, /name="twitter:image" content="https:\/\/1200km\.com\/assets\/site-og-v2\.png"/);
   assert.match(output, /property="og:image:width" content="1200"/);
   assert.match(output, /property="og:image:alt"/);
+});
+
+test('social metadata replaces audited unsuitable share images and stays idempotent', () => {
+  for (const source of [
+    'https://1200km.com/ITDR/img/logo.png',
+    'https://1200km.com/cti-analyst-field-manual/img/infographic-field-manual-cover.png',
+    'https://1200km.com/assets/ap-logo.png',
+    'https://1200km.com/articles/img/favicon.svg',
+  ]) {
+    const input = `<html><head><title>Research | 1200km</title><meta property="og:image" content="${source}"><meta name="twitter:image" content="${source}"><meta name="twitter:card" content="summary"><meta property="og:image:alt" content="Old image"></head></html>`;
+    const output = normalizeSocialImages(input);
+    assert.match(output, /property="og:image" content="https:\/\/1200km\.com\/assets\/site-og-v2\.png"/);
+    assert.match(output, /name="twitter:image" content="https:\/\/1200km\.com\/assets\/site-og-v2\.png"/);
+    assert.match(output, /name="twitter:card" content="summary_large_image"/);
+    assert.doesNotMatch(output, /content="Old image"/);
+    assert.equal(normalizeSocialImages(output), output);
+  }
+});
+
+test('release HTML includes one favicon link without replacing an authored icon', () => {
+  const input = '<html lang="en"><head><title>Example</title></head><body><main><h1>Example</h1></main></body></html>';
+  const output = transformReleaseHtml(input, { canonical: 'https://1200km.com/example/' });
+  assert.match(output, /<link rel="icon" href="\/favicon\.ico">/);
+  const authored = transformReleaseHtml(input.replace('</head>', '<link rel="icon" href="/special.ico"></head>'), { canonical: 'https://1200km.com/example/' });
+  assert.match(authored, /<link rel="icon" href="\/special\.ico">/);
+  assert.doesNotMatch(authored, /href="\/favicon\.ico"/);
 });
 
 test('only a real Question and acceptedAnswer collection remains FAQPage', () => {
@@ -231,6 +284,9 @@ test('known generated title suffixes are shortened without truncating the conten
     normalizeSeoTitle('A deliberately long article title that must remain complete | 1200km'),
     'A deliberately long article title that must remain complete | 1200km',
   );
+  assert.equal(normalizeSeoTitle('Detecting Mfa Fatigue and Oauth Abuse | ITDR'), 'Detecting MFA Fatigue and OAuth Abuse | ITDR');
+  assert.equal(normalizeSeoTitle('Dcsync, Asrep, Saml, Prt, Acl and Sid | ITDR'), 'DCSync, AS-REP, SAML, PRT, ACL and SID | ITDR');
+  assert.equal(normalizeSeoTitle('Mfa research outside ITDR | 1200km'), 'Mfa research outside ITDR | 1200km');
 });
 
 test('Docusaurus brand logos are decorative when adjacent title text names the site', () => {

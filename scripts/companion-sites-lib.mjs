@@ -7,7 +7,8 @@ export function sameOriginPlatformAssets(source) {
     // Archive CSS and the knowledge-mesh CSS import the same stylesheet with
     // different historical cache keys. Use the current authored key so the
     // browser downloads those identical bytes once. Other origins are untouched.
-    .replace(/(?<![\w/.:])\/assets\/site-theme\.css\?v=20260721-shell\b/g, '/assets/site-theme.css?v=20260904-light-default');
+    .replace(/(?<![\w/.:])\/assets\/site-theme\.css\?v=20260721-shell\b/g, '/assets/site-theme.css?v=20260904-light-default')
+    .replace(/(?<![\w/.:])\/assets\/docusaurus-ecosystem\.js\?v=20260614-3\b/g, '/assets/docusaurus-ecosystem.js?v=20260721-shell');
 }
 
 export function validateCompanions(entries) {

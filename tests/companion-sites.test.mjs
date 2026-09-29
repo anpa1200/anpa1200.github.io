@@ -27,6 +27,9 @@ test('CSP overlay rewrites platform assets only and survives serialized configur
   assert.equal(sameOriginPlatformAssets(JSON.stringify({ asset: 'https://1200km.com/assets/site-theme.css?v=1' })), '{"asset":"/assets/site-theme.css?v=1"}');
   assert.equal(sameOriginPlatformAssets('@import url(/assets/site-theme.css?v=20260721-shell);'), '@import url(/assets/site-theme.css?v=20260904-light-default);');
   assert.equal(sameOriginPlatformAssets('https://example.org/assets/site-theme.css?v=20260721-shell'), 'https://example.org/assets/site-theme.css?v=20260721-shell');
+  assert.equal(sameOriginPlatformAssets('src="https://1200km.com/assets/docusaurus-ecosystem.js?v=20260614-3"'), 'src="/assets/docusaurus-ecosystem.js?v=20260721-shell"');
+  assert.equal(sameOriginPlatformAssets('src="/assets/docusaurus-ecosystem.js?v=20260614-3"'), 'src="/assets/docusaurus-ecosystem.js?v=20260721-shell"');
+  assert.equal(sameOriginPlatformAssets('src="https://example.org/assets/docusaurus-ecosystem.js?v=20260614-3"'), 'src="https://example.org/assets/docusaurus-ecosystem.js?v=20260614-3"');
 });
 
 test('file-style companion canonicals remain extensionless without an invented slash', () => {
