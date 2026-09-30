@@ -21,6 +21,7 @@ const chapter04Markdown = readFileSync(join(ROOT, 'ai-security-course', 'module-
 const chapter04Html = readFileSync(join(ROOT, 'ai-security-course', 'module-00', 'chapter-04.html'), 'utf8');
 const module00Html = readFileSync(join(ROOT, 'ai-security-course', 'module-00.html'), 'utf8');
 const courseRootHtml = readFileSync(join(ROOT, 'ai-security-course.html'), 'utf8');
+assert.match(courseRootHtml, /<div class="meta-row" role="group" aria-label="Course summary">/);
 const module00Workbook = readFileSync(join(ROOT, 'ai-security-course', 'module-00-workbook.html'), 'utf8');
 const module00Instructor = readFileSync(join(ROOT, 'ai-security-course', 'module-00-instructor.html'), 'utf8');
 const courseGlossary = readFileSync(join(ROOT, 'ai-security-course', 'glossary.html'), 'utf8');
