@@ -49,7 +49,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
   const site=resolve(option('--site'));
   const identity=JSON.parse(await readFile(join(site,'build.json'),'utf8'));
   const assets=await Promise.all([
-    ['/index.html','index.html'],
+    ['/','index.html'],
     ['/about.html','about.html'],
     ['/articles/','articles/index.html'],
     ['/ai-security-course/module-00/chapter-04.html','ai-security-course/module-00/chapter-04.html'],

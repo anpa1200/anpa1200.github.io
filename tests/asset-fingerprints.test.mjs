@@ -40,6 +40,25 @@ test('shared assets get content-hash versions, including references between asse
   }
 });
 
+test('computed versions in scripts are code, not tokens: minified JS stays valid', () => {
+  const site = mkdtempSync(join(tmpdir(), '1200km-fingerprint-js-'));
+  try {
+    mkdirSync(join(site, 'assets'), { recursive: true });
+    mkdirSync(join(site, 'data'), { recursive: true });
+    writeFileSync(join(site, 'assets/site-search.css'), '.s{}\n');
+    // Shape of the minified site-theme.js that broke the first preview.
+    const script = "(function(){const v='20260722-3';function a(){const s=document.createElement('link');s.href=`/assets/site-search.css?v=${v}`;document.head.appendChild(s)}function b(t){return`Switch to ${t} mode`}a();b('dark')})();\n";
+    writeFileSync(join(site, 'assets/site-theme.js'), script);
+    const result = spawnSync(process.execPath, [join(root, 'scripts/fingerprint-shared-assets.mjs'), '--site', site], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    const output = readFileSync(join(site, 'assets/site-theme.js'), 'utf8');
+    assert.equal(output, script, 'template-literal version left untouched');
+    assert.doesNotThrow(() => new Function(output), 'script still parses');
+  } finally {
+    rmSync(site, { recursive: true, force: true });
+  }
+});
+
 test('fingerprinting refuses the authoring checkout', () => {
   const result = spawnSync(process.execPath, [join(root, 'scripts/fingerprint-shared-assets.mjs'), '--site', root], { encoding: 'utf8' });
   assert.notEqual(result.status, 0);
