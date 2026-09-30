@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const root = resolve(new URL('..', import.meta.url).pathname);
-const run = (script, args) => spawnSync(process.execPath, [join(root, 'scripts', script), ...args], { encoding: 'utf8' });
+const run = (script, args) => spawnSync(process.execPath, [join(root, 'scripts', script), ...args], { encoding: 'utf8', env: { ...process.env, ARCHIVE_OVERLAY_OPTIONAL: '1' } });
 
 function archiveFixture() {
   const archive = mkdtempSync(join(tmpdir(), '1200km-archive-'));

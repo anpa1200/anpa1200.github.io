@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ctiSourceRewrites, rewriteCrosslinksInDirectory } from './canonical-crosslinks.mjs';
+import { rewriteExternalInDirectory, unlinkPrivateUrls } from './external-link-replacements.mjs';
 
 export function migrationBodyHeadings() {
   return (tree, file) => {
@@ -97,6 +98,9 @@ for (const preset of config.presets || []) {
   for (const directory of ['docs', 'src', 'static']) {
     const result = await rewriteCrosslinksInDirectory(join(source, directory), ['.md', '.mdx', '.js', '.jsx', '.ts', '.tsx', '.html']);
     rewritten += result.replacements;
+    // Reviewed dead/moved/insecure external links and private-host links.
+    rewritten += (await rewriteExternalInDirectory(join(source, directory), ['.md', '.mdx', '.js', '.jsx', '.ts', '.tsx', '.html'])).replacements;
+    rewritten += (await rewriteExternalInDirectory(join(source, directory), ['.md', '.mdx'], unlinkPrivateUrls)).replacements;
   }
   if (mount === 'CTI_as_a_Code') {
     const labels = [

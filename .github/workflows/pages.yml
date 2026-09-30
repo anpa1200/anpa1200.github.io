@@ -144,6 +144,10 @@ jobs:
             --site "${RUNNER_TEMP}/site" \
             --source "${GITHUB_WORKSPACE}" \
             --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
+      - name: Replace reviewed dead, moved and insecure external links
+        # Docusaurus sources were rewritten before their builds; this covers
+        # static and generated pages, including the reference library above.
+        run: node scripts/rewrite-external-links.mjs --site "${RUNNER_TEMP}/site"
       - name: Audit platform discoverability, taxonomy, and sidebar coverage
         run: >-
           npm run check-discoverability --

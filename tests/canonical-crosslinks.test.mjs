@@ -42,7 +42,7 @@ test('archive preparation rewrites authored links even when the slash policy is 
     const source = join(root, 'docs', 'article.md');
     writeFileSync(source, '<a href="https://1200km.com/adversarygraph-docs/get-started.html">/adversarygraph-docs/get-started.html</a>');
     for (let run = 0; run < 2; run++) {
-      const result = spawnSync(process.execPath, [new URL('../scripts/prepare-article-archive.mjs', import.meta.url).pathname, '--archive', root], { encoding: 'utf8' });
+      const result = spawnSync(process.execPath, [new URL('../scripts/prepare-article-archive.mjs', import.meta.url).pathname, '--archive', root], { encoding: 'utf8', env: { ...process.env, ARCHIVE_OVERLAY_OPTIONAL: '1' } });
       assert.equal(result.status, 0, result.stderr);
     }
     assert.match(readFileSync(source, 'utf8'), /adversarygraph-docs\/getting-started\//);
