@@ -23,7 +23,7 @@ const a = (url, label, cls = '') => `<a${cls ? ` class="${cls}"` : ''} href="${e
 const p = (text) => `<p>${esc(text)}</p>`;
 const list = (items) => items.length ? `<ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul>` : '<p>No reviewed association in this snapshot.</p>';
 const section = (title, content, id = '') => `<section class="panel"${id ? ` id="${esc(id)}"` : ''}><h2>${esc(title)}</h2>${content}</section>`;
-const code = (text, label) => `<pre class="code-sample" tabindex="0" aria-label="${esc(label)}"><code>${esc(text)}</code></pre>`;
+const code = (text, label) => `<figure class="code-figure"><figcaption>${esc(label)}</figcaption><pre class="code-sample" tabindex="0"><code>${esc(text)}</code></pre></figure>`;
 const unique = (items, key = (r) => r.page) => [...new Map(items.map((r) => [key(r), r])).values()];
 const changed = [];
 function output(path, content) {

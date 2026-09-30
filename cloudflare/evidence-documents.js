@@ -4,7 +4,7 @@ export const isEvidenceDocument = (path) => EVIDENCE_DOCUMENTS.has(path.replace(
 
 // Exact, reviewed publisher destinations preserve old inbound report URLs.
 export const RETIRED_VENDOR_REPORTS = new Map([
-  ['/anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html', 'https://www.f5.com/fr_fr/labs/articles/2024-ddos-attack-trends'],
+  ['/anomaly-detection-atlas/reports/cti-ir/f5-2024-ddos-attack-trends.html', 'https://www.f5.com/labs/articles/2024-ddos-attack-trends'],
   ['/anomaly-detection-atlas/reports/cti-ir/mandiant-sunburst-supply-chain.html', 'https://cloud.google.com/blog/topics/threat-intelligence/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor/'],
   ['/anomaly-detection-atlas/reports/cti-ir/sysdig-ai-assisted-cloud-intrusion.html', 'https://www.sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes'],
   ['/anomaly-detection-atlas/reports/cti-ir/sysdig-scarleteel.html', 'https://www.sysdig.com/blog/cloud-breach-terraform-data-theft'],

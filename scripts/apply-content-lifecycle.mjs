@@ -58,7 +58,11 @@ for (const item of catalog.items || []) {
   }
   routes[new URL(item.canonical_url).pathname] = { lifecycle: item.lifecycle, ...message, docsLink: Boolean(docsLink) };
   const banner = `<aside class="content-lifecycle-banner" data-content-lifecycle="${item.lifecycle}" data-governance-fallback aria-label="Content lifecycle"><strong>${message.label}</strong><p>${message.text}${docsLink}</p></aside>`;
-  html = html.replace(/<\/body>/i, `${banner}\n</body>`);
+  // An SSR sibling before the React root is crawlable and visible before the
+  // article, without mutating Docusaurus-owned nodes during hydration.
+  const rootMarker = '<div id="__docusaurus">';
+  if (!html.includes(rootMarker)) throw new Error(`${item.id}: Docusaurus root marker is missing.`);
+  html = html.replace(rootMarker, `${banner}\n${rootMarker}`);
   await writeFile(path, html);
   updated += 1;
 }

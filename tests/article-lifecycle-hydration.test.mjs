@@ -26,10 +26,11 @@ test('article lifecycle fallback remains outside React root and has a route mani
     const reactRoot = html.slice(html.indexOf('<div id="__docusaurus">'), html.indexOf('</main></div>') + '</main></div>'.length);
     assert.doesNotMatch(reactRoot, /content-lifecycle-banner/);
     assert.match(html, /data-governance-fallback/);
+    assert.ok(html.indexOf('data-governance-fallback') < html.indexOf('<div id="__docusaurus">'));
     assert.match(html, /src="\/assets\/content-governance\.js" defer/);
     const manifest = JSON.parse(readFileSync(join(site, 'data/article-lifecycle.json'), 'utf8'));
     const runtime = readFileSync(join(root, 'assets/content-governance.js'), 'utf8');
-    assert.match(runtime, /root\.after\(aside\)/);
+    assert.match(runtime, /root\.before\(aside\)/);
     assert.doesNotMatch(runtime, /new MutationObserver/);
     assert.doesNotMatch(runtime, /article\.append\(fallback\)/);
     assert.match(runtime, /if \(!routes\) \{ loadRoutes\(\); return; \}/);

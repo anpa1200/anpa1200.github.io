@@ -1,4 +1,4 @@
-// Keep lifecycle notices outside the Docusaurus React root, including after navigation.
+// Keep lifecycle notices before the Docusaurus React root, including after navigation.
 // The build emits the initial crawlable fallback for no-JavaScript users.
 (() => {
   if (window.__articleLifecycleReady) return;
@@ -48,7 +48,7 @@
       paragraph.append(link, '.');
     }
     aside.append(strong, paragraph);
-    root.after(aside);
+    root.before(aside);
   }
   const schedule = () => { clearTimeout(timer); timer = setTimeout(update, 120); };
   const begin = () => {

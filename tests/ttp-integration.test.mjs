@@ -67,6 +67,8 @@ test('individual rules preserve author, source, license, original YAML and tagge
     const rule = json(summary.data_path);
     const body = html(`detections/rules/${rule.id}/`);
     assert.ok(body.includes(rule.source_sha256));
+    assert.match(body, /<figure class="code-figure"><figcaption>Original Sigma rule YAML, scroll horizontally if needed<\/figcaption><pre class="code-sample" tabindex="0"><code>/);
+    assert.doesNotMatch(body, /<pre[^>]*aria-label=/);
     assert.ok(body.includes(rule.license_url));
     assert.ok(body.includes(rule.source_url));
     assert.match(body, /not been compiled for a SIEM backend/);
