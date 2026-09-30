@@ -182,7 +182,8 @@ for file in sorted(OUT.rglob('*.md')):
             if token.type == 'link_open':
                 href = token.attrGet('href')
                 if not urlsplit(href).scheme and href.split('#')[0].endswith('.md'):
-                    token.attrSet('href', href.replace('.md', '.html'))
+                    # README.md is published as the directory index; README.html redirects there.
+                    token.attrSet('href', re.sub(r'/README\.html', '/', re.sub(r'^README\.html', './', href.replace('.md', '.html'))))
             if token.type == 'image':
                 token.attrSet('loading', 'lazy')
                 token.attrSet('width', '1600')

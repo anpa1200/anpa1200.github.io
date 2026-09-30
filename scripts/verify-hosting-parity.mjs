@@ -105,7 +105,7 @@ async function compare(path, accept = '*/*', method = 'GET') {
     if (expected.status === 301) {
       const location = new URL(next.headers.location || '', next.requested_url);
       const requested = new URL(next.requested_url);
-      check(location.origin === preview.origin && location.pathname === `${pathname}/` && location.search === requested.search && !location.hash, label, 'directory redirect URL/query', next.headers.location);
+      check(location.origin === preview.origin && location.pathname === expected.location && location.search === requested.search && !location.hash, label, 'canonical redirect URL/query', next.headers.location);
     } else check(!next.headers.location, label, 'no unwanted redirect', next.headers.location);
 
     const newGeneratedAsset = generatedAssets.has(pathname.slice(1)) && old.status === 404 && next.status === 200

@@ -9,7 +9,7 @@ import {
 } from '../scripts/canonical-crosslinks.mjs';
 
 test('all reviewed crosslink targets are unique same-origin paths', () => {
-  assert.equal(crosslinkRewrites.length, 80);
+  assert.equal(crosslinkRewrites.length, 82);
   assert.equal(crosslinkRewrites.filter(({ from }) => from.startsWith('/israel-government-threat-actors-cti/docs/actors/')).length, 15);
   assert.equal(new Set(crosslinkRewrites.map(({ from }) => from)).size, crosslinkRewrites.length);
   for (const { from, to } of crosslinkRewrites) {

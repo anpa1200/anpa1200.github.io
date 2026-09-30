@@ -61,11 +61,18 @@ try {
     } catch { await pause(200); }
   }
   assert.ok(ready, `Local Worker failed to start:\n${logs}`);
-  for (const path of ['/', '/index.html', '/index', '/about', '/about.html', '/projects.html', '/articles/', '/articles/index.html', '/articles/?q=a%20b']) {
+  for (const path of ['/', '/about.html', '/projects.html', '/articles/', '/articles/?q=a%20b']) {
     const response = await request(path);
     assert.equal(response.status, 200, path);
     assert.equal(response.headers.get('Location'), null);
     assert.equal(await response.text(), html, path);
+  }
+  // Duplicate aliases answer with one redirect to the canonical document URL.
+  for (const [path, location] of [['/index.html', '/'], ['/index', '/'], ['/about', '/about.html'], ['/articles/index.html?q=a', '/articles/?q=a']]) {
+    const response = await request(path);
+    assert.equal(response.status, 301, path);
+    assert.equal(response.headers.get('Location'), `${origin}${location}`, path);
+    await response.body?.cancel();
   }
   const redirect = await request('/articles?q=a%20b');
   assert.equal(redirect.status, 301);
