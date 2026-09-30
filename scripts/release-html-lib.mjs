@@ -107,6 +107,8 @@ export function normalizeSeoTitle(value = '') {
     .replace(/\s*\|\s*ITDR\s*[–—-]\s*Identity Threat Detection\s*&\s*Response\s*$/i, ' | ITDR')
     .replace(/\s*\|\s*1200km Security Research Articles\s*\|\s*1200km\s*$/i, ' | 1200km')
     .replace(/(?:\s*\|\s*1200km){2,}\s*$/i, ' | 1200km')
+    // One brand separator site-wide: "Title — 1200km" becomes "Title | 1200km".
+    .replace(/\s+[—–-]\s+1200km\s*$/i, ' | 1200km')
     .replace(/\s*\|\s*1200km\s*\|\s*AdversaryGraph Docs\s*$/i, ' | AdversaryGraph Docs')
     .replace(/^AdversaryGraph\s*[—-]\s*(.+)\s*\|\s*AdversaryGraph Docs$/i, '$1 | AdversaryGraph Docs')
     .replace(/^(ITDR\s*[–—-]\s*Identity Threat Detection\s*&\s*Response)\s*\|\s*ITDR$/i, '$1')

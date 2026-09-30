@@ -205,7 +205,8 @@ const itemList = {
   ],
 };
 
-const title = `Article and Guide References${pageNumber > 1 ? ' — Page ' + pageNumber : ''} — Searchable Source Index | 1200km`;
+// Pagination titles stay short: the page number, not repeated boilerplate.
+const title = `Article and Guide References — ${pageNumber > 1 ? 'Page ' + pageNumber : 'Source Index'} | 1200km`;
 const description = `${pageNumber > 1 ? `Page ${pageNumber} of ${pageCount}: ` : ''}Search ${model.record_count} deduplicated external sources cited across maintained 1200km articles, guides, research, case studies, documentation, and labs.`;
 const keywords = 'AI cyberattacks, CTI references, incident response reports, threat research, artificial intelligence, threat actors, MITRE ATT&CK, TTPs, LLM abuse, deepfakes, malware, phishing, vulnerability research';
 const removedScriptMarker = '__REFERENCE_BASE_SCRIPT_REMOVED__';

@@ -299,6 +299,8 @@ test('known generated title suffixes are shortened without truncating the conten
   assert.equal(normalizeSeoTitle('Detecting Mfa Fatigue and Oauth Abuse | ITDR'), 'Detecting MFA Fatigue and OAuth Abuse | ITDR');
   assert.equal(normalizeSeoTitle('Dcsync, Asrep, Saml, Prt, Acl and Sid | ITDR'), 'DCSync, AS-REP, SAML, PRT, ACL and SID | ITDR');
   assert.equal(normalizeSeoTitle('Mfa research outside ITDR | 1200km'), 'Mfa research outside ITDR | 1200km');
+  assert.equal(normalizeSeoTitle('Penetration Testing Tools Guide — 1200km'), 'Penetration Testing Tools Guide | 1200km');
+  assert.equal(normalizeSeoTitle('MITRE ATT&CK Knowledge Mesh — 1200km Cyber Knowledge'), 'MITRE ATT&CK Knowledge Mesh — 1200km Cyber Knowledge');
 });
 
 test('Docusaurus brand logos are decorative when adjacent title text names the site', () => {
