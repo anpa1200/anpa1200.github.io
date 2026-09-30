@@ -200,12 +200,12 @@ function authoredCourseCard(course) {
             <p class="course-verification">Facts last checked ${escapeHtml(course.facts_verified_at)} against the published course record.</p>
             <div class="course-actions"><a class="button primary" href="${escapeHtml(localPath(course.canonical_url))}">Open course</a></div>
           </div>
-          <aside class="authored-course-progress" aria-label="Course publication progress">
+          <section class="authored-course-progress" aria-label="Course publication progress">
             <span>${course.available_modules} of ${course.planned_modules}</span>
             <strong>modules available</strong>
             <meter min="0" max="${course.planned_modules}" value="${course.available_modules}">${course.available_modules} of ${course.planned_modules}</meter>
             <p>The syllabus is public. Published modules are usable now; the remaining curriculum is explicitly under construction.</p>
-          </aside>
+          </section>
         </article>`;
 }
 
@@ -224,7 +224,7 @@ function learningPathCard(path) {
           </div>
           <div class="learning-path-layout">
             <ol class="learning-path-steps">${path.steps.map((step) => `<li><span>${step.position}</span><div><small>${escapeHtml(label(step.kind))}</small><a href="${escapeHtml(step.url)}">${escapeHtml(step.title)}</a></div></li>`).join('')}</ol>
-            <aside class="learning-path-outcomes" aria-labelledby="outcomes-${escapeHtml(path.id)}"><h4 id="outcomes-${escapeHtml(path.id)}">Expected outcomes</h4><ul>${path.outcomes.map((outcome) => `<li>${escapeHtml(outcome)}</li>`).join('')}</ul><p>Anchored to ${anchors.join(' and ')}.</p></aside>
+            <section class="learning-path-outcomes" aria-labelledby="outcomes-${escapeHtml(path.id)}"><h4 id="outcomes-${escapeHtml(path.id)}">Expected outcomes</h4><ul>${path.outcomes.map((outcome) => `<li>${escapeHtml(outcome)}</li>`).join('')}</ul><p>Anchored to ${anchors.join(' and ')}.</p></section>
           </div>
         </article>`;
 }
@@ -333,7 +333,7 @@ const body = `    <section class="course-hero" aria-labelledby="course-library-t
         <p class="page-lead">${escapeHtml(model.description)}</p>
         <div class="page-hero-links"><a class="button primary" href="#course-library">Explore the library</a><a class="button" href="#review-method">Read the review method</a><a class="button" href="/cyber-knowledge/helping-materials/">Open helping materials</a></div>
       </div>
-      <aside class="course-principles" aria-label="Publication standard"><strong>Completion before recommendation</strong><p>${escapeHtml(model.editorial_policy.completion_rule)}</p><span>Updated ${escapeHtml(model.updated_at)}</span></aside>
+      <div role="note" class="course-principles" aria-label="Publication standard"><strong>Completion before recommendation</strong><p>${escapeHtml(model.editorial_policy.completion_rule)}</p><span>Updated ${escapeHtml(model.updated_at)}</span></div>
     </section>
     <section class="course-metrics" aria-label="Courses and learning paths summary">
       <article><strong>${originalCourses}</strong><span>original course in development</span></article>

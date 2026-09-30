@@ -178,10 +178,10 @@ const sourceGroups = [...new Set(sourceRecords.map((record) => sourceClass(recor
 const sourcesBody = `<section aria-labelledby="source-index-title">
         <h2 id="source-index-title">Referenced sources</h2>
         <p class="section-intro">${sourceRecords.length} unique external destinations cited by the eleven guides. Classification is descriptive; normative authority depends on the exact document and claim.</p>
-        <aside class="notice" aria-label="Related source directories">
+        <section class="notice" aria-label="Related source directories">
           <span aria-hidden="true">↗</span>
           <div><strong>Choose the right source index</strong><p>This page records citations used by the Cyber Knowledge guides. Use <a href="/references/">References</a> for citations across the whole 1200km site, or the <a href="/cyber-knowledge/knowledge-sources/">Knowledge Sources module</a> for ${knowledgeSourceCount} independently described and assessed standards, research portals, tools, datasets, and learning resources.</p></div>
-        </aside>
+        </section>
 ${sourceGroups.map((group) => `        <section id="source-${group.toLowerCase().replace(/[^a-z0-9]+/g, '-')}" aria-labelledby="source-${group.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-title">
           <h3 id="source-${group.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-title">${escapeHtml(group)}</h3>
           <div class="domain-grid">

@@ -320,6 +320,9 @@
       host = document.createElement('div');
       host.className = 'site-search-host site-search-host--floating';
       host.dataset.siteSearchTheme = 'true';
+      // Top-level content must sit in a landmark; this one is the page search.
+      host.setAttribute('role', 'search');
+      host.setAttribute('aria-label', 'Site search');
       document.body.appendChild(host);
     }
     populateHost(host, false);

@@ -62,6 +62,13 @@ test('an older sidebar-before-header page is normalized to skip-link-first order
 
 
 
+test('a module page without the site shell keeps its own skip link first', () => {
+  const module = fixture.replace('<body>', '<body data-root="/ttp-simulation/">\n<a class="skip" href="#main">Skip to module</a>');
+  const output = applyPlatformSidebar(module, shell, { pathname: '/ttp-simulation/' });
+  assert.ok(output.indexOf('class="skip"') < output.indexOf('id="platform-sidenav"'));
+  assert.equal(applyPlatformSidebar(output, shell, { pathname: '/ttp-simulation/' }), output);
+});
+
 test('redirect documents are not converted into navigable duplicate pages', () => {
   const redirect = '<html><head><title>Redirecting</title><meta http-equiv="refresh" content="0;url=/maintained/"></head><body></body></html>';
   assert.equal(isSidebarEligible(redirect), false);

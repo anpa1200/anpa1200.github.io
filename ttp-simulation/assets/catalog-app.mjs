@@ -42,8 +42,8 @@ function renderInventory(catalog) {
       <div><strong>${catalog.counts.by_classification.cannot_simulate_yet || 0}</strong><span>Unsupported in current evidence set</span></div>
       <div><strong>${catalog.counts.telemetry_mapped}</strong><span>With upstream telemetry mappings</span></div>
     </section>
-    <aside class="notice"><strong>Procedure availability is not feasibility or validation.</strong> The filter below describes the pinned Atomic index only. A missing Atomic candidate does not mean a technique cannot be simulated. Each page includes a full definition, detection guidance, collection contracts, anomaly-design worksheet and explicit gaps. <a href="/ttp-simulation/data/workbooks.json">All-page evidence inventory</a>. Imported procedures are not live-validated.</aside>
-    <div class="workspace"><aside class="filters"><form id="filters"><h2>Filter inventory</h2><label>Search<input name="q" type="search" placeholder="ID, behavior, platform, telemetry…" autocomplete="off"></label>
+    <div class="notice" role="note"><strong>Procedure availability is not feasibility or validation.</strong> The filter below describes the pinned Atomic index only. A missing Atomic candidate does not mean a technique cannot be simulated. Each page includes a full definition, detection guidance, collection contracts, anomaly-design worksheet and explicit gaps. <a href="/ttp-simulation/data/workbooks.json">All-page evidence inventory</a>. Imported procedures are not live-validated.</div>
+    <div class="workspace"><aside class="filters" aria-label="Inventory filters"><form id="filters"><h2>Filter inventory</h2><label>Search<input name="q" type="search" placeholder="ID, behavior, platform, telemetry…" autocomplete="off"></label>
       <label>Atomic procedure evidence<select name="classification"><option value="">Both groups</option><option value="can_simulate">Compatible Atomic candidate</option><option value="cannot_simulate_yet">No Atomic candidate in snapshot</option></select></label>
       ${select('domain', 'Domain', ['enterprise', 'mobile', 'ics'])}
       ${select('environment', 'Environment', facets('environments'))}

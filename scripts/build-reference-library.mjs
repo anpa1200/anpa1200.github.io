@@ -113,7 +113,7 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
           <p class="page-lead">${escapeHtml(model.description)} Search direct titles, descriptions and tags (shared relationships are explored with Find related), filter every normalized tag, pivot across facets, and find references connected by shared evidence metadata.</p>
           <div class="page-hero-links"><a class="button primary" href="/articles/">Browse articles</a><a class="button" href="/guides.html">Browse guides</a><a class="button" href="/cyber-knowledge/knowledge-sources/">Curated Knowledge Sources</a><a class="button" href="/cyber-knowledge/sources/">Cyber Knowledge citations</a><a class="button" href="/ai-attack-statistics/">AI cyberattack study</a><a class="button" href="/ai-attack-statistics/dashboard/">AI study dashboard</a></div>
         </div>
-        <aside class="reference-boundary" aria-label="Evidence boundary"><strong>Evidence boundary</strong><p>${escapeHtml(model.evidence_boundary)}</p></aside>
+        <div role="note" class="reference-boundary" aria-label="Evidence boundary"><strong>Evidence boundary</strong><p>${escapeHtml(model.evidence_boundary)}</p></div>
       </section>
       <section class="reference-metrics" aria-label="Reference library summary">
         <article><strong>${model.record_count}</strong><span>preserved records (all classifications)</span></article>
@@ -139,16 +139,16 @@ const body = `<section class="reference-intro" aria-labelledby="reference-librar
         </div>
         <div class="reference-status" aria-live="polite"><strong data-reference-count>${model.record_count}</strong> references shown <span data-reference-active></span></div>
         <div class="reference-analysis-grid">
-          <aside class="reference-correlation" aria-labelledby="reference-correlation-title">
+          <section class="reference-correlation" aria-labelledby="reference-correlation-title">
             <h3 id="reference-correlation-title">Tag correlations</h3>
             <p>Top co-occurring tags among the current results. Select a tag to pivot the library.</p>
             <div class="reference-correlation-list" data-reference-correlations></div>
-          </aside>
-          <aside class="reference-correlation" aria-labelledby="reference-related-title">
+          </section>
+          <section class="reference-correlation" aria-labelledby="reference-related-title">
             <h3 id="reference-related-title">Related references</h3>
             <p data-reference-related-help>Select <strong>Find related</strong> on a reference to rank other sources by shared normalized tags.</p>
             <ol class="reference-related-list" data-reference-related-list></ol>
-          </aside>
+          </section>
         </div>
       </section>
       <section aria-labelledby="reference-results-title">
