@@ -17,12 +17,18 @@
     try { localStorage.setItem(CONSENT_KEY, value); } catch { /* private mode: ask again next visit */ }
   }
 
+  // Docusaurus companions call window.gtag on every client-side route change.
+  // Until the visitor opts in, accept and discard those calls: nothing is
+  // queued, so nothing collected before consent is sent after it.
+  function discard() {}
+  if (typeof window.gtag !== 'function') window.gtag = discard;
+
   function loadAnalytics() {
     // Search URLs contain visitor-authored queries; never send them to analytics.
     if (readConsent() !== 'granted' || window.location.pathname === '/search.html' || !analyticsId || window.__1200kmAnalyticsLoaded) return;
     window.__1200kmAnalyticsLoaded = true;
     window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    if (window.gtag === discard) window.gtag = function () { window.dataLayer.push(arguments); };
     window.gtag('js', new Date());
     window.gtag('config', analyticsId);
     const tag = document.createElement('script');

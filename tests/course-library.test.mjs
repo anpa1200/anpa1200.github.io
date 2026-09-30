@@ -212,6 +212,9 @@ test('analytics loads only after an explicit opt-in', () => {
   const fresh = runConsentLoader();
   assert.equal(fresh.googleTags().length, 0, 'nothing from Google before a choice');
   assert.equal(fresh.window.dataLayer, undefined);
+  assert.equal(typeof fresh.window.gtag, 'function', 'companion route-change calls never throw');
+  fresh.window.gtag('event', 'page_view');
+  assert.equal(fresh.window.dataLayer, undefined, 'pre-consent calls are discarded, not queued');
   const banner = fresh.appended.body.find((n) => n.id === 'analytics-consent');
   assert.ok(banner, 'consent banner shown on first visit');
   assert.equal(banner.attributes['aria-label'], 'Analytics consent');
@@ -227,6 +230,9 @@ test('analytics loads only after an explicit opt-in', () => {
   accepting.window.__1200kmAnalyticsConsent.choose('granted');
   assert.equal(accepting.googleTags().length, 1, 'accept loads the tag once');
   assert.equal(accepting.googleTags()[0].src, 'https://www.googletagmanager.com/gtag/js?id=G-TEST');
+  assert.deepEqual([...accepting.window.dataLayer].map((args) => args[0]), ['js', 'config'], 'only post-consent calls are queued');
+  accepting.window.gtag('event', 'page_view');
+  assert.equal(accepting.window.dataLayer.length, 3, 'after consent, calls reach the tag');
 
   assert.equal(runConsentLoader({ stored: 'granted' }).googleTags().length, 1, 'remembered consent');
   const declined = runConsentLoader({ stored: 'denied' });
