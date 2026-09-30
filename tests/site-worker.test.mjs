@@ -57,7 +57,7 @@ test('directory redirect retains host and query and leaves fragment inheritance 
 });
 
 test('all broken legacy crosslinks redirect to reviewed current routes without origin escape', async () => {
-  assert.equal(LEGACY_CROSSLINK_REDIRECTS.size, 63);
+  assert.equal(LEGACY_CROSSLINK_REDIRECTS.size, 80);
   for (const [oldPath, newPath] of LEGACY_CROSSLINK_REDIRECTS) {
     const response = await get(`${oldPath}?source=old#section`);
     assert.equal(response.status, 301, oldPath);

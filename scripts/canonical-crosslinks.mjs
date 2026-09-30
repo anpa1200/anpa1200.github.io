@@ -34,11 +34,14 @@ export function rewriteCrosslinks(input, rewrites = crosslinkRewrites) {
     const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // A stale route must be a complete URL token on both sides. In particular,
     // /investigations/... inside a GitHub blob URL belongs to that external
-    // URL and must not be replaced with our site's absolute route.
-    const pattern = new RegExp(`(?<![A-Za-z0-9_./:%~-])${escaped}(?![A-Za-z0-9_./%~-])`, 'g');
+    // URL and must not be replaced with our site's absolute route. A path-form
+    // route also matches when written as an absolute https://1200km.com URL;
+    // the origin is kept, so only the path changes.
+    const origin = from.startsWith('/') ? '((?:https://1200km\\.com)?)' : '()';
+    const pattern = new RegExp(`(?<![A-Za-z0-9_./:%~-])${origin}${escaped}(?![A-Za-z0-9_./%~-])`, 'g');
     const occurrences = [...output.matchAll(pattern)].length;
     if (!occurrences) continue;
-    output = output.replace(pattern, to);
+    output = output.replace(pattern, (_, prefix) => `${prefix}${to}`);
     counts[from] = occurrences;
   }
   return { output, counts };

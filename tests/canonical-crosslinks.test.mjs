@@ -9,7 +9,7 @@ import {
 } from '../scripts/canonical-crosslinks.mjs';
 
 test('all reviewed crosslink targets are unique same-origin paths', () => {
-  assert.equal(crosslinkRewrites.length, 63);
+  assert.equal(crosslinkRewrites.length, 80);
   assert.equal(crosslinkRewrites.filter(({ from }) => from.startsWith('/israel-government-threat-actors-cti/docs/actors/')).length, 15);
   assert.equal(new Set(crosslinkRewrites.map(({ from }) => from)).size, crosslinkRewrites.length);
   for (const { from, to } of crosslinkRewrites) {
@@ -101,4 +101,23 @@ test('every canonical destination must be emitted into the static artifact', () 
     writeFileSync(file, '{}');
     assert.deepEqual(missingCrosslinkTargets(root), []);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('path-form routes also rewrite their absolute 1200km.com spelling without touching look-alikes', () => {
+  const input = [
+    '<a href="https://1200km.com/threatmapper-docs/">docs</a>',
+    '<a href="https://1200km.com/adversarygraph">product</a>',
+    '<a href="https://1200km.com/adversarygraph-docs/">current docs</a>',
+    '<a href="https://1200km.com/adversarygraph/">already canonical</a>',
+    '<a href="https://github.com/example/threatmapper-docs/">external</a>',
+    '<a href="/CTI_as_a_Code/ecosystem">relative</a>',
+  ].join('\n');
+  const { output } = rewriteCrosslinks(input);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph-docs\/">docs/);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph\/">product/);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph-docs\/">current docs/);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph\/">already canonical/);
+  assert.match(output, /href="https:\/\/github\.com\/example\/threatmapper-docs\/">external/);
+  assert.match(output, /href="\/CTI_as_a_Code\/ecosystem\/">relative/);
+  assert.deepEqual(rewriteCrosslinks(output).counts, {}, 'rewrites are idempotent');
 });
