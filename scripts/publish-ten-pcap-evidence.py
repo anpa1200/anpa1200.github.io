@@ -170,6 +170,13 @@ save_json('evidence/source-provenance.json', {'scope': 'Public derivative of ten
 style = '''*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14243b;font:17px/1.7 system-ui,sans-serif}header{padding:20px;background:#11233c;color:#fff}header a{color:#b7e5ff}main{max-width:1160px;margin:28px auto;padding:32px 44px;background:white;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3}h2{margin-top:2em}a{color:#075c91}img{display:block;max-width:100%;height:auto;margin:24px auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #b8c9db;padding:10px;text-align:left}th{background:#edf4fc}pre{overflow:auto;padding:16px;background:#11233c;color:#fff}code{font-size:.85em}blockquote{margin:20px 0;padding:8px 20px;border-left:4px solid #167bb0;background:#eff6ff}.notice{padding:12px;background:#eef6fd;font-size:14px}@media(max-width:700px){main{margin:0;padding:22px 16px}body{font-size:16px}}@media print{header{display:none}main{padding:0;margin:0}pre{white-space:pre-wrap}img,tr{break-inside:avoid}}'''
 for file in sorted(OUT.rglob('*.md')):
     tokens = md.parse(file.read_text())
+    # Exactly one H1 per page: promote the first heading of fragments that
+    # start at H2, and demote any later H1 to H2.
+    headings = [i for i, t in enumerate(tokens) if t.type in ('heading_open', 'heading_close')]
+    if headings and not any(tokens[i].tag == 'h1' for i in headings):
+        tokens[headings[0]].tag = tokens[headings[1]].tag = 'h1'
+    for i in [i for i in headings if tokens[i].tag == 'h1'][2:]:
+        tokens[i].tag = 'h2'
     seen = {}
     for i, token in enumerate(tokens):
         if token.type == 'heading_open':

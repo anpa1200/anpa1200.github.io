@@ -42,6 +42,7 @@ for (const directory of ['docs']) {
   for (const file of readdirSync(root, { recursive: true })) if (/\.mdx?$/i.test(file)) markdownFiles.push(resolve(root, file));
 }
 const tocPattern = new RegExp(overlay.medium_toc_anchor_links.pattern, 'g');
+const emptyCardLinkPattern = new RegExp(overlay.medium_empty_card_links.pattern, 'g');
 let editorial = 0;
 for (const entry of [...overlay.phrase_replacements, ...overlay.unlink_replacements]) {
   let matched = false;
@@ -63,7 +64,7 @@ for (const entry of [...overlay.phrase_replacements, ...overlay.unlink_replaceme
 let external = 0;
 for (const path of markdownFiles) {
   const text = readFileSync(path, 'utf8');
-  let next = text.replace(tocPattern, overlay.medium_toc_anchor_links.replace);
+  let next = text.replace(tocPattern, overlay.medium_toc_anchor_links.replace).replace(emptyCardLinkPattern, overlay.medium_empty_card_links.replace);
   next = rewriteExternalText(next).output;
   next = unlinkPrivateUrls(next).output;
   if (next !== text) { writeFileSync(path, next); external += 1; }

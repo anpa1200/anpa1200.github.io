@@ -77,6 +77,9 @@ test('archive editorial overlay entries are reviewed fixed strings', () => {
   const source = '- [**Real life examples**](http://7fff)\n- [Exclude &lt;host1[,host2]&gt;: hosts](http://9cd9)\n- [Keep](https://example.org/)';
   const fixed = source.replace(toc, overlay.medium_toc_anchor_links.replace);
   assert.equal(fixed, '- **Real life examples**\n- Exclude &lt;host1[,host2]&gt;: hosts\n- [Keep](https://example.org/)');
+  const empty = new RegExp(overlay.medium_empty_card_links.pattern, 'g');
+  const card = '[**Repo**\n*About*github.com](https://github.com/x/y)[](https://github.com/x/y)\n![](https://cdn.example/i.png)';
+  assert.equal(card.replace(empty, overlay.medium_empty_card_links.replace), '[**Repo**\n*About*github.com](https://github.com/x/y)\n![](https://cdn.example/i.png)', 'empty card links go, images stay');
 });
 
 test('archive preparation fails when a reviewed overlay entry no longer matches', async () => {
