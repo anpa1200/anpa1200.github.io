@@ -189,6 +189,9 @@ function normalizeMedia(body, article) {
   // Elementor layout. Keep the original heading text while making the local
   // article hierarchy valid beneath the page H1.
   out = out.replace(/<h[1-6](\b[^>]*)>/gi, '<h2$1>').replace(/<\/h[1-6]>/gi, '</h2>');
+  // Drop headings with no text (WordPress spacer blocks); they announce an
+  // empty section to screen-reader heading navigation.
+  out = out.replace(/\s*<h2\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/h2>/gi, '');
   // Use the privacy-preserving YouTube host and provide a visible source link
   // when a browser, extension, or network policy cannot render an iframe.
   out = out.replace(/<iframe\b([\s\S]*?)><\/iframe>/gi, (full, attrs) => {
