@@ -64,3 +64,20 @@ test('heading overlay preserves Docusaurus content titles and handles synthetic 
   assert.deepEqual(gaps.children.map((node)=>node.depth), [1,2,3,2,3,2,3]);
   assert.deepEqual(gaps.children.map((node)=>node.data.id), [0,1,2,3,4,5,6].map(index=>`anchor-${index}`));
 });
+
+test('config overlay gives square companion navbar logos explicit 32 px dimensions', async () => {
+  const { mkdtempSync, writeFileSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { createRequire } = await import('node:module');
+  const { prepareCompanionSource } = await import('../scripts/prepare-companion-source.mjs');
+  const root = mkdtempSync(join(tmpdir(), '1200km-companion-'));
+  try {
+    const configPath = join(root, 'docusaurus.config.js');
+    writeFileSync(configPath, "const config = { themeConfig: { navbar: { logo: { alt: '', src: 'img/logo.png' } } }, presets: [] };\nmodule.exports = config;\n");
+    await prepareCompanionSource(root, 'example-companion', configPath);
+    await prepareCompanionSource(root, 'example-companion', configPath);
+    const config = createRequire(import.meta.url)(configPath);
+    assert.deepEqual(config.themeConfig.navbar.logo, { alt: '', src: 'img/logo.png', width: 32, height: 32 });
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

@@ -41,6 +41,10 @@ for (const preset of config.presets || []) {
   preset[1].docs ||= {};
   preset[1].docs.remarkPlugins = [...(preset[1].docs.remarkPlugins || []), migrationBodyHeadings];
 }
+// Every companion logo is square and rendered at Infima's 2rem (32 px):
+// explicit dimensions let the header reserve its space before the image loads.
+const navbarLogo = config.themeConfig?.navbar?.logo;
+if (navbarLogo && navbarLogo.width == null && navbarLogo.height == null) Object.assign(navbarLogo, { width: 32, height: 32 });
 `;
   if (!config.includes('function migrationBodyHeadings')) {
     const marker = /(?:export default config;|module\.exports\s*=\s*config;)/;
