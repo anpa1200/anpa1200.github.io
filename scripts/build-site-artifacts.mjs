@@ -15,6 +15,7 @@ import {
   parseJsonLd,
   stripHtml,
   tagAttributes,
+  ensureFaviconLink,
   transformReleaseHtml,
 } from './release-html-lib.mjs';
 
@@ -284,6 +285,10 @@ for (const path of files) {
   if (!validation.indexable) {
     if (['off-origin-canonical', 'multiple-canonicals'].includes(validation.reason)) {
       throw new Error(`${relative(siteRoot, path)}: invalid canonical declaration (${validation.reason})`);
+    }
+    if (transformHtml) {
+      const withIcon = ensureFaviconLink(html);
+      if (withIcon !== html) await writeFile(path, withIcon);
     }
     continue;
   }

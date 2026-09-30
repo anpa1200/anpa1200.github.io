@@ -957,6 +957,13 @@ export function normalizeDocusaurusBrandLogoAlts(html) {
   );
 }
 
+export function ensureFaviconLink(html) {
+  const hasIcon = [...html.matchAll(/<link\b[^>]*>/gi)]
+    .some(([tag]) => (tagAttributes(tag).rel || '').toLowerCase().split(/\s+/).includes('icon'));
+  if (hasIcon) return html;
+  return html.replace(/<\/head>/i, '<link rel="icon" href="/favicon.ico">\n</head>');
+}
+
 export function transformReleaseHtml(html, options) {
   let transformed = deferThirdPartyBoot(html);
   if (options.canonical) {
@@ -967,11 +974,7 @@ export function transformReleaseHtml(html, options) {
   transformed = normalizeDocumentTitles(transformed);
   transformed = normalizeMetaDescriptions(transformed);
   transformed = normalizeSocialImages(transformed);
-  const hasIcon = [...transformed.matchAll(/<link\b[^>]*>/gi)]
-    .some(([tag]) => (tagAttributes(tag).rel || '').toLowerCase().split(/\s+/).includes('icon'));
-  if (!hasIcon) {
-    transformed = transformed.replace(/<\/head>/i, '<link rel="icon" href="/favicon.ico">\n</head>');
-  }
+  transformed = ensureFaviconLink(transformed);
   // Keep release-owned browser enhancements on the same origin. Checked-in
   // Docusaurus output historically used an absolute production URL, which made
   // local/staged accessibility tests execute the previously deployed script.
