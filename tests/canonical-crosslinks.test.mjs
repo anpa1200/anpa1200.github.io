@@ -121,3 +121,19 @@ test('path-form routes also rewrite their absolute 1200km.com spelling without t
   assert.match(output, /href="\/CTI_as_a_Code\/ecosystem\/">relative/);
   assert.deepEqual(rewriteCrosslinks(output).counts, {}, 'rewrites are idempotent');
 });
+
+test('JSON data keeps absolute URLs; only path-form values are rewritten there', async () => {
+  const { mkdtempSync, writeFileSync, readFileSync: read, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { rewriteCrosslinksInDirectory } = await import('../scripts/canonical-crosslinks.mjs');
+  const root = mkdtempSync(join(tmpdir(), '1200km-crosslink-json-'));
+  try {
+    const { from, to } = crosslinkRewrites.find((entry) => entry.to === `${entry.from}/`);
+    writeFileSync(join(root, 'catalog.json'), JSON.stringify({ canonical_url: `https://1200km.com${from}`, path: from }));
+    writeFileSync(join(root, 'page.md'), `[a](https://1200km.com${from})`);
+    await rewriteCrosslinksInDirectory(root, ['.json', '.md']);
+    assert.deepEqual(JSON.parse(read(join(root, 'catalog.json'), 'utf8')), { canonical_url: `https://1200km.com${from}`, path: to });
+    assert.equal(read(join(root, 'page.md'), 'utf8'), `[a](https://1200km.com${to})`);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
