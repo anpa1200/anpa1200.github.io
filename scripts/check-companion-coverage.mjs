@@ -43,6 +43,16 @@ for (const path of paths) {
       }
     }
   }
+  if (path === 'CTI_as_a_Code/intake-proactive/index.html') {
+    for (const [tag] of html.matchAll(/<input\b[^>]*>/gi)) {
+      if (!/\btype=["'](?:text|date)["']/i.test(tag)) continue;
+      const named = /\baria-label=["'][^"']+["']|\baria-labelledby=["'][^"']+["']/i.test(tag);
+      const id = tag.match(/\bid=["']([^"']+)["']/i)?.[1];
+      if (/\baria-label=["']_+["']/i.test(tag)) failures.push(`${path}: intake input has an opaque placeholder label: ${tag}`);
+      const associatedLabel = id && (html.includes(`for="${id}"`) || html.includes(`for='${id}'`));
+      if (!named && !associatedLabel) failures.push(`${path}: intake input has no accessible name: ${tag}`);
+    }
+  }
   for (const [tag] of html.matchAll(/<(?:script|link|img|source)\b[^>]*>/gi)) {
     if (/^<link/i.test(tag) && !/\brel=["'](?:stylesheet|preload|modulepreload|icon)["']/i.test(tag)) continue;
     const value = tag.match(/\b(?:src|href)=["']([^"']+)["']/i)?.[1];
