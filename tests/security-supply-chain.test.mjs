@@ -80,6 +80,8 @@ test('release transforms remove only selected complete script elements', () => {
     '<!doctype html><html><head>',
     '<script type="application/ld+json" data-value=">">{"stale":true}</script >',
     '<script src="https://www.googletagmanager.com/gtag/js?id=G-TEST123"></script >',
+    '<link rel="preconnect" href="https://www.google-analytics.com"> <link rel="dns-prefetch" href="//www.googletagmanager.com">',
+    '<link rel="preconnect" href="https://cdn.example.org">',
     '<script>gtag("config", "G-TEST123");</script >',
     '<script src="/assets/site-theme.js"></script >',
     '<script src="/assets/site-performance.js" data-google-analytics-id="G-TEST123" defer></script >',
@@ -87,7 +89,8 @@ test('release transforms remove only selected complete script elements', () => {
   ].join('');
   const withoutThirdParty = deferThirdPartyBoot(input);
   // Google's tag never boots from page HTML; only the opt-in consent loader may load it.
-  assert.doesNotMatch(withoutThirdParty, /googletagmanager|gtag\("config"/);
+  assert.doesNotMatch(withoutThirdParty, /googletagmanager|google-analytics\.com|gtag\("config"/, 'no tag and no pre-consent resource hints');
+  assert.match(withoutThirdParty, /<link rel="preconnect" href="https:\/\/cdn\.example\.org">/, 'other resource hints stay');
   assert.match(withoutThirdParty, /src="\/assets\/site-theme\.js"/);
   assert.equal((withoutThirdParty.match(/site-performance\.js/g) || []).length, 1, 'exactly one consent loader');
   assert.match(withoutThirdParty, new RegExp(`<script src="/assets/site-performance\\.js\\?v=1" data-google-analytics-id="${ANALYTICS_ID}" defer></script>`));
