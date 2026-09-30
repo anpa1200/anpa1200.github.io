@@ -108,6 +108,16 @@
       [data-theme="light"] .button:not(.primary) { color:#172033; }
       @media (max-width:760px) { .navlinks { display:none; } .grid,.gallery,.toc { grid-template-columns:1fr; } figure:first-child { grid-column:auto; } .video-list li { display:block; } .video-list a { display:inline-block; margin-top:8px; } }
       @media print { .site-header,.actions,.notice { display:none; } body { background:#fff; color:#111; } .hero { padding:20px 0; background:#fff; } .card,figure,.callout { break-inside:avoid; background:#fff; box-shadow:none; } h1,h2,h3,.lead,.card p,.callout p,td { color:#111; } }
+      /* Course palette is dark-first; light is the site default. */
+      [data-theme="light"]{--bg:#f0f4ff;--accent:#0b57d0;--warn:#8a5200}
+      [data-theme="light"] .eyebrow,[data-theme="light"] .crumb,[data-theme="light"] .letter,[data-theme="light"] .cat,[data-theme="light"] .worksheet h3,[data-theme="light"] .syllabus-title p{color:#0b57d0}
+      [data-theme="light"] .lead{color:#40516a}
+      [data-theme="light"] .syllabus-status{color:#52627a}
+      [data-theme="light"] .formula{color:#1e3a8a}
+      [data-theme="light"] .pill{background:#eef4ff}
+      [data-theme="light"] .filter.active{color:#fff}
+      /* Links inside prose are underlined, not distinguished by color alone. */
+      main p a:not([class]),main li a:not([class]),footer p a{text-decoration:underline;text-underline-offset:2px}
     </style>
     <script type="application/ld+json">
       {
@@ -131,10 +141,10 @@
       </nav>
     </header>
 
-    <div class="hero">
+    <div class="hero" role="region" aria-labelledby="page-title">
       <div class="hero-inner wrap">
         <p class="eyebrow"><a href="/ai-security-course.html">AI Security Engineering</a> / Module 00 / Part 1</p>
-        <h1>AI Security Course, Module 00 — Part 1: Introduction, AI/ML Taxonomy, and Data Foundations</h1>
+        <h1 id="page-title">AI Security Course, Module 00 — Part 1: Introduction, AI/ML Taxonomy, and Data Foundations</h1>
         <p class="lead">Introduction, AI/ML taxonomy, and data foundations for security practitioners. This course chapter follows the published Medium article and connects its terminology to real security evidence and the surrounding AI system.</p>
         <div class="notice" role="status" aria-label="Chapter development status"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Under construction</strong><p>This course chapter is a working draft. Content, media, terminology, references, and exercises may change during creation. The original publication remains the source version for this chapter.</p></div></div>
         <div class="meta"><span class="pill">Module 00</span><span class="pill">Chapter 1</span><span class="pill">Published companion</span><span class="pill">CTI evidence base</span></div>
@@ -197,7 +207,7 @@
       <section id="taxonomy" aria-labelledby="taxonomy-title" class="prose">
         <h2 id="taxonomy-title">1. AI, machine learning, deep learning, and generative AI are not synonyms</h2>
         <p>The first source of confusion is vocabulary. These terms describe overlapping scopes, not interchangeable products. The hierarchy below is useful as a map, but it is not a strict pipeline: some AI systems use no machine learning, some foundation models are not language models, and some generative systems are specialized rather than broadly reusable.</p>
-        <div class="callout"><pre>Artificial intelligence
+        <div class="callout"><pre tabindex="0">Artificial intelligence
 ├── symbolic AI: rules, search, planning, knowledge, optimization, robotics
 └── Machine learning
     ├── supervised, unsupervised, self-supervised, and reinforcement learning
@@ -218,7 +228,7 @@
         <h3>Artificial intelligence: the broadest category</h3>
         <p><strong>Artificial intelligence (AI)</strong> is the broad field of machine-based systems that produce predictions, recommendations, decisions, or content for human-defined objectives. AI includes symbolic rules, search, planning, optimization, robotics, expert systems, statistical models, and neural networks.</p>
         <p>Consider a rules-based transaction screening system:</p>
-        <pre>if amount &gt; approved_limit
+        <pre tabindex="0">if amount &gt; approved_limit
 and destination_country is restricted
 and account_age &lt; policy_threshold:
     require manual review</pre>
@@ -306,7 +316,7 @@ and account_age &lt; policy_threshold:
       <section id="real-life-examples" aria-labelledby="real-life-examples-title" class="prose">
         <h2 id="real-life-examples-title">Real-life examples: the label changes the security question</h2>
         <figure class="inline-media"><img src="/ai-security-course/assets/chapter-01/05-real-life-examples.png" alt="Table connecting AI system categories to real-life security questions" loading="lazy" /><figcaption>Figure 5 — The system label changes the security question and the evidence a defender should collect. <a href="/ai-security-course/assets/chapter-01/05-real-life-examples.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
-        <table class="case-table"><thead><tr><th>System or case</th><th>Technical category</th><th>What the system does</th><th>Security question</th></tr></thead><tbody>
+        <table tabindex="0" class="case-table"><thead><tr><th>System or case</th><th>Technical category</th><th>What the system does</th><th>Security question</th></tr></thead><tbody>
           <tr><td>Rules-based transaction screening</td><td>AI without ML</td><td>Applies explicit conditions to a transaction</td><td>Can an attacker manipulate inputs or bypass the decision workflow?</td></tr>
           <tr><td>Spam or fraud classifier</td><td>Classical ML</td><td>Produces a class or probability from features</td><td>Are training data, thresholds, feedback, and analyst actions protected?</td></tr>
           <tr><td>Image or speech recognition model</td><td>Deep learning</td><td>Learns representations from high-dimensional inputs</td><td>Does it generalize under shift, and can inputs cause targeted misclassification?</td></tr>
@@ -354,7 +364,7 @@ and account_age &lt; policy_threshold:
       <section id="data-foundations" aria-labelledby="data-title" class="prose">
         <h2 id="data-title">2. How learning systems use data</h2>
         <p>Security engineers need to understand where data enters the lifecycle and what happens to it.</p>
-        <pre>collect and document data
+        <pre tabindex="0">collect and document data
   → clean, transform, label, and split
   → select architecture and objective
   → initialize parameters
@@ -429,7 +439,7 @@ and account_age &lt; policy_threshold:
 
         <h3 id="phishing-classifier">Worked example: a phishing classifier</h3>
         <p>Suppose a security team builds a binary classifier that labels incoming messages as benign or phishing. The security analysis must include more than the algorithm:</p>
-        <pre>message and metadata
+        <pre tabindex="0">message and metadata
   → parser and feature extraction
   → classifier score
   → threshold and policy
@@ -437,7 +447,7 @@ and account_age &lt; policy_threshold:
   → analyst feedback and future training data</pre>
         <p>The threat model includes poisoned feedback, attacker-controlled features, evasion through formatting or language changes, threshold manipulation, analyst over-trust, and leakage from logs or training examples. A false negative can deliver a malicious message; a false positive can block a critical business message and teach operators to ignore alerts.</p>
         <p>The evaluation record should preserve the dataset population, class balance, split method, threshold, precision, recall, false-positive and false-negative counts, calibration, drift assumptions, and known blind spots. “The model is 98% accurate” is not enough to choose a quarantine policy.</p>
-        <table class="data-table"><thead><tr><th>Object</th><th>Example</th><th>What to preserve</th></tr></thead><tbody>
+        <table tabindex="0" class="data-table"><thead><tr><th>Object</th><th>Example</th><th>What to preserve</th></tr></thead><tbody>
           <tr><td><strong>Data</strong></td><td>Phishing messages, RAG documents, prompts, retrieved passages, and feedback.</td><td>Source, owner, access policy, provenance, content hash, split, retention.</td></tr>
           <tr><td><strong>Features</strong></td><td>URL features, pixel tensors, token IDs, or embedding vectors.</td><td>Extraction code, tokenizer/embedding version, normalization, validation.</td></tr>
           <tr><td><strong>Labels</strong></td><td><code>phishing</code>/<code>benign</code>, severity, entity spans, or preference choices.</td><td>Label policy, source, annotator, confidence, disagreement, policy version.</td></tr>
@@ -447,7 +457,7 @@ and account_age &lt; policy_threshold:
           <tr><td><strong>Inference</strong></td><td>A classification, generated answer, embedding, or proposed tool call.</td><td>Caller, tenant, model route, context, retrieval, policy, output, side effect.</td></tr>
         </tbody></table>
         <h3 id="lifecycle-questions">Security questions across the learning lifecycle</h3>
-        <table class="data-table"><thead><tr><th>Lifecycle stage</th><th>Security question</th><th>Evidence to preserve</th></tr></thead><tbody>
+        <table tabindex="0" class="data-table"><thead><tr><th>Lifecycle stage</th><th>Security question</th><th>Evidence to preserve</th></tr></thead><tbody>
           <tr><td>Collection</td><td>Who supplied the data, and could an attacker influence it?</td><td>Source, owner, consent or license, acquisition path, hashes</td></tr>
           <tr><td>Preparation</td><td>Which parser, filter, labeler, and transformation changed it?</td><td>Pipeline version, rejected records, transformations, reviewer</td></tr>
           <tr><td>Split and evaluation</td><td>Did information leak between training, validation, and test data?</td><td>Split seed, deduplication, temporal boundary, dataset manifests</td></tr>
