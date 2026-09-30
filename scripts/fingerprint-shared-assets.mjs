@@ -25,7 +25,7 @@ const escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // Only a literal version token is replaced. A computed version such as
 // `?v=${searchAssetVersion}` inside a template literal is code, not a token,
 // and must never be touched (the minified script would otherwise break).
-const reference = new RegExp(`((?:https://1200km\\.com)?/assets/(${shared.map(escape).join('|')}))\\?v=[A-Za-z0-9._-]+(?![A-Za-z0-9._\${-])`, 'g');
+const reference = new RegExp(`((?:https://1200km\\.com)?/assets/(${shared.map(escape).join('|')}))\\?v=[A-Za-z0-9._-]+(?![A-Za-z0-9._{$-])`, 'g');
 const hash = (name) => `h-${createHash('sha256').update(readFileSync(join(assetDir, name))).digest('hex').slice(0, 10)}`;
 const rewrite = (text, versions) => text.replace(reference, (_, path, name) => `${path}?v=${versions.get(name)}`);
 
