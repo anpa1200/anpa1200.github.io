@@ -9,6 +9,7 @@ import {
   addImageDimensions,
   addLcpPreload,
   normalizeDocusaurusBrandLogoAlts,
+  ensureFaviconLink,
   normalizeMetaDescriptions,
   normalizeSocialImages,
   normalizeSeoTitle,
@@ -247,6 +248,17 @@ test('release HTML includes one favicon link without replacing an authored icon'
   const authored = transformReleaseHtml(input.replace('</head>', '<link rel="icon" href="/special.ico"></head>'), { canonical: 'https://1200km.com/example/' });
   assert.match(authored, /<link rel="icon" href="\/special\.ico">/);
   assert.doesNotMatch(authored, /href="\/favicon\.ico"/);
+
+});
+test('nonindex HTML receives a favicon without changing canonical, robots or authored icons', () => {
+  const plain = '<html><head><meta name="robots" content="noindex"><link rel="canonical" href="https://trainsec.net/example"></head><body></body></html>';
+  const withIcon = ensureFaviconLink(plain);
+  assert.match(withIcon, /<link rel="icon" href="\/favicon\.ico">/);
+  assert.match(withIcon, /content="noindex"/);
+  assert.match(withIcon, /href="https:\/\/trainsec\.net\/example"/);
+  assert.equal(ensureFaviconLink(withIcon), withIcon);
+  const authored = plain.replace('</head>', '<link rel="icon" href="/own.svg"></head>');
+  assert.equal(ensureFaviconLink(authored), authored);
 });
 
 test('only a real Question and acceptedAnswer collection remains FAQPage', () => {
