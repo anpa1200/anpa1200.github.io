@@ -243,6 +243,9 @@ test('asset caching is immutable only for content-hashed filenames', async () =>
   for (const [path, expected] of [
     ['/articles/assets/js/main.85f2a5eb.js', 'public, max-age=31536000, immutable'],
     ['/assets/site-theme.js?v=20260721-shell', 'public, max-age=86400'],
+    ['/assets/site-theme.js?v=h-0123456789', 'public, max-age=31536000, immutable'],
+    ['/articles/assets/js/x.js?v=h-0123456789', 'public, max-age=86400'],
+    ['/assets/site-theme.js?v=h-0123', 'public, max-age=86400'],
     ['/assets/cover.png', 'public, max-age=86400'],
     ['/pagefind/fragment/test.pf_fragment', 'public, max-age=86400'],
   ]) {

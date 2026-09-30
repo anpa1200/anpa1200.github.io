@@ -208,6 +208,10 @@ jobs:
           node scripts/check-content-catalog.mjs --site "${RUNNER_TEMP}/site"
           npm run check-seo -- --site "${RUNNER_TEMP}/site" --require-release-transform --require-catalog-agreement
           npm run check-links -- --site "${RUNNER_TEMP}/site"
+      - name: Fingerprint shared assets by content hash
+        # After every validation that inspects asset URLs; before build identity,
+        # so the recorded artifact digest covers the rewritten references.
+        run: node scripts/fingerprint-shared-assets.mjs --site "${RUNNER_TEMP}/site"
       - name: Emit and validate immutable build identity
         run: |
           node scripts/check-companion-coverage.mjs --site "${RUNNER_TEMP}/site"

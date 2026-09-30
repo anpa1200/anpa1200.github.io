@@ -1,9 +1,16 @@
 #!/usr/bin/env node
+// Verifies governed article lifecycle notices in the deployable build.
+// The notices are inserted into the pinned archive source before the
+// Docusaurus build (scripts/prepare-article-archive.mjs), so React renders
+// them inside the article body under the H1. This step checks that every
+// governed article carries exactly the notice the deployable catalogue
+// expects, and keeps the code-block stylesheet on governed pages.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { localFileForUrl } from './search-index-lib.mjs';
+import { LIFECYCLE_MESSAGES, lifecycleDocsLink } from './article-lifecycle-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -12,60 +19,50 @@ const siteRoot = resolve(siteIndex >= 0 ? args[siteIndex + 1] || '' : ROOT);
 const catalogPath = join(siteRoot, 'data', 'content-catalog.json');
 
 if (!existsSync(catalogPath)) throw new Error(`Missing deployable content catalogue: ${catalogPath}`);
-if (!existsSync(join(siteRoot, 'assets', 'content-governance.css'))) throw new Error('Missing lifecycle banner stylesheet in deployable output.');
+if (!existsSync(join(siteRoot, 'assets', 'content-governance.css'))) throw new Error('Missing lifecycle stylesheet in deployable output.');
 const catalog = JSON.parse(await readFile(catalogPath, 'utf8'));
-if (catalog.scope !== 'deployable-domain-catalog') throw new Error('Lifecycle banners require the complete deployable-domain catalogue.');
+if (catalog.scope !== 'deployable-domain-catalog') throw new Error('Lifecycle notices require the complete deployable-domain catalogue.');
 
-const messages = Object.freeze({
-  historical: {
-    label: 'Historical version',
-    text: 'This article documents an earlier product version or a time-bound state. It is retained for provenance and is not current product guidance.',
-  },
-  preserved: {
-    label: 'Preserved article',
-    text: 'This older publication is retained for research history. Current technical applicability has not been asserted; validate versions, commands, and assumptions before use.',
-  },
-  'currentness-unknown': {
-    label: 'Currentness not reverified',
-    text: 'This published article remains available in the archive, but its technical currentness has not yet been reverified. Validate it against current authoritative sources before use.',
-  },
-  'stable-reference': {
-    label: 'Stable reference',
-    text: 'This article is retained as a durable reference. Validate environment-specific commands, versions, and assumptions before operational use.',
-  },
-});
-
-let updated = 0;
+const labels = Object.values(LIFECYCLE_MESSAGES).map((message) => message.label);
+const failures = [];
+let verified = 0;
 const routes = {};
 for (const item of catalog.items || []) {
   if (!/^https:\/\/1200km\.com\/articles\/read\/\d{4}\//.test(item.canonical_url)) continue;
-  const message = messages[item.lifecycle];
-  if (!message) continue;
   const path = localFileForUrl(siteRoot, item.canonical_url);
   if (!path) throw new Error(`${item.id}: article lifecycle page is missing from deployable output.`);
   let html = await readFile(path, 'utf8');
-  if (html.includes('data-content-lifecycle=')) throw new Error(`${item.id}: lifecycle banner is already present before the governed build step.`);
   const marker = '<div class="theme-doc-markdown markdown">';
-  if (!html.includes(marker)) throw new Error(`${item.id}: Docusaurus article body marker is missing.`);
+  const bodyStart = html.indexOf(marker);
+  if (bodyStart < 0) throw new Error(`${item.id}: Docusaurus article body marker is missing.`);
+  if (html.includes('data-governance-fallback')) failures.push(`${item.canonical_url}: legacy lifecycle banner outside the article body`);
+  const firstSection = html.slice(bodyStart, (html.indexOf('<h2', bodyStart) + 1 || html.length + 1) - 1);
+  const found = labels.filter((label) => new RegExp(`theme-admonition[^>]*>[\\s\\S]{0,4000}?${label}`).test(firstSection));
+  const message = LIFECYCLE_MESSAGES[item.lifecycle];
+  if (!message) {
+    if (found.length) failures.push(`${item.canonical_url}: ${item.lifecycle} article carries a lifecycle notice (${found.join(', ')})`);
+    continue;
+  }
+  if (found.length !== 1 || found[0] !== message.label) {
+    failures.push(`${item.canonical_url}: expected "${message.label}" notice under the H1, found ${found.length ? found.join(', ') : 'none'}`);
+    continue;
+  }
   if (!html.includes('/assets/content-governance.css')) {
     html = html.replace(/<\/head>/i, '<link rel="stylesheet" href="/assets/content-governance.css">\n</head>');
+    await writeFile(path, html);
   }
-  const docsLink = item.lifecycle === 'historical' && /adversarygraph/i.test(item.title)
-    ? ' <a href="/adversarygraph-docs/">Open current AdversaryGraph documentation</a>.'
-    : '';
-  if (!html.includes('/assets/content-governance.js')) {
-    html = html.replace(/<\/head>/i, '<script src="/assets/content-governance.js" defer></script>\n</head>');
-  }
-  routes[new URL(item.canonical_url).pathname] = { lifecycle: item.lifecycle, ...message, docsLink: Boolean(docsLink) };
-  const banner = `<aside class="content-lifecycle-banner" data-content-lifecycle="${item.lifecycle}" data-governance-fallback aria-label="Content lifecycle"><strong>${message.label}</strong><p>${message.text}${docsLink}</p></aside>`;
-  // An SSR sibling before the React root is crawlable and visible before the
-  // article, without mutating Docusaurus-owned nodes during hydration.
-  const rootMarker = '<div id="__docusaurus">';
-  if (!html.includes(rootMarker)) throw new Error(`${item.id}: Docusaurus root marker is missing.`);
-  html = html.replace(rootMarker, `${banner}\n${rootMarker}`);
-  await writeFile(path, html);
-  updated += 1;
+  routes[new URL(item.canonical_url).pathname] = {
+    lifecycle: item.lifecycle,
+    label: message.label,
+    text: message.text,
+    docsLink: lifecycleDocsLink(item.lifecycle, item.title),
+  };
+  verified += 1;
 }
 
+if (failures.length) {
+  console.error(`Article lifecycle verification failed (${failures.length}):\n- ${failures.slice(0, 40).join('\n- ')}`);
+  process.exit(1);
+}
 await writeFile(join(siteRoot, 'data', 'article-lifecycle.json'), `${JSON.stringify({ routes }, null, 2)}\n`);
-console.log(`Applied static lifecycle banners to ${updated} governed article page(s).`);
+console.log(`Verified in-article lifecycle notices on ${verified} governed article page(s).`);
