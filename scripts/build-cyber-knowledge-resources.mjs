@@ -22,9 +22,10 @@ function escapeHtml(value) {
 function text(value = '') {
   return value
     .replace(/<[^>]+>/g, ' ')
-    .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    // Last, so "&amp;quot;" becomes the literal text "&quot;", not '"'.
+    .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -110,7 +111,15 @@ function metadataPage({ slug, title, description, h1, lead, body, graph, modifie
       { ...graph, '@context': undefined },
     ],
   };
-  let html = hub
+  // Drop the hub's JSON-LD (replaced below) until none is left, so a nested
+  // or reassembled <script> fragment cannot survive a single pass.
+  let source = hub;
+  let previous;
+  do {
+    previous = source;
+    source = source.replace(/\s*<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
+  } while (source !== previous);
+  let html = source
     .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`)
     .replace(/<meta name="description" content="[^"]*"\s*\/?>/i, `<meta name="description" content="${escapeHtml(description)}" />`)
     .replace(/<meta property="og:title" content="[^"]*"\s*\/?>/i, `<meta property="og:title" content="${escapeHtml(title)}" />`)
@@ -120,7 +129,6 @@ function metadataPage({ slug, title, description, h1, lead, body, graph, modifie
     .replace(/<meta name="twitter:title" content="[^"]*"\s*\/?>/i, `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
     .replace(/<meta name="twitter:description" content="[^"]*"\s*\/?>/i, `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
     .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/i, `<link rel="canonical" href="${canonical}" />`)
-    .replace(/\s*<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<main\b[\s\S]*?<\/main>/i, `<main data-pagefind-body id="main-content">
       <div class="page-hero"><div class="page-hero-inner">
         <p class="page-eyebrow"><a href="/cyber-knowledge/">Cyber Knowledge</a> · Reference index</p>

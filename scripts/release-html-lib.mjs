@@ -916,10 +916,14 @@ export function hardenStandaloneHead(html) {
   // canonical tag below. Without stripping it first, reprocessing an
   // already-hardened page (routine on every content rebuild) accumulates one
   // more duplicate <script> on every run instead of leaving a single copy.
-  transformed = transformed.replace(
-    /\s*<script\b[^>]*\bsrc=["']\/assets\/theme-bootstrap\.js["'][^>]*>\s*<\/script>/gi,
-    '',
-  );
+  let previous;
+  do {
+    previous = transformed;
+    transformed = transformed.replace(
+      /\s*<script\b[^>]*\bsrc=["']\/assets\/theme-bootstrap\.js["'][^>]*>\s*<\/script>/gi,
+      '',
+    );
+  } while (transformed !== previous);
   // Keep frames disabled by default, but allow the explicitly supported
   // YouTube embeds used by course articles. This preserves the restrictive
   // policy for every page that does not embed external media.
