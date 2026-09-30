@@ -4,7 +4,7 @@ const h=escapeHtml;
 const link=(url,label)=>/^(?:https:\/\/|\/(?!\/)|#)/.test(url||'')?`<a href="${h(url)}">${h(label)}</a>`:h(label);
 const local=path=>'/ttp-simulation/'+path;
 const list=rows=>`<ul>${rows.map(row=>`<li>${row}</li>`).join('')}</ul>`;
-const code=(value,label)=>`<pre class="code-sample" tabindex="0" aria-label="${h(label)}"><code>${h(typeof value==='string'?value:JSON.stringify(value,null,2))}</code></pre>`;
+const code=(value,label)=>`<pre class="code-sample" tabindex="0" role="group" aria-label="${h(label)}"><code>${h(typeof value==='string'?value:JSON.stringify(value,null,2))}</code></pre>`;
 const section=(id,title,body)=>`<section class="panel workbook-section" id="${h(id)}"><h2 id="${h(id)}-heading">${h(title)}</h2>${body}</section>`;
 const details=(title,body,open=false)=>`<details${open?' open':''}><summary>${h(title)}</summary>${body}</details>`;
 

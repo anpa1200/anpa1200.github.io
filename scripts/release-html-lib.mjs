@@ -853,6 +853,11 @@ export function addArticleDiscovery(html, {
   return transformed;
 }
 
+// Google Analytics measurement ID. The consent loader (assets/site-performance.js)
+// loads Google's tag only after the visitor opts in; no page may boot it directly.
+export const ANALYTICS_ID = 'G-TMTG21RVHM';
+const ANALYTICS_LOADER = `<script src="/assets/site-performance.js?v=1" data-google-analytics-id="${ANALYTICS_ID}" defer></script>`;
+
 export function deferThirdPartyBoot(html) {
   let transformed = transformHtmlElements(html, 'script', (element) => {
     const attributes = tagAttributes(element.openTag);
@@ -873,6 +878,10 @@ export function deferThirdPartyBoot(html) {
     if (!config) return element.full;
     return '';
   });
+  // Exactly one opt-in consent loader per document (redirect stubs excluded).
+  if (/<\/head>/i.test(transformed) && !/<meta\b[^>]*http-equiv\s*=\s*["']?refresh/i.test(transformed)) {
+    transformed = transformed.replace(/\s*<\/head>/i, () => `\n    ${ANALYTICS_LOADER}\n  </head>`);
+  }
 
   // The local CSS already declares a professional system-font fallback stack.
   // Avoid a late web-font swap, which delays text LCP and causes needless work.
@@ -886,16 +895,16 @@ export function deferThirdPartyBoot(html) {
 
 const STANDALONE_CSP = [
   "default-src 'self'",
-  "script-src 'self' 'wasm-unsafe-eval'",
+  "script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com",
   "worker-src 'self' blob:",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
-  "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com",
-  "connect-src 'self'",
+  "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com https://*.google-analytics.com https://www.googletagmanager.com",
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://analytics.google.com https://www.googletagmanager.com",
   "frame-src 'none'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://buttondown.com",
   'upgrade-insecure-requests',
 ].join('; ');
 

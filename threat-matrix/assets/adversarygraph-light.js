@@ -460,7 +460,7 @@ function renderNavigator() {
           </div>
           <span class="matrix-help">Mouse wheel zooms · drag pans · ATT&amp;CK ${escapeHtml(state.data.version)} · ${state.data.tactics.length} tactics</span>
         </div>
-        <div class="matrix-viewport" tabindex="0" aria-label="ATT&CK matrix. Use the mouse wheel to zoom, drag to pan, or use the visible zoom controls.">
+        <div class="matrix-viewport" tabindex="0" role="region" aria-label="ATT&CK matrix. Use the mouse wheel to zoom, drag to pan, or use the visible zoom controls.">
           <div class="matrix-track">${renderMatrix()}</div>
         </div>
       </div>

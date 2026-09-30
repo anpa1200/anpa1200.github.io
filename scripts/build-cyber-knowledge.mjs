@@ -662,8 +662,8 @@ function renderRelationshipMap(edges) {
         <h2 id="domain-map-title">How the eleven domains connect</h2>
         <p class="section-intro">This map is generated from cross-domain links in the field guides. Select an icon to open that domain; select a connection to follow one of the underlying routes.</p>
         <div class="knowledge-map">
-          <div class="knowledge-map__summary" aria-label="Relationship map summary"><span><strong>11</strong> practitioner domains</span><span><strong>${visualEdges.length}</strong> unique relationships</span><span><strong>${edges.length}</strong> documented routes</span></div>
-          <div class="knowledge-map__canvas" tabindex="0" aria-label="Scrollable Cyber Knowledge relationship map">
+          <div class="knowledge-map__summary" role="group" aria-label="Relationship map summary"><span><strong>11</strong> practitioner domains</span><span><strong>${visualEdges.length}</strong> unique relationships</span><span><strong>${edges.length}</strong> documented routes</span></div>
+          <div class="knowledge-map__canvas" tabindex="0" role="region" aria-label="Scrollable Cyber Knowledge relationship map">
           <svg viewBox="0 0 1200 720" role="group" aria-labelledby="knowledge-map-svg-title knowledge-map-svg-desc">
             <title id="knowledge-map-svg-title">Cyber Knowledge cross-domain relationship map</title>
             <desc id="knowledge-map-svg-desc">Eleven color-coded security domain icons surround the Cyber Knowledge hub. Lines represent unique relationships derived from links in the field guides. A complete text equivalent follows the diagram.</desc>

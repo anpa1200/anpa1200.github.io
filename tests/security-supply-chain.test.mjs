@@ -5,6 +5,7 @@ import { join, resolve } from 'node:path';
 import test from 'node:test';
 import {
   decodeEntities,
+  ANALYTICS_ID,
   deferThirdPartyBoot,
   hardenStandaloneHead,
   replaceStructuredData,
@@ -85,9 +86,14 @@ test('release transforms remove only selected complete script elements', () => {
     '</head><body><main><h1>Test</h1></main></body></html>',
   ].join('');
   const withoutThirdParty = deferThirdPartyBoot(input);
+  // Google's tag never boots from page HTML; only the opt-in consent loader may load it.
   assert.doesNotMatch(withoutThirdParty, /googletagmanager|gtag\("config"/);
   assert.match(withoutThirdParty, /src="\/assets\/site-theme\.js"/);
-  assert.doesNotMatch(withoutThirdParty, /site-performance\.js|data-google-analytics-id/);
+  assert.equal((withoutThirdParty.match(/site-performance\.js/g) || []).length, 1, 'exactly one consent loader');
+  assert.match(withoutThirdParty, new RegExp(`<script src="/assets/site-performance\\.js\\?v=1" data-google-analytics-id="${ANALYTICS_ID}" defer></script>`));
+  assert.equal(deferThirdPartyBoot(withoutThirdParty), withoutThirdParty, 'idempotent');
+  const redirectStub = '<!doctype html><html><head><meta http-equiv="refresh" content="0; url=/x/"></head><body></body></html>';
+  assert.doesNotMatch(deferThirdPartyBoot(redirectStub), /site-performance/, 'redirect stubs get no loader');
 
   const output = replaceStructuredData(withoutThirdParty, {
     canonical: 'https://1200km.com/test.html',
@@ -114,11 +120,17 @@ test('edge worker declares all response security headers', () => {
   assert.match(worker, /frame-ancestors 'none'/);
 });
 
-test('no release security policy authorizes Google Analytics before opt-in', () => {
-  const headerPolicy = readFileSync(join(ROOT, '_headers'), 'utf8');
-  const standalone = hardenStandaloneHead('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>');
+test('security policies allow Google Analytics only as the opt-in loader needs it', () => {
+  const headerPolicy = readFileSync(join(ROOT, '_headers'), 'utf8').split('\n').find((line) => line.includes('Content-Security-Policy:'));
+  const standalone = hardenStandaloneHead('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>')
+    .match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)[1];
   for (const policy of [headerPolicy, standalone]) {
-    assert.doesNotMatch(policy, /googletagmanager\.com|google-analytics\.com|analytics\.google\.com/i);
+    const directive = (name) => policy.match(new RegExp(`${name} ([^;]+)`))?.[1] || '';
+    assert.match(directive('script-src'), /https:\/\/www\.googletagmanager\.com/);
+    assert.doesNotMatch(directive('script-src'), /google-analytics|(^|\s)'unsafe-eval'/);
+    for (const host of ['https://*.google-analytics.com', 'https://analytics.google.com']) assert.ok(directive('connect-src').includes(host), host);
+    assert.match(directive('form-action'), /^'self' https:\/\/buttondown\.com$/);
+    assert.doesNotMatch(policy, /doubleclick|googlesyndication/);
   }
 });
 

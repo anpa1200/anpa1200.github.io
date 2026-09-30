@@ -173,8 +173,8 @@ function buildModuleTagBlock(module, techniquesById, tacticsByShortname) {
 <aside class="attack-module-map" aria-labelledby="${module.anchor}-attack-map-title">
   <h3 id="${module.anchor}-attack-map-title">ATT&amp;CK knowledge mesh for ${escapeHtml(module.title)}</h3>
   <p>This module is contextually mapped to ATT&amp;CK Enterprise ${escapeHtml(module.attack_version)}. Tags are discovery routes, not claims that every technique is implemented or observed.</p>
-  <div class="attack-tag-list" aria-label="Relevant tactics">${tacticLinks}</div>
-  <div class="attack-tag-list" aria-label="Relevant techniques">${techniqueLinks}</div>
+  <div class="attack-tag-list" role="group" aria-label="Relevant tactics">${tacticLinks}</div>
+  <div class="attack-tag-list" role="group" aria-label="Relevant techniques">${techniqueLinks}</div>
   <p class="attack-map-method"><a href="/cyber-knowledge/attack-matrix.html#methodology">Review mapping method and confidence</a></p>
 </aside>
 ${END}`;

@@ -169,7 +169,7 @@ function reviewCard(review) {
               <div><dt>Materials</dt><dd>${review.learning_materials}</dd></div>
               <div><dt>Companions</dt><dd>${review.companion_count}</dd></div>
             </dl>
-            <div class="course-chip-list" aria-label="Course topics">${chips(review.topics)}</div>
+            <div class="course-chip-list" role="group" aria-label="Course topics">${chips(review.topics)}</div>
             <details class="course-evidence"><summary>Evidence, strengths, and limitations</summary>
               <div class="course-evidence-grid">
                 <div><h4>Evidence recorded</h4><ul>${review.evidence.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>
@@ -196,7 +196,7 @@ function authoredCourseCard(course) {
             <h3><a href="${escapeHtml(localPath(course.canonical_url))}">${escapeHtml(course.title)}</a></h3>
             <p class="course-provider">${escapeHtml(course.creator)} · ${escapeHtml(label(course.level))} · ${escapeHtml(label(course.format))}</p>
             <p>${escapeHtml(course.summary)}</p>
-            <div class="course-chip-list" aria-label="Course topics">${chips(course.topics)}</div>
+            <div class="course-chip-list" role="group" aria-label="Course topics">${chips(course.topics)}</div>
             <p class="course-verification">Facts last checked ${escapeHtml(course.facts_verified_at)} against the published course record.</p>
             <div class="course-actions"><a class="button primary" href="${escapeHtml(localPath(course.canonical_url))}">Open course</a></div>
           </div>

@@ -82,7 +82,7 @@ ${renderSecondaryNavigation(shell, page)}
           </div>
         </details>
         <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
-          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search all 1200km research">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search research on 1200km">
             <span aria-hidden="true" class="site-search-fallback-icon"></span>
             <span class="site-search-fallback-text">Search research</span>
           </a>

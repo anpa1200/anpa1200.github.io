@@ -185,29 +185,57 @@ test('client provides progressive filtering, URL restoration, sorting, reset, an
   ]) assert.match(client, new RegExp(escapeRegex(token)), token);
 });
 
-test('analytics asset registers no listeners or external scripts before opt-in', () => {
+function runConsentLoader({ stored = null, path = '/courses/' } = {}) {
+  const store = new Map(stored ? [['1200km-analytics-consent', stored]] : []);
+  const appended = { head: [], body: [] };
   const listeners = new Map();
-  const appendedScripts = [];
-  const context = {
-    URL,
-    document: {
-      currentScript: { dataset: { googleAnalyticsId: 'G-TEST' } },
-      addEventListener(name, handler, options) { listeners.set(`document:${name}`, { handler, options }); },
-      createElement() { return {}; },
-      head: { appendChild(node) { appendedScripts.push(node); } },
-    },
-    window: {
-      location: { href: 'https://1200km.com/courses/' },
-      addEventListener(name, handler, options) { listeners.set(`window:${name}`, { handler, options }); },
-      setTimeout() {},
-    },
+  const node = (tag) => ({ tagName: tag.toUpperCase(), id: '', dataset: {}, attributes: {}, textContent: '', innerHTML: '',
+    setAttribute(name, value) { this.attributes[name] = value; }, remove() { const i = appended.body.indexOf(this); if (i >= 0) appended.body.splice(i, 1); } });
+  const document = {
+    readyState: 'complete',
+    currentScript: { dataset: { googleAnalyticsId: 'G-TEST' } },
+    addEventListener(name, handler) { listeners.set(name, handler); },
+    dispatchEvent() {},
+    createElement: node,
+    getElementById(id) { return [...appended.head, ...appended.body].find((n) => n.id === id) || null; },
+    head: { appendChild(n) { appended.head.push(n); } },
+    body: { appendChild(n) { appended.body.push(n); } },
   };
+  const window = { location: { pathname: path, href: `https://1200km.com${path}` } };
+  const localStorage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v), removeItem: (k) => store.delete(k) };
+  runInNewContext(sitePerformance, { URL, document, window, localStorage, CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init?.detail; } }, Element: class {} });
+  const googleTags = () => appended.head.filter((n) => /googletagmanager\.com\/gtag\/js/.test(n.src || ''));
+  return { window, store, appended, googleTags };
+}
 
-  runInNewContext(sitePerformance, context);
-  assert.equal(listeners.size, 0);
-  assert.equal(context.window.dataLayer, undefined);
-  assert.equal(appendedScripts.length, 0);
+test('analytics loads only after an explicit opt-in', () => {
+  const fresh = runConsentLoader();
+  assert.equal(fresh.googleTags().length, 0, 'nothing from Google before a choice');
+  assert.equal(fresh.window.dataLayer, undefined);
+  const banner = fresh.appended.body.find((n) => n.id === 'analytics-consent');
+  assert.ok(banner, 'consent banner shown on first visit');
+  assert.equal(banner.attributes['aria-label'], 'Analytics consent');
+  assert.match(banner.innerHTML, /data-analytics-choice="granted"[\s\S]*data-analytics-choice="denied"/);
+  assert.match(banner.innerHTML, /href="\/privacy\.html#analytics-and-browser-storage"/);
+
+  fresh.window.__1200kmAnalyticsConsent.choose('denied');
+  assert.equal(fresh.store.get('1200km-analytics-consent'), 'denied');
+  assert.equal(fresh.googleTags().length, 0, 'decline loads nothing');
+  assert.equal(fresh.appended.body.some((n) => n.id === 'analytics-consent'), false, 'banner closes');
+
+  const accepting = runConsentLoader();
+  accepting.window.__1200kmAnalyticsConsent.choose('granted');
+  assert.equal(accepting.googleTags().length, 1, 'accept loads the tag once');
+  assert.equal(accepting.googleTags()[0].src, 'https://www.googletagmanager.com/gtag/js?id=G-TEST');
+
+  assert.equal(runConsentLoader({ stored: 'granted' }).googleTags().length, 1, 'remembered consent');
+  const declined = runConsentLoader({ stored: 'denied' });
+  assert.equal(declined.googleTags().length, 0);
+  assert.equal(declined.appended.body.length, 0, 'no banner after a decline');
+  const search = runConsentLoader({ stored: 'granted', path: '/search.html' });
+  assert.equal(search.googleTags().length, 0, 'search queries never reach analytics');
 });
+
 
 test('AI Security Course Chapter 3 completion remains synchronized and evidence-closed', () => {
   const mediumUrl = 'https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6';
