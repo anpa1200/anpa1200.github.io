@@ -43,7 +43,7 @@ let checks = 0;
 async function request(path, init = {}) {
   const response = await fetch(`${origin}${path}`, { ...init, redirect: 'manual', signal: AbortSignal.timeout(5000) });
   assert.ok(response.headers.get('Content-Security-Policy'), path);
-  assert.equal(response.headers.get('Strict-Transport-Security'), 'max-age=31536000', path);
+  assert.equal(response.headers.get('Strict-Transport-Security'), 'max-age=31536000; includeSubDomains', path);
   assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff', path);
   assert.equal(response.headers.get('Access-Control-Allow-Origin'), '*', path);
   checks++;

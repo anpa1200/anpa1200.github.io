@@ -216,9 +216,12 @@ test('new Worker preserves legacy security, discovery, MIME and Markdown semanti
       const request = new Request(`https://example.test${path}`);
       const old = await legacy.fetch(request);
       const next = await worker.fetch(request, environment());
-      for (const name of ['Permissions-Policy', 'Referrer-Policy', 'Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options']) {
+      for (const name of ['Permissions-Policy', 'Referrer-Policy', 'X-Content-Type-Options', 'X-Frame-Options']) {
         assert.equal(next.headers.get(name), old.headers.get(name), `${path} ${name}`);
       }
+      // Intentional hardening: HSTS now also covers subdomains (www is HTTPS-only).
+      assert.equal(old.headers.get('Strict-Transport-Security'), 'max-age=31536000');
+      assert.equal(next.headers.get('Strict-Transport-Security'), 'max-age=31536000; includeSubDomains', `${path} HSTS`);
       assert.match(old.headers.get('Content-Security-Policy'), /frame-src 'none'/);
       assert.match(next.headers.get('Content-Security-Policy'), /frame-src https:\/\/www\.youtube-nocookie\.com/);
       const nextCsp = next.headers.get('Content-Security-Policy').replace('frame-src https://www.youtube-nocookie.com', "frame-src 'none'");
