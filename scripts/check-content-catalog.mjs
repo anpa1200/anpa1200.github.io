@@ -386,6 +386,11 @@ if (catalog.scope === 'deployable-domain-catalog') {
     const path = localPathForUrl(item.canonical_url);
     const html = path ? read(path) : '';
     if (!html.includes(`data-content-lifecycle="${item.lifecycle}"`)) fail(`${item.id}: deployed article lacks its visible ${item.lifecycle} lifecycle notice.`);
+    const notice = html.indexOf(`data-content-lifecycle="${item.lifecycle}"`);
+    const reactRoot = html.indexOf('<div id="__docusaurus">');
+    if (notice < 0 || reactRoot < 0 || notice > reactRoot) {
+      fail(`${item.id}: lifecycle notice must precede the Docusaurus root, not follow the footer.`);
+    }
   }
 }
 

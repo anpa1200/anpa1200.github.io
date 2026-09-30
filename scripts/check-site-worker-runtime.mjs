@@ -85,7 +85,7 @@ try {
   for (const path of [retired, retired.slice(0, -5)]) {
     const response = await request(path);
     assert.equal(response.status, 301);
-    assert.equal(response.headers.get('Location'), 'https://www.f5.com/fr_fr/labs/articles/2024-ddos-attack-trends');
+    assert.equal(response.headers.get('Location'), 'https://www.f5.com/labs/articles/2024-ddos-attack-trends');
     assert.equal(response.headers.get('Content-Disposition'), null);
     assert.equal(await response.text(), '');
   }
