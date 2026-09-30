@@ -10,7 +10,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { localFileForUrl } from './search-index-lib.mjs';
-import { LIFECYCLE_MESSAGES, lifecycleDocsLink } from './article-lifecycle-lib.mjs';
+import { ARTICLE_BODY_MARKER, LIFECYCLE_MESSAGES, lifecycleDocsLink, lifecycleNoticeProblem } from './article-lifecycle-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -23,7 +23,6 @@ if (!existsSync(join(siteRoot, 'assets', 'content-governance.css'))) throw new E
 const catalog = JSON.parse(await readFile(catalogPath, 'utf8'));
 if (catalog.scope !== 'deployable-domain-catalog') throw new Error('Lifecycle notices require the complete deployable-domain catalogue.');
 
-const labels = Object.values(LIFECYCLE_MESSAGES).map((message) => message.label);
 const failures = [];
 let verified = 0;
 const routes = {};
@@ -32,21 +31,14 @@ for (const item of catalog.items || []) {
   const path = localFileForUrl(siteRoot, item.canonical_url);
   if (!path) throw new Error(`${item.id}: article lifecycle page is missing from deployable output.`);
   let html = await readFile(path, 'utf8');
-  const marker = '<div class="theme-doc-markdown markdown">';
-  const bodyStart = html.indexOf(marker);
-  if (bodyStart < 0) throw new Error(`${item.id}: Docusaurus article body marker is missing.`);
-  if (html.includes('data-governance-fallback')) failures.push(`${item.canonical_url}: legacy lifecycle banner outside the article body`);
-  const firstSection = html.slice(bodyStart, (html.indexOf('<h2', bodyStart) + 1 || html.length + 1) - 1);
-  const found = labels.filter((label) => new RegExp(`theme-admonition[^>]*>[\\s\\S]{0,4000}?${label}`).test(firstSection));
+  if (!html.includes(ARTICLE_BODY_MARKER)) throw new Error(`${item.id}: Docusaurus article body marker is missing.`);
+  const problem = lifecycleNoticeProblem(html, item.lifecycle);
+  if (problem) {
+    failures.push(`${item.canonical_url}: ${problem}`);
+    continue;
+  }
   const message = LIFECYCLE_MESSAGES[item.lifecycle];
-  if (!message) {
-    if (found.length) failures.push(`${item.canonical_url}: ${item.lifecycle} article carries a lifecycle notice (${found.join(', ')})`);
-    continue;
-  }
-  if (found.length !== 1 || found[0] !== message.label) {
-    failures.push(`${item.canonical_url}: expected "${message.label}" notice under the H1, found ${found.length ? found.join(', ') : 'none'}`);
-    continue;
-  }
+  if (!message) continue;
   if (!html.includes('/assets/content-governance.css')) {
     html = html.replace(/<\/head>/i, '<link rel="stylesheet" href="/assets/content-governance.css">\n</head>');
     await writeFile(path, html);

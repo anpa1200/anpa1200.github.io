@@ -28,6 +28,27 @@ export const LIFECYCLE_MESSAGES = Object.freeze({
 
 export const ADVERSARYGRAPH_DOCS_URL = 'https://1200km.com/adversarygraph-docs/';
 
+export const ARTICLE_BODY_MARKER = '<div class="theme-doc-markdown markdown">';
+
+// The deployed contract for a built archive article: its lifecycle notice is
+// a Docusaurus admonition inside the article body, between the H1 and the
+// first H2, carrying exactly the label for the catalogued lifecycle (and no
+// notice for maintained articles). Returns a problem description or null.
+export function lifecycleNoticeProblem(html, lifecycle) {
+  const bodyStart = html.indexOf(ARTICLE_BODY_MARKER);
+  if (bodyStart < 0) return 'Docusaurus article body marker is missing';
+  if (html.includes('data-governance-fallback')) return 'legacy lifecycle banner outside the article body';
+  const firstSection = html.slice(bodyStart, (html.indexOf('<h2', bodyStart) + 1 || html.length + 1) - 1);
+  const labels = Object.values(LIFECYCLE_MESSAGES).map((message) => message.label);
+  const found = labels.filter((label) => new RegExp(`theme-admonition[^>]*>[\\s\\S]{0,4000}?${label}`).test(firstSection));
+  const message = LIFECYCLE_MESSAGES[lifecycle];
+  if (!message) return found.length ? `${lifecycle} article carries a lifecycle notice (${found.join(', ')})` : null;
+  if (found.length !== 1 || found[0] !== message.label) {
+    return `expected "${message.label}" notice under the H1, found ${found.length ? found.join(', ') : 'none'}`;
+  }
+  return null;
+}
+
 // Mirrors applyArticleGovernance() in content-catalog-lib.mjs.
 export function articleLifecycle({ id, slug, published }, policy = {}) {
   const has = (list, value) => Boolean(value) && new Set(list || []).has(value);

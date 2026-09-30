@@ -98,3 +98,16 @@ test('retired lifecycle runtime stays inert and TTP guide runtime keeps its defe
   assert.match(backlinkBuilder, /docusaurus \? '<aside id="ttp-ecosystem"/);
   assert.match(backlinkBuilder, /aria-label="Related attack tools, simulations and detection rules"/);
 });
+
+test('one shared rule decides whether a built article carries the right lifecycle notice', async () => {
+  const { lifecycleNoticeProblem } = await import('../scripts/article-lifecycle-lib.mjs');
+  const page = (body) => `<body><div id="__docusaurus"><article><div class="theme-doc-markdown markdown"><header><h1>T</h1></header>${body}<h2>Body</h2></div></article></div></body>`;
+  assert.equal(lifecycleNoticeProblem(page(notice), 'preserved'), null);
+  assert.match(lifecycleNoticeProblem(page(''), 'preserved'), /expected "Preserved article" notice/);
+  assert.match(lifecycleNoticeProblem(page(notice), 'historical'), /expected "Historical version" notice/);
+  assert.equal(lifecycleNoticeProblem(page(''), 'maintained'), null);
+  assert.match(lifecycleNoticeProblem(page(notice), 'maintained'), /carries a lifecycle notice/);
+  // The retired body-level banner before the Docusaurus root is rejected.
+  const legacy = `<aside data-governance-fallback data-content-lifecycle="preserved">Preserved article</aside>${page('')}`;
+  assert.match(lifecycleNoticeProblem(legacy, 'preserved'), /legacy lifecycle banner/);
+});
