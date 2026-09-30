@@ -9,7 +9,7 @@ import {
 } from '../scripts/canonical-crosslinks.mjs';
 
 test('all reviewed crosslink targets are unique same-origin paths', () => {
-  assert.equal(crosslinkRewrites.length, 63);
+  assert.equal(crosslinkRewrites.length, 82);
   assert.equal(crosslinkRewrites.filter(({ from }) => from.startsWith('/israel-government-threat-actors-cti/docs/actors/')).length, 15);
   assert.equal(new Set(crosslinkRewrites.map(({ from }) => from)).size, crosslinkRewrites.length);
   for (const { from, to } of crosslinkRewrites) {
@@ -42,7 +42,7 @@ test('archive preparation rewrites authored links even when the slash policy is 
     const source = join(root, 'docs', 'article.md');
     writeFileSync(source, '<a href="https://1200km.com/adversarygraph-docs/get-started.html">/adversarygraph-docs/get-started.html</a>');
     for (let run = 0; run < 2; run++) {
-      const result = spawnSync(process.execPath, [new URL('../scripts/prepare-article-archive.mjs', import.meta.url).pathname, '--archive', root], { encoding: 'utf8' });
+      const result = spawnSync(process.execPath, [new URL('../scripts/prepare-article-archive.mjs', import.meta.url).pathname, '--archive', root], { encoding: 'utf8', env: { ...process.env, ARCHIVE_OVERLAY_OPTIONAL: '1' } });
       assert.equal(result.status, 0, result.stderr);
     }
     assert.match(readFileSync(source, 'utf8'), /adversarygraph-docs\/getting-started\//);
@@ -100,5 +100,40 @@ test('every canonical destination must be emitted into the static artifact', () 
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, '{}');
     assert.deepEqual(missingCrosslinkTargets(root), []);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('path-form routes also rewrite their absolute 1200km.com spelling without touching look-alikes', () => {
+  const input = [
+    '<a href="https://1200km.com/threatmapper-docs/">docs</a>',
+    '<a href="https://1200km.com/adversarygraph">product</a>',
+    '<a href="https://1200km.com/adversarygraph-docs/">current docs</a>',
+    '<a href="https://1200km.com/adversarygraph/">already canonical</a>',
+    '<a href="https://github.com/example/threatmapper-docs/">external</a>',
+    '<a href="/CTI_as_a_Code/ecosystem">relative</a>',
+  ].join('\n');
+  const { output } = rewriteCrosslinks(input);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph-docs\/">docs/);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph\/">product/);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph-docs\/">current docs/);
+  assert.match(output, /href="https:\/\/1200km\.com\/adversarygraph\/">already canonical/);
+  assert.match(output, /href="https:\/\/github\.com\/example\/threatmapper-docs\/">external/);
+  assert.match(output, /href="\/CTI_as_a_Code\/ecosystem\/">relative/);
+  assert.deepEqual(rewriteCrosslinks(output).counts, {}, 'rewrites are idempotent');
+});
+
+test('JSON data keeps absolute URLs; only path-form values are rewritten there', async () => {
+  const { mkdtempSync, writeFileSync, readFileSync: read, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { rewriteCrosslinksInDirectory } = await import('../scripts/canonical-crosslinks.mjs');
+  const root = mkdtempSync(join(tmpdir(), '1200km-crosslink-json-'));
+  try {
+    const { from, to } = crosslinkRewrites.find((entry) => entry.to === `${entry.from}/`);
+    writeFileSync(join(root, 'catalog.json'), JSON.stringify({ canonical_url: `https://1200km.com${from}`, path: from }));
+    writeFileSync(join(root, 'page.md'), `[a](https://1200km.com${from})`);
+    await rewriteCrosslinksInDirectory(root, ['.json', '.md']);
+    assert.deepEqual(JSON.parse(read(join(root, 'catalog.json'), 'utf8')), { canonical_url: `https://1200km.com${from}`, path: to });
+    assert.equal(read(join(root, 'page.md'), 'utf8'), `[a](https://1200km.com${to})`);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

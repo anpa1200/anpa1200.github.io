@@ -166,7 +166,12 @@ export function applyPlatformSidebar(html, shell, { pathname = '/' } = {}) {
       `${HEADER_END}\n${sidebar}\n`,
     );
   } else {
-    transformed = transformed.replace(/<body\b[^>]*>/i, (body) => `${body}\n${sidebar}\n`);
+    // A page's own skip link stays the first focusable element (and so is
+    // still recognized as a skip link rather than content outside landmarks).
+    transformed = transformed.replace(
+      /(<body\b[^>]*>)(\s*<a\b[^>]*\bclass=["'](?:[^"']*\s)?skip(?:-link)?(?:\s[^"']*)?["'][^>]*>[\s\S]*?<\/a>)?\s*/i,
+      (_, body, skip = '') => `${body}${skip}\n${sidebar}\n`,
+    );
   }
   transformed = ensureHeadAsset(
     transformed,

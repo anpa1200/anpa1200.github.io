@@ -120,11 +120,15 @@ test('range parity uses fresh cache keys and still requires exact artifact bytes
 
 
 test('artifact routing expectations distinguish missing companion content from valid pages', () => {
-  const paths = new Set(['index.html', 'about.html', 'articles/index.html', '404.html', '.well-known/api-catalog']);
+  const paths = new Set(['index.html', 'about.html', 'articles/index.html', '404.html', '.well-known/api-catalog', 'Hexstrike-AI-guide/docs/about.html']);
   assert.deepEqual(localAsset('/', paths), { status: 200, asset: 'index.html' });
   assert.deepEqual(localAsset('/about.html', paths), { status: 200, asset: 'about.html' });
-  assert.deepEqual(localAsset('/about', paths), { status: 200, asset: 'about.html' });
-  assert.deepEqual(localAsset('/articles', paths), { status: 301, asset: null });
+  assert.deepEqual(localAsset('/about', paths), { status: 301, asset: null, location: '/about.html' });
+  assert.deepEqual(localAsset('/index', paths), { status: 301, asset: null, location: '/' });
+  assert.deepEqual(localAsset('/index.html', paths), { status: 301, asset: null, location: '/' });
+  assert.deepEqual(localAsset('/articles/index.html', paths), { status: 301, asset: null, location: '/articles/' });
+  assert.deepEqual(localAsset('/articles', paths), { status: 301, asset: null, location: '/articles/' });
+  assert.deepEqual(localAsset('/Hexstrike-AI-guide/docs/about', paths), { status: 200, asset: 'Hexstrike-AI-guide/docs/about.html' });
   assert.deepEqual(localAsset('/.well-known/api-catalog', paths), { status: 200, asset: '.well-known/api-catalog' });
   assert.deepEqual(localAsset('/companion/', paths), { status: 404, asset: '404.html' });
 });

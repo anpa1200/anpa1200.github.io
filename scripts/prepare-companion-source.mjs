@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ctiSourceRewrites, rewriteCrosslinksInDirectory } from './canonical-crosslinks.mjs';
+import { rewriteExternalInDirectory, unlinkPrivateUrls } from './external-link-replacements.mjs';
 
 export function migrationBodyHeadings() {
   return (tree, file) => {
@@ -40,6 +41,10 @@ for (const preset of config.presets || []) {
   preset[1].docs ||= {};
   preset[1].docs.remarkPlugins = [...(preset[1].docs.remarkPlugins || []), migrationBodyHeadings];
 }
+// Every companion logo is square and rendered at Infima's 2rem (32 px):
+// explicit dimensions let the header reserve its space before the image loads.
+const navbarLogo = config.themeConfig?.navbar?.logo;
+if (navbarLogo && navbarLogo.width == null && navbarLogo.height == null) Object.assign(navbarLogo, { width: 32, height: 32 });
 `;
   if (!config.includes('function migrationBodyHeadings')) {
     const marker = /(?:export default config;|module\.exports\s*=\s*config;)/;
@@ -97,6 +102,9 @@ for (const preset of config.presets || []) {
   for (const directory of ['docs', 'src', 'static']) {
     const result = await rewriteCrosslinksInDirectory(join(source, directory), ['.md', '.mdx', '.js', '.jsx', '.ts', '.tsx', '.html']);
     rewritten += result.replacements;
+    // Reviewed dead/moved/insecure external links and private-host links.
+    rewritten += (await rewriteExternalInDirectory(join(source, directory), ['.md', '.mdx', '.js', '.jsx', '.ts', '.tsx', '.html'])).replacements;
+    rewritten += (await rewriteExternalInDirectory(join(source, directory), ['.md', '.mdx'], unlinkPrivateUrls)).replacements;
   }
   if (mount === 'CTI_as_a_Code') {
     const labels = [

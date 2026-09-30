@@ -2,6 +2,7 @@
 // Regression tests compare its agent behavior with agent-readiness-worker.js.
 import { retiredVendorReportTarget } from './evidence-documents.js';
 import crosslinkManifest from './crosslink-rewrites.json' with { type: 'json' };
+import companionSites from './companion-sites.json' with { type: 'json' };
 export const LEGACY_CROSSLINK_REDIRECTS = new Map(crosslinkManifest.rewrites.map(({ from, to }) => {
   const source = new URL(from, 'https://1200km.com');
   const target = new URL(to, 'https://1200km.com');
@@ -13,6 +14,11 @@ export const LEGACY_CROSSLINK_REDIRECTS = new Map(crosslinkManifest.rewrites.map
 if (LEGACY_CROSSLINK_REDIRECTS.size !== crosslinkManifest.rewrites.length) {
   throw new Error('Duplicate legacy crosslink redirect path');
 }
+// Companion Docusaurus builds keep their own slash policy; some of them
+// publish extensionless canonicals that are served from name.html.
+const COMPANION_PREFIXES = companionSites.map(({ mount }) => `/${mount}/`);
+export const isCompanionPath = (pathname) => COMPANION_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+
 export const MARKDOWN_ROUTES = new Map([
   ['/', '/index.md'],
   ['/projects/', '/projects.md'],
@@ -122,10 +128,13 @@ export function createSiteWorker(headerText) {
   const finish = (response, pathname, request, status = response.status) => {
     const headers = responseHeaders(response.headers, pathname, rules);
     // Static Assets defaults to revalidation on every visit. Cache asset URLs
-    // in browsers; reserve immutable for names with an embedded content hash.
-    // Query-string versions are not assumed immutable because some are stale.
+    // in browsers; reserve immutable for names with an embedded content hash,
+    // or shared /assets/ URLs carrying a release content-hash version
+    // (?v=h-<sha256 prefix>, written by scripts/fingerprint-shared-assets.mjs).
+    // Hand-written date versions are not assumed immutable because some are stale.
     if (status === 200 && (pathname.startsWith('/pagefind/') || /\.(?:avif|css|gif|ico|jpe?g|js|mjs|mp4|png|svg|ttf|wasm|webm|webp|woff2?)$/i.test(pathname))) {
-      const fingerprinted = /\.[a-f0-9]{8,}\.(?:css|js|mjs|avif|gif|jpe?g|png|svg|webp|woff2?)$/i.test(pathname);
+      const contentVersion = pathname.startsWith('/assets/') && /^h-[a-f0-9]{10}$/.test(new URL(request.url).searchParams.get('v') || '');
+      const fingerprinted = contentVersion || /\.[a-f0-9]{8,}\.(?:css|js|mjs|avif|gif|jpe?g|png|svg|webp|woff2?)$/i.test(pathname);
       headers.set('Cache-Control', fingerprinted
         ? 'public, max-age=31536000, immutable'
         : 'public, max-age=86400');
@@ -148,6 +157,9 @@ export function createSiteWorker(headerText) {
     async fetch(request, env) {
       const url = new URL(request.url);
       const pathname = url.pathname;
+      // An explicit origin keeps the host and prevents a //-prefixed path
+      // becoming an open redirect; browsers carry the fragment over.
+      const redirect = (target) => finish(new Response(null, { status: 301, headers: { Location: `${url.origin}${target}${url.search}`, 'Content-Type': 'text/html' } }), pathname, request);
       if (url.hostname === '1200km.com' && url.protocol === 'http:') {
         url.protocol = 'https:';
         return finish(new Response(null, { status: 301, headers: { Location: url.href, 'Content-Type': 'text/html' } }), pathname, request);
@@ -182,26 +194,35 @@ export function createSiteWorker(headerText) {
 
       const assetPath = pathname.endsWith('/') ? `${pathname}index.html` : pathname;
       let response = await env.ASSETS.fetch(assetRequest(request, assetPath));
-      if (response.status !== 404) return finish(response, pathname, request);
+      if (response.status !== 404) {
+        // One URL per document: a directory index is published as its directory.
+        if (pathname.endsWith('/index.html')) {
+          await response.body?.cancel();
+          return redirect(pathname.slice(0, -'index.html'.length));
+        }
+        return finish(response, pathname, request);
+      }
       await response.body?.cancel();
 
       if (!pathname.endsWith('/')) {
-        // GitHub Pages also accepts /about for /about.html. This is an internal
-        // compatibility alias, never an automatic .html -> extensionless redirect.
+        // GitHub Pages also accepts /about for /about.html. Main-site pages are
+        // canonical as name.html, so the alias redirects there (/index goes
+        // straight to /). Companion mounts keep serving their own canonical
+        // extensionless form. Never an automatic .html -> extensionless redirect.
         if (!pathname.endsWith('.html')) {
-          response = await env.ASSETS.fetch(assetRequest(request, `${pathname}.html`));
-          if (response.status !== 404) return finish(response, pathname, request);
+          const companion = isCompanionPath(pathname);
+          response = await env.ASSETS.fetch(assetRequest(request, `${pathname}.html`, { probe: !companion }));
+          if (response.status !== 404) {
+            if (companion) return finish(response, pathname, request);
+            await response.body?.cancel();
+            return redirect(pathname.endsWith('/index') ? pathname.slice(0, -'index'.length) : `${pathname}.html`);
+          }
           await response.body?.cancel();
         }
         const directory = await env.ASSETS.fetch(assetRequest(request, `${pathname}/index.html`, { probe: true }));
         const directoryExists = directory.ok;
         await directory.body?.cancel();
-        if (directoryExists) {
-          // Keep the incoming host and browser fragment inheritance. An explicit
-          // origin also prevents a //-prefixed path becoming an open redirect.
-          const location = `${url.origin}${pathname}/${url.search}`;
-          return finish(new Response(null, { status: 301, headers: { Location: location, 'Content-Type': 'text/html' } }), pathname, request);
-        }
+        if (directoryExists) return redirect(`${pathname}/`);
       }
       response = await env.ASSETS.fetch(assetRequest(request, '/404.html', { markdown: true }));
       if (!response.ok) {

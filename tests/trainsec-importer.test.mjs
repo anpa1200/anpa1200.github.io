@@ -289,3 +289,12 @@ test('metadata-only import requires one generic author and one TrainSec author t
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('committed TrainSec pages contain no empty headings', async () => {
+  const { readdirSync } = await import('node:fs');
+  const directory = fileURLToPath(new URL('../articles/trainsec/', import.meta.url));
+  for (const name of readdirSync(directory).filter((file) => file.endsWith('.html'))) {
+    const html = readFileSync(join(directory, name), 'utf8');
+    assert.doesNotMatch(html, /<h([1-6])\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/h\1>/i, `${name} has an empty heading`);
+  }
+});

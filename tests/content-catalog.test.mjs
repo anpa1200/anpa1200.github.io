@@ -176,7 +176,8 @@ test('taxonomy audit separates generated references from authored distribution',
     taxonomyAudit.distributions.by_primary_type['reference-entity'],
     catalog.items.filter((item) => item.primary_type === 'reference-entity').length,
   );
-  assert.ok(taxonomyAudit.distributions.by_primary_type['reference-entity'] >= 174);
+  // G0017 and G0055 have no ATT&CK v19.1 technique relationships and are noindex.
+  assert.ok(taxonomyAudit.distributions.by_primary_type['reference-entity'] >= 173);
   assert.equal(taxonomyAudit.authored_only.by_primary_type['generated-reference'], undefined);
   assert.ok(taxonomyAudit.warnings.some((warning) => warning.code === 'GENERATED_REFERENCE_DISTRIBUTION'));
   assert.ok(taxonomyAudit.warnings.every((warning) => warning.severity !== 'error'));

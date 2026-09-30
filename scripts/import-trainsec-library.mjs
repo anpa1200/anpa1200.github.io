@@ -189,6 +189,9 @@ function normalizeMedia(body, article) {
   // Elementor layout. Keep the original heading text while making the local
   // article hierarchy valid beneath the page H1.
   out = out.replace(/<h[1-6](\b[^>]*)>/gi, '<h2$1>').replace(/<\/h[1-6]>/gi, '</h2>');
+  // Drop headings with no text (WordPress spacer blocks); they announce an
+  // empty section to screen-reader heading navigation.
+  out = out.replace(/\s*<h2\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/h2>/gi, '');
   // Use the privacy-preserving YouTube host and provide a visible source link
   // when a browser, extension, or network policy cannot render an iframe.
   out = out.replace(/<iframe\b([\s\S]*?)><\/iframe>/gi, (full, attrs) => {
@@ -390,6 +393,44 @@ function ensurePagefindIgnored(html) {
   return replaceOneLiteral(output, main, normalizedMain, 'main element');
 }
 
+// Accessibility normalization for every generated TrainSec page, applied by
+// full imports and --metadata-only updates alike (idempotent):
+// - the templates are dark-first while light is the site default, so
+//   classless links, captions, eyebrows and headings get light-theme colors;
+// - long inline technical tokens (paths, API names) may break instead of
+//   widening the page; ordinary prose keeps normal wrapping;
+// - the rights notice is a note, not a nested complementary landmark;
+// - horizontally scrolling code, verse and table blocks get a focus stop;
+// - empty source links, which have no accessible name, are dropped;
+// - bare Windows paths in prose become <code> (text unchanged) and the
+//   source's broken Markdown "[label] (url)" links become real links.
+const TRAINSEC_ACCESSIBILITY_STYLE = '/* trainsec-accessibility */.trainsec-content :is(p,li,td,th,figcaption) :is(strong,b,code,a){overflow-wrap:anywhere}[data-theme="light"] a:not([class]){color:var(--accent)}[data-theme="light"] .brand small,[data-theme="light"] .article-cover figcaption,[data-theme="light"] .count,[data-theme="light"] .directory-group span,[data-theme="light"] footer{color:var(--muted)}[data-theme="light"] .eyebrow{color:var(--accent-dark)}[data-theme="light"] .lead{color:var(--panel-ink-soft)}[data-theme="light"] .directory-group h2{color:var(--panel-ink)}';
+function markTechnicalTokens(html) {
+  // Only text nodes outside code, links, form fields, scripts and styles.
+  return html.split(/(<(pre|code|a|textarea|script|style)\b[\s\S]*?<\/\2>)/).map((chunk, index, parts) => {
+    if (index % 3 === 1) return chunk;
+    if (index % 3 === 2) return '';
+    // A list item that is a whole path (which may contain spaces) first; then
+    // long space-free paths, which are the tokens that can overflow a phone.
+    return chunk.replace(/<li>([A-Z]:\\[^<]+)<\/li>/g, '<li><code>$1</code></li>')
+      .split(/(<code>[\s\S]*?<\/code>|<[^>]+>)/).map((part) => part.startsWith('<') ? part : part
+        .replace(/\[([^\]\n]{1,120})\] \((https?:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>')
+        .replace(/(^|\s)([A-Z]:\\[^\s]{21,}?)(?=[.,;:]?(?:\s|$))/g, '$1<code>$2</code>')).join('');
+  }).join('');
+}
+
+function normalizeTrainsecMarkup(html) {
+  let output = html.replace(/<aside class="rights-disclaimer">([\s\S]*?)<\/aside>/g, '<div class="rights-disclaimer" role="note">$1</div>');
+  output = output.replace(/<(pre|table)\b(?![^>]*\b(?:tabindex|aria-hidden)=)/g, '<$1 tabindex="0"');
+  output = output.replace(/<a\b(?=[^>]*\bhref=)[^>]*>\s*<\/a>/g, '');
+  const content = output.indexOf('<div class="trainsec-content">');
+  if (content >= 0) output = output.slice(0, content) + markTechnicalTokens(output.slice(content));
+  output = /\/\* trainsec-(?:light|accessibility) \*\//.test(output)
+    ? output.replace(/\/\* trainsec-(?:light|accessibility) \*\/[^<]*(?=<\/style>)/, TRAINSEC_ACCESSIBILITY_STYLE)
+    : output.replace('</style>', `${TRAINSEC_ACCESSIBILITY_STYLE}</style>`);
+  return output;
+}
+
 function enhanceTrainsecReleaseMetadata(html, article) {
   const description = article.excerpt || `${article.title} by ${article.author}, republished from TrainSec.net with permission.`;
   const image = trainsecImageUrl(article);
@@ -409,7 +450,7 @@ function enhanceTrainsecReleaseMetadata(html, article) {
   }
   output = ensureRssDiscovery(output);
   output = ensurePagefindIgnored(output);
-  return addStableHeadingIds(output);
+  return normalizeTrainsecMarkup(addStableHeadingIds(output));
 }
 
 function metadataOnlyPage(article, canonicalEntry, html) {
@@ -724,8 +765,8 @@ await fs.writeFile(dataPath, `${JSON.stringify(payload, null, 2)}\n`);
 
 const authorGroups = payload.authors.map((group) => ({ name: group.name, articles: payload.articles.filter((article) => article.author === group.name) }));
 const domainGroups = payload.domains.map((group) => ({ name: group.name, articles: payload.articles.filter((article) => article.domain === group.name) }));
-await fs.writeFile(path.join(outputRoot, 'authors.html'), directoryPage('authors', authorGroups));
-await fs.writeFile(path.join(outputRoot, 'domains.html'), directoryPage('domains', domainGroups));
+await fs.writeFile(path.join(outputRoot, 'authors.html'), normalizeTrainsecMarkup(directoryPage('authors', authorGroups)));
+await fs.writeFile(path.join(outputRoot, 'domains.html'), normalizeTrainsecMarkup(directoryPage('domains', domainGroups)));
 
 // Point catalogue titles at the local mirrors while retaining the original
 // TrainSec link in each Source line and rights notice.
@@ -863,7 +904,7 @@ catalogue = catalogue.replace(/<script>\(\(\)=>\{const cards=[\s\S]*?<\/script>/
 if (!catalogue.includes('/assets/trainsec-library-filters.js')) {
   catalogue = catalogue.replace('</body>', `${filterScript}\n</body>`);
 }
-await fs.writeFile(cataloguePath, catalogue);
+await fs.writeFile(cataloguePath, normalizeTrainsecMarkup(catalogue));
 
 const indexPath = path.join(root, 'articles', 'index.html');
 let indexHtml = await fs.readFile(indexPath, 'utf8');

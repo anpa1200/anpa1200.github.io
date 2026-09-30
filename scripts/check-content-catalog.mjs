@@ -9,6 +9,7 @@ import {
 } from './content-catalog-lib.mjs';
 import { parseSitemapEntries, stripHtml, validatePage } from './search-index-lib.mjs';
 import { trainsecCanonicalEntries } from './trainsec-canonical-lib.mjs';
+import { lifecycleNoticeProblem } from './article-lifecycle-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -385,12 +386,10 @@ if (catalog.scope === 'deployable-domain-catalog') {
   for (const item of archiveArticles.filter((entry) => ['stable-reference', 'preserved', 'historical', 'currentness-unknown'].includes(entry.lifecycle))) {
     const path = localPathForUrl(item.canonical_url);
     const html = path ? read(path) : '';
-    if (!html.includes(`data-content-lifecycle="${item.lifecycle}"`)) fail(`${item.id}: deployed article lacks its visible ${item.lifecycle} lifecycle notice.`);
-    const notice = html.indexOf(`data-content-lifecycle="${item.lifecycle}"`);
-    const reactRoot = html.indexOf('<div id="__docusaurus">');
-    if (notice < 0 || reactRoot < 0 || notice > reactRoot) {
-      fail(`${item.id}: lifecycle notice must precede the Docusaurus root, not follow the footer.`);
-    }
+    // Same contract as the release step (scripts/apply-content-lifecycle.mjs):
+    // the notice is rendered inside the article body, directly under the H1.
+    const problem = lifecycleNoticeProblem(html, item.lifecycle);
+    if (problem) fail(`${item.id}: ${problem}.`);
   }
 }
 

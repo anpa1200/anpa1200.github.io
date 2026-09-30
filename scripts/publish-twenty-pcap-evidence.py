@@ -250,7 +250,8 @@ def render_html(file):
     for h in soup.find_all(re.compile('^h[1-6]$')):h['id']=re.sub(r'[^\w -]','',h.get_text().lower()).strip().replace(' ','-')
     for a in soup.find_all('a'):
         href=a.get('href','')
-        if not urlsplit(href).scheme and href.endswith('.md'):a['href']=href[:-3]+'.html'
+        # README.md is published as the directory index; README.html redirects there.
+        if not urlsplit(href).scheme and href.endswith('.md'):a['href']=re.sub(r'/README\.html$','/',re.sub(r'^README\.html$','./',href[:-3]+'.html'))
     for im in soup.find_all('img'):
         path=file.parent/im['src']
         if path.is_file():

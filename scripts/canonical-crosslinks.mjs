@@ -27,18 +27,22 @@ export const ctiSourceRewrites = manifest.source_rewrites.CTI_as_a_Code
 export const archiveSourceRewrites = manifest.source_rewrites.MediumArticleArchive
   .sort((a, b) => b.from.length - a.from.length);
 
-export function rewriteCrosslinks(input, rewrites = crosslinkRewrites) {
+export function rewriteCrosslinks(input, rewrites = crosslinkRewrites, { absolute = true } = {}) {
   let output = input;
   const counts = {};
   for (const { from, to } of rewrites) {
     const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // A stale route must be a complete URL token on both sides. In particular,
     // /investigations/... inside a GitHub blob URL belongs to that external
-    // URL and must not be replaced with our site's absolute route.
-    const pattern = new RegExp(`(?<![A-Za-z0-9_./:%~-])${escaped}(?![A-Za-z0-9_./%~-])`, 'g');
+    // URL and must not be replaced with our site's absolute route. A path-form
+    // route also matches when written as an absolute https://1200km.com URL;
+    // the origin is kept, so only the path changes. Authored JSON data (e.g.
+    // an archive catalogue's canonical_url) keeps its absolute URLs as written.
+    const origin = from.startsWith('/') && absolute ? '((?:https://1200km\\.com)?)' : '()';
+    const pattern = new RegExp(`(?<![A-Za-z0-9_./:%~-])${origin}${escaped}(?![A-Za-z0-9_./%~-])`, 'g');
     const occurrences = [...output.matchAll(pattern)].length;
     if (!occurrences) continue;
-    output = output.replace(pattern, to);
+    output = output.replace(pattern, (_, prefix) => `${prefix}${to}`);
     counts[from] = occurrences;
   }
   return { output, counts };
@@ -55,7 +59,7 @@ export async function rewriteCrosslinksInDirectory(directory, extensions, rewrit
       if (entry.isDirectory()) { await walk(child); continue; }
       if (!entry.isFile() || ![...allowed].some((extension) => entry.name.endsWith(extension))) continue;
       const before = await readFile(child, 'utf8');
-      const { output, counts } = rewriteCrosslinks(before, rewrites);
+      const { output, counts } = rewriteCrosslinks(before, rewrites, { absolute: !entry.name.endsWith('.json') });
       if (output === before) continue;
       await writeFile(child, output);
       result.files++;

@@ -122,6 +122,8 @@ jobs:
         run: npm run build-sidebar -- --site "${RUNNER_TEMP}/site"
       - name: Compact shared UI scripts without changing research data
         run: node scripts/build-release-js.mjs --site "${RUNNER_TEMP}/site"
+      - name: Compact shared stylesheets and standalone inline styles
+        run: node scripts/build-release-css.mjs --site "${RUNNER_TEMP}/site"
       - name: Validate complete staged site
         run: |
           npm run check-semantics -- --site "${RUNNER_TEMP}/site"
@@ -144,6 +146,10 @@ jobs:
             --site "${RUNNER_TEMP}/site" \
             --source "${GITHUB_WORKSPACE}" \
             --sitemap "${RUNNER_TEMP}/site/sitemap.xml"
+      - name: Replace reviewed dead, moved and insecure external links
+        # Docusaurus sources were rewritten before their builds; this covers
+        # static and generated pages, including the reference library above.
+        run: node scripts/rewrite-external-links.mjs --site "${RUNNER_TEMP}/site"
       - name: Audit platform discoverability, taxonomy, and sidebar coverage
         run: >-
           npm run check-discoverability --
@@ -208,6 +214,10 @@ jobs:
           node scripts/check-content-catalog.mjs --site "${RUNNER_TEMP}/site"
           npm run check-seo -- --site "${RUNNER_TEMP}/site" --require-release-transform --require-catalog-agreement
           npm run check-links -- --site "${RUNNER_TEMP}/site"
+      - name: Fingerprint shared assets by content hash
+        # After every validation that inspects asset URLs; before build identity,
+        # so the recorded artifact digest covers the rewritten references.
+        run: node scripts/fingerprint-shared-assets.mjs --site "${RUNNER_TEMP}/site"
       - name: Emit and validate immutable build identity
         run: |
           node scripts/check-companion-coverage.mjs --site "${RUNNER_TEMP}/site"

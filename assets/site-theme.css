@@ -415,6 +415,18 @@ pre {
   color: var(--panel-muted) !important;
 }
 
+/* Exported Shiki blocks (TrainSec mirrors) color every token inline for a
+   dark background; keep that background in both themes. */
+pre.shiki {
+  background: #1e1e1e !important;
+  color: #d4d4d4 !important;
+}
+
+pre.shiki code {
+  background: transparent !important;
+  color: inherit !important;
+}
+
 .card.featured .artifact em,
 .artifact em {
   color: var(--accent-soft) !important;
@@ -1070,12 +1082,20 @@ footer,
   color: var(--panel-ink) !important;
   font: 700 0.82rem/1 Inter, ui-sans-serif, system-ui, sans-serif;
   text-decoration: none;
-  transform: translateY(-160%);
-  transition: transform 0.15s ease;
 }
 
-.skip-link:focus {
-  transform: translateY(0);
+/* Visually hidden until focused. A translate offset is not enough: the
+   header's backdrop-filter makes it the containing block for this fixed
+   link, so content placed above the header would pull the link into view. */
+.skip-link:not(:focus):not(:focus-visible) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .visually-hidden {

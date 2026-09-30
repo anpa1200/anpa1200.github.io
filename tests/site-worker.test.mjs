@@ -33,11 +33,11 @@ async function get(path, init = {}, env = environment()) {
   return worker.fetch(new Request(`https://1200km-site.test.workers.dev${path}`, init), env);
 }
 
-test('ASSETS-only root, directories, explicit HTML, and extensionless Pages aliases', async () => {
+test('ASSETS-only root, directories, and explicit HTML', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = () => { throw new Error('An origin network fetch is forbidden'); };
   try {
-    for (const [path, body] of [['/', 'HOME'], ['/index.html', 'HOME'], ['/articles/', 'ARTICLES'], ['/articles/index.html', 'ARTICLES'], ['/about.html', 'ABOUT'], ['/about', 'ABOUT'], ['/projects.html', 'PROJECTS']]) {
+    for (const [path, body] of [['/', 'HOME'], ['/articles/', 'ARTICLES'], ['/about.html', 'ABOUT'], ['/projects.html', 'PROJECTS']]) {
       const response = await get(path);
       assert.equal(response.status, 200, path);
       assert.equal(await response.text(), body, path);
@@ -46,6 +46,31 @@ test('ASSETS-only root, directories, explicit HTML, and extensionless Pages alia
     await get('/articles/?q=a%20b&tag=T1595');
     assert.equal(new URL(calls[0].url).search, '?q=a%20b&tag=T1595');
   } finally { globalThis.fetch = original; }
+});
+
+test('duplicate aliases redirect once to the canonical document URL', async () => {
+  for (const [path, location] of [
+    ['/index.html', '/'], ['/index', '/'], ['/articles/index.html?q=a', '/articles/?q=a'],
+    ['/about', '/about.html'], ['/projects?ref=x#top', '/projects.html?ref=x'],
+    ['//foreign.example/index.html', '//foreign.example/'],
+  ]) {
+    const response = await get(path);
+    assert.equal(response.status, 301, path);
+    assert.equal(response.headers.get('Location'), `https://1200km-site.test.workers.dev${location}`, path);
+    assert.equal(await response.text(), '', path);
+  }
+  assert.equal((await get('/about')).status, 301);
+  assert.equal(calls.at(-1).method, 'HEAD', 'the alias is probed, not downloaded');
+  assert.equal((await get('/missing/index.html')).status, 404, 'no redirect to a missing directory');
+  assert.equal((await get('/missing')).status, 404);
+});
+
+test('companion mounts keep serving their own extensionless canonical form', async () => {
+  const companion = new Map([...files, ['/Hexstrike-AI-guide/docs/about.html', ['HEXSTRIKE ABOUT', 'text/html; charset=utf-8']]]);
+  const response = await get('/Hexstrike-AI-guide/docs/about', {}, environment(companion));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Location'), null);
+  assert.equal(await response.text(), 'HEXSTRIKE ABOUT');
 });
 
 test('directory redirect retains host and query and leaves fragment inheritance to browser', async () => {
@@ -57,7 +82,7 @@ test('directory redirect retains host and query and leaves fragment inheritance 
 });
 
 test('all broken legacy crosslinks redirect to reviewed current routes without origin escape', async () => {
-  assert.equal(LEGACY_CROSSLINK_REDIRECTS.size, 63);
+  assert.equal(LEGACY_CROSSLINK_REDIRECTS.size, 82);
   for (const [oldPath, newPath] of LEGACY_CROSSLINK_REDIRECTS) {
     const response = await get(`${oldPath}?source=old#section`);
     assert.equal(response.status, 301, oldPath);
@@ -216,9 +241,12 @@ test('new Worker preserves legacy security, discovery, MIME and Markdown semanti
       const request = new Request(`https://example.test${path}`);
       const old = await legacy.fetch(request);
       const next = await worker.fetch(request, environment());
-      for (const name of ['Permissions-Policy', 'Referrer-Policy', 'Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options']) {
+      for (const name of ['Permissions-Policy', 'Referrer-Policy', 'X-Content-Type-Options', 'X-Frame-Options']) {
         assert.equal(next.headers.get(name), old.headers.get(name), `${path} ${name}`);
       }
+      // Intentional hardening: HSTS now also covers subdomains (www is HTTPS-only).
+      assert.equal(old.headers.get('Strict-Transport-Security'), 'max-age=31536000');
+      assert.equal(next.headers.get('Strict-Transport-Security'), 'max-age=31536000; includeSubDomains', `${path} HSTS`);
       assert.match(old.headers.get('Content-Security-Policy'), /frame-src 'none'/);
       assert.match(next.headers.get('Content-Security-Policy'), /frame-src https:\/\/www\.youtube-nocookie\.com/);
       const nextCsp = next.headers.get('Content-Security-Policy').replace('frame-src https://www.youtube-nocookie.com', "frame-src 'none'");
@@ -243,6 +271,9 @@ test('asset caching is immutable only for content-hashed filenames', async () =>
   for (const [path, expected] of [
     ['/articles/assets/js/main.85f2a5eb.js', 'public, max-age=31536000, immutable'],
     ['/assets/site-theme.js?v=20260721-shell', 'public, max-age=86400'],
+    ['/assets/site-theme.js?v=h-0123456789', 'public, max-age=31536000, immutable'],
+    ['/articles/assets/js/x.js?v=h-0123456789', 'public, max-age=86400'],
+    ['/assets/site-theme.js?v=h-0123', 'public, max-age=86400'],
     ['/assets/cover.png', 'public, max-age=86400'],
     ['/pagefind/fragment/test.pf_fragment', 'public, max-age=86400'],
   ]) {

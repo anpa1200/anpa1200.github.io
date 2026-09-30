@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { isCompanionPath } from '../cloudflare/site-worker-lib.js';
 
 export const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 export const CHECKED_HEADERS = [
@@ -36,14 +37,21 @@ export function withoutBuildIdentity(html) {
     .replace(/(<code\b[^>]*\bdata-site-build-id(?:=["'][^"']*["'])?[^>]*>)[a-f0-9]{40}(<\/code>)/gi, '$1BUILD$2');
 }
 
+// Mirrors cloudflare/site-worker-lib.js routing for one artifact path.
 export function localAsset(pathname, paths) {
   let path;
   try { path = decodeURIComponent(pathname).replace(/^\//, ''); } catch { return { status: 404, asset: '404.html' }; }
   const direct = path.endsWith('/') || !path ? `${path}index.html` : path;
-  if (paths.has(direct)) return { status: 200, asset: direct };
+  if (paths.has(direct)) {
+    if (`/${path}`.endsWith('/index.html')) return { status: 301, asset: null, location: `/${path.slice(0, -'index.html'.length)}` };
+    return { status: 200, asset: direct };
+  }
   if (path && !path.endsWith('/')) {
-    if (!path.endsWith('.html') && paths.has(`${path}.html`)) return { status: 200, asset: `${path}.html` };
-    if (paths.has(`${path}/index.html`)) return { status: 301, asset: null };
+    if (!path.endsWith('.html') && paths.has(`${path}.html`)) {
+      if (isCompanionPath(`/${path}`)) return { status: 200, asset: `${path}.html` };
+      return { status: 301, asset: null, location: `/${path}`.endsWith('/index') ? `/${path.slice(0, -'index'.length)}` : `/${path}.html` };
+    }
+    if (paths.has(`${path}/index.html`)) return { status: 301, asset: null, location: `/${path}/` };
   }
   return { status: 404, asset: '404.html' };
 }
