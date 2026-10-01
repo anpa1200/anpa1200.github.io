@@ -20,3 +20,12 @@ test('publication compatibility notice is bounded and idempotent',()=>{
  assert.ok(after.includes('<link rel="stylesheet" href="/assets/anomaly-tags.css'));
  assert.throws(()=>withAtlasSnapshotNotice('<main>No hydration root</main>'));
 });
+
+test('source-rendered article notice stays inside its hydration tree without duplication',()=>{
+ const source='<html><head></head><body><div id="__docusaurus"><main><article><h1 id="old">Research</h1><aside data-atlas-publication-snapshot="true">Maintained version in the Atlas.</aside><p id="preserved">Evidence.</p></article></main></div></body></html>';
+ const after=withAtlasSnapshotNotice(source);
+ assert.equal((after.match(/data-atlas-publication-snapshot/g)||[]).length,1);
+ assert.ok(after.indexOf('id="__docusaurus"')<after.indexOf('data-atlas-publication-snapshot'));
+ assert.ok(after.includes('<p id="preserved">Evidence.</p>'));
+ assert.equal(withAtlasSnapshotNotice(after),after);
+});

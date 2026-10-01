@@ -1,8 +1,8 @@
 import {readFileSync} from 'node:fs';
-import {atlasFamilyAssignments} from './anomaly-atlas-lib.mjs';
+import {atlasFamilyAssignments,atlasWorkedAssignments} from './anomaly-atlas-lib.mjs';
 export const anomalyTaxonomy = JSON.parse(readFileSync(new URL('../data/anomaly-taxonomy.json', import.meta.url)));
 export const anomalyAssignments = JSON.parse(readFileSync(new URL('../data/anomaly-tag-assignments.json', import.meta.url))).assignments;
-const byUrl = new Map([...anomalyAssignments,...atlasFamilyAssignments].map(row => [anomalyUrlKey(row.url), row.evidence.map(item => item.tag)]));
+const byUrl = new Map([...anomalyAssignments,...atlasFamilyAssignments,...atlasWorkedAssignments].map(row => [anomalyUrlKey(row.url), row.evidence.map(item => item.tag)]));
 export function anomalyUrlKey(value) {
   try {
     const url = new URL(value, 'https://1200km.com/');

@@ -3,7 +3,7 @@ import {readFileSync, writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {anomalyTaxonomy, anomalyAssignments, anomalyTagsForUrl, anomalySearchHref} from './anomaly-tags-lib.mjs';
-import {atlas,atlasFamilyAssignments} from './anomaly-atlas-lib.mjs';
+import {atlas,atlasFamilyAssignments,atlasWorkedAssignments,snapshotNotice} from './anomaly-atlas-lib.mjs';
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const check = process.argv.includes('--check');
 const labels = new Map(anomalyTaxonomy.tags.map(tag => [tag.id, tag.label]));
@@ -12,7 +12,7 @@ function output(path, content) {
   if (check) { if (old !== content) throw Error(`Stale anomaly tags: ${path}`); }
   else if (old !== content) writeFileSync(path, content);
 }
-const payload = {schema_version: 1, reviewed_at: anomalyTaxonomy.reviewed_at, article_url: anomalyTaxonomy.article_url, atlas_url:'https://1200km.com/anomaly-detection-atlas/', policy: 'Navigation topics, not independently validated incidents or detection coverage.', tags: anomalyTaxonomy.tags.map(t=>({...t,definition_url:atlas.families.find(f=>f.tag===t.id).url})), pages: Object.fromEntries([...anomalyAssignments,...atlasFamilyAssignments].map(row => [new URL(row.url).pathname.replace(/\/$/, ''), row.evidence.map(item => item.tag)]))};
+const payload = {schema_version: 1, publication_notice_html:snapshotNotice, worked_paths:atlas.pages.filter(p=>p.id.startsWith('worked-')).map(p=>({title:p.title,url:p.url})), reviewed_at: anomalyTaxonomy.reviewed_at, article_url: anomalyTaxonomy.article_url, atlas_url:'https://1200km.com/anomaly-detection-atlas/', policy: 'Navigation topics, not independently validated incidents or detection coverage.', tags: anomalyTaxonomy.tags.map(t=>({...t,definition_url:atlas.families.find(f=>f.tag===t.id).url})), pages: Object.fromEntries([...anomalyAssignments,...atlasFamilyAssignments,...atlasWorkedAssignments].map(row => [new URL(row.url).pathname.replace(/\/$/, ''), row.evidence.map(item => item.tag)]))};
 const publicPath = resolve(root, 'data/anomaly-tags.json');
 if (check) output(publicPath, JSON.stringify(payload)+'\n'); else writeFileSync(publicPath, JSON.stringify(payload)+'\n');
 const path = resolve(root, 'guides.html');

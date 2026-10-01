@@ -85,7 +85,10 @@ test('negative controls: learning rate, training cohorts, generic product diagra
 });
 test('public registry, search facet and definition links use the same reviewed IDs', () => {
   const registry = json('data/anomaly-tags.json');
-  assert.equal(Object.keys(registry.pages).length, anomalyAssignments.length + 15);
+  assert.equal(Object.keys(registry.pages).length, anomalyAssignments.length + 15 + 3);
+  assert.deepEqual(anomalyTagsForUrl('https://1200km.com/anomaly-detection-atlas/research/worked-password-spray/'), ['anomaly-frequency-rate','anomaly-identity-access','anomaly-sequence']);
+  assert.deepEqual(anomalyTagsForUrl('https://1200km.com/anomaly-detection-atlas/research/worked-saas-downloads/'), ['anomaly-volumetric','anomaly-data-movement','anomaly-temporal']);
+  assert.deepEqual(anomalyTagsForUrl('https://1200km.com/anomaly-detection-atlas/research/worked-kerberoasting/'), ['anomaly-frequency-rate','anomaly-identity-access']);
   for (const tag of registry.tags) assert.match(tag.definition_url, /^https:\/\/1200km\.com\/anomaly-detection-atlas\/families\//);
   const html = prepareHtmlForSearch(anomalyTaxonomy.article_url, '<html lang="en"><head><title>Research</title></head><body><main><h1>Research</h1><p>Anomaly research</p></main></body></html>');
   assert.equal([...html.matchAll(/data-pagefind-filter="anomaly\[content\]"/g)].length, 15);

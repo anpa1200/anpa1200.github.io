@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import * as pagefind from 'pagefind';
 import { governanceBoost } from './search-governance-lib.mjs';
-import { atlas } from './anomaly-atlas-lib.mjs';
+import { atlasSearchUrls } from './anomaly-atlas-lib.mjs';
 import {
   LOCAL_SEARCH_MINIMUM_PAGES,
   REMOTE_SEARCH_MINIMUM_PAGES,
@@ -50,7 +50,7 @@ const minimumKnowledgeSourceRecords = Number.parseInt(option('--minimum-knowledg
 const requiredIndexUrls = [
   `${SITE_ORIGIN}/attack-matrix/`,
   `${SITE_ORIGIN}/attack-matrix/atlas/AML.T0051/`,
-  ...(remote ? ['https://1200km.com/anomaly-detection-atlas/', 'https://1200km.com/anomaly-detection-atlas/research/', 'https://1200km.com/anomaly-detection-atlas/families/', 'https://1200km.com/anomaly-detection-atlas/visuals/', 'https://1200km.com/anomaly-detection-atlas/research/provenance/', ...atlas.pages.map(p => p.url)] : []),
+  ...(remote ? atlasSearchUrls : []),
   `${SITE_ORIGIN}/ttp-simulation/`,
   `${SITE_ORIGIN}/ttp-simulation/tools/`,
   `${SITE_ORIGIN}/ttp-simulation/detections/`,

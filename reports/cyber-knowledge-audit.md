@@ -9,9 +9,9 @@ This report is generated from deployable source HTML. External URLs are inventor
 | Measure | Result |
 |---|---:|
 | Pages | 15 |
-| Words | 131,652 |
+| Words | 131,731 |
 | Internal links | 4,833 |
-| External links | 598 |
+| External links | 604 |
 | Broken internal links | 0 |
 | Missing anchors | 0 |
 | Duplicate IDs | 0 |
@@ -23,7 +23,7 @@ This report is generated from deployable source HTML. External URLs are inventor
 | [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3096 | 46 | 330 | 1 | indexable |
 | [Cyber Threat Intelligence (CTI)](https://1200km.com/cyber-knowledge/cti.html) | field guide | 12743 | 25 | 413 | 174 | indexable |
 | [Red Team & Offensive Security](https://1200km.com/cyber-knowledge/red-team.html) | field guide | 25678 | 290 | 594 | 17 | indexable |
-| [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13384 | 161 | 471 | 19 | indexable |
+| [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13397 | 161 | 471 | 22 | indexable |
 | [Vulnerability Research & Exploit Development](https://1200km.com/cyber-knowledge/vulnerability-research.html) | field guide | 10707 | 127 | 352 | 42 | indexable |
 | [Malware Analysis & Reverse Engineering](https://1200km.com/cyber-knowledge/malware-analysis.html) | field guide | 7467 | 96 | 345 | 21 | indexable |
 | [Secure Code & Application Security](https://1200km.com/cyber-knowledge/secure-code.html) | field guide | 7120 | 73 | 351 | 16 | indexable |
@@ -33,7 +33,7 @@ This report is generated from deployable source HTML. External URLs are inventor
 | [OSINT & Reconnaissance](https://1200km.com/cyber-knowledge/osint.html) | field guide | 10153 | 114 | 308 | 29 | indexable |
 | [AI Security](https://1200km.com/cyber-knowledge/ai-security.html) | field guide | 5510 | 65 | 366 | 15 | indexable |
 | [Cyber Knowledge Glossary](https://1200km.com/cyber-knowledge/glossary/index.html) | glossary | 4939 | 144 | 169 | 1 | indexable |
-| [Cyber Knowledge Source Index](https://1200km.com/cyber-knowledge/sources/index.html) | source index | 4329 | 192 | 29 | 185 | indexable |
+| [Cyber Knowledge Source Index](https://1200km.com/cyber-knowledge/sources/index.html) | source index | 4395 | 195 | 29 | 188 | indexable |
 | [Editorial and Source Policy](https://1200km.com/cyber-knowledge/editorial-policy/index.html) | supporting page | 282 | 8 | 30 | 2 | indexable |
 
 ## Validation interpretation
