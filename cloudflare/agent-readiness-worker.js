@@ -40,7 +40,7 @@ const SECURITY_HEADERS = {
     "font-src 'self'",
     "img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com",
     "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
-    "frame-src 'none'",
+    'frame-src https://www.youtube-nocookie.com',
     "frame-ancestors 'none'",
     "object-src 'none'",
     "base-uri 'self'",

@@ -1,4 +1,148 @@
-<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Validate a command-shell detection candidate | 1200km</title><meta name="description" content="Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/command-shell-validation/"><meta property="og:url" content="https://1200km.com/learning-paths/command-shell-validation/"><meta property="og:title" content="Validate a command-shell detection candidate"><meta property="og:description" content="Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Validate a command-shell detection candidate","name":"Validate a command-shell detection candidate","url":"https://1200km.com/learning-paths/command-shell-validation/","description":"Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls.","dateModified":"2026-09-09","datePublished":"2026-09-09","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"}}</script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style></head><body id="top"><!-- site-shell:header:start -->
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script><meta name="viewport" content="width=device-width, initial-scale=1"><title>Validate a command-shell detection candidate | 1200km</title><meta name="description" content="Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/command-shell-validation/"><meta property="og:url" content="https://1200km.com/learning-paths/command-shell-validation/"><meta property="og:title" content="Validate a command-shell detection candidate with benign events"><meta property="og:description" content="Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style>    <meta name="twitter:title" content="Validate a command-shell detection candidate with benign events" />
+    <meta name="twitter:description" content="Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls." />
+    <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+      <meta property="article:published_time" content="2026-09-09" />
+    <meta property="article:modified_time" content="2026-09-09" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ],
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/learning-paths/command-shell-validation/#webpage",
+            "url": "https://1200km.com/learning-paths/command-shell-validation/",
+            "name": "Validate a command-shell detection candidate with benign events",
+            "description": "Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/learning-paths/command-shell-validation/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/site-og-v2.png"
+            },
+            "dateModified": "2026-09-09",
+            "mainEntity": {
+              "@id": "https://1200km.com/learning-paths/command-shell-validation/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/learning-paths/command-shell-validation/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Practical security learning paths",
+                "item": "https://1200km.com/learning-paths/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Validate a command-shell detection candidate with benign events",
+                "item": "https://1200km.com/learning-paths/command-shell-validation/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "Validate a command-shell detection candidate with benign events",
+            "name": "Validate a command-shell detection candidate",
+            "url": "https://1200km.com/learning-paths/command-shell-validation/",
+            "description": "Read benign synthetic process events and verify a narrow detection candidate with positive and negative controls.",
+            "dateModified": "2026-09-09",
+            "datePublished": "2026-09-09",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/learning-paths/command-shell-validation/#article",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/learning-paths/command-shell-validation/#webpage"
+            },
+            "image": "https://1200km.com/assets/site-og-v2.png"
+          }
+        ]
+      }
+    </script>
+</head><body id="top"><!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
       <nav class="nav" aria-label="Primary navigation">
@@ -43,7 +187,7 @@
         <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
       </nav>
     </header>
-    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1>Validate a command-shell detection candidate with benign events</h1>
+    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1 id="validate-a-command-shell-detection-candidate-with-benign-events">Validate a command-shell detection candidate with benign events</h1>
 <p><strong>Turn a documented behavior into a small, inspectable rule and test its positive and negative boundaries without executing a sample.</strong></p>
 <p>For analysts learning CTI-to-detection work, the useful output is a candidate plus evidence of what it matches. This example uses synthetic JSON shaped around Windows Security event 4688. It is an illustrative rule, not a production-ready detection or a reproduction of an intrusion.</p>
 <p>Environment: Python 3.9 or later; no third-party packages, network connection, malware, or administrator access. Estimated time: 15 minutes. Review date: 2026-09-09; rule version: 1.0; taxonomy: Enterprise ATT&amp;CK 19.1.</p>
@@ -62,9 +206,9 @@
 <p>If the JSON is malformed or the file is missing, Python reports a parsing or file error: fix the input before drawing conclusions. Missing fields fail to match and represent a visibility limitation. The repository regression test also checks an empty event and case variants.</p>
 <h2 id="limits">Failure modes and limitations</h2>
 <p>Approved Office automation may launch a shell and produce a false positive. Other parents, renamed binaries, absent audit events, spoofed fields, or incomplete collection are outside this rule. Fixture success confirms only the implemented matching behavior. It does not validate Windows event generation, ingestion, SIEM translation, evasion resistance, or detection effectiveness in production.</p>
-<h2>Conclusion and next step</h2><p>Keep source evidence, rule intent, fixture results, and visibility gaps together. Continue the <a href="/learning-paths/#cti-to-detection">CTI-to-detection path</a> by checking your own telemetry schema and approved baseline before adapting the candidate.</p>
+<h2 id="conclusion-and-next-step">Conclusion and next step</h2><p>Keep source evidence, rule intent, fixture results, and visibility gaps together. Continue the <a href="/learning-paths/#cti-to-detection">CTI-to-detection path</a> by checking your own telemetry schema and approved baseline before adapting the candidate.</p>
 <h2 id="references">References</h2><ul><li><a href="https://attack.mitre.org/techniques/T1059/003/">MITRE: Windows Command Shell</a></li><li><a href="https://attack.mitre.org/detectionstrategies/DET0202/">MITRE: DET0202</a></li><li><a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688">Microsoft: event 4688</a></li><li><a href="/newest-detection-engineering-techniques/">1200km detection engineering guide</a></li></ul>
-<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="https://medium.com/@1200km">Medium</a> · <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> · <a href="https://github.com/anpa1200">GitHub</a> · <a href="mailto:1200km@gmail.com">Contact</a></p>
+<h2 id="follow-my-work">Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="https://medium.com/@1200km">Medium</a> · <a href="https://www.linkedin.com/in/andrey-pautov/">LinkedIn</a> · <a href="https://github.com/anpa1200">GitHub</a> · <a href="mailto:1200km@gmail.com">Contact</a></p>
 </main><!-- site-shell:footer:start -->
     <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
       <div class="shared-footer-inner">

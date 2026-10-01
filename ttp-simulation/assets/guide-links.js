@@ -6,12 +6,13 @@
   let routes;
   const cache = new Map();
   let timer, running = false;
+  let hydrated = false;
   const base = '/ttp-simulation/';
   const path = () => location.pathname.replace(/index\.html$/, '').replace(/\/?$/, '/');
   const allowed = (target) => /^(?:tools\/[^/]+\/|techniques\/(?:enterprise|mobile|ics)\/T\d{4}(?:\.\d{3})?\/|detections\/(?:enterprise|mobile|ics)\/T\d{4}(?:\.\d{3})?\/)$/.test(target);
   function link(target, text) { const a = document.createElement('a'); a.href = base + target; a.textContent = text; return a; }
   async function update() {
-    if (running || !routes) return;
+    if (!hydrated || running || !routes) return;
     const current = path(), key = routes[current];
     const main = document.querySelector('main');
     if (!main) return;
@@ -35,6 +36,7 @@
         for (const row of records) { const li = document.createElement('li'); li.append(link(row.target, row.title), document.createTextNode(' — ' + row.basis)); ul.append(li); }
         // Docusaurus main is a flex layout; insert within the article column.
         section.append(ul); (main.querySelector('article') || main).append(section);
+        document.querySelector('body > #ttp-ecosystem')?.remove();
       }
       main.querySelector('#ttp-ecosystem').dataset.ttpGuideKey = key;
       const names = new Map(records.filter(r => r.title.endsWith(' tool reference')).map(r => [r.title.replace(/ tool reference$/, ''), r.target]));
@@ -49,6 +51,8 @@
   }
   const schedule = () => { clearTimeout(timer); timer = setTimeout(update, 120); };
   fetch(`${base}data/guide-backlinks.json`).then(r => { if (!r.ok) throw Error('No guide manifest'); return r.json(); }).then(data => { routes=data.routes; schedule(); }).catch(()=>{});
-  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+  const begin = () => { const run = () => { hydrated = true; schedule(); }; if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1000 }); else setTimeout(run, 0); };
+  if (document.readyState === 'complete') begin(); else addEventListener('load', begin, { once: true });
+  new MutationObserver(schedule).observe(document.querySelector('#__docusaurus') || document.body,{childList:true,subtree:true});
   addEventListener('popstate',schedule);
 })();

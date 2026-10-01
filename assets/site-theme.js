@@ -26,7 +26,7 @@
     return localStorage.getItem('theme') || 'light';
   }
 
-  function applyTheme(theme, persist) {
+  function applyTheme(theme, persist, syncButton = true) {
     const next = theme === 'light' ? 'light' : 'dark';
     root.setAttribute('data-theme', next);
 
@@ -34,7 +34,7 @@
     if (themeColor) themeColor.setAttribute('content', next === 'light' ? '#f5f5f4' : '#151515');
 
     const button = document.getElementById('theme-btn');
-    if (button) {
+    if (button && syncButton) {
       const target = next === 'dark' ? 'light' : 'dark';
       button.textContent = next === 'dark' ? '☀' : '☾';
       button.setAttribute('aria-label', `Switch to ${target} mode`);
@@ -137,7 +137,19 @@
   function initialize() {
     initializeHeader();
     initializeSideNavigation();
-    applyTheme(preferredTheme(), false);
+    // Docusaurus owns this button during hydration. Updating its text here
+    // creates React #418 before the client tree matches the server HTML.
+    const reactOwnedButton = Boolean(document.querySelector('#__docusaurus #theme-btn'));
+    applyTheme(preferredTheme(), false, !reactOwnedButton);
+    if (reactOwnedButton) {
+      const sync = () => applyTheme(preferredTheme(), false);
+      const afterLoad = () => {
+        if ('requestIdleCallback' in window) window.requestIdleCallback(sync, { timeout: 3000 });
+        else window.setTimeout(sync, 1000);
+      };
+      if (document.readyState === 'complete') afterLoad();
+      else window.addEventListener('load', afterLoad, { once: true });
+    }
     initializeEmailLinks();
   }
 

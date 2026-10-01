@@ -22,7 +22,8 @@ test('all technique, telemetry, tool and original rule pages are published refer
   for (const page of integration.pages) {
     const body = html(page.page);
     assert.match(body, /data-pagefind-body/, page.page);
-    assert.doesNotMatch(body, /content="noindex/, page.page);
+    if (page.kind === 'tag') assert.match(body, /<meta name="robots" content="noindex,follow">/, page.page);
+    else assert.doesNotMatch(body, /content="noindex/, page.page);
     assert.equal((body.match(/<h1\b/g) || []).length, 1, page.page);
     assert.match(body, new RegExp(`rel="canonical" href="https://1200km.com/ttp-simulation/${quote(page.page)}"`));
     assert.match(body, /No browser attack runner or production-validated detector is asserted/);

@@ -1,4 +1,148 @@
-<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Validate a simulated agent permission boundary | 1200km</title><meta name="description" content="Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/agent-permission-validation/"><meta property="og:url" content="https://1200km.com/learning-paths/agent-permission-validation/"><meta property="og:title" content="Validate a simulated agent permission boundary"><meta property="og:description" content="Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Validate a simulated agent permission boundary","name":"Validate a simulated agent permission boundary","url":"https://1200km.com/learning-paths/agent-permission-validation/","description":"Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls.","dateModified":"2026-09-09","datePublished":"2026-09-09","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"}}</script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style></head><body id="top"><!-- site-shell:header:start -->
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script><meta name="viewport" content="width=device-width, initial-scale=1"><title>Validate a simulated agent permission boundary | 1200km</title><meta name="description" content="Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/agent-permission-validation/"><meta property="og:url" content="https://1200km.com/learning-paths/agent-permission-validation/"><meta property="og:title" content="Validate a simulated agent permission boundary"><meta property="og:description" content="Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style>    <meta name="twitter:title" content="Validate a simulated agent permission boundary" />
+    <meta name="twitter:description" content="Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls." />
+    <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+      <meta property="article:published_time" content="2026-09-09" />
+    <meta property="article:modified_time" content="2026-09-09" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ],
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/learning-paths/agent-permission-validation/#webpage",
+            "url": "https://1200km.com/learning-paths/agent-permission-validation/",
+            "name": "Validate a simulated agent permission boundary",
+            "description": "Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/learning-paths/agent-permission-validation/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/site-og-v2.png"
+            },
+            "dateModified": "2026-09-09",
+            "mainEntity": {
+              "@id": "https://1200km.com/learning-paths/agent-permission-validation/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/learning-paths/agent-permission-validation/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Practical security learning paths",
+                "item": "https://1200km.com/learning-paths/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Validate a simulated agent permission boundary",
+                "item": "https://1200km.com/learning-paths/agent-permission-validation/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "Validate a simulated agent permission boundary",
+            "name": "Validate a simulated agent permission boundary",
+            "url": "https://1200km.com/learning-paths/agent-permission-validation/",
+            "description": "Run a benign local permission simulator and check allow/deny decisions, audit completeness, and negative controls.",
+            "dateModified": "2026-09-09",
+            "datePublished": "2026-09-09",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/learning-paths/agent-permission-validation/#article",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/learning-paths/agent-permission-validation/#webpage"
+            },
+            "image": "https://1200km.com/assets/site-og-v2.png"
+          }
+        ]
+      }
+    </script>
+</head><body id="top"><!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
       <nav class="nav" aria-label="Primary navigation">
@@ -43,7 +187,7 @@
         <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
       </nav>
     </header>
-    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1>Validate a simulated agent permission boundary</h1>
+    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1 id="validate-a-simulated-agent-permission-boundary">Validate a simulated agent permission boundary</h1>
 <p><strong>Check a tool allowlist and observable decisions using benign local requests.</strong></p>
 <p>Audience: practitioners reviewing agent tools and application logs. Prerequisites: basic JSON and Python 3.9 or later, with no additional packages. Planning time: 15–20 minutes. Executed here with Python 3.13.12 on Linux; fixture and policy version 1.0, reviewed 2026-09-09.</p>
 <p>This simulator accepts only an exact read request for <code>reports/summary.txt</code>. Every other request is denied. It evaluates request objects without performing their operations; no network, secrets, paid service, or privileged action is involved. Retrieved document text cannot change the fixed policy.</p>
@@ -62,7 +206,7 @@ python3 validate.py requests.json --events</code></pre>
 <p>Next step: follow the <a href="/learning-paths/#ai-agent-security">AI/agent security path</a>. In an authorized integration, record which component enforces permissions and which independent observation proves whether a tool actually ran. Include an event-loss test before relying on the log.</p>
 <h2 id="references">References</h2>
 <ul><li><a href="https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/">OWASP: Agentic AI threats and mitigations</a> — architecture context; this small simulator is an authored exercise, not an OWASP conformance test.</li><li><a href="https://docs.python.org/3/library/json.html">Python: JSON encoder and decoder</a>.</li><li><a href="/cyber-knowledge/ai-security.html">1200km: AI security</a>.</li></ul>
-<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="/about.html">About the author</a> · <a href="https://github.com/anpa1200">GitHub</a>.</p>
+<h2 id="follow-my-work">Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="/about.html">About the author</a> · <a href="https://github.com/anpa1200">GitHub</a>.</p>
 </main><!-- site-shell:footer:start -->
     <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
       <div class="shared-footer-inner">
