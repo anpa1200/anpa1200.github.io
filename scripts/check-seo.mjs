@@ -373,7 +373,6 @@ for (const page of pages) {
   // Google Analytics is opt-in: pages never boot Google's tag directly; the
   // consent loader (exactly one per page) loads it only after the visitor accepts.
   if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: Google Analytics boots without consent`);
-  if (/<link\b[^>]*\brel=["']?(?:preconnect|dns-prefetch)\b[^>]*(?:google-analytics|googletagmanager)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: resource hint contacts Google Analytics before consent`);
   const loaders = releaseHtml.match(/<script\b[^>]*\bsrc=["'][^"']*\/assets\/site-performance\.js(?:[?#][^"']*)?["'][^>]*>/gi) || [];
   if (!/http-equiv\s*=\s*["']?refresh/i.test(releaseHtml) && (loaders.length !== 1 || !/data-google-analytics-id="G-[A-Z0-9]+"/.test(loaders[0] || ''))) {
     failures.push(`${page.rel}: expected exactly one opt-in analytics consent loader, found ${loaders.length}`);

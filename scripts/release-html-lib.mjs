@@ -890,14 +890,6 @@ export function deferThirdPartyBoot(html) {
     .replace(/\s*<link\b[^>]*rel=["']preconnect["'][^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com[^"']*["'][^>]*>/gi, '')
     .replace(/\s*<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com[^"']*["'][^>]*rel=["']preconnect["'][^>]*>/gi, '');
 
-  // Docusaurus's gtag plugin also emits resource hints. A preconnect or DNS
-  // prefetch contacts Google before any consent choice, so drop them too.
-  transformed = transformed.replace(/\s*<link\b[^>]*>/gi, (link) => {
-    const attributes = tagAttributes(link);
-    const hint = /\b(?:preconnect|dns-prefetch)\b/i.test(attributes.rel || '');
-    return hint && /^(?:https?:)?\/\/(?:www\.)?(?:google-analytics\.com|googletagmanager\.com)(?:[/?#]|$)/i.test(attributes.href || '') ? '' : link;
-  });
-
   return transformed;
 }
 
