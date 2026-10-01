@@ -853,8 +853,8 @@ export function addArticleDiscovery(html, {
   return transformed;
 }
 
-// Google Analytics measurement ID. The consent loader (assets/site-performance.js)
-// loads Google's tag only after the visitor opts in; no page may boot it directly.
+// Google Analytics measurement ID. The analytics loader (assets/site-performance.js)
+// is the only thing that may load Google's tag; no page boots it directly.
 export const ANALYTICS_ID = 'G-TMTG21RVHM';
 const ANALYTICS_LOADER = `<script src="/assets/site-performance.js?v=1" data-google-analytics-id="${ANALYTICS_ID}" defer></script>`;
 
@@ -878,7 +878,7 @@ export function deferThirdPartyBoot(html) {
     if (!config) return element.full;
     return '';
   });
-  // Exactly one opt-in consent loader per document (redirect stubs excluded).
+  // Exactly one analytics loader per document (redirect stubs excluded).
   if (/<\/head>/i.test(transformed) && !/<meta\b[^>]*http-equiv\s*=\s*["']?refresh/i.test(transformed)) {
     transformed = transformed.replace(/\s*<\/head>/i, () => `\n    ${ANALYTICS_LOADER}\n  </head>`);
   }

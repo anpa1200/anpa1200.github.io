@@ -86,10 +86,10 @@ test('release transforms remove only selected complete script elements', () => {
     '</head><body><main><h1>Test</h1></main></body></html>',
   ].join('');
   const withoutThirdParty = deferThirdPartyBoot(input);
-  // Google's tag never boots from page HTML; only the opt-in consent loader may load it.
+  // Google's tag never boots from page HTML; only the analytics loader may load it.
   assert.doesNotMatch(withoutThirdParty, /googletagmanager|gtag\("config"/);
   assert.match(withoutThirdParty, /src="\/assets\/site-theme\.js"/);
-  assert.equal((withoutThirdParty.match(/site-performance\.js/g) || []).length, 1, 'exactly one consent loader');
+  assert.equal((withoutThirdParty.match(/site-performance\.js/g) || []).length, 1, 'exactly one analytics loader');
   assert.match(withoutThirdParty, new RegExp(`<script src="/assets/site-performance\\.js\\?v=1" data-google-analytics-id="${ANALYTICS_ID}" defer></script>`));
   assert.equal(deferThirdPartyBoot(withoutThirdParty), withoutThirdParty, 'idempotent');
   const redirectStub = '<!doctype html><html><head><meta http-equiv="refresh" content="0; url=/x/"></head><body></body></html>';
@@ -120,7 +120,7 @@ test('edge worker declares all response security headers', () => {
   assert.match(worker, /frame-ancestors 'none'/);
 });
 
-test('security policies allow Google Analytics only as the opt-in loader needs it', () => {
+test('security policies allow Google Analytics only as the loader needs it', () => {
   const headerPolicy = readFileSync(join(ROOT, '_headers'), 'utf8').split('\n').find((line) => line.includes('Content-Security-Policy:'));
   const standalone = hardenStandaloneHead('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>')
     .match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)[1];

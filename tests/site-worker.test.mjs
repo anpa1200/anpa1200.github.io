@@ -249,8 +249,8 @@ test('new Worker preserves legacy security, discovery, MIME and Markdown semanti
       assert.equal(next.headers.get('Strict-Transport-Security'), 'max-age=31536000; includeSubDomains', `${path} HSTS`);
       assert.match(old.headers.get('Content-Security-Policy'), /frame-src 'none'/);
       assert.match(next.headers.get('Content-Security-Policy'), /frame-src https:\/\/www\.youtube-nocookie\.com/);
-      // Intentional differences: YouTube embeds, the opt-in analytics hosts
-      // (loaded only after consent) and the Buttondown signup form target.
+      // Intentional differences: YouTube embeds, the Google Analytics hosts
+      // and the Buttondown signup form target.
       const analyticsHosts = / https:\/\/(?:\*\.|www\.|region1\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com)/g;
       const nextCsp = next.headers.get('Content-Security-Policy').replace('frame-src https://www.youtube-nocookie.com', "frame-src 'none'");
       assert.match(nextCsp, /script-src [^;]*https:\/\/www\.googletagmanager\.com/);
