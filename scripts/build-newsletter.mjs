@@ -24,9 +24,11 @@ export function newsletterBlock({ id, heading = 'h2', title }) {
   const intro = 'New CTI, detection-engineering and malware-analysis research from 1200km.com, a few emails a month at most.';
   const rss = '<a href="/feed.xml">RSS feed</a>';
   if (!config.username) {
-    return `<section class="newsletter-signup" aria-labelledby="${titleId}" data-newsletter="rss-only">
-  <${heading} id="${titleId}">${escape(title)}</${heading}>
-  <p>Follow new research through the ${rss}. Email delivery is being set up.</p>
+    // No email list yet: offer the channels that work today and promise nothing else.
+    return `<section class="newsletter-signup" aria-labelledby="${titleId}" data-newsletter="follow">
+  <${heading} id="${titleId}">Follow new research</${heading}>
+  <p>New CTI, detection-engineering and malware-analysis research appears in the RSS feed and on Medium as soon as it is published.</p>
+  <p class="newsletter-actions"><a class="button primary" href="/feed.xml">RSS feed</a> <a class="button" href="https://medium.com/@1200km" rel="noopener noreferrer">Follow on Medium</a></p>
 </section>`;
   }
   const action = `https://buttondown.com/api/emails/embed-subscribe/${escape(config.username)}`;
@@ -56,4 +58,4 @@ for (const page of PAGES) {
   else writeFileSync(path, next);
 }
 if (stale.length) throw new Error(`Newsletter block is stale in: ${stale.join(', ')}. Run node scripts/build-newsletter.mjs`);
-console.log(`Newsletter (${config.username ? `buttondown:${config.username}` : 'RSS only, username not set'}) ${check ? 'verified' : 'rendered'} in ${PAGES.length} pages.`);
+console.log(`Newsletter (${config.username ? `buttondown:${config.username}` : 'follow links only, username not set'}) ${check ? 'verified' : 'rendered'} in ${PAGES.length} pages.`);
