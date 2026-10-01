@@ -9,6 +9,8 @@ const check = args.includes('--check');
 const model = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge.json'), 'utf8'));
 const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
 const knowledgeSourceCount = knowledgeSources.sources.length;
+const atlasIntegration = JSON.parse(readFileSync(join(ROOT, 'data', 'anomaly-atlas.json'), 'utf8'));
+const atlasWorkedPaths = new Set((atlasIntegration.worked_paths || []).map((entry) => entry.url.replace(/\/$/, '')));
 const hub = readFileSync(join(ROOT, 'cyber-knowledge', 'index.html'), 'utf8');
 
 function escapeHtml(value) {
@@ -200,7 +202,7 @@ ${sourceRecords.filter((record) => sourceClass(record.url) === group).map((recor
               <span class="domain-index">${escapeHtml(new URL(record.url).hostname)}</span>
               <h4 class="domain-title"><a href="${escapeHtml(record.url)}">${escapeHtml(label)}</a></h4>
               <p class="domain-desc"><strong>Used in:</strong> ${escapeHtml(used)}</p>
-              <p class="domain-audience">Referenced as of ${escapeHtml(model.collection.reviewed_at)}. Use the destination’s own version and supersession notice for normative decisions.</p>
+              <p class="domain-audience">${atlasWorkedPaths.has(record.url.replace(/\/$/, '')) ? 'Maintained Atlas worked example.' : `Referenced as of ${escapeHtml(model.collection.reviewed_at)}.`} Use the destination’s own version and supersession notice for normative decisions.</p>
             </article>`;
   }).join('\n')}
           </div>

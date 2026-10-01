@@ -16,7 +16,7 @@
     note.dataset.atlasPublicationSnapshot = 'true';
     note.className = 'anomaly-atlas-notice';
     note.setAttribute('aria-label', 'Publication snapshot');
-    note.innerHTML = '<strong>Publication snapshot.</strong> This edition and its anchors remain available for citations. Continue in the <a href="https://1200km.com/anomaly-detection-atlas/research/">unified Anomaly Detection Atlas</a> for research chapters, <a href="https://1200km.com/anomaly-detection-atlas/families/">family pages</a>, <a href="https://1200km.com/anomaly-detection-atlas/attack-statistical-anomaly-mapping/">models</a>, and the <a href="https://1200km.com/anomaly-detection-atlas/visuals/">visual index</a>. Integration does not imply a new incident audit or production validation.';
+    note.innerHTML = registry.publication_notice_html || '<strong>Publication snapshot.</strong> This edition and its anchors remain available for citations. Continue in the <a href="https://1200km.com/anomaly-detection-atlas/research/">unified Anomaly Detection Atlas</a> for research chapters, <a href="https://1200km.com/anomaly-detection-atlas/families/">family pages</a>, <a href="https://1200km.com/anomaly-detection-atlas/attack-statistical-anomaly-mapping/">models</a>, and the <a href="https://1200km.com/anomaly-detection-atlas/visuals/">visual index</a>. Integration does not imply a new incident audit or production validation.';
     const root = document.querySelector('#__docusaurus');
     if (root) root.before(note); else title.closest('main').append(note);
   }
