@@ -511,7 +511,7 @@ try {
     };
   })()`);
   if (JSON.stringify(staticMobileState.navigation) !== JSON.stringify(['Research', 'Library', 'Products & Labs', 'AdversaryGraph', 'Cyber Knowledge', 'Courses', 'Attack Tools', 'Attack Simulations', 'Detection Rules', 'References', 'About', 'CV', 'External validation'])
-    || staticMobileState.footerCount !== 8
+    || staticMobileState.footerCount !== 9
     || !staticMobileState.privacy
     || staticMobileState.search !== '/search.html'
     || !staticMobileState.menuVisible
@@ -615,8 +615,9 @@ try {
   if (JSON.stringify(staticControl.navigation) !== JSON.stringify(canonicalNavigation)
     || JSON.stringify(desktopState.navigation) !== JSON.stringify(staticControl.navigation)
     || JSON.stringify(desktopState.footerLinks) !== JSON.stringify(staticControl.footerLinks)
-    || staticControl.footerLinks.length !== 8
-    || !staticControl.footerLinks.includes('/privacy.html')) {
+    || staticControl.footerLinks.length !== 9
+    || !staticControl.footerLinks.includes('/privacy.html')
+    || !staticControl.footerLinks.includes('/subscribe.html')) {
     failures.push(`source/rendered shell mismatch: ${JSON.stringify({
       sourceNavigation: staticControl.navigation,
       renderedNavigation: desktopState.navigation,
@@ -853,7 +854,7 @@ try {
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     };
   })()`);
-  if (mobileFooterState.links !== 8
+  if (mobileFooterState.links !== 9
     || JSON.stringify(mobileFooterState.labels) !== JSON.stringify(['Footer navigation', 'Site information'])
     || !mobileFooterState.privacy
     || !mobileFooterState.contained
