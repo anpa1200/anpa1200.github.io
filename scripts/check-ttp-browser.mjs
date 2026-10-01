@@ -31,7 +31,8 @@ try {
  const {sessionId}=await send('Target.attachToTarget',{targetId,flatten:true});
  const call=(m,p={})=>send(m,p,sessionId);
  const evaluate=async expression=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
- const waitFor=async expression=>{const start=Date.now();while(!await evaluate(expression)){if(Date.now()-start>=20000){const state=await evaluate("({url:location.href,ready:document.readyState,fonts:document.fonts.status,scrollY,targetTop:document.getElementById(location.hash.slice(1))?.getBoundingClientRect().top})");assert.fail(expression+' '+JSON.stringify(state));}await new Promise(done=>setTimeout(done,100));}};
+ // Poll truthiness without serializing DOM nodes and their React reference chains.
+ const waitFor=async expression=>{const start=Date.now();while(!await evaluate(`Boolean(${expression})`)){if(Date.now()-start>=20000){const state=await evaluate("({url:location.href,ready:document.readyState,fonts:document.fonts.status,scrollY,targetTop:document.getElementById(location.hash.slice(1))?.getBoundingClientRect().top})");assert.fail(expression+' '+JSON.stringify(state));}await new Promise(done=>setTimeout(done,100));}};
  await call('Page.enable');await call('Runtime.enable');
  const routes=['','tools/','detections/','telemetry/','techniques/enterprise/T1059.001/','techniques/ics/T0880/','techniques/mobile/T1423/','tools/nmap/','tools/S0002/','telemetry/DC0032/','detections/enterprise/T1059.001/','detections/enterprise/T1593/','detections/mobile/T1423/','detections/ics/T0880/','detections/rules/1ab3c5ed-5baf-417b-bb6b-78ca33f6c3df/','tags/environment/onprem/','tags/'];
  for(const width of [390,1440])for(const route of routes){
