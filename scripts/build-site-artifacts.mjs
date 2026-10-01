@@ -16,6 +16,7 @@ import {
   tagAttributes,
   transformReleaseHtml,
 } from './release-html-lib.mjs';
+import { applyIndexPolicy, sitemapEligible } from './technical-seo-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -269,8 +270,10 @@ const pages = [];
 const titleMap = new Map();
 
 for (const path of files) {
-  const html = await readFile(path, 'utf8');
+  const original = await readFile(path, 'utf8');
   const url = urlForFile(path);
+  const html = applyIndexPolicy(original, url);
+  if (transformHtml && original !== html) await writeFile(path, html);
   const validation = validatePage(url, html);
   if (!validation.indexable) {
     if (['off-origin-canonical', 'multiple-canonicals'].includes(validation.reason)) {
@@ -299,7 +302,7 @@ for (const page of pages) {
   const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
   const dates = contentDates(page.html);
   const published = dates.published || archiveDate(page.canonical);
-  const lastmod = dates.modified || published || gitDate(page.path);
+  const lastmod = gitDate(page.path) || dates.modified || published;
   localEntries.set(page.canonical, { loc: page.canonical, ...(lastmod ? { lastmod } : {}) });
 
   const parsed = parseJsonLd(page.html);
@@ -369,7 +372,7 @@ if (includeRemote) {
 
 for (const url of localEntries.keys()) remoteEntries.delete(url);
 const localSorted = [...localEntries.values()].sort((a, b) => a.loc.localeCompare(b.loc));
-const canonicalSorted = [...localEntries.values(), ...remoteEntries.values()]
+const canonicalSorted = [...localEntries.values(), ...remoteEntries.values()].filter(entry => sitemapEligible(entry.loc))
   .sort((a, b) => a.loc.localeCompare(b.loc));
 feedItems.sort((a, b) => (b.published.localeCompare(a.published) || a.url.localeCompare(b.url)));
 

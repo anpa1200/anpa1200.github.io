@@ -2,33 +2,187 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
-  <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Neural Networks and Optimization — Course Chapter | 1200km</title>
-  <meta name="description" content="Neural-network computation, optimization, reproducibility, attacker access, adversarial examples, robustness, poisoning, backdoors, inference attacks, and defensible AI-security evidence." />
+  <meta name="description" content="Study neural-network computation and optimization, connecting reproducibility and attacker access to adversarial examples, poisoning and inference risks." />
   <meta name="author" content="Andrey Pautov" />
-  <meta property="og:title" content="AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization" />
-  <meta property="og:description" content="Neural-network computation, optimization, reproducibility, attacker access, adversarial examples, robustness, poisoning, backdoors, inference attacks, and defensible AI-security evidence." />
+  <meta property="og:title" content="Neural Networks and Optimization — Course Chapter | 1200km" />
+  <meta property="og:description" content="Study neural-network computation and optimization, connecting reproducibility and attacker access to adversarial examples, poisoning and inference risks." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://1200km.com/ai-security-course/module-00/chapter-03.html" />
   <meta property="og:image" content="https://1200km.com/ai-security-course/assets/chapter-03/00-cover.png" />
   <meta property="og:image:width" content="1400" /><meta property="og:image:height" content="788" />
   <meta property="og:site_name" content="1200km Security Research" />
-  <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization" /><meta name="twitter:description" content="Neural-network computation, optimization, reproducibility, attacker access, adversarial examples, robustness, poisoning, backdoors, inference attacks, and defensible AI-security evidence." /><meta name="twitter:image" content="https://1200km.com/ai-security-course/assets/chapter-03/00-cover.png" />
+  <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="Neural Networks and Optimization — Course Chapter | 1200km" /><meta name="twitter:description" content="Study neural-network computation and optimization, connecting reproducibility and attacker access to adversarial examples, poisoning and inference risks." /><meta name="twitter:image" content="https://1200km.com/ai-security-course/assets/chapter-03/00-cover.png" />
   <meta name="theme-color" content="#0f62fe" />
   <link rel="canonical" href="https://1200km.com/ai-security-course/module-00/chapter-03.html" />
   <link rel="alternate" type="text/markdown" href="/ai-security-course/module-00/chapter-03.md" />
   <link rel="icon" href="/assets/ap-logo-72.png" type="image/png" sizes="72x72" />
-  <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" />
-  <script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
+  <link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default" /><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
   <style>
     :root{--bg:#050c1a;--surface:rgba(8,19,38,.9);--text:#cdd9ee;--muted:#9db4d5;--heading:#f8fbff;--line:#1a3060;--accent:#60a5fa;--green:#34d399;--shadow:0 14px 34px rgba(0,0,0,.4)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);background:#050c1a url('/assets/bg-cyber.png') center/cover fixed;font:16px/1.65 Inter,system-ui,sans-serif}a{color:var(--accent);text-decoration:none}a:hover{color:#bfdbfe;text-decoration:underline}.wrap{width:min(1100px,calc(100% - 32px));margin:0 auto}.site-header{position:sticky;top:0;z-index:8;border-bottom:1px solid var(--line);background:rgba(5,12,26,.96);backdrop-filter:blur(14px)}.nav{display:flex;align-items:center;justify-content:space-between;min-height:64px;gap:18px}.brand{display:flex;align-items:center;gap:10px;color:var(--heading);font-weight:800;white-space:nowrap}.brand img{border-radius:10px}.navlinks{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:16px;font-size:.92rem}.navlinks a{color:var(--text)}.theme-btn{border:1px solid #38537a;border-radius:8px;background:transparent;color:var(--text);width:34px;height:34px;cursor:pointer}.hero{border-bottom:1px solid var(--line);background:radial-gradient(circle at 82% 8%,rgba(15,98,254,.2),transparent 38%),rgba(5,12,26,.9)}.hero-inner{padding:68px 0 48px}.eyebrow{margin:0 0 12px;color:#7dd3fc;font-size:.78rem;font-weight:850;letter-spacing:.11em;text-transform:uppercase}h1,h2,h3{color:var(--heading);line-height:1.2}h1{max-width:900px;margin:0;font-size:clamp(2.3rem,5.2vw,4.5rem);letter-spacing:-.045em}h2{margin:48px 0 16px;font-size:clamp(1.45rem,2.5vw,2rem)}h3{margin:30px 0 8px;font-size:1.1rem}.lead{max-width:900px;margin:20px 0 0;color:#b8c9e3;font-size:1.15rem}.notice{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;max-width:900px;margin-top:26px;padding:20px;border:1px solid rgba(52,211,153,.55);border-radius:13px;background:rgba(52,211,153,.1)}.notice-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--green);color:#02160e;font-weight:900}.notice strong{display:block;color:#a7f3d0;font-size:1.15rem;text-transform:uppercase;letter-spacing:.04em}.notice p{margin:5px 0 0}.meta,.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}.pill{padding:6px 10px;border:1px solid rgba(147,197,253,.3);border-radius:999px;background:rgba(96,165,250,.1);color:#dbeafe;font-size:.82rem}.button{display:inline-flex;align-items:center;min-height:42px;padding:0 15px;border:1px solid #37527a;border-radius:8px;color:#eef5ff;font-weight:750}.button.primary{border-color:transparent;background:var(--accent);color:#031026}main{padding:42px 0 72px}.prose{max-width:930px}.prose p{margin:12px 0}.prose p a,.prose li a,.inline-media figcaption a{text-decoration:underline;text-underline-offset:.14em}.prose ul,.prose ol{padding-left:24px;color:var(--muted)}.prose li{margin:7px 0}.prose pre{overflow:auto;margin:16px 0;padding:17px;border:1px solid rgba(147,197,253,.22);border-radius:10px;background:#030814;color:#dbeafe;font:.88rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}.prose pre:focus-visible,.table-wrap:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.prose blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--green);background:var(--surface);color:var(--muted)}.prose blockquote strong{color:var(--heading)}.toc{columns:2;gap:28px}.toc li{break-inside:avoid}.inline-media{margin:24px 0}.inline-media img{display:block;width:100%;height:auto;border:1px solid rgba(147,197,253,.22);border-radius:12px;background:#fff;box-shadow:var(--shadow)}.inline-media figcaption{margin-top:9px;color:var(--muted);font-size:.9rem}.table-wrap{overflow-x:auto}.data-table{width:100%;border-collapse:collapse;margin:16px 0}th,td{padding:10px 9px;border-bottom:1px solid rgba(147,197,253,.18);text-align:left;vertical-align:top}th{color:var(--heading);font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}td{color:var(--muted)}code{color:#bfdbfe}footer{padding:28px 0;border-top:1px solid var(--line);color:var(--muted)}[data-theme='light']{--bg:#f0f4ff;--surface:rgba(255,255,255,.96);--text:#172033;--muted:#52627a;--heading:#101827;--line:#d5dfed;--accent:#0b4fc2;--shadow:0 14px 34px rgba(24,38,69,.09)}[data-theme='light'] body{background:#f0f4ff}[data-theme='light'] .site-header{background:rgba(255,255,255,.96)}[data-theme='light'] .hero{background:linear-gradient(135deg,#eef4ff,#f8fbff)}[data-theme='light'] .eyebrow,[data-theme='light'] .eyebrow a{color:#173b7a}[data-theme='light'] .lead{color:#40516a}[data-theme='light'] .pill{border-color:#718199;background:#e2e8f0;color:#172033}[data-theme='light'] .button:not(.primary){color:#172033}@media(max-width:760px){.navlinks{display:none}.toc{columns:1}}@media print{.site-header,.actions{display:none}body{background:#fff;color:#111}.hero{background:#fff}.inline-media{break-inside:avoid}h1,h2,h3,.lead,td{color:#111}}
   </style>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization","description":"Neural-network computation, optimization, reproducibility, attacker access, adversarial examples, robustness, poisoning, backdoors, inference attacks, and defensible AI-security evidence.","url":"https://1200km.com/ai-security-course/module-00/chapter-03.html","sameAs":"https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6","image":"https://1200km.com/ai-security-course/assets/chapter-03/00-cover.png","datePublished":"2026-08-08","dateModified":"2026-08-30","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/"},"isPartOf":{"@type":"Course","name":"AI Security Engineering: From Models to Agentic Systems","url":"https://1200km.com/ai-security-course.html"},"about":["AI security","Neural networks","Adversarial machine learning","Model optimization","MITRE ATLAS"],"inLanguage":"en"}</script>
+  
     <link rel="stylesheet" href="/assets/platform-sidebar.css?v=20260830-1" />
       <script src="/assets/platform-sidebar.js?v=20260830-1" defer></script>
-  </head>
+  <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta property="og:image:alt" content="AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization" />
+    <meta name="twitter:image:alt" content="AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+      <meta property="article:published_time" content="2026-08-08" />
+    <meta property="article:modified_time" content="2026-09-09" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ],
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/ai-security-course/module-00/chapter-03.html#webpage",
+            "url": "https://1200km.com/ai-security-course/module-00/chapter-03.html",
+            "name": "AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization",
+            "description": "Study neural-network computation and optimization, connecting reproducibility and attacker access to adversarial examples, poisoning and inference risks.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/ai-security-course/module-00/chapter-03.html#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "about": [
+              {
+                "@type": "Thing",
+                "name": "AI security"
+              }
+            ],
+            "keywords": "AI security",
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/ai-security-course/assets/chapter-03/00-cover.png"
+            },
+            "dateModified": "2026-09-09",
+            "mainEntity": {
+              "@id": "https://1200km.com/ai-security-course/module-00/chapter-03.html#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/ai-security-course/module-00/chapter-03.html#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization",
+                "item": "https://1200km.com/ai-security-course/module-00/chapter-03.html"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "AI Security Course, Module 00 — Chapter 3: Neural Networks and Optimization",
+            "description": "Study neural-network computation and optimization, connecting reproducibility and attacker access to adversarial examples, poisoning and inference risks.",
+            "url": "https://1200km.com/ai-security-course/module-00/chapter-03.html",
+            "sameAs": "https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6",
+            "image": "https://1200km.com/ai-security-course/assets/chapter-03/00-cover.png",
+            "datePublished": "2026-08-08",
+            "dateModified": "2026-09-09",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "isPartOf": {
+              "@type": "Course",
+              "name": "AI Security Engineering: From Models to Agentic Systems",
+              "url": "https://1200km.com/ai-security-course.html"
+            },
+            "about": [
+              {
+                "@type": "Thing",
+                "name": "AI security"
+              }
+            ],
+            "inLanguage": "en",
+            "@id": "https://1200km.com/ai-security-course/module-00/chapter-03.html#article",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/ai-security-course/module-00/chapter-03.html#webpage"
+            },
+            "wordCount": 5814,
+            "articleSection": "AI security",
+            "keywords": "AI security"
+          }
+        ]
+      }
+    </script>
+</head>
 <body id="top" class="has-platform-sidenav"><!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -127,7 +281,7 @@
 </blockquote>
 <p>This chapter explains neural-network computation, optimization, reproducibility, attacker access, adversarial claims, and defensible evidence for security practitioners without a calculus prerequisite.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/00-cover.png" alt="AI Security Course Chapter 3 cover: Neural Networks and Optimization for security practitioners" width="1400" height="788" loading="eager" decoding="async" /><figcaption>AI Security Course Chapter 3 cover: Neural Networks and Optimization for security practitioners <a href="/ai-security-course/assets/chapter-03/00-cover.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
-<h2>Learning objectives</h2>
+<h2 id="learning-objectives">Learning objectives</h2>
 <p>After completing this chapter, you will be able to:</p>
 <ol>
 <li>distinguish architecture, parameters, activations, gradients, artifacts, configuration, and inference evidence;</li>
@@ -137,7 +291,7 @@
 <li>map the chapter&#39;s security mechanisms to version-pinned MITRE ATLAS techniques and case studies; and</li>
 <li>complete an evidence-preserving analyst exercise that separates observed, reproduced, demonstrated, inferred, and unknown claims.</li>
 </ol>
-<h2>Table of contents</h2>
+<h2 id="table-of-contents">Table of contents</h2>
 <ol>
 <li><a href="#mechanism">1. Why the mechanism matters to security</a></li>
 <li><a href="#security-objects">2. Neural-network security objects</a></li>
@@ -159,7 +313,7 @@
 <li><a href="#next">18. What comes next</a></li>
 </ol>
 <p><a id="mechanism"></a></p>
-<h2>1. Why the mechanism matters to security</h2>
+<h2 id="1-why-the-mechanism-matters-to-security">1. Why the mechanism matters to security</h2>
 <p>Security teams do not need calculus, but they do need a causal model of changed predictions. A neural network is a parameterized computation, not the complete AI system; data, preprocessing, features, configuration, dependencies, serving, policy, and downstream action also matter.</p>
 <p>During incident response, a changed output may result from a modified input, parser, tokenizer, checkpoint, adapter, threshold, random seed, library, or serving route. A score is evidence for a policy decision, never the policy or an authorization. Ask which observable component changed and what evidence connects it to the outcome.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/01-overview.png" alt="The full Chapter 3 arc from an input tensor through layers, loss, gradients, optimization, a released artifact, inference, downstream policy, and evidence." width="1400" height="1050" loading="eager" decoding="async" /><figcaption>The full Chapter 3 arc from an input tensor through layers, loss, gradients, optimization, a released artifact, inference, downstream policy, and evidence. <a href="/ai-security-course/assets/chapter-03/01-overview.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
@@ -181,21 +335,21 @@
 <p><strong>Course rule:</strong> Describe the computation and the evidence chain before naming an attack. “Adversarial” is a claim that needs an access level, a perturbation budget, a query budget where applicable, reproducible conditions, and an evidence level.</p>
 </blockquote>
 <p><a id="security-objects"></a></p>
-<h2>2. Neural-network security objects</h2>
+<h2 id="2-neural-network-security-objects">2. Neural-network security objects</h2>
 <p>An <strong>architecture</strong> is the ordered computation graph specifying layers, connections, and operations. <strong>Parameters</strong> are learned numeric values, such as weights and biases. <strong>Activations</strong> are intermediate values for one input. <strong>Gradients</strong> describe how an objective changes when a parameter or input changes.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/02-security-objects.png" alt="Architecture, parameters, activations, gradients, artifacts, and dependencies as distinct security objects." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>Architecture, parameters, activations, gradients, artifacts, and dependencies as distinct security objects. <a href="/ai-security-course/assets/chapter-03/02-security-objects.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
-<h3>Tensor</h3>
+<h3 id="tensor">Tensor</h3>
 <p>A <strong>tensor</strong> is a typed, shaped array of numbers. Shape, data type, device, normalization, and layout form part of the model interface. A byte-level change in a file can be harmless to a human reviewer but material after parsing, padding, or conversion into a tensor.</p>
 <p><strong>Security consequence:</strong> Record the tensor contract and representative preprocessing output. A changed channel order, dtype, truncation rule, or missing-value policy can change a score without changing the checkpoint.</p>
-<h3>Activation, logit, and probability</h3>
+<h3 id="activation-logit-and-probability">Activation, logit, and probability</h3>
 <p>An <strong>activation</strong> is the value produced by an intermediate layer for a particular input. A <strong>logit</strong> is an unnormalized output score. A <strong>probability</strong> is a transformed score, such as a sigmoid or softmax value, that may be easier to communicate but is not automatically calibrated. A threshold converts a score into an application decision; it is configuration and policy, not a learned parameter.</p>
 <p><strong>Security consequence:</strong> Preserve preprocessing output, logits, post-processing, threshold, and final action separately. “The model said malicious” hides where the change occurred.</p>
-<h3>Artifact, dependency, and runtime</h3>
+<h3 id="artifact-dependency-and-runtime">Artifact, dependency, and runtime</h3>
 <p>A <strong>model artifact</strong> is a released representation of an architecture and learned parameters, such as a checkpoint or serialized package. A <strong>dependency</strong> is a library, tokenizer, custom operator, loader, or runtime component needed to execute it. Hardware, drivers, framework, and serving configuration determine how the artifact is interpreted.</p>
 <p><strong>Security consequence:</strong> A weight-file digest is insufficient. Record the architecture, tokenizer or parser, loader, lockfile, runtime versions, and release approval.</p>
 <p><a href="https://1200km.com/ai-security-course/module-00/chapter-02.html" target="_self">Chapter 2</a> covers data, features, labels, artifacts, configuration, and split methodology; cross-link rather than repeat it here.</p>
 <p><a id="forward-pass"></a></p>
-<h2>3. The forward pass</h2>
+<h2 id="3-the-forward-pass">3. The forward pass</h2>
 <p>The <strong>forward pass</strong> applies an architecture and its parameters to an input to produce intermediate activations and an output. In a simple layer, the computation combines an input with weights, adds a bias, and applies an activation function:</p>
 <pre tabindex="0"><code class="language-text">z = W · x + b
 a = activation(z)
@@ -205,7 +359,7 @@ a = activation(z)
 <p>Capture a minimal request fixture and run it against the approved artifact. Compare the raw input, parsed object, normalized tensor, intermediate shapes, logits, score transformation, and final policy. Use the same fixture to compare a suspected replacement, a new parser, or a new runtime.</p>
 <p><strong>Security consequence:</strong> This separates “the computation changed” from “the application sent a different tensor” and gives detection engineering a concrete parser, preprocessing, shape, or artifact signal.</p>
 <p><a id="loss"></a></p>
-<h2>4. Loss functions and objectives</h2>
+<h2 id="4-loss-functions-and-objectives">4. Loss functions and objectives</h2>
 <p>A <strong>loss function</strong> turns a prediction and a target into a number that training tries to minimize. Cross-entropy is common for classification, mean-squared error is common for regression, and ranking or contrastive objectives are common for retrieval and representation learning. The objective is selected by people and code; it is not a neutral description of risk.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/04-loss-objectives.png" alt="Loss functions, objectives, class weighting, thresholds, and their security questions." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>Loss functions, objectives, class weighting, thresholds, and their security questions. <a href="/ai-security-course/assets/chapter-03/04-loss-objectives.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>Class weights, focal loss, label smoothing, data filtering, reward models, and safety penalties change which errors receive attention. A security team should ask who chose the objective, which examples had the greatest influence, what cost function was used, and whether safety and abuse outcomes were measured separately from task performance.</p>
@@ -230,7 +384,7 @@ a = activation(z)
 </tr>
 </tbody></table></div>
 <p><a id="gradients"></a></p>
-<h2>5. Gradients and backpropagation</h2>
+<h2 id="5-gradients-and-backpropagation">5. Gradients and backpropagation</h2>
 <p><strong>Backpropagation</strong> is the procedure that sends the loss signal backward through the computation graph to compute gradients for the parameters. A gradient is information about local sensitivity, not an attacker by itself. During training, the optimizer uses these values to decide how to update parameters; during an authorized white-box evaluation, an analyst may use input gradients to search for an evasion condition.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/05-backpropagation.png" alt="Forward computation, backward gradient propagation, and parameter updates." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>Forward computation, backward gradient propagation, and parameter updates. <a href="/ai-security-course/assets/chapter-03/05-backpropagation.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <pre tabindex="0"><code class="language-text">forward:  input → activations → loss
@@ -240,7 +394,7 @@ update:   parameter ← parameter − learning rate × gradient
 <p>Exploding gradients, vanishing gradients, saturated activations, or unstable loss curves can indicate an implementation, data, or optimization problem. The symptoms are not proof of tampering. Preserve training logs, representative fixtures, and checkpoint lineage so an investigator can reproduce the condition and compare it with a clean reference.</p>
 <p><strong>Security consequence:</strong> The attacker access question is concrete. If an evaluator had gradients, state that as white-box access and record how it was obtained. If an evasion worked without gradients, do not imply that the attacker used them. The Cylance/Skylight case in Section 14 is important precisely because the researchers manipulated feature extraction and scoring without touching weights or gradients.</p>
 <p><a id="optimization"></a></p>
-<h2>6. Optimization in practice</h2>
+<h2 id="6-optimization-in-practice">6. Optimization in practice</h2>
 <p>An <strong>optimizer</strong> is an update rule that uses gradients to change parameters. <strong>Stochastic gradient descent (SGD)</strong> estimates an update from a batch; momentum smooths updates; Adam adapts step sizes. A <strong>learning rate</strong> is the scale of an update. Batch size, epochs, schedule, weight decay, initialization, and seed can change the artifact.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/06-training-loop.png" alt="The training loop from forward pass through loss, backward pass, parameter update, and the evidence to retain at each step." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>The training loop from forward pass through loss, backward pass, parameter update, and the evidence to retain at each step. <a href="/ai-security-course/assets/chapter-03/06-training-loop.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <pre tabindex="0"><code class="language-text">dataset manifest + code + configuration
@@ -290,7 +444,7 @@ update:   parameter ← parameter − learning rate × gradient
 </tbody></table></div>
 <p><strong>Security consequence:</strong> A training run is an auditable build, not just a command that produced a file. Store the inputs and decisions needed to answer “which exact process produced this artifact?” before the artifact is released.</p>
 <p><a id="generalization"></a></p>
-<h2>7. Generalization, regularization, and drift</h2>
+<h2 id="7-generalization-regularization-and-drift">7. Generalization, regularization, and drift</h2>
 <p><strong>Generalization</strong> is performance on conditions not used to fit or repeatedly tune the model. <strong>Overfitting</strong> occurs when a model learns training-specific patterns that do not transfer. <strong>Underfitting</strong> occurs when it has not captured enough useful structure. <strong>Regularization</strong> is a constraint or training choice intended to improve generalization, such as weight decay, dropout, augmentation, label smoothing, or early stopping.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/08-generalization.png" alt="Generalization, overfitting, underfitting, regularization, and their security implications." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>Generalization, overfitting, underfitting, regularization, and their security implications. <a href="/ai-security-course/assets/chapter-03/08-generalization.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>Regularization can reduce ordinary overfitting, but it is not a security guarantee. A backdoor can remain hidden because its trigger-to-target association costs almost nothing in clean-set accuracy; standard validation then has little signal to detect it. That is a property of model capacity and evaluation design, not ordinary overfitting. An evasion gap can likewise arise from a deployment/threat-model mismatch, not simply underfitting.</p>
@@ -322,7 +476,7 @@ update:   parameter ← parameter − learning rate × gradient
 </tr>
 </tbody></table></div>
 <p><a id="reproducibility"></a></p>
-<h2>8. Reproducibility and the nondeterminism problem</h2>
+<h2 id="8-reproducibility-and-the-nondeterminism-problem">8. Reproducibility and the nondeterminism problem</h2>
 <p><strong>Nondeterminism</strong> means that the same nominal program, data, and configuration can produce different execution results because hidden or implementation-dependent choices are not fixed. A second run can therefore produce a different checkpoint without an attacker changing the source code or dataset.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/10-reproducibility.png" alt="Sources of nondeterminism in seeds, kernels, precision, data loading, frameworks, drivers, and hardware." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>Sources of nondeterminism in seeds, kernels, precision, data loading, frameworks, drivers, and hardware. <a href="/ai-security-course/assets/chapter-03/10-reproducibility.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>Seed handling is a source. A project may seed one library but not the framework, augmentation library, workers, or device generator. Record every seed and its consumer. GPU kernels can complete parallel reductions in different orders; record determinism flags, kernels, device, and workers.</p>
@@ -365,7 +519,7 @@ update:   parameter ← parameter − learning rate × gradient
 </tbody></table></div>
 <p><strong>Security consequence:</strong> An investigator who cannot rebuild an artifact cannot distinguish tampering from ordinary nondeterminism. “Bit-identical” is a stronger and rarer claim than “behaviorally equivalent.” State which claim is supported, preserve the build record, and compare a fixed fixture across runs before escalating a difference as a security event.</p>
 <p><a id="attacker-access"></a></p>
-<h2>9. Attacker access and the threat-model taxonomy</h2>
+<h2 id="9-attacker-access-and-the-threat-model-taxonomy">9. Attacker access and the threat-model taxonomy</h2>
 <p>An evasion or extraction result is not meaningful without an access level. <strong>White-box access</strong> means target weights, architecture, gradients, or equivalent internal detail. <strong>Gray-box access</strong> means architecture, feature schema, training assumptions, or score semantics without weights. <strong>Black-box query access</strong> means submitted inputs and returned labels or scores without internals. <strong>Transfer from a surrogate</strong> means another model is used without direct target access.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/12-attacker-access.png" alt="The four attacker access levels, their required knowledge, and the budgets needed to make a claim falsifiable." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>The four attacker access levels, their required knowledge, and the budgets needed to make a claim falsifiable. <a href="/ai-security-course/assets/chapter-03/12-attacker-access.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>A <strong>perturbation budget</strong> is the permitted change to an input, expressed by a stated norm or a real-world constraint such as preserving a valid file and its function. A <strong>query budget</strong> is the maximum number of probes available to an attacker with query access. These budgets make a robustness claim falsifiable: a result under unlimited, unlogged queries is not equivalent to a result under a rate-limited production identity.</p>
@@ -401,14 +555,14 @@ update:   parameter ← parameter − learning rate × gradient
 </tbody></table></div>
 <p><strong>Security consequence:</strong> A robustness claim without both budgets and an access level is not a claim. The Cylance/Skylight case is a non-gradient feature-manipulation result; describing it as white-box gradient evasion would erase the relevant attack surface.</p>
 <p><a id="adversarial"></a></p>
-<h2>10. Adversarial examples and evasion</h2>
+<h2 id="10-adversarial-examples-and-evasion">10. Adversarial examples and evasion</h2>
 <p>An <strong>adversarial example</strong> is an input intentionally modified to produce an unwanted result under a specified threat model. Evasion occurs at test time, after training, and a capability demonstration is not automatically an intrusion.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/14-adversarial-examples.png" alt="Adversarial examples and test-time evasion under an explicit threat model." width="1400" height="1050" loading="lazy" decoding="async" /><figcaption>Adversarial examples and test-time evasion under an explicit threat model. <a href="/ai-security-course/assets/chapter-03/14-adversarial-examples.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>The research lineage matters. Szegedy et al. (2013) first documented the phenomenon in neural networks. Biggio et al. (2013), working in the security literature, independently demonstrated test-time evasion against malware and PDF classifiers. Goodfellow et al. (2014) provided a linear explanation and the fast-gradient method. Madry et al. (2017) framed robustness as constrained optimization against a first-order adversary. Each contribution answers a different question; none by itself proves that a particular production tenant was affected.</p>
 <p>The problem-space and feature-space distinction is especially important for malware. A <strong>feature-space perturbation</strong> changes coordinates consumed by a classifier, while a <strong>problem-space perturbation</strong> changes the real artifact that must remain valid and functional. A semantically trivial file change—such as appended strings, repacking, or added sections—can move a feature vector substantially, but many mathematically convenient feature changes cannot be realized as a functioning file. A real malware attacker must preserve functionality, respect the file format, and work without arbitrary access to feature coordinates.</p>
 <p><strong>Security consequence:</strong> Ask whether the change can be applied to the real artifact while preserving its purpose. Record input hash, transformation, access level, both budgets, artifact digest, and consequence; do not generalize an image-space result to malware without problem-space validation.</p>
 <p><a id="robustness"></a></p>
-<h2>11. Evaluating robustness claims</h2>
+<h2 id="11-evaluating-robustness-claims">11. Evaluating robustness claims</h2>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png" alt="A robustness-review poster covering adaptive attacks, explicit access and budgets, defense limits, review questions, and the five-term evidence ladder." width="1400" height="788" loading="lazy" decoding="async" /><figcaption>Figure 7 — Robustness claims require adaptive testing, explicit budgets, known defense limits, and proposition-level evidence. <a href="/ai-security-course/assets/chapter-03/15-problem-vs-feature-space.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/16-robustness-evaluation.png" alt="Robustness evaluation requirements: adaptive attacks, access assumptions, budgets, baselines, and bypass conditions." width="950" height="228" loading="lazy" decoding="async" /><figcaption>Robustness evaluation requirements: adaptive attacks, access assumptions, budgets, baselines, and bypass conditions. <a href="/ai-security-course/assets/chapter-03/16-robustness-evaluation.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>An <strong>adaptive attack</strong> is an evaluation that uses knowledge of the proposed defense and chooses an attack strategy intended to test that defense, rather than repeating a fixed weak attack. A defense that merely makes gradients uninformative can appear robust under a weak gradient method and collapse under an adaptive method. Athalye, Carlini, and Wagner called this failure mode obfuscated or masked gradients; Carlini and Wagner provided a practical framework for evaluating adversarial robustness.</p>
@@ -458,7 +612,7 @@ update:   parameter ← parameter − learning rate × gradient
 <p><strong>Evidence standard:</strong> Use one five-term ladder throughout this chapter: <strong>Observed</strong> — a production event or provider report. <strong>Reproduced</strong> — the same failure under documented local conditions. <strong>Demonstrated</strong> — a research proof-of-concept on a stated model, not necessarily yours. <strong>Inferred</strong> — a hypothesis linking observations. <strong>Unknown</strong> — an explicitly recorded gap.</p>
 </blockquote>
 <p><a id="poisoning"></a></p>
-<h2>12. Poisoning and backdoors</h2>
+<h2 id="12-poisoning-and-backdoors">12. Poisoning and backdoors</h2>
 <p><strong>Poisoning</strong> changes training data or the training process so a learned artifact behaves incorrectly. A <strong>backdoor</strong> is a hidden trigger-to-target association that causes a selected behavior while ordinary inputs appear acceptable. A <strong>trigger</strong> is the condition that activates the backdoor, such as a pattern, token, or artifact property. The attacker can target collection, labels, augmentation, a dependency, a checkpoint, or a loader.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/17-poisoning-backdoors.png" alt="Poisoning and backdoor attack surfaces across datasets, labels, dependencies, checkpoints, and loaders." width="1400" height="788" loading="lazy" decoding="async" /><figcaption>Poisoning and backdoor attack surfaces across datasets, labels, dependencies, checkpoints, and loaders. <a href="/ai-security-course/assets/chapter-03/17-poisoning-backdoors.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>Backdoor detection needs explicit methods and assumptions. <strong>Trigger reconstruction</strong> searches for a compact input pattern that causes a target output; it assumes the trigger is sufficiently simple and that the search objective exposes it, so distributed or semantic triggers can be missed. <strong>Activation clustering</strong> groups internal activations to find a suspicious cluster associated with poisoned examples; it assumes poisoned and clean representations separate enough to cluster, so weak or entangled triggers can evade it. <strong>Fine-pruning</strong> removes neurons that appear dormant on clean data and then evaluates behavior; it assumes backdoor functionality depends on removable dormant capacity, so triggers using ordinary shared features can survive and pruning can damage legitimate behavior. BadNets is the canonical reference for the backdoor threat model.</p>
@@ -466,7 +620,7 @@ update:   parameter ← parameter − learning rate × gradient
 <p>When investigating a suspected poisoning event, preserve the original dataset and manifest, compare lineage with the approved version, record label history, test for unusual clusters or trigger correlations, and rerun with a clean reference. Do not overwrite the only copy by “cleaning” it in place. Preserve the suspect bytes, access history, and chain of custody before making a derivative dataset.</p>
 <p><strong>Security consequence:</strong> A clean validation score or model digest does not prove a clean build. Preserve dataset versions, label events, features, activations, checkpoint lineage, loader behavior, and release identity.</p>
 <p><a id="inference-training"></a></p>
-<h2>13. What inference reveals about training</h2>
+<h2 id="13-what-inference-reveals-about-training">13. What inference reveals about training</h2>
 <p>Inference can reveal information about training even when the attacker cannot read the artifact. A <strong>model extraction attack</strong>, also called model stealing, uses target-service outputs to build an approximation of its decision function. It needs query access; confidence scores or logits help more than labels alone; and the query budget affects cost and detectability. Ask who queried, at what rate, from which identity, with what output granularity, and whether responses and model-route identifiers were observable.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/18-inference-attacks.png" alt="Model extraction, membership inference, and model inversion through inference interfaces." width="1400" height="788" loading="lazy" decoding="async" /><figcaption>Model extraction, membership inference, and model inversion through inference interfaces. <a href="/ai-security-course/assets/chapter-03/18-inference-attacks.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p><strong>Security consequence:</strong> Record caller, tenant, source, request count, timing, output fields, model version, and rate-limit decisions. Coarse outputs and quotas reduce exposure but do not eliminate surrogate transfer.</p>
@@ -476,20 +630,20 @@ update:   parameter ← parameter − learning rate × gradient
 <p><strong>Security consequence:</strong> Treat outputs, embeddings, gradients, and explanations as information-bearing. Minimize granularity, authorize by tenant and purpose, rate-limit probing, and retain keyed telemetry. Map these controls to Section 15.</p>
 <p>These mechanisms identify what could be tested; they do not prove that training data was exposed. Keep the claim at the level supported by telemetry.</p>
 <p><a id="cti-case"></a></p>
-<h2>14. CTI case study: evading a malware classifier</h2>
+<h2 id="14-cti-case-study-evading-a-malware-classifier">14. CTI case study: evading a malware classifier</h2>
 <p>The <a href="https://github.com/mitre-atlas/atlas-data/blob/v2026.07/dist/v6/ATLAS-2026.07.yaml#L6167-L6192" target="_blank" rel="noopener noreferrer">MITRE ATLAS AML.CS0003 case study, <strong>Bypassing Cylance&#39;s AI Malware Detection</strong></a>, documents work by Skylight Cyber researchers Adi Ashkenazy and Shahar Zini, published in July 2019. This is a disclosed research case, not evidence that every Cylance customer was compromised.</p>
-<h3>What the researchers did</h3>
+<h3 id="what-the-researchers-did">What the researchers did</h3>
 <p>The researchers analyzed the CylancePROTECT engine and model using publicly available information and verbose logging. They reverse-engineered which attributes carried positive or negative weight, found that feature extraction relied heavily on strings, and reported a strong bias toward one specific video game. They also discovered a secondary model that could override the primary decision. By appending a selected list of strings to a malicious file, they changed its score enough to avoid detection. Their report states that the method bypassed detection for all ten malware samples in its May 2019 set, 83.59% of a separate 384-sample set after one application, and 88.54% after repeated application. These are researcher-reported results for the tested engine, samples, and procedure—not a global product-detection rate.</p>
 <p><strong>Security consequence:</strong> The exploitable surface described by the researchers was feature extraction plus a scoring-policy override. The attacker did not need to touch weights or gradients. The relevant local evidence would therefore include the original and modified file hashes, parser output, extracted strings, score, model route, policy decision, and release version.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/19-cylance-case.png" alt="The AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and evidence-ladder classification." width="1400" height="788" loading="lazy" decoding="async" /><figcaption>The AML.CS0003 evidence chain: research claim, vendor dispute, remediation, and evidence-ladder classification. <a href="/ai-security-course/assets/chapter-03/19-cylance-case.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
-<h3>Why gradients were never needed</h3>
+<h3 id="why-gradients-were-never-needed">Why gradients were never needed</h3>
 <p>The case is not a white-box gradient example. The reported method used public information, verbose logging, feature observations, and score behavior. The change was applied to the problem-space file and evaluated through the released detector. An analyst can therefore test a feature-extraction and policy path without possessing weights or gradients.</p>
-<h3>The vendor&#39;s response and remediation boundary</h3>
+<h3 id="the-vendor-s-response-and-remediation-boundary">The vendor&#39;s response and remediation boundary</h3>
 <p><a href="https://www.kb.cert.org/vuls/id/489481" target="_blank" rel="noopener noreferrer">CERT/CC Vulnerability Note VU#489481</a> records Cylance&#39;s response and identifies products before 21 July 2019 as affected. The vendor disputed the “universal bypass” characterization, describing manipulation of one feature type that in limited circumstances led to an incorrect conclusion. It reported parser anti-tampering controls, model changes to detect disproportionately weighted features, removal of the most susceptible features, and automatic patch deployment. CERT/CC assessed that these changes should stop the disclosed string set but did not establish that every similar forced-misclassification method was eliminated.</p>
 <p><strong>Security consequence:</strong> The disagreement is useful CTI context but does not resolve every environment. Identify engine version, parser, features, route, and remediation state in scope.</p>
-<h3>What each party would need to prove</h3>
+<h3 id="what-each-party-would-need-to-prove">What each party would need to prove</h3>
 <p>The researchers&#39; claim requires samples, transformation, feature output, score change, sample-set definition, engine version, and reproducible conditions. The vendor&#39;s characterization requires feature scope, affected versions, result limits, and remediation evidence. Customer impact additionally requires deployment identity, version, telemetry, sample handling, and action.</p>
-<h3>Evidence ladder for this case</h3>
+<h3 id="evidence-ladder-for-this-case">Evidence ladder for this case</h3>
 <p>Use the same five terms: <strong>Observed</strong> — a production event or provider report. <strong>Reproduced</strong> — the same failure under documented local conditions. <strong>Demonstrated</strong> — a research proof-of-concept on a stated model, not necessarily yours. <strong>Inferred</strong> — a hypothesis linking observations. <strong>Unknown</strong> — an explicitly recorded gap.</p>
 <ul>
 <li><strong>Observed:</strong> CERT/CC preserves the vendor statement and records the affected-version and patch boundary as published facts; this does not independently prove a customer outcome.</li>
@@ -517,7 +671,7 @@ update:   parameter ← parameter − learning rate × gradient
 </code></pre>
 <p>The CTI publication guides the hypothesis; it does not replace local evidence. Preserve original and derivative samples, hashes, parser output, engine and model identifiers, configuration, request identity, action, and remediation status. This distinguishes an observed local event from an inferred similarity to a public demonstration.</p>
 <p><a id="controls"></a></p>
-<h2>15. Controls, ATLAS mapping, and analyst exercise</h2>
+<h2 id="15-controls-atlas-mapping-and-analyst-exercise">15. Controls, ATLAS mapping, and analyst exercise</h2>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/20-controls-atlas.png" alt="Four-panel control map showing current MITRE ATLAS v2026.07 identifiers, five investigation questions, an eight-part learner deliverable, and a ten-point rubric with the Observed–Unknown evidence ladder." width="1400" height="788" loading="lazy" decoding="async" /><figcaption>Four panels connect current ATLAS identifiers and control questions to the learner deliverable, ten-point completion rubric, and five-term evidence ladder. <a href="/ai-security-course/assets/chapter-03/20-controls-atlas.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <p>The terminology becomes operational when each object has an owner, a control point, and a record an analyst can collect. MITRE ATLAS supplies vocabulary and mapping; a defensible case still requires local artifacts, configuration, and telemetry. The table below was verified against the version-pinned <a href="https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.07" target="_blank" rel="noopener noreferrer">MITRE ATLAS v2026.07 release</a>. Preserve both the stable ID and the ATLAS content version because technique titles and scopes evolve.</p>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/21-atlas-mapping.png" alt="MITRE ATLAS mappings for evasion, poisoning, backdoors, extraction, and inference risks." width="962" height="444" loading="lazy" decoding="async" /><figcaption>MITRE ATLAS mappings for evasion, poisoning, backdoors, extraction, and inference risks. <a href="/ai-security-course/assets/chapter-03/21-atlas-mapping.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
@@ -580,7 +734,7 @@ update:   parameter ← parameter − learning rate × gradient
 <td>Report, version, parser, remediation</td>
 </tr>
 </tbody></table></div>
-<h3>Control checklist</h3>
+<h3 id="control-checklist">Control checklist</h3>
 <figure class="inline-media"><img src="/ai-security-course/assets/chapter-03/22-control-checklist.png" alt="Chapter 3 control checklist for training provenance, release integrity, inference telemetry, and robustness evaluation." width="810" height="228" loading="lazy" decoding="async" /><figcaption>Chapter 3 control checklist for training provenance, release integrity, inference telemetry, and robustness evaluation. <a href="/ai-security-course/assets/chapter-03/22-control-checklist.png" target="_blank" rel="noopener">Open infographic ↗</a></figcaption></figure>
 <div class="table-wrap" role="region" aria-label="Chapter 3 control checklist" tabindex="0"><table class="data-table">
 <thead>
@@ -616,7 +770,7 @@ update:   parameter ← parameter − learning rate × gradient
 <td>Fields, rate, identity, egress</td>
 </tr>
 </tbody></table></div>
-<h3>Analyst exercise</h3>
+<h3 id="analyst-exercise">Analyst exercise</h3>
 <p>Choose a local classifier or course-owned demonstration. Do not upload confidential data or test without authorization. Draw its graph and record one parameter, hyperparameter, feature step, threshold, and inference event.</p>
 <ol>
 <li>Record the input and preprocessing output.</li>
@@ -640,7 +794,7 @@ update:   parameter ← parameter − learning rate × gradient
 <p><strong>Pass standard:</strong> 8/10, with full credit on the access-and-evidence criterion. Revise any submission that treats a score as authorization, labels a research demonstration as a local incident, or omits the affected artifact or route version.</p>
 <p>You have completed this chapter when the deliverable meets that pass standard and, for a misclassification, you can name an observable distinguishing evasion, distribution shift, parser or feature change, threshold change, and swapped artifact; state the access level and both budgets; apply the five-term ladder; and identify control and telemetry needed to test it.</p>
 <p><a id="key-takeaways"></a></p>
-<h2>16. Key takeaways</h2>
+<h2 id="16-key-takeaways">16. Key takeaways</h2>
 <ul>
 <li>A neural network is a parameterized computation, not an isolated AI system. The parser, features, configuration, dependencies, runtime, policy, and downstream action also matter.</li>
 <li>A forward pass produces outputs; loss, gradients, and optimizer updates belong to training. Preserve those boundaries in the evidence graph.</li>
@@ -653,7 +807,7 @@ update:   parameter ← parameter − learning rate × gradient
 <li>Research demonstrations establish capability; use the five-term evidence ladder consistently and record unknowns rather than filling them with assumptions.</li>
 </ul>
 <p><a id="references"></a></p>
-<h2>17. References</h2>
+<h2 id="17-references">17. References</h2>
 <ul>
 <li><a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener noreferrer">Rumelhart, Hinton, and Williams — Learning representations by back-propagating errors</a></li>
 <li><a href="https://arxiv.org/abs/1412.6572" target="_blank" rel="noopener noreferrer">Goodfellow, Shlens, and Szegedy — Explaining and Harnessing Adversarial Examples</a></li>
@@ -682,7 +836,7 @@ update:   parameter ← parameter − learning rate × gradient
 <li><a href="https://www.kb.cert.org/vuls/id/489481" target="_blank" rel="noopener noreferrer">CERT/CC VU#489481 — Cylance Antivirus Products Susceptible to Concatenation Bypass</a></li>
 </ul>
 <p><a id="next"></a></p>
-<h2>18. What comes next</h2>
+<h2 id="18-what-comes-next">18. What comes next</h2>
 <p><a href="https://1200km.com/ai-security-course/module-00/chapter-04.html" target="_self">Chapter 4 — Transformers and LLM Generation</a> connects this mechanism to tokenization, chat templates, embeddings, attention, decoding, prompt injection, application controls, and reproducible CTI evidence.</p>
 <hr>
 <p><strong>Chapter 3 status: complete.</strong> Finalized 30 August 2026 as a learner-ready chapter with version-pinned ATLAS mappings, a reviewed evidence boundary, and an assessed analyst exercise. The wider AI Security Engineering course remains under construction.</p>

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import { transformHtmlElements } from './html-token-utils.mjs';
 import { topicsFromText } from './content-topic-lib.mjs';
+import { applyTechnicalSeo, contentSignals, repairSchemaDomains } from './technical-seo-lib.mjs';
 
 export const PERSON_ID = 'https://1200km.com/#person';
 export const WEBSITE_ID = 'https://1200km.com/#website';
@@ -416,6 +417,7 @@ export function buildConnectedGraph(html, {
   const image = metaContent(html, 'og:image');
   const topics = topicsFromText(`${new URL(canonical).pathname} ${title} ${description}`);
   const about = topics.map((name) => ({ '@type': 'Thing', name }));
+  const signals = contentSignals(html);
   const personSource = firstObjectWithType(objects, new Set(['Person'])) || {};
   const websiteSource = firstObjectWithType(objects, new Set(['WebSite'])) || {};
   const pageSource = firstObjectWithType(objects, WEB_PAGE_TYPES) || {};
@@ -549,6 +551,8 @@ export function buildConnectedGraph(html, {
       if (description) normalized.description = description;
       if (image && !normalized.image) normalized.image = image;
       if (datePublished) normalized.datePublished = datePublished;
+      if (signals.wordCount) normalized.wordCount = signals.wordCount;
+      if (topics.length) normalized.articleSection = topics[0];
       if (about.length) {
         normalized.about = about;
         normalized.keywords = topics.join(', ');
@@ -589,10 +593,17 @@ export function buildConnectedGraph(html, {
     });
   }
 
-  return {
+  if (signals.steps.length >= 2 && !primary.some(entity => schemaTypes(entity).includes('HowTo'))) {
+    primary.push({
+      '@type': 'HowTo', '@id': `${canonical}#howto`, name: title,
+      mainEntityOfPage: { '@id': page['@id'] },
+      step: signals.steps.map(step => ({ '@type': 'HowToStep', name: step.name, text: step.name, url: `${canonical}#${step.id}` })),
+    });
+  }
+  return repairSchemaDomains({
     '@context': 'https://schema.org',
     '@graph': [person, website, page, breadcrumb, ...primary, ...related],
-  };
+  });
 }
 
 export function replaceStructuredData(html, options) {
@@ -903,6 +914,7 @@ export function transformReleaseHtml(html, options) {
   transformed = removeMetaKeywords(transformed);
   transformed = normalizeDocumentTitles(transformed);
   transformed = normalizeMetaDescriptions(transformed);
+  transformed = applyTechnicalSeo(transformed, options.canonical);
   transformed = normalizeSocialImages(transformed);
   // Keep release-owned browser enhancements on the same origin. Checked-in
   // Docusaurus output historically used an absolute production URL, which made

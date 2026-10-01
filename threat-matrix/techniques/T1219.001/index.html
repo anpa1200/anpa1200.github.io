@@ -1,17 +1,187 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>T1219.001 IDE Tunneling | AdversaryGraph</title>
-<meta name="description" content="T1219.001 IDE Tunneling: ATT&amp;CK behavior, detection strategies, mitigations, groups, and Cyber Knowledge context.">
+<meta name="description" content="Investigate IDE Tunneling (T1219.001) with ATT&amp;CK behavior, defensive context and linked CTI references. Check source evidence before applying a mapping.">
 <link rel="canonical" href="https://1200km.com/threat-matrix/techniques/T1219.001/"><link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 <style>body{margin:0;background:#07101f;color:#dce7f7;font:16px/1.6 system-ui,sans-serif}main{width:min(1120px,calc(100% - 2rem));margin:2rem auto}a{color:#8bd8ff}.meta,.muted{color:#93a4bd}.cta{display:inline-block;background:#e11d48;color:#fff;padding:.65rem .85rem;border-radius:.4rem;text-decoration:none;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem}.card{display:block;border:1px solid #334155;border-radius:.5rem;padding:.8rem;background:#0d1728;color:#dce7f7;text-decoration:none}.card p{color:#c6d4e8}</style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"T1219.001 IDE Tunneling","url":"https://1200km.com/threat-matrix/techniques/T1219.001/","about":["MITRE ATT&CK","T1219.001","command-and-control"]}</script>
-  <meta property="article:published_time" content="2026-07-29"><meta property="article:modified_time" content="2026-07-29">
-</head><body><main><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / T1219.001</nav>
+
+  <meta property="article:published_time" content="2026-07-29"><meta property="article:modified_time" content="2026-08-09">
+<meta name="robots" content="index,follow,max-image-preview:large">
+    <meta property="og:title" content="T1219.001 IDE Tunneling | AdversaryGraph" />
+    <meta name="twitter:title" content="T1219.001 IDE Tunneling | AdversaryGraph" />
+    <meta property="og:description" content="Investigate IDE Tunneling (T1219.001) with ATT&amp;CK behavior, defensive context and linked CTI references. Check source evidence before applying a mapping." />
+    <meta name="twitter:description" content="Investigate IDE Tunneling (T1219.001) with ATT&amp;CK behavior, defensive context and linked CTI references. Check source evidence before applying a mapping." />
+    <meta property="og:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta property="og:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ],
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1219.001/#webpage",
+            "url": "https://1200km.com/threat-matrix/techniques/T1219.001/",
+            "name": "IDE Tunneling",
+            "description": "Investigate IDE Tunneling (T1219.001) with ATT&CK behavior, defensive context and linked CTI references. Check source evidence before applying a mapping.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1219.001/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "about": [
+              {
+                "@type": "Thing",
+                "name": "MITRE ATT&CK"
+              },
+              {
+                "@type": "Thing",
+                "name": "Cyber threat intelligence"
+              }
+            ],
+            "keywords": "MITRE ATT&CK, Cyber threat intelligence",
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/site-og-v2.png"
+            },
+            "dateModified": "2026-08-09",
+            "mainEntity": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1219.001/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/threat-matrix/techniques/T1219.001/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Threat Matrix — AdversaryGraph Light",
+                "item": "https://1200km.com/threat-matrix/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "IDE Tunneling",
+                "item": "https://1200km.com/threat-matrix/techniques/T1219.001/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "IDE Tunneling",
+            "url": "https://1200km.com/threat-matrix/techniques/T1219.001/",
+            "about": [
+              {
+                "@type": "Thing",
+                "name": "MITRE ATT&CK"
+              },
+              {
+                "@type": "Thing",
+                "name": "Cyber threat intelligence"
+              }
+            ],
+            "@id": "https://1200km.com/threat-matrix/techniques/T1219.001/#article",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/threat-matrix/techniques/T1219.001/#webpage"
+            },
+            "dateModified": "2026-08-09",
+            "description": "Investigate IDE Tunneling (T1219.001) with ATT&CK behavior, defensive context and linked CTI references. Check source evidence before applying a mapping.",
+            "image": "https://1200km.com/assets/site-og-v2.png",
+            "datePublished": "2026-07-29",
+            "wordCount": 541,
+            "articleSection": "MITRE ATT&CK",
+            "keywords": "MITRE ATT&CK, Cyber threat intelligence"
+          }
+        ]
+      }
+    </script>
+</head><body><main data-pagefind-body><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / T1219.001</nav>
 <p class="meta">T1219.001 · command-and-control · ATT&amp;CK 19.1</p>
-<h1>IDE Tunneling</h1><p>Adversaries may abuse Integrated Development Environment (IDE) software with remote development features to establish an interactive command and control channel on target systems within a network. IDE tunneling combines SSH, port forwarding, file sharing, and debugging into a single secure connection, letting developers work on remote systems as if they were local. Unlike SSH and port forwarding, IDE tunneling encapsulates an entire session and may use proprietary tunneling protocols alongside SSH, allowing adversaries to blend in with legitimate development workflows. Some IDEs, like Visual Studio Code, also provide CLI tools (e.g., `code tunnel`) that adversaries may use to programmatically establish tunnels and generate web-accessible URLs for remote access. These tunnels can be authenticated through accounts such as GitHub, enabling the adversary to control the compromised system via a legitimate developer portal.(Citation: sentinelone operationDigitalEye Dec 2024)(Citation: Unit42 Chinese VSCode 06 September 2024)(Citation: Thornton tutorial VSCode shell September 2023) Additionally, adversaries may use IDE tunneling for persistence. Some IDEs, such as Visual Studio Code and JetBrains, support automatic reconnection. Adversaries may configure the IDE to auto-launch at startup, re-establishing the tunnel upon execution. Compromised developer machines may also be exploited as jump hosts to move further into the network. IDE tunneling tools may be built-in or installed as [IDE Extensions](https://attack.mitre.org/techniques/T1176/002).</p>
+<h1 id="ide-tunneling">IDE Tunneling</h1><p>Adversaries may abuse Integrated Development Environment (IDE) software with remote development features to establish an interactive command and control channel on target systems within a network. IDE tunneling combines SSH, port forwarding, file sharing, and debugging into a single secure connection, letting developers work on remote systems as if they were local. Unlike SSH and port forwarding, IDE tunneling encapsulates an entire session and may use proprietary tunneling protocols alongside SSH, allowing adversaries to blend in with legitimate development workflows. Some IDEs, like Visual Studio Code, also provide CLI tools (e.g., `code tunnel`) that adversaries may use to programmatically establish tunnels and generate web-accessible URLs for remote access. These tunnels can be authenticated through accounts such as GitHub, enabling the adversary to control the compromised system via a legitimate developer portal.(Citation: sentinelone operationDigitalEye Dec 2024)(Citation: Unit42 Chinese VSCode 06 September 2024)(Citation: Thornton tutorial VSCode shell September 2023) Additionally, adversaries may use IDE tunneling for persistence. Some IDEs, such as Visual Studio Code and JetBrains, support automatic reconnection. Adversaries may configure the IDE to auto-launch at startup, re-establishing the tunnel upon execution. Compromised developer machines may also be exploited as jump hosts to move further into the network. IDE tunneling tools may be built-in or installed as [IDE Extensions](https://attack.mitre.org/techniques/T1176/002).</p>
 <p><a class="cta" href="/cyber-knowledge/attack-matrix.html?technique=T1219.001">Open in the interactive knowledge mesh</a></p>
-<section><h2>Detection overview</h2><p>Use the published detection strategies below and validate required telemetry in the target environment.</p></section>
-<section><h2>Observed groups</h2><div class="grid"><a class="card" href="/threat-matrix/actors/G0129/"><strong>Mustang Panda</strong><br><span class="muted">G0129</span></a></div></section>
+<section><h2 id="detection-overview">Detection overview</h2><p>Use the published detection strategies below and validate required telemetry in the target environment.</p></section>
+<section><h2 id="observed-groups">Observed groups</h2><div class="grid"><a class="card" href="/threat-matrix/actors/G0129/"><strong>Mustang Panda</strong><br><span class="muted">G0129</span></a></div></section>
 
 <!-- ATTACK_KNOWLEDGE_MESH_START -->
 <section class="attack-knowledge-detail">

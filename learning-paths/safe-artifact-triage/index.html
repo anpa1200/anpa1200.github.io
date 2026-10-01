@@ -1,4 +1,165 @@
-<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Triage a reproducible benign artifact | 1200km</title><meta name="description" content="Inspect a deterministic benign ZIP with hashes, structured observations, corroboration, and negative controls."><link rel="canonical" href="https://1200km.com/learning-paths/safe-artifact-triage/"><meta property="og:url" content="https://1200km.com/learning-paths/safe-artifact-triage/"><meta property="og:title" content="Triage a reproducible benign artifact"><meta property="og:description" content="Inspect a deterministic benign ZIP with hashes, structured observations, corroboration, and negative controls."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Triage a reproducible benign artifact","name":"Triage a reproducible benign artifact","url":"https://1200km.com/learning-paths/safe-artifact-triage/","description":"Inspect a deterministic benign ZIP with hashes, structured observations, corroboration, and negative controls.","dateModified":"2026-09-09","datePublished":"2026-09-09","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"}}</script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style></head><body id="top"><!-- site-shell:header:start -->
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn-images-1.medium.com https://1200km.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <script src="/assets/theme-bootstrap.js"></script><meta name="viewport" content="width=device-width, initial-scale=1"><title>Triage a reproducible benign artifact | 1200km</title><meta name="description" content="Triage a deterministic benign ZIP using hashes and structured observations, corroborate findings and test negative controls without handling live malware."><link rel="canonical" href="https://1200km.com/learning-paths/safe-artifact-triage/"><meta property="og:url" content="https://1200km.com/learning-paths/safe-artifact-triage/"><meta property="og:title" content="Triage a reproducible benign artifact | 1200km"><meta property="og:description" content="Triage a deterministic benign ZIP using hashes and structured observations, corroborate findings and test negative controls without handling live malware."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km practical security learning"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:2rem 1rem;line-height:1.7}pre{padding:1rem;background:var(--surface-2,#eee)}li{margin-block:.5rem}</style><meta name="robots" content="index,follow,max-image-preview:large">
+    <meta name="twitter:title" content="Triage a reproducible benign artifact | 1200km" />
+    <meta name="twitter:description" content="Triage a deterministic benign ZIP using hashes and structured observations, corroborate findings and test negative controls without handling live malware." />
+    <meta name="twitter:image" content="https://1200km.com/assets/site-og-v2.png" />
+    <meta name="twitter:image:alt" content="1200km Security Research — threat intelligence, detection engineering, and analyst tooling" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <link rel="alternate" type="application/rss+xml" title="1200km Security Research Feed" href="https://1200km.com/feed.xml" />
+      <meta property="article:published_time" content="2026-09-09" />
+    <meta property="article:modified_time" content="2026-09-09" />
+
+    <script type="application/ld+json" data-site-graph>
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://1200km.com/#person",
+            "name": "Andrey Pautov",
+            "url": "https://1200km.com/",
+            "image": "https://1200km.com/assets/ap-logo.png",
+            "jobTitle": "Threat Intelligence Research Engineer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "XPLG"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tel Aviv",
+              "addressCountry": "IL"
+            },
+            "knowsAbout": [
+              "Cyber Threat Intelligence",
+              "Detection Engineering",
+              "MITRE ATT&CK",
+              "Threat Hunting",
+              "Malware Analysis",
+              "OpenCTI",
+              "SIEM Validation",
+              "Adversary Simulation",
+              "Reverse Engineering",
+              "Cloud Security"
+            ],
+            "email": "mailto:1200km@gmail.com",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "professional inquiries",
+              "email": "mailto:1200km@gmail.com"
+            },
+            "sameAs": [
+              "https://github.com/anpa1200",
+              "https://medium.com/@1200km",
+              "https://www.linkedin.com/in/andrey-pautov/",
+              "https://infosecwriteups.com/@1200km"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://1200km.com/#website",
+            "name": "1200km Security Research",
+            "url": "https://1200km.com/",
+            "description": "Security research and practical CTI-to-detection engineering by Andrey Pautov.",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://1200km.com/learning-paths/safe-artifact-triage/#webpage",
+            "url": "https://1200km.com/learning-paths/safe-artifact-triage/",
+            "name": "Triage a reproducible benign artifact",
+            "description": "Triage a deterministic benign ZIP using hashes and structured observations, corroborate findings and test negative controls without handling live malware.",
+            "isPartOf": {
+              "@id": "https://1200km.com/#website"
+            },
+            "breadcrumb": {
+              "@id": "https://1200km.com/learning-paths/safe-artifact-triage/#breadcrumb"
+            },
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "inLanguage": "en",
+            "about": [
+              {
+                "@type": "Thing",
+                "name": "Malware analysis"
+              }
+            ],
+            "keywords": "Malware analysis",
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://1200km.com/assets/site-og-v2.png"
+            },
+            "dateModified": "2026-09-09",
+            "mainEntity": {
+              "@id": "https://1200km.com/learning-paths/safe-artifact-triage/#article"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://1200km.com/learning-paths/safe-artifact-triage/#breadcrumb",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://1200km.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Practical security learning paths",
+                "item": "https://1200km.com/learning-paths/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Triage a reproducible benign artifact",
+                "item": "https://1200km.com/learning-paths/safe-artifact-triage/"
+              }
+            ]
+          },
+          {
+            "@type": "TechArticle",
+            "headline": "Triage a reproducible benign artifact",
+            "name": "Triage a reproducible benign artifact",
+            "url": "https://1200km.com/learning-paths/safe-artifact-triage/",
+            "description": "Triage a deterministic benign ZIP using hashes and structured observations, corroborate findings and test negative controls without handling live malware.",
+            "dateModified": "2026-09-09",
+            "datePublished": "2026-09-09",
+            "author": {
+              "@id": "https://1200km.com/#person"
+            },
+            "@id": "https://1200km.com/learning-paths/safe-artifact-triage/#article",
+            "publisher": {
+              "@id": "https://1200km.com/#person"
+            },
+            "mainEntityOfPage": {
+              "@id": "https://1200km.com/learning-paths/safe-artifact-triage/#webpage"
+            },
+            "image": "https://1200km.com/assets/site-og-v2.png",
+            "wordCount": 475,
+            "articleSection": "Malware analysis",
+            "about": [
+              {
+                "@type": "Thing",
+                "name": "Malware analysis"
+              }
+            ],
+            "keywords": "Malware analysis"
+          }
+        ]
+      }
+    </script>
+</head><body id="top"><!-- site-shell:header:start -->
     <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
       <a class="skip-link" href="#main-content">Skip to main content</a>
       <nav class="nav" aria-label="Primary navigation">
@@ -40,7 +201,7 @@
         <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
       </nav>
     </header>
-    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1>Triage a reproducible benign artifact</h1>
+    <!-- site-shell:header:end --><main id="main-content" data-pagefind-body><p><a href="/">Home</a> / <a href="/learning-paths/">Learning paths</a></p><h1 id="triage-a-reproducible-benign-artifact">Triage a reproducible benign artifact</h1>
 <p><strong>Produce a structured observation record without extracting or executing the contents.</strong></p>
 <p>Audience: beginning malware-analysis and DFIR learners. Prerequisites: a terminal, JSON familiarity, and Python 3.9 or later; no third-party packages. Planning time: 15–20 minutes. Executed with Python 3.13.12 on Linux; fixture and validator version 1.0, reviewed 2026-09-09.</p>
 <p>The artifact is an authored ZIP containing one plain-text note. The source fixes the entry name, timestamp, permissions, storage mode, and bytes so it can be regenerated. A URL and the word <code>powershell</code> are text observations; their presence does not demonstrate a network connection or interpreter execution.</p>
@@ -66,7 +227,7 @@ python3 triage.py regenerated.zip</code></pre>
 <p>Continue the <a href="/learning-paths/#malware-triage">malware-triage path</a> and the <a href="/cyber-knowledge/malware-analysis.html">analysis guide</a>. Adapt the observation schema to another approved benign artifact before considering any separately authorized dynamic analysis.</p>
 <h2 id="references">References</h2>
 <ul><li><a href="https://docs.python.org/3/library/zipfile.html">Python: ZIP archive inspection and CRC checking</a>.</li><li><a href="https://docs.python.org/3/library/hashlib.html">Python: SHA-256 and other digest algorithms</a>.</li></ul>
-<h2>Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="/about.html">About the author</a> · <a href="https://github.com/anpa1200">GitHub</a>.</p>
+<h2 id="follow-my-work">Follow My Work</h2><p><a href="/feed.xml">Research RSS</a> · <a href="/about.html">About the author</a> · <a href="https://github.com/anpa1200">GitHub</a>.</p>
 </main><!-- site-shell:footer:start -->
     <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
       <div class="shared-footer-inner">

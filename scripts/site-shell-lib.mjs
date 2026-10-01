@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { applyTechnicalSeo } from './technical-seo-lib.mjs';
 
 export const HEADER_START = '<!-- site-shell:header:start -->';
 export const HEADER_END = '<!-- site-shell:header:end -->';
@@ -176,5 +177,6 @@ export function applySiteShell(html, shell, page) {
     'standalone footer',
     page.path,
   );
-  return ensureStaticThemeScript(ensureStaticThemeStyles(ensureMainTarget(ensureTopTarget(transformed))));
+  const canonical = 'https://1200km.com/' + page.path.replace(/(?:^|\/)index\.html$/, match => match.startsWith('/') ? '/' : '');
+  return applyTechnicalSeo(ensureStaticThemeScript(ensureStaticThemeStyles(ensureMainTarget(ensureTopTarget(transformed)))), canonical);
 }
