@@ -1,5 +1,6 @@
 import {readFileSync} from 'node:fs';
 export const atlas=JSON.parse(readFileSync(new URL('../data/anomaly-atlas.json',import.meta.url)));
+export const atlasSearchUrls=[...new Set(['https://1200km.com/anomaly-detection-atlas/', 'https://1200km.com/anomaly-detection-atlas/research/', 'https://1200km.com/anomaly-detection-atlas/families/', 'https://1200km.com/anomaly-detection-atlas/visuals/', 'https://1200km.com/anomaly-detection-atlas/research/provenance/', ...atlas.pages.map(p=>p.url)])];
 export const atlasFamilyAssignments=atlas.families.map(f=>({url:f.url,evidence:[{tag:f.tag}]}));
 export const atlasWorkedAssignments=atlas.pages.filter(p=>p.id.startsWith('worked-')).map(p=>({url:p.url,evidence:p.tags.map(tag=>({tag}))}));
 export function atlasFamiliesForTechnique(key){

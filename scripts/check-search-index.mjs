@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { atlasSearchUrls } from './anomaly-atlas-lib.mjs';
 import { rerankSearchResults } from './search-governance-lib.mjs';
 import {
   LOCAL_SEARCH_MINIMUM_PAGES,
@@ -67,7 +68,7 @@ try {
   if (governance.indexed_custom_record_count !== build?.indexedCustomRecords) failures.push(`search governance targets ${governance.indexed_custom_record_count} of ${build?.indexedCustomRecords} custom records`);
   if (governance.indexed_record_count !== build?.indexedRecords) failures.push(`search governance targets ${governance.indexed_record_count} of ${build?.indexedRecords} total records`);
   if (governance.expected_module_pages && governance.indexed_module_pages !== governance.expected_module_pages) failures.push('TTP module search coverage is incomplete');
-  if (remote && (governance.expected_atlas_research_pages !== 30 || governance.indexed_atlas_research_pages !== 30)) failures.push('Unified Atlas research search coverage is incomplete');
+  if (remote && (governance.expected_atlas_research_pages !== atlasSearchUrls.length || governance.indexed_atlas_research_pages !== atlasSearchUrls.length)) failures.push('Unified Atlas research search coverage is incomplete');
   if (governance.record_count < Math.floor((build?.indexedRecords || 0) * 0.95)) failures.push(`search governance has too few Pagefind fragment records: ${governance.record_count}`);
   if (Object.keys(governance.records || {}).length !== governance.record_count) failures.push('search governance record_count disagrees with its records');
 } catch (error) {
