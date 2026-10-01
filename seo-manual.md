@@ -1,0 +1,8 @@
+# Account-side follow-up
+
+These actions require account access and cannot be completed by changing this repository. The reported empty Search Console link and legacy GA4 stream URL have not been independently verified in the accounts.
+
+1. **Link Search Console to GA4.** Open GA4 → Admin → Product links → Search Console links → Link. Select the verified 1200km Search Console property, select the site's existing web data stream, review and submit. The operator needs GA4 Editor access and Search Console verified-owner access. See [Google's instructions](https://support.google.com/analytics/answer/10737381).
+2. **Correct the GA4 stream URL if it still shows the legacy domain.** In Admin → Data collection and modification → Data streams, open the existing web stream, edit its details and set Website URL to `https://1200km.com`. Preserve the existing stream and measurement ID; do not create a replacement stream merely to change the displayed URL.
+3. **Submit the sitemap after deployment verification.** In the verified 1200km Search Console property, open Sitemaps and submit `https://1200km.com/sitemap.xml`. Check processing status and inspect representative canonical URLs. Submission does not guarantee indexing.
+4. **Correct existing Medium duplicates.** Use Search Console and Medium analytics to select roughly ten important duplicates; do not invent a traffic-based ranking from the repository. In each Medium story's editing settings, set its canonical/original URL to the exact corresponding 1200km article, save and republish. Verify the live canonical afterward. For future cross-posts, follow `PUBLISHING.md` and [Import a story](https://help.medium.com/hc/en-us/articles/214550207-Importing-a-post-to-Medium).

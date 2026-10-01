@@ -142,7 +142,7 @@ test('metadata descriptions are unique-page prose rather than generic level labe
 test('priority pages use governed hand-authored descriptions', () => {
   const input = '<html><head><title>1200km</title><link rel="canonical" href="https://1200km.com/"><meta name="description" content="Generated fallback."></head><body><main><h1>1200km</h1></main></body></html>';
   const output = normalizeMetaDescriptions(input);
-  assert.match(output, /content="Threat-intelligence research by Andrey Pautov: adversary behavior, ATT&amp;CK mapping, malware analysis, detection engineering, and validated security tools\."/);
+  assert.match(output, /content="Explore Andrey Pautov’s threat intelligence research, detection workflows, malware-analysis guides, and safe labs with evidence you can inspect\."/);
   assert.doesNotMatch(output, /Generated fallback/);
 });
 

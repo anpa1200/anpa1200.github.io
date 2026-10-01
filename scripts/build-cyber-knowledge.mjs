@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { applyTechnicalSeo } from './technical-seo-lib.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -851,7 +852,7 @@ assertEntryPaths();
 for (const domain of domains) {
   const path = join(site, domain.path);
   const current = source.get(domain.id);
-  const generated = transformDomain(current, domain);
+  const generated = applyTechnicalSeo(transformDomain(current, domain), `https://1200km.com/${domain.path}`);
   source.set(domain.id, generated);
   stats.set(domain.id, {
     modules: moduleCount(withoutAttackKnowledgeMesh(generated)),
@@ -864,7 +865,7 @@ for (const domain of domains) {
 
 const hubPath = join(site, 'cyber-knowledge/index.html');
 const hubCurrent = readFileSync(hubPath, 'utf8');
-const hubGenerated = transformHub(hubCurrent, stats, crossDomainEdges(source));
+const hubGenerated = applyTechnicalSeo(transformHub(hubCurrent, stats, crossDomainEdges(source)), 'https://1200km.com/cyber-knowledge/');
 if (!equivalentGeneratedHtml(hubCurrent, hubGenerated)) {
   if (check) stale.push('cyber-knowledge/index.html');
   else writeFileSync(hubPath, hubGenerated);

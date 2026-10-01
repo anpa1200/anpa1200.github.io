@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { applyTechnicalSeo } from './technical-seo-lib.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -135,7 +136,7 @@ function metadataPage({ slug, title, description, h1, lead, body, graph, modifie
       ${body}
     </main>`)
     .replace('</head>', `    <script type="application/ld+json" id="cyber-knowledge-structured-data">\n${JSON.stringify(pageGraph, (key, value) => value === undefined ? undefined : value, 2).split('\n').map((line) => `      ${line}`).join('\n')}\n    </script>\n  </head>`);
-  return html.replace(/^[ \t]+$/gm, '');
+  return applyTechnicalSeo(html.replace(/^[ \t]+$/gm, ''), `https://1200km.com/cyber-knowledge/${slug}/`);
 }
 
 const letters = [...new Set(terms.map((term) => term.name[0].toUpperCase()).filter((letter) => /[A-Z0-9]/.test(letter)))];

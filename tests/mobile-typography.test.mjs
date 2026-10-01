@@ -61,10 +61,10 @@ test('light is the default theme and dark mode uses the neutral gray palette', (
   assert.match(runtime, /next === 'light' \? '#f5f5f4' : '#151515'/);
 });
 
-test('AdversaryGraph product hero remains an unbroken responsive wordmark', () => {
+test('AdversaryGraph query-first hero wraps at spaces without breaking words', () => {
   const source = readFileSync(join(ROOT, 'adversarygraph', 'index.html'), 'utf8');
-  assert.match(source, /<h1[^>]*class="hero-title"[^>]*data-product-name="AdversaryGraph"[^>]*>AdversaryGraph<\/h1>/);
-  assert.match(source, /\.hero-title\s*\{[^}]*overflow-wrap:\s*normal;[^}]*word-break:\s*normal;[^}]*white-space:\s*nowrap;/s);
+  assert.match(source, /<h1[^>]*class="hero-title"[^>]*data-product-name="AdversaryGraph"[^>]*>MITRE ATT&amp;CK mapping with AdversaryGraph<\/h1>/);
+  assert.match(source, /\.hero-title\s*\{[^}]*overflow-wrap:\s*normal;[^}]*word-break:\s*normal;[^}]*white-space:\s*normal;/s);
   assert.match(source, /font-size:\s*clamp\(2rem,\s*4\.6vw,\s*4rem\)/);
 });
 

@@ -1,0 +1,3382 @@
+[
+  {
+    "url": "https://1200km.com/ai-vs-defense/cti-evolution/threat-informed-detection",
+    "status": 200,
+    "title": "Threat-Informed Detection — The CTI→SOC Pipeline | 1200km",
+    "description": "Build a CTI-to-SOC pipeline that converts adversary behavior into prioritized, validated coverage and keeps engineering work aligned with current threats.",
+    "h1": "Threat-Informed Detection: The CTI→SOC Pipeline",
+    "word_count": 1165,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 12,
+    "paragraphs": [
+      "Threat-informed detection is the practice of building and prioritizing detection rules based on the actual TTPs of actual adversaries targeting your organization — not based on generic best practices, vendor recommendations, or ATT&CK coverage percentages.",
+      "The concept is simple. The implementation requires three connected components that most organizations do not have fully working: a CTI capability that produces behavioral intelligence, a detection engineering function that consumes it, and a validation loop that confirms detections actually work.",
+      "Each step is necessary. A gap at any point breaks the pipeline.",
+      "This is CTI's core deliverable for the detection pipeline. For each priority threat actor, produce an ATT&CK-mapped behavioral profile with:"
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "Threat-Informed Detection: The CTI→SOC Pipeline"
+      },
+      {
+        "tag": "h2",
+        "id": "the-complete-pipeline",
+        "text": "The Complete Pipeline ​"
+      },
+      {
+        "tag": "h2",
+        "id": "step-1-build-the-actor-ttp-profile",
+        "text": "Step 1: Build the Actor TTP Profile ​"
+      },
+      {
+        "tag": "h2",
+        "id": "step-2-gap-analysis-against-current-detections",
+        "text": "Step 2: Gap Analysis Against Current Detections ​"
+      },
+      {
+        "tag": "h2",
+        "id": "step-3-prioritize-the-detection-gap",
+        "text": "Step 3: Prioritize the Detection Gap ​"
+      },
+      {
+        "tag": "h2",
+        "id": "step-4-translate-to-detection-requirements",
+        "text": "Step 4: Translate to Detection Requirements ​"
+      },
+      {
+        "tag": "h2",
+        "id": "step-56-write-deploy-and-baseline",
+        "text": "Step 5–6: Write, Deploy, and Baseline ​"
+      },
+      {
+        "tag": "h2",
+        "id": "step-7-purple-team-validate",
+        "text": "Step 7: Purple Team Validate ​"
+      },
+      {
+        "tag": "h2",
+        "id": "step-810-hunt-validate-in-production-feed-back",
+        "text": "Step 8–10: Hunt, Validate in Production, Feed Back ​"
+      },
+      {
+        "tag": "h2",
+        "id": "keeping-the-pipeline-current",
+        "text": "Keeping the Pipeline Current ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/ai-vs-defense/new-paradigm/detection-stack",
+    "status": 200,
+    "title": "The Detection Stack: What Survives AI-Assisted Offense | 1200km",
+    "description": "Compare detection approaches by their resilience to novel tools and AI-researched evasion, then prioritize layers grounded in environment-specific evidence.",
+    "h1": "The Detection Stack: What Survives AI-Assisted Offense",
+    "word_count": 1234,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 12,
+    "paragraphs": [
+      "Not all detections are equally robust against AI-assisted attackers. This section provides a tiered assessment of each detection approach, honest about what still works and what is losing reliability.",
+      "The robustness of a detection correlates strongly with one factor: how much it depends on environment-specific normal behavior versus publicly documented attack signatures.",
+      "These detection types are losing reliability and should not be your primary investment for new controls:",
+      "Robustness: Very Low"
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "The Detection Stack: What Survives AI-Assisted Offense"
+      },
+      {
+        "tag": "h2",
+        "id": "the-robustness-spectrum",
+        "text": "The Robustness Spectrum ​"
+      },
+      {
+        "tag": "h2",
+        "id": "tier-1--low-robustness-signature-based",
+        "text": "Tier 1 — Low Robustness (Signature-Based) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "hash-matching",
+        "text": "Hash Matching ​"
+      },
+      {
+        "tag": "h3",
+        "id": "ipdomain-ioc-matching",
+        "text": "IP/Domain IOC Matching ​"
+      },
+      {
+        "tag": "h3",
+        "id": "static-string-yara-rules",
+        "text": "Static String YARA Rules ​"
+      },
+      {
+        "tag": "h2",
+        "id": "tier-2--moderate-robustness-behavioral-signatures",
+        "text": "Tier 2 — Moderate Robustness (Behavioral Signatures) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "attck-ttp-based-detection-validated",
+        "text": "ATT&CK TTP-Based Detection (Validated) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "process-relationship-anomaly-detection",
+        "text": "Process Relationship Anomaly Detection ​"
+      },
+      {
+        "tag": "h2",
+        "id": "tier-3--high-robustness-baseline-dependent",
+        "text": "Tier 3 — High Robustness (Baseline-Dependent) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "userentity-behavioral-baseline-deviation-ueba",
+        "text": "User/Entity Behavioral Baseline Deviation (UEBA) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "network-traffic-statistical-baseline-deviation",
+        "text": "Network Traffic Statistical Baseline Deviation ​"
+      },
+      {
+        "tag": "h3",
+        "id": "cross-signal-correlation-multi-layer",
+        "text": "Cross-Signal Correlation (Multi-Layer) ​"
+      },
+      {
+        "tag": "h2",
+        "id": "the-detection-investment-matrix",
+        "text": "The Detection Investment Matrix ​"
+      },
+      {
+        "tag": "h2",
+        "id": "practical-minimum-baseline-what-every-soc-should-have",
+        "text": "Practical Minimum Baseline: What Every SOC Should Have ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/ai-vs-defense/offensive-ai/from-my-research",
+    "status": 200,
+    "title": "From My Research: Concrete Examples | 1200km",
+    "description": "Review hands-on experiments covering custom malware, prompt-driven testing, and hardware attack research, with clear limits on what each result proves.",
+    "h1": "From My Research: Concrete Examples",
+    "word_count": 778,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 12,
+    "paragraphs": [
+      "The claims in this guide are not vendor whitepapers or theoretical projections. They are grounded in hands-on research I published across a series of documented experiments. Here is what I actually built and tested.",
+      "A few years ago, developing a functional custom malware implant required:",
+      "This was a real skill barrier. Most Tier 3 actors could not clear it. They were limited to signature-known tools.",
+      "With Cursor AI , the requirement changed: you need to understand what the tool should accomplish , not how to implement it. An analyst who understands what a persistence mechanism does but has never written Windows API code can now direct an AI to implement it."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "From My Research: Concrete Examples"
+      },
+      {
+        "tag": "h2",
+        "id": "custom-malware-development-a-weekend-project",
+        "text": "Custom Malware Development: A Weekend Project ​"
+      },
+      {
+        "tag": "h2",
+        "id": "full-network-penetration-test-with-one-prompt",
+        "text": "Full Network Penetration Test with One Prompt ​"
+      },
+      {
+        "tag": "h2",
+        "id": "wifi-cracking-with-one-prompt",
+        "text": "WiFi Cracking with One Prompt ​"
+      },
+      {
+        "tag": "h2",
+        "id": "credential-attacks-with-ai-orchestration",
+        "text": "Credential Attacks with AI Orchestration ​"
+      },
+      {
+        "tag": "h2",
+        "id": "hardware-attack-tools-badusb-with-ai-assistance",
+        "text": "Hardware Attack Tools: BadUSB with AI Assistance ​"
+      },
+      {
+        "tag": "h2",
+        "id": "ai-driven-exploit-development",
+        "text": "AI-Driven Exploit Development ​"
+      },
+      {
+        "tag": "h2",
+        "id": "the-unified-pattern",
+        "text": "The Unified Pattern ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/ai-vs-defense/pyramid-reloaded/script-kiddie-scenario",
+    "status": 200,
+    "title": "What a Script Kiddie + AI Actually Looks Like | 1200km",
+    "description": "Follow a realistic three-day AI-assisted attack scenario and compare the expertise, time, and operational barriers that the same campaign required in 2020.",
+    "h1": "What a \"Script Kiddie + AI\" Actually Looks Like",
+    "word_count": 835,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 12,
+    "paragraphs": [
+      "Abstract descriptions of AI-lowering-the-bar can feel unconvincing. Let me make it concrete: here is a realistic attack scenario that an intermediate-skill attacker with AI tools could execute in 2025 — and the equivalent scenario from 2020 that would have required a senior professional.",
+      "The attacker has: intermediate security knowledge (equivalent to a mid-level CTF player), access to AI tools (Cursor, Gemini CLI, HexStrike-AI or equivalent), and a target organization to investigate.",
+      "A senior attacker with OSINT experience manually:",
+      "Time required: Multiple days. Several separate skill domains."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "What a \"Script Kiddie + AI\" Actually Looks Like"
+      },
+      {
+        "tag": "h2",
+        "id": "day-1--target-research-and-tool-preparation",
+        "text": "Day 1 — Target Research and Tool Preparation ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2020-version-senior-professional-required",
+        "text": "2020 Version (Senior Professional Required) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2025-version-intermediate-skill--ai",
+        "text": "2025 Version (Intermediate Skill + AI) ​"
+      },
+      {
+        "tag": "h2",
+        "id": "day-2--initial-access",
+        "text": "Day 2 — Initial Access ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2020-version",
+        "text": "2020 Version ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2025-version",
+        "text": "2025 Version ​"
+      },
+      {
+        "tag": "h2",
+        "id": "day-3--exploitation-and-post-compromise",
+        "text": "Day 3 — Exploitation and Post-Compromise ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2020-version-1",
+        "text": "2020 Version ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2025-version-1",
+        "text": "2025 Version ​"
+      },
+      {
+        "tag": "h2",
+        "id": "the-comparison-in-numbers",
+        "text": "The Comparison in Numbers ​"
+      },
+      {
+        "tag": "h2",
+        "id": "what-this-means-for-your-soc",
+        "text": "What This Means for Your SOC ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/ai-vs-defense/soc-playbook/medium-term",
+    "status": 200,
+    "title": "SOC Analyst Playbook — 90-Day Roadmap | 1200km",
+    "description": "Plan a 90-day detection upgrade covering audit closure, AI-assisted purple teaming, freshness reviews, actor profiles, and anomaly-focused SIEM investment.",
+    "h1": "SOC Analyst Playbook: The 90-Day Roadmap",
+    "word_count": 1437,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 12,
+    "paragraphs": [
+      "The immediate actions in the previous section are things you can do now. This section is the structural program that needs to exist within 90 days if your detection strategy is going to keep pace with AI-assisted offense.",
+      "Complete the detection audit from the immediate actions section and build a Navigator layer that reflects validated coverage, not theoretical coverage.",
+      "The difference matters for decision-making. Theoretical: \"we have a rule tagged T1003.001.\" Validated: \"that rule fires when tested with Atomic Red Team against Sysmon EventID 10 data, detected in under 3 minutes.\"",
+      "Target output: a Navigator heatmap that shows:"
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "SOC Analyst Playbook: The 90-Day Roadmap"
+      },
+      {
+        "tag": "h2",
+        "id": "month-1-know-your-real-state",
+        "text": "Month 1: Know Your Real State ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-11--complete-detection-audit-and-navigator-layer",
+        "text": "Priority 1.1 — Complete Detection Audit and Navigator Layer ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-12--data-source-inventory",
+        "text": "Priority 1.2 — Data Source Inventory ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-13--build-priority-threat-actor-profiles",
+        "text": "Priority 1.3 — Build Priority Threat Actor Profiles ​"
+      },
+      {
+        "tag": "h2",
+        "id": "month-2-build-and-deploy",
+        "text": "Month 2: Build and Deploy ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-21--detection-engineering-against-your-gap-backlog",
+        "text": "Priority 2.1 — Detection Engineering Against Your Gap Backlog ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-22--run-a-purple-team-exercise-ai-assisted-red-team",
+        "text": "Priority 2.2 — Run a Purple Team Exercise (AI-Assisted Red Team) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-23--implement-ueba-for-privileged-accounts",
+        "text": "Priority 2.3 — Implement UEBA for Privileged Accounts ​"
+      },
+      {
+        "tag": "h2",
+        "id": "month-3-validate-iterate-and-systematize",
+        "text": "Month 3: Validate, Iterate, and Systematize ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-31--validate-all-newly-deployed-rules",
+        "text": "Priority 3.1 — Validate All Newly Deployed Rules ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-32--establish-detection-freshness-program",
+        "text": "Priority 3.2 — Establish Detection Freshness Program ​"
+      },
+      {
+        "tag": "h3",
+        "id": "priority-33--establish-recurring-cadences",
+        "text": "Priority 3.3 — Establish Recurring Cadences ​"
+      },
+      {
+        "tag": "h2",
+        "id": "what-updated-and-fit-looks-like",
+        "text": "What \"Updated and Fit\" Looks Like ​"
+      },
+      {
+        "tag": "h2",
+        "id": "quick-reference-key-resources",
+        "text": "Quick Reference: Key Resources ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/attack-techniques/adcs-esc8",
+    "status": 200,
+    "title": "AI-Assisted ADCS ESC8 Lab Validation in GOAD-Mini | 1200km",
+    "description": "Validate ADCS ESC8 conditions in a controlled GOAD-Mini lab with Cursor and HexStrike, preserving evidence, limitations, and remediation guidance.",
+    "h1": "AI-Assisted ADCS ESC8 Lab Validation in GOAD-Mini",
+    "word_count": 1567,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "Controlled lab validation in a GOAD-Mini environment",
+      "",
+      "This article documents a controlled lab engagement that validates ADCS ESC8 exposure in GOAD-Mini. Starting from an IP address, the AI-assisted workflow helped sequence reconnaissance, ADCS enumeration, certificate-abuse validation, evidence collection, and remediation notes."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "AI-Assisted ADCS ESC8 Lab Validation in GOAD-Mini"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-assisted-adcs-esc8-lab-validation-in-goad-mini-1",
+        "text": "AI-Assisted ADCS ESC8 Lab Validation in GOAD-Mini ​"
+      },
+      {
+        "tag": "h4",
+        "id": "controlled-adcs-esc8-validation-with-cursor-and-hexstrike-mcp",
+        "text": "Controlled ADCS ESC8 validation with Cursor and HexStrike MCP ​"
+      },
+      {
+        "tag": "h3",
+        "id": "abstract",
+        "text": "Abstract ​"
+      },
+      {
+        "tag": "h3",
+        "id": "known-limitations",
+        "text": "Known Limitations ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h3",
+        "id": "what-makes-this-attack-complicated",
+        "text": "What Makes This Attack Complicated? ​"
+      },
+      {
+        "tag": "h3",
+        "id": "attack-overview",
+        "text": "Attack Overview ​"
+      },
+      {
+        "tag": "h4",
+        "id": "target-environment",
+        "text": "Target Environment ​"
+      },
+      {
+        "tag": "h3",
+        "id": "attack-chain",
+        "text": "Attack Chain ​"
+      },
+      {
+        "tag": "h3",
+        "id": "single-prompt-initiation",
+        "text": "Single-Prompt Initiation ​"
+      },
+      {
+        "tag": "h4",
+        "id": "the-prompt",
+        "text": "The Prompt ​"
+      },
+      {
+        "tag": "h3",
+        "id": "why-this-works",
+        "text": "Why This Works ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-by-phase-execution",
+        "text": "Phase-by-Phase Execution ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-1-reconnaissance",
+        "text": "Phase 1: Reconnaissance ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-2-credential-acquisition",
+        "text": "Phase 2: Credential Acquisition ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-3-adcs-enumeration",
+        "text": "Phase 3: ADCS Enumeration ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-4-certificate-request",
+        "text": "Phase 4: Certificate Request ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-5-certificate-authentication",
+        "text": "Phase 5: Certificate Authentication ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-6-impact-validation-dcsync-risk",
+        "text": "Phase 6: Impact Validation (DCSync Risk) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-7-reporting",
+        "text": "Phase 7: Reporting ​"
+      },
+      {
+        "tag": "h3",
+        "id": "automation-features",
+        "text": "Automation Features ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-automatic-troubleshooting",
+        "text": "1. Automatic Troubleshooting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-intelligent-decision-making",
+        "text": "2. Intelligent Decision Making ​"
+      },
+      {
+        "tag": "h4",
+        "id": "3-comprehensive-logging",
+        "text": "3. Comprehensive Logging ​"
+      },
+      {
+        "tag": "h3",
+        "id": "results-summary",
+        "text": "Results Summary ​"
+      },
+      {
+        "tag": "h4",
+        "id": "attack-timeline",
+        "text": "Attack Timeline ​"
+      },
+      {
+        "tag": "h3",
+        "id": "key-achievements",
+        "text": "Key Achievements ​"
+      },
+      {
+        "tag": "h3",
+        "id": "technical-deep-dive",
+        "text": "Technical Deep Dive ​"
+      },
+      {
+        "tag": "h4",
+        "id": "why-this-attack-is-complicated",
+        "text": "Why This Attack is Complicated ​"
+      },
+      {
+        "tag": "h3",
+        "id": "attack-complexity-metrics",
+        "text": "Attack Complexity Metrics ​"
+      },
+      {
+        "tag": "h3",
+        "id": "defense-and-mitigation",
+        "text": "Defense and Mitigation ​"
+      },
+      {
+        "tag": "h4",
+        "id": "immediate-actions",
+        "text": "Immediate Actions ​"
+      },
+      {
+        "tag": "h3",
+        "id": "long-term-security",
+        "text": "Long-Term Security ​"
+      },
+      {
+        "tag": "h3",
+        "id": "detection-and-monitoring",
+        "text": "Detection and Monitoring ​"
+      },
+      {
+        "tag": "h4",
+        "id": "indicators-of-compromise-iocs",
+        "text": "Indicators of Compromise (IOCs) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "detection-queries",
+        "text": "Detection Queries ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      },
+      {
+        "tag": "h3",
+        "id": "key-takeaways",
+        "text": "Key Takeaways ​"
+      },
+      {
+        "tag": "h3",
+        "id": "references",
+        "text": "References ​"
+      },
+      {
+        "tag": "h3",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h2",
+        "id": "known-limitations-1",
+        "text": "Known Limitations ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/attack-techniques/smb-brute-force",
+    "status": 200,
+    "title": "SMB Exposure & Credential Brute-Force | 1200km",
+    "description": "Assess SMB exposure in an authorized lab with Gemini and HexStrike, from service fingerprinting and authentication checks to share-risk remediation.",
+    "h1": "HexStrike + Gemini. AI-Assisted SMB Exposure Credential Brute-Force",
+    "word_count": 1875,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "Authorization required. All techniques on this page are for use in authorized lab environments only . Never test against systems you do not own or have explicit written permission to assess. Document scope, maintain an audit log, and obtain approval before executing any exploitation step.",
+      "From Toolchain Failures → Service Fingerprinting → Authentication Findings → Share Risk",
+      ""
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike + Gemini. AI-Assisted SMB Exposure Credential Brute-Force"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike--gemini-ai-assisted-smb-exposure-credential-brute-force-1",
+        "text": "HexStrike + Gemini. AI-Assisted SMB Exposure Credential Brute-Force ​"
+      },
+      {
+        "tag": "h4",
+        "id": "from-toolchain-failures--service-fingerprinting--authentication-findings--share-risk",
+        "text": "From Toolchain Failures → Service Fingerprinting → Authentication Findings → Share Risk ​"
+      },
+      {
+        "tag": "h3",
+        "id": "overview",
+        "text": "Overview ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scenario",
+        "text": "Scenario ​"
+      },
+      {
+        "tag": "h4",
+        "id": "objective",
+        "text": "Objective ​"
+      },
+      {
+        "tag": "h4",
+        "id": "inputs",
+        "text": "Inputs ​"
+      },
+      {
+        "tag": "h4",
+        "id": "prompt",
+        "text": "Prompt: ​"
+      },
+      {
+        "tag": "h3",
+        "id": "execution-flow-what-actually-happened",
+        "text": "Execution flow (what actually happened) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-fast-scan-failed--fallback-to-a-full-nmap-fingerprint",
+        "text": "1) Fast scan failed → fallback to a full Nmap fingerprint ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2-smb-enumeration-tooling-mismatch-enum4linux-ng-wrapper-issue",
+        "text": "2) SMB enumeration tooling mismatch (enum4linux-ng wrapper issue) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "3-smbmap-unauthenticated-run-produced-a-transportread-error",
+        "text": "3) SMBMap unauthenticated run produced a transport/read error ​"
+      },
+      {
+        "tag": "h3",
+        "id": "4-netexec-fingerprinting-revealed-two-critical-posture-flags",
+        "text": "4) NetExec fingerprinting revealed two critical posture flags ​"
+      },
+      {
+        "tag": "h3",
+        "id": "5-hydra-attack",
+        "text": "5) Hydra Attack ​"
+      },
+      {
+        "tag": "h3",
+        "id": "6-credential-hygiene-test-succeeded-but-reveals-systemic-weakness",
+        "text": "6) Credential hygiene test succeeded (but reveals systemic weakness) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "7-authenticated-share-enumeration-succeeded",
+        "text": "7) Authenticated share enumeration succeeded ​"
+      },
+      {
+        "tag": "h3",
+        "id": "findings-summary",
+        "text": "Findings summary ​"
+      },
+      {
+        "tag": "h3",
+        "id": "defensive-remediation-checklist-prioritized",
+        "text": "Defensive remediation checklist (prioritized) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-fix-protocol-posture-high-impact",
+        "text": "1) Fix protocol posture (high impact) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-reduce-exposure",
+        "text": "2) Reduce exposure ​"
+      },
+      {
+        "tag": "h4",
+        "id": "3-repair-identity-controls",
+        "text": "3) Repair identity controls ​"
+      },
+      {
+        "tag": "h4",
+        "id": "4-tighten-share-permissions",
+        "text": "4) Tighten share permissions ​"
+      },
+      {
+        "tag": "h4",
+        "id": "5-keep-the-good-part-network-logon-restrictions",
+        "text": "5) Keep the good part: network logon restrictions ​"
+      },
+      {
+        "tag": "h3",
+        "id": "detection-engineering-what-to-monitor",
+        "text": "Detection engineering (what to monitor) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "windows-logs-to-prioritize",
+        "text": "Windows logs to prioritize ​"
+      },
+      {
+        "tag": "h4",
+        "id": "network-telemetry",
+        "text": "Network telemetry ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/attack-techniques/ssh-brute-force",
+    "status": 200,
+    "title": "SSH Credential Brute-Force | 1200km",
+    "description": "Assess SSH exposure in an authorized lab with Gemini and HexStrike, covering service validation, credential-risk checks, evidence, and remediation guidance.",
+    "h1": "HexStrike + Gemini. AI-Assisted SSH Credential Brute-Force",
+    "word_count": 578,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "Authorization required. All techniques on this page are for use in authorized lab environments only . Never test against systems you do not own or have explicit written permission to assess. Document scope, maintain an audit log, and obtain approval before executing any exploitation step.",
+      "From Service Validation → Dependency Fixes → Findings → Defensive Takeaways",
+      ""
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike + Gemini. AI-Assisted SSH Credential Brute-Force"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike--gemini-ai-assisted-ssh-credential-brute-force-1",
+        "text": "HexStrike + Gemini. AI-Assisted SSH Credential Brute-Force ​"
+      },
+      {
+        "tag": "h4",
+        "id": "from-service-validation--dependency-fixes--findings--defensive-takeaways",
+        "text": "From Service Validation → Dependency Fixes → Findings → Defensive Takeaways ​"
+      },
+      {
+        "tag": "h3",
+        "id": "overview",
+        "text": "Overview ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scenario",
+        "text": "Scenario ​"
+      },
+      {
+        "tag": "h4",
+        "id": "objective",
+        "text": "Objective ​"
+      },
+      {
+        "tag": "h4",
+        "id": "inputs",
+        "text": "Inputs ​"
+      },
+      {
+        "tag": "h4",
+        "id": "tooling-via-hexstrike-ai--gemini-cli-orchestration",
+        "text": "Tooling (via HexStrike-AI / Gemini CLI orchestration) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "step-by-step-execution-flow",
+        "text": "Step-by-step execution flow ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-prompt",
+        "text": "1) Prompt ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2-port-scanning",
+        "text": "2) Port scanning ​"
+      },
+      {
+        "tag": "h3",
+        "id": "3-custom-small-lists-succeeded-and-exposed-weak-credentials",
+        "text": "3) Custom small lists succeeded (and exposed weak credentials) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "findings-summary-redacted-example-format",
+        "text": "Findings summary (redacted example format) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "final-result-lab-outcome",
+        "text": "Final result (lab outcome) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "why-this-matters-defensive-perspective",
+        "text": "Why this matters (defensive perspective) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "detection-and-hardening-checklist-what-to-do-next",
+        "text": "Detection and hardening checklist (what to do next) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "hardening-highest-roi-first",
+        "text": "Hardening (highest ROI first) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "detection-engineering",
+        "text": "Detection engineering ​"
+      },
+      {
+        "tag": "h3",
+        "id": "key-takeaways",
+        "text": "Key takeaways ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/attack-techniques/web-cloud",
+    "status": 200,
+    "title": "Web & Cloud Penetration Testing | 1200km",
+    "description": "Coordinate authorized web and cloud testing with Cursor, HexStrike, and Burp Suite MCP while preserving scope, approvals, evidence, and limitations.",
+    "h1": "AI-Assisted Web and Cloud Penetration Testing with Cursor + MCP HexStrike and Burp Suite MCP. | Check if HexStrike server is running | Test Burp MCP endpoint",
+    "word_count": 7638,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "Authorization required. All techniques on this page are for use in authorized lab environments only . Never test against systems you do not own or have explicit written permission to assess. Document scope, maintain an audit log, and obtain approval before executing any exploitation step.",
+      "A Complete Guide to Modern AI-Powered Security Testing. From One Prompt to Full Attack Surface Coverage (Recon → Exploit → Report).",
+      "This page documents a lab workflow. Results depend on application design, cloud permissions, MCP connectivity, Burp configuration, rate limits, and operator approval. Treat AI output as recommendations to review, not as an authority to execute high-impact actions automatically."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "AI-Assisted Web and Cloud Penetration Testing with Cursor + MCP HexStrike and Burp Suite MCP."
+      },
+      {
+        "tag": "h3",
+        "id": "known-limitations",
+        "text": "Known Limitations ​"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-assisted-web-and-cloud-penetration-testing-with-cursor--mcp-hexstrike-and-burp-suite-mcp-1",
+        "text": "AI-Assisted Web and Cloud Penetration Testing with Cursor + MCP HexStrike and Burp Suite MCP. ​"
+      },
+      {
+        "tag": "h4",
+        "id": "a-complete-guide-to-modern-ai-powered-security-testing-from-one-prompt-to-full-attack-surface-coverage-recon--exploit--report",
+        "text": "A Complete Guide to Modern AI-Powered Security Testing. From One Prompt to Full Attack Surface Coverage (Recon → Exploit → Report). ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "table-of-contents",
+        "text": "Table of Contents ​"
+      },
+      {
+        "tag": "h3",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h4",
+        "id": "what-makes-this-different",
+        "text": "What Makes This Different? ​"
+      },
+      {
+        "tag": "h3",
+        "id": "mcp-architecture-overview",
+        "text": "MCP Architecture Overview ​"
+      },
+      {
+        "tag": "h4",
+        "id": "what-is-model-context-protocol-mcp",
+        "text": "What is Model Context Protocol (MCP)? ​"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike-mcp-configuration",
+        "text": "HexStrike MCP Configuration ​"
+      },
+      {
+        "tag": "h3",
+        "id": "burp-suite-mcp-configuration",
+        "text": "Burp Suite MCP Configuration ​"
+      },
+      {
+        "tag": "h4",
+        "id": "how-mcp-integration-works",
+        "text": "How MCP Integration Works ​"
+      },
+      {
+        "tag": "h3",
+        "id": "setting-up-the-environment",
+        "text": "Setting Up the Environment ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-1-install-cursor-ai",
+        "text": "Step 1: Install Cursor AI ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-2-configure-hexstrike-mcp",
+        "text": "Step 2: Configure HexStrike MCP ​"
+      },
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "Check if HexStrike server is running"
+      },
+      {
+        "tag": "h4",
+        "id": "step-3-configure-burp-suite-mcp",
+        "text": "Step 3: Configure Burp Suite MCP ​"
+      },
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "Test Burp MCP endpoint"
+      },
+      {
+        "tag": "h4",
+        "id": "step-4-verify-integration",
+        "text": "Step 4: Verify Integration ​"
+      },
+      {
+        "tag": "h3",
+        "id": "complete-penetration-test-flow-ai-reasoning-in-action",
+        "text": "Complete Penetration Test Flow: AI Reasoning in Action ​"
+      },
+      {
+        "tag": "h4",
+        "id": "the-starting-point-a-simple-prompt",
+        "text": "The Starting Point: A Simple Prompt ​"
+      },
+      {
+        "tag": "h4",
+        "id": "initial-reasoning-where-do-i-start",
+        "text": "Initial Reasoning: Where Do I Start? ​"
+      },
+      {
+        "tag": "h4",
+        "id": "first-tool-selection-hexstrike-mcp-or-direct-command",
+        "text": "First Tool Selection: HexStrike MCP or Direct Command? ​"
+      },
+      {
+        "tag": "h4",
+        "id": "web-application-enumeration-choosing-the-right-approach",
+        "text": "Web Application Enumeration: Choosing the Right Approach ​"
+      },
+      {
+        "tag": "h4",
+        "id": "information-disclosure-the-critical-discovery",
+        "text": "Information Disclosure: The Critical Discovery ​"
+      },
+      {
+        "tag": "h4",
+        "id": "cloud-function-testing-tool-selection-dilemma",
+        "text": "Cloud Function Testing: Tool Selection Dilemma ​"
+      },
+      {
+        "tag": "h4",
+        "id": "gcp-metadata-access-complex-command-execution",
+        "text": "GCP Metadata Access: Complex Command Execution ​"
+      },
+      {
+        "tag": "h4",
+        "id": "cloud-enumeration-using-gcp-apis",
+        "text": "Cloud Enumeration: Using GCP APIs ​"
+      },
+      {
+        "tag": "h4",
+        "id": "advanced-testing-when-to-use-mcp-tools",
+        "text": "Advanced Testing: When to Use MCP Tools ​"
+      },
+      {
+        "tag": "h4",
+        "id": "final-reasoning-compiling-the-assessment",
+        "text": "Final Reasoning: Compiling the Assessment ​"
+      },
+      {
+        "tag": "h3",
+        "id": "full-pt-report-generated-by-ai",
+        "text": "Full PT Report (Generated by AI) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "tool-usage-and-integration",
+        "text": "Tool Usage and Integration ​"
+      },
+      {
+        "tag": "h4",
+        "id": "when-to-use-hexstrike-mcp",
+        "text": "When to Use HexStrike MCP ​"
+      },
+      {
+        "tag": "h4",
+        "id": "when-to-use-burp-suite-mcp",
+        "text": "When to Use Burp Suite MCP ​"
+      },
+      {
+        "tag": "h4",
+        "id": "when-to-use-direct-commands",
+        "text": "When to Use Direct Commands ​"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-reasoning-and-decision-making",
+        "text": "AI Reasoning and Decision Making ​"
+      },
+      {
+        "tag": "h4",
+        "id": "how-ai-makes-decisions",
+        "text": "How AI Makes Decisions ​"
+      },
+      {
+        "tag": "h4",
+        "id": "example-ai-reasoning-chain",
+        "text": "Example: AI Reasoning Chain ​"
+      },
+      {
+        "tag": "h4",
+        "id": "decision-tree-example",
+        "text": "Decision Tree Example ​"
+      },
+      {
+        "tag": "h3",
+        "id": "troubleshooting-and-problem-solving",
+        "text": "Troubleshooting and Problem Solving ​"
+      },
+      {
+        "tag": "h3",
+        "id": "common-issues-and-solutions",
+        "text": "Common Issues and Solutions ​"
+      },
+      {
+        "tag": "h4",
+        "id": "issue-1-hexstrike-mcp-connection-failed",
+        "text": "Issue 1: HexStrike MCP Connection Failed ​"
+      },
+      {
+        "tag": "h4",
+        "id": "issue-2-burp-mcp-not-responding",
+        "text": "Issue 2: Burp MCP Not Responding ​"
+      },
+      {
+        "tag": "h4",
+        "id": "issue-3-tool-not-found-in-hexstrike",
+        "text": "Issue 3: Tool Not Found in HexStrike ​"
+      },
+      {
+        "tag": "h4",
+        "id": "issue-4-sqlmap-redirecting-to-login",
+        "text": "Issue 4: SQLmap Redirecting to Login ​"
+      },
+      {
+        "tag": "h4",
+        "id": "issue-5-metadata-service-returns-403",
+        "text": "Issue 5: Metadata Service Returns 403 ​"
+      },
+      {
+        "tag": "h3",
+        "id": "ais-problem-solving-approach",
+        "text": "AI’s Problem-Solving Approach ​"
+      },
+      {
+        "tag": "h3",
+        "id": "why-this-configuration-is-powerful",
+        "text": "Why This Configuration is Powerful ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-unified-intelligence-layer",
+        "text": "1. Unified Intelligence Layer ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-contextual-understanding",
+        "text": "2. Contextual Understanding ​"
+      },
+      {
+        "tag": "h4",
+        "id": "3-adaptive-strategy",
+        "text": "3. Adaptive Strategy ​"
+      },
+      {
+        "tag": "h4",
+        "id": "4-comprehensive-documentation",
+        "text": "4. Comprehensive Documentation ​"
+      },
+      {
+        "tag": "h4",
+        "id": "5-speed-and-efficiency",
+        "text": "5. Speed and Efficiency ​"
+      },
+      {
+        "tag": "h4",
+        "id": "6-reduced-human-error",
+        "text": "6. Reduced Human Error ​"
+      },
+      {
+        "tag": "h4",
+        "id": "7-learning-and-improvement",
+        "text": "7. Learning and Improvement ​"
+      },
+      {
+        "tag": "h2",
+        "id": "lessons-learned",
+        "text": "Lessons Learned ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-mcp-integration-is-game-changing",
+        "text": "1. MCP Integration is Game-Changing ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-ai-reasoning-is-critical",
+        "text": "2. AI Reasoning is Critical ​"
+      },
+      {
+        "tag": "h4",
+        "id": "3-graceful-degradation-is-essential",
+        "text": "3. Graceful Degradation is Essential ​"
+      },
+      {
+        "tag": "h4",
+        "id": "4-documentation-is-automatic",
+        "text": "4. Documentation is Automatic ​"
+      },
+      {
+        "tag": "h4",
+        "id": "5-cloud-services-are-often-less-protected",
+        "text": "5. Cloud Services are Often Less Protected ​"
+      },
+      {
+        "tag": "h4",
+        "id": "6-information-disclosure-is-critical",
+        "text": "6. Information Disclosure is Critical ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      },
+      {
+        "tag": "h4",
+        "id": "key-takeaways",
+        "text": "Key Takeaways ​"
+      },
+      {
+        "tag": "h4",
+        "id": "future-directions",
+        "text": "Future Directions ​"
+      },
+      {
+        "tag": "h4",
+        "id": "final-thoughts",
+        "text": "Final Thoughts ​"
+      },
+      {
+        "tag": "h3",
+        "id": "appendix-a-complete-tool-inventory",
+        "text": "Appendix A: Complete Tool Inventory ​"
+      },
+      {
+        "tag": "h4",
+        "id": "hexstrike-mcp-tools-used",
+        "text": "HexStrike MCP Tools Used ​"
+      },
+      {
+        "tag": "h4",
+        "id": "burp-suite-mcp-tools-used",
+        "text": "Burp Suite MCP Tools Used ​"
+      },
+      {
+        "tag": "h4",
+        "id": "direct-commands-used",
+        "text": "Direct Commands Used ​"
+      },
+      {
+        "tag": "h3",
+        "id": "appendix-b-complete-attack-timeline",
+        "text": "Appendix B: Complete Attack Timeline ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/attack-techniques/wireless-wifi",
+    "status": 200,
+    "title": "Wireless / WiFi Cracking | 1200km",
+    "description": "Examine an authorized wireless-security lab using Gemini, HexStrike, and Aircrack-ng, with scope controls, evidence handling, and defensive takeaways.",
+    "h1": "AI-Driven Wireless Penetration Testing. One Prompt WIFI cracking",
+    "word_count": 711,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "Authorization required. All techniques on this page are for use in authorized lab environments only . Never test against systems you do not own or have explicit written permission to assess. Document scope, maintain an audit log, and obtain approval before executing any exploitation step.",
+      "Using Aircrack-ng with HexStrike-AI and Gemini-CLI",
+      ""
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "AI-Driven Wireless Penetration Testing. One Prompt WIFI cracking"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-driven-wireless-penetration-testing-one-prompt-wifi-cracking-1",
+        "text": "AI-Driven Wireless Penetration Testing. One Prompt WIFI cracking ​"
+      },
+      {
+        "tag": "h4",
+        "id": "using-aircrack-ng-with-hexstrike-ai-and-gemini-cli",
+        "text": "Using Aircrack-ng with HexStrike-AI and Gemini-CLI ​"
+      },
+      {
+        "tag": "h3",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "architecture-overview",
+        "text": "Architecture Overview ​"
+      },
+      {
+        "tag": "h3",
+        "id": "prerequisites",
+        "text": "Prerequisites ​"
+      },
+      {
+        "tag": "h3",
+        "id": "environment",
+        "text": "Environment ​"
+      },
+      {
+        "tag": "h3",
+        "id": "required-tools-already-in-kali",
+        "text": "Required tools (already in Kali) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "prompt",
+        "text": "Prompt ​"
+      },
+      {
+        "tag": "h3",
+        "id": "what-happened-step-by-step",
+        "text": "What happened (step by step) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "1-interface-discovery",
+        "text": "1. Interface discovery ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2-monitor-mode-enablement",
+        "text": "2. Monitor mode enablement ​"
+      },
+      {
+        "tag": "h3",
+        "id": "3-initial-wireless-scan",
+        "text": "3. Initial wireless scan ​"
+      },
+      {
+        "tag": "h3",
+        "id": "4-target-selection-first-attempt",
+        "text": "4. Target selection (first attempt) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "5-pivot-to-another-ap-same-essid",
+        "text": "5. Pivot to another AP (same ESSID) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "6-handshake-capture",
+        "text": "6. Handshake capture ​"
+      },
+      {
+        "tag": "h3",
+        "id": "7-offline-cracking",
+        "text": "7. Offline cracking ​"
+      },
+      {
+        "tag": "h3",
+        "id": "final-result",
+        "text": "Final result ​"
+      },
+      {
+        "tag": "h3",
+        "id": "outcome",
+        "text": "Outcome ​"
+      },
+      {
+        "tag": "h3",
+        "id": "recovered-password",
+        "text": "Recovered password ​"
+      },
+      {
+        "tag": "h3",
+        "id": "key-technical-observations",
+        "text": "Key technical observations ​"
+      },
+      {
+        "tag": "h3",
+        "id": "this-was-not-a-single-command-crack--it-was-a-full-adaptive-pt-flow",
+        "text": "This was not a single-command crack — it was a full, adaptive PT flow . ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/changelog",
+    "status": 200,
+    "title": "Changelog | 1200km",
+    "description": "Track HexStrike guide updates, including content synchronization, safety framing, redactions, technical corrections, navigation, and release history.",
+    "h1": "Changelog",
+    "word_count": 775,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      "Content synchronization",
+      "Redaction",
+      "Technical accuracy",
+      "Framing"
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "Changelog"
+      },
+      {
+        "tag": "h2",
+        "id": "may-2026--v23-current",
+        "text": "May 2026 — v2.3 (Current) ​"
+      },
+      {
+        "tag": "h2",
+        "id": "may-2026--v22",
+        "text": "May 2026 — v2.2 ​"
+      },
+      {
+        "tag": "h2",
+        "id": "may-2026--v21",
+        "text": "May 2026 — v2.1 ​"
+      },
+      {
+        "tag": "h2",
+        "id": "may-2026--v20",
+        "text": "May 2026 — v2.0 ​"
+      },
+      {
+        "tag": "h2",
+        "id": "december-2025--v10-initial",
+        "text": "December 2025 — v1.0 (Initial) ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/full-pt-walkthroughs/black-box-ad",
+    "status": 200,
+    "title": "Black-Box Active Directory PT Walkthrough | 1200km",
+    "description": "Study a black-box Active Directory lab workflow for scoped discovery, reviewed validation, attack-path evidence, remediation, and reporting.",
+    "h1": "AI-Driven Black Box Active Directory Penetration Testing",
+    "word_count": 2925,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "AI-Assisted AD Discovery and Exploitation with Cursor AI and HexStrike AI MCP. Lab walkthrough on GOAD-Mini.",
+      "",
+      "This article documents a controlled black box Active Directory lab assessment using Cursor AI integrated with HexStrike AI MCP (Model Context Protocol) tools. The run shows how AI-assisted orchestration can help discover, analyze, troubleshoot, validate findings, and document evidence in a known lab environment."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "AI-Driven Black Box Active Directory Penetration Testing"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-driven-black-box-active-directory-penetration-testing-1",
+        "text": "AI-Driven Black Box Active Directory Penetration Testing ​"
+      },
+      {
+        "tag": "h4",
+        "id": "ai-assisted-ad-discovery-and-exploitation-with-cursor-ai-and-hexstrike-ai-mcp-lab-walkthrough-on-goad-mini",
+        "text": "AI-Assisted AD Discovery and Exploitation with Cursor AI and HexStrike AI MCP. Lab walkthrough on GOAD-Mini. ​"
+      },
+      {
+        "tag": "h3",
+        "id": "abstract",
+        "text": "Abstract ​"
+      },
+      {
+        "tag": "h3",
+        "id": "known-limitations",
+        "text": "Known Limitations ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h2",
+        "id": "table-of-contents",
+        "text": "Table of Contents ​"
+      },
+      {
+        "tag": "h2",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h3",
+        "id": "the-black-box-challenge",
+        "text": "The Black Box Challenge ​"
+      },
+      {
+        "tag": "h3",
+        "id": "the-single-prompt-black-box-penetration-test",
+        "text": "The Single-Prompt Black Box Penetration Test ​"
+      },
+      {
+        "tag": "h3",
+        "id": "target-configuration-discovered-during-assessment",
+        "text": "Target Configuration (Discovered During Assessment) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "lab-environment-setup",
+        "text": "Lab Environment Setup ​"
+      },
+      {
+        "tag": "h4",
+        "id": "target-environment",
+        "text": "Target Environment ​"
+      },
+      {
+        "tag": "h3",
+        "id": "technology-stack-cursor-ai-and-hexstrike-ai-mcp",
+        "text": "Technology Stack: Cursor AI and HexStrike AI MCP ​"
+      },
+      {
+        "tag": "h4",
+        "id": "cursor-ai-the-autonomous-orchestrator",
+        "text": "Cursor AI: The Autonomous Orchestrator ​"
+      },
+      {
+        "tag": "h4",
+        "id": "hexstrike-ai-mcp-the-tool-integration-layer",
+        "text": "HexStrike AI MCP: The Tool Integration Layer ​"
+      },
+      {
+        "tag": "h4",
+        "id": "hexstrike-ai-mcp-tools-used",
+        "text": "HexStrike AI MCP Tools Used ​"
+      },
+      {
+        "tag": "h4",
+        "id": "integration-architecture",
+        "text": "Integration Architecture ​"
+      },
+      {
+        "tag": "h3",
+        "id": "black-box-methodology",
+        "text": "Black Box Methodology ​"
+      },
+      {
+        "tag": "h4",
+        "id": "the-discovery-first-approach",
+        "text": "The Discovery-First Approach ​"
+      },
+      {
+        "tag": "h4",
+        "id": "the-single-prompt-black-box-assessment-flow",
+        "text": "The Single-Prompt Black Box Assessment Flow ​"
+      },
+      {
+        "tag": "h3",
+        "id": "key-observation-black-box-discovery--assisted-troubleshooting",
+        "text": "Key Observation: Black Box Discovery + Assisted Troubleshooting ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-1-network-discovery",
+        "text": "Phase 1: Network Discovery ​"
+      },
+      {
+        "tag": "h4",
+        "id": "ai-planning-process",
+        "text": "AI Planning Process ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-2-active-directory-discovery-via-smb-enumeration",
+        "text": "Phase 2: Active Directory Discovery via SMB Enumeration ​"
+      },
+      {
+        "tag": "h4",
+        "id": "black-box-ad-environment-discovery",
+        "text": "Black Box AD Environment Discovery ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-3-user-enumeration",
+        "text": "Phase 3: User Enumeration ​"
+      },
+      {
+        "tag": "h4",
+        "id": "kerbrute-user-enumeration",
+        "text": "Kerbrute User Enumeration ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-4-credential-discovery",
+        "text": "Phase 4: Credential Discovery ​"
+      },
+      {
+        "tag": "h4",
+        "id": "password-spraying",
+        "text": "Password Spraying ​"
+      },
+      {
+        "tag": "h4",
+        "id": "as-rep-roasting",
+        "text": "AS-REP Roasting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "kerberoasting",
+        "text": "Kerberoasting ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-5-authenticated-enumeration",
+        "text": "Phase 5: Authenticated Enumeration ​"
+      },
+      {
+        "tag": "h4",
+        "id": "ldap-domain-dump",
+        "text": "LDAP Domain Dump ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-6-advanced-exploitation",
+        "text": "Phase 6: Advanced Exploitation ​"
+      },
+      {
+        "tag": "h4",
+        "id": "dcsync-attack",
+        "text": "DCSync Attack ​"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-assisted-decision-process",
+        "text": "AI-Assisted Decision Process ​"
+      },
+      {
+        "tag": "h4",
+        "id": "decision-support-examples",
+        "text": "Decision Support Examples ​"
+      },
+      {
+        "tag": "h3",
+        "id": "robust-automated-troubleshooting",
+        "text": "Robust Automated Troubleshooting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "example-1-tool-not-found",
+        "text": "Example 1: Tool Not Found ​"
+      },
+      {
+        "tag": "h4",
+        "id": "ai-troubleshooting-process",
+        "text": "AI Troubleshooting Process: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "example-2-authentication-failures",
+        "text": "Example 2: Authentication Failures ​"
+      },
+      {
+        "tag": "h4",
+        "id": "example-3-ldap-anonymous-bind-failed",
+        "text": "Example 3: LDAP Anonymous Bind Failed ​"
+      },
+      {
+        "tag": "h4",
+        "id": "key-feature-troubleshooting-was-structured-and-repeatable--cursor-ai-helped-identify-errors-propose-alternatives-and-document-recovery-steps",
+        "text": "Key Feature: Troubleshooting was structured and repeatable — Cursor AI helped identify errors, propose alternatives, and document recovery steps. ​"
+      },
+      {
+        "tag": "h3",
+        "id": "results-and-findings",
+        "text": "Results and Findings ​"
+      },
+      {
+        "tag": "h4",
+        "id": "summary",
+        "text": "Summary ​"
+      },
+      {
+        "tag": "h4",
+        "id": "valid-credentials",
+        "text": "Valid Credentials ​"
+      },
+      {
+        "tag": "h4",
+        "id": "vulnerabilities-identified",
+        "text": "Vulnerabilities Identified ​"
+      },
+      {
+        "tag": "h4",
+        "id": "exploits-executed",
+        "text": "Exploits Executed ​"
+      },
+      {
+        "tag": "h2",
+        "id": "advantages-of-cursor-ai--hexstrike-ai-mcp-automated-penetration-testing",
+        "text": "Advantages of Cursor AI + HexStrike AI MCP Automated Penetration Testing ​"
+      },
+      {
+        "tag": "h3",
+        "id": "practical-capabilities",
+        "text": "Practical Capabilities ​"
+      },
+      {
+        "tag": "h3",
+        "id": "comparison-manual-vs-ai-driven",
+        "text": "Comparison: Manual vs. AI-Driven ​"
+      },
+      {
+        "tag": "h3",
+        "id": "robust-troubleshooting-examples",
+        "text": "Robust Troubleshooting Examples ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      },
+      {
+        "tag": "h3",
+        "id": "key-achievements",
+        "text": "Key Achievements ​"
+      },
+      {
+        "tag": "h3",
+        "id": "the-human-prompt-that-started-it-all",
+        "text": "The Human Prompt That Started It All ​"
+      },
+      {
+        "tag": "h3",
+        "id": "future-implications",
+        "text": "Future Implications ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h2",
+        "id": "known-limitations-1",
+        "text": "Known Limitations ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/full-pt-walkthroughs/full-subnet",
+    "status": 200,
+    "title": "Full Subnet Compromise Walkthrough | 1200km",
+    "description": "Follow a controlled subnet-assessment lab from discovery and credential validation to multi-host evidence, risk analysis, cleanup, and reporting.",
+    "h1": "HexStrike + Cursor (MCP): From Single Target → Full Subnet Compromise (Lab PT Walkthrough)",
+    "word_count": 6788,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "A real end-to-end lab engagement: recon → credential discovery → share abuse → lateral movement → multi-host compromise → reporting",
+      "",
+      "Most “AI pentest” content stops at a scan screenshot."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike + Cursor (MCP): From Single Target → Full Subnet Compromise (Lab PT Walkthrough)"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike--cursor-mcp-from-single-target--full-subnet-compromise-lab-pt-walkthrough-1",
+        "text": "HexStrike + Cursor (MCP): From Single Target → Full Subnet Compromise (Lab PT Walkthrough) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "a-real-end-to-end-lab-engagement-recon--credential-discovery--share-abuse--lateral-movement--multi-host-compromise--reporting",
+        "text": "A real end-to-end lab engagement: recon → credential discovery → share abuse → lateral movement → multi-host compromise → reporting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h4",
+        "id": "after-a-lot-of-testing-i-think-that-hexstrike--cursor-is-the-most-efficient-couple--because-the-agent-can-drive-the-workflow-including-pivots-and-troubleshooting-while-hexstrike-runs-the-heavy-tooling",
+        "text": "After a lot of testing, I think that HexStrike + Cursor is the most efficient couple — because the agent can drive the workflow (including pivots and troubleshooting) while HexStrike runs the heavy tooling. ​"
+      },
+      {
+        "tag": "h4",
+        "id": "hexstrike-on-kali-linux-20254-a-comprehensive-guide",
+        "text": "HexStrike on Kali Linux 2025.4: A Comprehensive Guide ​"
+      },
+      {
+        "tag": "h4",
+        "id": "configure-cursor-mcp-to-talk-to-hexstrike-here",
+        "text": "Configure Cursor MCP to talk to HexStrike here ​"
+      },
+      {
+        "tag": "h4",
+        "id": "additional-hexstrike-guides",
+        "text": "Additional HexStrike guides: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "practical-applications--lab-comparisons",
+        "text": "Practical Applications & Lab Comparisons ​"
+      },
+      {
+        "tag": "h4",
+        "id": "specific-tooling--technique-guides",
+        "text": "Specific Tooling & Technique Guides ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scenario-and-objective",
+        "text": "Scenario and objective ​"
+      },
+      {
+        "tag": "h3",
+        "id": "tooling-model-cursor--mcp--hexstrike",
+        "text": "Tooling model: Cursor + MCP + HexStrike ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-0--prompt",
+        "text": "Phase 0 — Prompt: ​"
+      },
+      {
+        "tag": "h3",
+        "id": "raw-penetration-test-log-with-reasoning",
+        "text": "Raw Penetration Test Log with Reasoning ​"
+      },
+      {
+        "tag": "h3",
+        "id": "troubleshooting-patterns-what-actually-broke-and-how-the-workflow-recovered",
+        "text": "Troubleshooting patterns (what actually broke, and how the workflow recovered) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "findings-summary-as-reported",
+        "text": "Findings summary (as reported) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      },
+      {
+        "tag": "h3",
+        "id": "end-of-post",
+        "text": "End of post ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h2",
+        "id": "known-limitations",
+        "text": "Known Limitations ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/full-pt-walkthroughs/lab-setup",
+    "status": 200,
+    "title": "Lab Setup: Vulnerable Ubuntu 24.04 Server | 1200km",
+    "description": "Build a deliberately vulnerable Ubuntu 24.04 lab for authorized HexStrike practice, with isolated networking, services, controls, and reset guidance.",
+    "h1": "Building an Extremely Vulnerable Ubuntu 24.04 Server Lab (Bonus: Full PT with Hexstrike)",
+    "word_count": 3020,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "A Step-by-Step Guide: Hands-on guide to creating an intentionally insecure Ubuntu 24.04.3 Server VM with open SSH, FTP, Samba, NFS…",
+      "",
+      "This guide will walk you through creating a vulnerable Ubuntu 24.04.3 Server virtual machine (VM) lab for ethical penetration testing, security research, or educational purposes. Important Safety Note: This setup intentionally introduces severe security flaws, making the system highly exploitable. Only run this in an isolated virtual environment (e.g., a VM on your local machine). Do not deploy this on production systems, public networks, or without explicit permission. Always comply with laws and ethical guidelines — use for authorized testing only (e.g., CTFs, bug bounties, or personal labs). The vulnerabilities introduced here are based on common real-world exploits but are amplified for demonstration."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "Building an Extremely Vulnerable Ubuntu 24.04 Server Lab (Bonus: Full PT with Hexstrike)"
+      },
+      {
+        "tag": "h3",
+        "id": "building-an-extremely-vulnerable-ubuntu-2404-server-lab-bonus-full-pt-with-hexstrike-1",
+        "text": "Building an Extremely Vulnerable Ubuntu 24.04 Server Lab (Bonus: Full PT with Hexstrike) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "a-step-by-step-guide-hands-on-guide-to-creating-an-intentionally-insecure-ubuntu-24043-server-vm-with-open-ssh-ftp-samba-nfs-apachephp-mariadb-privilege-escalation-vectors-vulnerable-web-apps-and-sensitive-data-leaks",
+        "text": "A Step-by-Step Guide: Hands-on guide to creating an intentionally insecure Ubuntu 24.04.3 Server VM with open SSH, FTP, Samba, NFS, Apache/PHP, MariaDB, privilege escalation vectors, vulnerable web apps, and sensitive data leaks ​"
+      },
+      {
+        "tag": "h3",
+        "id": "prerequisites",
+        "text": "Prerequisites ​"
+      },
+      {
+        "tag": "h4",
+        "id": "virtualbox-recommended-for-beginners--free-and-open-source",
+        "text": "VirtualBox (Recommended for Beginners — Free and Open-Source) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "vmware-alternative-vmware-workstation-player--free-for-personal-use-better-performance-as-of-20252026-vmware-workstation-playerpro-is-free-for-personalnon-commercial-use",
+        "text": "VMware Alternative (VMware Workstation Player — Free for Personal Use, Better Performance) As of 2025–2026, VMware Workstation Player/Pro is free for personal/non-commercial use. ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-1-download-the-ubuntu-24043-server-iso",
+        "text": "Step 1: Download the Ubuntu 24.04.3 Server ISO ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-2-create-a-new-virtual-machine-in-virtualbox",
+        "text": "Step 2: Create a New Virtual Machine In VirtualBox: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "in-vmware",
+        "text": "In VMware: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-3-install-ubuntu-24043-server",
+        "text": "Step 3: Install Ubuntu 24.04.3 Server ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-4-configure-basic-networking-and-access",
+        "text": "Step 4: Configure Basic Networking and Access ​"
+      },
+      {
+        "tag": "h3",
+        "id": "take-clear-snapshot",
+        "text": "TAKE CLEAR SNAPSHOT!!! ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-this-is-a-server-only-cli-vm",
+        "text": "If this is a server-only (CLI) VM ​"
+      },
+      {
+        "tag": "h4",
+        "id": "recommended-alternatives",
+        "text": "Recommended alternatives: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-5-introduce-vulnerabilities-using-bash-script",
+        "text": "Step 5: Introduce Vulnerabilities Using Bash Script ​"
+      },
+      {
+        "tag": "h3",
+        "id": "take-new-snapshot",
+        "text": "TAKE NEW SNAPSHOT! ​"
+      },
+      {
+        "tag": "h4",
+        "id": "quick-testing-the-lab",
+        "text": "Quick Testing the Lab ​"
+      },
+      {
+        "tag": "h3",
+        "id": "basic-penetration-test-report-for-this-lab",
+        "text": "Basic Penetration Test Report for this Lab ​"
+      },
+      {
+        "tag": "h2",
+        "id": "known-limitations",
+        "text": "Known Limitations ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/getting-started/vs-other-tools",
+    "status": 200,
+    "title": "HexStrike vs. HackerAI | 1200km",
+    "description": "Compare HexStrike with HackerAI across orchestration, tool execution, context handling, evidence capture, limitations, and safe use in authorized labs.",
+    "h1": "HexStrike + Gemini vs. HackerAI: “Ops Copilot” vs. “Chatbot with Tools”",
+    "word_count": 958,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      "A practical lab comparison: Why orchestration quality beats raw model IQ in real-world workflows.",
+      "",
+      "HackerAI is an AI-powered penetration testing assistant designed to automate the initial discovery and reporting phases of a security audit.",
+      ""
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike + Gemini vs. HackerAI: “Ops Copilot” vs. “Chatbot with Tools”"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike--gemini-vs-hackerai-ops-copilot-vs-chatbot-with-tools-1",
+        "text": "HexStrike + Gemini vs. HackerAI: “Ops Copilot” vs. “Chatbot with Tools” ​"
+      },
+      {
+        "tag": "h4",
+        "id": "a-practical-lab-comparison-why-orchestration-quality-beats-raw-model-iq-in-real-world-workflows",
+        "text": "A practical lab comparison: Why orchestration quality beats raw model IQ in real-world workflows. ​"
+      },
+      {
+        "tag": "h3",
+        "id": "what-is-hackerai",
+        "text": "What is HackerAI? ​"
+      },
+      {
+        "tag": "h4",
+        "id": "i-tested-hackerai-agent-on-similar-objectives-and-compared-it-to-hexstrike--gemini-cli-workflows-ive-already-written-about",
+        "text": "I tested HackerAI agent on similar objectives and compared it to HexStrike + Gemini CLI workflows I’ve already written about: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "the-objective-operational-reality",
+        "text": "The Objective: Operational Reality ​"
+      },
+      {
+        "tag": "h3",
+        "id": "the-verdict-hexstrike--gemini-is-faster-more-deterministic-and-operator-grade-it-doesnt-just-chat-it-drives",
+        "text": "The Verdict: HexStrike + Gemini is faster, more deterministic, and “operator-grade.” It doesn’t just chat; it drives. ​"
+      },
+      {
+        "tag": "h3",
+        "id": "what-defines-better-in-offensive-ai",
+        "text": "What Defines “Better” in Offensive AI? ​"
+      },
+      {
+        "tag": "h3",
+        "id": "why-hexstrike--gemini-wins",
+        "text": "Why HexStrike + Gemini Wins ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-the-high-fidelity-execution-loop",
+        "text": "1. The High-Fidelity Execution Loop ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-diagnostic-troubleshooting",
+        "text": "2. Diagnostic Troubleshooting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "3-pragmatic-tool-chaining",
+        "text": "3. Pragmatic Tool Chaining ​"
+      },
+      {
+        "tag": "h4",
+        "id": "4-transparency-as-a-feature",
+        "text": "4. Transparency as a Feature ​"
+      },
+      {
+        "tag": "h3",
+        "id": "the-shift-impact-on-the-threat-landscape",
+        "text": "The Shift: Impact on the Threat Landscape ​"
+      },
+      {
+        "tag": "h3",
+        "id": "final-takeaway-for-red-teams",
+        "text": "Final Takeaway for Red Teams ​"
+      },
+      {
+        "tag": "h2",
+        "id": "benchmark-methodology--appendix",
+        "text": "Benchmark Methodology — Appendix ​"
+      },
+      {
+        "tag": "h3",
+        "id": "limitations",
+        "text": "Limitations ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/llm-integrations/cursor-mcp",
+    "status": 200,
+    "title": "Cursor MCP Integration | 1200km",
+    "description": "Configure Cursor as a HexStrike MCP client and follow a controlled multi-host lab workflow for discovery, validation, evidence capture, and reporting.",
+    "h1": "HexStrike + Cursor (MCP): From Single Target → Full Subnet Compromise (Lab PT Walkthrough)",
+    "word_count": 6692,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      "A real end-to-end lab engagement: recon → credential discovery → share abuse → lateral movement → multi-host compromise → reporting",
+      "",
+      "Most “AI pentest” content stops at a scan screenshot.",
+      "This engagement did not."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike + Cursor (MCP): From Single Target → Full Subnet Compromise (Lab PT Walkthrough)"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike--cursor-mcp-from-single-target--full-subnet-compromise-lab-pt-walkthrough-1",
+        "text": "HexStrike + Cursor (MCP): From Single Target → Full Subnet Compromise (Lab PT Walkthrough) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "a-real-end-to-end-lab-engagement-recon--credential-discovery--share-abuse--lateral-movement--multi-host-compromise--reporting",
+        "text": "A real end-to-end lab engagement: recon → credential discovery → share abuse → lateral movement → multi-host compromise → reporting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h4",
+        "id": "after-a-lot-of-testing-i-think-that-hexstrike--cursor-is-the-most-efficient-couple--because-the-agent-can-drive-the-workflow-including-pivots-and-troubleshooting-while-hexstrike-runs-the-heavy-tooling",
+        "text": "After a lot of testing, I think that HexStrike + Cursor is the most efficient couple — because the agent can drive the workflow (including pivots and troubleshooting) while HexStrike runs the heavy tooling. ​"
+      },
+      {
+        "tag": "h4",
+        "id": "hexstrike-on-kali-linux-20254-a-comprehensive-guide",
+        "text": "HexStrike on Kali Linux 2025.4: A Comprehensive Guide ​"
+      },
+      {
+        "tag": "h4",
+        "id": "configure-cursor-mcp-to-talk-to-hexstrike-here",
+        "text": "Configure Cursor MCP to talk to HexStrike here ​"
+      },
+      {
+        "tag": "h4",
+        "id": "additional-hexstrike-guides",
+        "text": "Additional HexStrike guides: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "practical-applications--lab-comparisons",
+        "text": "Practical Applications & Lab Comparisons ​"
+      },
+      {
+        "tag": "h4",
+        "id": "specific-tooling--technique-guides",
+        "text": "Specific Tooling & Technique Guides ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scenario-and-objective",
+        "text": "Scenario and objective ​"
+      },
+      {
+        "tag": "h3",
+        "id": "tooling-model-cursor--mcp--hexstrike",
+        "text": "Tooling model: Cursor + MCP + HexStrike ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-0--prompt",
+        "text": "Phase 0 — Prompt: ​"
+      },
+      {
+        "tag": "h3",
+        "id": "raw-penetration-test-log-with-reasoning",
+        "text": "Raw Penetration Test Log with Reasoning ​"
+      },
+      {
+        "tag": "h3",
+        "id": "troubleshooting-patterns-what-actually-broke-and-how-the-workflow-recovered",
+        "text": "Troubleshooting patterns (what actually broke, and how the workflow recovered) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "findings-summary-as-reported",
+        "text": "Findings summary (as reported) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      },
+      {
+        "tag": "h3",
+        "id": "end-of-post",
+        "text": "End of post ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/llm-integrations/gemini",
+    "status": 200,
+    "title": "Gemini CLI Integration | 1200km",
+    "description": "Connect Gemini CLI to HexStrike through MCP, verify the server and tool catalog, handle common setup failures, and run controlled security-lab workflows.",
+    "h1": "HexStrike AI: Install, Configure, and Run MCP with Gemini, OpenAI, Cursor, Llama",
+    "word_count": 3087,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "A practical, end-to-end guide to installing HexStrike AI, wiring it as an MCP server, and running real tool-driven workflows (recon →…",
+      "",
+      "HexStrike -AI acts as a Model Context Protocol (MCP) server, bridging LLMs (like ChatGPT or Google’s Gemini) to real-world security utilities. In practice, you can issue natural-language prompts, and HexStrike will autonomously run tools such as Nmap, Burp Suite, Ghidra, or Metasploit in sequence. With an arsenal of 150+ tools, enabling automated penetration testing and vulnerability research . Its goal is to transform LLMs into “world-class cybersecurity experts” by having them conduct multi-stage attack chains and recon tasks with minimal human intervention."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike AI: Install, Configure, and Run MCP with Gemini, OpenAI, Cursor, Llama"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike-ai-install-configure-and-run-mcp-with-gemini-openai-cursor-llama-1",
+        "text": "HexStrike AI: Install, Configure, and Run MCP with Gemini, OpenAI, Cursor, Llama ​"
+      },
+      {
+        "tag": "h4",
+        "id": "a-practical-end-to-end-guide-to-installing-hexstrike-ai-wiring-it-as-an-mcp-server-and-running-real-tool-driven-workflows-recon--enumeration--validation-with-gemini-openai-cursor-and-llama",
+        "text": "A practical, end-to-end guide to installing HexStrike AI, wiring it as an MCP server, and running real tool-driven workflows (recon → enumeration → validation) with Gemini, OpenAI, Cursor, and Llama. ​"
+      },
+      {
+        "tag": "h3",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h4",
+        "id": "what-youll-achieve",
+        "text": "What you’ll achieve ​"
+      },
+      {
+        "tag": "h4",
+        "id": "who-this-is-for",
+        "text": "Who this is for ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "table-of-contents",
+        "text": "Table of Contents ​"
+      },
+      {
+        "tag": "h4",
+        "id": "core-guides-and-setup",
+        "text": "Core Guides and Setup ​"
+      },
+      {
+        "tag": "h4",
+        "id": "specific-tooling--technique-guides",
+        "text": "Specific Tooling & Technique Guides ​"
+      },
+      {
+        "tag": "h3",
+        "id": "installation-instructions",
+        "text": "Installation Instructions ​"
+      },
+      {
+        "tag": "h3",
+        "id": "configuration-guide",
+        "text": "Configuration Guide ​"
+      },
+      {
+        "tag": "h4",
+        "id": "starting-hexstrike-server",
+        "text": "Starting HexStrike Server ​"
+      },
+      {
+        "tag": "h3",
+        "id": "connecting-to-codex-openai-api",
+        "text": "Connecting to Codex (OpenAI API) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "install-codex-cli-on-ubuntudebian-and-connect-to-mcp-hexstrike-on-kali-via-ssh",
+        "text": "Install Codex CLI on Ubuntu/Debian and connect to MCP HexStrike on Kali via ssh ​"
+      },
+      {
+        "tag": "h4",
+        "id": "install-prerequisites-nodejs--npm",
+        "text": "Install prerequisites (Node.js + npm) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "install-codex-cli-global",
+        "text": "Install Codex CLI (global) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "first-run-and-sign-in",
+        "text": "First run (and sign-in) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "add-hexstrike-as-an-mcp-server-in-codex-ssh--mcp-stdio",
+        "text": "Add HexStrike as an MCP server in Codex (SSH → MCP STDIO) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "prerequisites",
+        "text": "Prerequisites ​"
+      },
+      {
+        "tag": "h4",
+        "id": "add-the-mcp-server-exact-pattern-from-your-screenshot",
+        "text": "Add the MCP server (exact pattern from your screenshot) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "verify-mcp-is-enabled-inside-codex",
+        "text": "Verify MCP is enabled inside Codex ​"
+      },
+      {
+        "tag": "h4",
+        "id": "using-hexstrike-tools-from-codex",
+        "text": "Using HexStrike tools from Codex ​"
+      },
+      {
+        "tag": "h3",
+        "id": "connecting-to-google-gemini",
+        "text": "Connecting to Google Gemini ​"
+      },
+      {
+        "tag": "h3",
+        "id": "configure-cursor-mcp-to-talk-to-hexstrike",
+        "text": "Configure Cursor MCP to talk to HexStrike ​"
+      },
+      {
+        "tag": "h4",
+        "id": "minimal-mcpjson-for-hexstrike",
+        "text": "Minimal mcp.json for HexStrike ​"
+      },
+      {
+        "tag": "h4",
+        "id": "validate-the-connection-inside-cursor",
+        "text": "Validate the connection inside Cursor ​"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike-real-use-light-example-a-full-lifecycle-pentesting-guide-for-metasploitable",
+        "text": "HexStrike real use light example. A Full-Lifecycle Pentesting Guide for Metasploitable ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-1-reconnaissance-attack-surface-mapping",
+        "text": "Phase 1: Reconnaissance (Attack Surface Mapping) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-2-vulnerability-discovery-the-hit-list",
+        "text": "Phase 2: Vulnerability Discovery (The “Hit List”) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-3-exploitation-gaining-access",
+        "text": "Phase 3: Exploitation (Gaining Access) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "phase-4-post-exploitation-living-off-the-land",
+        "text": "Phase 4: Post-Exploitation (Living off the Land) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "essential-safety--performance-tips",
+        "text": "Essential Safety & Performance Tips ​"
+      },
+      {
+        "tag": "h3",
+        "id": "compatibility-and-environment-notes",
+        "text": "Compatibility and Environment Notes ​"
+      },
+      {
+        "tag": "h4",
+        "id": "practical-tips",
+        "text": "Practical tips: ​"
+      },
+      {
+        "tag": "h3",
+        "id": "security-and-ethics-reminder",
+        "text": "Security and Ethics Reminder ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "follow-for-practical-cybersecurity-research",
+        "text": "Follow for practical cybersecurity research ​"
+      },
+      {
+        "tag": "h4",
+        "id": "andrey-pautov",
+        "text": "Andrey Pautov ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/llm-integrations/ollama-local",
+    "status": 200,
+    "title": "Ollama Local Integration | 1200km",
+    "description": "Run HexStrike with local Ollama models across an Ubuntu host and Kali VM, including SSH bridging, model selection, performance limits, and recovery.",
+    "h1": "HexStrike MCP Orchestration with Ollama: Ubuntu Host, Kali VM, SSH Bridging, and Performance…",
+    "word_count": 1860,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "How to wire Ubuntu (Ollama) to Kali (HexStrike) with MCP over SSH, what models actually behaved (Qwen3 8B/14B), and when you should move to…",
+      "",
+      "Below is a practical, end-to-end setup that keeps the LLM on Ubuntu (host) and runs HexStrike on Kali (VM) , then bridges them so your local model can “drive” HexStrike tool calls."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike MCP Orchestration with Ollama: Ubuntu Host, Kali VM, SSH Bridging, and Performance…"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike-mcp-orchestration-with-ollama-ubuntu-host-kali-vm-ssh-bridging-and-performance-caveats",
+        "text": "HexStrike MCP Orchestration with Ollama: Ubuntu Host, Kali VM, SSH Bridging, and Performance Caveats ​"
+      },
+      {
+        "tag": "h4",
+        "id": "how-to-wire-ubuntu-ollama-to-kali-hexstrike-with-mcp-over-ssh-what-models-actually-behaved-qwen3-8b14b-and-when-you-should-move-to-gpu-or-cloud-models",
+        "text": "How to wire Ubuntu (Ollama) to Kali (HexStrike) with MCP over SSH, what models actually behaved (Qwen3 8B/14B), and when you should move to GPU or cloud models. ​"
+      },
+      {
+        "tag": "h3",
+        "id": "additional-guides",
+        "text": "Additional guides: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "table-of-content",
+        "text": "Table of content ​"
+      },
+      {
+        "tag": "h3",
+        "id": "disclaimer-performance--practicality",
+        "text": "Disclaimer (Performance & Practicality) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "which-llm-to-use",
+        "text": "Which LLM to use? ​"
+      },
+      {
+        "tag": "h3",
+        "id": "why-use-a-local-llm-for-pentesting",
+        "text": "Why use a local LLM for pentesting? ​"
+      },
+      {
+        "tag": "h3",
+        "id": "0-target-architecture-recommended",
+        "text": "0) Target architecture (recommended) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "1-vm-tuning-for-dell-latitude-7420-performance-first",
+        "text": "1) VM tuning for Dell Latitude 7420 (performance-first) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2-ubuntu-host-install-ollama--pull-a-model",
+        "text": "2) Ubuntu (host): install Ollama + pull a model ​"
+      },
+      {
+        "tag": "h4",
+        "id": "21-install-ollama",
+        "text": "2.1 Install Ollama ​"
+      },
+      {
+        "tag": "h4",
+        "id": "22-pull-a-laptop-friendly-model",
+        "text": "2.2 Pull a laptop-friendly model ​"
+      },
+      {
+        "tag": "h4",
+        "id": "23-laptop-optimization-recommended-defaults",
+        "text": "2.3 Laptop optimization (recommended defaults) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "3-kali-vm-install-and-start-hexstrike",
+        "text": "3) Kali VM: install and start HexStrike ​"
+      },
+      {
+        "tag": "h4",
+        "id": "31-install",
+        "text": "3.1 Install ​"
+      },
+      {
+        "tag": "h4",
+        "id": "32-start-hexstrike-api-server-binds-to-localhost-on-kali",
+        "text": "3.2 Start HexStrike API server (binds to localhost on Kali) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "4-kali-vm--networking--ssh-so-ubuntu-can-run-hexstrike-tools-inside-kali",
+        "text": "4) Kali VM — Networking + SSH (so Ubuntu can run HexStrike tools inside Kali) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "41-vm-networking-recommendation",
+        "text": "4.1 VM networking recommendation ​"
+      },
+      {
+        "tag": "h4",
+        "id": "42-enable-ssh-on-kali",
+        "text": "4.2 Enable SSH on Kali ​"
+      },
+      {
+        "tag": "h3",
+        "id": "5-host-ubuntu--install-mcphost-terminal-mcp-host-and-wire-it-to-hexstrike",
+        "text": "5) Host (Ubuntu) — Install mcphost (terminal MCP host) and wire it to HexStrike ​"
+      },
+      {
+        "tag": "h4",
+        "id": "51-install-go--mcphost",
+        "text": "5.1 Install Go + mcphost ​"
+      },
+      {
+        "tag": "h3",
+        "id": "6-ssh-key-auth-recommended--prevent-ssh-banners-from-breaking-mcp-stdio",
+        "text": "6) SSH key auth (recommended) + prevent SSH banners from breaking MCP stdio ​"
+      },
+      {
+        "tag": "h4",
+        "id": "61-set-up-ssh-keys-ubuntu--kali",
+        "text": "6.1 Set up SSH keys (Ubuntu → Kali) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "62-disable-motdbanner-output-for-this-kali-user-important",
+        "text": "6.2 Disable MOTD/banner output for this Kali user (important) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "7-create-the-mcphost-config-to-run-hexstrike-mcp-remotely-via-ssh",
+        "text": "7) Create the mcphost config to run HexStrike MCP remotely via SSH ​"
+      },
+      {
+        "tag": "h4",
+        "id": "71-test-it",
+        "text": "7.1 Test it: ​"
+      },
+      {
+        "tag": "h3",
+        "id": "8-like-ollama-run---one-liner-usage-from-ubuntu-terminal",
+        "text": "8) “Like ollama run …” — one-liner usage from Ubuntu terminal ​"
+      },
+      {
+        "tag": "h4",
+        "id": "81-plain-llm-no-tools-mcphost-one-liner",
+        "text": "8.1 Plain LLM (no tools), mcphost one-liner ​"
+      },
+      {
+        "tag": "h4",
+        "id": "82-tool-using-prompt-hexstrike-via-mcp",
+        "text": "8.2 Tool-using prompt (HexStrike via MCP) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "9-recommended-hardening-do-this",
+        "text": "9) Recommended hardening (do this) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "91-do-not-expose-hexstrike-api-on-the-network",
+        "text": "9.1 Do not expose HexStrike API on the network ​"
+      },
+      {
+        "tag": "h4",
+        "id": "92-use-tool-filtering-once-you-know-tool-names",
+        "text": "9.2 Use tool filtering once you know tool names ​"
+      },
+      {
+        "tag": "h4",
+        "id": "93-stay-current-there-has-been-at-least-one-published-hexstrike-security-advisory",
+        "text": "9.3 Stay current: there has been at least one published HexStrike security advisory ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      },
+      {
+        "tag": "h4",
+        "id": "if-you-like-this-research-buy-me-a-coffee-paypal--keep-the-lab-running-1",
+        "text": "If you like this research, buy me a coffee (PayPal) — Keep the lab running ​"
+      },
+      {
+        "tag": "h3",
+        "id": "follow-for-practical-cybersecurity-research",
+        "text": "Follow for practical cybersecurity research ​"
+      },
+      {
+        "tag": "h4",
+        "id": "andrey-pautov",
+        "text": "Andrey Pautov ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/llm-integrations/openai-codex",
+    "status": 200,
+    "title": "OpenAI Codex Integration | 1200km",
+    "description": "Connect OpenAI Codex to HexStrike for authorized Metasploitable assessment, structured tool orchestration, evidence capture, validation, and reporting.",
+    "h1": "HexStrike+OpenAI Codex. AI-Driven Exploitation of Metasploitable.",
+    "word_count": 1326,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "How I Used an LLM-Orchestrated Toolchain to Enumerate and Exploit a Deliberately Vulnerable Host (With Real Proofs)",
+      "",
+      "AI-assisted penetration testing is no longer a concept — it is operational reality."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike+OpenAI Codex. AI-Driven Exploitation of Metasploitable."
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrikeopenai-codex-ai-driven-exploitation-of-metasploitable-1",
+        "text": "HexStrike+OpenAI Codex. AI-Driven Exploitation of Metasploitable. ​"
+      },
+      {
+        "tag": "h4",
+        "id": "how-i-used-an-llm-orchestrated-toolchain-to-enumerate-and-exploit-a-deliberately-vulnerable-host-with-real-proofs",
+        "text": "How I Used an LLM-Orchestrated Toolchain to Enumerate and Exploit a Deliberately Vulnerable Host (With Real Proofs) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "introduction",
+        "text": "Introduction ​"
+      },
+      {
+        "tag": "h4",
+        "id": "core-guides-and-setup",
+        "text": "Core Guides and Setup ​"
+      },
+      {
+        "tag": "h4",
+        "id": "practical-applications--lab-comparisons",
+        "text": "Practical Applications & Lab Comparisons ​"
+      },
+      {
+        "tag": "h4",
+        "id": "specific-tooling--technique-guides",
+        "text": "Specific Tooling & Technique Guides ​"
+      },
+      {
+        "tag": "h3",
+        "id": "what-is-hexstrike-ai",
+        "text": "What Is HexStrike-AI? ​"
+      },
+      {
+        "tag": "h3",
+        "id": "test-scope--authorization",
+        "text": "Test Scope & Authorization ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scope",
+        "text": "Scope ​"
+      },
+      {
+        "tag": "h3",
+        "id": "the-prompt-that-started-everything",
+        "text": "The Prompt That Started Everything ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-1-reachability-and-discovery",
+        "text": "Phase 1: Reachability and Discovery ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-2-enumeration--service-fingerprinting",
+        "text": "Phase 2: Enumeration & Service Fingerprinting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "confirmed-exposed-services-high-level",
+        "text": "Confirmed exposed services (high-level) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "host-identity-confirmation",
+        "text": "Host identity confirmation ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-3-vulnerability-discovery-what-stood-out-immediately",
+        "text": "Phase 3: Vulnerability Discovery (What Stood Out Immediately) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "phase-4-exploitation-with-proofs",
+        "text": "Phase 4: Exploitation (With Proofs) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "exploit-1--vsftpd-234-backdoor-cve-20112523--root",
+        "text": "Exploit #1 — vsftpd 2.3.4 backdoor (CVE-2011–2523) → Root ​"
+      },
+      {
+        "tag": "h4",
+        "id": "why-it-worked",
+        "text": "Why it worked ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-a--trigger-the-backdoor",
+        "text": "Step A — Trigger the backdoor ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-b--connect-to-backdoor-shell-and-capture-proof",
+        "text": "Step B — Connect to backdoor shell and capture proof ​"
+      },
+      {
+        "tag": "h4",
+        "id": "exploit-2--samba-usermap_script-cve-20072447--root-bind-shell",
+        "text": "Exploit #2 — Samba usermap_script (CVE-2007–2447) → Root bind shell ​"
+      },
+      {
+        "tag": "h4",
+        "id": "why-it-worked-1",
+        "text": "Why it worked ​"
+      },
+      {
+        "tag": "h4",
+        "id": "tooling-nuance-why-a-bind-shell-was-used",
+        "text": "Tooling nuance: why a bind shell was used ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-a--launch-exploit-with-bind-netcat-payload-binds-on-port-4446",
+        "text": "Step A — Launch exploit with bind netcat payload (binds on port 4446) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "step-b--connect-to-bind-shell-and-capture-proof",
+        "text": "Step B — Connect to bind shell and capture proof ​"
+      },
+      {
+        "tag": "h3",
+        "id": "final-results-summary",
+        "text": "Final Results Summary ​"
+      },
+      {
+        "tag": "h4",
+        "id": "what-was-validated",
+        "text": "What was validated ​"
+      },
+      {
+        "tag": "h4",
+        "id": "what-was-intentionally-not-done",
+        "text": "What was intentionally not done ​"
+      },
+      {
+        "tag": "h3",
+        "id": "remediation-recommendations-real-world-perspective",
+        "text": "Remediation Recommendations (Real-World Perspective) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "critical",
+        "text": "Critical ​"
+      },
+      {
+        "tag": "h4",
+        "id": "high",
+        "text": "High ​"
+      },
+      {
+        "tag": "h4",
+        "id": "medium",
+        "text": "Medium ​"
+      },
+      {
+        "tag": "h4",
+        "id": "low",
+        "text": "Low ​"
+      },
+      {
+        "tag": "h3",
+        "id": "why-this-matters",
+        "text": "Why This Matters ​"
+      },
+      {
+        "tag": "h3",
+        "id": "final-thoughts",
+        "text": "Final Thoughts ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/password-recovery/office-documents",
+    "status": 200,
+    "title": "Office Documents Password Recovery | 1200km",
+    "description": "Recover access to owned Office documents with Gemini and HexStrike through a controlled process for format checks, evidence, limits, and remediation.",
+    "h1": "AI-Driven Office Documents Password Recovery with HexStrike-AI and Gemini-CLI",
+    "word_count": 692,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "From Encrypted Document to Readable Content Using LLM-Orchestrated Tooling",
+      "",
+      "This guide shows how HexStrike-AI, orchestrated through Gemini-CLI, can autonomously handle a common, authorized security task:"
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "AI-Driven Office Documents Password Recovery with HexStrike-AI and Gemini-CLI"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-driven-office-documents-password-recovery-with-hexstrike-ai-and-gemini-cli-1",
+        "text": "AI-Driven Office Documents Password Recovery with HexStrike-AI and Gemini-CLI ​"
+      },
+      {
+        "tag": "h4",
+        "id": "from-encrypted-document-to-readable-content-using-llm-orchestrated-tooling",
+        "text": "From Encrypted Document to Readable Content Using LLM-Orchestrated Tooling ​"
+      },
+      {
+        "tag": "h3",
+        "id": "overview",
+        "text": "Overview ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scenario",
+        "text": "Scenario ​"
+      },
+      {
+        "tag": "h4",
+        "id": "objective",
+        "text": "Objective ​"
+      },
+      {
+        "tag": "h4",
+        "id": "inputs",
+        "text": "Inputs ​"
+      },
+      {
+        "tag": "h3",
+        "id": "step-by-step-execution-flow",
+        "text": "Step-by-Step Execution Flow ​"
+      },
+      {
+        "tag": "h4",
+        "id": "prompt",
+        "text": "Prompt: ​"
+      },
+      {
+        "tag": "h3",
+        "id": "execution-flow",
+        "text": "Execution Flow: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-task-initiation-single-high-level-prompt",
+        "text": "1) Task initiation (single high-level prompt) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-tool-capability-gap-identified",
+        "text": "2) Tool capability gap identified ​"
+      },
+      {
+        "tag": "h4",
+        "id": "3-first-failure-write-location-permissions",
+        "text": "3) First failure: write location permissions ​"
+      },
+      {
+        "tag": "h4",
+        "id": "4-second-failure-dependency-not-in-path",
+        "text": "4) Second failure: dependency not in PATH ​"
+      },
+      {
+        "tag": "h4",
+        "id": "5-extraction-succeeded-hashverification-artifact-produced",
+        "text": "5) Extraction succeeded (hash/verification artifact produced) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "6-offline-candidate-validation-dictionary-replay",
+        "text": "6) Offline candidate validation (dictionary replay) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "7-success-password-recovered",
+        "text": "7) Success: password recovered ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/password-recovery/pdf",
+    "status": 200,
+    "title": "PDF Password Recovery | 1200km",
+    "description": "Recover access to an owned PDF with Gemini and HexStrike through a controlled workflow covering format checks, tool recovery, evidence, and limitations.",
+    "h1": "AI-Driven PDF Password Recovery with HexStrike-AI and Gemini-CLI",
+    "word_count": 697,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "From Encrypted Document to Readable Content Using LLM-Orchestrated Tooling",
+      "",
+      "This guide shows how HexStrike-AI, orchestrated through Gemini-CLI, can autonomously handle a common, authorized security task:"
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "AI-Driven PDF Password Recovery with HexStrike-AI and Gemini-CLI"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-driven-pdf-password-recovery-with-hexstrike-ai-and-gemini-cli-1",
+        "text": "AI-Driven PDF Password Recovery with HexStrike-AI and Gemini-CLI ​"
+      },
+      {
+        "tag": "h4",
+        "id": "from-encrypted-document-to-readable-content-using-llm-orchestrated-tooling",
+        "text": "From Encrypted Document to Readable Content Using LLM-Orchestrated Tooling ​"
+      },
+      {
+        "tag": "h3",
+        "id": "overview",
+        "text": "Overview ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scenario",
+        "text": "Scenario ​"
+      },
+      {
+        "tag": "h4",
+        "id": "objective",
+        "text": "Objective ​"
+      },
+      {
+        "tag": "h4",
+        "id": "inputs",
+        "text": "Inputs ​"
+      },
+      {
+        "tag": "h3",
+        "id": "step-by-step-execution-flow",
+        "text": "Step-by-Step Execution Flow ​"
+      },
+      {
+        "tag": "h4",
+        "id": "prompt",
+        "text": "Prompt: ​"
+      },
+      {
+        "tag": "h3",
+        "id": "execution-flow",
+        "text": "Execution Flow: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-task-initiation-single-high-level-prompt",
+        "text": "1) Task initiation (single high-level prompt) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-tool-capability-gap-identified",
+        "text": "2) Tool capability gap identified ​"
+      },
+      {
+        "tag": "h4",
+        "id": "3-first-failure-write-location-permissions",
+        "text": "3) First failure: write location permissions ​"
+      },
+      {
+        "tag": "h4",
+        "id": "4-second-failure-dependency-not-in-path",
+        "text": "4) Second failure: dependency not in PATH ​"
+      },
+      {
+        "tag": "h4",
+        "id": "5-extraction-succeeded-hashverification-artifact-produced",
+        "text": "5) Extraction succeeded (hash/verification artifact produced) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "6-offline-candidate-validation-dictionary-replay",
+        "text": "6) Offline candidate validation (dictionary replay) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "7-success-password-recovered",
+        "text": "7) Success: password recovered ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/password-recovery/zip",
+    "status": 200,
+    "title": "ZIP Password Recovery | 1200km",
+    "description": "Recover access to an owned ZIP archive with Gemini and HexStrike in a controlled workflow that documents failures, evidence, limits, and safer practices.",
+    "h1": "AI-Driven ZIP Password Recovery with HexStrike-AI and Gemini-CLI",
+    "word_count": 553,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "From Encrypted Archive to Flag Using LLM-Orchestrated Tooling",
+      "",
+      "This guide demonstrates how HexStrike-AI , orchestrated through Gemini-CLI , can autonomously solve a common security / CTF task:"
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "AI-Driven ZIP Password Recovery with HexStrike-AI and Gemini-CLI"
+      },
+      {
+        "tag": "h3",
+        "id": "ai-driven-zip-password-recovery-with-hexstrike-ai-and-gemini-cli-1",
+        "text": "AI-Driven ZIP Password Recovery with HexStrike-AI and Gemini-CLI ​"
+      },
+      {
+        "tag": "h4",
+        "id": "from-encrypted-archive-to-flag-using-llm-orchestrated-tooling",
+        "text": "From Encrypted Archive to Flag Using LLM-Orchestrated Tooling ​"
+      },
+      {
+        "tag": "h4",
+        "id": "overview",
+        "text": "Overview ​"
+      },
+      {
+        "tag": "h3",
+        "id": "scenario",
+        "text": "Scenario ​"
+      },
+      {
+        "tag": "h3",
+        "id": "step-by-step-execution-flow",
+        "text": "Step-by-Step Execution Flow ​"
+      },
+      {
+        "tag": "h3",
+        "id": "1-task-initiation-llm-driven",
+        "text": "1. Task initiation (LLM-driven) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "2-tool-discovery--preparation",
+        "text": "2. Tool discovery & preparation ​"
+      },
+      {
+        "tag": "h3",
+        "id": "3-zip-hash-extraction",
+        "text": "3. ZIP hash extraction ​"
+      },
+      {
+        "tag": "h3",
+        "id": "4-offline-password-cracking",
+        "text": "4. Offline password cracking ​"
+      },
+      {
+        "tag": "h3",
+        "id": "5-first-extraction-attempt-failure-handling",
+        "text": "5. First extraction attempt (failure handling) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "6-adaptive-pivot-tool-switching",
+        "text": "6. Adaptive pivot (tool switching) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "7-flag-retrieval",
+        "text": "7. Flag retrieval ​"
+      },
+      {
+        "tag": "h3",
+        "id": "final-result",
+        "text": "Final Result ​"
+      },
+      {
+        "tag": "h3",
+        "id": "why-this-matters",
+        "text": "Why This Matters ​"
+      },
+      {
+        "tag": "h3",
+        "id": "what-hexstrike-ai-did-autonomously",
+        "text": "What HexStrike-AI did autonomously ​"
+      },
+      {
+        "tag": "h3",
+        "id": "what-the-user-did",
+        "text": "What the user did ​"
+      },
+      {
+        "tag": "h3",
+        "id": "key-takeaways",
+        "text": "Key Takeaways ​"
+      },
+      {
+        "tag": "h3",
+        "id": "defensive-perspective",
+        "text": "Defensive Perspective ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      }
+    ]
+  },
+  {
+    "url": "https://1200km.com/Hexstrike-AI-guide/docs/recon-osint/email-osint",
+    "status": 200,
+    "title": "OSINT: From One Email to a Full Exposure Map | 1200km",
+    "description": "Build a privacy-conscious exposure map from an email address using Cursor and HexStrike, with evidence boundaries, validation steps, and safe reporting.",
+    "h1": "HexStrike + Cursor for OSINT: From One Email to a Full Exposure Map",
+    "word_count": 3065,
+    "canonical_self": true,
+    "noindex": false,
+    "content_type": "text/html; charset=utf-8",
+    "inbound_internal_links": 28,
+    "paragraphs": [
+      ":::info Last tested\nKali Linux 2025.4 · HexStrike AI (Kali package 2025.4 repo) · May 2026. Results may vary on other versions.\n:::",
+      "Why OSINT is harder than “hack the box,” what an AI-assisted workflow looks like in practice, and how to publish a real report without…",
+      "",
+      "I started OSINT on myself from a single email address. Within a short time, I could correlate a surprising amount of information."
+    ],
+    "headings": [
+      {
+        "tag": "h1",
+        "id": "",
+        "text": "HexStrike + Cursor for OSINT: From One Email to a Full Exposure Map"
+      },
+      {
+        "tag": "h3",
+        "id": "hexstrike--cursor-for-osint-from-one-email-to-a-full-exposure-map-1",
+        "text": "HexStrike + Cursor for OSINT: From One Email to a Full Exposure Map ​"
+      },
+      {
+        "tag": "h4",
+        "id": "why-osint-is-harder-than-hack-the-box-what-an-ai-assisted-workflow-looks-like-in-practice-and-how-to-publish-a-real-report-without-doxxing-yourself-or-your-family",
+        "text": "Why OSINT is harder than “hack the box,” what an AI-assisted workflow looks like in practice, and how to publish a real report without doxxing yourself or your family. ​"
+      },
+      {
+        "tag": "h3",
+        "id": "exposed-information",
+        "text": "Exposed Information: ​"
+      },
+      {
+        "tag": "h4",
+        "id": "1-what-makes-osint-harder-than-pentesting",
+        "text": "1) What makes OSINT harder than pentesting ​"
+      },
+      {
+        "tag": "h4",
+        "id": "2-why-cursor--hexstrike-is-a-strong-osint-pairing",
+        "text": "2) Why Cursor + HexStrike is a strong OSINT pairing ​"
+      },
+      {
+        "tag": "h4",
+        "id": "cursor-the-brain",
+        "text": "Cursor (the “brain”) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "hexstrike-the-hands",
+        "text": "HexStrike (the “hands”) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "3-kali-osint-configuration-that-actually-matters-and-why-its-not-out-of-the-box",
+        "text": "3) Kali OSINT configuration that actually matters (and why it’s not out-of-the-box) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "31-key-management-non-negotiable",
+        "text": "3.1 Key management (non-negotiable) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "32-accounts-subscriptions-and-rate-limits",
+        "text": "3.2 Accounts, subscriptions, and rate limits ​"
+      },
+      {
+        "tag": "h4",
+        "id": "33-separate-collection-and-publishing-modes",
+        "text": "3.3 Separate “collection” and “publishing” modes ​"
+      },
+      {
+        "tag": "h4",
+        "id": "34-logging-controls",
+        "text": "3.4 Logging controls ​"
+      },
+      {
+        "tag": "h4",
+        "id": "4-the-osint-workflow-how-ai-thinks-the-reasoning-loop",
+        "text": "4) The OSINT workflow: how AI “thinks” (the reasoning loop) ​"
+      },
+      {
+        "tag": "h3",
+        "id": "5-real-report-public--redacted-exposure--correlation-report",
+        "text": "5) Real report (PUBLIC / REDACTED): Exposure & Correlation Report ​"
+      },
+      {
+        "tag": "h3",
+        "id": "finding-1--identity-correlation-is-possible-from-minimal-starting-data",
+        "text": "Finding 1 — Identity correlation is possible from minimal starting data ​"
+      },
+      {
+        "tag": "h3",
+        "id": "finding-2--real-world-identifiers-are-the-highest-risk-exposure-category",
+        "text": "Finding 2 — Real-world identifiers are the highest-risk exposure category ​"
+      },
+      {
+        "tag": "h3",
+        "id": "finding-3--credential-exposure-checksresult-summary-public-safe",
+        "text": "Finding 3 — Credential exposure checks Result summary (public-safe): ​"
+      },
+      {
+        "tag": "h4",
+        "id": "risk-assessment-public-version",
+        "text": "Risk Assessment (Public Version) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "overall-exposure-level-critical",
+        "text": "Overall exposure level: CRITICAL ​"
+      },
+      {
+        "tag": "h4",
+        "id": "likely-attack-paths-enabled",
+        "text": "Likely attack paths enabled ​"
+      },
+      {
+        "tag": "h3",
+        "id": "recommendations-defensive",
+        "text": "Recommendations (Defensive) ​"
+      },
+      {
+        "tag": "h4",
+        "id": "immediate",
+        "text": "Immediate ​"
+      },
+      {
+        "tag": "h4",
+        "id": "short-term",
+        "text": "Short-term ​"
+      },
+      {
+        "tag": "h4",
+        "id": "ongoing",
+        "text": "Ongoing ​"
+      },
+      {
+        "tag": "h3",
+        "id": "conclusion",
+        "text": "Conclusion ​"
+      }
+    ]
+  }
+]

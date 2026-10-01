@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { applyTechnicalSeo } from './technical-seo-lib.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadSiteShell, renderFooter, renderHeader } from './site-shell-lib.mjs';
@@ -514,7 +515,7 @@ ${categorySections}
 const dataset = JSON.parse(readFileSync(DATA_PATH, 'utf8'));
 for (let pageNumber = 1; pageNumber <= Math.ceil(dataset.sources.length / 8); pageNumber++) {
 const OUTPUT_PATH = pageNumber === 1 ? join(ROOT, PAGE_PATH) : join(ROOT, 'cyber-knowledge/knowledge-sources/page', String(pageNumber), 'index.html');
-const generated = renderPage(dataset, pageNumber);
+const generated = applyTechnicalSeo(renderPage(dataset, pageNumber), `https://1200km.com/cyber-knowledge/knowledge-sources/${pageNumber === 1 ? '' : `page/${pageNumber}/`}`);
 
 if (CHECK) {
   if (!existsSync(OUTPUT_PATH) || readFileSync(OUTPUT_PATH, 'utf8') !== generated) {

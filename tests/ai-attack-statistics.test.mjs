@@ -76,7 +76,7 @@ const usableReferenceCount = eligibleCount + summary.context_only_publications;
 const articleDescription = articleSource.match(/^description:\s*["'](.+)["']\s*$/m)?.[1];
 
 test('dashboard publishes professional metadata at the canonical nested route', () => {
-  assert.match(html, /<title>AI in Cyberattacks — Interactive Statistical CTI Dashboard \| 1200km<\/title>/);
+  assert.match(html, /<title>AI in Cyberattacks — Research Dashboard \| 1200km<\/title>/);
   assert.match(html, /<link rel="canonical" href="https:\/\/1200km\.com\/ai-attack-statistics\/dashboard\/" \/>/);
   assert.match(html, /<meta property="og:url" content="https:\/\/1200km\.com\/ai-attack-statistics\/dashboard\/" \/>/);
   assert.match(html, /<meta property="og:image" content="https:\/\/1200km\.com\/assets\/cti\/ai-in-cyberattacks-statistical-study\/cover\.png" \/>/);

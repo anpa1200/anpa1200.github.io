@@ -152,7 +152,14 @@ for (const entry of trainsecCanonicalEntries) {
     source: 'external-canonical-mirror',
   }, config));
 }
-for (const relativePath of config.additional_pages || []) {
+// Search-engine index hygiene must not remove useful scaffold/documentation
+// entries from the site's own catalogue or erase their cited source records.
+const technicalPolicy = JSON.parse(await readFile(join(sourceRoot, 'data', 'seo-policy.json'), 'utf8'));
+const thinPaths = Object.entries(technicalPolicy.pages).filter(([, entry]) => entry.classification === 'Thin')
+  .map(([pathname]) => pathname.slice(1) + (pathname.endsWith('/') ? 'index.html' : ''))
+  .filter(relativePath => existsSync(join(siteRoot, relativePath)));
+const additionalPaths = [...new Set([...(config.additional_pages || []), ...thinPaths])];
+for (const relativePath of additionalPaths) {
   const path = join(siteRoot, relativePath);
   if (!existsSync(path)) throw new Error(`Missing configured additional page: ${relativePath}`);
   const url = `https://1200km.com/${relativePath.replace(/index\.html$/, '')}`;
@@ -197,4 +204,4 @@ if (check) {
   console.log(`Wrote ${catalog.inventory.item_count} content identities to ${output}.`);
   console.log(`Wrote taxonomy audit to ${taxonomyOutput}.`);
 }
-console.log(`Coverage: ${sitemapItemCount} sitemap pages, ${trainsecCanonicalEntries.length} externally canonical TrainSec mirror(s), ${(config.additional_pages || []).length} additional noindex page(s), ${externalItems.length} linked external article(s), ${catalog.inventory.indexable_count} indexable items.`);
+console.log(`Coverage: ${sitemapItemCount} sitemap pages, ${trainsecCanonicalEntries.length} governed TrainSec canonical entries, ${additionalPaths.length} additional noindex page(s), ${externalItems.length} linked external article(s), ${catalog.inventory.indexable_count} indexable items.`);

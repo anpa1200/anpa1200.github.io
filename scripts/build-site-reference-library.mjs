@@ -68,7 +68,7 @@ function publisher(url) {
 }
 
 const usage = new Map();
-for (const item of catalog.items.filter((entry) => entry.indexable && CONTENT_TYPES.has(entry.primary_type) && entry.canonical_url.startsWith('https://1200km.com/'))) {
+for (const item of catalog.items.filter((entry) => CONTENT_TYPES.has(entry.primary_type) && entry.canonical_url.startsWith('https://1200km.com/'))) {
   if (/^https:\/\/1200km\.com\/(?:references|cyber-knowledge\/knowledge-sources)\//.test(item.canonical_url)) continue;
   let html;
   try { html = await readFile(localPath(item.canonical_url), 'utf8'); } catch { continue; }

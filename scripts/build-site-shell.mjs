@@ -19,6 +19,9 @@ for (const page of shell.pages) {
     continue;
   }
   const current = readFileSync(path, 'utf8');
+  // Combined audit previews also contain independently deployed Docusaurus
+  // routes. Their React layout owns the shell; do not replace its DOM.
+  if (/\bid=["']__docusaurus["']/.test(current)) continue;
   const generated = applySiteShell(current, shell, page);
   if (current === generated) continue;
   if (check) stale.push(`${page.path}: generated shell is stale`);

@@ -57,10 +57,10 @@ test('the old remote archive is not merged into the canonical sitemap', () => {
   assert.equal(archive.primary_type, 'article');
 });
 
-test('article archive routes receive authoritative sitemap dates', () => {
-  assert.match(metadataBuilder, /function archiveDate\(canonical\)/);
-  assert.match(metadataBuilder, /content\.local_article_archive/);
-  assert.match(metadataBuilder, /archiveDate\(page\.canonical\)/);
+test('article publication dates come from content, never filename inference', () => {
+  assert.match(metadataBuilder, /const published = dates\.published/);
+  assert.match(metadataBuilder, /gitDate\(page\.path\)/);
+  assert.doesNotMatch(metadataBuilder, /function archiveDate/);
 });
 
 test('TrainSec catalogue filters search metadata and reset stale browser state', () => {

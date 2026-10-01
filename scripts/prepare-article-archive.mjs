@@ -1,9 +1,11 @@
 // Reproducible source overlay for the pinned, separately built archive.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
 const args = process.argv.slice(2),
   i = args.indexOf('--archive');
 if (i < 0 || !args[i + 1]) throw Error('--archive source checkout required');
+execFileSync(process.execPath, [resolve(import.meta.dirname, 'export-documentation-seo.mjs'), '--project', resolve(args[i + 1]), '--prefix', '/articles/'], {stdio: 'inherit'});
 const path = resolve(args[i + 1], 'docusaurus.config.js');
 let source = readFileSync(path, 'utf8');
 if (/\btrailingSlash:\s*true\b/.test(source)) {

@@ -22,8 +22,8 @@ if (model.schema_version !== 1 || !model.descriptions || Array.isArray(model.des
 }
 
 for (const [canonical, description] of Object.entries(model.descriptions)) {
-  if (description.length < 150 || description.length > 160) {
-    throw new Error(`${canonical}: curated description must be 150–160 characters; found ${description.length}.`);
+  if (description.length < 120 || description.length > 155) {
+    throw new Error(`${canonical}: curated description must be 120–155 characters; found ${description.length}.`);
   }
   if (/…|\.\.|\s{2,}/.test(description)) {
     throw new Error(`${canonical}: curated description contains truncation, repeated punctuation, or repeated whitespace.`);

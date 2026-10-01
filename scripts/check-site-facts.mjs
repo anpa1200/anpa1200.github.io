@@ -179,8 +179,8 @@ if (siteRoot === sourceRoot) {
   const listedLabs = (readFileSync(path.join(sourceRoot, 'labs.html'), 'utf8').match(/\bclass=["'][^"']*\blab-row\b[^"']*["']/g) || []).length;
   if (listedLabs !== fact('content.listed_labs').value) fail('Listed lab count disagrees with labs.html.');
   const remoteSites = JSON.parse(readFileSync(path.join(sourceRoot, 'seo', 'remote-sitemaps.json'), 'utf8'));
-  const excluded = new Set(['Live AdversaryGraph Documentation', '1200km Article Archive']);
-  if (remoteSites.filter(item => !excluded.has(item.name)).length !== fact('content.field_guides').value) {
+  const namedGuides = new Set(fact('content.field_guide_names').value);
+  if (remoteSites.filter(item => namedGuides.has(item.name)).length !== fact('content.field_guides').value) {
     fail('Field-guide count disagrees with seo/remote-sitemaps.json.');
   }
 }

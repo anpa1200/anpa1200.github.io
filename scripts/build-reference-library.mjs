@@ -2,7 +2,7 @@
 import { existsSync } from 'node:fs';
 import { inertReferenceKinds, bibliographicReferenceKinds } from './reference-metadata-lib.mjs';
 import { mkdir, readFile, writeFile, readdir, unlink } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { transformHtmlElements } from './html-token-utils.mjs';
 import { tagAttributes } from './release-html-lib.mjs';
@@ -95,10 +95,8 @@ const years = [...new Set(model.records.map((record) => record.published_at?.sli
 const pageSize = 24;
 const pageCount = Math.ceil(model.records.length / pageSize);
 const pagesRoot = join(SITE_ROOT, 'references/page');
-if (!check && existsSync(pagesRoot)) for (const name of await readdir(pagesRoot)) {
-  const stale = join(pagesRoot, name, 'index.html');
-  if (/^\d+$/.test(name) && Number(name) > pageCount && existsSync(stale) && (await readFile(stale,'utf8')).includes('data-reference-grid')) await unlink(stale);
-}
+// Published pagination URLs are permanent on GitHub Pages. If the catalogue
+// shrinks, keep old pages crawlable with the shared noindex policy; never unlink.
 for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
 const canonical = baseCanonical + (pageNumber === 1 ? '' : `page/${pageNumber}/`);
 const currentOutput = pageNumber === 1 ? outputPath : join(SITE_ROOT, 'references', 'page', String(pageNumber), 'index.html');
@@ -241,7 +239,7 @@ let html = transformHtmlElements(base, 'script', (element) => {
   .replace('</body>', '    <script src="/assets/reference-library.js?v=20260904-sitewide" defer></script>\n  </body>')
   .replace('</head>', `    <script type="application/ld+json" id="reference-library-structured-data">\n${safeJson(itemList).split('\n').map((line) => `      ${line}`).join('\n')}\n    </script>\n  </head>`)
   .replace(/^[ \t]+$/gm, '');
-html = applySiteShell(html, shell, page).replace('</body>', '<script src="/assets/directory-browser.js" data-directory="references" defer></script></body>');
+html = applySiteShell(html, shell, { ...page, path: relative(SITE_ROOT, currentOutput).replace(/\\/g, '/') }).replace('</body>', '<script src="/assets/directory-browser.js" data-directory="references" defer></script></body>');
 html = html.replace(/<script src="\/assets\/reference-library.js[^"]*" defer><\/script>/, '');
 
 html = html.replace(/[ \t]+$/gm, '');

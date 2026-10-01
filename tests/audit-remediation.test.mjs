@@ -98,6 +98,10 @@ test('reader RSS excludes taxonomy and retains substantive research with stable 
     assert.ok(Number.isFinite(Date.parse(item[1].match(/<pubDate>(.*?)<\/pubDate>/)?.[1])));
   }
   const sitemap = readFileSync('sitemap-all.xml', 'utf8');
-  assert.match(sitemap, /<loc>https:\/\/1200km.com\/<\/loc>\s*<lastmod>2026-09-09<\/lastmod>/);
-  assert.match(sitemap, /<loc>https:\/\/1200km.com\/external-validation.html<\/loc>\s*<lastmod>2026-09-03<\/lastmod>/);
+  for (const route of ['/', '/external-validation.html']) {
+    const entry = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].find(match => match[1].includes(`<loc>https://1200km.com${route}</loc>`));
+    assert.ok(entry, `Missing canonical sitemap entry ${route}`);
+    assert.match(entry[1], /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
+  }
+  assert.match(readFileSync('scripts/build-site-artifacts.mjs','utf8'), /const lastmod = gitDate\(page.path\)/);
 });

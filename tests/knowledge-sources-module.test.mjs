@@ -71,7 +71,8 @@ test('module statically renders every source at its stable anchor', () => {
   assert.match(html, /data-pagefind-filter="section\[content\]"/);
   assert.match(html, /data-pagefind-filter="content_type\[content\]"/);
   assert.match(html, /<link rel="canonical" href="https:\/\/1200km\.com\/cyber-knowledge\/knowledge-sources\/"/);
-  assert.match(html, new RegExp(`Search and compare ${dataset.sources.length} assessed cybersecurity knowledge sources`));
+  assert.match(html, /Find assessed cybersecurity sources/);
+  assert.match(allHtml, new RegExp(`>${dataset.sources.length}<`));
   assert.doesNotMatch(html, /<article class="ks-source-card"[^>]*\shidden(?:\s|=|>)/);
 
   for (const source of dataset.sources) {

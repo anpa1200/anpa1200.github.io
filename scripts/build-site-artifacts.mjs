@@ -16,6 +16,7 @@ import {
   tagAttributes,
   transformReleaseHtml,
 } from './release-html-lib.mjs';
+import { applyIndexPolicy, sitemapEligible } from './technical-seo-lib.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -124,27 +125,6 @@ function gitDate(path) {
   } catch {
     return '';
   }
-}
-
-let articleArchiveVerifiedAt = '';
-try {
-  const facts = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
-  articleArchiveVerifiedAt = isoDate(facts?.facts?.['content.local_article_archive']?.verified_at);
-} catch {
-  // A staged subtree can omit the main-site fact model; page metadata remains the fallback.
-}
-
-function archiveDate(canonical) {
-  let pathname = '';
-  try {
-    pathname = new URL(canonical).pathname;
-  } catch {
-    return '';
-  }
-  const datedArticle = pathname.match(/^\/articles\/read\/\d{4}\/(\d{4}-\d{2}-\d{2})-/);
-  if (datedArticle) return isoDate(datedArticle[1]);
-  if (pathname === '/articles/read/' || pathname === '/articles/read') return articleArchiveVerifiedAt;
-  return '';
 }
 
 function sitemapXml(entries) {
@@ -267,14 +247,24 @@ function feedXml(items) {
 const files = (await walk()).sort();
 const pages = [];
 const titleMap = new Map();
+const sourceCanonicals = JSON.parse(await readFile(join(ROOT, 'seo/external-source-canonicals.json'), 'utf8'));
 
 for (const path of files) {
-  const html = await readFile(path, 'utf8');
-  const url = urlForFile(path);
+  const original = await readFile(path, 'utf8');
+  let url = urlForFile(path);
+  const declared = canonicalFromHtml(original);
+  if (/^https:\/\/1200km.com\/(?:Hexstrike-AI-guide|ai-vs-defense)\//.test(url) && url.endsWith('.html') && declared === url.slice(0,-5)) url = declared;
+  // Preserved third-party source snapshots are not original 1200km articles.
+  if (sourceCanonicals[new URL(url).pathname] === canonicalFromHtml(original)) continue;
+  const html = applyIndexPolicy(original, url);
+  if (transformHtml && original !== html) await writeFile(path, html);
   const validation = validatePage(url, html);
   if (!validation.indexable) {
     if (['off-origin-canonical', 'multiple-canonicals'].includes(validation.reason)) {
       throw new Error(`${relative(siteRoot, path)}: invalid canonical declaration (${validation.reason})`);
+    }
+    if (transformHtml && validation.reason === 'noindex' && normalizeCanonical(canonicalFromHtml(html), url) === normalizeCanonical(url)) {
+      await writeFile(path, transformReleaseHtml(html, {canonical: url, htmlPath: path, siteRoot, dateModified: gitDate(path) || contentDates(html).modified}));
     }
     continue;
   }
@@ -298,8 +288,8 @@ const articlePages = pages.filter((page) => {
 for (const page of pages) {
   const rel = relative(siteRoot, page.path).replace(/\\/g, '/');
   const dates = contentDates(page.html);
-  const published = dates.published || archiveDate(page.canonical);
-  const lastmod = dates.modified || published || gitDate(page.path);
+  const published = dates.published;
+  const lastmod = gitDate(page.path) || dates.modified || published;
   localEntries.set(page.canonical, { loc: page.canonical, ...(lastmod ? { lastmod } : {}) });
 
   const parsed = parseJsonLd(page.html);
@@ -332,10 +322,7 @@ for (const page of pages) {
 }
 
 const factModel = JSON.parse(await readFile(join(sourceRoot, 'data', 'site-facts.json'), 'utf8'));
-localEntries.set('https://1200km.com/llms.txt', {
-  loc: 'https://1200km.com/llms.txt',
-  lastmod: isoDate(factModel.facts['site.description']?.verified_at),
-});
+// llms.txt remains linked from robots.txt; the search sitemap contains HTML only.
 const stableTag = factModel.facts['adversarygraph.latest_release_tag'];
 const stablePublished = factModel.facts['adversarygraph.release_published_at'];
 const sourceRelease = factModel.facts['adversarygraph.current_source_release'];
@@ -369,7 +356,7 @@ if (includeRemote) {
 
 for (const url of localEntries.keys()) remoteEntries.delete(url);
 const localSorted = [...localEntries.values()].sort((a, b) => a.loc.localeCompare(b.loc));
-const canonicalSorted = [...localEntries.values(), ...remoteEntries.values()]
+const canonicalSorted = [...localEntries.values(), ...remoteEntries.values()].filter(entry => sitemapEligible(entry.loc))
   .sort((a, b) => a.loc.localeCompare(b.loc));
 feedItems.sort((a, b) => (b.published.localeCompare(a.published) || a.url.localeCompare(b.url)));
 
