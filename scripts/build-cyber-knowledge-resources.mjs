@@ -10,7 +10,7 @@ const model = JSON.parse(readFileSync(join(ROOT, 'data', 'cyber-knowledge.json')
 const knowledgeSources = JSON.parse(readFileSync(join(ROOT, 'data', 'knowledge-sources.json'), 'utf8'));
 const knowledgeSourceCount = knowledgeSources.sources.length;
 const atlasIntegration = JSON.parse(readFileSync(join(ROOT, 'data', 'anomaly-atlas.json'), 'utf8'));
-const atlasWorkedPaths = new Set((atlasIntegration.worked_paths || []).map((entry) => entry.url.replace(/\/$/, '')));
+const atlasWorkedPaths = new Set(atlasIntegration.pages.filter((entry) => /\/research\/worked-/.test(entry.url)).map((entry) => entry.url.replace(/\/$/, '')));
 const hub = readFileSync(join(ROOT, 'cyber-knowledge', 'index.html'), 'utf8');
 
 function escapeHtml(value) {
