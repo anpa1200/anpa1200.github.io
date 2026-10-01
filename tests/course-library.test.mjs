@@ -185,29 +185,38 @@ test('client provides progressive filtering, URL restoration, sorting, reset, an
   ]) assert.match(client, new RegExp(escapeRegex(token)), token);
 });
 
-test('analytics asset registers no listeners or external scripts before opt-in', () => {
+function runAnalyticsLoader({ path = '/courses/' } = {}) {
+  const appended = [];
   const listeners = new Map();
-  const appendedScripts = [];
-  const context = {
-    URL,
-    document: {
-      currentScript: { dataset: { googleAnalyticsId: 'G-TEST' } },
-      addEventListener(name, handler, options) { listeners.set(`document:${name}`, { handler, options }); },
-      createElement() { return {}; },
-      head: { appendChild(node) { appendedScripts.push(node); } },
-    },
-    window: {
-      location: { href: 'https://1200km.com/courses/' },
-      addEventListener(name, handler, options) { listeners.set(`window:${name}`, { handler, options }); },
-      setTimeout() {},
-    },
+  const document = {
+    currentScript: { dataset: { googleAnalyticsId: 'G-TEST' } },
+    addEventListener(name, handler) { listeners.set(name, handler); },
+    createElement: (tag) => ({ tagName: tag.toUpperCase() }),
+    head: { appendChild(n) { appended.push(n); } },
+    body: { appendChild(n) { appended.push(n); } },
   };
+  const window = { location: { pathname: path, href: `https://1200km.com${path}` } };
+  runInNewContext(sitePerformance, { URL, document, window, Element: class {} });
+  const googleTags = () => appended.filter((n) => /googletagmanager\.com\/gtag\/js/.test(n.src || ''));
+  return { window, appended, googleTags };
+}
 
-  runInNewContext(sitePerformance, context);
-  assert.equal(listeners.size, 0);
-  assert.equal(context.window.dataLayer, undefined);
-  assert.equal(appendedScripts.length, 0);
+test('analytics loads on every page without a prompt, except search', () => {
+  const page = runAnalyticsLoader();
+  assert.equal(page.googleTags().length, 1, 'the tag loads once, immediately');
+  assert.equal(page.googleTags()[0].src, 'https://www.googletagmanager.com/gtag/js?id=G-TEST');
+  assert.equal(page.appended.length, 1, 'no banner or other UI is added');
+  assert.deepEqual([...page.window.dataLayer].map((args) => args[0]), ['js', 'config']);
+  page.window.gtag('event', 'page_view');
+  assert.equal(page.window.dataLayer.length, 3, 'companion route changes reach the tag');
+
+  const search = runAnalyticsLoader({ path: '/search.html' });
+  assert.equal(search.googleTags().length, 0, 'search queries never reach analytics');
+  assert.equal(typeof search.window.gtag, 'function', 'gtag calls never throw');
+  search.window.gtag('event', 'page_view');
+  assert.equal(search.window.dataLayer, undefined, 'and are discarded on search');
 });
+
 
 test('AI Security Course Chapter 3 completion remains synchronized and evidence-closed', () => {
   const mediumUrl = 'https://medium.com/@1200km/ai-security-course-module-00-chapter-3-1bf0411472f6';

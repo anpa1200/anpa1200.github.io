@@ -1,23 +1,25 @@
 (function () {
   'use strict';
-  // Analytics is disabled until an explicit opt-in control is implemented.
-  // Keep this legacy asset inert for visitors with cached HTML that still
-  // references it. The release build also removes new script references.
-  const analyticsConsentReady = false;
-  if (!analyticsConsentReady) return;
-
+  // Google Analytics 4 runs on every page except search, whose URLs carry
+  // visitor-typed queries. Disclosed on /privacy.html#analytics-and-browser-storage.
   const script = document.currentScript;
   const analyticsId = script?.dataset.googleAnalyticsId || '';
+  const enabled = Boolean(analyticsId) && window.location.pathname !== '/search.html';
   const affiliateLinks = new Map([
     ['https://training.trainsec.net/malware-analyst-professional-level-1/v6dfz', 'trainsec-malware-analyst-professional-level-1'],
   ]);
 
-  function loadAnalytics() {
-    // Search URLs contain visitor-authored queries; do not load automatic URL/history analytics here.
-    if (window.location.pathname === '/search.html' || !analyticsId || window.__1200kmAnalyticsLoaded) return;
-    window.__1200kmAnalyticsLoaded = true;
+  // Docusaurus companions call window.gtag on every client-side route change,
+  // so it must always be a function; on search it discards the calls.
+  if (enabled) {
     window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    if (typeof window.gtag !== 'function') window.gtag = function () { window.dataLayer.push(arguments); };
+  } else if (typeof window.gtag !== 'function') {
+    window.gtag = function () {};
+  }
+
+  if (enabled && !window.__1200kmAnalyticsLoaded) {
+    window.__1200kmAnalyticsLoaded = true;
     window.gtag('js', new Date());
     window.gtag('config', analyticsId);
     const tag = document.createElement('script');
@@ -26,31 +28,18 @@
     document.head.appendChild(tag);
   }
 
-  ['pointerdown', 'keydown', 'touchstart'].forEach(function (eventName) {
-    window.addEventListener(eventName, loadAnalytics, { once: true, passive: true });
-  });
-
   document.addEventListener('click', function (event) {
+    if (!window.__1200kmAnalyticsLoaded) return;
     const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null;
     if (!anchor) return;
-
     let destination;
-    try {
-      destination = new URL(anchor.href, window.location.href);
-    } catch {
-      return;
-    }
-
+    try { destination = new URL(anchor.href, window.location.href); } catch { return; }
     const affiliateId = affiliateLinks.get(destination.href);
     if (!affiliateId) return;
-
-    loadAnalytics();
-    window.gtag?.('event', 'affiliate_click', {
+    window.gtag('event', 'affiliate_click', {
       affiliate_id: affiliateId,
       link_domain: destination.hostname,
       link_url: destination.href,
     });
   }, { capture: true });
-
-  window.setTimeout(loadAnalytics, 30_000);
 })();

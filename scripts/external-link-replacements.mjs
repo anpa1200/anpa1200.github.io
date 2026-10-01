@@ -94,21 +94,60 @@ export async function rewriteExternalInDirectory(directory, extensions, rewrite 
 // Markdown links to loopback, link-local metadata or RFC 1918 hosts point at
 // the reader's own machine, not a resource: render them as inline code.
 const PRIVATE_URL = String.raw`https?://(?:localhost|127\.0\.0\.1|0\.0\.0\.0|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|169\.254\.169\.254)(?::\d+)?(?:[/?#][^)\s>]*)?`;
+// Fenced blocks (also indented inside list items, or unclosed to the end),
+// CommonMark indented code blocks and single-line inline code spans are
+// literal text: nothing inside them is a link, so nothing there is rewritten.
+const FENCED_CODE = /^([ \t]*)(`{3,}|~{3,})[^\n]*\n[\s\S]*?(?:^[ \t]*\2[ \t]*$|(?![\s\S]))/gm;
+const INLINE_CODE = /(?<!`)(`+)(?!`)[^\n]*?(?<!`)\1(?!`)/g;
+function mapOutside(text, pattern, transform) {
+  let output = '';
+  let last = 0;
+  for (const match of text.matchAll(pattern)) {
+    output += transform(text.slice(last, match.index)) + match[0];
+    last = match.index + match[0].length;
+  }
+  return output + transform(text.slice(last));
+}
+// Every rewrite below is single-line, so prose is transformed line by line.
+// A 4-space/tab line after a blank line starts an indented code block (in MDX
+// it is prose; skipping it there only leaves a link in place, never breaks code).
+function mapOutsideIndentedCode(text, transform) {
+  let code = false;
+  let previousBlank = true;
+  return text.split('\n').map((line) => {
+    const blank = !line.trim();
+    if (!blank) code = /^(?: {4}|\t)/.test(line) && (code || previousBlank);
+    previousBlank = blank;
+    return code || blank ? line : transform(line);
+  }).join('\n');
+}
 export function unlinkPrivateUrls(markdown) {
   let replacements = 0;
-  const parts = markdown.split(/(^```[\s\S]*?^```|^~~~[\s\S]*?^~~~)/m);
-  const output = parts.map((part, index) => {
-    if (index % 2 === 1) return part; // fenced code block
-    return part
-      .replace(new RegExp(String.raw`\[([^\]\n]+)\]\((${PRIVATE_URL})\)`, 'g'), (_, text, url) => {
-        replacements += 1;
-        const label = text.replace(/^`|`$/g, '');
-        return label === url ? `\`${url}\`` : `${text} (\`${url}\`)`;
-      })
-      .replace(new RegExp(String.raw`<(${PRIVATE_URL})>`, 'g'), (_, url) => {
-        replacements += 1;
-        return `\`${url}\``;
-      });
-  }).join('');
+  // Medium exports an autolink inside code as a whole-span `[label](url)`,
+  // often followed by the swallowed punctuation as a second link:
+  // `[url](url)`[.](url) -> `url`. The reader saw the label, so keep it.
+  const mediumCodeLink = new RegExp(String.raw`\`\[([^\]\n]+)\]\(<?(${PRIVATE_URL})>?\)\`(?:\[([^\]\n\w]*)\]\(<?\2>?\))?`, 'g');
+  const prose = (text) => text
+    .replace(new RegExp(String.raw`\[([^\]\n]+)\]\((${PRIVATE_URL})\)`, 'g'), (_, text, url) => {
+      replacements += 1;
+      const label = text.replace(/^(\*\*|__|\*|_)?`?|`?(\*\*|__|\*|_)?$/g, '');
+      return label === url ? `\`${url}\`` : `${text} (\`${url}\`)`;
+    })
+    .replace(new RegExp(String.raw`<(${PRIVATE_URL})>`, 'g'), (_, url) => {
+      replacements += 1;
+      return `\`${url}\``;
+    })
+    // GFM autolinks a bare URL after any non-letter; skip URLs that are part
+    // of a larger URL, an HTML/JSX attribute or a Markdown link destination.
+    .replace(new RegExp(String.raw`(?<![\w/:.@\-\`<]|=["']|\]\()(${PRIVATE_URL})`, 'g'), (_, match) => {
+      const url = match.replace(/[.,:;!?*_~'"]+$/, '');
+      replacements += 1;
+      return `\`${url}\`${match.slice(url.length)}`;
+    });
+  const line = (text) => mapOutside(text.replace(mediumCodeLink, (_, label, url, tail = '') => {
+    replacements += 1;
+    return `\`${label}\`${tail}`;
+  }), INLINE_CODE, prose);
+  const output = mapOutside(markdown, FENCED_CODE, (text) => mapOutsideIndentedCode(text, line));
   return { output, replacements };
 }

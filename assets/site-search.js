@@ -192,7 +192,7 @@
     link.className = 'site-search-fallback' + (compact ? ' site-search-fallback--compact' : '');
     link.href = '/search.html';
     link.dataset.siteSearchControl = 'fallback';
-    link.setAttribute('aria-label', 'Search all 1200km research');
+    link.setAttribute('aria-label', 'Search research on 1200km');
     link.innerHTML = '<span aria-hidden="true" class="site-search-fallback-icon"></span><span class="site-search-fallback-text">Search research</span>';
     return link;
   }
@@ -202,7 +202,7 @@
     button.className = 'pf-trigger-btn';
     button.type = 'button';
     button.dataset.siteSearchControl = 'trigger';
-    button.setAttribute('aria-label', 'Search all 1200km research');
+    button.setAttribute('aria-label', 'Search research on 1200km');
     button.setAttribute('aria-haspopup', 'dialog');
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-controls', 'site-search-modal');

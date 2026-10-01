@@ -370,8 +370,13 @@ for (const page of pages) {
 
   const isDocusaurus = /\bid=["']__docusaurus["']/i.test(releaseHtml);
   if (/<link\b[^>]*href=["']https:\/\/fonts\.(?:googleapis|gstatic)\.com/i.test(releaseHtml)) failures.push(`${page.rel}: release HTML still blocks on an external web font`);
-  if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: Google Analytics boot script remains enabled`);
-  if (/<script\b[^>]*\bsrc=["'][^"']*\/assets\/site-performance\.js(?:[?#][^"']*)?["']/i.test(releaseHtml)) failures.push(`${page.rel}: legacy analytics loader remains in release HTML`);
+  // Google's tag is loaded only by the analytics loader (exactly one per page),
+  // never booted directly from page HTML.
+  if (/googletagmanager\.com\/gtag\/js/i.test(releaseHtml)) failures.push(`${page.rel}: page boots Google's tag directly instead of through the analytics loader`);
+  const loaders = releaseHtml.match(/<script\b[^>]*\bsrc=["'][^"']*\/assets\/site-performance\.js(?:[?#][^"']*)?["'][^>]*>/gi) || [];
+  if (!/http-equiv\s*=\s*["']?refresh/i.test(releaseHtml) && (loaders.length !== 1 || !/data-google-analytics-id="G-[A-Z0-9]+"/.test(loaders[0] || ''))) {
+    failures.push(`${page.rel}: expected exactly one analytics loader, found ${loaders.length}`);
+  }
   if (!isDocusaurus && !/<main\b[^>]*data-pagefind-body/i.test(releaseHtml)) failures.push(`${page.rel}: main is not marked as Pagefind content`);
   // H1 is already addressable by the canonical page URL. Never mutate a
   // hydrated Docusaurus tree just to add anchors; its generated document pages

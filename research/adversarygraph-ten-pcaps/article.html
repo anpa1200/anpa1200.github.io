@@ -67,7 +67,7 @@
 <p>The final deployment was the real local AdversaryGraph installation, accessed through its browser frontend on loopback. The recorded source revision was <code>93a79512f6304ce719d5d32cd1b6d26960865f75</code>. Packet parsing used TShark 4.4.18, the <code>tshark-evidence-v3</code> profile, and <code>pcap-rules-v3</code>.</p>
 <p>The relevant implementation is a deterministic saved-PCAP route with an internal analyzer service, structured evidence, database persistence, and investigation handoffs. AdversaryGraph has AI-assisted capabilities elsewhere, but the route tested here did not invoke an LLM. Its presence under an <strong>AI Analysis</strong> screen—and a visible provider selector—does not mean that provider processed the capture. The result itself identifies the deterministic profile. See the <a href="https://github.com/anpa1200/adversarygraph">project repository</a> and the per-case analyzer manifests in the native JSON files.</p>
 <p>The operational sequence was:</p>
-<pre><code class="language-text">Saved capture + source checksum
+<pre tabindex="0"><code class="language-text">Saved capture + source checksum
     → isolated decode + versioned rules
     → structured packet evidence + semantic checksum
     → persistence + API retrieval + independent repeat
@@ -187,7 +187,7 @@
 <p>Evidence: <a href="reports/cases/2024-09-04/REPORT.html">full report</a>, <a href="reports/cases/2024-09-04/api-upload.json">native JSON</a>, and <a href="https://www.malware-traffic-analysis.net/2024/09/04/page2.html">publisher answer source</a>.</p>
 <h3 id="warmcookie-the-missing-archive-child">WarmCookie: the missing archive child</h3>
 <p>The August 2024 case recovered the selected identity for <code>10.8.15.133</code>, <code>DESKTOP-H8ALZBV</code>, account <code>plucero</code>. It retained the selected infrastructure and the transferred ZIP/DLL hashes. It did <strong>not</strong> recover one JavaScript child hash from inside the ZIP:</p>
-<pre><code class="language-text">dab98819d1d7677a60f5d06be210d45b74ae5fd8cf0c24ec1b3766e25ce6dc2c
+<pre tabindex="0"><code class="language-text">dab98819d1d7677a60f5d06be210d45b74ae5fd8cf0c24ec1b3766e25ce6dc2c
 </code></pre>
 <p>That is the single missing item behind 87/88. It is a real extraction boundary, not a failed reputation lookup. Enriching the outer archive cannot make the inner file hash appear in packet extraction output. Fixing this requires bounded archive inspection, with controls for nesting depth, decompressed size, file count, and unsafe paths; it does not require executing the content.</p>
 <p>The current native profile did not implement that step. Nor could it reveal the complete URL path of an encrypted follow-up request from TLS metadata alone. The WarmCookie family label comes from the exercise context and supporting intelligence, not an independent general-purpose family classifier.</p>
@@ -285,7 +285,7 @@
 <p>The tested filters found zero matching frames for the conflicting published alternatives. The <a href="evidence/publisher-conflicts.json">conflict evidence</a> supplies exact, executable filters and initial matching frames. These counts describe the particular filters, not unique connections or attack events.</p>
 <p>Against literal publisher values, the selected results would be <strong>50/52 identity facts</strong> and <strong>84/88 indicators</strong>. Against packet-verified values, they are <strong>52/52</strong> and <strong>87/88</strong>. Both views belong in the record. Quietly changing an answer key and reporting only the higher score would make the experiment harder to audit.</p>
 <p>For example, after acquiring the exact Nemotodes capture, this read-only TShark command inspects the protocol evidence without contacting the address:</p>
-<pre><code class="language-bash">tshark -n -r 2024-11-26-traffic-analysis-exercise.pcap \
+<pre tabindex="0"><code class="language-bash">tshark -n -r 2024-11-26-traffic-analysis-exercise.pcap \
   -Y 'http.request &amp;&amp; ip.addr == 194.180.191.64 &amp;&amp; tcp.port == 443' \
   -T fields -e frame.number -e ip.src -e tcp.dstport \
   -e http.request.method -e http.request.uri -e http.user_agent
@@ -474,7 +474,7 @@
 </tbody>
 </table></div>
 <p>To inspect the supplement without running malware or contacting any provider, use Python 3, <code>jq</code>, and standard checksum tools from the extracted article directory:</p>
-<pre><code class="language-bash">sha256sum -c SHA256SUMS
+<pre tabindex="0"><code class="language-bash">sha256sum -c SHA256SUMS
 jq '.totals' evidence/summary.json
 jq '.[] | select(.date == &quot;2024-08-15&quot;)' evidence/live-metrics.json
 jq '.lookups | all(.stored_exact and .ai_disabled)' evidence/enrichment-database-audit.json

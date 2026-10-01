@@ -67,6 +67,46 @@ test('private-host Markdown links become inline code, outside fenced code only',
   assert.equal(unlinkPrivateUrls(output).output, output);
 });
 
+test('bare private URLs that GFM would autolink become inline code; code spans stay literal', () => {
+  const markdown = [
+    '| [OpenCTI](/x/opencti) | http://localhost:8080 | admin |',
+    '- Open http://localhost:5601',
+    '1. Open [TheHive](/x/thehive) (http://localhost:9100)',
+    'The metadata service is at http://169.254.169.254/ . Result at http://localhost:8080.',
+    "DownloadString('http://127.0.0.1:19999/...'))",
+    'In the VM browser:[**http://localhost:8080/**](http://localhost:8080/)',
+    'Open the UI at`[http://localhost:3000](http://localhost:3000)`[.](http://localhost:3000)',
+    '`[https://google-gruyere.appspot.com/](<http://192.168.1.242/1142014131>)`',
+    '',
+    '    curl http://localhost:8888/health',
+    '',
+    '    hexstrike_mcp --server http://127.0.0.1:8888',
+    'Paragraph',
+    '    continued at http://localhost:7000',
+    'Code `curl http://localhost:9200` and `curl [a](http://localhost:1)` stay.',
+    'Archived https://web.archive.org/web/2020/http://localhost:3000/ and <a href="http://localhost:3000">x</a> stay.',
+    '  ```bash',
+    '  export URL=http://localhost:8080',
+    '  ```',
+  ].join('\n');
+  const { output, replacements } = unlinkPrivateUrls(markdown);
+  assert.equal(replacements, 10);
+  assert.match(output, /\| `http:\/\/localhost:8080` \|/);
+  assert.match(output, /- Open `http:\/\/localhost:5601`/);
+  assert.match(output, /\(`http:\/\/localhost:9100`\)/);
+  assert.match(output, /at `http:\/\/169\.254\.169\.254\/` \. Result at `http:\/\/localhost:8080`\./, 'trailing punctuation stays outside');
+  assert.match(output, /DownloadString\('`http:\/\/127\.0\.0\.1:19999\/`\.\.\.'\)\)/);
+  assert.match(output, /browser:`http:\/\/localhost:8080\/`$/m, 'bold URL label collapses to code');
+  assert.match(output, /UI at`http:\/\/localhost:3000`\.$/m, 'Medium code autolink and its swallowed period');
+  assert.match(output, /^`https:\/\/google-gruyere\.appspot\.com\/`$/m, 'a whole-span code link keeps the label the reader saw');
+  assert.match(output, /^ {4}curl http:\/\/localhost:8888\/health\n\n {4}hexstrike_mcp --server http:\/\/127\.0\.0\.1:8888$/m, 'indented code is untouched');
+  assert.match(output, /^ {4}continued at `http:\/\/localhost:7000`$/m, 'an indented paragraph continuation is prose');
+  assert.match(output, /Code `curl http:\/\/localhost:9200` and `curl \[a\]\(http:\/\/localhost:1\)` stay\./);
+  assert.match(output, /web\/2020\/http:\/\/localhost:3000\/ and <a href="http:\/\/localhost:3000">x<\/a> stay/);
+  assert.match(output, / {2}export URL=http:\/\/localhost:8080\n/, 'indented fence is untouched');
+  assert.equal(unlinkPrivateUrls(output).output, output);
+});
+
 test('archive editorial overlay entries are reviewed fixed strings', () => {
   const overlay = JSON.parse(readFileSync(new URL('../data/archive-editorial-overlay.json', import.meta.url), 'utf8'));
   assert.equal(overlay.schema_version, 1);

@@ -249,10 +249,13 @@ test('new Worker preserves legacy security, discovery, MIME and Markdown semanti
       assert.equal(next.headers.get('Strict-Transport-Security'), 'max-age=31536000; includeSubDomains', `${path} HSTS`);
       assert.match(old.headers.get('Content-Security-Policy'), /frame-src 'none'/);
       assert.match(next.headers.get('Content-Security-Policy'), /frame-src https:\/\/www\.youtube-nocookie\.com/);
+      // Intentional differences: YouTube embeds, the Google Analytics hosts
+      // and the Buttondown signup form target.
+      const analyticsHosts = / https:\/\/(?:\*\.|www\.|region1\.)?(?:googletagmanager\.com|google-analytics\.com|analytics\.google\.com)/g;
       const nextCsp = next.headers.get('Content-Security-Policy').replace('frame-src https://www.youtube-nocookie.com', "frame-src 'none'");
-      const oldCspWithoutAnalytics = old.headers.get('Content-Security-Policy').replace(/ https:\/\/(?:www\.googletagmanager\.com|www\.google-analytics\.com|analytics\.google\.com|region1\.google-analytics\.com)/g, '');
-      assert.doesNotMatch(nextCsp, /googletagmanager|google-analytics|analytics\.google/);
-      assert.equal(nextCsp, oldCspWithoutAnalytics);
+      assert.match(nextCsp, /script-src [^;]*https:\/\/www\.googletagmanager\.com/);
+      assert.match(nextCsp, /form-action 'self' https:\/\/buttondown\.com;/);
+      assert.equal(nextCsp.replace(analyticsHosts, '').replace(' https://buttondown.com', ''), old.headers.get('Content-Security-Policy').replace(analyticsHosts, ''));
       for (const link of (old.headers.get('Link') || '').split(/,\s*(?=<)/).filter(Boolean)) {
         assert.ok(next.headers.get('Link')?.includes(link), `${path}: lost ${link}`);
       }

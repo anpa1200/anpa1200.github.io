@@ -200,6 +200,8 @@ for file in sorted(OUT.rglob('*.md')):
     links(tokens)
     content = md.renderer.render(tokens, md.options, {})
     content = re.sub(r'(<table>.*?</table>)', r'<div class="table-wrap">\1</div>', content, flags=re.S)
+    # Code blocks scroll horizontally; keyboard users need a tab stop to scroll them.
+    content = content.replace('<pre>', '<pre tabindex="0">')
     title = next((tokens[i+1].content for i,t in enumerate(tokens) if t.type == 'heading_open'), file.stem)
     relative = str(file.relative_to(OUT).with_suffix('.html'))
     canonical = BASE if file.name == 'README.md' else (ARTICLE if file.name == 'article.md' else BASE + relative)

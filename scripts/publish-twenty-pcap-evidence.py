@@ -252,6 +252,8 @@ def render_html(file):
         href=a.get('href','')
         # README.md is published as the directory index; README.html redirects there.
         if not urlsplit(href).scheme and href.endswith('.md'):a['href']=re.sub(r'/README\.html$','/',re.sub(r'^README\.html$','./',href[:-3]+'.html'))
+    # Code blocks scroll horizontally; keyboard users need a tab stop to scroll them.
+    for pre in soup.find_all('pre'):pre['tabindex']='0'
     for im in soup.find_all('img'):
         path=file.parent/im['src']
         if path.is_file():

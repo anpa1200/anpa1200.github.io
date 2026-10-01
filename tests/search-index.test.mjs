@@ -429,7 +429,8 @@ test('homepage ships a visible progressive search fallback and hero search befor
   assert.match(html, new RegExp(`id="site-search-styles"[^>]+site-search\\.css\\?v=${version}`));
   assert.match(html, new RegExp(`site-search\\.js\\?v=${version}`));
   assert.match(html, /class="site-search-host site-search-host--standalone"[\s\S]*?href="\/search\.html"[\s\S]*?id="theme-btn"/);
-  assert.match(html, /aria-label="Search all 1200km research"/);
+  // The accessible name contains the visible "Search research" text (label in name).
+  assert.match(html, /aria-label="Search research on 1200km"[^>]*>[\s\S]*?Search research</);
   assert.match(html, /data-site-search-hero[\s\S]*?<form[^>]+action="\/search\.html"[\s\S]*?<input[^>]+name="q"/);
 });
 
