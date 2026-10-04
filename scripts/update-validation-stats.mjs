@@ -62,11 +62,21 @@ function ghUser(username) {
   return runJson('gh', ['api', `users/${username}`]);
 }
 
+// Maintainer engagement counts only people other than the PR author. Bot activity (CLA bots,
+// CodeRabbit, Copilot reviews, welcome workflows) and the author's own follow-ups are not review
+// signal, and counting them overstated engagement.
+function maintainerActivity(items, author) {
+  if (!Array.isArray(items)) return 0;
+  return items.filter(item => item.user && item.user.type === 'User' && item.user.login !== author).length;
+}
+
 function ghPrDetails(pr, includeReviewHealth = false) {
   const nameWithOwner = pr.repository.nameWithOwner;
   const details = runJson('gh', ['api', `repos/${nameWithOwner}/pulls/${pr.number}`]);
   const comments = includeReviewHealth ? runJson('gh', ['api', `repos/${nameWithOwner}/issues/${pr.number}/comments?per_page=100`], []) : [];
+  const reviewComments = includeReviewHealth ? runJson('gh', ['api', `repos/${nameWithOwner}/pulls/${pr.number}/comments?per_page=100`], []) : [];
   const reviews = includeReviewHealth ? runJson('gh', ['api', `repos/${nameWithOwner}/pulls/${pr.number}/reviews?per_page=100`], []) : [];
+  const author = details.user?.login;
   return {
     ...pr,
     canonical_state: details.state,
@@ -74,8 +84,8 @@ function ghPrDetails(pr, includeReviewHealth = false) {
     closed_at: details.closed_at,
     draft: details.draft,
     mergeable_state: details.mergeable_state || 'unknown',
-    comments_count: Array.isArray(comments) ? comments.length : 0,
-    reviews_count: Array.isArray(reviews) ? reviews.length : 0,
+    comments_count: maintainerActivity(comments, author) + maintainerActivity(reviewComments, author),
+    reviews_count: maintainerActivity(reviews, author),
   };
 }
 
@@ -168,7 +178,7 @@ function renderReviewBacklog() {
 
   return `          <article class="card">
             <h3>Open PR Backlog Health</h3>
-            <p>${review.no_comments_no_reviews} of ${stats.github.open_prs} open GitHub PRs have no maintainer comments or reviews yet. ${review.drafts} are draft PRs.</p>
+            <p>${review.no_comments_no_reviews} of ${stats.github.open_prs} open GitHub PRs have no comments or reviews from a human maintainer yet (bot and author activity excluded). ${review.drafts} are draft PRs.</p>
             <ul class="signal-list">
 ${stateRows}
             </ul>
