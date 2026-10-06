@@ -19,9 +19,9 @@ AdversaryGraph is a self-hosted CTI-to-detection workbench for mapping reports, 
 
 Canonical page: https://1200km.com/adversarygraph/
 
-Current source release: v7.0.0, merged and CI-validated on `main` at
+Documented source release: v7.0.0, merged and CI-validated on `main` at
 `2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`, matching the latest published
-immutable GitHub release v7.0.0.
+stable GitHub release v7.0.0.
 
 Authoritative fact model: https://1200km.com/data/site-facts.json
 
@@ -37,3 +37,7 @@ Authoritative fact model: https://1200km.com/data/site-facts.json
 ## Safety Boundary
 
 Security content on this site is intended for authorized defensive research, lab validation, detection engineering, malware analysis workflow design, and professional education. The public website does not expose attack execution, malware upload, SIEM forwarding, private IOC lookup, or authenticated AdversaryGraph workflows.
+
+## Development source boundary
+
+The latest published stable release is v7.0.0. Main declares **8.0.0-beta.1** at [commit 27de0b1](https://github.com/anpa1200/adversarygraph/blob/27de0b13fc2daca78a46f861074654509da45e70/VERSION), verified October 5, 2026. The retained v7 documentation describes the stable release; beta development is not a claim of stable availability or production validation. See [site facts](https://1200km.com/data/site-facts.json).

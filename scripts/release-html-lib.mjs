@@ -193,12 +193,12 @@ export function normalizeMetaDescriptions(html) {
   // Include the page-specific title so every canonical article retains a
   // distinct search snippet. End at a word boundary with a real sentence
   // terminator rather than publishing a literal truncation ellipsis.
-  const archiveBase = canonical?.includes('/articles/read/')
+  const archiveBase = !curated && canonical?.includes('/articles/read/')
     ? (alreadyPrefixed ? base : `${title}. ${base}`)
     : base;
-  const description = canonical?.includes('/articles/read/')
+  const description = curated || (canonical?.includes('/articles/read/')
     ? conciseDescription(archiveBase, 159).replace(/…$/, '.')
-    : conciseDescription(archiveBase);
+    : conciseDescription(archiveBase));
   let transformed = html;
   for (const [attribute, key] of [
     ['name', 'description'],

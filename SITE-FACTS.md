@@ -35,17 +35,16 @@ articles must not be used to establish a current version or metric.
 
 ## Release boundary
 
-AdversaryGraph has two explicit release facts, tracked separately even when
-their values are equal. The current merged and CI-validated source release is
-`v7.0.0` at commit `2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`. The latest
-non-draft, non-prerelease immutable GitHub release is also `v7.0.0`: the
-protected v6.5.0 tag workflow was superseded and the project published v7.0.0
-directly, closing the source-ahead-of-tag gap that existed while `v6.5.0` was
-merged but unreleased. `adversarygraph.current_source_release` and
-`adversarygraph.development_status` keep `status: "current-development"` by
-convention even when the value matches the latest tag — that status labels the
-fact type (tracks whatever is merged on `main`), not a claim that the value
-itself is unpublished.
+The documented stable source remains `v7.0.0`, pinned to
+`2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`. The legacy
+`adversarygraph.current_source_release` key refers to that documented release,
+with released status. It does not describe the moving main branch.
+
+As verified October 5, 2026, `adversarygraph.development_version` is
+`8.0.0-beta.1` at `27de0b13fc2daca78a46f861074654509da45e70`.
+The latest published stable release remains `v7.0.0`. GitHub reports the release's
+`immutable` property as false; publication is not an immutability guarantee.
+Beta capabilities have not been validated by the retained v7 documentation.
 
 ### 2026-08-14 reassessment
 

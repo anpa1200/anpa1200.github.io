@@ -24,10 +24,10 @@ function synchronize(content) {
       /(data-site-fact=["']adversarygraph\.latest_release_tag["'][^>]*data-fact-value=["'])v\d+\.\d+\.\d+(["'][^>]*>)v\d+\.\d+\.\d+(<\/[^>]+>)/gi,
       `$1${publishedTag}$2${publishedTag}$3`,
     )
-    .replace(/Current source release: AdversaryGraph v\d+\.\d+\.\d+; published tag: v\d+\.\d+\.\d+\./g,
-      `Current source release: AdversaryGraph ${sourceRelease}; published tag: ${publishedTag}.`)
-    .replace(/Current source release: v\d+\.\d+\.\d+; published tag: v\d+\.\d+\.\d+/g,
-      `Current source release: ${sourceRelease}; published tag: ${publishedTag}`)
+    .replace(/Documented source release: AdversaryGraph v\d+\.\d+\.\d+; published tag: v\d+\.\d+\.\d+\./g,
+      `Documented source release: AdversaryGraph ${sourceRelease}; published tag: ${publishedTag}.`)
+    .replace(/Documented source release: v\d+\.\d+\.\d+; published tag: v\d+\.\d+\.\d+/g,
+      `Documented source release: ${sourceRelease}; published tag: ${publishedTag}`)
     .replace(/v6\.5 source release/g, `${sourceRelease} release`)
     .replace(/v6\.5 source/g, `${sourceRelease} release`)
     .replace(/Current v5 platform documentation/g, `Current ${sourceRelease} platform documentation`)
@@ -43,30 +43,30 @@ function synchronize(content) {
     .replace(/>Current-development guide</g, '>RAG/MCP guide<')
     .replace(/<span class="status dev">Publication pending<\/span>/g,
       `<span class="status stable">Published tag ${publishedTag}</span>`)
-    .replace(/Current source release: <strong>AdversaryGraph v\d+\.\d+\.\d+<\/strong>; latest published tag: <strong>v\d+\.\d+\.\d+<\/strong>\./g,
-      `Current source release: <strong>AdversaryGraph ${sourceRelease}</strong>; latest published tag: <strong>${publishedTag}</strong>.`)
+    .replace(/Documented source release: <strong>AdversaryGraph v\d+\.\d+\.\d+<\/strong>; latest published tag: <strong>v\d+\.\d+\.\d+<\/strong>\./g,
+      `Documented source release: <strong>AdversaryGraph ${sourceRelease}</strong>; latest published tag: <strong>${publishedTag}</strong>.`)
     .replace(
-      /(children:\["Current source release: ",[\s\S]{0,120}?children:")AdversaryGraph v\d+\.\d+\.\d+("\}\),"; latest published tag: ",[\s\S]{0,120}?children:")v\d+\.\d+\.\d+/g,
+      /(children:\["Documented source release: ",[\s\S]{0,120}?children:")AdversaryGraph v\d+\.\d+\.\d+("\}\),"; latest published tag: ",[\s\S]{0,120}?children:")v\d+\.\d+\.\d+/g,
       `$1AdversaryGraph ${sourceRelease}$2${publishedTag}`,
     )
     .replace(/AdversaryGraph v\d+\.\d+\.\d+ source/g, `AdversaryGraph ${sourceRelease} release`)
     .replace(/v\d+\.\d+\.\d+ source/g, `${sourceRelease} release`)
     .replace(
-      /AdversaryGraph v\d+\.\d+\.\d+ is the current merged, CI-validated source release(?:, with a reproducible readiness gate, rollback guidance, current evidence, and documented case studies|\. It packages the production-readiness gate, rollback guidance, screenshot evidence, and case studies)\. v\d+\.\d+\.\d+ remains the latest published immutable GitHub release(?: until (?:the )?protected(?: tag workflow publishes v\d+\.\d+\.\d+| v\d+\.\d+\.\d+ tag workflow completes))?\./g,
-      `AdversaryGraph ${sourceRelease} is the current merged, CI-validated source release and matches ${publishedTag}, the latest published immutable GitHub release.`,
+      /AdversaryGraph v\d+\.\d+\.\d+ is the documented, release-validated source release(?:, with a reproducible readiness gate, rollback guidance, current evidence, and documented case studies|\. It packages the production-readiness gate, rollback guidance, screenshot evidence, and case studies)\. v\d+\.\d+\.\d+ remains the latest published stable GitHub release(?: until (?:the )?protected(?: tag workflow publishes v\d+\.\d+\.\d+| v\d+\.\d+\.\d+ tag workflow completes))?\./g,
+      `AdversaryGraph ${sourceRelease} is the documented, release-validated source release and matches ${publishedTag}, the latest published stable GitHub release.`,
     )
-    .replace(/(latest published immutable GitHub release)\.\d+\.\d+ tag workflow completes\./g, '$1.')
+    .replace(/(latest published stable GitHub release)\.\d+\.\d+ tag workflow completes\./g, '$1.')
     .replace(
-      /Screenshots are version-specific evidence\. v4 and v5 captures are retained as (?:clearly )?historical workflow evidence; the current source release is v\d+\.\d+\.\d+ and the latest published immutable GitHub release is v\d+\.\d+\.\d+\./g,
+      /Screenshots are version-specific evidence\. v4 and v5 captures are retained as (?:clearly )?historical workflow evidence; the documented source release is v\d+\.\d+\.\d+ and the latest published stable GitHub release is v\d+\.\d+\.\d+\./g,
       `Screenshots are version-specific evidence. v4 and v5 captures are retained as historical workflow evidence; the current source and latest published release are ${sourceRelease}.`,
     )
     .replace(
-      /Release boundary: <strong>v\d+\.\d+\.\d+<\/strong> is merged and CI-validated on <code>main<\/code>, and the 31 workspaces below describe that source release\. <strong>v\d+\.\d+\.\d+<\/strong> remains the latest published immutable GitHub release until the protected tag workflow publishes v\d+\.\d+\.\d+\./g,
-      `Release boundary: <strong>${sourceRelease}</strong> is merged and CI-validated on <code>main</code>, and the 31 workspaces below describe that release. It matches <strong>${publishedTag}</strong>, the latest published immutable GitHub release.`,
+      /Release boundary: <strong>v\d+\.\d+\.\d+<\/strong> is merged and CI-validated on <code>main<\/code>, and the 31 workspaces below describe that source release\. <strong>v\d+\.\d+\.\d+<\/strong> remains the latest published stable GitHub release until the protected tag workflow publishes v\d+\.\d+\.\d+\./g,
+      `Release boundary: <strong>${sourceRelease}</strong> is merged and CI-validated on <code>main</code>, and the 31 workspaces below describe that release. It matches <strong>${publishedTag}</strong>, the latest published stable GitHub release.`,
     )
     .replace(
-      /<span data-site-fact="adversarygraph\.current_source_release" data-fact-value="v\d+\.\d+\.\d+">v\d+\.\d+\.\d+<\/span> is the current merged, CI-validated source release described by this guide\. <span data-site-fact="adversarygraph\.latest_release_tag" data-fact-value="v\d+\.\d+\.\d+">v\d+\.\d+\.\d+<\/span> remains the latest published immutable GitHub release until the protected v\d+\.\d+\.\d+ tag workflow completes\./g,
-      `<span data-site-fact="adversarygraph.current_source_release" data-fact-value="${sourceRelease}">${sourceRelease}</span> is the current merged, CI-validated release described by this guide and matches <span data-site-fact="adversarygraph.latest_release_tag" data-fact-value="${publishedTag}">${publishedTag}</span>, the latest published immutable GitHub release.`,
+      /<span data-site-fact="adversarygraph\.current_source_release" data-fact-value="v\d+\.\d+\.\d+">v\d+\.\d+\.\d+<\/span> is the documented, release-validated source release described by this guide\. <span data-site-fact="adversarygraph\.latest_release_tag" data-fact-value="v\d+\.\d+\.\d+">v\d+\.\d+\.\d+<\/span> remains the latest published stable GitHub release until the protected v\d+\.\d+\.\d+ tag workflow completes\./g,
+      `<span data-site-fact="adversarygraph.current_source_release" data-fact-value="${sourceRelease}">${sourceRelease}</span> is the current merged, CI-validated release described by this guide and matches <span data-site-fact="adversarygraph.latest_release_tag" data-fact-value="${publishedTag}">${publishedTag}</span>, the latest published stable GitHub release.`,
     );
 }
 

@@ -16,19 +16,19 @@ It helps analysts connect:
 - SIEM validation results
 - Analyst decisions
 
-## Current Source Release
+## Documented Stable Release
 
 AdversaryGraph v7.0.0 is merged and CI-validated on `main`. It includes the
 reproducible release gate, rollback guidance, governed Threat Hunting, Query
 Library, Unified RAG/MCP, asset exposure assessment, SOC access groups, sanitized
 screenshot evidence, and documented case studies.
 
-The latest published immutable GitHub release is v7.0.0, matching the current
+The latest published stable GitHub release is v7.0.0, matching the documented
 source release.
 
 ## Unified RAG and MCP in v7.0 Source
 
-Unified RAG and MCP are included in the immutable v7.0.0 release. They are not
+Unified RAG and MCP are included in the published v7.0.0 release. They are not
 part of the older v6.0.0 tag.
 
 The governed retrieval layer indexes 12 AdversaryGraph source types:
@@ -89,3 +89,7 @@ forwarding. Those capabilities belong inside an operator-controlled deployment.
 ## Safety Boundary
 
 All security material is intended for authorized defensive research, lab validation, detection engineering, and professional education.
+
+## Development source boundary
+
+The latest published stable release is v7.0.0. Main declares **8.0.0-beta.1** at [commit 27de0b1](https://github.com/anpa1200/adversarygraph/blob/27de0b13fc2daca78a46f861074654509da45e70/VERSION), verified October 5, 2026. The retained v7 documentation describes the stable release; beta development is not a claim of stable availability or production validation. See [site facts](https://1200km.com/data/site-facts.json).

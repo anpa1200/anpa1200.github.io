@@ -360,7 +360,7 @@ if (!stableTag || stableTag.status !== 'released' || !stablePublished
 feedItems.push({
   url: 'https://1200km.com/adversarygraph/',
   title: `AdversaryGraph ${sourceRelease.value} Validated Source Release`,
-  description: `AdversaryGraph ${sourceRelease.value} is merged and CI-validated on main; the latest published immutable GitHub release is ${stableTag.value}. ${developmentStatus.value}`,
+  description: `AdversaryGraph ${sourceRelease.value} is merged and CI-validated on main; the latest published stable GitHub release is ${stableTag.value}. ${developmentStatus.value}`,
   published: sourceMerged.value,
   modified: localEntries.get('https://1200km.com/adversarygraph/')?.lastmod || sourceMerged.value,
 });

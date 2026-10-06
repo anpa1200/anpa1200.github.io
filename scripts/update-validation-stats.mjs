@@ -189,7 +189,7 @@ ${stateRows}
 function repoStatsCard(repoKey, title, description) {
   const repo = stats.repositories[repoKey];
   const sourceReleaseRow = repoKey === 'adversarygraph'
-    ? `\n              <li><span>Current source release</span><strong><a href="https://github.com/anpa1200/adversarygraph/blob/${escapeHtml(repo.source_commit)}/docs/release-notes/${escapeHtml(repo.source_release)}.md" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.source_release)}</a></strong></li>`
+    ? `\n              <li><span>Documented source release</span><strong><a href="https://github.com/anpa1200/adversarygraph/blob/${escapeHtml(repo.source_commit)}/docs/release-notes/${escapeHtml(repo.source_release)}.md" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.source_release)}</a></strong></li>`
     : '';
   return `          <article class="card">
             <h3><a href="${escapeHtml(repo.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
