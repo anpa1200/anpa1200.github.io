@@ -27,7 +27,7 @@ Core capabilities:
 - Investigation reporting
 - Analyst review workflow
 
-Current v7.0.0 source-release capabilities:
+Documented v7.0.0 release capabilities:
 
 - Unified RAG over 12 governed source types: ATT&CK techniques, groups, and
   campaigns; actor intelligence; IOCs; CVEs; analysis reports; knowledge;
@@ -41,7 +41,7 @@ Current v7.0.0 source-release capabilities:
   `search_intelligence`, `ask_intelligence`, `get_indexed_entity`, and
   `propose_navigator_layer`
 
-These RAG/MCP capabilities are merged, CI-validated, and part of the immutable
+These RAG/MCP capabilities are merged, CI-validated, and part of the published
 v7.0.0 tag; they are not part of the older v6.0.0 tag. RAG analysis requires `run_analysis`, profile
 administration requires `manage_intel`, and index administration requires
 `manage_feeds`. MCP cannot reindex, confirm proposals, or mutate platform state.
@@ -112,3 +112,7 @@ Restricted capabilities:
 ## Safety Boundary
 
 All offensive-security, malware-analysis, adversary-simulation, and detection-validation material is intended for authorized research, defensive security, lab environments, and professional security education.
+
+## Development source boundary
+
+The latest published stable release is v7.0.0. Main declares **8.0.0-beta.1** at [commit 27de0b1](https://github.com/anpa1200/adversarygraph/blob/27de0b13fc2daca78a46f861074654509da45e70/VERSION), verified October 5, 2026. The retained v7 documentation describes the stable release; beta development is not a claim of stable availability or production validation. See [site facts](https://1200km.com/data/site-facts.json).

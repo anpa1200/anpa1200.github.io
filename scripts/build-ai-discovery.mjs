@@ -40,9 +40,9 @@ Use this file as a curated discovery map. Follow the linked source pages for evi
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench. It was formerly named ThreatMapper.
 
-- Current source release: **${sourceRelease}**, merged and CI-validated on \`main\` at commit \`${sourceCommit.slice(0, 7)}\`
-- Latest published immutable GitHub release: **${releaseTag}**, published ${releaseDate}
-- Publication boundary: ${sourceRelease} is not an immutable tag until the protected release workflow publishes it
+- Documented source release: **${sourceRelease}**, merged and CI-validated on \`main\` at commit \`${sourceCommit.slice(0, 7)}\`
+- Latest published stable GitHub release: **${releaseTag}**, published ${releaseDate}
+- Current development: **${value('adversarygraph.development_version')}** at commit \`${value('adversarygraph.development_commit')}\`, verified ${facts['adversarygraph.development_version'].verified_at}. This is not the stable release.
 - [Product hub](https://1200km.com/adversarygraph/)
 - [Documentation](${value('adversarygraph.documentation_url')})
 - [Source and releases](${value('adversarygraph.repository_url')})

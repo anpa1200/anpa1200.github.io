@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { prepareAdversaryGraphDiscovery } from './adversarygraph-discovery-overlay.mjs';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -60,6 +62,7 @@ if (navbarLogo && navbarLogo.width == null && navbarLogo.height == null) Object.
     await writeFile(file, css.replace(/@import url\(['"]https:\/\/fonts\.googleapis\.com\/[^'"\n]+['"]\);/g, ''));
   }
   if (mount === 'adversarygraph-docs') {
+    prepareAdversaryGraphDiscovery(source, JSON.parse(readFileSync(new URL('../data/site-facts.json', import.meta.url), 'utf8')).facts);
     const file = join(source, 'src/css/custom.css');
     const css = await readFile(file, 'utf8');
     // The upstream optimizer sorts media rules after base rules. Explicit

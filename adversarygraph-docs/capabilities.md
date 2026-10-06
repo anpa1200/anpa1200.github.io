@@ -2,7 +2,7 @@
 
 AdversaryGraph is a self-hosted CTI-to-detection workbench for analysts and detection engineers.
 
-Current source release: v7.0.0.
+Documented source release: v7.0.0.
 
 Latest published tag: v7.0.0.
 
@@ -35,3 +35,7 @@ Agents may summarize public pages, retrieve methodology, and explain documented 
 ## Safety Boundary
 
 Offensive-security and malware-analysis content is for authorized defensive research, controlled lab validation, and professional education.
+
+## Development source boundary
+
+The latest published stable release is v7.0.0. Main declares **8.0.0-beta.1** at [commit 27de0b1](https://github.com/anpa1200/adversarygraph/blob/27de0b13fc2daca78a46f861074654509da45e70/VERSION), verified October 5, 2026. The retained v7 documentation describes the stable release; beta development is not a claim of stable availability or production validation. See [site facts](https://1200km.com/data/site-facts.json).

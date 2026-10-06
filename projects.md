@@ -14,12 +14,12 @@ answers cite indexed evidence, and Navigator output remains a checksum-bound,
 analyst-confirmed advisory proposal. Its audit state is persisted, but no named
 layer is saved or applied automatically. MCP exposes only
 four fixed read/propose tools and cannot reindex, confirm, or mutate platform
-state. This work is merged, CI-validated, and part of the immutable v7.0.0 tag;
+state. This work is merged, CI-validated, and part of the published v7.0.0 tag;
 it is not part of the older v6.0.0 tag.
 
 Project hub: https://1200km.com/adversarygraph/
 
-Current source release: v7.0.0. Latest published immutable release: v7.0.0.
+Documented source release: v7.0.0. Latest published stable release: v7.0.0.
 
 v7.0 RAG/MCP source guide: https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/docs/unified-rag-and-mcp.md
 
@@ -54,3 +54,7 @@ Public pages describe tools, workflows, documentation, and research. Private
 platform operations such as malware uploads, SIEM forwarding, private IOC
 enrichment, authenticated investigations, and RAG/MCP access are not exposed as
 public APIs.
+
+## Development source boundary
+
+The latest published stable release is v7.0.0. Main declares **8.0.0-beta.1** at [commit 27de0b1](https://github.com/anpa1200/adversarygraph/blob/27de0b13fc2daca78a46f861074654509da45e70/VERSION), verified October 5, 2026. The retained v7 documentation describes the stable release; beta development is not a claim of stable availability or production validation. See [site facts](https://1200km.com/data/site-facts.json).

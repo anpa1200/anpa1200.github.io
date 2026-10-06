@@ -31,12 +31,19 @@ export function shouldApplyDiscoveryGovernance(term) {
   return tokens.length === 2 || tokens.length === 3;
 }
 
+export function titleMatchesQuery(title, term) {
+  const words = value => String(value || '').toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+  const query = words(term);
+  return query.length > 0 && (' ' + words(title).join(' ') + ' ').includes(' ' + query.join(' ') + ' ');
+}
+
 export function rerankSearchResults(results, term, records) {
   if (!Array.isArray(results) || !shouldApplyDiscoveryGovernance(term)) return results;
   const normalizedTerm = String(term || '').trim().toLowerCase().replace(/\s+/g, ' ');
   return results.map((result, index) => ({
     result,
     index,
+    titleMatch: titleMatchesQuery(records?.[result.id]?.title, term),
     governedScore: (Number(result.score) || 0) * (
       records?.[result.id]?.custom_record
         && String(records?.[result.id]?.title || '').trim().toLowerCase().replace(/\s+/g, ' ') === normalizedTerm
@@ -44,7 +51,8 @@ export function rerankSearchResults(results, term, records) {
         : records?.[result.id]?.boost || 1
     ),
   })).sort((left, right) =>
-    right.governedScore - left.governedScore
+    Number(right.titleMatch) - Number(left.titleMatch)
+    || right.governedScore - left.governedScore
     || (Number(right.result.score) || 0) - (Number(left.result.score) || 0)
     || left.index - right.index
   ).map(({ result }) => result);

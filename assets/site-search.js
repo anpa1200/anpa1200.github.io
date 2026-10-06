@@ -117,24 +117,89 @@
     return tokens.length === 2 || tokens.length === 3;
   }
 
+  function titleMatchesQuery(title, term) {
+    const words = value => String(value || '').toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+    const query = words(term);
+    return query.length > 0 && (' ' + words(title).join(' ') + ' ').includes(' ' + query.join(' ') + ' ');
+  }
+
   function rerankDiscoveryResults(results, term, records) {
     if (!Array.isArray(results) || !shouldGovernDiscovery(term)) return results;
+    const normalizedTerm = String(term || '').trim().toLowerCase().replace(/\s+/g, ' ');
     return results.map(function (result, index) {
+      const record = records?.[result.id];
       return {
         result,
         index,
-        governedScore: (Number(result.score) || 0) * (records?.[result.id]?.boost || 1),
+        titleMatch: titleMatchesQuery(record?.title, term),
+        governedScore: (Number(result.score) || 0) * (record?.custom_record
+          && String(record.title || '').trim().toLowerCase().replace(/\s+/g, ' ') === normalizedTerm
+          ? Math.max(record.boost || 1, 100) : record?.boost || 1),
       };
     }).sort(function (left, right) {
-      return right.governedScore - left.governedScore
+      return Number(right.titleMatch) - Number(left.titleMatch)
+        || right.governedScore - left.governedScore
         || (Number(right.result.score) || 0) - (Number(left.result.score) || 0)
         || left.index - right.index;
     }).map(function (entry) { return entry.result; });
   }
 
+  function plausibleSearchWord(query, candidate) {
+    // Preserve autocomplete and small spelling mistakes, but reject Pagefind's
+    // very loose fallback from a long unknown word to a tiny shared fragment.
+    if (candidate.startsWith(query)) return true;
+    const limit = query.length >= 8 ? 2 : 1;
+    if (Math.abs(query.length - candidate.length) > limit) return false;
+    let previous = Array.from({ length: candidate.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= query.length; i += 1) {
+      const row = [i];
+      for (let j = 1; j <= candidate.length; j += 1) {
+        row[j] = Math.min(row[j - 1] + 1, previous[j] + 1,
+          previous[j - 1] + (query[i - 1] === candidate[j - 1] ? 0 : 1));
+      }
+      if (Math.min(...row) > limit) return false;
+      previous = row;
+    }
+    return previous[candidate.length] <= limit;
+  }
+
+  function installQueryValidation(engine) {
+    if (engine.__1200kmQueryValidationInstalled) return;
+    const search = engine.search.bind(engine);
+    const validationCache = new Map();
+    async function hasPlausibleMatch(token) {
+      if (validationCache.has(token)) return validationCache.get(token);
+      const pending = (async function () {
+        const exact = await search('"' + token + '"');
+        if (exact.results.length) return true;
+        const fuzzy = await search(token);
+        const candidates = await Promise.all(fuzzy.results.slice(0, 5).map(result => result.data()));
+        return candidates.some(data => {
+          const text = [data.content, ...Object.values(data.meta || {})].join(' ').toLowerCase();
+          return (text.match(/[\p{L}\p{N}.]+/gu) || []).some(word => plausibleSearchWord(token, word));
+        });
+      })();
+      validationCache.set(token, pending);
+      if (validationCache.size > 100) validationCache.delete(validationCache.keys().next().value);
+      try { return await pending; }
+      catch (error) { validationCache.delete(token); throw error; }
+    }
+    engine.search = async function (term, options) {
+      const tokens = /^\s*".+"\s*$/.test(term || '') ? []
+        : [...new Set((String(term || '').toLowerCase().match(/[\p{L}\p{N}.]+/gu) || []).filter(token => token.length >= 6))];
+      const valid = await Promise.all(tokens.map(hasPlausibleMatch));
+      if (valid.some(value => !value)) {
+        return { results: [], unfilteredResultCount: 0, filters: {}, totalFilters: {}, timings: [] };
+      }
+      return search(term, options);
+    };
+    engine.__1200kmQueryValidationInstalled = true;
+  }
+
   async function installDiscoveryGovernance(instance) {
     const engine = instance?.__pagefind__;
     if (!engine || engine.__1200kmGovernanceInstalled) return false;
+    installQueryValidation(engine);
     try {
       const response = await fetch(`/pagefind/search-governance.json?v=${ASSET_VERSION}`, { credentials: 'same-origin' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -281,7 +346,18 @@
     const state = componentsReady ? 'ready' : searchFailed ? 'error' : 'loading';
     if (host.dataset.searchState === state) return;
     host.dataset.searchState = state;
-    if (componentsReady) host.replaceChildren(buildHeroSearchbox());
+    if (componentsReady) {
+      const previousInput = host.querySelector('input');
+      const query = previousInput?.value || '';
+      const focused = document.activeElement === previousInput;
+      host.replaceChildren(buildHeroSearchbox());
+      const input = host.querySelector('input');
+      if (input && query) {
+        input.value = query;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      if (input && focused) input.focus();
+    }
     else if (!host.querySelector('.site-search-hero-form')) host.replaceChildren(buildHeroFallback());
   }
 
@@ -483,11 +559,13 @@
 
     const inputHost = searchPage.querySelector('[data-site-search-input]');
     if (inputHost) {
-      const earlyValue = inputHost.querySelector('input')?.value;
+      const earlyInput = inputHost.querySelector('input');
+      searchPageActivationRequested = document.activeElement === earlyInput;
+      const earlyValue = earlyInput?.value;
       if (earlyValue) { pendingSearchValue = earlyValue.slice(0, 300); queryEdited = true; }
       const input = document.createElement('pagefind-input');
       input.setAttribute('placeholder', 'Try T1059.003, MuddyWater, Kerberoasting, RAG MCP…');
-      if (!window.matchMedia('(max-width: 760px)').matches) input.setAttribute('autofocus', 'true');
+      if (searchPageActivationRequested) input.setAttribute('autofocus', 'true');
       inputHost.replaceWith(input);
     }
 
@@ -604,7 +682,6 @@
       pagefindInstance = instance;
       if (searchPage) {
         instance.faceted = true;
-        mountSearchPageComponents();
         instance.on('search', function () {
           const filters = JSON.stringify(instance.searchFilters || {});
           if (hydrated && !restoringSearch && filters !== knownFilters) {
@@ -653,7 +730,10 @@
       componentsReady = true;
       repairFilterAccessibility(document.querySelector('[data-site-search-filters]'));
       mount();
-      window.setTimeout(hydrateSearchPageQuery, 100);
+      if (searchPage) {
+        mountSearchPageComponents();
+        hydrateSearchPageQuery();
+      }
     } catch (error) {
       handleComponentError(error);
     }

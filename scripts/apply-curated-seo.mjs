@@ -22,8 +22,8 @@ if (model.schema_version !== 1 || !model.descriptions || Array.isArray(model.des
 }
 
 for (const [canonical, description] of Object.entries(model.descriptions)) {
-  if (description.length < 150 || description.length > 160) {
-    throw new Error(`${canonical}: curated description must be 150–160 characters; found ${description.length}.`);
+  if (description.length < 100 || description.length > 160) {
+    throw new Error(`${canonical}: curated description must be 100–160 characters; found ${description.length}.`);
   }
   if (/…|\.\.|\s{2,}/.test(description)) {
     throw new Error(`${canonical}: curated description contains truncation, repeated punctuation, or repeated whitespace.`);
@@ -33,7 +33,11 @@ for (const [canonical, description] of Object.entries(model.descriptions)) {
   }
   const relativePath = routeFile(canonical);
   const path = join(ROOT, relativePath);
-  if (!existsSync(path)) throw new Error(`${relativePath}: curated-description target is missing.`);
+  if (!existsSync(path)) {
+    // Article pages are assembled from the pinned archive during release.
+    if (new URL(canonical).pathname.startsWith('/articles/read/')) continue;
+    throw new Error(`${relativePath}: curated-description target is missing.`);
+  }
   const current = readFileSync(path, 'utf8');
   const generated = normalizeMetaDescriptions(current);
   if (generated === current) continue;

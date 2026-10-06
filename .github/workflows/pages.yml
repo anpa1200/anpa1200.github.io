@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTICLE_ARCHIVE_COMMIT: 2ddbd22d263b9fa0baa99e18a5c7055f14310b4a
+  ARTICLE_ARCHIVE_COMMIT: d29ca309d445b50ff1359d79aed79ce81a15ee89
 
 jobs:
   quality:
@@ -172,6 +172,7 @@ jobs:
           node scripts/check-content-schema.mjs --site "${RUNNER_TEMP}/site"
           node scripts/check-content-catalog.mjs --site "${RUNNER_TEMP}/site"
           npm run check-search:index -- --bundle "${RUNNER_TEMP}/site/pagefind" --remote
+          SEARCH_TEST_BUNDLE="${RUNNER_TEMP}/site/pagefind" node --test tests/site-search-input.test.mjs tests/site-search-relevance.test.mjs
       - name: Browser smoke test search and autocomplete
         run: npm run check-search:browser -- --site "${RUNNER_TEMP}/site" --bundle "${RUNNER_TEMP}/site/pagefind"
       - name: Validate attack and detection modules, tags and hydrated guide backlinks

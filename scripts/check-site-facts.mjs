@@ -124,10 +124,10 @@ const sourceVersion = String(sourceRelease).replace(/^v/, '');
 const sourceCommit = fact('adversarygraph.current_source_commit').value;
 if (stableTag !== `v${stable}`) fail('Stable release and latest release tag disagree.');
 if (fact('adversarygraph.stable_release').status !== 'released') fail('Stable release must have released status.');
-if (!/^v\d+\.\d+\.\d+$/.test(sourceRelease)) fail('Current source release must be a v-prefixed semantic version.');
+if (!/^v\d+\.\d+\.\d+$/.test(sourceRelease)) fail('Documented source release must be a v-prefixed semantic version.');
 if (!/^[0-9a-f]{40}$/.test(sourceCommit)) fail('Current source commit must be a full Git commit SHA.');
-if (fact('adversarygraph.current_source_release').status !== 'current-development') {
-  fail('Current source release must remain current-development until its immutable GitHub release is published.');
+if (fact('adversarygraph.current_source_release').status !== 'released') {
+  fail('Documented source release must have released status.');
 }
 if (fact('adversarygraph.development_status').status !== 'current-development') fail('Development status must be current-development.');
 
@@ -228,14 +228,14 @@ if (!adgSoftware) fail('adversarygraph/index.html: SoftwareApplication JSON-LD i
 else {
   if (adgSoftware.name !== fact('adversarygraph.product_name').value) fail('AdversaryGraph JSON-LD product name disagrees with facts.');
   if (adgSoftware.alternateName !== fact('products.threatmapper').value.name) fail('AdversaryGraph JSON-LD historical alias disagrees with facts.');
-  if (adgSoftware.softwareVersion !== sourceVersion) fail('AdversaryGraph JSON-LD softwareVersion disagrees with the current source release.');
+  if (adgSoftware.softwareVersion !== sourceVersion) fail('AdversaryGraph JSON-LD softwareVersion disagrees with the documented source release.');
   if (!String(adgSoftware.releaseNotes || '').includes(sourceCommit)) fail('AdversaryGraph JSON-LD releaseNotes does not point to the reviewed source commit.');
 }
 
 const homeHtml = currentTexts.find(([name]) => name === 'index.html')?.[1] || '';
 const homeNodes = flattenJsonLd(parseJsonLd(homeHtml, 'index.html'));
 const homeSoftware = homeNodes.find(node => node['@type'] === 'SoftwareApplication' && node.name === 'AdversaryGraph');
-if (!homeSoftware || homeSoftware.softwareVersion !== sourceVersion) fail('Homepage AdversaryGraph structured data disagrees with the current source release fact.');
+if (!homeSoftware || homeSoftware.softwareVersion !== sourceVersion) fail('Homepage AdversaryGraph structured data disagrees with the documented source release fact.');
 else if (homeSoftware.alternateName !== fact('products.threatmapper').value.name) fail('Homepage AdversaryGraph structured data omits the governed historical alias.');
 
 const markerPattern = /data-site-fact=["']([^"']+)["'][^>]*data-fact-value=["']([^"']+)["']/gi;
@@ -323,7 +323,7 @@ for (const absolute of walk(docsOutputRoot, file => /\.(?:html|md|js)$/i.test(fi
     fail(`${path.relative(siteRoot, absolute)}: stale current-version or product-name content remains in documentation output.`);
   }
   for (const pattern of [
-    /Current source release:[^"'\\<]{0,100}\b(v\d+\.\d+\.\d+)\b/gi,
+    /Documented source release:[^"'\\<]{0,100}\b(v\d+\.\d+\.\d+)\b/gi,
     /latest published (?:immutable GitHub release|tag)[^"'\\<]{0,100}\b(v\d+\.\d+\.\d+)\b/gi,
     /AdversaryGraph\s+(v\d+\.\d+\.\d+)\s+is the current merged/gi,
     /current source(?: release)? is\s+(v\d+\.\d+\.\d+)/gi,
@@ -378,8 +378,8 @@ const textSurfaceRequirements = new Map([
   ['llms.txt', [sourceRelease, stableTag, acceptedExternalText, openExternalText]],
   ['llms-full.txt', [sourceRelease, stableTag, 'Threat Matrix']],
   ['agent-index.md', [sourceRelease, stableTag, 'data/site-facts.json']],
-  ['adversarygraph-docs/index.md', [`Current source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
-  ['adversarygraph-docs/capabilities.md', [`Current source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
+  ['adversarygraph-docs/index.md', [`Documented source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
+  ['adversarygraph-docs/capabilities.md', [`Documented source release: ${sourceRelease}.`, `Latest published tag: ${stableTag}.`]],
   ['adversarygraph-docs/unified-rag-mcp.md', [sourceRelease, stableTag, sourceCommit]],
   ['agent-skills/explain-adversarygraph.md', [sourceRelease]],
 ]);
@@ -390,7 +390,7 @@ for (const [relativePath, values] of textSurfaceRequirements) {
 
 const feed = read('feed.xml');
 if (!feed.includes(`AdversaryGraph ${sourceRelease} Validated Source Release`)) fail('feed.xml: current AdversaryGraph source release item is missing.');
-if (!feed.includes(`latest published immutable GitHub release is ${stableTag}`)) fail('feed.xml: published AdversaryGraph tag boundary is missing.');
+if (!feed.includes(`latest published stable GitHub release is ${stableTag}`)) fail('feed.xml: published AdversaryGraph tag boundary is missing.');
 if (!feed.includes('Historical: AdversaryGraph v4 Capability Map')) fail('feed.xml: version-specific v4 item is not labelled historical.');
 const catalog = read('.well-known/api-catalog');
 if (!catalog.includes('https://1200km.com/data/site-facts.json')) fail('API catalog does not expose the authoritative fact model.');
