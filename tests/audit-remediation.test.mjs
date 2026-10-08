@@ -99,5 +99,10 @@ test('reader RSS excludes taxonomy and retains substantive research with stable 
   }
   const sitemap = readFileSync('sitemap-all.xml', 'utf8');
   assert.match(sitemap, /<loc>https:\/\/1200km.com\/<\/loc>\s*<lastmod>2026-09-09<\/lastmod>/);
-  assert.match(sitemap, /<loc>https:\/\/1200km.com\/external-validation.html<\/loc>\s*<lastmod>2026-09-03<\/lastmod>/);
+  const validationDate = readFileSync('external-validation.html', 'utf8').match(/"dateModified":\s*"(\d{4}-\d{2}-\d{2})"/)?.[1];
+  assert.ok(validationDate, 'External Validation declares its modification date');
+  for (const file of ['sitemap-all.xml', 'sitemap.xml']) {
+    const lastmod = readFileSync(file, 'utf8').match(/<loc>https:\/\/1200km.com\/external-validation.html<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/)?.[1];
+    assert.equal(lastmod, validationDate, `${file}: External Validation date matches its page metadata`);
+  }
 });
