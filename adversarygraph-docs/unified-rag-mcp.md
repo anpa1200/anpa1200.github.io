@@ -6,8 +6,8 @@ This capability is not part of the older immutable v6.0.0 release.
 Canonical, authoritative source:
 https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/docs/unified-rag-and-mcp.md
 
-Publication note: the merged source and latest published GitHub
-release are aligned at v7.0.0.
+Publication note: this retained guide describes v7.0.0. The latest published
+stable release is v8.1.1; see https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.1 .
 
 ## Direct answer
 

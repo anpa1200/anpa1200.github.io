@@ -35,16 +35,15 @@ articles must not be used to establish a current version or metric.
 
 ## Release boundary
 
-The documented stable source remains `v7.0.0`, pinned to
-`2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`. The legacy
-`adversarygraph.current_source_release` key refers to that documented release,
-with released status. It does not describe the moving main branch.
+The latest published stable release is `v8.1.1`, verified 2026-10-19, at
+`0a044e42aa5c190b72757eb2022cd513cf362df0`. The protected release workflow publishes a nine-image digest
+manifest; see [the release](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.1).
 
-As verified October 5, 2026, `adversarygraph.development_version` is
-`8.0.0-beta.1` at `27de0b13fc2daca78a46f861074654509da45e70`.
-The latest published stable release remains `v7.0.0`. GitHub reports the release's
-`immutable` property as false; publication is not an immutability guarantee.
-Beta capabilities have not been validated by the retained v7 documentation.
+The retained documentation source remains `v7.0.0`, pinned to
+`2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`. The legacy
+`adversarygraph.current_source_release` key describes that retained documentation,
+not the latest software release. Its screenshots are historical evidence and
+are not relabelled as v8.1. Main's verified version is 8.1.1 at the release commit.
 
 ### 2026-08-14 reassessment
 
@@ -83,7 +82,7 @@ deployed v6.0.0 documentation from commit
 `29574898051`. The project Pages route and the root-site mirror therefore came
 from different build inputs and disagreed.
 
-Unified RAG/MCP is part of the current v7.0.0 release. A static documentation
+The retained Unified RAG/MCP guide describes the v7.0.0 release. A static documentation
 route is included in this root-site deployable output; links to the
 authoritative source guide are pinned to the reviewed v7.0.0 release commit.
 

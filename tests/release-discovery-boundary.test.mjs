@@ -5,7 +5,15 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 const facts = JSON.parse(read('data/site-facts.json')).facts;
 test('stable documentation and moving development branch have separate provenance', () => {
   assert.equal(facts['adversarygraph.current_source_release'].status, 'released');
-  assert.equal(facts['adversarygraph.current_source_release'].value, facts['adversarygraph.latest_release_tag'].value);
+  const documented = facts['adversarygraph.current_source_release'];
+  const latest = facts['adversarygraph.latest_release_tag'];
+  const documentedCommit = facts['adversarygraph.current_source_commit'].value;
+  assert.match(documentedCommit, /^[a-f0-9]{40}$/);
+  assert.ok(documented.source.some(url => url.includes(`/blob/${documentedCommit}/VERSION`)));
+  assert.ok(latest.source.some(url => url.endsWith(`/releases/tag/${latest.value}`)));
+  assert.ok(read('adversarygraph-docs/index.md').includes(`Documented source release: ${documented.value}.`));
+  assert.ok(read('adversarygraph-docs/index.md').includes(`Latest published tag: ${latest.value}.`));
+  if (documented.value !== latest.value) assert.match(documented.note, /retained|historical/i);
   assert.match(facts['adversarygraph.current_source_release'].scope, /does not describe.*development/);
   assert.equal(facts['adversarygraph.development_version'].status, 'current-development');
   const commit = facts['adversarygraph.development_commit'].value;
