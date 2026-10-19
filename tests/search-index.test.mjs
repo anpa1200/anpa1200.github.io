@@ -489,3 +489,12 @@ test('remote index builds prefer release files and require stable ranking fixtur
   assert.match(builder, /REMOTE_SEARCH_MINIMUM_PAGES/);
   assert.match(readFileSync(join(ROOT, 'scripts', 'check-search-index.mjs'), 'utf8'), /REMOTE_SEARCH_MINIMUM_PAGES/);
 });
+
+
+test('the established Kerberosting query indexes as an ITDR spelling alias without changing source prose', () => {
+  const html='<html><head><title>Kerberoasting</title></head><body><main><h1>Kerberoasting</h1><p>Identity investigation.</p></main></body></html>';
+  const prepared=prepareHtmlForSearch('https://1200km.com/ITDR/docs/kerberoasting/',html);
+  assert.match(prepared,/Search spelling alias: Kerberosting/);
+  assert.doesNotMatch(html,/Kerberosting/);
+  assert.doesNotMatch(prepareHtmlForSearch('https://1200km.com/articles/example/',html),/Search spelling alias/);
+});
