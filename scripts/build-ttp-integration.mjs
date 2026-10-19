@@ -100,7 +100,7 @@ function renderPage({ page, title, description, core, connections = '', interact
   const sigmaRule = kind === 'sigma-rule' ? ruleById.get(page.split('/')[2]) : null;
   const active = Object.keys(interactive).length > 0;
   const bodyData = Object.entries(interactive).map(([k, v]) => ` data-${k}="${esc(v)}"`).join('');
-  const schema = { '@context': 'https://schema.org', '@type': 'WebPage', '@id': canonical + '#webpage', url: canonical, name: title, description, datePublished: kind === 'lab' ? '2026-09-28' : '2026-09-27', dateModified: '2026-09-28', ...(sigmaRule ? { creditText: sigmaRule.author, isBasedOn: sigmaRule.source_url } : { author: { '@type': 'Person', name: 'Andrey Pautov', url: ORIGIN + '/about.html' } }), isPartOf: { '@type': 'WebSite', '@id': ORIGIN + '/#website', name: '1200km', url: ORIGIN + '/' } };
+  const schema = { '@context': 'https://schema.org', '@type': 'WebPage', '@id': canonical + '#webpage', url: canonical, name: title, description, datePublished: kind === 'lab' ? '2026-09-28' : '2026-09-27', dateModified: sigmaRule ? '2026-09-28' : inventory.source_manifest.retrieved_at.slice(0,10), ...(sigmaRule ? { creditText: sigmaRule.author, isBasedOn: sigmaRule.source_url } : { author: { '@type': 'Person', name: 'Andrey Pautov', url: ORIGIN + '/about.html' } }), isPartOf: { '@type': 'WebSite', '@id': ORIGIN + '/#website', name: '1200km', url: ORIGIN + '/' } };
   const ownTags = [...(pageTags.get(page) || [])];
   pages.push({ page, title, kind, tags: ownTags });
   output(BASE.slice(1) + page + 'index.html', `<!doctype html>

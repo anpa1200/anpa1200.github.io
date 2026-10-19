@@ -429,6 +429,11 @@ export function prepareHtmlForSearch(urlValue, html, catalogItem = null) {
   prepared = prepared.replace(/<head\b[^>]*>/i, (tag) => `${tag}\n    ${metadata}`);
   // Adjacent cells/list items are separate text units, even without authored whitespace.
   prepared = prepared.replace(/<\/(?:td|th|li|p|h[1-6])>/gi, tag => `${tag} `);
+  // This affects indexing input only; published/historical prose remains unchanged.
+  // Preserve the established misspelling query alongside the canonical term.
+  if (url.pathname.startsWith('/ITDR/') && /\bkerberoasting\b/i.test(stripHtml(html))) {
+    prepared = prepared.replace(/<\/h1>/i, tag => `${tag}<p data-pagefind-weight="0.1">Search spelling alias: Kerberosting</p>`);
+  }
   prepared = markPagefindContent(prepared, discoveryWeight(catalogItem));
   return prepared;
 }

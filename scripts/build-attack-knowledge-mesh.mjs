@@ -281,11 +281,19 @@ async function enrichTechniquePage(technique, routes) {
   try {
     let html = await readFile(path, 'utf8');
     html = html.replace(GENERATED_BLOCK_PATTERN, '');
+    html = html.replace(/<p class="meta">[\s\S]*?<\/p>/, `<p class="meta">${escapeHtml(technique.id)} · ${escapeHtml((technique.tactic_ids || []).join(' · '))} · ATT&amp;CK ${escapeHtml(attackVersion)}</p>`);
+    html = html.replace(/(<h1\b[^>]*>)[\s\S]*?<\/h1>\s*<p>[\s\S]*?<\/p>/, (_, opening) => `${opening}${escapeHtml(technique.name)}</h1><p>${escapeHtml(technique.description)}</p>`);
+    html = html.replace(/(<section><h2>Detection overview<\/h2>)<p>[\s\S]*?<\/p>/, (_, opening) => `${opening}<p>${escapeHtml(technique.detection || 'Use the published detection strategies below and validate required telemetry in the target environment.')}</p>`);
+    html = html.replace(/(property="article:modified_time" content=")[^"]+/, `$1${new Date().toISOString().slice(0, 10)}`);
+
+    const groups = attackGroups.filter(group => group.technique_ids.includes(technique.id));
+    const groupCards = groups.map(group => `<a class="card" href="/threat-matrix/actors/${escapeHtml(group.id)}/"><strong>${escapeHtml(group.name)}</strong><br><span class="muted">${escapeHtml(group.id)}</span></a>`).join('');
+    html = html.replace(/(<section><h2[^>]*>Observed (?:actors|groups)<\/h2>)<div class="grid">[\s\S]*?<\/div><\/section>/, (_, heading) => `${heading}<div class="grid">${groupCards || '<p>No current Enterprise group relationship is published in this bundle.</p>'}</div></section>`);
     const marker = '<section><h2 id="continue-the-investigation">';
     const section = techniqueKnowledgeSection(technique, routes);
     html = html.includes(marker)
-      ? html.replace(new RegExp(`\\s*${marker}`), `\n\n${section}\n  ${marker}`)
-      : html.replace(/\s*<\/main>/, `\n\n${section}\n</main>`);
+      ? html.replace(new RegExp(`\\s*${marker}`), () => `\n\n${section}\n  ${marker}`)
+      : html.replace(/\s*<\/main>/, () => `\n\n${section}\n</main>`);
     if (!html.includes('/assets/attack-knowledge-mesh.css')) {
       html = html.replace('</head>', '  <link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">\n</head>');
     }
@@ -303,7 +311,7 @@ async function enrichTechniquePage(technique, routes) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(technique.id)} ${escapeHtml(technique.name)} | AdversaryGraph</title>
 <meta name="description" content="${escapeHtml(`${technique.id} ${technique.name}: ATT&CK behavior, detection strategies, mitigations, groups, and Cyber Knowledge context.`)}">
-<meta property="article:published_time" content="2026-07-29"><meta property="article:modified_time" content="2026-07-29">
+<meta property="article:published_time" content="${new Date().toISOString().slice(0, 10)}"><meta property="article:modified_time" content="${new Date().toISOString().slice(0, 10)}">
 <link rel="canonical" href="${canonical}"><link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 <style>body{margin:0;background:#07101f;color:#dce7f7;font:16px/1.6 system-ui,sans-serif}main{width:min(1120px,calc(100% - 2rem));margin:2rem auto}a{color:#8bd8ff}.meta,.muted{color:#93a4bd}.cta{display:inline-block;background:#e11d48;color:#fff;padding:.65rem .85rem;border-radius:.4rem;text-decoration:none;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem}.card{display:block;border:1px solid #334155;border-radius:.5rem;padding:.8rem;background:#0d1728;color:#dce7f7;text-decoration:none}.card p{color:#c6d4e8}</style>
 <script type="application/ld+json">${JSON.stringify({ '@context':'https://schema.org','@type':'TechArticle',headline:`${technique.id} ${technique.name}`,url:canonical,about:['MITRE ATT&CK',technique.id,...technique.tactic_ids] })}</script>
@@ -334,7 +342,13 @@ ${END}`;
   try {
     let html = await readFile(path, 'utf8');
     html = html.replace(GENERATED_BLOCK_PATTERN, '');
-    html = html.replace(/\s*<\/main>/, `\n${section}\n</main>`);
+    html = html.replace(/This group has no technique relationships in MITRE ATT&amp;CK v\d+\.\d+/, `This group has no technique relationships in MITRE ATT&amp;CK v${escapeHtml(attackVersion)}`);
+    html = html.replace(/ATT&amp;CK \d+\.\d+ group/, `ATT&amp;CK ${escapeHtml(attackVersion)} group`);
+    html = html.replace(/(<h1\b[^>]*>)[\s\S]*?<\/h1>(?:\s*<p class="muted">[\s\S]*?<\/p>)?\s*<p>[\s\S]*?<\/p>/, (_, opening) => `${opening}${escapeHtml(group.name)}</h1><p class="muted">Aliases: ${escapeHtml((group.aliases || []).join(', '))}</p><p>${escapeHtml(group.description)}</p>`);
+
+    const techniqueCards = group.technique_ids.map(id => `<a class="card" href="/threat-matrix/techniques/${escapeHtml(id)}/"><strong>${escapeHtml(id)}</strong></a>`).join('');
+    html = html.replace(/<section><h2[^>]*>(?:Mapped techniques(?: \(\d+\))?|ATT&amp;CK techniques)<\/h2><div class="grid">[\s\S]*?<\/div><\/section>/, `<section><h2 id="att-and-ck-techniques">ATT&amp;CK techniques</h2><div class="grid">${techniqueCards || '<p>No active technique relationship is published in this bundle.</p>'}</div></section>`);
+    html = html.replace(/\s*<\/main>/, () => `\n${section}\n</main>`);
     if (!html.includes('/assets/attack-knowledge-mesh.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/attack-knowledge-mesh.css"></head>');
     await writeFile(path, html.replace(/[ \t]+$/gm, ''));
   } catch (error) {
@@ -343,7 +357,7 @@ ${END}`;
     const techniques = group.technique_ids.map((id) => `<a class="card" href="/threat-matrix/techniques/${escapeHtml(id)}/"><strong>${escapeHtml(id)}</strong></a>`).join('');
     const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(group.name)} ${escapeHtml(group.id)} | AdversaryGraph</title><meta name="description" content="${escapeHtml(`${group.name} (${group.id}): aliases, ATT&CK techniques, and Cyber Knowledge routes.`)}">
-<meta property="article:published_time" content="2026-07-29"><meta property="article:modified_time" content="2026-07-29"><link rel="canonical" href="${canonical}"><link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
+<meta property="article:published_time" content="${new Date().toISOString().slice(0, 10)}"><meta property="article:modified_time" content="${new Date().toISOString().slice(0, 10)}"><link rel="canonical" href="${canonical}"><link rel="stylesheet" href="/assets/attack-knowledge-mesh.css">
 <style>body{margin:0;background:#07101f;color:#dce7f7;font:16px/1.6 system-ui,sans-serif}main{width:min(1120px,calc(100% - 2rem));margin:2rem auto}a{color:#8bd8ff}.muted{color:#93a4bd}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.7rem}.card{display:block;border:1px solid #334155;border-radius:.5rem;padding:.8rem;background:#0d1728;color:#dce7f7;text-decoration:none}</style></head>
 <body><main><nav><a href="/cyber-knowledge/attack-matrix.html">ATT&amp;CK Knowledge Mesh</a> / ${escapeHtml(group.id)}</nav><p class="muted">${escapeHtml(group.id)} · ATT&amp;CK ${escapeHtml(attackVersion)} group</p>
 <h1>${escapeHtml(group.name)}</h1><p>${escapeHtml(group.description)}</p><p><strong>Aliases:</strong> ${escapeHtml((group.aliases || []).join(', ') || 'None published')}</p>
@@ -451,6 +465,14 @@ async function main() {
   }
   await Promise.all(attack.techniques.map((technique) => enrichTechniquePage(technique, reverse[technique.id].knowledge_routes)));
   await Promise.all(attack.groups.map((group) => enrichGroupPage(group, reverse)));
+  const landingPath = join(ROOT, 'cyber-knowledge/index.html');
+  const landing = await readFile(landingPath, 'utf8');
+  await writeFile(landingPath, landing.replace(/Shared module · ATT&amp;CK Enterprise \d+\.\d+/, `Shared module · ATT&amp;CK Enterprise ${attack.version}`));
+  for (const retired of attack.revoked_techniques || []) {
+    const path = join(ROOT, `threat-matrix/techniques/${retired.id}/index.html`);
+    try { const html = await readFile(path, 'utf8'); await writeFile(path, html.replace(/not part of the current v\d+\.\d+ dataset/, `not part of the current v${attack.version} dataset`)); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
   console.log(`Built ATT&CK knowledge mesh: ${modules.length} modules, ${attack.techniques.length} techniques`);
 }
 

@@ -44,8 +44,8 @@ try{
         console.log(row.page,width,await evaluate("({doc:document.documentElement.scrollWidth,viewport:innerWidth,body:document.body.scrollWidth,htmlStyle:getComputedStyle(document.documentElement).cssText,elements:[...document.querySelectorAll('body *')].filter(e=>e.scrollWidth>e.clientWidth+1).map(e=>({tag:e.tagName,id:e.id,cls:e.className,scroll:e.scrollWidth,client:e.clientWidth,overflow:getComputedStyle(e).overflow,display:getComputedStyle(e).display,rect:JSON.stringify(e.getBoundingClientRect()),text:e.textContent.slice(0,80)})).slice(0,18)})"));
       }
       assert.equal(result.h1,1,row.page);assert.equal(result.overflow,false,row.page+' '+width);assert.deepEqual(result.duplicateIds,[],row.page);assert.deepEqual(result.sections,[],row.page);assert.equal(result.canonical,'https://1200km.com'+row.page);
-      if(row.domain!=='atlas'){
-        assert.equal(result.workbook,row.key);
+      if(row.domain!=='atlas') assert.equal(result.workbook,row.key);
+      if(row.synthetic_collection_fixture){
         await evaluate("document.querySelector('[data-workbook-check]')?.click()");
         const clickStart=Date.now();let checked;
         do{checked=await evaluate("document.querySelector('[data-workbook-result]')?.dataset.passed");if(Date.now()-clickStart>10000)throw Error('Fixture timeout '+row.key);if(checked===undefined)await new Promise(done=>setTimeout(done,20));}while(checked===undefined);

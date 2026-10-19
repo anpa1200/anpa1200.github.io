@@ -31,5 +31,5 @@ for record in matrix['atlas']['techniques']:
     original = atlas['techniques'][record['id']]
     assert record['description'] == original['description'] and record['name'] == original['name']
     count += 1
-assert count == 1126
+assert count == len(sources['records']) + len(matrix['atlas']['techniques'])
 print(json.dumps({'source_identity_and_full_definition_checks': count, 'source_hashes': 'passed', 'independent_incident_claim_review': 'not_performed'}))

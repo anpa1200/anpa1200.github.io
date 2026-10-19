@@ -13,6 +13,7 @@ const server=createServer((req,res)=>{const route=decodeURIComponent(new URL(req
 await new Promise(done=>server.listen(0,'127.0.0.1',done));
 const base=process.env.LIVE_ORIGIN||`http://127.0.0.1:${server.address().port}`;
 const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--disable-background-networking','--user-data-dir='+mkdtempSync('/tmp/interactive-matrix-chrome-'),'--remote-debugging-port=0','about:blank'],{stdio:['ignore','ignore','pipe']});
+const expectedEntries=JSON.parse(readFileSync(resolve(site,'attack-matrix/matrix-data.json'))).records.length;
 const results=[],errors=[];let socket;
 try{
   const endpoint=await new Promise((done,reject)=>{let log='';const timer=setTimeout(()=>reject(Error('Chrome startup timeout')),15000);chrome.stderr.on('data',d=>{log+=d;const m=log.match(/DevTools listening on (ws:\/\/\S+)/);if(m){clearTimeout(timer);done(m[1]);}});chrome.on('error',reject);});
@@ -83,11 +84,11 @@ try{
   // Network failure retains the complete useful static matrix.
   await call('Fetch.enable',{patterns:[{urlPattern:'*/attack-matrix/matrix-data.json',requestStage:'Request'}]});
   await navigate('/attack-matrix/',"document.documentElement.dataset.matrixReady==='error'");
-  assert.equal(await evaluate("new Set([...document.querySelectorAll('#matrix-fallback [data-technique]')].map(e=>e.dataset.technique)).size"),1126);
+  assert.equal(await evaluate("new Set([...document.querySelectorAll('#matrix-fallback [data-technique]')].map(e=>e.dataset.technique)).size"),expectedEntries);
   await call('Fetch.disable');
   await call('Emulation.setScriptExecutionDisabled',{value:true});
   await navigate('/attack-matrix/',"!!document.querySelector('#matrix-fallback')");
-  assert.equal(await evaluate("new Set([...document.querySelectorAll('#matrix-fallback [data-technique]')].map(e=>e.dataset.technique)).size"),1126);
+  assert.equal(await evaluate("new Set([...document.querySelectorAll('#matrix-fallback [data-technique]')].map(e=>e.dataset.technique)).size"),expectedEntries);
   assert.deepEqual(errors,[]);
   writeFileSync(resolve(report,'browser.json'),JSON.stringify({checked_at:new Date().toISOString(),origin:base,results,interactions:'deep links, filters, telemetry links, history, real technique navigation, keyboard disclosures, XSS safety, empty/reset states, failed-fetch and no-JavaScript fallbacks',errors},null,2)+'\n');
   console.log(`Passed ${results.length} framework/viewport/theme checks plus interaction, keyboard, accessibility, failure and no-JavaScript tests.`);

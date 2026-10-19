@@ -23,7 +23,7 @@ function isSubTechnique(technique) {
 
 test('Threat Matrix Enterprise ATT&CK data renders non-empty Navigator columns', async () => {
   const data = await readJson('threat-matrix/mitre-data.json');
-  assert.equal(data.version, '19.1');
+  assert.equal(data.version, '20.0');
   assert.equal(data.source?.name, 'MITRE ATT&CK STIX data');
   assert.ok(data.techniques.length >= 690);
   assert.ok(data.groups.length >= 170);
@@ -66,4 +66,22 @@ test('threat-matrix pages outside the current ATT&CK relationships are noindex a
       assert.match(html, /data-attack-retired/, `${kind}/${id} must explain why it is excluded`);
     }
   }
+});
+
+test('ATT&CK v20 domain snapshots preserve restored Mobile and retired ICS identities', async () => {
+  const enterprise = await readJson('threat-matrix/mitre-data.json');
+  const mobile = await readJson('threat-matrix/mitre-data-mobile.json');
+  const ics = await readJson('threat-matrix/mitre-data-ics.json');
+  for (const data of [enterprise, mobile, ics]) assert.equal(data.version, '20.0');
+  assert.equal(enterprise.tactics.length, 15);
+  assert.equal(enterprise.techniques.filter(row => !row.is_sub).length, 227);
+  assert.equal(enterprise.techniques.filter(row => row.is_sub).length, 479);
+  assert.ok(mobile.techniques.some(row => row.id === 'T1476'));
+  assert.equal(mobile.techniques.length, 125);
+  assert.equal(ics.techniques.length, 104);
+  for (const id of ['T0807', 'T0853']) {
+    assert.equal(ics.techniques.some(row => row.id === id), false);
+    assert.equal(ics.revoked_techniques.find(row => row.id === id)?.status, 'deprecated');
+  }
+  assert.equal(ics.techniques.filter(row => row.parent_id === 'T1701').length, 6);
 });

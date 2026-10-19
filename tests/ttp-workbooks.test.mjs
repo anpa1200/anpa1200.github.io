@@ -11,9 +11,9 @@ const raw=read('data/ttp-workbook-sources.json'),catalog=read('ttp-simulation/da
 const full=new Map(raw.records.map(r=>[r.key,r]));
 const sections=['technique-description','telemetry','detection-rules','anomalies','anomaly-design','attack-tools','simulation','constraints','synthetic-logs','validation','sources'];
 
-test('all 1126 matrix destinations receive source-aware engineering sections',()=>{
-  assert.equal(audit.records.length,1126);
-  assert.equal(new Set(audit.records.map(r=>r.key)).size,1126);
+test('all v20 matrix destinations receive source-aware engineering sections',()=>{
+  assert.equal(audit.records.length,1143);
+  assert.equal(new Set(audit.records.map(r=>r.key)).size,1143);
   for(const record of audit.records){
     const html=readFileSync(root+record.page.slice(1)+'index.html','utf8');
     assert.ok(record.full_definition,record.key);
@@ -43,7 +43,7 @@ test('every ATT&CK workbook preserves the full pinned definition and exact candi
   }
 });
 
-test('all 918 offline fixtures pass collection contracts and reject missing-field negative controls',()=>{
+test('all offline fixtures pass collection contracts and reject missing-field negative controls',()=>{
   let total=0,negative=0;
   for(const row of catalog.records){
     const w=read(`ttp-simulation/data/workbooks/${row.key}.json`);
@@ -61,7 +61,7 @@ test('all 918 offline fixtures pass collection contracts and reject missing-fiel
       }
     }
   }
-  assert.equal(total,918);assert.ok(negative>5000);
+  assert.equal(total,928);assert.ok(negative>5000);
 });
 
 test('Nmap associations are explicit and reciprocal, not copied from T1046',()=>{
