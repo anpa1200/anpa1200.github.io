@@ -30,6 +30,16 @@ for domain in ("enterprise", "mobile", "ics"):
         tactics.append({"id": external["external_id"], "name": row["name"], "slug": row["x_mitre_shortname"], "url": external["url"]})
     attack[domain] = {"version": inventory["attack_version"], "source": source, "tactics": tactics}
 
+# Preserve the independently pinned ATLAS collection unless explicitly refreshing it.
+if len(sys.argv) == 2:
+    output = ROOT / "data/interactive-matrix-sources.json"
+    model = json.loads(output.read_text())
+    model["attack"] = attack
+    model["attack_imported_on"] = inventory["source_manifest"]["retrieved_at"][:10]
+    output.write_text(json.dumps(model, ensure_ascii=False, indent=2) + "\n")
+    print("Imported pinned ATT&CK tactic order; preserved ATLAS snapshot byte-for-byte as JSON data.")
+    sys.exit(0)
+
 raw = pathlib.Path(sys.argv[2]).read_bytes()
 atlas = yaml.safe_load(raw)
 assert atlas["format-version"] == "6.0.0" and atlas["collection"]["version"] == "2026.09"

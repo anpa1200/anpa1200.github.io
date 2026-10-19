@@ -15,7 +15,7 @@ const sources=read('data/interactive-matrix-sources.json'),inventory=read('ttp-s
 const shell=loadSiteShell(site),changed=[];
 const a=(url,label)=>`<a href="${h(url)}">${h(label)}</a>`;
 const local=id=>`/attack-matrix/atlas/${id}/`;
-const model={schema_version:1,generated_on:sources.imported_on,domains:[
+const model={schema_version:1,generated_on:sources.attack_imported_on||sources.imported_on,domains:[
   ...Object.entries(sources.attack).map(([id,r])=>({id,name:`MITRE ATT&CK ${id==='ics'?'ICS':id[0].toUpperCase()+id.slice(1)}`,version:r.version,tactics:r.tactics})),
   {id:'atlas',name:'MITRE ATLAS',version:sources.atlas.version,tactics:sources.atlas.tactics},
 ],telemetry:read('ttp-simulation/data/telemetry.json').records.map(r=>({id:r.id,name:r.name,page:'/ttp-simulation/'+r.page})),records:[
@@ -33,7 +33,7 @@ function page(path,title,description,body,{interactive=false,keywords=[]}={}){
 <link rel="stylesheet" href="/ttp-simulation/assets/workbook.css">
 <script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script src="/assets/site-performance.js" data-google-analytics-id="G-TMTG21RVHM" defer></script>
 ${interactive?'<script type="module" src="/assets/interactive-matrix.mjs"></script>':''}
-<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':interactive?'CollectionPage':'TechArticle',headline:title,name:title,description,url,dateModified:sources.imported_on,author:{'@type':'Person',name:'Andrey Pautov',url:'https://1200km.com/about.html'},isPartOf:{'@type':'WebSite',name:'1200km',url:'https://1200km.com/'}}).replaceAll('<','\\u003c')}</script>
+<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':interactive?'CollectionPage':'TechArticle',headline:title,name:title,description,url,dateModified:path.startsWith('attack-matrix/atlas/')?sources.imported_on:(sources.attack_imported_on||sources.imported_on),author:{'@type':'Person',name:'Andrey Pautov',url:'https://1200km.com/about.html'},isPartOf:{'@type':'WebSite',name:'1200km',url:'https://1200km.com/'}}).replaceAll('<','\\u003c')}</script>
 </head><body class="interactive-matrix-page" id="top"><header class="site-header"></header><main id="main-content" data-pagefind-body>${body}</main><footer></footer></body></html>\n`;
   output(path+'index.html',applyPlatformSidebar(applySiteShell(html,shell,{path:path+'index.html',active:'attack-matrix',back_to_top:true}),shell,{pathname:'/'+path}));
 }

@@ -44,9 +44,9 @@ test('official defensive relationships survive the public ATT&CK transform', asy
   const strategyCount = defense.techniques.flatMap((technique) => technique.detection_strategies || []).length;
   const analyticCount = defense.techniques.flatMap((technique) =>
     (technique.detection_strategies || []).flatMap((strategy) => strategy.analytics || [])).length;
-  assert.equal(mitigationCount, 1448);
-  assert.equal(strategyCount, 697);
-  assert.equal(analyticCount, 1745);
+  assert.equal(mitigationCount, 1477);
+  assert.equal(strategyCount, 703);
+  assert.equal(analyticCount, 1755);
 });
 
 test('matrix module and static pages expose the same knowledge mesh', async () => {
@@ -81,9 +81,9 @@ test('runtime ATT&CK audit preserves live, retired, defensive, and failure seman
   assert.equal(attack.techniques.some((item) => item.id.startsWith('T1562')), false);
   assert.deepEqual(
     attack.techniques.filter((item) => item.id === 'T1685' || item.parent_id === 'T1685').map((item) => item.id).sort(),
-    ['T1685', 'T1685.001', 'T1685.002', 'T1685.003', 'T1685.004', 'T1685.005', 'T1685.006'],
+    ['T1685', 'T1685.001', 'T1685.002', 'T1685.003', 'T1685.004', 'T1685.005', 'T1685.006', 'T1685.007'],
   );
-  for (const [id, subCount] of [['T1078', 4], ['T1685', 6], ['T1027', 18], ['T1059', 13], ['T1566', 4]]) {
+  for (const [id, subCount] of [['T1078', 4], ['T1685', 7], ['T1027', 18], ['T1059', 13], ['T1566', 4]]) {
     assert.equal(attack.techniques.filter((item) => item.parent_id === id).length, subCount, `${id} sub-technique count drifted`);
   }
   assert.equal(attack.revoked_techniques.find((item) => item.id === 'T1562')?.successor?.id, 'T1685');
@@ -95,4 +95,23 @@ test('runtime ATT&CK audit preserves live, retired, defensive, and failure seman
   assert.match(app, /last successful bundle build/);
   assert.match(app, /mitre-defense-data\.json/);
   assert.doesNotMatch(builder, new RegExp(`ATT&CK ${attack.version.replace('.', '\\.')}`), 'current ATT&CK version is hardcoded in the page generator');
+});
+
+test('current group and observed-actor sections use v20 relationships rather than old page cards', async () => {
+  const attack=await readJson('threat-matrix/mitre-data.json');
+  for (const group of attack.groups) {
+    const html=await readFile(`threat-matrix/actors/${group.id}/index.html`,'utf8');
+    const section=html.match(/<section><h2[^>]*>ATT&amp;CK techniques<\/h2><div class="grid">([\s\S]*?)<\/div><\/section>/);
+    assert.ok(section,`${group.id}: missing current relationship section`);
+    const ids=[...section[1].matchAll(/href="\/threat-matrix\/techniques\/([^/]+)\//g)].map(match=>match[1]);
+    assert.deepEqual(ids,group.technique_ids,group.id);
+  }
+});
+
+test('source descriptions containing replacement metacharacters cannot duplicate canonical markup', async () => {
+  const attack=await readJson('threat-matrix/mitre-data.json');
+  for (const technique of attack.techniques) {
+    const html=await readFile(`threat-matrix/techniques/${technique.id}/index.html`,'utf8');
+    assert.equal((html.match(/rel="canonical"/g)||[]).length,1,technique.id);
+  }
 });

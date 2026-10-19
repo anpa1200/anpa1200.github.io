@@ -14,10 +14,10 @@ const catalog = json('data/catalog.json');
 const quote = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 test('all technique, telemetry, tool and original rule pages are published references', () => {
-  assert.equal(integration.counts.simulations, 918);
-  assert.equal(integration.counts.detection_workspaces, 918);
+  assert.equal(integration.counts.simulations, 935);
+  assert.equal(integration.counts.detection_workspaces, 935);
   assert.equal(integration.counts.tools, 116);
-  assert.equal(integration.counts.telemetry, 139);
+  assert.equal(integration.counts.telemetry, 137);
   assert.equal(integration.counts.sigma_rules, 2791);
   for (const page of integration.pages) {
     const body = html(page.page);
@@ -124,5 +124,23 @@ test('actor-tool backlinks use explicit pinned software relationships, not commo
     assert.ok(actor.includes(`/ttp-simulation/${tool.page}`));
     assert.match(edge.source_ref, /^intrusion-set--/);
     assert.match(edge.target_ref, /^(?:tool|malware)--/);
+  }
+});
+
+test('v20 retirement preserves historical URLs without treating them as current mappings', () => {
+  assert.equal(catalog.attack_version, '20.0');
+  for (const id of ['T0807', 'T0853']) {
+    assert.equal(catalog.records.some(row => row.domain === 'ics' && row.id === id), false);
+    for (const kind of ['techniques', 'detections']) {
+      const body = html(`${kind}/ics/${id}/`);
+      assert.match(body, /Historical ATT&amp;CK record/);
+      assert.match(body, /content="noindex,follow"/);
+      assert.doesNotMatch(body, /data-pagefind-body/);
+    }
+  }
+  for (const id of ['DC0045', 'DC0119']) {
+    assert.equal(json('data/telemetry.json').records.some(row => row.id === id), false);
+    assert.match(html(`telemetry/${id}/`), /Historical telemetry reference/);
+    assert.match(html(`telemetry/${id}/`), /content="noindex,follow"/);
   }
 });

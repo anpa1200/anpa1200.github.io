@@ -6,7 +6,8 @@ const SITE_ROOT = new URL('..', import.meta.url).pathname;
 const THREAT_MATRIX_ROOT = join(SITE_ROOT, 'threat-matrix');
 const DEMO_DATA_ROOT = join(THREAT_MATRIX_ROOT, 'demo-data');
 
-const ATTACK_INDEX_URL = 'https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/index.json';
+const ATTACK_RELEASE_COMMIT = '20664a889568dce884a1dac0ec7b12ae3a199f51';
+const ATTACK_INDEX_URL = `https://raw.githubusercontent.com/mitre-attack/attack-stix-data/${ATTACK_RELEASE_COMMIT}/index.json`;
 const URLHAUS_RECENT_URL = 'https://urlhaus.abuse.ch/downloads/json_recent/';
 const CISA_KEV_URL = 'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json';
 const args = process.argv.slice(2);
@@ -26,18 +27,20 @@ async function main() {
   await mkdir(DEMO_DATA_ROOT, { recursive: true });
 
   const attackIndex = await readJsonSource(ATTACK_INDEX_URL, 'attack-stix-index.json');
+  const written = new Set();
   for (const collection of attackIndex.collections || []) {
     const target = DOMAIN_OUTPUTS[collection.name];
     if (!target) continue;
     if (selectedDomain && target.domain !== selectedDomain) continue;
-    const pinned = args.includes('--version') ? args[args.indexOf('--version') + 1] : '19.1';
+    const pinned = args.includes('--version') ? args[args.indexOf('--version') + 1] : '20.0';
     const latest = collection.versions?.find(v => v.version === pinned);
-    if (!latest?.url) throw new Error(`Missing latest URL for ${collection.name}`);
-    const bundle = await readJsonSource(latest.url, basenameFromUrl(latest.url));
+    if (!latest?.url) continue;
+    const sourceUrl = latest.url.replace("/master/", `/${ATTACK_RELEASE_COMMIT}/`);
+    const bundle = await readJsonSource(sourceUrl, basenameFromUrl(sourceUrl));
     const generated = transformAttackBundle(bundle, {
       domain: target.domain,
       version: latest.version,
-      source_url: latest.url,
+      source_url: sourceUrl,
       source_modified: latest.modified,
       retrieved_at: new Date().toISOString(),
     });
@@ -54,9 +57,12 @@ async function main() {
     } else {
       await writeJson(join(THREAT_MATRIX_ROOT, target.output), generated);
     }
+    written.add(target.domain);
     console.log(`Wrote ${target.output}: ${generated.techniques.length} techniques, ${generated.groups.length} groups, ATT&CK ${generated.version}`);
   }
 
+  const expectedDomains = Object.values(DOMAIN_OUTPUTS).filter(target => !selectedDomain || target.domain === selectedDomain);
+  if (!expectedDomains.length || expectedDomains.some(target => !written.has(target.domain))) throw new Error('Pinned release does not contain all requested ATT&CK domains');
   if (attackOnly) return;
 
   const iocs = buildIocDemoLibrary(await readJsonSource(URLHAUS_RECENT_URL, 'urlhaus_recent.json'));

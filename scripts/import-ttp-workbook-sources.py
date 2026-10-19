@@ -85,8 +85,8 @@ for domain, bundle in bundles.items():
                         'mitigations': sorted(mitigations, key=lambda r: r['id']),
                         'actors': sorted(actors, key=lambda r: r['id']), 'candidates': candidates})
 
-assert len(records) == len(catalog['records']) == 918
-output = {'schema_version': 1, 'imported_on': '2026-09-28', 'source_manifest': manifest,
+assert len(records) == len(catalog['records'])
+output = {'schema_version': 1, 'imported_on': manifest['retrieved_at'][:10], 'source_manifest': manifest,
           'scope': 'Full pinned definitions and exact relationships. Source fidelity checks are not independent incident verification or lab execution.',
           'records': sorted(records, key=lambda r: r['key'])}
 (ROOT / 'data/ttp-workbook-sources.json').write_text(json.dumps(output, ensure_ascii=False, separators=(',', ':')) + '\n')

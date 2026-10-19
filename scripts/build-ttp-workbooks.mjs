@@ -49,7 +49,7 @@ for(const summary of catalog.records){
   if(!original||original.id!==row.id||original.stix_id!==row.source_stix_id||original.modified!==row.source_modified)throw Error('Source identity mismatch: '+row.key);
   const refs=summary.tool_references.map(r=>({...r,guides:allTools.get(r.id)?.guides||[]}));
   const collection=row.telemetry.references.map(ref=>{const s=sources.get(ref.id);if(!s)throw Error('Missing collection reference '+ref.id);return {...Object.fromEntries(['id','name','page','kind','category','description','collection_focus','providers','configuration','configuration_example','required_fields','example','example_note','limitations','sources'].map(k=>[k,s[k]])),association:ref.kind,anomaly_design:featureLenses[s.category]};});
-  const workbook={schema_version:1,key:row.key,id:row.id,name:row.name,domain:row.domain,reviewed_on:'2026-09-28',
+  const workbook={source_checked_on:catalog.source_manifest.retrieved_at.slice(0,10),schema_version:1,key:row.key,id:row.id,name:row.name,domain:row.domain,reviewed_on:'2026-09-28',
     source_url:row.source_url,source_file:catalog.source_manifest.sources.find(r=>r.file===row.domain+'.json'),source_object_sha256:digest(original),
     description:original.description,references:original.references,platforms:row.platforms,environments:row.environments,
     visibility:row.telemetry.visibility,visibility_note:det.visibility_note||row.telemetry.planning_note||null,
