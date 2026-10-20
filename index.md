@@ -40,4 +40,4 @@ Security content on this site is intended for authorized defensive research, lab
 
 ## Development source boundary
 
-The latest published stable release is v8.1.1, supporting MITRE ATT&CK v20 across Enterprise, Mobile and ICS. The retained v7 documentation and screenshots preserve their original source context. See [release notes](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.1) and [site facts](https://1200km.com/data/site-facts.json).
+The latest published stable release is v8.1.2, supporting MITRE ATT&CK v20 across Enterprise, Mobile and ICS. The retained v7 documentation and screenshots preserve their original source context. See [release notes](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.2) and [site facts](https://1200km.com/data/site-facts.json).

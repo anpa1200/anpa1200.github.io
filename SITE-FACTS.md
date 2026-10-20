@@ -35,15 +35,15 @@ articles must not be used to establish a current version or metric.
 
 ## Release boundary
 
-The latest published stable release is `v8.1.1`, verified 2026-10-19, at
-`0a044e42aa5c190b72757eb2022cd513cf362df0`. The protected release workflow publishes a nine-image digest
-manifest; see [the release](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.1).
+The latest published stable release is `v8.1.2`, verified 2026-10-20, at
+`789d874f9c360f4a69f3e86614581f4097b86f88`. The protected release workflow publishes a nine-image digest
+manifest; see [the release](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.2).
 
 The retained documentation source remains `v7.0.0`, pinned to
 `2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73`. The legacy
 `adversarygraph.current_source_release` key describes that retained documentation,
 not the latest software release. Its screenshots are historical evidence and
-are not relabelled as v8.1. Main's verified version is 8.1.1 at the release commit.
+are not relabelled as v8.1. Main's verified version is 8.1.2 at the release commit.
 
 ### 2026-08-14 reassessment
 

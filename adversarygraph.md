@@ -23,7 +23,7 @@ reproducible release gate, rollback guidance, governed Threat Hunting, Query
 Library, Unified RAG/MCP, asset exposure assessment, SOC access groups, sanitized
 screenshot evidence, and documented case studies.
 
-The latest published stable GitHub release is v8.1.1, while the retained documentation describes v7.0.0.
+The latest published stable GitHub release is v8.1.2, while the retained documentation describes v7.0.0.
 
 ## Unified RAG and MCP in v7.0 Source
 
@@ -91,4 +91,4 @@ All security material is intended for authorized defensive research, lab validat
 
 ## Development source boundary
 
-The latest published stable release is v8.1.1, supporting MITRE ATT&CK v20 across Enterprise, Mobile and ICS. The retained v7 documentation and screenshots preserve their original source context. See [release notes](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.1) and [site facts](https://1200km.com/data/site-facts.json).
+The latest published stable release is v8.1.2, supporting MITRE ATT&CK v20 across Enterprise, Mobile and ICS. The retained v7 documentation and screenshots preserve their original source context. See [release notes](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.2) and [site facts](https://1200km.com/data/site-facts.json).

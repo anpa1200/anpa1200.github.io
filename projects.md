@@ -19,7 +19,7 @@ it is not part of the older v6.0.0 tag.
 
 Project hub: https://1200km.com/adversarygraph/
 
-Documented source release: v7.0.0. Latest published stable release: v8.1.1.
+Documented source release: v7.0.0. Latest published stable release: v8.1.2.
 
 v7.0 RAG/MCP source guide: https://github.com/anpa1200/adversarygraph/blob/2a9a7bedf6115dbcfbf1e90a70e08f50d76e8c73/docs/unified-rag-and-mcp.md
 
@@ -57,4 +57,4 @@ public APIs.
 
 ## Development source boundary
 
-The latest published stable release is v8.1.1, supporting MITRE ATT&CK v20 across Enterprise, Mobile and ICS. The retained v7 documentation and screenshots preserve their original source context. See [release notes](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.1) and [site facts](https://1200km.com/data/site-facts.json).
+The latest published stable release is v8.1.2, supporting MITRE ATT&CK v20 across Enterprise, Mobile and ICS. The retained v7 documentation and screenshots preserve their original source context. See [release notes](https://github.com/anpa1200/adversarygraph/releases/tag/v8.1.2) and [site facts](https://1200km.com/data/site-facts.json).
