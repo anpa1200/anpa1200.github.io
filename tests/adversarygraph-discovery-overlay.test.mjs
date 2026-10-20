@@ -16,7 +16,11 @@ test('companion source overlay uses PNG geometry and is idempotent',()=>{
   prepareAdversaryGraphDiscovery(root,facts);const first=readFileSync(file,'utf8');
   assert.match(first,/width: 1440, height: 900/);assert.match(first,/width=\{width\} height=\{height\}/);
   assert.ok(first.includes(facts['adversarygraph.development_version'].value));
-  assert.doesNotMatch(readFileSync(join(root,'docs/intro.md'),'utf8'),/immutable/);
-  prepareAdversaryGraphDiscovery(root,facts);assert.equal(readFileSync(file,'utf8'),first);
+  const intro=readFileSync(join(root,'docs/intro.md'),'utf8');
+  assert.doesNotMatch(intro,/immutable/);
+  assert.match(intro,/These retained guides document AdversaryGraph v7\.0\.0/);
+  assert.ok(intro.includes(`Latest published stable release: <a href="https://github.com/anpa1200/adversarygraph/releases/tag/${facts['adversarygraph.latest_release_tag'].value}"`));
+  assert.doesNotMatch(first,/These guides describe the stable release/);
+  prepareAdversaryGraphDiscovery(root,facts);assert.equal(readFileSync(file,'utf8'),first);assert.equal(readFileSync(join(root,'docs/intro.md'),'utf8'),intro);
  } finally {rmSync(root,{recursive:true,force:true});}
 });
