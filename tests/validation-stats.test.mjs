@@ -10,6 +10,7 @@ const now = new Date('2026-10-22T12:00:00Z');
 function api(endpoint) {
  if (endpoint.startsWith('users/anpa1200/repos?')) return [{ name:'AIDebug',html_url:'https://github.com/anpa1200/AIDebug',fork:false,private:false,stargazers_count:20,forks_count:3 }];
  if (endpoint === 'users/anpa1200') return {followers:42,following:0,public_repos:1};
+ if (endpoint.endsWith('/traffic/clones')) return {count:3,uniques:2,clones:[{timestamp:'2026-10-21T00:00:00Z',count:3,uniques:2}]};
  if (endpoint.endsWith('/releases/latest')) return {tag_name:endpoint.includes('AIDebug')?'v3.0.0':'v8.1.2'};
  if (endpoint.includes('/issues?')) return [{number:1},{number:2,pull_request:{url:'pr'}}];
  return {stargazers_count:20,watchers_count:20,subscribers_count:2,forks_count:3,open_issues_count:2,pushed_at:'2026-10-21T12:00:00Z'};
@@ -33,10 +34,10 @@ test('pagination retains later repository/issue pages',()=>{
  let calls=0;const result=pages('endpoint',()=>++calls===1?Array.from({length:100},(_,id)=>({id})):[{id:100}]);
  assert.equal(result.length,101);assert.equal(calls,2);
 });
-test('successful update renders consistent counters and preserves clone bytes',()=>{
+test('successful update renders consistent counters and preserves legacy clone records',()=>{
  const dir=fixture();try {
  const before=bytes(dir);update(dir,api,now);const after=bytes(dir);
- assert.equal(after[2],before[2]);assert.match(after[0],/data-validation="profile.followers">42<\/span>/);
+ const oldHistory=JSON.parse(before[2]), newHistory=JSON.parse(after[2]);assert.deepEqual(newHistory.baseline,oldHistory.baseline);for(const [date,value] of Object.entries(oldHistory.days))if(date<=oldHistory.aggregate_only_through)assert.deepEqual(newHistory.days[date],value);assert.match(after[0],/data-validation="profile.followers">42<\/span>/);
  assert.equal(JSON.parse(after[1]).repositories.aidebug.watchers,2);
  assert.match(after[0],/AIDebug accepted into REMnux/);
  assert.match(after[0],/2026-10-22/);
