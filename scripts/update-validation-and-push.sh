@@ -21,7 +21,7 @@ npm run build-ai-discovery
 npm run build-content
 npm run check-release-source
 
-git add external-validation.html assets/validation/stats.json assets/validation/clone-history.json assets/validation/clone-traffic.json data/content-catalog.json llms.txt
+git add external-validation.html assets/validation/stats.json assets/validation/clone-history.json assets/validation/clone-traffic.json data/content-catalog.json llms.txt sitemap.xml sitemap-all.xml
 if git diff --cached --quiet; then
   echo "No validation stats changes."
   exit 0

@@ -18,17 +18,18 @@ function api(endpoint) {
 function fixture() {
  const dir=mkdtempSync(path.join(os.tmpdir(),'validation-test-'));
  mkdirSync(path.join(dir,'assets/validation'),{recursive:true});
- for (const file of ['external-validation.html','assets/validation/stats.json','assets/validation/clone-history.json']) writeFileSync(path.join(dir,file),readFileSync(path.join(root,file)));
+ for (const file of ['external-validation.html','assets/validation/stats.json','assets/validation/clone-history.json','sitemap.xml','sitemap-all.xml','assets/validation/clone-traffic.json']) writeFileSync(path.join(dir,file),readFileSync(path.join(root,file)));
  return dir;
 }
-function bytes(dir) { return ['external-validation.html','assets/validation/stats.json','assets/validation/clone-history.json'].map(file=>readFileSync(path.join(dir,file),'utf8')); }
+function bytes(dir) { return ['external-validation.html','assets/validation/stats.json','assets/validation/clone-history.json','sitemap.xml','sitemap-all.xml','assets/validation/clone-traffic.json'].map(file=>readFileSync(path.join(dir,file),'utf8')); }
 test('subscribers differ from stars; actual issues exclude PRs; historical evidence is immutable',()=>{
+ const original=structuredClone(previous);
  const result=collect(previous,api,now);
  assert.equal(result.repositories.aidebug.watchers,2);
  assert.equal(result.repositories.aidebug.open_issues,1);
  assert.equal(result.repositories.aidebug.open_pull_requests,1);
  for (const key of ['clone_traffic','github','gitlab','aidebug_distribution']) assert.deepEqual(result[key],previous[key]);
- assert.deepEqual(previous.repositories.aidebug.stars,15);
+ assert.deepEqual(previous,original);
 });
 test('pagination retains later repository/issue pages',()=>{
  let calls=0;const result=pages('endpoint',()=>++calls===1?Array.from({length:100},(_,id)=>({id})):[{id:100}]);
@@ -40,7 +41,8 @@ test('successful update renders consistent counters and preserves legacy clone r
  const oldHistory=JSON.parse(before[2]), newHistory=JSON.parse(after[2]);assert.deepEqual(newHistory.baseline,oldHistory.baseline);for(const [date,value] of Object.entries(oldHistory.days))if(date<=oldHistory.aggregate_only_through)assert.deepEqual(newHistory.days[date],value);assert.match(after[0],/data-validation="profile.followers">42<\/span>/);
  assert.equal(JSON.parse(after[1]).repositories.aidebug.watchers,2);
  assert.match(after[0],/AIDebug accepted into REMnux/);
- assert.match(after[0],/2026-10-22/);
+ assert.match(after[0],/"dateModified": "2026-10-22"/);
+ for(const index of [3,4]) assert.match(after[index],/<loc>https:\/\/1200km.com\/external-validation.html<\/loc>\s*<lastmod>2026-10-22<\/lastmod>/);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
 test('missing HTML marker fails before any file changes',()=>{

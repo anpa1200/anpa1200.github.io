@@ -70,6 +70,9 @@ export function render(html, stats) {
     const expected = key === 'verification.github_repositories' ? 3 : (key.startsWith('totals.') && key !== 'totals.aidebug_adversarygraph_stars') || /repositories\.(aidebug|adversarygraph)\.(stars|forks)$/.test(key) ? 2 : 1;
     if (count !== expected) throw new Error(`Missing validation marker or duplicate (${count}/${expected}): ${key}`);
   }
+  const modified = /("dateModified":\s*")\d{4}-\d{2}-\d{2}(")/g;
+  if ([...html.matchAll(modified)].length !== 1) throw new Error('Missing or duplicate page modification date');
+  html = html.replace(modified, (_all,start,end)=>start+stats.generated_at.slice(0,10)+end);
   const clonePattern = /<!-- BEGIN CLONE_METRICS -->[\s\S]*?<!-- END CLONE_METRICS -->/g;
   if ([...html.matchAll(clonePattern)].length !== 1) throw new Error('Missing or duplicate clone metrics marker');
   html = html.replace(clonePattern, `<!-- BEGIN CLONE_METRICS -->\n          ${renderCloneMetrics(stats)}\n          <!-- END CLONE_METRICS -->`);
@@ -100,7 +103,13 @@ export function update(root = ROOT, api = gh, now = new Date()) {
   const trafficPath = path.join(root, 'assets/validation/clone-traffic.json');
   const { stats, history, traffic } = collectClones(counters, JSON.parse(readFileSync(historyPath, 'utf8')), counters.repositories.public_source_names, api, now);
   const html = render(readFileSync(pagePath, 'utf8'), stats);
-  writeTransaction([[statsPath, JSON.stringify(stats, null, 2) + '\n'], [pagePath, html], [historyPath, JSON.stringify(history, null, 2) + '\n'], [trafficPath, JSON.stringify(traffic, null, 2) + '\n']]);
+  const sitemaps = ['sitemap.xml','sitemap-all.xml'].map(name => {
+    const target = path.join(root,name), source = readFileSync(target,'utf8');
+    const pattern = /(<loc>https:\/\/1200km\.com\/external-validation\.html<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/g;
+    if ([...source.matchAll(pattern)].length !== 1) throw new Error(`Missing or duplicate validation sitemap record: ${name}`);
+    return [target,source.replace(pattern,(_all,start,end)=>start+stats.generated_at.slice(0,10)+end)];
+  });
+  writeTransaction([[statsPath, JSON.stringify(stats, null, 2) + '\n'], [pagePath, html], [historyPath, JSON.stringify(history, null, 2) + '\n'], [trafficPath, JSON.stringify(traffic, null, 2) + '\n'], ...sitemaps]);
   return stats;
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

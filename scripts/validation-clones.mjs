@@ -11,7 +11,7 @@ export function collectClones(previous, originalHistory, names, api, now=new Dat
   const today=iso(now), since=iso(new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()-14))), through=iso(new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()-1)));
   history.aggregate_only_through ??= Object.keys(history.days).sort().at(-1) || history.baseline?.through;
   history.daily_by_repository ??= {};
-  const traffic={observed_at:now.toISOString(),since,through,scope:'Current public non-fork source repositories; completed UTC dates only',repositories:{}};
+  const traffic={observed_at:now.toISOString(),since,through,scope:'Raw authenticated responses for current public non-fork source repositories. The selected since/through window excludes older boundary and current-day records.',repositories:{}};
   const windowDays=dates(since,through); let clones=0,dailyUniques=0,active=0;
   const toolWindows={};
   for (const name of names) {
