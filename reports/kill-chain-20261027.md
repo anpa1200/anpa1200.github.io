@@ -39,4 +39,6 @@ The source base was current public `main` at `13b8a784838801e25fe98a54e98a47817f
 
 ## Publication status
 
-Prepared and verified locally. No push, PR, merge, or deployment was performed. Publishing requires the authorized repository workflow: review the branch, push/open a PR, pass current CI and hosting dependency audits, merge, and verify the actual Cloudflare deployment and production build identity. The historical Worker dependency-audit issue was not changed or claimed resolved. Full hosted deployment, companion assembly, and fresh production verification remain publication steps rather than completed checks.
+This report records the initial local implementation and verification. Publication follows the authorized repository workflow: push/open a PR, pass current CI and hosting dependency audits, merge, and verify the actual Cloudflare deployment and production build identity. A successful source check alone is not a production deployment.
+
+During the authorized publication pass, the Cloudflare build dependency `undici` was patched from 7.29.1 to 7.30.1 through a narrowly scoped override. This fixes GHSA-xjj6-f33q-929c and clears the existing hosting audit gate without changing Wrangler, routing, credentials, or security policies. The Cloudflare dependency audit reports zero vulnerabilities; 51 Worker tests and 33 real workerd/ASSETS HTTP cases pass. Consult the publication PR and its deployment run for the final live release status.
