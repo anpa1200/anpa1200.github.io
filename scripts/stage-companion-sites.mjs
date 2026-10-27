@@ -6,7 +6,7 @@ import { cp, lstat, mkdir, mkdtemp, readFile, readdir, writeFile } from 'node:fs
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sameOriginPlatformAssets, validateCompanions } from './companion-sites-lib.mjs';
+import { sameOriginPlatformAssets, validateCompanions, withCompanionCheckout } from './companion-sites-lib.mjs';
 import { isEvidenceDocument } from '../cloudflare/evidence-documents.js';
 import { prepareCompanionSource } from './prepare-companion-source.mjs';
 
@@ -38,10 +38,9 @@ async function walk(path) {
   return files;
 }
 const evidence = [];
-// Sequential builds bound peak memory. npm ci honors upstream lockfiles.
+// Sequential builds bound peak memory and disk. npm ci honors upstream lockfiles.
 for (const entry of entries) {
-  const checkout = join(workspace, entry.mount);
-  await mkdir(checkout);
+  await withCompanionCheckout(workspace, entry.mount, async (checkout) => {
   await run('git', ['init', '--quiet'], checkout);
   await run('git', ['fetch', '--quiet', '--depth=1', `https://github.com/${entry.repository}.git`, entry.commit], checkout);
   await run('git', ['checkout', '--quiet', '--detach', 'FETCH_HEAD'], checkout);
@@ -100,6 +99,7 @@ for (const entry of entries) {
     await cp(join(checkout, navigator), publishedNavigator);
   }
   console.log(`Staged ${entry.mount}: ${files.length} files from ${entry.commit}`);
+  });
 }
 await mkdir(join(site, 'data'), { recursive: true });
 await writeFile(join(site, 'data/companion-builds.json'), `${JSON.stringify({ schema_version: 1, asset_origin_overlay: 1, sites: evidence }, null, 2)}\n`);

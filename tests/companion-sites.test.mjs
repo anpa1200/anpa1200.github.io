@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { sameOriginPlatformAssets, validateCompanions, rightSizeShellLogos } from '../scripts/companion-sites-lib.mjs';
+import { mkdtemp, mkdir, writeFile, readFile, readdir, cp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { sameOriginPlatformAssets, validateCompanions, rightSizeShellLogos, withCompanionCheckout } from '../scripts/companion-sites-lib.mjs';
 import { normalizeSiteUrl, pageUrlForRelativePath } from '../scripts/search-index-lib.mjs';
 import { migrationBodyHeadings } from '../scripts/prepare-companion-source.mjs';
 
@@ -80,4 +83,38 @@ test('config overlay gives square companion navbar logos explicit 32 px dimensio
     const config = createRequire(import.meta.url)(configPath);
     assert.deepEqual(config.themeConfig.navbar.logo, { alt: '', src: 'img/logo.png', width: 32, height: 32 });
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('sequential companion staging releases each checkout while preserving copied output', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'companion-disk-test-'));
+  try {
+    const workspace = join(root, 'work');
+    const destination = join(root, 'published');
+    await mkdir(workspace);
+    await mkdir(destination);
+    for (const mount of ['first', 'second']) {
+      assert.deepEqual(await readdir(workspace), []);
+      await withCompanionCheckout(workspace, mount, async (checkout) => {
+        await mkdir(join(checkout, 'node_modules'));
+        await writeFile(join(checkout, 'node_modules', 'dependency'), 'temporary dependency');
+        await writeFile(join(checkout, 'index.html'), mount);
+        await cp(join(checkout, 'index.html'), join(destination, mount + '.html'));
+      });
+      assert.deepEqual(await readdir(workspace), []);
+      assert.equal(await readFile(join(destination, mount + '.html'), 'utf8'), mount);
+    }
+    await assert.rejects(withCompanionCheckout(workspace, 'failed', async (checkout) => {
+      await writeFile(join(checkout, 'partial'), 'partial build');
+      throw Error('build failed');
+    }), /build failed/);
+    assert.deepEqual(await readdir(workspace), []);
+    await mkdir(join(workspace, 'existing'));
+    await writeFile(join(workspace, 'existing', 'keep'), 'existing work');
+    await assert.rejects(withCompanionCheckout(workspace, 'existing', async () => {}), { code: 'EEXIST' });
+    assert.equal(await readFile(join(workspace, 'existing', 'keep'), 'utf8'), 'existing work');
+    await assert.rejects(withCompanionCheckout(workspace, '../published', async () => {}));
+    assert.equal(await readFile(join(destination, 'first.html'), 'utf8'), 'first');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
