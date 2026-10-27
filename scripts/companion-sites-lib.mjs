@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { mkdir, rm } from 'node:fs/promises';
+import { join } from 'node:path';
 
 // Only platform assets follow the current host, including after hydration.
 // Canonical URLs, navigation, citations, and other origins are not rewritten.
@@ -36,4 +38,17 @@ export function rightSizeShellLogos(html) {
       || !/\bheight=["'](?:32|36)["']/.test(tag)) return tag;
     return tag.replace(/(\bsrc=["'])\/assets\/ap-logo\.png(["'])/, '$1/assets/ap-logo-72.png$2');
   });
+}
+
+// Only newly created, task-owned checkouts are removed. Keep staged output
+// outside this workspace so successive builds do not retain node_modules.
+export async function withCompanionCheckout(workspace, mount, stage) {
+  assert.match(mount, /^[A-Za-z0-9_-]+$/);
+  const checkout = join(workspace, mount);
+  await mkdir(checkout);
+  try {
+    return await stage(checkout);
+  } finally {
+    await rm(checkout, { recursive: true, force: true });
+  }
 }
