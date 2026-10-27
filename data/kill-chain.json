@@ -15,7 +15,18 @@
       "techniques": [
         "T1595",
         "T1593"
-      ]
+      ],
+      "explanation": {
+        "overview": "Reconnaissance is the preparation in which an adversary learns enough about a target to choose an approach. The information may come from public sources, interactions with exposed services, or earlier knowledge of the organization. The goal is to reduce uncertainty about who to target, which systems are reachable, and where a useful weakness might exist.",
+        "activities": [
+          "Identify public domains, internet-facing systems, technologies, and organizational relationships.",
+          "Research people, roles, suppliers, and public information that could support targeting or a convincing pretext.",
+          "Assess exposed services and potential weaknesses before choosing an entry route."
+        ],
+        "example": "A public job advertisement reveals a technology in use, while an exposed service confirms that it is reachable. Together, those observations can guide a later attempt; neither observation establishes that an intrusion occurred.",
+        "boundary": "Passive research may leave no trace in the target’s own logs. Active scanning can produce network or application events, but legitimate monitoring can look similar. Discovery inside an already compromised environment serves a different purpose from pre-intrusion reconnaissance.",
+        "question": "What can an outsider learn about us, and which changes in exposure or scanning deserve investigation?"
+      }
     },
     {
       "slug": "weaponization",
@@ -26,7 +37,18 @@
       "techniques": [
         "T1587",
         "T1588"
-      ]
+      ],
+      "explanation": {
+        "overview": "Weaponization is the preparation or adaptation of a capability for use against the target. In the classic model, this often means combining an exploit with a payload and packaging it into a deliverable artifact. The capability may be developed, purchased, reused, or modified; it does not have to be novel.",
+        "activities": [
+          "Select or adapt an exploit and the payload intended to run after access.",
+          "Prepare a malicious document, executable, script, or modified software artifact for a chosen delivery route.",
+          "Configure payload behavior and use packaging or obfuscation to make the artifact usable in the intended environment."
+        ],
+        "example": "An attacker prepares a document containing malicious content before sending it. Preparing that artifact is weaponization; sending it is delivery; triggering its behavior belongs to the later execution or exploitation analysis.",
+        "boundary": "Much of this work happens outside the defender’s environment. Recovered samples, build artifacts, and intelligence can reveal preparation, but imports, strings, and file structure indicate possible capabilities rather than proof that they ran.",
+        "question": "What was the artifact prepared to do, and which independent evidence would confirm those capabilities?"
+      }
     },
     {
       "slug": "delivery",
@@ -37,7 +59,18 @@
       "techniques": [
         "T1566",
         "T1189"
-      ]
+      ],
+      "explanation": {
+        "overview": "Delivery is the point at which an adversary brings a malicious artifact or interaction to the target. It connects preparation to the environment the adversary wants to affect. The route can involve a message, a website, removable media, a trusted supplier, or a software distribution channel.",
+        "activities": [
+          "Send a malicious attachment or link through email or another communication channel.",
+          "Place adversary-controlled content where a target is expected to browse, download, or retrieve it.",
+          "Use removable media or a compromised software distribution path to bring an artifact into the environment."
+        ],
+        "example": "An employee receives an email with an attachment. Mail and download records can establish arrival, but receiving or saving the attachment does not establish that its payload executed.",
+        "boundary": "Delivery and exploitation can be close together, as with browser-based attacks, but they answer different questions: how did it reach the target, and what caused unauthorized behavior? Some identity or insider incidents do not involve a conventional delivered malware file.",
+        "question": "Which route brought the artifact or interaction to the target, and can we connect that arrival to subsequent activity?"
+      }
     },
     {
       "slug": "exploitation",
@@ -48,7 +81,18 @@
       "techniques": [
         "T1203",
         "T1190"
-      ]
+      ],
+      "explanation": {
+        "overview": "Exploitation is the triggering of behavior that gives the adversary an opportunity to run code or cross a security boundary. A software vulnerability is a common mechanism. In the broader intrusion story, user actions and failures of trust can also help turn delivered content into unauthorized execution.",
+        "activities": [
+          "Trigger a flaw in an exposed application, client, document parser, or operating-system component.",
+          "Cause a user or application to execute adversary-controlled content.",
+          "Use the resulting execution or access to establish an initial foothold."
+        ],
+        "example": "A crafted request reaches a vulnerable application and is followed by an unexpected child process. The request and process relationship are stronger evidence of exploitation than the presence of an unpatched version alone.",
+        "boundary": "A vulnerability scan identifies a possible weakness; it does not prove successful exploitation. Credential guessing, stolen-account use, and permission abuse can provide access without exploiting a software flaw. Relevant guides include these adjacent access paths with that distinction preserved.",
+        "question": "Which request, input, or user action crossed the boundary, and what evidence shows that it succeeded?"
+      }
     },
     {
       "slug": "installation",
@@ -59,7 +103,18 @@
       "techniques": [
         "T1547",
         "T1543"
-      ]
+      ],
+      "explanation": {
+        "overview": "Installation is the establishment of an adversary-controlled component in the compromised environment. An implant, backdoor, malicious extension, or web shell can give the operator a foothold from which to continue. The relevant evidence is the component and the changes that made it available for use.",
+        "activities": [
+          "Place or load a malicious executable, script, web shell, or other component.",
+          "Change a service, scheduled task, startup entry, or application configuration to support continued access.",
+          "Prepare the foothold to survive expected interruptions when the operation requires persistence."
+        ],
+        "example": "After an application compromise, a new web shell appears in a server directory. File-change records, application requests, and process events can help establish when it was placed and whether it was used.",
+        "boundary": "Installation and persistence overlap, but are not identical. A newly deployed component may be temporary, and persistence can rely on identity or configuration changes rather than a conventional installed program. Memory-only activity may leave little durable file evidence.",
+        "question": "What new component or configuration established the foothold, and which evidence distinguishes it from an authorized change?"
+      }
     },
     {
       "slug": "command-and-control",
@@ -70,7 +125,18 @@
       "techniques": [
         "T1071",
         "T1573"
-      ]
+      ],
+      "explanation": {
+        "overview": "Command and Control, often shortened to C2, is the communication that lets an adversary direct or coordinate activity on compromised systems. The channel may deliver instructions, return results, or obtain additional components. It can use familiar protocols and legitimate services, so the protocol name alone does not establish malicious intent.",
+        "activities": [
+          "Establish communication between a compromised system and operator-controlled or abused infrastructure.",
+          "Exchange instructions, execution results, status messages, or additional payloads.",
+          "Use direct connections, intermediaries, or changing infrastructure to maintain communication as the operation evolves."
+        ],
+        "example": "A process repeatedly contacts an unfamiliar destination and receives responses before launching commands. Timing, destination history, process identity, and the resulting actions together support a C2 hypothesis.",
+        "boundary": "A domain in a binary, periodic traffic, encryption, or use of port 443 is not sufficient proof of C2. Some payloads operate autonomously after staging and do not need a continuing command channel. Data transferred over C2 may also serve an objective such as exfiltration.",
+        "question": "Who is communicating, what changes after the communication, and what corroborates operator control?"
+      }
     },
     {
       "slug": "actions-on-objectives",
@@ -81,7 +147,18 @@
       "techniques": [
         "T1041",
         "T1486"
-      ]
+      ],
+      "explanation": {
+        "overview": "Actions on Objectives are the activities through which the adversary pursues the intended outcome of the operation. That outcome may be intelligence collection, theft, financial gain, disruption, destruction, or manipulation. This stage explains why the intrusion matters to the affected organization.",
+        "activities": [
+          "Collect and access information of value, then transfer it when theft is the objective.",
+          "Encrypt, delete, alter, or disrupt systems and data when the goal involves impact.",
+          "Use compromised access to support fraud, espionage, or another mission-specific outcome."
+        ],
+        "example": "An account accesses an unusual volume of sensitive files and transfers data to an external destination. Access logs, transfer evidence, and the business role of those files help distinguish collection from demonstrated theft.",
+        "boundary": "Objectives are not limited to exfiltration or ransomware. Internal discovery, credential access, and lateral movement may be enabling steps toward an objective rather than the final outcome themselves. A capability to destroy or steal data does not establish that destruction or theft occurred.",
+        "question": "What outcome was pursued, what was actually achieved, and which evidence supports the resulting business impact?"
+      }
     }
   ],
   "items": [
