@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTICLE_ARCHIVE_COMMIT: a85ec21c3d5522c04a67784f9f7b01fb8040cc55
+  ARTICLE_ARCHIVE_COMMIT: 0c1c598ab54707726d4927b8e25b458c68c9ce3b
 
 jobs:
   quality:
@@ -92,6 +92,9 @@ jobs:
         working-directory: .article-archive-source
         run: |
           npm ci
+          python3 -m venv "${RUNNER_TEMP}/article-python"
+          "${RUNNER_TEMP}/article-python/bin/pip" install --requirement requirements.txt
+          export PATH="${RUNNER_TEMP}/article-python/bin:$PATH"
           npm audit --package-lock-only --audit-level=critical
           npm run validate:archive
           npm run validate:media:local
