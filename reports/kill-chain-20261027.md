@@ -4,7 +4,7 @@ The new `/kill-chain/` landing page opens seven dedicated stage pages through re
 
 ## Coverage
 
-The reviewed register is `data/kill-chain.json`. It records 361 canonical identities and explicit inclusion or exclusion decisions, including all 194 authored articles from `anpa1200/medium-blog-navigation` at the website workflow's pinned commit `0e086667d49ecd1c820236b710eaa616f647bd20`, all local catalogue guide/lab/research/case-study identities, and the 87 attributed public TrainSec readings. Generated reference entities and product documentation are not counted as authored articles.
+The reviewed register is `data/kill-chain.json`. It records 361 canonical identities and explicit inclusion or exclusion decisions, including all 194 authored articles from `anpa1200/medium-blog-navigation` at the website workflow's pinned commit `0c1c598ab54707726d4927b8e25b458c68c9ce3b`, all local catalogue guide/lab/research/case-study identities, and the 87 attributed public TrainSec readings. Generated reference entities and product documentation are not counted as authored articles.
 
 169 original guides, articles, and exercises and 15 attributed TrainSec readings have stage placements. One resource can occur in several stages; 177 reviewed identities have explicit exclusions. Source paths, SHA-256 hashes for authored source files, section evidence, and per-placement relevance notes make the selection reviewable. The three existing bounded learning-path exercises and relevant public TrainSec companion articles are included. No separate express-guide collection was found in this inventory; no private course lessons were used.
 
@@ -42,3 +42,7 @@ The source base was current public `main` at `13b8a784838801e25fe98a54e98a47817f
 This report records the initial local implementation and verification. Publication follows the authorized repository workflow: push/open a PR, pass current CI and hosting dependency audits, merge, and verify the actual Cloudflare deployment and production build identity. A successful source check alone is not a production deployment.
 
 During the authorized publication pass, the Cloudflare build dependency `undici` was patched from 7.29.1 to 7.30.1 through a narrowly scoped override. This fixes GHSA-xjj6-f33q-929c and clears the existing hosting audit gate without changing Wrangler, routing, credentials, or security policies. The Cloudflare dependency audit reports zero vulnerabilities; 51 Worker tests and 33 real workerd/ASSETS HTTP cases pass. Consult the publication PR and its deployment run for the final live release status.
+
+## Article import repair reconciliation — 2026-10-30
+
+Updated the archive pin and source hashes after repairing imported code layout, fences, and prose spacing in 160 existing articles. The catalog identities, article routes, inclusion decisions, and stage placements are unchanged. Source hashes were recomputed from the repaired archive Markdown; this reconciliation does not claim a new technical review of the research.
