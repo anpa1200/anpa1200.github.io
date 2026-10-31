@@ -45,3 +45,47 @@ test('all local guide/lab/research/case-study canonical identities have reviewed
  const known=new Set(data.items.map(i=>i.url));
  for(const i of catalog.filter(i=>['guide','lab','research','case-study'].includes(i.primary_type)&&!i.canonical_url.includes('/kill-chain/')))assert.ok(known.has(i.canonical_url),i.canonical_url);
 });
+
+test('curated ATT&CK mappings cover every stage with official active technique identities',()=>{
+ const attack=JSON.parse(readFileSync('data/kill-chain-attack.json','utf8'));
+ assert.equal(attack.source.release,'20.0');
+ assert.match(attack.source.repository_commit,/^[a-f0-9]{40}$/);
+ assert.match(attack.source.sha256,/^[a-f0-9]{64}$/);
+ assert.deepEqual(Object.keys(attack.stages),data.stages.map(s=>s.slug));
+ const officialPath=process.env.ATTACK_ENTERPRISE_SOURCE;
+ const official=officialPath?JSON.parse(readFileSync(officialPath,'utf8')):null;
+ if(official)assert.equal(createHash('sha256').update(readFileSync(officialPath)).digest('hex'),attack.source.sha256);
+ const sourceObjects=new Map((official?.objects||[]).map(o=>[o.id,o]));
+ for(const stage of data.stages){
+  const rows=attack.stages[stage.slug];assert.ok(rows.length>=5);
+  assert.equal(new Set(rows.map(r=>r.id)).size,rows.length);
+  const page=readFileSync(`kill-chain/${stage.slug}/index.html`,'utf8');
+  assert.match(page,/href="\/assets\/kill-chain\.css\?v=[A-Za-z0-9._-]+"/);
+  assert.ok(page.includes('id="ttp-examples"'));assert.ok(page.includes('not an exhaustive checklist or an official one-to-one mapping'));
+  assert.equal((page.match(/class="kc-ttp-link"/g)||[]).length,rows.length);
+  for(const row of rows){
+   const technique=attack.techniques[row.id];assert.ok(technique,row.id);
+   assert.match(row.id,/^T\d{4}(?:\.\d{3})?$/);assert.ok(row.relevance.length>60);
+   assert.equal(technique.revoked,false);assert.equal(technique.deprecated,false);
+   assert.equal(technique.is_subtechnique,row.id.includes('.'));
+   assert.equal(new URL(technique.url).origin,'https://attack.mitre.org');
+   assert.equal(new URL(technique.url).pathname.replace(/\/$/,''),`/techniques/${row.id.replace('.','/')}`);
+   assert.ok(page.includes(`href="${technique.url}"`));
+   if(technique.parent)assert.equal(technique.parent.id,row.id.split('.')[0]);
+   if(official){
+    const o=sourceObjects.get(technique.stix_id);assert.ok(o);
+    assert.equal(o.type,'attack-pattern');assert.ok(!o.revoked&&!o.x_mitre_deprecated);
+    assert.equal(o.name,technique.name);assert.equal(o.modified,technique.modified);
+    const ref=o.external_references.find(r=>r.source_name==='mitre-attack');
+    assert.equal(ref.external_id,row.id);assert.equal(ref.url,technique.url);
+    if(technique.parent){
+     const p=official.objects.find(p=>p.type==='attack-pattern'&&p.external_references?.some(r=>r.source_name==='mitre-attack'&&r.external_id===technique.parent.id));
+     assert.ok(p&&!p.revoked&&!p.x_mitre_deprecated);assert.equal(p.name,technique.parent.name);
+     assert.ok(official.objects.some(r=>r.type==='relationship'&&r.relationship_type==='subtechnique-of'&&r.source_ref===o.id&&r.target_ref===p.id&&!r.revoked));
+    }
+   }
+  }
+ }
+ assert.ok(attack.stages['delivery'].some(r=>r.id==='T1608.001')&&attack.stages.weaponization.some(r=>r.id==='T1608.001'));
+ assert.ok(attack.stages['command-and-control'].some(r=>r.id==='T1041')&&attack.stages['actions-on-objectives'].some(r=>r.id==='T1041'));
+});
