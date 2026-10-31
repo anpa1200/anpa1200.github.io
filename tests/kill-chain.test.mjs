@@ -60,6 +60,7 @@ test('curated ATT&CK mappings cover every stage with official active technique i
   const rows=attack.stages[stage.slug];assert.ok(rows.length>=5);
   assert.equal(new Set(rows.map(r=>r.id)).size,rows.length);
   const page=readFileSync(`kill-chain/${stage.slug}/index.html`,'utf8');
+  assert.match(page,/href="\/assets\/kill-chain\.css\?v=[A-Za-z0-9._-]+"/);
   assert.ok(page.includes('id="ttp-examples"'));assert.ok(page.includes('not an exhaustive checklist or an official one-to-one mapping'));
   assert.equal((page.match(/class="kc-ttp-link"/g)||[]).length,rows.length);
   for(const row of rows){
