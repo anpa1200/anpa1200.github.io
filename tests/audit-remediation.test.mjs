@@ -98,7 +98,10 @@ test('reader RSS excludes taxonomy and retains substantive research with stable 
     assert.ok(Number.isFinite(Date.parse(item[1].match(/<pubDate>(.*?)<\/pubDate>/)?.[1])));
   }
   const sitemap = readFileSync('sitemap-all.xml', 'utf8');
-  assert.match(sitemap, /<loc>https:\/\/1200km.com\/<\/loc>\s*<lastmod>2026-09-09<\/lastmod>/);
+  const homeDate = readFileSync('index.html', 'utf8').match(/"dateModified":\s*"(\d{4}-\d{2}-\d{2})"/)?.[1];
+  assert.ok(homeDate, 'Homepage declares its modification date');
+  const homeLastmod = sitemap.match(/<loc>https:\/\/1200km.com\/<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/)?.[1];
+  assert.equal(homeLastmod, homeDate, 'Homepage sitemap date matches its page metadata');
   const validationDate = readFileSync('external-validation.html', 'utf8').match(/"dateModified":\s*"(\d{4}-\d{2}-\d{2})"/)?.[1];
   assert.ok(validationDate, 'External Validation declares its modification date');
   for (const file of ['sitemap-all.xml', 'sitemap.xml']) {
