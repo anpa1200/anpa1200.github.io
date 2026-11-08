@@ -193,7 +193,11 @@ async function checkQueries() {
       { query: 'blue team', expectedPrefixes: ['/cyber-knowledge/blue-team.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'vulnerability research', expectedPrefixes: ['/cyber-knowledge/vulnerability-research.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'application security', expectedPrefixes: ['/cyber-knowledge/secure-code.html'], first: true, broad: true, requiredTier: 'core' },
-      { query: 'incident response', expectedPrefixes: ['/cyber-knowledge/dfir.html'], first: true, broad: true, requiredTier: 'core' },
+      // The lifecycle article and broader DFIR guide answer complementary
+      // intents. Keep DFIR near the top and require the specific lifecycle
+      // query to lead to the maintained original article.
+      { query: 'incident response', expectedPrefixes: ['/cyber-knowledge/dfir.html'], maxRank: 2, broad: true, requiredTier: 'core' },
+      { query: 'incident response lifecycle', expectedPrefixes: ['/articles/read/2026/incident-response-lifecycle/'], first: true, matchedTier: 'core', matchedType: 'article', matchedLifecycle: 'maintained' },
       { query: 'cloud security', expectedPrefixes: ['/cyber-knowledge/cloud-security.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'AI security field guide prompt injection MCP', expectedPrefixes: ['/cyber-knowledge/ai-security.html'], first: true, broad: true, requiredTier: 'core' },
       { query: 'cybersecurity governance', expectedPrefixes: ['/cyber-knowledge/grc.html'], broad: true, requiredTier: 'core' },
