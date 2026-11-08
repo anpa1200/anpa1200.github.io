@@ -13,7 +13,7 @@ for (const [slug, title, description] of [['', 'Practical security learning path
     name: title,
     url,
     description,
-    dateModified: '2026-09-09',
+    dateModified: slug ? '2026-09-09' : '2026-11-08',
     ...(slug ? {
       datePublished: '2026-09-09'
     } : {}),
