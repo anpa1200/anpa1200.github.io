@@ -14,6 +14,7 @@ const args = process.argv.slice(2);
 const site = resolve(args.includes('--site') ? args[args.indexOf('--site') + 1] : ROOT);
 const check = args.includes('--check');
 const BASE = '/ttp-simulation/';
+const nativeLogSources = JSON.parse(readFileSync(join(ROOT, 'data/log-sources.json'), 'utf8')).sources;
 const ORIGIN = 'https://1200km.com';
 const moduleRoot = join(site, BASE);
 const read = (path) => JSON.parse(readFileSync(join(moduleRoot, path), 'utf8'));
@@ -82,6 +83,10 @@ function toolActors(id) {
   return rows.length ? section('Documented actor use', '<p>Explicit actor-to-software uses relationships in the pinned ATT&CK source. These links are historical behavior context, not attribution of current events.</p>' + list(rows.map(r => `${a(`/threat-matrix/actors/${r.actor_id}/`, `${r.actor_name} · ${r.actor_id}`)} · ${a(r.source_url, 'Pinned relationship source')} (${esc(r.relationship_id)})`))) : '';
 }
 function renderPage({ page, title, description, core, connections = '', interactive = {}, kind = 'reference', keywords = [] }) {
+  if (interactive.telemetry) {
+    const profiles = nativeLogSources.filter(r => r.telemetry_components.includes(interactive.telemetry));
+    connections += section('Native security log sources', `<p>${a('/log-sources/', 'Security log-source library')} groups concrete producers and formats separately from ATT&CK data components. Samples carry provenance and version limits; associations do not prove collection coverage.</p>` + (profiles.length ? list(profiles.map(r => a('/log-sources/' + r.id + '/', r.title))) : ''));
+  }
   if (kind === 'detection' && interactive.detection) {
     const path = `techniques/${interactive.detection}/`;
     connections += section('Complete technique engineering workbook', `<p>${a(path + '#telemetry', 'Collection configuration and event examples')} · ${a(path + '#anomalies', 'Anomaly models and design worksheet')} · ${a(path + '#attack-tools', 'Tools and documented software')} · ${a(path + '#simulation', 'Simulation procedures')} · ${a(path + '#synthetic-logs', 'Offline synthetic collection check')}</p><p>Exact source tags are not semantic relevance verdicts. Review actual rule conditions and observation points; imported rules are not backend-compiled or live-validated.</p>`);

@@ -326,7 +326,7 @@ for (const relativePath of config.major_indexes || []) {
     const parsedUrl = new URL(url);
     if (relativePath === 'references/index.html' && parsedUrl.hostname !== '1200km.com') continue;
     if (parsedUrl.hostname === 'github.com' || parsedUrl.hostname === 'pypi.org' || parsedUrl.hostname === 'linkedin.com') continue;
-    if (/\.(?:json|xml|txt|pdf|png|jpe?g|webp|svg)$/i.test(parsedUrl.pathname)) continue;
+    if (/\.(?:json|xml|txt|pdf|png|jpe?g|webp|svg|zip)$/i.test(parsedUrl.pathname)) continue;
     if (url === 'https://medium.com/@1200km') continue;
     if (itemByAnyUrl.has(url) || aliasUrls.has(url) || url === searchUtilityUrl) continue;
     const declared = (catalog.declared_collections || []).some((collection) => url.startsWith(collection.canonical_prefix));

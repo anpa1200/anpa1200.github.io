@@ -1,0 +1,154 @@
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Azure Activity Log | 1200km</title><meta name="description" content="Azure Activity Log. Azure control-plane activity exported as structured events."><link rel="canonical" href="https://1200km.com/log-sources/azure-activity/"><meta property="og:url" content="https://1200km.com/log-sources/azure-activity/"><meta property="og:title" content="Azure Activity Log"><meta property="og:description" content="Azure Activity Log. Azure control-plane activity exported as structured events."><meta property="og:type" content="article"><meta property="og:image" content="https://1200km.com/assets/site-og-v2.png"><meta property="og:image:alt" content="1200km security research"><link rel="stylesheet" href="/assets/site-theme.css?v=20260904-light-default"><link rel="stylesheet" href="/assets/log-sources.css"><script src="/assets/theme-bootstrap.js"></script><script src="/assets/site-theme.js?v=20260904-light-default" defer></script><script src="/assets/log-sources.js" defer></script><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Azure Activity Log","headline":"Azure Activity Log","description":"Azure Activity Log. Azure control-plane activity exported as structured events.","url":"https://1200km.com/log-sources/azure-activity/","datePublished":"2026-11-10","dateModified":"2026-11-10","author":{"@type":"Person","name":"Andrey Pautov","url":"https://1200km.com/about.html"}}</script></head><body id="top"><!-- site-shell:header:start -->
+    <header class="site-header" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="36" height="36" />
+          <span class="brand-copy"><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <details class="nav-links" open data-mobile-navigation>
+          <summary class="nav-menu-toggle" aria-label="Open navigation" aria-controls="primary-nav-list">
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span>
+            <span class="nav-menu-text">Menu</span>
+          </summary>
+          <div class="nav-list" id="primary-nav-list">
+            <!-- site-shell:primary-navigation:start -->
+            <a href="/cti.html">Research</a>
+            <a class="active" aria-current="location" href="/guides.html">Library</a>
+            <a href="/projects.html">Products &amp; Labs</a>
+            <a class="nav-flagship" href="/adversarygraph/">AdversaryGraph</a>
+            <details class="nav-more">
+              <summary>More</summary>
+              <div class="nav-more-list">
+                <a href="/cyber-knowledge/">Cyber Knowledge</a>
+                <a href="/courses/">Courses</a>
+                <a href="/ttp-simulation/tools/">Attack Tools</a>
+                <a href="/ttp-simulation/">Attack Simulations</a>
+                <a href="/ttp-simulation/detections/">Detection Rules</a>
+                <a href="/references/">References</a>
+                <a href="/about.html">About</a>
+                <a href="/cv.html">CV</a>
+                <a href="/external-validation.html">External validation</a>
+              </div>
+            </details>
+            <!-- site-shell:primary-navigation:end -->
+          </div>
+        </details>
+        <div class="site-search-host site-search-host--standalone" data-site-search-theme data-search-state="loading" role="search" aria-label="Site search">
+          <a class="site-search-fallback" data-site-search-control="fallback" href="/search.html" aria-label="Search research on 1200km">
+            <span aria-hidden="true" class="site-search-fallback-icon"></span>
+            <span class="site-search-fallback-text">Search research</span>
+          </a>
+        </div>
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle theme">☀</button>
+      </nav>
+    </header>
+    <!-- site-shell:header:end --><main id="main-content" class="log-main" data-pagefind-body><nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/log-sources/">Log sources</a></nav><h1>Azure Activity Log</h1><p class="log-lead">Azure Activity Log. Azure control-plane activity exported as structured events.</p><div class="log-tags" aria-label="Tags"><a href="/log-sources/tags/azure/">azure</a> <a href="/log-sources/tags/json/">json</a> <a href="/log-sources/tags/cloud/">cloud</a> <a href="/log-sources/tags/audit/">audit</a></div><section><h2>Source and collection</h2><p>Activity Log / configured diagnostic destination.</p><p>Select subscriptions and export categories; record destination-specific envelopes.</p></section><section><h2>Native example and provenance</h2><p><strong>publisher documentation example</strong>. Published example; no independent capture provenance claimed.</p><p><a href="https://learn.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-schema">Original publisher / pinned upstream fixture</a> — preformatted example 1</p><p>One complete record selected; values unchanged.</p><p><a href="/log-sources/samples/azure-activity.json">Download the exact sample</a> · <a href="/log-sources/research-kit.zip">Offline research kit</a></p><p class="log-hash">SHA-256: <code>f8df819b342ef50baf0a73994fd7e2a139063b3c7b6137ea42db18260e424094</code></p><pre tabindex="0" aria-label="Native log example"><code>{
+    &quot;authorization&quot;: {
+        &quot;action&quot;: &quot;Microsoft.Network/networkSecurityGroups/write&quot;,
+        &quot;scope&quot;: &quot;/subscriptions/&lt;subscription ID&gt;/resourcegroups/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/myNSG&quot;
+    },
+    &quot;caller&quot;: &quot;rob@contoso.com&quot;,
+    &quot;channels&quot;: &quot;Operation&quot;,
+    &quot;claims&quot;: {
+        &quot;aud&quot;: &quot;https://management.core.windows.net/&quot;,
+        &quot;iss&quot;: &quot;https://sts.windows.net/aaaabbbb-0000-cccc-1111-dddd2222eeee/&quot;,
+        &quot;iat&quot;: &quot;1234567890&quot;,
+        &quot;nbf&quot;: &quot;1234567890&quot;,
+        &quot;exp&quot;: &quot;1234567890&quot;,
+        &quot;_claim_names&quot;: &quot;{\&quot;groups\&quot;:\&quot;src1\&quot;}&quot;,
+        &quot;_claim_sources&quot;: &quot;{\&quot;src1\&quot;:{\&quot;endpoint\&quot;:\&quot;https://graph.microsoft.com/aaaabbbb-0000-cccc-1111-dddd2222eeee/users/bbbbbbbb-1111-2222-3333-cccccccccccc/getMemberObjects\&quot;}}&quot;,
+        &quot;http://schemas.microsoft.com/claims/authnclassreference&quot;: &quot;1&quot;,
+        &quot;aio&quot;: &quot;A3GgTJdwK4vy7Fa7l6DgJC2mI0GX44tML385OpU1Q+z+jaPnFMwB&quot;,
+        &quot;http://schemas.microsoft.com/claims/authnmethodsreferences&quot;: &quot;rsa,mfa&quot;,
+        &quot;appid&quot;: &quot;00001111-aaaa-2222-bbbb-3333cccc4444&quot;,
+        &quot;appidacr&quot;: &quot;2&quot;,
+        &quot;http://schemas.microsoft.com/2012/01/devicecontext/claims/identifier&quot;: &quot;cccccccc-2222-3333-4444-dddddddddddd&quot;,
+        &quot;e_exp&quot;: &quot;262800&quot;,
+        &quot;http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname&quot;: &quot;Robertson&quot;,
+        &quot;http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname&quot;: &quot;Rob&quot;,
+        &quot;ipaddr&quot;: &quot;111.111.1.111&quot;,
+        &quot;name&quot;: &quot;Rob Robertson&quot;,
+        &quot;http://schemas.microsoft.com/identity/claims/objectidentifier&quot;: &quot;bbbbbbbb-1111-2222-3333-cccccccccccc&quot;,
+        &quot;onprem_sid&quot;: &quot;S-1-5-21-4837261184-168309720-1886587427-18514304&quot;,
+        &quot;puid&quot;: &quot;18247BBD84827C6D&quot;,
+        &quot;http://schemas.microsoft.com/identity/claims/scope&quot;: &quot;user_impersonation&quot;,
+        &quot;http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier&quot;: &quot;b-24Jf94A3FH2sHWVIFqO3-RSJEiv24Jnif3gj7s&quot;,
+        &quot;http://schemas.microsoft.com/identity/claims/tenantid&quot;: &quot;aaaabbbb-0000-cccc-1111-dddd2222eeee&quot;,
+        &quot;http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name&quot;: &quot;rob@contoso.com&quot;,
+        &quot;http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn&quot;: &quot;rob@contoso.com&quot;,
+        &quot;uti&quot;: &quot;IdP3SUJGtkGlt7dDQVRPAA&quot;,
+        &quot;ver&quot;: &quot;1.0&quot;
+    },
+    &quot;correlationId&quot;: &quot;aaaa0000-bb11-2222-33cc-444444dddddd&quot;,
+    &quot;eventDataId&quot;: &quot;aaaa0a0a-bb1b-cc2c-dd3d-eeeeee4e4e4e&quot;,
+    &quot;eventName&quot;: {
+        &quot;value&quot;: &quot;EndRequest&quot;,
+        &quot;localizedValue&quot;: &quot;End request&quot;
+    },
+    &quot;category&quot;: {
+        &quot;value&quot;: &quot;Administrative&quot;,
+        &quot;localizedValue&quot;: &quot;Administrative&quot;
+    },
+    &quot;eventTimestamp&quot;: &quot;2018-01-29T20:42:31.3810679Z&quot;,
+    &quot;id&quot;: &quot;/subscriptions/&lt;subscription ID&gt;/resourcegroups/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/myNSG/events/aaaa0a0a-bb1b-cc2c-dd3d-eeeeee4e4e4e/ticks/636528553513810679&quot;,
+    &quot;level&quot;: &quot;Informational&quot;,
+    &quot;operationId&quot;: &quot;eeee4444-ff55-6666-77aa-888888bbbbbb&quot;,
+    &quot;operationName&quot;: {
+        &quot;value&quot;: &quot;Microsoft.Network/networkSecurityGroups/write&quot;,
+        &quot;localizedValue&quot;: &quot;Microsoft.Network/networkSecurityGroups/write&quot;
+    },
+    &quot;resourceGroupName&quot;: &quot;myResourceGroup&quot;,
+    &quot;resourceProviderName&quot;: {
+        &quot;value&quot;: &quot;Microsoft.Network&quot;,
+        &quot;localizedValue&quot;: &quot;Microsoft.Network&quot;
+    },
+    &quot;resourceType&quot;: {
+        &quot;value&quot;: &quot;Microsoft.Network/networkSecurityGroups&quot;,
+        &quot;localizedValue&quot;: &quot;Microsoft.Network/networkSecurityGroups&quot;
+    },
+    &quot;resourceId&quot;: &quot;/subscriptions/&lt;subscription ID&gt;/resourcegroups/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/myNSG&quot;,
+    &quot;status&quot;: {
+        &quot;value&quot;: &quot;Succeeded&quot;,
+        &quot;localizedValue&quot;: &quot;Succeeded&quot;
+    },
+    &quot;subStatus&quot;: {
+        &quot;value&quot;: &quot;&quot;,
+        &quot;localizedValue&quot;: &quot;&quot;
+    },
+    &quot;submissionTimestamp&quot;: &quot;2018-01-29T20:42:50.0724829Z&quot;,
+    &quot;subscriptionId&quot;: &quot;&lt;subscription ID&gt;&quot;,
+    &quot;properties&quot;: {
+        &quot;statusCode&quot;: &quot;Created&quot;,
+        &quot;serviceRequestId&quot;: &quot;ffff5555-aa66-7777-88bb-999999cccccc&quot;,
+        &quot;responseBody&quot;: &quot;&quot;,
+        &quot;requestbody&quot;: &quot;&quot;
+    },
+    &quot;relatedEvents&quot;: []
+}
+</code></pre></section><section><h2>Structure and field interpretation</h2><div class="log-table"><table><caption>Observed structure in this specific sample</caption><thead><tr><th scope="col">Field/path</th><th scope="col">Serialized type</th></tr></thead><tbody><tr><td><code>authorization.action</code></td><td>str</td></tr><tr><td><code>authorization.scope</code></td><td>str</td></tr><tr><td><code>caller</code></td><td>str</td></tr><tr><td><code>channels</code></td><td>str</td></tr><tr><td><code>claims.aud</code></td><td>str</td></tr><tr><td><code>claims.iss</code></td><td>str</td></tr><tr><td><code>claims.iat</code></td><td>str</td></tr><tr><td><code>claims.nbf</code></td><td>str</td></tr><tr><td><code>claims.exp</code></td><td>str</td></tr><tr><td><code>claims._claim_names</code></td><td>str</td></tr><tr><td><code>claims._claim_sources</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.microsoft.com/claims/authnclassreference</code></td><td>str</td></tr><tr><td><code>claims.aio</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.microsoft.com/claims/authnmethodsreferences</code></td><td>str</td></tr><tr><td><code>claims.appid</code></td><td>str</td></tr><tr><td><code>claims.appidacr</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.microsoft.com/2012/01/devicecontext/claims/identifier</code></td><td>str</td></tr><tr><td><code>claims.e_exp</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname</code></td><td>str</td></tr><tr><td><code>claims.ipaddr</code></td><td>str</td></tr><tr><td><code>claims.name</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.microsoft.com/identity/claims/objectidentifier</code></td><td>str</td></tr><tr><td><code>claims.onprem_sid</code></td><td>str</td></tr><tr><td><code>claims.puid</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.microsoft.com/identity/claims/scope</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.microsoft.com/identity/claims/tenantid</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name</code></td><td>str</td></tr><tr><td><code>claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn</code></td><td>str</td></tr><tr><td><code>claims.uti</code></td><td>str</td></tr><tr><td><code>claims.ver</code></td><td>str</td></tr><tr><td><code>correlationId</code></td><td>str</td></tr><tr><td><code>eventDataId</code></td><td>str</td></tr><tr><td><code>eventName.value</code></td><td>str</td></tr><tr><td><code>eventName.localizedValue</code></td><td>str</td></tr><tr><td><code>category.value</code></td><td>str</td></tr><tr><td><code>category.localizedValue</code></td><td>str</td></tr><tr><td><code>eventTimestamp</code></td><td>str</td></tr><tr><td><code>id</code></td><td>str</td></tr><tr><td><code>level</code></td><td>str</td></tr><tr><td><code>operationId</code></td><td>str</td></tr><tr><td><code>operationName.value</code></td><td>str</td></tr><tr><td><code>operationName.localizedValue</code></td><td>str</td></tr><tr><td><code>resourceGroupName</code></td><td>str</td></tr><tr><td><code>resourceProviderName.value</code></td><td>str</td></tr><tr><td><code>resourceProviderName.localizedValue</code></td><td>str</td></tr><tr><td><code>resourceType.value</code></td><td>str</td></tr><tr><td><code>resourceType.localizedValue</code></td><td>str</td></tr><tr><td><code>resourceId</code></td><td>str</td></tr><tr><td><code>status.value</code></td><td>str</td></tr><tr><td><code>status.localizedValue</code></td><td>str</td></tr><tr><td><code>subStatus.value</code></td><td>str</td></tr><tr><td><code>subStatus.localizedValue</code></td><td>str</td></tr><tr><td><code>submissionTimestamp</code></td><td>str</td></tr><tr><td><code>subscriptionId</code></td><td>str</td></tr><tr><td><code>properties.statusCode</code></td><td>str</td></tr><tr><td><code>properties.serviceRequestId</code></td><td>str</td></tr><tr><td><code>properties.responseBody</code></td><td>str</td></tr><tr><td><code>properties.requestbody</code></td><td>str</td></tr><tr><td><code>relatedEvents</code></td><td>array</td></tr></tbody></table></div><dl><dt>category</dt><dd>Native field; inspect its exact type and nesting in the complete example below.</dd><dt>operationName</dt><dd>Native field; inspect its exact type and nesting in the complete example below.</dd><dt>correlationId</dt><dd>Native field; inspect its exact type and nesting in the complete example below.</dd></dl></section><section><h2>Investigation uses</h2><ul><li>Review operationName, caller, status and correlationId for administrative changes.</li><li>Retain resource, account/project/subscription and region context for correlation.</li></ul></section><section><h2>Validation boundaries</h2><p>Control-plane activity is different from resource data-plane access; export representations vary.</p><p>This sample passed byte-integrity and JSON/XML parsing checks, including the catalogue’s specified event discriminators. This is not a complete vendor-schema validation or a tested detection.</p><p>For a simulation, first parse this fixture offline, then create a separately labelled synthetic variant and test it against the intended collector in an isolated lab. Never replay public example identities or destinations into production.</p></section><section><h2>Related sources</h2><ul><li><a href="/log-sources/aws-cloudtrail/">AWS CloudTrail</a></li><li><a href="/log-sources/aws-waf/">AWS WAF</a></li><li><a href="/log-sources/aws-api-gateway/">AWS API Gateway — configured access JSON</a></li><li><a href="/log-sources/gcp-audit/">Google Cloud Audit Logs</a></li><li><a href="/log-sources/gcp-vpc-flow/">Google Cloud VPC Flow Logs</a></li></ul></section><section><h2>Ecosystem connections</h2><ul><li><a href="/ttp-simulation/telemetry/">Telemetry Library — ATT&amp;CK data components</a></li><li><a href="/ttp-simulation/detections/">Detection Rules — candidate detection content</a></li><li><a href="/articles/read/2026/threat-hunting-from-intelligence-to-validated-defense/">Threat hunting — from intelligence to validated defense</a></li><li><a href="/learning-paths/">Practical security learning paths</a></li><li><a href="/adversarygraph/">AdversaryGraph — evidence-led investigation</a></li></ul><ul></ul></section><section><h2>References</h2><ul><li><a href="https://learn.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-schema">Azure Activity Log event schema - Azure Monitor | Microsoft Learn</a></li></ul><p>Sample provenance is linked above. Field availability and product behavior must be checked against the deployed version.</p></section></main><!-- site-shell:footer:start -->
+    <footer class="site-footer" data-site-shell="standalone" data-site-shell-version="2026-08-30.1">
+      <div class="shared-footer-inner">
+        <a class="shared-footer-brand" href="/">
+          <img src="/assets/ap-logo.png" alt="" width="32" height="32" />
+          <span><strong>Andrey Pautov</strong><small>Security research</small></span>
+        </a>
+        <nav class="shared-footer-links" aria-label="Footer navigation">
+          <a href="/cti.html">Research</a>
+          <a href="/guides.html">Library</a>
+          <a href="/projects.html">Products &amp; Labs</a>
+          <a href="/adversarygraph/">AdversaryGraph</a>
+          <a href="/about.html">About</a>
+        </nav>
+        <nav class="shared-footer-meta" aria-label="Site information">
+          <a href="/subscribe.html">Subscribe</a>
+          <a href="/privacy.html">Privacy / Data Handling</a>
+          <a href="/about.html#contact">Contact</a>
+          <a href="https://github.com/anpa1200" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true"> ↗</span></a>
+        </nav>
+      </div>
+      <div class="shared-footer-bottom">
+        <span>© 2026 Andrey Pautov · Original research and tooling</span>
+      </div>
+    </footer>
+    <!-- site-shell:footer:end --></body></html>

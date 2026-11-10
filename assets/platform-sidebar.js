@@ -21,7 +21,8 @@
       ['Detection Rules', '/ttp-simulation/detections/', ['/ttp-simulation/detections/']],
       ['Anomaly Detection Atlas', '/anomaly-detection-atlas/', ['/anomaly-detection-atlas/']],
       ['Telemetry Library', '/ttp-simulation/telemetry/', ['/ttp-simulation/telemetry/']],
-      ['Simulation & detection tags', '/ttp-simulation/tags/', ['/ttp-simulation/tags/']]
+      ['Simulation & detection tags', '/ttp-simulation/tags/', ['/ttp-simulation/tags/']],
+      ['Security log sources', '/log-sources/', ['/log-sources/']]
     ] },
     { label: 'Tools & proof', links: [
       ['HexStrike', '/hexstrike.html', ['/hexstrike.html']],

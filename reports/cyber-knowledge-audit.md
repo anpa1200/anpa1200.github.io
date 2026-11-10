@@ -9,8 +9,8 @@ This report is generated from deployable source HTML. External URLs are inventor
 | Measure | Result |
 |---|---:|
 | Pages | 15 |
-| Words | 131,799 |
-| Internal links | 4,832 |
+| Words | 131,904 |
+| Internal links | 4,841 |
 | External links | 604 |
 | Broken internal links | 0 |
 | Missing anchors | 0 |
@@ -23,11 +23,11 @@ This report is generated from deployable source HTML. External URLs are inventor
 | [Cybersecurity Knowledge Base and Practitioner Field Guides](https://1200km.com/cyber-knowledge/) | collection page | 3096 | 46 | 330 | 1 | indexable |
 | [Cyber Threat Intelligence (CTI)](https://1200km.com/cyber-knowledge/cti.html) | field guide | 12742 | 25 | 414 | 174 | indexable |
 | [Red Team & Offensive Security](https://1200km.com/cyber-knowledge/red-team.html) | field guide | 25676 | 290 | 594 | 17 | indexable |
-| [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13442 | 161 | 473 | 22 | indexable |
+| [Blue Team & Defensive Security](https://1200km.com/cyber-knowledge/blue-team.html) | field guide | 13495 | 162 | 478 | 22 | indexable |
 | [Vulnerability Research & Exploit Development](https://1200km.com/cyber-knowledge/vulnerability-research.html) | field guide | 10707 | 127 | 352 | 42 | indexable |
 | [Malware Analysis & Reverse Engineering](https://1200km.com/cyber-knowledge/malware-analysis.html) | field guide | 7463 | 96 | 343 | 21 | indexable |
 | [Secure Code & Application Security](https://1200km.com/cyber-knowledge/secure-code.html) | field guide | 7118 | 73 | 351 | 16 | indexable |
-| [Digital Forensics & Incident Response (DFIR)](https://1200km.com/cyber-knowledge/dfir.html) | field guide | 8307 | 70 | 350 | 17 | indexable |
+| [Digital Forensics & Incident Response (DFIR)](https://1200km.com/cyber-knowledge/dfir.html) | field guide | 8359 | 71 | 354 | 17 | indexable |
 | [Cloud Security](https://1200km.com/cyber-knowledge/cloud-security.html) | field guide | 8836 | 69 | 364 | 20 | indexable |
 | [Governance, Risk & Compliance (GRC)](https://1200km.com/cyber-knowledge/grc.html) | field guide | 9122 | 89 | 362 | 39 | indexable |
 | [OSINT & Reconnaissance](https://1200km.com/cyber-knowledge/osint.html) | field guide | 10154 | 114 | 308 | 29 | indexable |
