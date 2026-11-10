@@ -109,6 +109,16 @@ try {
   assert.deepEqual(errors.slice(beforeBlockedBridge),[],'Article hydration must not depend on the ecosystem bridge script');
   await call('Network.setBlockedURLs',{urls:[]});
  }
+ // Native log-source links must survive the same article hydration lifecycle.
+ for(const route of ['/articles/read/2026/threat-hunting-from-intelligence-to-validated-defense/','/articles/read/2026/incident-response-lifecycle/']){
+  if(!existsSync(resolve(site,'.'+route,'index.html')))continue;
+  await call('Page.navigate',{url:base+route});
+  await waitFor("document.readyState==='complete' && document.querySelector('[data-log-source-crosslinks] a[href=\"/log-sources/\"]')");
+  await evaluate("document.querySelector('[data-log-source-crosslinks]').remove()");
+  await waitFor("document.querySelector('[data-log-source-crosslinks] a[href=\"/log-sources/\"]')");
+  assert.equal(await evaluate("document.querySelectorAll('[data-log-source-crosslinks]').length"),1);
+  assert.ok(await evaluate("document.querySelectorAll('[data-log-source-crosslinks] a').length>=4"));
+ }
  // The publication snapshot keeps its original anchors and navigation after hydration.
  const atlas=JSON.parse(readFileSync(resolve(project,'data/anomaly-atlas.json'),'utf8'));
  const snapshot=new URL(atlas.publication_snapshot).pathname;

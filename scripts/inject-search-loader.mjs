@@ -30,6 +30,11 @@ for (const file of await walk(site)) {
   if (relative === '/threat-matrix/index.html') continue;
   const pageUrl = normalizeSiteUrl(pageUrlForRelativePath(relative.slice(1)));
   if (!pageUrl) continue;
+  // Load on every article entry point so client-side navigation to a mapped guide works.
+  if (relative.startsWith('/articles/') && html.includes('__docusaurus') && !html.includes('/assets/log-source-crosslinks.js')) {
+    html = html.replace('</head>', '<script src="/assets/log-source-crosslinks.js" defer></script></head>');
+    await writeFile(file, html);
+  }
   const withTopics = withAnomalyTopicLoader(html, pageUrl.href);
   if (withTopics !== html) {
     html = withTopics;
