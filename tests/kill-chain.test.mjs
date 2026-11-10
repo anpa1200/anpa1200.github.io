@@ -8,7 +8,7 @@ const stages = ['Reconnaissance','Weaponization','Delivery','Exploitation','Inst
 test('classic stages, unique identities and explicit coverage decisions',()=>{
  assert.deepEqual(data.stages.map(s=>s.name),stages);
  assert.ok(readFileSync('.github/workflows/pages.yml','utf8').includes(`ARTICLE_ARCHIVE_COMMIT: ${data.archive_commit}`),'Update the reviewed inventory when the published archive pin changes.');
- assert.equal(data.items.filter(i=>i.id.startsWith('archive:')).length,196);
+ assert.equal(data.items.filter(i=>i.id.startsWith('archive:')).length,197);
  assert.equal(data.items.filter(i=>i.kind==='trainsec').length,87);
  assert.equal(new Set(data.items.map(i=>i.id)).size,data.items.length);
  assert.equal(new Set(data.items.map(i=>i.url)).size,data.items.length);
