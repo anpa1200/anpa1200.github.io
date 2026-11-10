@@ -16,7 +16,8 @@ const textExtensions = new Set(['.html', '.js', '.css', '.json', '.xml', '.txt',
 const secretPatterns = [
   ['private key', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/],
   ['GitHub token', /\bgh[opusr]_[A-Za-z0-9_]{30,}\b/],
-  ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/],
+  // AWS documentation's exact public example identifier is not a credential.
+  ['AWS access key', /\bAKIA(?!IOSFODNN7EXAMPLE\b)[0-9A-Z]{16}\b/],
   ['Google API key', /\bAIza[0-9A-Za-z_-]{30,}\b/],
   ['Slack token', /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/],
 ];
