@@ -224,7 +224,7 @@ function learningPathCard(path) {
           </div>
           <div class="learning-path-layout">
             <ol class="learning-path-steps">${path.steps.map((step) => `<li><span>${step.position}</span><div><small>${escapeHtml(label(step.kind))}</small><a href="${escapeHtml(step.url)}">${escapeHtml(step.title)}</a></div></li>`).join('')}</ol>
-            <section class="learning-path-outcomes" aria-labelledby="outcomes-${escapeHtml(path.id)}"><h4 id="outcomes-${escapeHtml(path.id)}">Expected outcomes</h4><ul>${path.outcomes.map((outcome) => `<li>${escapeHtml(outcome)}</li>`).join('')}</ul><p>Anchored to ${anchors.join(' and ')}.</p></section>
+            <section class="learning-path-outcomes" aria-labelledby="outcomes-${escapeHtml(path.id)}"><h4 id="outcomes-${escapeHtml(path.id)}">${escapeHtml(path.title)} outcomes</h4><ul>${path.outcomes.map((outcome) => `<li>${escapeHtml(outcome)}</li>`).join('')}</ul><p>Anchored to ${anchors.join(' and ')}.</p></section>
           </div>
         </article>`;
 }
