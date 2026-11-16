@@ -79,7 +79,7 @@ function assertModel() {
     if (review.status === 'completed' && !review.completed_at) {
       throw new Error(`${review.id}: completed review is missing completed_at.`);
     }
-    if (!(review.completed_at <= review.published_at && review.published_at <= review.updated_at)) {
+    if (!((review.completed_at === null || review.completed_at <= review.published_at) && review.published_at <= review.updated_at)) {
       throw new Error(`${review.id}: expected completed_at <= published_at <= updated_at.`);
     }
     if (review.facts_verified_at < review.published_at || review.syllabus_verified_at < review.published_at) {
@@ -165,8 +165,8 @@ function reviewCard(review) {
             <p>${escapeHtml(review.summary)}</p>
             <dl class="course-card-facts">
               <div><dt>Status</dt><dd>${escapeHtml(label(review.status))}</dd></div>
-              <div><dt>Advertised content</dt><dd>${review.advertised_content_hours} hours</dd></div>
-              <div><dt>Materials</dt><dd>${review.learning_materials}</dd></div>
+              <div><dt>Advertised content</dt><dd>${review.advertised_content_hours === null ? 'Not recorded' : `${review.advertised_content_hours} hours`}</dd></div>
+              <div><dt>Materials</dt><dd>${review.learning_materials ?? 'Not recorded'}</dd></div>
               <div><dt>Companions</dt><dd>${review.companion_count}</dd></div>
             </dl>
             <div class="course-chip-list" role="group" aria-label="Course topics">${chips(review.topics)}</div>
@@ -178,7 +178,7 @@ function reviewCard(review) {
                 <div><h4>Commercial disclosure</h4><ul><li>Access: ${escapeHtml(label(review.commercial_disclosure.access_basis))}</li><li>Affiliate link: ${review.commercial_disclosure.affiliate_link ? 'yes' : 'no'}</li><li>Provider-controlled conclusions: ${review.commercial_disclosure.provider_controlled_conclusions ? 'yes' : 'no'}</li></ul></div>
               </div>
             </details>
-            <p class="course-verification">Review scope: ${escapeHtml(review.review_scope)}. Course facts were checked against ${review.official_fact_sources.length} official sources; ${review.local_evidence_sources.length} local evidence record${review.local_evidence_sources.length === 1 ? '' : 's'} preserve the assessment.</p>
+            <p class="course-verification">Review scope: ${escapeHtml(review.review_scope)}. Course evidence references ${review.official_fact_sources.length} official sources; ${review.local_evidence_sources.length} local evidence record${review.local_evidence_sources.length === 1 ? '' : 's'} preserve the assessment.</p>
             <div class="course-actions">
               <a class="button primary" href="${escapeHtml(localPath(review.canonical_url))}">Open learning record</a>
               <a class="button" href="${escapeHtml(localPath(review.full_review_url))}">Read full review</a>
@@ -324,7 +324,7 @@ const structuredData = {
 };
 
 const title = 'Cybersecurity Courses & Learning Paths | 1200km';
-const description = 'Independent cybersecurity course reviews and evidence-backed learning paths with completed study records, practical materials, limitations, and recommendations.';
+const description = 'Independent cybersecurity course reviews and evidence-backed learning paths with explicit study status, practical materials, limitations, and recommendations.';
 
 const body = `    <section class="course-hero" aria-labelledby="course-library-title">
       <div class="course-hero-copy">
@@ -333,16 +333,16 @@ const body = `    <section class="course-hero" aria-labelledby="course-library-t
         <p class="page-lead">${escapeHtml(model.description)}</p>
         <div class="page-hero-links"><a class="button primary" href="#course-library">Explore the library</a><a class="button" href="#review-method">Read the review method</a><a class="button" href="/cyber-knowledge/helping-materials/">Open helping materials</a></div>
       </div>
-      <div role="note" class="course-principles" aria-label="Publication standard"><strong>Completion before recommendation</strong><p>${escapeHtml(model.editorial_policy.completion_rule)}</p><span>Updated ${escapeHtml(model.updated_at)}</span></div>
+      <div role="note" class="course-principles" aria-label="Publication standard"><strong>Evidence before recommendation</strong><p>${escapeHtml(model.editorial_policy.completion_rule)}</p><span>Updated ${escapeHtml(model.updated_at)}</span></div>
     </section>
     <section class="course-metrics" aria-label="Courses and learning paths summary">
       <article><strong>${originalCourses}</strong><span>original course in development</span></article>
       <article><strong>${completedReviews}</strong><span>completed review${completedReviews === 1 ? '' : 's'}</span></article>
       <article><strong>${publishedPaths}</strong><span>published learning path${publishedPaths === 1 ? '' : 's'}</span></article>
-      <article><strong>${companionMaterials}</strong><span>original companion guides</span></article>
+      <article><strong>${companionMaterials}</strong><span>companion resources</span></article>
     </section>
     <section id="course-library" aria-labelledby="course-library-heading">
-      <div class="section-heading"><div><p class="page-eyebrow">Searchable learning record</p><h2 id="course-library-heading">Courses, reviews, and learning paths</h2><p>Filter original courses, completed independent reviews, and sequenced learning paths. Every result remains readable without JavaScript.</p></div></div>
+      <div class="section-heading"><div><p class="page-eyebrow">Searchable learning record</p><h2 id="course-library-heading">Courses, reviews, and learning paths</h2><p>Filter original courses, independent reviews, and sequenced learning paths. Every result remains readable without JavaScript.</p></div></div>
       <div class="course-controls" data-course-controls>
         <label><span>Search</span><input type="search" data-course-search placeholder="Course, provider, skill, topic…" autocomplete="off" /></label>
         <label><span>Content</span><select data-course-kind><option value="">Courses, reviews, and paths</option><option value="course">Original courses</option><option value="review">Course reviews</option><option value="path">Learning paths</option></select></label>
@@ -356,7 +356,7 @@ const body = `    <section class="course-hero" aria-labelledby="course-library-t
       <p class="course-empty" data-course-empty hidden>No course reviews or learning paths match the selected filters.</p>
     </section>
     <section id="review-method" class="course-method" aria-labelledby="review-method-title">
-      <div><p class="page-eyebrow">Editorial standard</p><h2 id="review-method-title">How reviews earn publication</h2><p>The module separates course facts from personal evaluation and does not convert access, marketing material, or an unfinished syllabus into a recommendation.</p></div>
+      <div><p class="page-eyebrow">Editorial standard</p><h2 id="review-method-title">How reviews are documented</h2><p>The module separates course facts from personal evaluation and records completion separately from publication and preserves both strengths and limitations.</p></div>
       <div class="course-method-grid">
         <article><span>01</span><h3>Complete</h3><p>${escapeHtml(model.editorial_policy.completion_rule)}</p></article>
         <article><span>02</span><h3>Verify</h3><p>${escapeHtml(model.editorial_policy.evidence_rule)}</p></article>

@@ -46,8 +46,8 @@ test('course library passes its governed JSON Schema', () => {
 
 test('published module has unique and resolved course, review, and path identities', () => {
   assert.equal(model.courses.length, 1);
-  assert.equal(model.reviews.length, 1);
-  assert.equal(model.learning_paths.length, 1);
+  assert.equal(model.reviews.length, 2);
+  assert.equal(model.learning_paths.length, 2);
   const ids = [...model.courses, ...model.reviews, ...model.learning_paths].map((entry) => entry.id);
   assert.equal(new Set(ids).size, ids.length);
   const governedUrls = [
@@ -66,10 +66,11 @@ test('published module has unique and resolved course, review, and path identiti
   }
 });
 
-test('review policy publishes only completed evidence-backed decisions with disclosure', () => {
+test('review records distinguish confirmed completion from reviewed material and disclose affiliate links', () => {
   for (const review of model.reviews) {
-    assert.equal(review.status, 'completed');
-    assert.match(review.completed_at, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(['completed', 'reviewed'].includes(review.status));
+    if (review.status === 'completed') assert.match(review.completed_at, /^\d{4}-\d{2}-\d{2}$/);
+    else assert.equal(review.completed_at, null);
     assert.notEqual(review.recommendation, 'pending');
     assert.ok(review.evidence.length >= 3);
     assert.ok(review.strengths.length >= 1);
@@ -79,9 +80,9 @@ test('review policy publishes only completed evidence-backed decisions with disc
     assert.match(review.facts_verified_at, /^\d{4}-\d{2}-\d{2}$/);
     assert.equal(typeof review.commercial_disclosure.affiliate_link, 'boolean');
     assert.equal(typeof review.commercial_disclosure.provider_controlled_conclusions, 'boolean');
-    assert.ok(review.advertised_content_hours > 0);
+    assert.ok(review.advertised_content_hours === null || review.advertised_content_hours > 0);
     assert.equal('workload_hours' in review, false);
-    assert.ok(review.completed_at <= review.published_at);
+    assert.ok(review.completed_at === null || review.completed_at <= review.published_at);
     assert.ok(review.published_at <= review.updated_at);
     assert.ok(review.facts_verified_at >= review.published_at);
     assert.ok(review.syllabus_verified_at >= review.published_at);
@@ -131,7 +132,7 @@ test('hub statically renders every record with one canonical identity', () => {
   assert.match(html, /<link rel="canonical" href="https:\/\/1200km\.com\/courses\/"/);
   assert.match(html, /<meta property="og:url" content="https:\/\/1200km\.com\/courses\/"/);
   assert.match(html, /data-pagefind-body/);
-  assert.match(html, /<label hidden><span>Topic<\/span>/);
+  assert.match(html, /<label><span>Topic<\/span>/);
   assert.match(html, /course-library\.css\?v=20260830-1/);
   assert.match(html, /course-library\.js\?v=20260830-1/);
   assert.match(html, /<meta property="og:image" content="https:\/\/1200km\.com\/assets\/site-og-v2\.png"/);
@@ -153,8 +154,8 @@ test('hub structured data distinguishes owned course, independent review, and le
   const graph = JSON.parse(source)['@graph'];
   assert.deepEqual(graph.map((entry) => entry['@type']), ['CollectionPage', 'ItemList', 'BreadcrumbList']);
   const items = graph.find((entry) => entry['@type'] === 'ItemList');
-  assert.equal(items.numberOfItems, 3);
-  assert.deepEqual(items.itemListElement.map((entry) => entry.item['@type']), ['Course', 'LearningResource', 'LearningResource']);
+  assert.equal(items.numberOfItems, 5);
+  assert.deepEqual(items.itemListElement.map((entry) => entry.item['@type']), ['Course', 'LearningResource', 'LearningResource', 'LearningResource', 'LearningResource']);
   assert.equal(items.itemListElement[1].item.about['@type'], 'Course');
   assert.equal(items.itemListElement[1].item.subjectOf['@type'], 'TechArticle');
   assert.equal(items.itemListElement[1].item.subjectOf.url, model.reviews[0].full_review_url);
