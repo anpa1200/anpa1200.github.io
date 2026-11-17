@@ -104,7 +104,10 @@ npm run check-release-source
 ```
 
 Refresh external contribution/repository statistics with
-`npm run update-validation`; that command also updates the contribution and
-release facts. Review the diff before committing. The separate
+`npm run update-validation`; that command refreshes repository/profile counters,
+authenticated clone observations, page dates, and sitemap dates. Contribution
+acceptance, PR review states, Kali requests, releases, archive counts, and the
+adoption-evidence inventory require a separate primary-source audit. Review the
+diff before committing. The separate
 `scripts/update-validation-and-push.sh` wrapper publishes changes and must only
 be used when a push is explicitly authorized.
