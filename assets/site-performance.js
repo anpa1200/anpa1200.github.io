@@ -7,6 +7,7 @@
   const enabled = Boolean(analyticsId) && window.location.pathname !== '/search.html';
   const affiliateLinks = new Map([
     ['https://training.trainsec.net/malware-analyst-professional-level-1/v6dfz', 'trainsec-malware-analyst-professional-level-1'],
+    ['https://training.trainsec.net/soc-analyst-professional-attack-and-defense/v6dfz', 'trainsec-soc-analyst-professional-attack-and-defense'],
   ]);
 
   // Docusaurus companions call window.gtag on every client-side route change,

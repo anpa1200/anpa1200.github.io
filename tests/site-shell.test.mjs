@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { runInNewContext } from 'node:vm';
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -99,4 +100,50 @@ test('Docusaurus and Threat Matrix retain native shells with explicit ecosystem 
   assert.doesNotMatch(workspace, /class="site-header"/, 'application workspace must not receive a competing global header');
   assert.match(workspace, /<noscript>[\s\S]*?href="https:\/\/1200km\.com\/adversarygraph\/"/);
   assert.match(workspace, /class="ag-web-project-intro[\s\S]*?href="https:\/\/1200km\.com\/adversarygraph\/"/);
+});
+
+test('GA counts only exact TrainSec affiliate links using the existing event schema', () => {
+  const source = readFileSync(join(ROOT, 'assets/site-performance.js'), 'utf8');
+  const domain = 'training.trainsec.net';
+  const oldLink = `https://${domain}/malware-analyst-professional-level-1/v6dfz`;
+  const reviewLink = `https://${domain}/soc-analyst-professional-attack-and-defense/v6dfz`;
+  class TestAnchor {
+    constructor(href) { this.href = href; }
+    closest(selector) { return selector === 'a[href]' ? this : null; }
+  }
+  function collect(pathname) {
+    const events = [];
+    let click;
+    const window = {
+      location: { pathname, href: `https://1200km.com${pathname}` },
+      gtag: (...args) => events.push(args),
+    };
+    const document = {
+      currentScript: { dataset: { googleAnalyticsId: 'G-TEST' } },
+      createElement: () => ({}),
+      head: { appendChild() {} },
+      addEventListener(name, listener) {
+        if (name === 'click') click = listener;
+      },
+    };
+    runInNewContext(source, { window, document, URL, Element: TestAnchor });
+    for (const href of [oldLink, reviewLink, reviewLink + '?extra=1',
+      reviewLink.replace('/v6dfz', ''), reviewLink.replace(domain, 'example.com')]) {
+      click({ target: new TestAnchor(href) });
+    }
+    return JSON.parse(JSON.stringify(events.filter(([kind]) => kind === 'event')));
+  }
+  assert.deepEqual(collect('/articles/'), [
+    ['event', 'affiliate_click', {
+      affiliate_id: 'trainsec-malware-analyst-professional-level-1',
+      link_domain: domain,
+      link_url: oldLink,
+    }],
+    ['event', 'affiliate_click', {
+      affiliate_id: 'trainsec-soc-analyst-professional-attack-and-defense',
+      link_domain: domain,
+      link_url: reviewLink,
+    }],
+  ]);
+  assert.deepEqual(collect('/search.html'), []);
 });
